@@ -1,0 +1,362 @@
+#include <sourcemod>
+
+#include <sdktools>
+#include <sdkhooks>
+
+#include <gokz>
+#include <movementapi>
+
+#undef REQUIRE_PLUGIN
+#include <gokz/core>
+
+#pragma newdecls required
+#pragma semicolon 1
+
+
+
+public Plugin myinfo = 
+{
+	name = "GOKZ Mode - SimpleKZ", 
+	author = "DanZay", 
+	description = "GOKZ Mode Module - SimpleKZ", 
+	version = "0.14.0", 
+	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+};
+
+#define DUCK_SPEED_MINIMUM 7.0
+#define PERF_TICKS 2
+#define PRE_VELMOD_MAX 1.104 // Calculated 276/250
+#define PRE_MINIMUM_DELTA_ANGLE 0.4
+#define PRE_VELMOD_INCREMENT 0.0014 // Per tick when prestrafing
+#define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
+#define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - calculated 0.104velmod/94ticks
+
+float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.4, 0.0 };
+bool gB_GOKZCore;
+ConVar gCV_ModeCVar[MODECVAR_COUNT];
+float gF_PreVelMod[MAXPLAYERS + 1];
+float gF_PreVelModLanding[MAXPLAYERS + 1];
+bool gB_PreTurningLeft[MAXPLAYERS + 1];
+int gI_OldButtons[MAXPLAYERS + 1];
+float gF_OldAngles[MAXPLAYERS + 1][3];
+
+
+
+// =========================  PLUGIN  ========================= //
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	RegPluginLibrary("gokz-mode-vanilla");
+	return APLRes_Success;
+}
+
+public void OnPluginStart()
+{
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
+	
+	CreateConVars();
+	
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
+	}
+}
+
+public void OnPluginEnd()
+{
+	if (gB_GOKZCore)
+	{
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, false);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
+	}
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	if (StrEqual(name, "gokz-core"))
+	{
+		gB_GOKZCore = false;
+	}
+}
+
+
+
+// =========================  CLIENT  ========================= //
+
+public void OnClientPostAdminCheck(int client)
+{
+	SDKHook(client, SDKHook_PreThinkPost, OnClientPreThink_Post);
+}
+
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	
+	KZPlayer player = new KZPlayer(client);
+	RemoveCrouchJumpBind(player, buttons);
+	TweakVelMod(player, angles);
+	gI_OldButtons[client] = buttons;
+	gF_OldAngles[client] = angles;
+}
+
+public void OnClientPreThink_Post(int client)
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	
+	// Don't tweak convars if GOKZ isn't running
+	if (gB_GOKZCore)
+	{
+		TweakConVars();
+	}
+}
+
+public void Movement_OnStartTouchGround(int client)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	KZPlayer player = new KZPlayer(client);
+	ReduceDuckSlowdown(player);
+	gF_PreVelModLanding[player.id] = gF_PreVelMod[player.id];
+}
+
+public void Movement_OnStopTouchGround(int client, bool jumped)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	KZPlayer player = new KZPlayer(client);
+	if (jumped)
+	{
+		TweakJump(player);
+	}
+	else if (gB_GOKZCore)
+	{
+		player.gokzHitPerf = false;
+		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+public void Movement_OnChangeMoveType(int client, MoveType newMoveType)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	KZPlayer player = new KZPlayer(client);
+	if (gB_GOKZCore && newMoveType == MOVETYPE_WALK)
+	{
+		player.gokzHitPerf = false;
+		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static bool IsUsingMode(int client)
+{
+	// If GOKZ core isn't loaded, then apply mode at all times
+	return !gB_GOKZCore || GOKZ_GetOption(client, Option_Mode) == Mode_SimpleKZ;
+}
+
+
+// CONVARS
+
+static void CreateConVars()
+{
+	gCV_ModeCVar[ModeCVar_Accelerate] = FindConVar("sv_accelerate");
+	gCV_ModeCVar[ModeCVar_Friction] = FindConVar("sv_friction");
+	gCV_ModeCVar[ModeCVar_AirAccelerate] = FindConVar("sv_airaccelerate");
+	gCV_ModeCVar[ModeCVar_LadderScaleSpeed] = FindConVar("sv_ladder_scale_speed");
+	gCV_ModeCVar[ModeCVar_MaxVelocity] = FindConVar("sv_maxvelocity");
+	gCV_ModeCVar[ModeCVar_Gravity] = FindConVar("sv_gravity");
+	gCV_ModeCVar[ModeCVar_EnableBunnyhopping] = FindConVar("sv_enablebunnyhopping");
+	gCV_ModeCVar[ModeCVar_AutoBunnyhopping] = FindConVar("sv_autobunnyhopping");
+	gCV_ModeCVar[ModeCVar_StaminaMax] = FindConVar("sv_staminamax");
+	gCV_ModeCVar[ModeCVar_StaminaLandCost] = FindConVar("sv_staminalandcost");
+	gCV_ModeCVar[ModeCVar_StaminaJumpCost] = FindConVar("sv_staminajumpcost");
+	gCV_ModeCVar[ModeCVar_StaminaRecoveryRate] = FindConVar("sv_staminarecoveryrate");
+	gCV_ModeCVar[ModeCVar_MaxSpeed] = FindConVar("sv_maxspeed");
+	gCV_ModeCVar[ModeCVar_WaterAccelerate] = FindConVar("sv_wateraccelerate");
+	gCV_ModeCVar[ModeCVar_TimeBetweenDucks] = FindConVar("sv_timebetweenducks");
+	gCV_ModeCVar[ModeCVar_AccelerateUseWeaponSpeed] = FindConVar("sv_accelerate_use_weapon_speed");
+	
+	// Remove these notify flags because these ConVars are being set constantly
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		gCV_ModeCVar[i].Flags &= ~FCVAR_NOTIFY;
+	}
+}
+
+static void TweakConVars()
+{
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		gCV_ModeCVar[i].FloatValue = gF_ModeCVarValues[i];
+	}
+}
+
+
+// VELOCITY MODIFIER
+
+static void TweakVelMod(KZPlayer player, const float angles[3])
+{
+	player.velocityModifier = CalcPrestrafeVelMod(player, angles) * CalcWeaponVelMod(player);
+}
+
+static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
+{
+	// If player is in mid air, decrement their velocity modifier
+	if (!player.onGround)
+	{
+		gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT_MIDAIR;
+	}
+	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier
+	else if (FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE
+		 && ((player.buttons & IN_FORWARD && !(player.buttons & IN_BACK)) || (!(player.buttons & IN_FORWARD) && player.buttons & IN_BACK))
+		 && ((player.buttons & IN_MOVELEFT && !(player.buttons & IN_MOVERIGHT)) || (!(player.buttons & IN_MOVELEFT) && player.buttons & IN_MOVERIGHT)))
+	{
+		// If player changes their prestrafe direction, reset it
+		if (player.turningLeft && !gB_PreTurningLeft[player.id] || player.turningRight && gB_PreTurningLeft[player.id])
+		{
+			gF_PreVelMod[player.id] = 1.0;
+		}
+		gB_PreTurningLeft[player.id] = player.turningLeft;
+		gF_PreVelMod[player.id] += PRE_VELMOD_INCREMENT;
+	}
+	else
+	{
+		gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT;
+	}
+	
+	// Keep prestrafe velocity modifier within range
+	if (gF_PreVelMod[player.id] < 1.0)
+	{
+		gF_PreVelMod[player.id] = 1.0;
+	}
+	else if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX)
+	{
+		gF_PreVelMod[player.id] = PRE_VELMOD_MAX;
+	}
+	
+	return gF_PreVelMod[player.id];
+}
+
+static float CalcWeaponVelMod(KZPlayer player)
+{
+	int weaponEnt = GetEntPropEnt(player.id, Prop_Data, "m_hActiveWeapon");
+	if (!IsValidEntity(weaponEnt))
+	{
+		return SPEED_NORMAL / SPEED_NO_WEAPON; // Weapon entity not found, so no weapon
+	}
+	
+	char weaponName[64];
+	GetEntityClassname(weaponEnt, weaponName, sizeof(weaponName)); // Weapon the client is holding
+	
+	// Get weapon speed and work out how much to scale the modifier
+	int weaponCount = sizeof(gC_WeaponNames);
+	for (int weaponID = 0; weaponID < weaponCount; weaponID++)
+	{
+		if (StrEqual(weaponName, gC_WeaponNames[weaponID]))
+		{
+			return SPEED_NORMAL / gI_WeaponRunSpeeds[weaponID];
+		}
+	}
+	
+	return 1.0; // If weapon isn't found (new weapon?)
+}
+
+
+
+// JUMPING
+
+static void TweakJump(KZPlayer player)
+{
+	if (player.takeoffTick - player.landingTick <= PERF_TICKS)
+	{
+		if (!player.hitPerf || player.takeoffSpeed > SPEED_NORMAL)
+		{
+			float velocity[3], baseVelocity[3], newVelocity[3];
+			player.GetVelocity(velocity);
+			player.GetBaseVelocity(baseVelocity);
+			player.GetLandingVelocity(newVelocity);
+			newVelocity[2] = velocity[2];
+			SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
+			AddVectors(newVelocity, baseVelocity, newVelocity);
+			player.SetVelocity(newVelocity);
+			// Restore prestrafe lost due to briefly being on the ground
+			gF_PreVelMod[player.id] = gF_PreVelModLanding[player.id];
+			if (gB_GOKZCore)
+			{
+				player.gokzHitPerf = true;
+				player.gokzTakeoffSpeed = player.speed;
+			}
+		}
+		else if (gB_GOKZCore)
+		{
+			player.gokzHitPerf = true;
+			player.gokzTakeoffSpeed = player.takeoffSpeed;
+		}
+	}
+	else if (gB_GOKZCore)
+	{
+		player.gokzHitPerf = false;
+		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+// Takeoff speed assuming player has met the conditions to need tweaking
+static float CalcTweakedTakeoffSpeed(KZPlayer player)
+{
+	// Formula
+	if (player.landingSpeed > SPEED_NORMAL)
+	{
+		return FloatMin(player.landingSpeed, (0.2 * player.landingSpeed + 200) * gF_PreVelModLanding[player.id]);
+	}
+	return player.landingSpeed;
+}
+
+
+
+// OTHER
+
+static void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
+{
+	if (player.onGround && buttons & IN_JUMP && !(gI_OldButtons[player.id] & IN_JUMP) && !(gI_OldButtons[player.id] & IN_DUCK))
+	{
+		buttons &= ~IN_DUCK;
+	}
+}
+
+static void ReduceDuckSlowdown(KZPlayer player)
+{
+	if (player.duckSpeed < DUCK_SPEED_MINIMUM)
+	{
+		player.duckSpeed = DUCK_SPEED_MINIMUM;
+	}
+} 

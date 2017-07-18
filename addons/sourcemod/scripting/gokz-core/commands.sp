@@ -1,0 +1,329 @@
+/*
+	Commands
+	
+	Commands for player and admin use.
+*/
+
+
+
+static char radioCommands[][] = 
+{
+	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
+	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
+	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
+	"enemydown", "compliment", "thanks", "cheer"
+};
+
+
+
+// =========================  PUBLIC  ========================= //
+
+void CreateCommands()
+{
+	RegConsoleCmd("sm_menu", CommandToggleMenu, "[KZ] Toggle the visibility of the teleport menu.");
+	RegConsoleCmd("sm_checkpoint", CommandMakeCheckpoint, "[KZ] Set a checkpoint.");
+	RegConsoleCmd("sm_gocheck", CommandTeleportToCheckpoint, "[KZ] Teleport to your current checkpoint.");
+	RegConsoleCmd("sm_prev", CommandPrevCheckpoint, "[KZ] Go back a checkpoint.");
+	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
+	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
+	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
+	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
+	RegConsoleCmd("sm_pause", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
+	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
+	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
+	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
+	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
+	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
+	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open up the options menu.");
+	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
+	RegConsoleCmd("sm_speed", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
+	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
+	RegConsoleCmd("sm_measure", CommandMeasureMenu, "[KZ] Open the measurement menu.");
+	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
+	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
+	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
+	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
+	RegConsoleCmd("sm_mode", CommandMode, "[KZ] Open the movement mode selection menu.");
+	RegConsoleCmd("sm_vanilla", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
+	RegConsoleCmd("sm_v", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
+	RegConsoleCmd("sm_simplekz", CommandSimpleKZ, "[KZ] Switch to the SimpleKZ mode.");
+	RegConsoleCmd("sm_s", CommandSimpleKZ, "[KZ] Switch to the SimpleKZ mode.");
+	RegConsoleCmd("sm_kztimer", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
+	RegConsoleCmd("sm_k", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
+}
+
+void CreateCommandListeners()
+{
+	AddCommandListener(CommandJoinTeam, "jointeam");
+	for (int i = 0; i < sizeof(radioCommands); i++)
+	{
+		AddCommandListener(CommandBlock, radioCommands[i]);
+	}
+}
+
+
+
+// =========================  COMMAND HANDLERS  ========================= //
+
+public Action CommandBlock(int client, const char[] command, int argc)
+{
+	return Plugin_Handled;
+}
+
+public Action CommandJoinTeam(int client, const char[] command, int argc)
+{
+	char teamString[4];
+	GetCmdArgString(teamString, sizeof(teamString));
+	int team = StringToInt(teamString);
+	JoinTeam(client, team);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleMenu(int client, int args)
+{
+	CycleOption(client, Option_ShowingTPMenu, true);
+	return Plugin_Handled;
+}
+
+public Action CommandMakeCheckpoint(int client, int args)
+{
+	GOKZ_MakeCheckpoint(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandTeleportToCheckpoint(int client, int args)
+{
+	GOKZ_TeleportToCheckpoint(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandPrevCheckpoint(int client, int args)
+{
+	GOKZ_PrevCheckpoint(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandNextCheckpoint(int client, int args)
+{
+	GOKZ_NextCheckpoint(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandUndoTeleport(int client, int args)
+{
+	GOKZ_UndoTeleport(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandTeleportToStart(int client, int args)
+{
+	GOKZ_TeleportToStart(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandTogglePause(int client, int args)
+{
+	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
+	{
+		JoinTeam(client, CS_TEAM_CT);
+	}
+	else
+	{
+		TogglePause(client);
+	}
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandStopTimer(int client, int args)
+{
+	if (TimerStop(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Time Stopped");
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandStopSound(int client, int args)
+{
+	StopSounds(client);
+	return Plugin_Handled;
+}
+
+public Action CommandGoto(int client, int args)
+{
+	// If no arguments, respond with error message
+	if (args < 1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Didn't Specify Player)");
+		GOKZ_PlayErrorSound(client);
+	}
+	// Otherwise try to teleport to the player
+	else
+	{
+		char specifiedPlayer[MAX_NAME_LENGTH];
+		GetCmdArg(1, specifiedPlayer, sizeof(specifiedPlayer));
+		
+		int target = FindTarget(client, specifiedPlayer, false, false);
+		if (target != -1)
+		{
+			if (target == client)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Not Yourself)");
+				GOKZ_PlayErrorSound(client);
+			}
+			else if (!IsPlayerAlive(target))
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Dead)");
+				GOKZ_PlayErrorSound(client);
+			}
+			else
+			{
+				GotoPlayer(client, target);
+				if (GetTimerRunning(client))
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
+					GOKZ_StopTimer(client);
+				}
+			}
+		}
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandSpec(int client, int args)
+{
+	// If no arguments, just join spectators
+	if (args < 1)
+	{
+		JoinTeam(client, CS_TEAM_SPECTATOR);
+	}
+	// Otherwise try to spectate the player
+	else
+	{
+		char specifiedPlayer[MAX_NAME_LENGTH];
+		GetCmdArg(1, specifiedPlayer, sizeof(specifiedPlayer));
+		
+		int target = FindTarget(client, specifiedPlayer, false, false);
+		if (target != -1)
+		{
+			if (target == client)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Spectate Failure (Not Yourself)");
+				GOKZ_PlayErrorSound(client);
+			}
+			else if (!IsPlayerAlive(target))
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Spectate Failure (Dead)");
+				GOKZ_PlayErrorSound(client);
+			}
+			else
+			{
+				JoinTeam(client, CS_TEAM_SPECTATOR);
+				SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+				SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", target);
+			}
+		}
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandOptions(int client, int args)
+{
+	DisplayOptionsMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleShowPlayers(int client, int args)
+{
+	CycleOption(client, Option_ShowingPlayers, true);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleInfoPanel(int client, int args)
+{
+	CycleOption(client, Option_ShowingInfoPanel, true);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleShowWeapon(int client, int args)
+{
+	CycleOption(client, Option_ShowingWeapon, true);
+	return Plugin_Handled;
+}
+
+public Action CommandMeasureMenu(int client, int args)
+{
+	DisplayMeasureMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandPistolMenu(int client, int args)
+{
+	DisplayPistolMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleNoclip(int client, int args)
+{
+	ToggleNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandEnableNoclip(int client, int args)
+{
+	Movement_SetMoveType(client, MOVETYPE_NOCLIP);
+	return Plugin_Handled;
+}
+
+public Action CommandDisableNoclip(int client, int args)
+{
+	Movement_SetMoveType(client, MOVETYPE_WALK);
+	return Plugin_Handled;
+}
+
+public Action CommandMode(int client, int args)
+{
+	DisplayModeMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandVanilla(int client, int args)
+{
+	SwitchToModeIfAvailable(client, Mode_Vanilla);
+	return Plugin_Handled;
+}
+
+public Action CommandSimpleKZ(int client, int args)
+{
+	SwitchToModeIfAvailable(client, Mode_SimpleKZ);
+	return Plugin_Handled;
+}
+
+public Action CommandKZTimer(int client, int args)
+{
+	SwitchToModeIfAvailable(client, Mode_KZTimer);
+	return Plugin_Handled;
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static void SwitchToModeIfAvailable(int client, int mode)
+{
+	if (!GOKZ_GetModeLoaded(mode))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", gC_ModeNames[mode]);
+	}
+	else
+	{
+		SetOption(client, Option_Mode, mode, true);
+	}
+} 

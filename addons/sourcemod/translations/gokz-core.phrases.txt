@@ -1,0 +1,432 @@
+"Phrases"
+{
+	// General
+	"Mode - Vanilla"
+	{
+		"en"		"Vanilla"
+	}
+	"Mode - SimpleKZ"
+	{
+		"en"		"SimpleKZ"
+	}
+	"Mode - KZTimer"
+	{
+		"en"		"KZTimer"
+	}
+	"Time Type - NUB"
+	{
+		"en"		"NUB"
+	}
+	"Time Type - PRO"
+	{
+		"en"		"PRO"
+	}
+
+	// General Chat Messages ////////////////////////////////////////////////////////////
+	"Beat Map (NUB)"
+	{
+		// Bill finished in NUB 01:23.45 [Mode]
+		"#format"	"{1:N},{2:s},{3:t}"
+		"en"		"{lime}{1} {grey}finished in {yellow}NUB {default}{2} {grey}[{purple}{3}{grey}]"
+	}
+	"Beat Map (PRO)"
+	{
+		// Bill finished in PRO 01:23.45 [Mode]
+		"#format"	"{1:N},{2:s},{3:t}"
+		"en"		"{lime}{1} {grey}finished in {blue}PRO {default}{2} {grey}[{purple}{3}{grey}]"
+	}
+	"Beat Bonus (NUB)"
+	{
+		// Bill finished Bonus 1 in NUB 01:23.45 [Mode]
+		"#format"	"{1:N},{2:d},{3:s},{4:t}"
+		"en"		"{lime}{1} {grey}finished {bluegrey}Bonus {2} {grey}in {yellow}NUB {default}{3} {grey}[{purple}{4}{grey}]"
+	}
+	"Beat Bonus (PRO)"
+	{
+		// Bill finished Bonus 1 in PRO 01:23.45 [Mode]
+		"#format"	"{1:N},{2:d},{3:s},{4:t}"
+		"en"		"{lime}{1} {grey}finished {bluegrey}Bonus {2} {grey}in {blue}PRO {default}{3} {grey}[{purple}{4}{grey}]"
+	}
+	"Time Stopped"
+	{
+		"en"		"{darkred}Your timer has stopped."
+	}
+	"Time Stopped (Noclipped)"
+	{
+		"en"		"{darkred}Your timer has stopped because you noclipped."	
+	}
+	"Time Stopped (Goto)"
+	{
+		"en"		"{darkred}Your timer has stopped because you used !goto."
+	}
+	"Time Stopped (Changed Mode)"
+	{
+		"en"		"{darkred}Your timer has stopped because you switched mode."
+	}
+	"Client Connection Message"
+	{
+		// Bill has joined the server.
+		"#format"	"{1:N}"
+		"en"		"{lime}{1}{grey} has joined the server."
+	}
+	"Client Disconnection Message"
+	{
+		// Bill has left the server (Disconnect).
+		"#format"	"{1:N},{2:s}"
+		"en"		"{lime}{1}{grey} has left the server ({2})."
+	}
+	"Database Not Connected"
+	{
+		"en"		"{grey}This server isn't connected to a {default}SimpleKZ{grey} database."
+	}
+	
+	
+	// Command Chat Messages ////////////////////////////////////////////////////////////
+	"Must Be Alive"
+	{
+		"en"		"{darkred}You must be alive to do that."
+	}
+	"Make Checkpoint"
+	{
+		"en"		"{grey}You have set a checkpoint."
+	}
+	"Can't Checkpoint (Midair)"
+	{
+		"en"		"{darkred}You can't make a checkpoint mid-air."
+	}
+	"Can't Checkpoint (Just Landed)"
+	{
+		"en"		"{darkred}You can't make a checkpoint because you just landed."
+	}
+	"Can't Teleport (No Checkpoints)"
+	{
+		"en"		"{darkred}You can't teleport because you have not set a checkpoint."
+	}
+	"Can't Teleport (Map)"
+	{
+		"en"		"{darkred}You can't teleport to your checkpoint in this area."
+	}
+	"Can't Prev CP (No Checkpoints)"
+	{
+		"en"		"{darkred}You have no checkpoints to go back to."
+	}
+	"Can't Next CP (No Checkpoints)"
+	{
+		"en"		"{darkred}You have no checkpoints to go forward to."
+	}
+	"Can't Undo (No Teleports)"
+	{
+		"en"		"{darkred}You can't undo because there are no teleports to undo."
+	}
+	"Can't Undo (TP Was Midair)"
+	{
+		"en"		"{darkred}You can't undo because you teleported mid-air."
+	}
+	"Can't Undo (Just Landed)"
+	{
+		"en"		"{darkred}You can't undo because you had just landed."
+	}
+	"Can't Pause (Just Resumed)"
+	{
+		"en"		"{darkred}You can't pause because you just resumed."
+	}
+	"Can't Pause (Midair)"
+	{
+		"en"		"{darkred}You can't pause in mid-air."
+	}
+	"Can't Resume (Just Paused)"
+	{
+		"en"		"{darkred}You can't resume because you just paused."
+	}
+	"Stopped Sounds"
+	{
+		"en"		"{grey}You have stopped all sounds."
+	}
+	"Goto Success"
+	{
+		// You have teleported to Bill.
+		"#format"	"{1:N}"
+		"en"		"{grey}You have teleported to {lime}{1}{grey}."
+	}
+	"Goto Failure (Didn't Specify Player)"
+	{
+		"en"		"{darkred}Please specify a player to go to."
+	}
+	"Goto Failure (Not Yourself)"
+	{
+		"en"		"{darkred}You can't teleport to yourself."
+	}
+	"Goto Failure (Dead)"
+	{
+		"en"		"{darkred}The player you specified is not alive."
+	}
+	"Spectate Failure (Not Yourself)"
+	{
+		"en"		"{darkred}You can't spectate yourself."
+	}
+	"Spectate Failure (Dead)"
+	{
+		"en"		"{darkred}The player you specified is not alive."
+	}
+	"Measure Result"
+	{
+		// Distance - Horizontal: 123.45, Vertical: 12.34.
+		"#format"	"{1:.2f},{2:.2f}"
+		"en"		"{default}Distance{grey} - Horizontal: {default}{1}{grey}, Vertical: {default}{2}{grey}"
+	}
+	"Measure Failure (Points Not Set)"
+	{
+		"en"		"{darkred}You must set both points to measure a distance."
+	}
+	"Measure Failure (Not Aiming at Solid)"
+	{
+		"en"		"{darkred}You are not aiming at anything solid!"
+	}
+	"Switched Mode"
+	{
+		// You have switched to the Vanilla mode.
+		"#format"	"{1:t}"
+		"en"		"{grey}You have switched to the {purple}{1} {grey}mode."
+	}
+	"Mode Not Available"
+	{
+		// The Vanilla mode is currently not available.
+		"#format"	"{1:t}"
+		"en"		"{grey}The {purple}{1} {grey}mode is currently not available."
+	}
+	
+	
+	// Option Change Chat Messages ////////////////////////////////////////////////////////////
+	"Option - Teleport Menu - Enable"
+	{
+		"en"		"{grey}Your teleport menu has been enabled."
+	}
+	"Option - Teleport Menu - Disable"
+	{
+		"en"		"{grey}Your teleport menu has been disabled."
+	}
+	"Option - Show Players - Enable"
+	{
+		"en"		"{grey}You are now showing other players."
+	}
+	"Option - Show Players - Disable"
+	{
+		"en"		"{grey}You are now hiding other players."
+	}
+	"Option - Info Panel - Enable"
+	{
+		"en"		"{grey}Your centre information panel has been enabled."
+	}
+	"Option - Info Panel - Disable"
+	{
+		"en"		"{grey}Your centre information panel has been disabled."
+	}
+	"Option - Show Weapon - Enable"
+	{
+		"en"		"{grey}You are now showing your weapon."
+	}
+	"Option - Show Weapon - Disable"
+	{
+		"en"		"{grey}You are now hiding your weapon."
+	}
+	"Option - Auto Restart - Enable"
+	{
+		"en"		"{grey}Your timer will now restart when you teleport to start."
+	}
+	"Option - Auto Restart - Disable"
+	{
+		"en"		"{grey}Your timer will no longer restart you teleport to start."
+	}
+	"Option - Slay On End - Enable"
+	{
+		"en"		"{grey}You will now be slain after finishing a time. This helps de-glitch your demo recordings."
+	}
+	"Option - Slay On End - Disable"
+	{
+		"en"		"{grey}You will no longer be slain after finishing a time."
+	}
+	
+	
+	// Info Panel Text ////////////////////////////////////////////////////////////
+	"Info Panel Text - Time"
+	{
+		"en"		"Time"
+	}
+	"Info Panel Text - Stopped"
+	{
+		"en"		"Stopped"
+	}
+	"Info Panel Text - PAUSED"
+	{
+		"en"		"PAUSED"
+	}
+	"Info Panel Text - Speed"
+	{
+		"en"		"Speed"
+	}
+	"Info Panel Text - Keys"
+	{
+		"en"		"Keys"
+	}
+	
+	
+	// Teleport Menu ////////////////////////////////////////////////////////////
+	"TP Menu - Checkpoint"
+	{
+		"en"		"Checkpoint"
+	}
+	"TP Menu - Teleport"
+	{
+		"en"		"Teleport"
+	}
+	"TP Menu - Prev CP"
+	{
+		"en"		"Prev CP"
+	}
+	"TP Menu - Next CP"
+	{
+		"en"		"Next CP"
+	}
+	"TP Menu - Undo TP"
+	{
+		"en"		"Undo TP"
+	}
+	"TP Menu - Pause"
+	{
+		"en"		"Pause"
+	}
+	"TP Menu - Resume"
+	{
+		"en"		"Resume"
+	}
+	"TP Menu - Restart"
+	{
+		"en"		"Restart"
+	}
+	"TP Menu - Respawn"
+	{
+		"en"		"Respawn"
+	}
+	
+	// Mode Menu ////////////////////////////////////////////////////////////
+	"Mode Menu - Title"
+	{
+		"en"		"Switch Modes"
+	}
+	
+	// Measure Menu ////////////////////////////////////////////////////////////
+	"Measure Menu - Title"
+	{
+		"en"		"Measure"
+	}
+	"Measure Menu - Point A"
+	{
+		"en"		"Point A (Green)"
+	}
+	"Measure Menu - Point B"
+	{
+		"en"		"Point B (Red)"
+	}
+	"Measure Menu - Get Distance"
+	{
+		"en"		"Get Distance"
+	}
+	
+	
+	// Pistol Menu ////////////////////////////////////////////////////////////
+	"Pistol Menu - Title"
+	{
+		"en"		"Pick a Pistol"
+	}
+	
+	
+	// Options Menu ////////////////////////////////////////////////////////////
+	"Options Menu - Title"
+	{
+		"en"		"Options"
+	}
+	"Options Menu - Enabled"
+	{
+		"en"		"Enabled"
+	}
+	"Options Menu - Disabled"
+	{
+		"en"		"Disabled"
+	}
+	"Options Menu - Top"
+	{
+		"en"		"Top"
+	}
+	"Options Menu - Bottom"
+	{
+		"en"		"Bottom"
+	}
+	"Options Menu - Bottom"
+	{
+		"en"		"Bottom"
+	}
+	"Options Menu - Always"
+	{
+		"en"		"Always"
+	}
+	"Options Menu - Spectating"
+	{
+		"en"		"Spectating"
+	}
+	"Options Menu - Teleport Menu"
+	{
+		"en"		"Teleport menu"
+	}
+	"Options Menu - Info Panel"
+	{
+		"en"		"Centre panel"
+	}
+	"Options Menu - Show Players"
+	{
+		"en"		"Show players"
+	}
+	"Options Menu - Show Weapon"
+	{
+		"en"		"Show weapon"
+	}
+	"Options Menu - Show Keys"
+	{
+		"en"		"Show key presses"
+	}
+	"Options Menu - Auto Restart"
+	{
+		"en"		"Auto restart"
+	}
+	"Options Menu - Slay On End"
+	{
+		"en"		"End timer slay"
+	}
+	"Options Menu - Pistol"
+	{
+		"en"		"Pistol"
+	}
+	"Options Menu - Checkpoint Messages"
+	{
+		"en"		"Checkpoint messages"
+	}
+	"Options Menu - Checkpoint Sounds"
+	{
+		"en"		"Checkpoint sounds"
+	}
+	"Options Menu - Teleport Sounds"
+	{
+		"en"		"Teleport sounds"
+	}
+	"Options Menu - Error Sounds"
+	{
+		"en"		"Error sounds"
+	}
+	"Options Menu - Timer Text"
+	{
+		"en"		"Timer text"
+	}
+	"Options Menu - Speed Text"
+	{
+		"en"		"Speed text"
+	}
+}
