@@ -26,25 +26,25 @@
 	"Beat Map (NUB)"
 	{
 		// Bill finished in NUB 01:23.45 [Mode]
-		"#format"	"{1:N},{2:s},{3:t}"
+		"#format"	"{1:N},{2:s},{3:s}"
 		"en"		"{lime}{1} {grey}finished in {yellow}NUB {default}{2} {grey}[{purple}{3}{grey}]"
 	}
 	"Beat Map (PRO)"
 	{
 		// Bill finished in PRO 01:23.45 [Mode]
-		"#format"	"{1:N},{2:s},{3:t}"
+		"#format"	"{1:N},{2:s},{3:s}"
 		"en"		"{lime}{1} {grey}finished in {blue}PRO {default}{2} {grey}[{purple}{3}{grey}]"
 	}
 	"Beat Bonus (NUB)"
 	{
 		// Bill finished Bonus 1 in NUB 01:23.45 [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:s}"
 		"en"		"{lime}{1} {grey}finished {bluegrey}Bonus {2} {grey}in {yellow}NUB {default}{3} {grey}[{purple}{4}{grey}]"
 	}
 	"Beat Bonus (PRO)"
 	{
 		// Bill finished Bonus 1 in PRO 01:23.45 [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:s}"
 		"en"		"{lime}{1} {grey}finished {bluegrey}Bonus {2} {grey}in {blue}PRO {default}{3} {grey}[{purple}{4}{grey}]"
 	}
 	"Time Stopped"
@@ -185,13 +185,13 @@
 	"Switched Mode"
 	{
 		// You have switched to the Vanilla mode.
-		"#format"	"{1:t}"
+		"#format"	"{1:s}"
 		"en"		"{grey}You have switched to the {purple}{1} {grey}mode."
 	}
 	"Mode Not Available"
 	{
 		// The Vanilla mode is currently not available.
-		"#format"	"{1:t}"
+		"#format"	"{1:s}"
 		"en"		"{grey}The {purple}{1} {grey}mode is currently not available."
 	}
 	

@@ -5,13 +5,13 @@
 	{
 		// Your search for player 'Bill' returned with no results.
 		"#format"	"{1:s}"
-		"en"		"{grey}Your search for player '{default}{1}{grey}' returned with no results."
+		"en"		"{grey}Your search for player '{default}{1}{grey}' returned no results."
 	}
 	"Map Not Found"
 	{
 		// Your search for map 'kz_fakemap' returned with no results.
 		"#format"	"{1:s}"
-		"en"		"{grey}Your search for map '{default}{1}{grey}' returned with no results."
+		"en"		"{grey}Your search for map '{default}{1}{grey}' returned no results."
 	}
 	"Main Course Not Found"
 	{
@@ -31,6 +31,14 @@
 		"#format"	"{1:s}"
 		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
 	}
+	"No Times Found"
+	{
+		"en"		"{grey}No times were found!"
+	}
+	"No Times Found (PRO)"
+	{
+		"en"		"{grey}No {blue}PRO{grey} times were found!"
+	}
 	"No Ranked Maps"
 	{
 		"en"		"{grey}This server hasn't set any maps to be ranked."
@@ -38,121 +46,121 @@
 	"New Record (NUB)"
 	{
 		// Bill set a new NUB RECORD [Mode]!
-		"#format"	"{1:N},{2:t}"
+		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {yellow}NUB RECORD {grey}[{purple}{2}{grey}]"
 	}
 	"New Record (PRO)"
 	{
 		// Bill set a new PRO RECORD [Mode]!
-		"#format"	"{1:N},{2:t}"
+		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {blue}PRO RECORD {grey}[{purple}{2}{grey}]"
 	}
 	"New Record (NUB and PRO)"
 	{
 		// Bill set a new NUB/PRO RECORD [Mode]!
-		"#format"	"{1:N},{2:t}"
+		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {yellow}NUB{grey}/{blue}PRO RECORD{grey} [{purple}{2}{grey}]"
 	}
 	"New Bonus Record (NUB)"
 	{
 		// Bill set a new Bonus 1 NUB RECORD [Mode]!
-		"#format"	"{1:N},{2:d},{3:t}"
+		"#format"	"{1:N},{2:d},{3:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {yellow}NUB RECORD{grey} [{purple}{3}{grey}]"
 	}
 	"New Bonus Record (PRO)"
 	{
 		// Bill set a new Bonus 1 PRO RECORD [Mode]!
-		"#format"	"{1:N},{2:d},{3:t}"
+		"#format"	"{1:N},{2:d},{3:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {blue}PRO RECORD{grey} [{purple}{3}{grey}]"
 	}
 	"New Bonus Record (NUB and PRO)"
 	{
 		// Bill set a new Bonus 1 NUB/PRO RECORD [Mode]!
-		"#format"	"{1:N},{2:d},{3:d},{4:t}"
+		"#format"	"{1:N},{2:d},{3:d},{4:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {yellow}NUB{grey}/{blue}PRO RECORD{grey} [{purple}{4}{grey}]"
 	}
 	"New Time - First Time"
 	{
 		// Bill finished in NUB 01:23.45 [#2/5] [Mode]
-		"#format"	"{1:N},{2:s},{3:d},{4:d},{5:t}"
+		"#format"	"{1:N},{2:s},{3:d},{4:d},{5:s}"
 		"en"		"{lime}{1}{grey} finished in {yellow}NUB {default}{2} {grey}[#{default}{3}{grey}/{default}{4}{grey}] [{purple}{5}{grey}]"
 	}
 	"New Time - Beat PB"
 	{
 		// Bill finished in NUB 01:23.45 (-00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:t}"
+		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:s}"
 		"en"		"{lime}{1}{grey} finished in {yellow}NUB {default}{2} {grey}({green}-{3}{grey}) {grey}[#{default}{4}{grey}/{default}{5}{grey}] [{purple}{6}{grey}]"
 	}
 	"New Time - Miss PB"
 	{
 		// Bill finished in NUB 01:23.45 (+00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:t}"
+		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:s}"
 		"en"		"{lime}{1}{grey} finished in {yellow}NUB {default}{2} {grey}({lightred}+{3}{grey}) {grey}[#{default}{4}{grey}/{default}{5}{grey}] [{purple}{6}{grey}]"
 	}
 	"New Time - First Time (PRO)"
 	{
 		// Bill finished in PRO 01:23.45 [#2/5] [Mode]
-		"#format"	"{1:N},{2:s},{3:d},{4:d},{5:t}"
+		"#format"	"{1:N},{2:s},{3:d},{4:d},{5:s}"
 		"en"		"{lime}{1}{grey} finished in {blue}PRO {default}{2} {grey}[#{default}{3}{grey}/{default}{4}{grey}] [{purple}{5}{grey}]"
 	}
 	"New Time - Beat PB (PRO)"
 	{
 		// Bill finished in PRO 01:23.45 (-00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:t}"
+		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:s}"
 		"en"		"{lime}{1}{grey} finished in {blue}PRO {default}{2} {grey}({green}-{3}{grey}) {grey}[#{default}{4}{grey}/{default}{5}{grey}] [{purple}{6}{grey}]"
 	}
 	"New Time - Miss PB (PRO)"
 	{
 		// Bill finished in PRO 01:23.45 (+00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:t}"
+		"#format"	"{1:N},{2:s},{3:s},{4:d},{5:d},{6:s}"
 		"en"		"{lime}{1}{grey} finished in {blue}PRO {default}{2} {grey}({lightred}+{3}{grey}) {grey}[#{default}{4}{grey}/{default}{5}{grey}] [{purple}{6}{grey}]"
 	}
 	"New Bonus Time - First Time"
 	{
 		// Bill finished Bonus 1 in NUB 01:23.45 [#2/5] [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:d},{5:d},{6:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:d},{5:d},{6:s}"
 		"en"		"{lime}{1}{grey} finished {bluegrey}Bonus {2} {grey}in {yellow}NUB {default}{3} {grey}[#{default}{4}{grey}/{default}{5}{grey}] [{purple}{6}{grey}]"
 	}
 	"New Bonus Time - Beat PB"
 	{
 		// Bill finished Bonus 1 in NUB 01:23.45 (-00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:s}"
 		"en"		"{lime}{1}{grey} finished {bluegrey}Bonus {2} {grey}in {yellow}NUB {default}{3} {grey}({green}-{4}{grey}) {grey}[#{default}{5}{grey}/{default}{6}{grey}] [{purple}{7}{grey}]"
 	}
 	"New Bonus Time - Miss PB"
 	{
 		// Bill finished Bonus 1 in NUB 01:23.45 (+00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:s}"
 		"en"		"{lime}{1}{grey} finished {bluegrey}Bonus {2} {grey}in {yellow}NUB {default}{3} {grey}({lightred}+{4}{grey}) {grey}[#{default}{5}{grey}/{default}{6}{grey}] [{purple}{7}{grey}]"
 	}
 	"New Bonus Time - First Time (PRO)"
 	{
 		// Bill finished Bonus 1 in PRO 01:23.45 [#2/5] [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:d},{5:d},{6:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:d},{5:d},{6:s}"
 		"en"		"{lime}{1}{grey} finished {bluegrey}Bonus {2} {grey}in {blue}PRO {default}{3} {grey}[#{default}{4}{grey}/{default}{5}{grey}] [{purple}{6}{grey}]"
 	}
 	"New Bonus Time - Beat PB (PRO)"
 	{
 		// Bill finished Bonus 1 in PRO 01:23.45 (-00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:s}"
 		"en"		"{lime}{1}{grey} finished {bluegrey}Bonus {2} {grey}in {blue}PRO {default}{3} {grey}({green}-{4}{grey}) {grey}[#{default}{5}{grey}/{default}{6}{grey}] [{purple}{7}{grey}]"
 	}
 	"New Bonus Time - Miss PB (PRO)"
 	{
 		// Bill finished Bonus 1 in PRO 01:23.45 (+00:12.34) [#2/5] [Mode]
-		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:t}"
+		"#format"	"{1:N},{2:d},{3:s},{4:s},{5:d},{6:d},{7:s}"
 		"en"		"{lime}{1}{grey} finished {bluegrey}Bonus {2} {grey}in {blue}PRO {default}{3} {grey}({lightred}+{4}{grey}) {grey}[#{default}{5}{grey}/{default}{6}{grey}] [{purple}{7}{grey}]"
 	}
 	"PB Header"
 	{	
 		// Bill on kz_map [Mode]
-		"#format"	"{1:s},{2:s},{3:t}"
+		"#format"	"{1:s},{2:s},{3:s}"
 		"en"		"{lime}{1}{grey} on {default}{2} {grey}[{purple}{3}{grey}]"
 	}
 	"PB Header (Bonus)"
 	{
 		// Bill on kz_map Bonus 1 [Mode]
-		"#format"	"{1:s},{2:s},{3:d},{4:t}"
+		"#format"	"{1:s},{2:s},{3:d},{4:s}"
 		"en"		"{lime}{1}{grey} on {default}{2} {bluegrey}Bonus {3} {grey}[{purple}{4}{grey}]"
 	}
 	"PB Time - No Times"
@@ -184,18 +192,14 @@
 	"WR Header"
 	{
 		// Server WRs on kz_map [Mode]
-		"#format"	"{1:s},{2:t}"
+		"#format"	"{1:s},{2:s}"
 		"en"		"{grey}Records on {default}{1} {grey}[{purple}{2}{grey}]"
 	}
 	"WR Header (Bonus)"
 	{
 		// Server WRs on kz_map Bonus 1 [Mode]
-		"#format"	"{1:s},{2:d},{3:t}"
+		"#format"	"{1:s},{2:d},{3:s}"
 		"en"		"{grey}Records on {default}{1} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
-	}
-	"WR No Times"
-	{
-		"en"		"{grey}No times found!"
 	}
 	"WR Time - NUB"
 	{
@@ -219,14 +223,6 @@
 	{
 		"en"		"{blue}PRO RECORD{grey}: None... yet."
 	}
-	"Map Top - No Times"
-	{
-		"en"		"{grey}No times were found."
-	}
-	"Map Top - No Times (PRO)"
-	{
-		"en"		"{grey}No {blue}PRO{grey} times were found."
-	}
 	"Player Top - No Times"
 	{
 		"en"		"{grey}No one has beaten a ranked map on this server... yet."
@@ -235,10 +231,38 @@
 	{
 		"en"		"{grey}No one has {blue}PRO{grey}'d a ranked map on this server... yet."
 	}
+	"Average Time Header"
+	{
+		// Average Times on kz_map [Mode]
+		"#format"	"{1:s},{2:s}"
+		"en"		"{grey}Average Times on {default}{1}{grey} {grey}[{purple}{2}{grey}]"
+	}
+	"Average Time Header (Bonus)"
+	{
+		// Average Times on kz_map Bonus 1 [Mode]
+		"#format"	"{1:s},{2:d},{3:s}"
+		"en"		"{grey}Average Times on {default}{1}{grey} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
+	}
+	"Average Time - NUB"
+	{
+		// NUB: 01:23.45 (22)
+		"#format"	"{1:s},{2:d}"
+		"en"		"{yellow}NUB{grey}: {default}{1} {grey}({default}{2}{grey})"
+	}
+	"Average Time - PRO"
+	{
+		// PRO: 01:23.45 (22)
+		"#format"	"{1:s},{2:d}"
+		"en"		"{blue}PRO{grey}: {default}{1} {grey}({default}{2}{grey})"
+	}
+	"Average Time - No PRO Time"
+	{
+		"en"		"{blue}PRO{grey}: None... yet."
+	}
 	"Map Completion"
 	{
-		// Bill has beaten 12/234 and PRO'd 6/234 maps, and has beaten 3/21 and PRO'd 1/21 bonuses [Vanilla].
-		"#format"	"{1:s},{2:d},{3:d},{4:d},{5:d},{6:d},{7:d},{8:d},{9:d},{10:t}"
+		// Bill has beaten 12/234 and PRO'd 6/234 maps, and has beaten 3/21 and PRO'd 1/21 bonuses [Mode].
+		"#format"	"{1:s},{2:d},{3:d},{4:d},{5:d},{6:d},{7:d},{8:d},{9:d},{10:s}"
 		"en"		"{lime}{1}{grey} has beaten {default}{2}{grey}/{default}{3}{grey} and {blue}PRO{grey}'d {default}{4}{grey}/{default}{5}{grey} maps, and has beaten {default}{6}{grey}/{default}{7}{grey} and {blue}PRO{grey}'d {default}{8}{grey}/{default}{9}{grey} bonuses [{purple}{10}{grey}]."
 	}
 
@@ -249,7 +273,7 @@
 		// Map - kz_map
 		// Mode - Vanilla
 		//
-		"#format"	"{1:s},{2:t}"
+		"#format"	"{1:s},{2:s}"
 		"en"		"Map - {1}\nMode - {2}\n "
 	}
 	"Map Top Menu - Title (Bonus)"
@@ -257,13 +281,13 @@
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
-		"#format"	"{1:s},{2:d},{3:t}"
+		"#format"	"{1:s},{2:d},{3:s}"
 		"en"		"Map - {1} (Bonus {2})\nMode - {3}\n "
 	}
 	"Map Top Menu - Top 20"
 	{
 		// Top 20 Pro
-		"#format"	"{1:t}"
+		"#format"	"{1:s}"
 		"en"		"Top 20 {1}"
 	}
 	"Map Top Submenu - Title"
@@ -273,7 +297,7 @@
 		// Map - kz_map
 		// Mode - Vanilla
 		//
-		"#format"	"{1:t},{2:s},{3:t}"
+		"#format"	"{1:s},{2:s},{3:s}"
 		"en"		"Top 20 {1} Times\n \nMap - {2}\nMode - {3}\n "	
 	}
 	"Map Top Submenu - Title (Bonus)"
@@ -283,7 +307,7 @@
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
-		"#format"	"{1:t},{2:s},{3:d},{4:t}"
+		"#format"	"{1:s},{2:s},{3:d},{4:s}"
 		"en"		"Top 20 {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
 	}
 
@@ -295,13 +319,13 @@
 		//
 		// Mode - Vanilla
 		//
-		"#format"	"{1:t}"
+		"#format"	"{1:s}"
 		"en"		"Top Record Holders\n \nMode - {1}\n "
 	}
 	"Player Top Menu - Top 20"
 	{
 		// Top 20 PRO
-		"#format"	"{1:t}"
+		"#format"	"{1:s}"
 		"en"		"Top 20 {1}"
 	}
 	"Player Top Submenu - Title"
@@ -310,7 +334,7 @@
 		//
 		// Mode - Vanilla
 		//
-		"#format"	"{1:t},{2:t}"
-		"en"		"Top 20 {1:t} Record Holders\n \nMode - {2}\n "
+		"#format"	"{1:s},{2:s}"
+		"en"		"Top 20 {1:s} Record Holders\n \nMode - {2}\n "
 	}
 }

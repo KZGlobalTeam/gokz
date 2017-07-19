@@ -53,6 +53,7 @@ int g_PlayerTopMode[MAXPLAYERS + 1];
 #include "gokz-localranks/database/open_maptop.sp"
 #include "gokz-localranks/database/open_maptop20.sp"
 #include "gokz-localranks/database/open_playertop20.sp"
+#include "gokz-localranks/database/print_average.sp"
 #include "gokz-localranks/database/print_pbs.sp"
 #include "gokz-localranks/database/print_records.sp"
 #include "gokz-localranks/database/process_new_time.sp"

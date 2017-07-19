@@ -113,7 +113,7 @@ public void DB_TxnSuccess_PrintRecords(Handle db, DataPack data, int numQueries,
 	// Print WR times to chat
 	if (!mapHasRecord)
 	{
-		CPrintToChat(client, "  %t", "WR No Times");
+		CPrintToChat(client, "  %t", "No Times Found");
 	}
 	else if (!mapHasRecordPro)
 	{

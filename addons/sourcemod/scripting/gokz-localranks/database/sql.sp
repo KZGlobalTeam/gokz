@@ -235,4 +235,22 @@ char sql_gettopplayers_pro[] =
 ..."INNER JOIN Players ON Players.SteamID32=RecordHolders.SteamID32 "
 ..."GROUP BY Players.Alias "
 ..."ORDER BY RecordCount DESC "
-..."LIMIT 20"; 
+..."LIMIT 20";
+
+char sql_getaverage[] = 
+"SELECT AVG(PBTime) "
+..."FROM "
+..."(SELECT MIN(Times.RunTime) AS PBTime "
+..."FROM Times "
+..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
+..."WHERE MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d "
+..."GROUP BY Times.SteamID32)";
+
+char sql_getaverage_pro[] = 
+"SELECT AVG(PBTime) "
+..."FROM "
+..."(SELECT MIN(Times.RunTime) AS PBTime "
+..."FROM Times "
+..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
+..."WHERE MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d AND Times.Teleports=0 "
+..."GROUP BY Times.SteamID32)"; 

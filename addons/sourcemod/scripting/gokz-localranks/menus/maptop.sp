@@ -28,7 +28,7 @@ void MapTopMenuDisplay(int client)
 	else
 	{
 		gH_MapTopMenu[client].SetTitle("%T", "Map Top Menu - Title (Bonus)", client, 
-			gC_MapTopMapName[client], gC_ModeNames[g_MapTopMode[client]]);
+			gC_MapTopMapName[client], gI_MapTopCourse[client], gC_ModeNames[g_MapTopMode[client]]);
 	}
 	MapTopMenuAddItems(client, gH_MapTopMenu[client]);
 	gH_MapTopMenu[client].Display(client, MENU_TIME_FOREVER);

@@ -77,8 +77,8 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 	{
 		switch (timeType)
 		{
-			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "Map Top - No Times");
-			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "Map Top - No Times (PRO)");
+			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "No Times Found");
+			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "No Times Found (PRO)");
 		}
 		MapTopMenuDisplay(client);
 		return;

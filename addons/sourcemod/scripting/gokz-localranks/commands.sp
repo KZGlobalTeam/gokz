@@ -15,6 +15,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_bpb", CommandBPB, "[KZ] Prints PB bonus times and ranks to chat. Usage: !bpb <#bonus> <map> <player>");
 	RegConsoleCmd("sm_wr", CommandWR, "[KZ] Prints map record times to chat. Usage: !wr <map>");
 	RegConsoleCmd("sm_bwr", CommandBWR, "[KZ] Prints bonus record times to chat. Usage: !bwr <#bonus> <map>");
+	RegConsoleCmd("sm_avg", CommandAVG, "[KZ] Prints the average map run time to chat. Usage !avg <map>");
+	RegConsoleCmd("sm_bavg", CommandBAVG, "[KZ] Prints the average bonus run time to chat. Usage !bavg <#bonus> <map>");
 	RegConsoleCmd("sm_pc", CommandPC, "[KZ] Prints map completion to chat. Usage: !pc <player>");
 	
 	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Updates the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
@@ -204,6 +206,59 @@ public Action CommandBWR(int client, int args)
 		if (bonus > 0)
 		{
 			DB_PrintRecords_FindMap(client, argMap, bonus, GOKZ_GetOption(client, Option_Mode));
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Bonus Number", argBonus);
+		}
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandAVG(int client, int args)
+{
+	if (args == 0)
+	{  // Print average times for current map and their current mode
+		DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetOption(client, Option_Mode));
+	}
+	else if (args >= 1)
+	{  // Print average times for specified map and their current mode
+		char argMap[33];
+		GetCmdArg(1, argMap, sizeof(argMap));
+		DB_PrintAverage_FindMap(client, argMap, 0, GOKZ_GetOption(client, Option_Mode));
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandBAVG(int client, int args)
+{
+	if (args == 0)
+	{  // Print Bonus 1 average times for current map and their current mode
+		DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetOption(client, Option_Mode));
+	}
+	else if (args == 1)
+	{  // Print specified Bonus # average times for current map and their current mode
+		char argBonus[4];
+		GetCmdArg(1, argBonus, sizeof(argBonus));
+		int bonus = StringToInt(argBonus);
+		if (bonus > 0)
+		{
+			DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetOption(client, Option_Mode));
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Bonus Number", argBonus);
+		}
+	}
+	else if (args >= 2)
+	{  // Print specified Bonus # average times for specified map and their current mode
+		char argBonus[4], argMap[33];
+		GetCmdArg(1, argBonus, sizeof(argBonus));
+		GetCmdArg(2, argMap, sizeof(argMap));
+		int bonus = StringToInt(argBonus);
+		if (bonus > 0)
+		{
+			DB_PrintAverage_FindMap(client, argMap, bonus, GOKZ_GetOption(client, Option_Mode));
 		}
 		else
 		{
