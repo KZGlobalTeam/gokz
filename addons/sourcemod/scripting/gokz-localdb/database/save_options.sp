@@ -33,6 +33,7 @@ void DB_SaveOptions(int client)
 		player.errorSounds, 
 		player.timerText, 
 		player.speedText, 
+		player.jumpBeam, 
 		GetSteamAccountID(client));
 	txn.AddQuery(query);
 	

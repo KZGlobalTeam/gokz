@@ -68,6 +68,7 @@ enum Option
 	Option_ErrorSounds, 
 	Option_TimerText, 
 	Option_SpeedText, 
+	Option_JumpBeam, 
 	OPTION_COUNT
 }
 
@@ -193,9 +194,19 @@ enum
 	SPEEDTEXT_COUNT
 }
 
+enum
+{
+	JumpBeam_Disabled = 0, 
+	JumpBeam_Feet, 
+	JumpBeam_Head, 
+	JumpBeam_FeetAndHead, 
+	JumpBeam_Ground, 
+	JUMPBEAM_COUNT
+}
 
 
-// =========================  TRANSLATION PHRASES  ========================= //
+
+// =========================  PHRASES  ========================= //
 
 stock char gC_ModeNames[MODE_COUNT][] = 
 {
@@ -978,6 +989,15 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 		public set(int value) {
 			this.SetOption(Option_SpeedText, value);
+		}
+	}
+	
+	property int jumpBeam {
+		public get() {
+			return this.GetOption(Option_JumpBeam);
+		}
+		public set(int value) {
+			this.SetOption(Option_JumpBeam, value);
 		}
 	}
 	

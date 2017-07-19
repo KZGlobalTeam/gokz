@@ -66,6 +66,7 @@ char sqlite_options_create[] =
 ..."ErrorSounds INTEGER NOT NULL DEFAULT '1', "
 ..."TimerText INTEGER NOT NULL DEFAULT '1', "
 ..."SpeedText INTEGER NOT NULL DEFAULT '1', "
+..."JumpBeam INTEGER NOT NULL DEFAULT '0', "
 ..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
@@ -88,6 +89,7 @@ char mysql_options_create[] =
 ..."ErrorSounds TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."TimerText TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."SpeedText TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."JumpBeam TINYINT UNSIGNED NOT NULL DEFAULT '0', "
 ..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
@@ -97,11 +99,11 @@ char sql_options_insert[] =
 
 char sql_options_update[] = 
 "UPDATE Options "
-..."SET Mode=%d, Style=%d, ShowingTeleportMenu=%d, ShowingInfoPanel=%d, ShowingKeys=%d, ShowingPlayers=%d, ShowingWeapon=%d, AutoRestart=%d, SlayOnEnd=%d, Pistol=%d, CheckpointMessages=%d, CheckpointSounds=%d, TeleportSounds=%d, ErrorSounds=%d, TimerText=%d, SpeedText=%d "
+..."SET Mode=%d, Style=%d, ShowingTeleportMenu=%d, ShowingInfoPanel=%d, ShowingKeys=%d, ShowingPlayers=%d, ShowingWeapon=%d, AutoRestart=%d, SlayOnEnd=%d, Pistol=%d, CheckpointMessages=%d, CheckpointSounds=%d, TeleportSounds=%d, ErrorSounds=%d, TimerText=%d, SpeedText=%d, JumpBeam=%d "
 ..."WHERE SteamID32=%d";
 
 char sql_options_get[] = 
-"SELECT Mode, Style, ShowingTeleportMenu, ShowingInfoPanel, ShowingKeys, ShowingPlayers, ShowingWeapon, AutoRestart, SlayOnEnd, Pistol, CheckpointMessages, CheckpointSounds, TeleportSounds, ErrorSounds, TimerText, SpeedText "
+"SELECT Mode, Style, ShowingTeleportMenu, ShowingInfoPanel, ShowingKeys, ShowingPlayers, ShowingWeapon, AutoRestart, SlayOnEnd, Pistol, CheckpointMessages, CheckpointSounds, TeleportSounds, ErrorSounds, TimerText, SpeedText, JumpBeam "
 ..."FROM Options "
 ..."WHERE SteamID32=%d";
 

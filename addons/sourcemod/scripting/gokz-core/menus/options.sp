@@ -31,6 +31,15 @@ static char PhrasesSpeedText[SPEEDTEXT_COUNT][] =
 	"Options Menu - Bottom"
 };
 
+static char PhrasesJumpBeam[JUMPBEAM_COUNT][] = 
+{
+	"Options Menu - Disabled", 
+	"Options Menu - Feet", 
+	"Options Menu - Head", 
+	"Options Menu - Feet and Head",
+	"Options Menu - Ground"
+};
+
 static char pistolNames[PISTOL_COUNT][] = 
 {
 	"P2000 / USP-S", 
@@ -96,6 +105,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 			}
 			case 12:CycleOption(param1, Option_AutoRestart, true);
 			case 13:CycleOption(param1, Option_SlayOnEnd, true);
+			case 14:CycleOption(param1, Option_JumpBeam);
 		}
 		if (param2 != 11) // Pistol
 		{
@@ -127,6 +137,7 @@ static void OptionsMenuUpdate(int client, Menu menu)
 	OptionsMenuAddPistol(client, menu);
 	OptionsMenuAddToggle(client, menu, Option_AutoRestart, "Options Menu - Auto Restart");
 	OptionsMenuAddToggle(client, menu, Option_SlayOnEnd, "Options Menu - Slay On End");
+	OptionsMenuAddJumpBeam(client, menu);
 }
 
 static void OptionsMenuAddToggle(int client, Menu menu, Option option, const char[] optionPhrase)
@@ -180,5 +191,14 @@ static void OptionsMenuAddSpeedText(int client, Menu menu)
 	FormatEx(temp, sizeof(temp), "%T - %T", 
 		"Options Menu - Speed Text", client, 
 		PhrasesSpeedText[GetOption(client, Option_SpeedText)], client);
+	menu.AddItem("", temp);
+}
+
+static void OptionsMenuAddJumpBeam(int client, Menu menu)
+{
+	char temp[32];
+	FormatEx(temp, sizeof(temp), "%T - %T", 
+		"Options Menu - Jump Beam", client, 
+		PhrasesJumpBeam[GetOption(client, Option_JumpBeam)], client);
 	menu.AddItem("", temp);
 } 

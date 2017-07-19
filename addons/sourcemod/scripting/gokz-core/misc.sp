@@ -402,4 +402,177 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 		GOKZ_PrintToChatAll(false, "{lime}%N{default} : %s", client, message);
 	}
 	return Plugin_Handled;
+}
+
+
+
+// =========================  VALID JUMP TRACKING  ========================= //
+
+static bool validJump[MAXPLAYERS + 1];
+
+bool GetValidJump(int client)
+{
+	return validJump[client];
+}
+
+void OnStopTouchGround_ValidJump(int client)
+{
+	if (Movement_GetMoveType(client) == MOVETYPE_WALK)
+	{
+		validJump[client] = true;
+	}
+}
+
+void OnChangeMoveType_ValidJump(int client, MoveType newMoveType)
+{
+	if (newMoveType != MOVETYPE_WALK)
+	{
+		validJump[client] = false;
+	}
+}
+
+void OnPlayerSpawn_ValidJump(int client)
+{
+	validJump[client] = false;
+}
+
+void OnPrevCheckpoint_ValidJump(int client)
+{
+	validJump[client] = false;
+}
+
+void OnNextCheckpoint_ValidJump(int client)
+{
+	validJump[client] = false;
+}
+
+void OnTeleportToCheckpoint_ValidJump(int client)
+{
+	validJump[client] = false;
+}
+
+void OnTeleportToStart_ValidJump(int client)
+{
+	validJump[client] = false;
+}
+
+void OnUndoTeleport_ValidJump(int client)
+{
+	validJump[client] = false;
+}
+
+
+
+// =========================  JUMP BEAM  ========================= //
+
+#define JUMP_BEAM_LIFETIME 4.0
+
+static int jumpBeam;
+
+void OnMapStart_JumpBeam()
+{
+	jumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
+}
+
+void OnPlayerRunCmd_JumpBeam(int client)
+{
+	static float oldOrigin[MAXPLAYERS + 1][3];
+	static bool oldDucking[MAXPLAYERS + 1];
+	KZPlayer player = new KZPlayer(client);
+	
+	if (!player.alive || player.jumpBeam == JumpBeam_Disabled
+		 || !GetValidJump(player.id) || player.onGround)
+	{
+		player.GetOrigin(oldOrigin[player.id]);
+		oldDucking[player.id] = player.ducking;
+		return;
+	}
+	
+	switch (player.jumpBeam)
+	{
+		case JumpBeam_Feet:SendFeetJumpBeam(player, oldOrigin[player.id]);
+		case JumpBeam_Head:SendHeadJumpBeam(player, oldOrigin[player.id], oldDucking[player.id]);
+		case JumpBeam_FeetAndHead:
+		{
+			SendFeetJumpBeam(player, oldOrigin[player.id]);
+			SendHeadJumpBeam(player, oldOrigin[player.id], oldDucking[player.id]);
+		}
+		case JumpBeam_Ground:SendGroundJumpBeam(player, oldOrigin[player.id]);
+	}
+	
+	player.GetOrigin(oldOrigin[player.id]);
+	oldDucking[player.id] = player.ducking;
+}
+
+static void SendFeetJumpBeam(KZPlayer player, const float oldOrigin[3])
+{
+	float origin[3], beamStart[3], beamEnd[3];
+	int beamColour[4];
+	player.GetOrigin(origin);
+	
+	beamStart = oldOrigin;
+	beamEnd = origin;
+	GetJumpBeamColour(player, beamColour);
+	
+	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SendToClient(player.id);
+}
+
+static void SendHeadJumpBeam(KZPlayer player, const float oldOrigin[3], bool oldDucking)
+{
+	float origin[3], beamStart[3], beamEnd[3];
+	int beamColour[4];
+	player.GetOrigin(origin);
+	
+	beamStart = oldOrigin;
+	beamEnd = origin;
+	if (oldDucking)
+	{
+		beamStart[2] = beamStart[2] + 54.0;
+	}
+	else
+	{
+		beamStart[2] = beamStart[2] + 72.0;
+	}
+	if (player.ducking)
+	{
+		beamEnd[2] = beamEnd[2] + 54.0;
+	}
+	else
+	{
+		beamEnd[2] = beamEnd[2] + 72.0;
+	}
+	GetJumpBeamColour(player, beamColour);
+	
+	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SendToClient(player.id);
+}
+
+static void SendGroundJumpBeam(KZPlayer player, const float oldOrigin[3])
+{
+	float origin[3], takeoffOrigin[3], beamStart[3], beamEnd[3];
+	int beamColour[4];
+	player.GetOrigin(origin);
+	player.GetTakeoffOrigin(takeoffOrigin);
+	
+	beamStart = oldOrigin;
+	beamEnd = origin;
+	beamStart[2] = takeoffOrigin[2];
+	beamEnd[2] = takeoffOrigin[2];
+	GetJumpBeamColour(player, beamColour);
+	
+	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SendToClient(player.id);
+}
+
+static void GetJumpBeamColour(KZPlayer player, int colour[4])
+{
+	if (player.ducking)
+	{
+		colour =  { 255, 0, 0, 90 }; // Red
+	}
+	else
+	{
+		colour =  { 0, 255, 0, 90 }; // Green
+	}
 } 

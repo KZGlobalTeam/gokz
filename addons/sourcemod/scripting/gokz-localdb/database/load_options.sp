@@ -65,6 +65,7 @@ public void DB_TxnSuccess_LoadOptions(Handle db, int userid, int numQueries, Han
 		player.errorSounds = SQL_FetchInt(results[0], 13);
 		player.timerText = SQL_FetchInt(results[0], 14);
 		player.speedText = SQL_FetchInt(results[0], 15);
+		player.jumpBeam = SQL_FetchInt(results[0], 16);
 	}
 }
 

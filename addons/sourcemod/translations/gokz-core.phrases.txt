@@ -373,6 +373,22 @@
 	{
 		"en"		"Spectating"
 	}
+	"Options Menu - Feet"
+	{
+		"en"		"Feet"
+	}
+	"Options Menu - Head"
+	{
+		"en"		"Head"
+	}
+	"Options Menu - Feet and Head"
+	{
+		"en"		"Feet and Head"
+	}
+	"Options Menu - Ground"
+	{
+		"en"		"Ground"
+	}
 	"Options Menu - Teleport Menu"
 	{
 		"en"		"Teleport menu"
@@ -428,5 +444,9 @@
 	"Options Menu - Speed Text"
 	{
 		"en"		"Speed text"
+	}
+	"Options Menu - Jump Beam"
+	{
+		"en"		"Jump beam"
 	}
 }

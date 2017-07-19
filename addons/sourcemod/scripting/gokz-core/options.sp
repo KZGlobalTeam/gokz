@@ -25,7 +25,8 @@ static int optionCounts[OPTION_COUNT] =
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
 	TIMERTEXT_COUNT, 
-	SPEEDTEXT_COUNT
+	SPEEDTEXT_COUNT, 
+	JUMPBEAM_COUNT
 };
 
 
@@ -98,6 +99,7 @@ static void SetDefaultOptions(int client)
 	SetOption(client, Option_ErrorSounds, ErrorSounds_Enabled);
 	SetOption(client, Option_TimerText, TimerText_InfoPanel);
 	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
+	SetOption(client, Option_JumpBeam, JumpBeam_Disabled);
 }
 
 // Set client to a mode that is loaded

@@ -175,6 +175,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	OnPlayerSpawn_Modes(client);
 	OnPlayerSpawn_Pause(client);
+	OnPlayerSpawn_ValidJump(client);
 	UpdateCSGOHUD(client);
 	UpdateHideWeapon(client);
 	UpdatePistol(client);
@@ -203,6 +204,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	OnPlayerRunCmd_InfoPanel(client, tickcount);
 	OnPlayerRunCmd_SpeedText(client, tickcount);
 	OnPlayerRunCmd_TimerText(client, tickcount);
+	OnPlayerRunCmd_JumpBeam(client);
 	return Plugin_Continue;
 }
 
@@ -219,6 +221,12 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 {
 	OnChangeMoveType_Timer(client, newMoveType);
 	OnChangeMoveType_Pause(client, newMoveType);
+	OnChangeMoveType_ValidJump(client, newMoveType);
+}
+
+public void Movement_OnStopTouchGround(int client, bool jumped)
+{
+	OnStopTouchGround_ValidJump(client);
 }
 
 
@@ -245,27 +253,32 @@ public void GOKZ_OnMakeCheckpoint_Post(int client)
 
 public void GOKZ_OnTeleportToCheckpoint_Post(int client)
 {
+	OnTeleportToCheckpoint_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnPrevCheckpoint_Post(int client)
 {
+	OnPrevCheckpoint_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnNextCheckpoint_Post(int client)
 {
+	OnNextCheckpoint_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnTeleportToStart_Post(int client)
 {
 	OnTeleportToStart_Timer(client);
+	OnTeleportToStart_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnUndoTeleport_Post(int client)
 {
+	OnUndoTeleport_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
@@ -287,6 +300,7 @@ public void OnMapStart()
 	OnMapStart_PlayerModel();
 	OnMapStart_KZConfig();
 	OnMapStart_Prefix();
+	OnMapStart_JumpBeam();
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
