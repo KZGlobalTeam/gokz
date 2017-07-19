@@ -383,7 +383,7 @@
 	}
 	"Options Menu - Feet and Head"
 	{
-		"en"		"Feet and Head"
+		"en"		"Feet and head"
 	}
 	"Options Menu - Ground"
 	{

@@ -31,6 +31,8 @@ public Plugin myinfo =
 bool gB_LateLoad;
 bool gB_BaseComm;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
+float gF_OldOrigin[MAXPLAYERS + 1][3];
+bool gB_OldDucking[MAXPLAYERS + 1];
 
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
@@ -205,6 +207,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	OnPlayerRunCmd_SpeedText(client, tickcount);
 	OnPlayerRunCmd_TimerText(client, tickcount);
 	OnPlayerRunCmd_JumpBeam(client);
+	UpdateOldVariables(client);
 	return Plugin_Continue;
 }
 
@@ -221,7 +224,7 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 {
 	OnChangeMoveType_Timer(client, newMoveType);
 	OnChangeMoveType_Pause(client, newMoveType);
-	OnChangeMoveType_ValidJump(client, newMoveType);
+	OnChangeMoveType_ValidJump(client, oldMoveType, newMoveType);
 }
 
 public void Movement_OnStopTouchGround(int client, bool jumped)
@@ -356,4 +359,13 @@ static void CreateHooks()
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	HookEntityOutput("trigger_multiple", "OnStartTouch", OnTrigMultTouch);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
+}
+
+static void UpdateOldVariables(int client)
+{
+	if (IsPlayerAlive(client))
+	{
+		Movement_GetOrigin(client, gF_OldOrigin[client]);
+		gB_OldDucking[client] = Movement_GetDucking(client);
+	}
 } 

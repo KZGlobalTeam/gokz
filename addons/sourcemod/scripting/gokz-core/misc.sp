@@ -423,11 +423,15 @@ void OnStopTouchGround_ValidJump(int client)
 	}
 }
 
-void OnChangeMoveType_ValidJump(int client, MoveType newMoveType)
+void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
 {
 	if (newMoveType != MOVETYPE_WALK)
 	{
 		validJump[client] = false;
+	}
+	else if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
+	{
+		validJump[client] = true;
 	}
 }
 
@@ -476,57 +480,70 @@ void OnMapStart_JumpBeam()
 
 void OnPlayerRunCmd_JumpBeam(int client)
 {
-	static float oldOrigin[MAXPLAYERS + 1][3];
-	static bool oldDucking[MAXPLAYERS + 1];
-	KZPlayer player = new KZPlayer(client);
 	
-	if (!player.alive || player.jumpBeam == JumpBeam_Disabled
-		 || !GetValidJump(player.id) || player.onGround)
+	KZPlayer player = new KZPlayer(client);
+	KZPlayer targetPlayer;
+	
+	if (player.fake || player.jumpBeam == JumpBeam_Disabled)
 	{
-		player.GetOrigin(oldOrigin[player.id]);
-		oldDucking[player.id] = player.ducking;
+		return;
+	}
+	
+	// Determine target player
+	if (player.alive)
+	{
+		targetPlayer = player;
+	}
+	else
+	{
+		targetPlayer = new KZPlayer(player.observerTarget);
+		if (targetPlayer.id == -1)
+		{
+			return;
+		}
+	}
+	
+	if (!GetValidJump(targetPlayer.id) || targetPlayer.onGround)
+	{
 		return;
 	}
 	
 	switch (player.jumpBeam)
 	{
-		case JumpBeam_Feet:SendFeetJumpBeam(player, oldOrigin[player.id]);
-		case JumpBeam_Head:SendHeadJumpBeam(player, oldOrigin[player.id], oldDucking[player.id]);
+		case JumpBeam_Feet:SendFeetJumpBeam(player, targetPlayer);
+		case JumpBeam_Head:SendHeadJumpBeam(player, targetPlayer);
 		case JumpBeam_FeetAndHead:
 		{
-			SendFeetJumpBeam(player, oldOrigin[player.id]);
-			SendHeadJumpBeam(player, oldOrigin[player.id], oldDucking[player.id]);
+			SendFeetJumpBeam(player, targetPlayer);
+			SendHeadJumpBeam(player, targetPlayer);
 		}
-		case JumpBeam_Ground:SendGroundJumpBeam(player, oldOrigin[player.id]);
+		case JumpBeam_Ground:SendGroundJumpBeam(player, targetPlayer);
 	}
-	
-	player.GetOrigin(oldOrigin[player.id]);
-	oldDucking[player.id] = player.ducking;
 }
 
-static void SendFeetJumpBeam(KZPlayer player, const float oldOrigin[3])
+static void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
 	float origin[3], beamStart[3], beamEnd[3];
 	int beamColour[4];
-	player.GetOrigin(origin);
+	targetPlayer.GetOrigin(origin);
 	
-	beamStart = oldOrigin;
+	beamStart = gF_OldOrigin[targetPlayer.id];
 	beamEnd = origin;
-	GetJumpBeamColour(player, beamColour);
+	GetJumpBeamColour(targetPlayer, beamColour);
 	
 	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
-static void SendHeadJumpBeam(KZPlayer player, const float oldOrigin[3], bool oldDucking)
+static void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
 	float origin[3], beamStart[3], beamEnd[3];
 	int beamColour[4];
-	player.GetOrigin(origin);
+	targetPlayer.GetOrigin(origin);
 	
-	beamStart = oldOrigin;
+	beamStart = gF_OldOrigin[targetPlayer.id];
 	beamEnd = origin;
-	if (oldDucking)
+	if (gB_OldDucking[targetPlayer.id])
 	{
 		beamStart[2] = beamStart[2] + 54.0;
 	}
@@ -534,7 +551,7 @@ static void SendHeadJumpBeam(KZPlayer player, const float oldOrigin[3], bool old
 	{
 		beamStart[2] = beamStart[2] + 72.0;
 	}
-	if (player.ducking)
+	if (targetPlayer.ducking)
 	{
 		beamEnd[2] = beamEnd[2] + 54.0;
 	}
@@ -542,37 +559,37 @@ static void SendHeadJumpBeam(KZPlayer player, const float oldOrigin[3], bool old
 	{
 		beamEnd[2] = beamEnd[2] + 72.0;
 	}
-	GetJumpBeamColour(player, beamColour);
+	GetJumpBeamColour(targetPlayer, beamColour);
 	
 	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
-static void SendGroundJumpBeam(KZPlayer player, const float oldOrigin[3])
+static void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
 	float origin[3], takeoffOrigin[3], beamStart[3], beamEnd[3];
 	int beamColour[4];
-	player.GetOrigin(origin);
-	player.GetTakeoffOrigin(takeoffOrigin);
+	targetPlayer.GetOrigin(origin);
+	targetPlayer.GetTakeoffOrigin(takeoffOrigin);
 	
-	beamStart = oldOrigin;
+	beamStart = gF_OldOrigin[targetPlayer.id];
 	beamEnd = origin;
 	beamStart[2] = takeoffOrigin[2];
 	beamEnd[2] = takeoffOrigin[2];
-	GetJumpBeamColour(player, beamColour);
+	GetJumpBeamColour(targetPlayer, beamColour);
 	
 	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
-static void GetJumpBeamColour(KZPlayer player, int colour[4])
+static void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 {
-	if (player.ducking)
+	if (targetPlayer.ducking)
 	{
-		colour =  { 255, 0, 0, 90 }; // Red
+		colour =  { 255, 0, 0, 100 }; // Red
 	}
 	else
 	{
-		colour =  { 0, 255, 0, 90 }; // Green
+		colour =  { 0, 255, 0, 100 }; // Green
 	}
 } 
