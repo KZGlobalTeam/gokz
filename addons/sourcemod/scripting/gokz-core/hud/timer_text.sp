@@ -55,15 +55,22 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 		return;
 	}
 	
+	int colour[4]; // RGBA
+	switch (GetCurrentTimeType(targetPlayer.id))
+	{
+		case TimeType_Nub:colour =  { 255, 221, 153, 0 };
+		case TimeType_Pro:colour =  { 160, 205, 255, 0 };
+	}
+	
 	switch (player.timerText)
 	{
 		case TimerText_Top:
 		{
-			SetHudTextParams(-1.0, 0.013, 0.5, 255, 255, 255, 0, 0, 0.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.013, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
 		}
 		case TimerText_Bottom:
 		{
-			SetHudTextParams(-1.0, 0.957, 0.5, 255, 255, 255, 0, 0, 0.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.957, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
 		}
 	}
 	

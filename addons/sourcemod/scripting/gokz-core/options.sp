@@ -90,8 +90,8 @@ static void SetDefaultOptions(int client)
 	SetOption(client, Option_ShowingKeys, ShowingKeys_Spectating);
 	SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
 	SetOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled);
-	SetOption(client, Option_AutoRestart, AutoRestart_Enabled);
-	SetOption(client, Option_SlayOnEnd, SlayOnEnd_Enabled);
+	SetOption(client, Option_AutoRestart, AutoRestart_Disabled);
+	SetOption(client, Option_SlayOnEnd, SlayOnEnd_Disabled);
 	SetOption(client, Option_Pistol, Pistol_USP);
 	SetOption(client, Option_CheckpointMessages, CheckpointMessages_Disabled);
 	SetOption(client, Option_CheckpointSounds, CheckpointSounds_Enabled);

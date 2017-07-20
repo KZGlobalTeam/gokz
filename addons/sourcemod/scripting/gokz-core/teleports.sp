@@ -41,6 +41,15 @@ int GetTeleportCount(int client)
 	return teleportCount[client];
 }
 
+void SetupClientTeleports(int client)
+{
+	checkpointCount[client] = 0;
+	storedCheckpointCount[client] = 0;
+	checkpointPrevCount[client] = 0;
+	teleportCount[client] = 0;
+	hasCustomStartPosition[client] = false;
+}
+
 
 // CHECKPOINT
 
@@ -316,11 +325,6 @@ void TeleportToStart(int client)
 bool GetHasCustomStartPosition(int client)
 {
 	return hasCustomStartPosition[client];
-}
-
-void SetupClientCustomStartPosition(int client)
-{
-	hasCustomStartPosition[client] = false;
 }
 
 void SetCustomStartPosition(int client)

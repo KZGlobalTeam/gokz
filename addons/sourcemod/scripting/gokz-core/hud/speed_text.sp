@@ -55,28 +55,27 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 		return;
 	}
 	
+	int colour[4]; // RGBA
+	if (targetPlayer.gokzHitPerf && !targetPlayer.onGround && !targetPlayer.onLadder && !targetPlayer.noclipping)
+	{
+		colour =  { 3, 204, 0, 0 };
+	}
+	else
+	{
+		colour =  { 210, 210, 210, 0 };
+	}
+	
 	switch (player.speedText)
 	{
 		case SpeedText_Bottom:
 		{
-			if (targetPlayer.gokzHitPerf && !targetPlayer.onGround && !targetPlayer.onLadder && !targetPlayer.noclipping)
+			if (IsPlayerAlive(player.id))
 			{
-				if (IsPlayerAlive(player.id))
-				{
-					SetHudTextParams(-1.0, 0.75, 0.5, 3, 204, 0, 0, 1, 0.0, 0.0, 0.0);
-				}
-				else
-				{
-					SetHudTextParams(-1.0, 0.595, 0.5, 3, 204, 0, 0, 0, 0.0, 0.0, 0.0);
-				}
-			}
-			else if (IsPlayerAlive(player.id))
-			{
-				SetHudTextParams(-1.0, 0.75, 0.5, 255, 255, 255, 0, 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.75, 0.5, colour[0], colour[1], colour[2], colour[3], 1, 0.0, 0.0, 0.0);
 			}
 			else
 			{
-				SetHudTextParams(-1.0, 0.595, 0.5, 255, 255, 255, 0, 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.595, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
 			}
 		}
 	}

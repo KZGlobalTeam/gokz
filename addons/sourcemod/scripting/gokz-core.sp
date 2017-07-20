@@ -147,7 +147,7 @@ public void OnClientPostAdminCheck(int client)
 	SetupClientPause(client);
 	SetupClientBhopTriggers(client);
 	SetupClientHidePlayers(client);
-	SetupClientCustomStartPosition(client);
+	SetupClientTeleports(client);
 	PrintConnectMessage(client);
 	gB_ClientIsSetUp[client] = true;
 	Call_GOKZ_OnClientSetup(client);
