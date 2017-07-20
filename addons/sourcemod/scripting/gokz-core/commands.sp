@@ -28,6 +28,10 @@ void CreateCommands()
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
+	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
+	RegConsoleCmd("sm_ssp", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
+	RegConsoleCmd("sm_clearstartpos", CommandClearStartPos, "[KZ] Clear your custom start position.");
+	RegConsoleCmd("sm_csp", CommandClearStartPos, "[KZ] Clear your custom start position.");
 	RegConsoleCmd("sm_pause", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
@@ -123,6 +127,20 @@ public Action CommandUndoTeleport(int client, int args)
 public Action CommandTeleportToStart(int client, int args)
 {
 	GOKZ_TeleportToStart(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandSetStartPos(int client, int args)
+{
+	SetCustomStartPosition(client);
+	UpdateTPMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandClearStartPos(int client, int args)
+{
+	ClearCustomStartPosition(client);
 	UpdateTPMenu(client);
 	return Plugin_Handled;
 }

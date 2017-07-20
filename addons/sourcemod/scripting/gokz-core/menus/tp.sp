@@ -188,7 +188,7 @@ static void AddItemTPMenuPause(int client, Menu menu)
 
 static void AddItemTPMenuStart(int client, Menu menu) {
 	char temp[16];
-	if (GetHasStartedTimerThisMap(client))
+	if (GetHasStartedTimerThisMap(client) || GetHasCustomStartPosition(client))
 	{
 		FormatEx(temp, sizeof(temp), "%T", "TP Menu - Restart", client);
 		menu.AddItem("", temp, ITEMDRAW_DEFAULT);

@@ -409,17 +409,19 @@ forward void GOKZ_OnNextCheckpoint_Post(int client);
  * Called when a player teleports to start.
  *
  * @param client		Client index.
+ * @param customPos		Whether a custom start position is in use.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
-forward Action GOKZ_OnTeleportToStart(int client);
+forward Action GOKZ_OnTeleportToStart(int client, bool customPos);
 
 /**
  * Called when a player has teleported to start.
  *
  * @param client		Client index.
+ * @param customPos		Whether a custom start position is in use.
  * @noreturn
  */
-forward void GOKZ_OnTeleportToStart_Post(int client);
+forward void GOKZ_OnTeleportToStart_Post(int client, bool customPos);
 
 /**
  * Called when a player undoes a teleport.
@@ -532,17 +534,18 @@ native void GOKZ_EndTimer(int client, int course);
  * Forces the player's timer to stop. Intended for run invalidation.
  *
  * @param client    	Client index.
+ * @param playSound		Whether to play the timer stop sound.
  * @return				Whether player's timer was stopped.
  */
-native bool GOKZ_StopTimer(int client);
+native bool GOKZ_StopTimer(int client, bool playSound = true);
 
 /**
  * Forces all players' timers to stop. Intended for run invalidation.
  *
- * @param client    	Client index.
+ * @param playSound		Whether to play the timer stop sound.
  * @noreturn
  */
-native void GOKZ_StopTimerAll(int client);
+native void GOKZ_StopTimerAll(bool playSound = true);
 
 /**
  * Gets whether client has been set up by GOKZ e.g. options, timer etc.

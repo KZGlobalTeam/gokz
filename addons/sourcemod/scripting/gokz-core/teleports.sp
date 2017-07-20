@@ -17,6 +17,9 @@ static int checkpointIndex[MAXPLAYERS + 1];
 static int teleportCount[MAXPLAYERS + 1];
 static float startOrigin[MAXPLAYERS + 1][3];
 static float startAngles[MAXPLAYERS + 1][3];
+static bool hasCustomStartPosition[MAXPLAYERS + 1];
+static float customStartOrigin[MAXPLAYERS + 1][3];
+static float customStartAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
@@ -272,7 +275,7 @@ void TeleportToStart(int client)
 {
 	// Call Pre Forward
 	Action result;
-	Call_GOKZ_OnTeleportToStart(client, result);
+	Call_GOKZ_OnTeleportToStart(client, hasCustomStartPosition[client], result);
 	if (result != Plugin_Continue)
 	{
 		return;
@@ -283,7 +286,17 @@ void TeleportToStart(int client)
 	{
 		CS_SwitchTeam(client, CS_TEAM_CT);
 	}
-	if (GetHasStartedTimerThisMap(client))
+	
+	if (hasCustomStartPosition[client])
+	{
+		if (!IsPlayerAlive(client))
+		{
+			CS_RespawnPlayer(client);
+		}
+		TeleportDo(client, customStartOrigin[client], customStartAngles[client]);
+		GOKZ_StopTimer(client, false);
+	}
+	else if (GetHasStartedTimerThisMap(client))
 	{
 		if (!IsPlayerAlive(client))
 		{
@@ -297,7 +310,40 @@ void TeleportToStart(int client)
 	}
 	
 	// Call Post Forward
-	Call_GOKZ_OnTeleportToStart_Post(client);
+	Call_GOKZ_OnTeleportToStart_Post(client, hasCustomStartPosition[client]);
+}
+
+bool GetHasCustomStartPosition(int client)
+{
+	return hasCustomStartPosition[client];
+}
+
+void SetupClientCustomStartPosition(int client)
+{
+	hasCustomStartPosition[client] = false;
+}
+
+void SetCustomStartPosition(int client)
+{
+	if (!IsPlayerAlive(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
+		PlayErrorSound(client);
+		return;
+	}
+	
+	Movement_GetOrigin(client, customStartOrigin[client]);
+	Movement_GetEyeAngles(client, customStartAngles[client]);
+	hasCustomStartPosition[client] = true;
+	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
+	UpdateTPMenu(client);
+}
+
+void ClearCustomStartPosition(int client)
+{
+	hasCustomStartPosition[client] = false;
+	GOKZ_PrintToChat(client, true, "%t", "Cleared Custom Start Position");
+	UpdateTPMenu(client);
 }
 
 

@@ -55,8 +55,8 @@ void CreateGlobalForwards()
 	H_OnPrevCheckpoint_Post = CreateGlobalForward("GOKZ_OnPrevCheckpoint_Post", ET_Ignore, Param_Cell);
 	H_OnNextCheckpoint = CreateGlobalForward("GOKZ_OnNextCheckpoint", ET_Hook, Param_Cell);
 	H_OnNextCheckpoint_Post = CreateGlobalForward("GOKZ_OnNextCheckpoint_Post", ET_Ignore, Param_Cell);
-	H_OnTeleportToStart = CreateGlobalForward("GOKZ_OnTeleportToStart", ET_Hook, Param_Cell);
-	H_OnTeleportToStart_Post = CreateGlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell);
+	H_OnTeleportToStart = CreateGlobalForward("GOKZ_OnTeleportToStart", ET_Hook, Param_Cell, Param_Cell);
+	H_OnTeleportToStart_Post = CreateGlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnUndoTeleport = CreateGlobalForward("GOKZ_OnUndoTeleport", ET_Hook, Param_Cell);
 	H_OnUndoTeleport_Post = CreateGlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
 }
@@ -205,17 +205,19 @@ void Call_GOKZ_OnNextCheckpoint_Post(int client)
 	Call_Finish();
 }
 
-void Call_GOKZ_OnTeleportToStart(int client, Action &result)
+void Call_GOKZ_OnTeleportToStart(int client, bool customPos, Action &result)
 {
 	Call_StartForward(H_OnTeleportToStart);
 	Call_PushCell(client);
+	Call_PushCell(customPos);
 	Call_Finish(result);
 }
 
-void Call_GOKZ_OnTeleportToStart_Post(int client)
+void Call_GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 {
 	Call_StartForward(H_OnTeleportToStart_Post);
 	Call_PushCell(client);
+	Call_PushCell(customPos);
 	Call_Finish();
 }
 

@@ -91,12 +91,12 @@ public int Native_EndTimer(Handle plugin, int numParams)
 
 public int Native_StopTimer(Handle plugin, int numParams)
 {
-	return view_as<int>(TimerStop(GetNativeCell(1)));
+	return view_as<int>(TimerStop(GetNativeCell(1), GetNativeCell(2)));
 }
 
 public int Native_StopTimerAll(Handle plugin, int numParams)
 {
-	TimerStopAll();
+	TimerStopAll(GetNativeCell(1));
 }
 
 public int Native_TeleportToStart(Handle plugin, int numParams)

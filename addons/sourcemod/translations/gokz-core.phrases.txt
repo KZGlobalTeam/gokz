@@ -194,6 +194,14 @@
 		"#format"	"{1:s}"
 		"en"		"{grey}The {purple}{1} {grey}mode is currently not available."
 	}
+	"Set Custom Start Position"
+	{
+		"en"		"{grey}You have set your custom start position."
+	}
+	"Cleared Custom Start Position"
+	{
+		"en"		"{grey}You have cleared your custom start position."
+	}
 	
 	
 	// Option Change Chat Messages ////////////////////////////////////////////////////////////

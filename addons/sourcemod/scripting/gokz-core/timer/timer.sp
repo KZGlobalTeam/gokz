@@ -118,7 +118,7 @@ void TimerEnd(int client, int course)
 	Call_GOKZ_OnTimerEnd_Post(client, course, time, teleportsUsed);
 }
 
-bool TimerStop(int client)
+bool TimerStop(int client, bool playSound = true)
 {
 	if (!timerRunning[client])
 	{
@@ -126,20 +126,23 @@ bool TimerStop(int client)
 	}
 	
 	timerRunning[client] = false;
-	PlayTimerStopSound(client);
+	if (playSound)
+	{
+		PlayTimerStopSound(client);
+	}
 	
 	Call_GOKZ_OnTimerStopped(client);
 	
 	return true;
 }
 
-void TimerStopAll()
+void TimerStopAll(bool playSound = true)
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client))
 		{
-			TimerStop(client);
+			TimerStop(client, playSound);
 		}
 	}
 }
@@ -177,13 +180,14 @@ void OnChangeMoveType_Timer(int client, MoveType newMoveType)
 	}
 }
 
-void OnTeleportToStart_Timer(int client)
+void OnTeleportToStart_Timer(int client, bool customPos)
 {
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro)
 	{
-		TimerStop(client);
+		TimerStop(client, false);
 	}
-	if (hasStartedTimerThisMap[client] && GetOption(client, Option_AutoRestart) == AutoRestart_Enabled)
+	if (GetOption(client, Option_AutoRestart) == AutoRestart_Enabled
+		 && !customPos && hasStartedTimerThisMap[client])
 	{
 		TimerStart(client, currentCourse[client], true);
 	}

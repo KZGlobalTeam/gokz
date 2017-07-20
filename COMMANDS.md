@@ -12,6 +12,8 @@
  * ```!undo``` - Undo teleport.
  * ```!start```/```!r``` - Teleport to the start of the map.
  * ```!stop``` - Stop your timer.
+ * ```!setstartpos```/```!ssp``` - Set your current position as your custom start position.
+ * ```!clearstartpos```/```!csp``` - Clear your custom start position.
 
 ### Options
 
@@ -49,4 +51,6 @@ These commands return results based on your currently selected mode.
  * ```!bpb``` - Prints PB bonus times and ranks to chat. Usage: ```!bpb <#bonus> <map> <player>```
  * ```!wr``` - Prints map record times to chat. Usage: ```!wr <map>```
  * ```!bwr``` - Prints bonus record times to chat. Usage: ```!bwr <#bonus> <map>```
+ * ```!avg``` - Prints the average map run time to chat. Usage ```!avg <map>```
+ * ```!bavg``` - Prints the average bonus run time to chat. Usage ```!bavg <#bonus> <map>```
  * ```!pc``` - Prints map completion to chat. Usage: ```!pc <player>```

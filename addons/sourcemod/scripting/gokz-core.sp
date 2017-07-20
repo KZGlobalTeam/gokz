@@ -147,6 +147,7 @@ public void OnClientPostAdminCheck(int client)
 	SetupClientPause(client);
 	SetupClientBhopTriggers(client);
 	SetupClientHidePlayers(client);
+	SetupClientCustomStartPosition(client);
 	PrintConnectMessage(client);
 	gB_ClientIsSetUp[client] = true;
 	Call_GOKZ_OnClientSetup(client);
@@ -271,9 +272,9 @@ public void GOKZ_OnNextCheckpoint_Post(int client)
 	UpdateTPMenu(client);
 }
 
-public void GOKZ_OnTeleportToStart_Post(int client)
+public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 {
-	OnTeleportToStart_Timer(client);
+	OnTeleportToStart_Timer(client, customPos);
 	OnTeleportToStart_ValidJump(client);
 	UpdateTPMenu(client);
 }
