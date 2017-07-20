@@ -77,7 +77,7 @@ void MakeCheckpoint(int client)
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
 	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_TELEPORT);
+		EmitSoundToClient(client, SOUND_CHECKPOINT);
 	}
 	if (GetOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
@@ -340,6 +340,10 @@ void SetCustomStartPosition(int client)
 	Movement_GetEyeAngles(client, customStartAngles[client]);
 	hasCustomStartPosition[client] = true;
 	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
+	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	{
+		EmitSoundToClient(client, SOUND_CHECKPOINT);
+	}
 	UpdateTPMenu(client);
 }
 
