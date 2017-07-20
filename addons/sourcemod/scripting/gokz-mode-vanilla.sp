@@ -44,12 +44,6 @@ public void OnPluginStart()
 	}
 	
 	CreateConVars();
-	
-	if (LibraryExists("gokz-core"))
-	{
-		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_Vanilla, true);
-	}
 }
 
 public void OnPluginEnd()
@@ -57,6 +51,15 @@ public void OnPluginEnd()
 	if (gB_GOKZCore)
 	{
 		GOKZ_SetModeLoaded(Mode_Vanilla, false);
+	}
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_Vanilla, true);
 	}
 }
 

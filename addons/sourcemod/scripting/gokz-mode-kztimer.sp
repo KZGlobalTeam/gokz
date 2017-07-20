@@ -54,21 +54,6 @@ public void OnPluginStart()
 	}
 	
 	CreateConVars();
-	RegConsoleCmd("sm_test", CommandTester);
-	if (LibraryExists("gokz-core"))
-	{
-		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_KZTimer, true);
-	}
-}
-
-public Action CommandTester(int client, int args)
-{
-	if (gB_GOKZCore)
-	{
-		GOKZ_PrintToChatAll(false, "Loaded");
-	}
-	return Plugin_Handled;
 }
 
 public void OnPluginEnd()
@@ -76,6 +61,15 @@ public void OnPluginEnd()
 	if (gB_GOKZCore)
 	{
 		GOKZ_SetModeLoaded(Mode_KZTimer, false);
+	}
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_KZTimer, true);
 	}
 }
 

@@ -58,12 +58,6 @@ public void OnPluginStart()
 	}
 	
 	CreateConVars();
-	
-	if (LibraryExists("gokz-core"))
-	{
-		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
-	}
 }
 
 public void OnPluginEnd()
@@ -71,6 +65,15 @@ public void OnPluginEnd()
 	if (gB_GOKZCore)
 	{
 		GOKZ_SetModeLoaded(Mode_SimpleKZ, false);
+	}
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
 	}
 }
 

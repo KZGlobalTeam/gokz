@@ -94,8 +94,6 @@ public void OnPluginStart()
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 	
-	gB_BaseComm = LibraryExists("basecomm");
-	
 	if (gB_LateLoad)
 	{
 		OnLateLoad();
@@ -115,6 +113,7 @@ void OnLateLoad()
 
 public void OnAllPluginsLoaded()
 {
+	gB_BaseComm = LibraryExists("basecomm");
 	if (GetLoadedModeCount() <= 0)
 	{
 		SetFailState("At least one GOKZ mode plugin is required.");
