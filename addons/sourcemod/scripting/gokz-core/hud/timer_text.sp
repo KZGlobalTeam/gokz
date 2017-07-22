@@ -36,9 +36,9 @@ void UpdateTimerText(int client)
 
 // =========================  LISTENERS  ========================= //
 
-void OnPlayerRunCmd_TimerText(int client, int tickcount)
+void OnPlayerRunCmd_TimerText(int client, int cmdnum)
 {
-	if ((tickcount + client) % 32 == 0)
+	if (cmdnum % 32 == 0)
 	{
 		UpdateTimerText(client);
 	}

@@ -203,9 +203,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	OnPlayerRunCmd_Timer(client);
 	OnPlayerRunCmd_TPMenu(client);
-	OnPlayerRunCmd_InfoPanel(client, tickcount);
-	OnPlayerRunCmd_SpeedText(client, tickcount);
-	OnPlayerRunCmd_TimerText(client, tickcount);
+	OnPlayerRunCmd_InfoPanel(client, cmdnum);
+	OnPlayerRunCmd_SpeedText(client, cmdnum);
+	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
 	UpdateOldVariables(client);
 	return Plugin_Continue;

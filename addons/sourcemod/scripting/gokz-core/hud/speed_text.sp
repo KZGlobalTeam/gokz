@@ -36,9 +36,9 @@ void UpdateSpeedText(int client)
 
 // =========================  LISTENERS  ========================= //
 
-void OnPlayerRunCmd_SpeedText(int client, int tickcount)
+void OnPlayerRunCmd_SpeedText(int client, int cmdnum)
 {
-	if ((tickcount + client) % 3 == 0)
+	if (cmdnum % 3 == 0)
 	{
 		UpdateSpeedText(client);
 	}
@@ -62,7 +62,7 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 	}
 	else
 	{
-		colour =  { 210, 210, 210, 0 };
+		colour =  { 235, 235, 235, 0 };
 	}
 	
 	switch (player.speedText)

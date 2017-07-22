@@ -37,9 +37,9 @@ void UpdateInfoPanel(int client)
 
 // =========================  LISTENERS  ========================= //
 
-void OnPlayerRunCmd_InfoPanel(int client, int tickcount)
+void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
 {
-	if ((tickcount + client) % 12 == 0)
+	if (cmdnum % 12 == 0)
 	{
 		UpdateInfoPanel(client);
 	}
@@ -101,7 +101,7 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 	else
 	{
 		FormatEx(timeString, sizeof(timeString), 
-			" <b>%T</b>: %T %s\n", 
+			" <b>%T</b>: <font color='#8B0000'>%T</font> %s\n", 
 			"Info Panel Text - Time", player.id, 
 			"Info Panel Text - Stopped", player.id, 
 			GetPausedString(player, targetPlayer));
