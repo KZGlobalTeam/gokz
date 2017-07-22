@@ -57,8 +57,8 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
 		 || !Movement_GetOnGround(client) && !allowOffGround
-		 || Movement_GetMoveType(client) != MOVETYPE_WALK
-		 || timerRunning[client] && currentTime[client] < 0.1)
+		 || (Movement_GetMoveType(client) != MOVETYPE_WALK && Movement_GetMoveType(client) != MOVETYPE_NONE)
+		 || timerRunning[client] && currentTime[client] < 0.05)
 	{
 		return;
 	}

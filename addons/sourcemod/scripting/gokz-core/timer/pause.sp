@@ -127,6 +127,7 @@ void OnTimerStart_Pause(int client)
 {
 	hasPausedInThisRun[client] = false;
 	hasResumedInThisRun[client] = false;
+	GOKZ_Resume(client);
 }
 
 void OnChangeMoveType_Pause(int client, MoveType newMoveType)
