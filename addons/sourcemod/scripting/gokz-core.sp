@@ -315,12 +315,6 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 {
 	OnRoundStart_Timer();
 	OnRoundStart_ForceAllTalk();
-	UpdateMapButtons();
-}
-
-public void OnTrigMultTouch(const char[] name, int caller, int activator, float delay)
-{
-	OnTrigMultTouch_BhopTriggers(activator);
 }
 
 public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char[] soundEntry, int &seed)
@@ -330,6 +324,17 @@ public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public void OnEntityCreated(int entity, const char[] classname)
+{
+	SDKHook(entity, SDKHook_Spawn, OnEntitySpawned);
+}
+
+public void OnEntitySpawned(int entity)
+{
+	OnEntitySpawned_MapButtons(entity);
+	OnEntitySpawned_MapBhopTriggers(entity);
 }
 
 
@@ -357,7 +362,6 @@ static void CreateHooks()
 	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
-	HookEntityOutput("trigger_multiple", "OnStartTouch", OnTrigMultTouch);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 }
 

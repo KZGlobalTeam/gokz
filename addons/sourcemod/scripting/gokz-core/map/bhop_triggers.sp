@@ -17,14 +17,20 @@ static int justTouchedTrigMult[MAXPLAYERS + 1];
 
 bool BhopTriggersJustTouched(int client)
 {
-	// If just touched trigger_multiple and landed within 0.2 seconds ago
-	if ((justTouchedTrigMult[client] > 0)
-		 && (GetGameTickCount() - Movement_GetLandingTick(client))
-		 < (BHOP_DETECTION_TIME / GetTickInterval()))
+	if (justTouchedTrigMult[client] > 0 && JustLanded(client))
 	{
 		return true;
 	}
 	return false;
+}
+
+static bool JustLanded(int client)
+{
+	// Includes safety check in case MovementAPI landing tick hasn't updated
+	// which was found to be a problem allowing the player to checkpoint
+	// at the exact time of landing.
+	return (GetGameTickCount() - Movement_GetLandingTick(client)) < (BHOP_DETECTION_TIME / GetTickInterval())
+	 || Movement_GetTakeoffTick(client) > Movement_GetLandingTick(client);
 }
 
 
@@ -36,13 +42,28 @@ void SetupClientBhopTriggers(int client)
 	justTouchedTrigMult[client] = 0;
 }
 
-void OnTrigMultTouch_BhopTriggers(int activator)
+void OnEntitySpawned_MapBhopTriggers(int entity)
 {
-	if (IsValidClient(activator))
+	char tempString[32];
+	
+	GetEntityClassname(entity, tempString, sizeof(tempString));
+	if (!StrEqual("trigger_multiple", tempString))
 	{
-		justTouchedTrigMult[activator]++;
-		CreateTimer(BHOP_DETECTION_TIME, TrigMultTouchDelayed, GetClientUserId(activator));
+		return;
 	}
+	
+	SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouch_MapBhopTriggers);
+}
+
+public void OnTrigMultTouch_MapBhopTriggers(int entity, int other)
+{
+	if (!IsValidClient(other))
+	{
+		return;
+	}
+	
+	justTouchedTrigMult[other]++;
+	CreateTimer(BHOP_DETECTION_TIME, TrigMultTouchDelayed, GetClientUserId(other));
 }
 
 

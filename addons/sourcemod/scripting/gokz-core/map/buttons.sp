@@ -21,33 +21,34 @@ void CreateRegexesMapButtons()
 
 
 
-// =========================  PUBLIC  ========================= //
+// =========================  LISTENERS  ========================= //
 
-void UpdateMapButtons()
+void OnEntitySpawned_MapButtons(int entity)
 {
-	int entity = -1;
 	char tempString[32];
 	
-	while ((entity = FindEntityByClassname(entity, "func_button")) != -1)
+	GetEntityClassname(entity, tempString, sizeof(tempString));
+	if (!StrEqual("func_button", tempString))
 	{
-		GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-		
-		if (StrEqual("climb_startbutton", tempString, false))
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
-		}
-		else if (StrEqual("climb_endbutton", tempString, false))
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
-		}
-		else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
-		}
-		else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
-		}
+		return;
+	}
+	
+	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
+	if (StrEqual("climb_startbutton", tempString))
+	{
+		SDKHook(entity, SDKHook_UsePost, OnStartButtonPress);
+	}
+	else if (StrEqual("climb_endbutton", tempString))
+	{
+		SDKHook(entity, SDKHook_Use, OnEndButtonPress);
+	}
+	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
+	{
+		SDKHook(entity, SDKHook_UsePost, OnBonusStartButtonPress);
+	}
+	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
+	{
+		SDKHook(entity, SDKHook_UsePost, OnBonusEndButtonPress);
 	}
 }
 
@@ -55,7 +56,7 @@ void UpdateMapButtons()
 
 // =========================  HANDLERS  ========================= //
 
-public void OnStartButtonPress(const char[] name, int caller, int activator, float delay)
+public void OnStartButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
 	if (!IsValidEntity(caller) || !IsValidClient(activator))
 	{
@@ -66,7 +67,7 @@ public void OnStartButtonPress(const char[] name, int caller, int activator, flo
 	OnStartButtonPress_VirtualButtons(activator, 0);
 }
 
-public void OnEndButtonPress(const char[] name, int caller, int activator, float delay)
+public void OnEndButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
 	if (!IsValidEntity(caller) || !IsValidClient(activator))
 	{
@@ -77,44 +78,45 @@ public void OnEndButtonPress(const char[] name, int caller, int activator, float
 	OnEndButtonPress_VirtualButtons(activator, 0);
 }
 
-public void OnBonusStartButtonPress(const char[] name, int caller, int activator, float delay)
+public void OnBonusStartButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
-	if (!IsValidEntity(caller) || !IsValidClient(activator)) {
+	if (!IsValidEntity(entity) || !IsValidClient(activator))
+	{
 		return;
 	}
 	
 	char tempString[32];
-	GetEntPropString(caller, Prop_Data, "m_iName", tempString, sizeof(tempString));
+	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
 	if (MatchRegex(RE_BonusStartButton, tempString) > 0)
 	{
 		GetRegexSubString(RE_BonusStartButton, 1, tempString, sizeof(tempString));
-		int bonus = StringToInt(tempString);
-		if (bonus > 0)
+		int course = StringToInt(tempString);
+		if (course > 0 && course < MAX_COURSES)
 		{
-			TimerStart(activator, bonus);
-			OnStartButtonPress_VirtualButtons(activator, bonus);
+			TimerStart(activator, course);
+			OnStartButtonPress_VirtualButtons(activator, course);
 		}
 	}
 }
 
-public void OnBonusEndButtonPress(const char[] name, int caller, int activator, float delay)
+public void OnBonusEndButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
-	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	if (!IsValidEntity(entity) || !IsValidClient(activator))
 	{
 		return;
 	}
 	
 	char tempString[32];
 	
-	GetEntPropString(caller, Prop_Data, "m_iName", tempString, sizeof(tempString));
+	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
 	if (MatchRegex(RE_BonusEndButton, tempString) > 0)
 	{
 		GetRegexSubString(RE_BonusEndButton, 1, tempString, sizeof(tempString));
-		int bonus = StringToInt(tempString);
-		if (bonus > 0)
+		int course = StringToInt(tempString);
+		if (course > 0 && course < MAX_COURSES)
 		{
-			TimerEnd(activator, bonus);
-			OnEndButtonPress_VirtualButtons(activator, bonus);
+			TimerEnd(activator, course);
+			OnEndButtonPress_VirtualButtons(activator, course);
 		}
 	}
 } 
