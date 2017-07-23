@@ -107,11 +107,14 @@ void TimerEnd(int client, int course)
 	hasEndedTimerThisMap[client] = true;
 	PlayTimerEndSound(client);
 	
-	// Print end timer message
-	Call_GOKZ_OnTimerEndMessage(client, course, time, teleportsUsed, result);
-	if (result == Plugin_Continue)
+	if (!IsFakeClient(client))
 	{
-		PrintEndTimeString(client);
+		// Print end timer message
+		Call_GOKZ_OnTimerEndMessage(client, course, time, teleportsUsed, result);
+		if (result == Plugin_Continue)
+		{
+			PrintEndTimeString(client);
+		}
 	}
 	
 	// Call Post Forward

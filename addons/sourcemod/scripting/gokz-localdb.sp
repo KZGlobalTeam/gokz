@@ -95,6 +95,11 @@ void OnLateLoad()
 
 public void GOKZ_OnClientSetup(int client)
 {
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
 	DB_SetupClient(client);
 	DB_LoadOptions(client);
 }
@@ -106,10 +111,12 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 
 public void OnClientDisconnect(int client)
 {
-	if (!IsFakeClient(client))
+	if (IsFakeClient(client))
 	{
-		DB_SaveOptions(client);
+		return;
 	}
+	
+	DB_SaveOptions(client);
 }
 
 public void OnMapStart()
@@ -119,6 +126,11 @@ public void OnMapStart()
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
 	int mode = GOKZ_GetOption(client, Option_Mode);
 	int style = GOKZ_GetOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
