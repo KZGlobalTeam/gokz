@@ -737,6 +737,15 @@ native float GOKZ_GetTakeoffSpeed(int client);
  */
 native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
 
+/**
+ * Gets whether the player's current or last jump/airtime is valid.
+ * A jump is deemed invalid if the player is teleported.
+ *
+ * @param client		Client index.
+ * @noreturn			Validity of player's current or last jump.
+ */
+native bool GOKZ_GetValidJump(int client);
+
 
 
 // =========================  METHODMAP  ========================= //
@@ -1028,6 +1037,12 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 		public set(float value) {
 			GOKZ_SetTakeoffSpeed(this.id, value);
+		}
+	}
+	
+	property bool validJump {
+		public get() {
+			return GOKZ_GetValidJump(this.id);
 		}
 	}
 	

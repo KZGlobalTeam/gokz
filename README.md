@@ -15,6 +15,7 @@
  * SourceMod 1.8+
  * 128 Tick
  * [MovementAPI Plugin](https://github.com/danzayau/MovementAPI)
+ * [DHooks Extension](https://forums.alliedmods.net/showthread.php?t=180114)
 
 ### Plugin Installation
 

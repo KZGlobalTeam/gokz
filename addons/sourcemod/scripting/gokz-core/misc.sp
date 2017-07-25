@@ -408,6 +408,8 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 
 // =========================  VALID JUMP TRACKING  ========================= //
 
+#define VALID_JUMP_TAKEOFF_GRACE_TICKS 2 // Ticks after takeoff when velocity can be affected
+
 static bool validJump[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
@@ -440,29 +442,16 @@ void OnPlayerSpawn_ValidJump(int client)
 	validJump[client] = false;
 }
 
-void OnPrevCheckpoint_ValidJump(int client)
+void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 {
-	validJump[client] = false;
-}
-
-void OnNextCheckpoint_ValidJump(int client)
-{
-	validJump[client] = false;
-}
-
-void OnTeleportToCheckpoint_ValidJump(int client)
-{
-	validJump[client] = false;
-}
-
-void OnTeleportToStart_ValidJump(int client)
-{
-	validJump[client] = false;
-}
-
-void OnUndoTeleport_ValidJump(int client)
-{
-	validJump[client] = false;
+	if (origin)
+	{
+		validJump[client] = false;
+	}
+	else if (velocity && GetGameTickCount() - Movement_GetTakeoffTick(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
+	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
+		validJump[client] = false;
+	}
 }
 
 

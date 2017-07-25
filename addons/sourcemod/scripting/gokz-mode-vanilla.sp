@@ -84,12 +84,12 @@ public void OnLibraryRemoved(const char[] name)
 
 // =========================  CLIENT  ========================= //
 
-public void OnClientPostAdminCheck(int client)
+public void OnClientPutInServer(int client)
 {
-	SDKHook(client, SDKHook_PreThinkPost, OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
 }
 
-public void OnClientPreThink_Post(int client)
+public void SDKHook_OnClientPreThink_Post(int client)
 {
 	if (!IsUsingMode(client))
 	{

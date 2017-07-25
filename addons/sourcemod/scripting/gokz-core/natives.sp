@@ -41,6 +41,7 @@ void CreateNatives()
 	CreateNative("GOKZ_SetHitPerf", Native_SetHitPerf);
 	CreateNative("GOKZ_GetTakeoffSpeed", Native_GetTakeoffSpeed);
 	CreateNative("GOKZ_SetTakeoffSpeed", Native_SetTakeoffSpeed);
+	CreateNative("GOKZ_GetValidJump", Native_GetValidJump);
 }
 
 public int Native_GetModeLoaded(Handle plugin, int numParams)
@@ -207,4 +208,9 @@ public int Native_GetTakeoffSpeed(Handle plugin, int numParams)
 public int Native_SetTakeoffSpeed(Handle plugin, int numParams)
 {
 	SetGOKZTakeoffSpeed(GetNativeCell(1), view_as<float>(GetNativeCell(2)));
+}
+
+public int Native_GetValidJump(Handle plugin, int numParams)
+{
+	return view_as<int>(GetValidJump(GetNativeCell(1)));
 } 

@@ -242,4 +242,4 @@ void Call_GOKZ_OnOptionChanged(int client, Option option, int optionValue)
 	Call_PushCell(option);
 	Call_PushCell(optionValue);
 	Call_Finish();
-} 
+}

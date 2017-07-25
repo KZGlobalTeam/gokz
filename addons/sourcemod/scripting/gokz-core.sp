@@ -1,16 +1,16 @@
 #include <sourcemod>
 
-#include <cstrike>
-#include <regex>
+#include <dhooks>
 #include <sdktools>
 #include <sdkhooks>
 
 #include <colorvariables>
+#include <cstrike>
 #include <gokz>
+#include <regex>
 
 #include <movementapi>
 #include <gokz/core>
-
 #undef REQUIRE_PLUGIN
 #include <basecomm>
 
@@ -30,6 +30,7 @@ public Plugin myinfo =
 
 bool gB_LateLoad;
 bool gB_BaseComm;
+Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
@@ -104,9 +105,13 @@ void OnLateLoad()
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (IsClientInGame(client) && IsClientAuthorized(client))
+		if (IsClientInGame(client))
 		{
-			OnClientPostAdminCheck(client);
+			OnClientPutInServer(client);
+			if (IsClientAuthorized(client))
+			{
+				OnClientPostAdminCheck(client);
+			}
 		}
 	}
 }
@@ -140,7 +145,7 @@ public void OnLibraryRemoved(const char[] name)
 
 // =========================  CLIENT  ========================= //
 
-public void OnClientPostAdminCheck(int client)
+public void OnClientPutInServer(int client)
 {
 	SetupClientOptions(client);
 	SetupClientTimer(client);
@@ -149,6 +154,11 @@ public void OnClientPostAdminCheck(int client)
 	SetupClientHidePlayers(client);
 	SetupClientTeleports(client);
 	PrintConnectMessage(client);
+	DHookEntity(gH_DHooks_OnTeleport, true, client);
+}
+
+public void OnClientPostAdminCheck(int client)
+{
 	gB_ClientIsSetUp[client] = true;
 	Call_GOKZ_OnClientSetup(client);
 }
@@ -212,6 +222,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
+public MRESReturn DHooks_OnTeleport(int client, Handle params)
+{
+	bool origin = !DHookIsNullParam(params, 1); // Origin affected
+	bool velocity = !DHookIsNullParam(params, 3); // Velocity affected
+	OnTeleport_ValidJump(client, origin, velocity);
+	return MRES_Ignored;
+}
+
 
 
 // =========================  MOVEMENTAPI  ========================= //
@@ -257,32 +275,27 @@ public void GOKZ_OnMakeCheckpoint_Post(int client)
 
 public void GOKZ_OnTeleportToCheckpoint_Post(int client)
 {
-	OnTeleportToCheckpoint_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnPrevCheckpoint_Post(int client)
 {
-	OnPrevCheckpoint_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnNextCheckpoint_Post(int client)
 {
-	OnNextCheckpoint_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 {
 	OnTeleportToStart_Timer(client, customPos);
-	OnTeleportToStart_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnUndoTeleport_Post(int client)
 {
-	OnUndoTeleport_ValidJump(client);
 	UpdateTPMenu(client);
 }
 
@@ -364,6 +377,16 @@ static void CreateHooks()
 	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
+	
+	// Setup DHooks OnTeleport
+	Handle gameData = LoadGameConfigFile("sdktools.games");
+	int offset = GameConfGetOffset(gameData, "Teleport");
+	gameData.Close();
+	gH_DHooks_OnTeleport = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnTeleport);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_ObjectPtr);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 }
 
 static void UpdateOldVariables(int client)
