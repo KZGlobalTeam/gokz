@@ -160,8 +160,9 @@ public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcas
 	{
 		return;
 	}
-	gB_ClientIsSetUp[client] = false;
 	PrintDisconnectMessage(client, event);
+	OnPlayerDisconnect_Timer(client);
+	gB_ClientIsSetUp[client] = false;
 }
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
