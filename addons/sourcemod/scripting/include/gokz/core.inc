@@ -445,6 +445,15 @@ forward Action GOKZ_OnUndoTeleport(int client);
  */
 forward void GOKZ_OnUndoTeleport_Post(int client);
 
+/**
+ * Called when player's current jump is invalidated.
+ * A jump is deemed invalid if the player is teleported.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnJumpInvalidated(int client);
+
 
 
 // =========================  NATIVES  ========================= //

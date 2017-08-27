@@ -22,14 +22,10 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define BHOP_ON_GROUND_TICKS 4
-
 bool gB_LateLoad;
-bool gB_HitSomething[MAXPLAYERS + 1];
-JumpType g_CurrentJumpType[MAXPLAYERS + 1];
-JumpType g_LastJumpType[MAXPLAYERS + 1];
-float gF_JumpDistance[MAXPLAYERS + 1];
-float gF_JumpOffset[MAXPLAYERS + 1];
+
+#include "gokz-jumpstats/api.sp"
+#include "gokz-jumpstats/jumptracking.sp"
 
 
 
@@ -37,6 +33,7 @@ float gF_JumpOffset[MAXPLAYERS + 1];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-jumpstats");
 	gB_LateLoad = late;
 	return APLRes_Success;
@@ -48,6 +45,8 @@ public void OnPluginStart()
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
+	
+	CreateGlobalForwards();
 	
 	if (gB_LateLoad)
 	{
@@ -70,6 +69,11 @@ void OnLateLoad()
 
 // =========================  CLIENT  ========================= //
 
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	OnPlayerRunCmd_JumpTracking(client);
+}
+
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_StartTouch, SDKHook_StartTouch_Callback);
@@ -77,116 +81,50 @@ public void OnClientPutInServer(int client)
 
 public Action SDKHook_StartTouch_Callback(int client, int touched)
 {
-	if (!Movement_GetOnGround(client))
-	{
-		gB_HitSomething[client] = true;
-	}
+	OnStartTouch_JumpTracking(client);
 }
+
+
+
+// =========================  MOVEMENTAPI  ========================= //
 
 public void Movement_OnStopTouchGround(int client, bool jumped)
 {
-	BeginJump(client, DetermineJumpType(client, jumped));
+	OnStopTouchGround_JumpTracking(client, jumped);
 }
 
 public void Movement_OnStartTouchGround(int client)
 {
-	if (GOKZ_GetValidJump(client) && !gB_HitSomething[client])
-	{
-		gF_JumpDistance[client] = CalcJumpDistance(client);
-		gF_JumpOffset[client] = CalcJumpOffset(client);
-		g_LastJumpType[client] = g_CurrentJumpType[client];
-		PrintJumpReport(client);
-	}
-	else
-	{
-		g_LastJumpType[client] = JumpType_Invalid;
-	}
+	OnStartTouchGround_JumpTracking(client);
 }
 
 public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
 {
-	if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK)
+	OnChangeMoveType_JumpTracking(client, oldMoveType, newMoveType);
+}
+
+
+
+// =========================  GOKZ  ========================= //
+
+public void GOKZ_OnJumpInvalidated(int client)
+{
+	OnJumpInvalidated_JumpTracking(client);
+}
+
+public void GOKZ_JS_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float maxSpeed, int strafes, float sync, float duration)
+{
+	PrintJumpReport(client, jumpType, distance, offset, height, maxSpeed, strafes, sync, duration);
+}
+
+static void PrintJumpReport(int client, JumpType jumpType, float distance, float offset, float height, float maxSpeed, int strafes, float sync, float duration)
+{
+	// TODO Make this not bad
+	if (jumpType == JumpType_Invalid)
 	{
-		BeginJump(client, JumpType_LadderJump);
+		return;
 	}
-}
-
-
-
-// =========================  PRIVATE  ========================= //
-
-static void BeginJump(int client, JumpType jumpType)
-{
-	g_CurrentJumpType[client] = jumpType;
-	gB_HitSomething[client] = false;
-}
-
-static JumpType DetermineJumpType(int client, bool jumped)
-{
-	if (!jumped)
-	{
-		return JumpType_Fall;
-	}
-	else if (HitBhop(client))
-	{
-		if (g_LastJumpType[client] == JumpType_Fall)
-		{
-			return JumpType_WeirdJump;
-		}
-		else if (LastJumpWasBhop(client) || g_LastJumpType[client] == JumpType_Invalid)
-		{
-			return JumpType_MultiBhop;
-		}
-		else if (gF_JumpOffset[client] < 0.0)
-		{
-			return JumpType_DropBhop;
-		}
-		else
-		{
-			return JumpType_Bhop;
-		}
-	}
-	else
-	{
-		return JumpType_LongJump;
-	}
-}
-
-static bool HitBhop(int client)
-{
-	return Movement_GetTakeoffTick(client) - Movement_GetLandingTick(client) <= BHOP_ON_GROUND_TICKS;
-}
-
-static bool LastJumpWasBhop(int client)
-{
-	return g_LastJumpType[client] == JumpType_Bhop
-	 || g_LastJumpType[client] == JumpType_MultiBhop
-	 || g_LastJumpType[client] == JumpType_DropBhop
-	 || g_LastJumpType[client] == JumpType_WeirdJump;
-}
-
-static float CalcJumpDistance(int client)
-{
-	float takeoffOrigin[3], landingOrigin[3];
-	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	Movement_GetLandingOrigin(client, landingOrigin);
-	return GetVectorHorizontalDistance(takeoffOrigin, landingOrigin) + 32.0;
-}
-
-static float CalcJumpOffset(int client)
-{
-	float takeoffOrigin[3], landingOrigin[3];
-	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	Movement_GetLandingOrigin(client, landingOrigin);
-	return landingOrigin[2] - takeoffOrigin[2];
-}
-
-static void PrintJumpReport(int client)
-{
 	GOKZ_PrintToChat(client, true, 
-		"%s - Dist: {yellow}%.3f{grey}, Offset: {yellow}%.1f{grey}, Pre: {yellow}%.1f{grey}", 
-		gC_JumpTypes[g_CurrentJumpType[client]], 
-		gF_JumpDistance[client], 
-		gF_JumpOffset[client], 
-		Movement_GetTakeoffSpeed(client));
+		"%s | Dist %.3f (%.0f) | Pre %.0f | Max %.0f | Height %.0f | Strafes %d | Sync %.0f | Duration %.3f", 
+		gC_JumpTypes[jumpType], distance, offset, GOKZ_GetTakeoffSpeed(client), maxSpeed, height, strafes, sync, duration);
 } 

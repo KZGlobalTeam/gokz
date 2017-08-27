@@ -172,6 +172,7 @@ public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcas
 	}
 	PrintDisconnectMessage(client, event);
 	OnPlayerDisconnect_Timer(client);
+	OnPlayerDisconnect_ValidJump(client);
 	gB_ClientIsSetUp[client] = false;
 }
 
@@ -202,6 +203,7 @@ public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) //
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	OnPlayerDeath_Timer(client);
+	OnPlayerDeath_ValidJump(client);
 }
 
 public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team hook

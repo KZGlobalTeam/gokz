@@ -417,6 +417,15 @@ bool GetValidJump(int client)
 	return validJump[client];
 }
 
+static void InvalidateJump(int client)
+{
+	if (validJump[client])
+	{
+		validJump[client] = false;
+		Call_GOKZ_OnJumpInvalidated(client);
+	}
+}
+
 void OnStopTouchGround_ValidJump(int client)
 {
 	if (Movement_GetMoveType(client) == MOVETYPE_WALK)
@@ -429,7 +438,7 @@ void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMo
 {
 	if (newMoveType != MOVETYPE_WALK)
 	{
-		validJump[client] = false;
+		InvalidateJump(client);
 	}
 	else if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
 	{
@@ -437,20 +446,30 @@ void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMo
 	}
 }
 
+void OnPlayerDisconnect_ValidJump(int client)
+{
+	InvalidateJump(client);
+}
+
 void OnPlayerSpawn_ValidJump(int client)
 {
-	validJump[client] = false;
+	InvalidateJump(client);
+}
+
+void OnPlayerDeath_ValidJump(int client)
+{
+	InvalidateJump(client);
 }
 
 void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 {
 	if (origin)
 	{
-		validJump[client] = false;
+		InvalidateJump(client);
 	}
 	else if (velocity && GetGameTickCount() - Movement_GetTakeoffTick(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
 	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
-		validJump[client] = false;
+		InvalidateJump(client);
 	}
 }
 
