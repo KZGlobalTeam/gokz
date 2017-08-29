@@ -17,7 +17,7 @@ static Handle H_OnJumpInvalidated;
 void CreateGlobalForwards()
 {
 	H_OnTakeoff = CreateGlobalForward("GOKZ_JS_OnTakeoff", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnLanding = CreateGlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float);
+	H_OnLanding = CreateGlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float);
 	H_OnJumpInvalidated = CreateGlobalForward("GOKZ_JS_OnJumpInvalidated", ET_Ignore, Param_Cell);
 }
 
@@ -29,7 +29,7 @@ void Call_OnTakeoff(int client, JumpType jumpType)
 	Call_Finish();
 }
 
-void Call_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float maxSpeed, int strafes, float sync, float duration)
+void Call_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
 	Call_StartForward(H_OnLanding);
 	Call_PushCell(client);
@@ -37,6 +37,7 @@ void Call_OnLanding(int client, JumpType jumpType, float distance, float offset,
 	Call_PushFloat(distance);
 	Call_PushFloat(offset);
 	Call_PushFloat(height);
+	Call_PushFloat(preSpeed);
 	Call_PushFloat(maxSpeed);
 	Call_PushCell(strafes);
 	Call_PushFloat(sync);

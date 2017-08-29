@@ -411,6 +411,7 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 #define VALID_JUMP_TAKEOFF_GRACE_TICKS 2 // Ticks after takeoff when velocity can be affected
 
 static bool validJump[MAXPLAYERS + 1];
+static int lastTeleportTick[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -426,23 +427,31 @@ static void InvalidateJump(int client)
 	}
 }
 
-void OnStopTouchGround_ValidJump(int client)
+void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
-	if (Movement_GetMoveType(client) == MOVETYPE_WALK)
+	// Make sure leaving the ground wasn't caused by a teleport or anything fishy
+	if (Movement_GetMoveType(client) == MOVETYPE_WALK
+		 && GetGameTickCount() - lastTeleportTick[client] > 1)
 	{
 		validJump[client] = true;
+		Call_GOKZ_OnJumpValidated(client, jumped, false);
+	}
+	else
+	{
+		InvalidateJump(client);
 	}
 }
 
 void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
 {
-	if (newMoveType != MOVETYPE_WALK)
-	{
-		InvalidateJump(client);
-	}
-	else if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
+	if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
 	{
 		validJump[client] = true;
+		Call_GOKZ_OnJumpValidated(client, false, true);
+	}
+	else
+	{
+		InvalidateJump(client);
 	}
 }
 
@@ -471,6 +480,7 @@ void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
 		InvalidateJump(client);
 	}
+	lastTeleportTick[client] = GetGameTickCount();
 }
 
 

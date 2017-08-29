@@ -69,13 +69,14 @@ forward void GOKZ_JS_OnTakeoff(int client, JumpType jumpType);
  * @param distance		Horizontal distance of the jump.
  * @param offset		Vertical distance of the jump.
  * @param height		Max height of the player relative to their takeoff origin.
+ * @param preSpeed		Takeoff speed.
  * @param maxSpeed		Max horizontal speed reached.
  * @param strafes		Number of strafes.
  * @param sync			Percentage of time that speed was gained.
  * @param duration		Duration of the jump in seconds.
  * @noreturn
  */
-forward void GOKZ_JS_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float maxSpeed, int strafes, float sync, float duration);
+forward void GOKZ_JS_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration);
 
 /**
  * Called when player's current jump has been declared an invalid jumpstat.

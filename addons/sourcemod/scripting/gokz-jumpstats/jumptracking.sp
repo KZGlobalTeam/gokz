@@ -6,9 +6,19 @@
 
 
 
-#define BHOP_ON_GROUND_TICKS 4
+#define BHOP_ON_GROUND_TICKS 5
 
 
+
+void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump)
+{
+	BeginJumpstat(client, jumped, ladderJump);
+}
+
+void OnStartTouchGround_JumpTracking(int client)
+{
+	EndJumpstat(client);
+}
 
 void OnPlayerRunCmd_JumpTracking(int client)
 {
@@ -17,6 +27,9 @@ void OnPlayerRunCmd_JumpTracking(int client)
 		return;
 	}
 	
+	CheckGravity(client);
+	CheckBaseVelocity(client);
+	
 	UpdateHeight(client);
 	UpdateMaxSpeed(client);
 	UpdateStrafes(client);
@@ -24,26 +37,9 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	UpdateDuration(client);
 }
 
-void OnStopTouchGround_JumpTracking(int client, bool jumped)
+void OnJumpInvalidated_JumpTracking(int client)
 {
-	BeginJumpstat(client, jumped, false);
-}
-
-void OnStartTouchGround_JumpTracking(int client)
-{
-	EndJumpstat(client);
-}
-
-void OnChangeMoveType_JumpTracking(int client, MoveType oldMoveType, MoveType newMoveType)
-{
-	if (newMoveType != MOVETYPE_WALK)
-	{
-		InvalidateJump(client);
-	}
-	else if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK)
-	{
-		BeginJumpstat(client, false, true);
-	}
+	InvalidateJump(client);
 }
 
 void OnStartTouch_JumpTracking(int client)
@@ -51,14 +47,9 @@ void OnStartTouch_JumpTracking(int client)
 	InvalidateJump(client);
 }
 
-void OnJumpInvalidated_JumpTracking(int client)
+static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 {
-	InvalidateJump(client);
-}
-
-static void BeginJumpstat(int client, bool jumped, bool ladder)
-{
-	BeginType(client, jumped, ladder);
+	BeginType(client, jumped, ladderJump);
 	BeginHeight(client);
 	BeginMaxSpeed(client);
 	BeginStrafes(client);
@@ -80,7 +71,31 @@ static void EndJumpstat(int client)
 	EndDuration(client);
 	
 	Call_OnLanding(client, GetType(client), GetDistance(client), GetOffset(client), GetHeight(client), 
-		GetMaxSpeed(client), GetStrafes(client), GetSync(client), GetDuration(client));
+		GOKZ_GetTakeoffSpeed(client), GetMaxSpeed(client), GetStrafes(client), GetSync(client), GetDuration(client));
+}
+
+
+
+// =========================  CHECKS  ========================= //
+
+static void CheckGravity(int client)
+{
+	float gravity = Movement_GetGravity(client);
+	// Allow 1.0 and 0.0 gravity as both values appear during normal gameplay
+	if (gravity != 1.0 && gravity != 0.0)
+	{
+		InvalidateJump(client);
+	}
+}
+
+static void CheckBaseVelocity(int client)
+{
+	float baseVelocity[3];
+	Movement_GetBaseVelocity(client, baseVelocity);
+	if (baseVelocity[0] != 0.0 || baseVelocity[1] != 0.0 || baseVelocity[2] != 0.0)
+	{
+		InvalidateJump(client);
+	}
 }
 
 
@@ -93,7 +108,7 @@ static void EndJumpstat(int client)
 	
 	A takeoff occurs when the player stops touching the ground, with
 	the exception of ladderjumps, which occur when the player leaves
-	a ladder.
+	a ladderJump.
 	
 	A brief description of each jump type:
 		LongJump - Normal jump.
@@ -101,7 +116,7 @@ static void EndJumpstat(int client)
 		MultiBhop - Bunnyhop after landing a bunnyhop type jump.
 		DropBhop - Bhop, except the previous jump had a negative height offset, and was not a Fall.
 		WeirdJump - Bhop, except the previous jump was of the Fall type.
-		LadderJump - Taking off from a ladder.
+		LadderJump - Taking off from a ladderJump.
 		Fall - Becoming airborne without jumping, i.e. walking/falling down.
 		Other - Jump type can't be determined, or the player touched something.
 		Invalid - Jump was deemed invalid e.g. because of teleportation.
@@ -110,8 +125,8 @@ static void EndJumpstat(int client)
 	it will be of the Other type.
 */
 
-JumpType jumpTypeLast[MAXPLAYERS + 1];
-JumpType jumpTypeCurrent[MAXPLAYERS + 1];
+static JumpType jumpTypeLast[MAXPLAYERS + 1];
+static JumpType jumpTypeCurrent[MAXPLAYERS + 1];
 
 JumpType GetType(int client)
 {
@@ -127,14 +142,15 @@ void InvalidateJump(int client)
 {
 	if (InValidJump(client))
 	{
+		jumpTypeLast[client] = JumpType_Invalid;
 		jumpTypeCurrent[client] = JumpType_Invalid;
 		Call_OnJumpInvalidated(client);
 	}
 }
 
-static void BeginType(int client, bool jumped, bool ladder)
+static void BeginType(int client, bool jumped, bool ladderJump)
 {
-	jumpTypeCurrent[client] = DetermineType(client, jumped, ladder);
+	jumpTypeCurrent[client] = DetermineType(client, jumped, ladderJump);
 }
 
 static void EndType(int client)
@@ -142,9 +158,13 @@ static void EndType(int client)
 	jumpTypeLast[client] = jumpTypeCurrent[client];
 }
 
-static JumpType DetermineType(int client, bool jumped, bool ladder)
+static JumpType DetermineType(int client, bool jumped, bool ladderJump)
 {
-	if (ladder)
+	if (gI_TouchingEntities[client] > 0)
+	{
+		return JumpType_Invalid;
+	}
+	if (ladderJump)
 	{
 		return JumpType_LadderJump;
 	}
@@ -213,11 +233,7 @@ static float CalcDistance(int client)
 	Movement_GetTakeoffOrigin(client, takeoffOrigin);
 	Movement_GetLandingOrigin(client, landingOrigin);
 	distance = GetVectorHorizontalDistance(takeoffOrigin, landingOrigin);
-	if (GetType(client) == JumpType_LadderJump)
-	{
-		distance += 16.0;
-	}
-	else
+	if (GetType(client) != JumpType_LadderJump)
 	{
 		distance += 32.0;
 	}

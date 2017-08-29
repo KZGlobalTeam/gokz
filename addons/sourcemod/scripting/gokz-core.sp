@@ -250,7 +250,7 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 
 public void Movement_OnStopTouchGround(int client, bool jumped)
 {
-	OnStopTouchGround_ValidJump(client);
+	OnStopTouchGround_ValidJump(client, jumped);
 }
 
 

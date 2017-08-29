@@ -30,6 +30,7 @@ static Handle H_OnTeleportToStart;
 static Handle H_OnTeleportToStart_Post;
 static Handle H_OnUndoTeleport;
 static Handle H_OnUndoTeleport_Post;
+static Handle H_OnJumpValidated;
 static Handle H_OnJumpInvalidated;
 
 
@@ -60,6 +61,7 @@ void CreateGlobalForwards()
 	H_OnTeleportToStart_Post = CreateGlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnUndoTeleport = CreateGlobalForward("GOKZ_OnUndoTeleport", ET_Hook, Param_Cell);
 	H_OnUndoTeleport_Post = CreateGlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
+	H_OnJumpValidated = CreateGlobalForward("GOKZ_OnJumpValidated", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	H_OnJumpInvalidated = CreateGlobalForward("GOKZ_OnJumpInvalidated", ET_Ignore, Param_Cell);
 }
 
@@ -243,6 +245,15 @@ void Call_GOKZ_OnOptionChanged(int client, Option option, int optionValue)
 	Call_PushCell(client);
 	Call_PushCell(option);
 	Call_PushCell(optionValue);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
+{
+	Call_StartForward(H_OnJumpValidated);
+	Call_PushCell(client);
+	Call_PushCell(jumped);
+	Call_PushCell(ladderJump);
 	Call_Finish();
 }
 
