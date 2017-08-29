@@ -164,11 +164,11 @@ static JumpType DetermineType(int client, bool jumped, bool ladderJump)
 	{
 		return JumpType_Invalid;
 	}
-	if (ladderJump)
+	else if (ladderJump)
 	{
 		return JumpType_LadderJump;
 	}
-	if (!jumped)
+	else if (!jumped)
 	{
 		return JumpType_Fall;
 	}
@@ -193,7 +193,6 @@ static JumpType DetermineType(int client, bool jumped, bool ladderJump)
 			return JumpType_Other;
 		}
 	}
-	
 	return JumpType_LongJump;
 }
 

@@ -117,17 +117,90 @@ public void GOKZ_OnJumpInvalidated(int client)
 
 public void GOKZ_JS_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
-	PrintJumpReport(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
-}
-
-static void PrintJumpReport(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
-{
-	// TODO Make this not bad
 	if (jumpType == JumpType_Invalid)
 	{
 		return;
 	}
+	
+	PrintJumpReportToConsole(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
+	PrintJumpReportToChat(client, jumpType, distance, offset, preSpeed, maxSpeed, strafes, sync);
+}
+
+static void PrintJumpReportToConsole(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
+{
+	PrintToConsole(client, 
+		"You did a %s (%s). Here's your stats report:\n %.3f units\t| %d Offset\t| %.2f Height\t| %.3f Seconds\n %d Strafes\t| %.2f Pre\t| %.2f Max\t| %.2f%% Sync\n", 
+		gC_JumpTypes[jumpType], gC_JumpTypesShort[jumpType], distance, RoundFloat(offset), height, duration, strafes, preSpeed, maxSpeed, sync);
+}
+
+static void PrintJumpReportToChat(int client, JumpType jumpType, float distance, float offset, float preSpeed, float maxSpeed, int strafes, float sync)
+{
 	GOKZ_PrintToChat(client, true, 
-		"%s | Dist %.3f (%.0f) | Pre %.0f | Max %.0f | Height %.0f | Strafes %d | Sync %.0f | Duration %.3f", 
-		gC_JumpTypes[jumpType], distance, offset, preSpeed, maxSpeed, height, strafes, sync, duration);
+		"{grey}%s: %s units [%s | %s | %s | %s]", 
+		gC_JumpTypesShort[jumpType], 
+		GetDistanceString(distance, offset), 
+		GetStrafesString(strafes), 
+		GetPreSpeedString(client, preSpeed), 
+		GetMaxSpeedString(maxSpeed), 
+		GetSyncString(sync));
+}
+
+static char[] GetDistanceString(float distance, float offset)
+{
+	char distanceString[64];
+	if (RoundFloat(offset) == 0)
+	{
+		FormatEx(distanceString, sizeof(distanceString), "%.2f", distance);
+	}
+	else if (RoundFloat(offset) > 0)
+	{
+		FormatEx(distanceString, sizeof(distanceString), "%.2f ({green}+%d{grey})", distance, RoundFloat(offset));
+	}
+	else
+	{
+		FormatEx(distanceString, sizeof(distanceString), "%.2f ({darkred}%d{grey})", distance, RoundFloat(offset));
+	}
+	return distanceString;
+}
+
+static char[] GetStrafesString(int strafes)
+{
+	char strafesString[32];
+	if (strafes == 1)
+	{
+		strafesString = "{lime}1{grey} Strafe";
+	}
+	else
+	{
+		FormatEx(strafesString, sizeof(strafesString), "{lime}%d{grey} Strafes", strafes);
+	}
+	return strafesString;
+}
+
+static char[] GetPreSpeedString(int client, float preSpeed)
+{
+	char preSpeedString[32];
+	if (GOKZ_GetHitPerf(client))
+	{
+		FormatEx(preSpeedString, sizeof(preSpeedString), "{green}%.0f{grey} Pre", preSpeed);
+	}
+	else
+	{
+		FormatEx(preSpeedString, sizeof(preSpeedString), "{lime}%.0f{grey} Pre", preSpeed);
+	}
+	return preSpeedString;
+}
+
+static char[] GetMaxSpeedString(float maxSpeed)
+{
+	char maxSpeedString[32];
+	FormatEx(maxSpeedString, sizeof(maxSpeedString), "{lime}%.0f{grey} Max", maxSpeed);
+	return maxSpeedString;
+}
+
+static char[] GetSyncString(float sync)
+{
+	char syncString[32];
+	FormatEx(syncString, sizeof(syncString), "{lime}%.0f%%%%{grey} Sync", sync);
+	return syncString;
 } 

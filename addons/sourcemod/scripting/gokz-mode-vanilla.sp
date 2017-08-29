@@ -113,7 +113,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	KZPlayer player = new KZPlayer(client);
 	if (gB_GOKZCore)
 	{
-		player.gokzHitPerf = false;
+		player.gokzHitPerf = Movement_GetHitPerf(client);
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
 	}
 }

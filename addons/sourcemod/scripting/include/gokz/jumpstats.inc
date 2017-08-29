@@ -39,13 +39,24 @@ enum StrafeDirection
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
-	"Other", 
+	"Jump", 
 	"Long Jump", 
-	"B-Hop", 
-	"Multi B-Hop", 
+	"Bunnyhop", 
+	"Multi Bunnyhop", 
 	"Weird Jump", 
 	"Ladder Jump", 
 	"Fall"
+}
+
+stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] = 
+{
+	"??", 
+	"LJ", 
+	"BH", 
+	"MBH", 
+	"WJ", 
+	"LAJ", 
+	"FL"
 }
 
 
