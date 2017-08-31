@@ -7,6 +7,8 @@
 
 
 
+#define LADDERJUMP_OFFSET_ALLOWANCE 2.0 // How much offset ladder jumps are allowed to have
+
 static float distanceTiers[JUMPTYPE_COUNT - 1][MODE_COUNT][DISTANCETIER_COUNT];
 static char jumpTypeKeys[JUMPTYPE_COUNT - 1][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "fall" };
 static char modeKeys[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
@@ -19,7 +21,9 @@ static char distanceTierKeys[DISTANCETIER_COUNT][] =  { "meh", "impressive", "pe
 int GetDistanceTier(int jumpType, int mode, float distance, float offset)
 {
 	// No tiers given for 'Invalid' jumps.
-	if (jumpType == JumpType_Invalid || jumpType == JumpType_Other || RoundFloat(offset) != 0.0)
+	if (jumpType == JumpType_Invalid || jumpType == JumpType_Other
+		 || jumpType != JumpType_LadderJump && offset != 0.0
+		 || FloatAbs(offset) >= LADDERJUMP_OFFSET_ALLOWANCE)
 	{
 		// TODO Give a tier to "Other" jumps
 		// TODO Give a tier to offset jumps
