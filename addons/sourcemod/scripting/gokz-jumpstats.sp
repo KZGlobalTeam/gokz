@@ -49,6 +49,8 @@ public void OnPluginStart()
 		SetFailState("This plugin is only for CS:GO.");
 	}
 	
+	LoadTranslations("gokz-jumpstats.phrases");
+	
 	CreateGlobalForwards();
 	
 	OnPluginStart_JumpReporting();

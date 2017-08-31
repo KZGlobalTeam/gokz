@@ -7,6 +7,7 @@
 
 
 #define BHOP_ON_GROUND_TICKS 5
+#define WEIRDJUMP_MAX_FALL_OFFSET 64.0
 
 
 
@@ -176,7 +177,7 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 	}
 	else if (HitBhop(client))
 	{
-		if (FloatAbs(GetOffset(client)) <= 0.1)
+		if (FloatAbs(GetOffset(client)) <= 0.1) // Check for no offset
 		{
 			switch (GetType(client))
 			{
@@ -186,7 +187,8 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 				default:return JumpType_Other;
 			}
 		}
-		else if (GetType(client) == JumpType_Fall)
+		// Check for weird jump
+		else if (GetType(client) == JumpType_Fall && ValidWeirdJumpDropDistance(client))
 		{
 			return JumpType_WeirdJump;
 		}
@@ -201,6 +203,21 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 static bool HitBhop(int client)
 {
 	return Movement_GetTakeoffTick(client) - Movement_GetLandingTick(client) <= BHOP_ON_GROUND_TICKS;
+}
+
+static bool ValidWeirdJumpDropDistance(int client)
+{
+	float offset = GetOffset(client);
+	if (offset < -1 * WEIRDJUMP_MAX_FALL_OFFSET)
+	{
+		// Don't bother telling them if they fell a very far distance
+		if (offset >= -2 * WEIRDJUMP_MAX_FALL_OFFSET)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Dropped Too Far (Weird Jump)", -1 * offset, WEIRDJUMP_MAX_FALL_OFFSET);
+		}
+		return false;
+	}
+	return true;
 }
 
 

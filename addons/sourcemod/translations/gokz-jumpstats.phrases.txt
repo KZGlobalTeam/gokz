@@ -1,0 +1,10 @@
+"Phrases"
+{	
+	// Chat Messages ////////////////////////////////////////////////////////////
+	"Dropped Too Far (Weird Jump)"
+	{
+		// Your search for player 'Bill' returned with no results.
+		"#format"	"{1:.1f},{2:.1f}"
+		"en"		"{grey}You fell too far for a valid Weird Jump ({red}{1}{grey}/{green}{2}{grey})."
+	}
+}
