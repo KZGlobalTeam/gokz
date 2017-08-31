@@ -13,24 +13,35 @@
 
 // =========================  ENUMERATIONS  ========================= //
 
-enum JumpType
+enum
 {
 	JumpType_Invalid = -1, 
-	JumpType_Other, 
 	JumpType_LongJump, 
 	JumpType_Bhop, 
 	JumpType_MultiBhop, 
 	JumpType_WeirdJump, 
 	JumpType_LadderJump, 
 	JumpType_Fall, 
+	JumpType_Other, 
 	JUMPTYPE_COUNT
 }
 
-enum StrafeDirection
+enum
 {
 	StrafeDirection_None, 
 	StrafeDirection_Left, 
 	StrafeDirection_Right
+}
+
+enum
+{
+	DistanceTier_None = -1, 
+	DistanceTier_Meh, 
+	DistanceTier_Impressive, 
+	DistanceTier_Perfect, 
+	DistanceTier_Godlike, 
+	DistanceTier_Ownage, 
+	DISTANCETIER_COUNT
 }
 
 
@@ -39,24 +50,24 @@ enum StrafeDirection
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
-	"Jump", 
 	"Long Jump", 
 	"Bunnyhop", 
 	"Multi Bunnyhop", 
 	"Weird Jump", 
 	"Ladder Jump", 
-	"Fall"
+	"Fall", 
+	"Unknown Jump"
 }
 
 stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] = 
 {
-	"??", 
 	"LJ", 
 	"BH", 
 	"MBH", 
 	"WJ", 
 	"LAJ", 
-	"FL"
+	"FL", 
+	"??"
 }
 
 
@@ -67,10 +78,10 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
  * Called when a player begins their jump.
  *
  * @param client		Client index.
-  * @param jumpType		Type of jump.
+ * @param jumpType		Type of jump.
  * @noreturn
  */
-forward void GOKZ_JS_OnTakeoff(int client, JumpType jumpType);
+forward void GOKZ_JS_OnTakeoff(int client, int jumpType);
 
 /**
  * Called when a player lands their jump.
@@ -87,7 +98,7 @@ forward void GOKZ_JS_OnTakeoff(int client, JumpType jumpType);
  * @param duration		Duration of the jump in seconds.
  * @noreturn
  */
-forward void GOKZ_JS_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration);
+forward void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration);
 
 /**
  * Called when player's current jump has been declared an invalid jumpstat.

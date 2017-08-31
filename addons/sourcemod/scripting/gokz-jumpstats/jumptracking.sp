@@ -22,7 +22,7 @@ void OnStartTouchGround_JumpTracking(int client)
 
 void OnPlayerRunCmd_JumpTracking(int client)
 {
-	if (!IsPlayerAlive(client) || !InValidJump(client))
+	if (!IsPlayerAlive(client) || !GetValidJump(client))
 	{
 		return;
 	}
@@ -114,7 +114,6 @@ static void CheckBaseVelocity(int client)
 		LongJump - Normal jump.
 		Bhop - Bunnyhop after landing a non-bunnyhop type jump.
 		MultiBhop - Bunnyhop after landing a bunnyhop type jump.
-		DropBhop - Bhop, except the previous jump had a negative height offset, and was not a Fall.
 		WeirdJump - Bhop, except the previous jump was of the Fall type.
 		LadderJump - Taking off from a ladderJump.
 		Fall - Becoming airborne without jumping, i.e. walking/falling down.
@@ -125,22 +124,22 @@ static void CheckBaseVelocity(int client)
 	it will be of the Other type.
 */
 
-static JumpType jumpTypeLast[MAXPLAYERS + 1];
-static JumpType jumpTypeCurrent[MAXPLAYERS + 1];
+static int jumpTypeLast[MAXPLAYERS + 1];
+static int jumpTypeCurrent[MAXPLAYERS + 1];
 
-JumpType GetType(int client)
+int GetType(int client)
 {
 	return jumpTypeLast[client];
 }
 
-bool InValidJump(int client)
+bool GetValidJump(int client)
 {
-	return !Movement_GetOnGround(client) && jumpTypeCurrent[client] != JumpType_Invalid;
+	return jumpTypeCurrent[client] != JumpType_Invalid;
 }
 
 void InvalidateJump(int client)
 {
-	if (InValidJump(client))
+	if (GetValidJump(client))
 	{
 		jumpTypeLast[client] = JumpType_Invalid;
 		jumpTypeCurrent[client] = JumpType_Invalid;
@@ -158,7 +157,7 @@ static void EndType(int client)
 	jumpTypeLast[client] = jumpTypeCurrent[client];
 }
 
-static JumpType DetermineType(int client, bool jumped, bool ladderJump)
+static int DetermineType(int client, bool jumped, bool ladderJump)
 {
 	if (gI_TouchingEntities[client] > 0)
 	{
@@ -174,7 +173,7 @@ static JumpType DetermineType(int client, bool jumped, bool ladderJump)
 	}
 	else if (HitBhop(client))
 	{
-		if (FloatAbs(GetOffset(client)) <= 0.01)
+		if (FloatAbs(GetOffset(client)) <= 0.1)
 		{
 			switch (GetType(client))
 			{
@@ -353,7 +352,7 @@ static void UpdateMaxSpeed(int client)
 
 static int strafesLast[MAXPLAYERS + 1];
 static int strafesCurrent[MAXPLAYERS + 1];
-static StrafeDirection strafesDirection[MAXPLAYERS + 1];
+static int strafesDirection[MAXPLAYERS + 1];
 
 int GetStrafes(int client)
 {

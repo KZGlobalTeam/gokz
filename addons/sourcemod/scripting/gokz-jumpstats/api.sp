@@ -21,7 +21,7 @@ void CreateGlobalForwards()
 	H_OnJumpInvalidated = CreateGlobalForward("GOKZ_JS_OnJumpInvalidated", ET_Ignore, Param_Cell);
 }
 
-void Call_OnTakeoff(int client, JumpType jumpType)
+void Call_OnTakeoff(int client, int jumpType)
 {
 	Call_StartForward(H_OnTakeoff);
 	Call_PushCell(client);
@@ -29,7 +29,7 @@ void Call_OnTakeoff(int client, JumpType jumpType)
 	Call_Finish();
 }
 
-void Call_OnLanding(int client, JumpType jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
+void Call_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
 	Call_StartForward(H_OnLanding);
 	Call_PushCell(client);

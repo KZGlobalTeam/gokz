@@ -539,6 +539,31 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 }
 
 /**
+ * Prints a chat message to those spectating the client, formatting colours 
+ * and optionally adding the chat prefix. If using the chat prefix, specify 
+ * a colour at the beginning of the message.
+ *
+ * @param client		Client index.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ * @noreturn
+ */
+stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] format, any...)
+{
+	char buffer[1024];
+	for (int target = 1; target <= MaxClients; target++)
+	{
+		if (IsClientInGame(target) && GetObserverTarget(target) == client)
+		{
+			SetGlobalTransTarget(target);
+			VFormat(buffer, sizeof(buffer), format, 4);
+			GOKZ_PrintToChat(target, addPrefix, buffer);
+		}
+	}
+}
+
+/**
  * Starts the player's timer for a course on the current map.
  *
  * @param client    	Client index.
