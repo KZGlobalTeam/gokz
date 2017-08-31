@@ -44,7 +44,10 @@ void OnJumpInvalidated_JumpTracking(int client)
 
 void OnStartTouch_JumpTracking(int client)
 {
-	InvalidateJump(client);
+	if (!Movement_GetOnGround(client))
+	{
+		InvalidateJump(client);
+	}
 }
 
 static void BeginJumpstat(int client, bool jumped, bool ladderJump)
