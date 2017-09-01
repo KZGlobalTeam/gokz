@@ -10,9 +10,6 @@
 #define LADDERJUMP_OFFSET_ALLOWANCE 2.0 // How much offset ladder jumps are allowed to have
 
 static float distanceTiers[JUMPTYPE_COUNT - 1][MODE_COUNT][DISTANCETIER_COUNT];
-static char jumpTypeKeys[JUMPTYPE_COUNT - 1][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "fall" };
-static char modeKeys[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
-static char distanceTierKeys[DISTANCETIER_COUNT][] =  { "meh", "impressive", "perfect", "godlike", "ownage" };
 
 
 
@@ -49,7 +46,7 @@ float GetDistanceTierDistance(int jumpType, int mode, int tier)
 
 // =========================  LISTENERS  ========================= //
 
-void OnPluginStart_JumpReporting()
+void OnMapStart_DistanceTiers()
 {
 	if (!LoadDistanceTiers())
 	{
@@ -64,23 +61,26 @@ void OnPluginStart_JumpReporting()
 static bool LoadDistanceTiers()
 {
 	KeyValues kv = new KeyValues("tiers");
-	kv.ImportFromFile("cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg");
+	if (!kv.ImportFromFile("cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"))
+	{
+		return false;
+	}
 	
 	for (int jumpType = 0; jumpType < JUMPTYPE_COUNT - 1; jumpType++)
 	{
-		if (!kv.JumpToKey(jumpTypeKeys[jumpType]))
+		if (!kv.JumpToKey(gC_KeysJumpType[jumpType]))
 		{
 			return false;
 		}
 		for (int mode = 0; mode < MODE_COUNT; mode++)
 		{
-			if (!kv.JumpToKey(modeKeys[mode]))
+			if (!kv.JumpToKey(gC_KeysMode[mode]))
 			{
 				return false;
 			}
 			for (int tier = 0; tier < DISTANCETIER_COUNT; tier++)
 			{
-				distanceTiers[jumpType][mode][tier] = kv.GetFloat(distanceTierKeys[tier]);
+				distanceTiers[jumpType][mode][tier] = kv.GetFloat(gC_KeysDistanceTier[tier]);
 			}
 			kv.GoBack();
 		}

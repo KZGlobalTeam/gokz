@@ -72,6 +72,15 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 
 
 
+// =========================  OTHER  ========================= //
+
+// Used and recommended for key value files
+stock char gC_KeysJumpType[JUMPTYPE_COUNT - 1][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "fall" };
+stock char gC_KeysMode[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
+stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =  { "meh", "impressive", "perfect", "godlike", "ownage" };
+
+
+
 // =========================  FORWARDS  ========================= //
 
 /**

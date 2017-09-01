@@ -6,9 +6,13 @@
 
 
 
+#define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-sounds.cfg"
+
 static char tierColours[DISTANCETIER_COUNT][] =  { "{grey}", "{blue}", "{green}", "{darkred}", "{gold}" };
 
 
+
+// =========================  LISTENERS  ========================= //
 
 void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
@@ -21,6 +25,15 @@ void OnLanding_JumpReporting(int client, int jumpType, float distance, float off
 	if (tier != DistanceTier_None)
 	{
 		DoChatReport(client, jumpType, distance, height, preSpeed, maxSpeed, strafes, sync, tier);
+		PlayJumpstatSound(client, tier);
+	}
+}
+
+void OnMapStart_JumpReporting()
+{
+	if (!LoadSounds())
+	{
+		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
 	}
 }
 
@@ -117,4 +130,40 @@ static char[] GetSyncString(float sync)
 	char syncString[32];
 	FormatEx(syncString, sizeof(syncString), "{lime}%.0f%%%%{grey} Sync", sync);
 	return syncString;
+}
+
+
+
+// =========================  SOUNDS  ========================= //
+
+static char sounds[DISTANCETIER_COUNT][256];
+
+void PlayJumpstatSound(int client, int tier)
+{
+	if (tier <= DistanceTier_Meh || tier >= DISTANCETIER_COUNT)
+	{
+		return; // No sound available for specified tier
+	}
+	EmitSoundToClientAny(client, sounds[tier]);
+}
+
+static bool LoadSounds()
+{
+	KeyValues kv = new KeyValues("sounds");
+	if (!kv.ImportFromFile(SOUNDS_CFG_PATH))
+	{
+		return false;
+	}
+	
+	char downloadPath[256];
+	for (int tier = DistanceTier_Impressive; tier < DISTANCETIER_COUNT; tier++)
+	{
+		kv.GetString(gC_KeysDistanceTier[tier], sounds[tier], sizeof(sounds[]));
+		FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", sounds[tier]);
+		AddFileToDownloadsTable(downloadPath);
+		PrecacheSoundAny(sounds[tier]);
+	}
+	
+	delete kv;
+	return true;
 } 
