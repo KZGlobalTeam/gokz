@@ -9,7 +9,7 @@
 
 #define LADDERJUMP_OFFSET_ALLOWANCE 2.0 // How much offset ladder jumps are allowed to have
 
-static float distanceTiers[JUMPTYPE_COUNT - 1][MODE_COUNT][DISTANCETIER_COUNT];
+static float distanceTiers[JUMPTYPE_COUNT - 2][MODE_COUNT][DISTANCETIER_COUNT];
 
 
 
@@ -18,7 +18,7 @@ static float distanceTiers[JUMPTYPE_COUNT - 1][MODE_COUNT][DISTANCETIER_COUNT];
 int GetDistanceTier(int jumpType, int mode, float distance, float offset)
 {
 	// No tiers given for 'Invalid' jumps.
-	if (jumpType == JumpType_Invalid || jumpType == JumpType_Other
+	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
 		 || jumpType != JumpType_LadderJump && FloatAbs(offset) >= 0.01
 		 || FloatAbs(offset) >= LADDERJUMP_OFFSET_ALLOWANCE)
 	{
@@ -66,7 +66,7 @@ static bool LoadDistanceTiers()
 		return false;
 	}
 	
-	for (int jumpType = 0; jumpType < JUMPTYPE_COUNT - 1; jumpType++)
+	for (int jumpType = 0; jumpType < JUMPTYPE_COUNT - 2; jumpType++)
 	{
 		if (!kv.JumpToKey(gC_KeysJumpType[jumpType]))
 		{
