@@ -411,7 +411,7 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 #define VALID_JUMP_TAKEOFF_GRACE_TICKS 2 // Ticks after takeoff when velocity can be affected
 
 static bool validJump[MAXPLAYERS + 1];
-static int lastTeleportTick[MAXPLAYERS + 1];
+static int recentTeleports[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -429,9 +429,8 @@ static void InvalidateJump(int client)
 
 void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
-	// Make sure leaving the ground wasn't caused by a teleport or anything fishy
-	if (Movement_GetMoveType(client) == MOVETYPE_WALK
-		 && GetGameTickCount() - lastTeleportTick[client] > 1)
+	// Make sure leaving the ground wasn't caused anything fishy
+	if (Movement_GetMoveType(client) == MOVETYPE_WALK && recentTeleports[client] == 0)
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
@@ -476,11 +475,18 @@ void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 	{
 		InvalidateJump(client);
 	}
-	else if (velocity && GetGameTickCount() - Movement_GetTakeoffTick(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
+	else if (velocity && gI_OldTickCount[client] - Movement_GetTakeoffTick(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
 	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
 		InvalidateJump(client);
 	}
-	lastTeleportTick[client] = GetGameTickCount();
+	// Count recent teleports
+	recentTeleports[client]++;
+	CreateTimer(0.1, Timer_DecrementRecentTeleports, client);
+}
+
+public Action Timer_DecrementRecentTeleports(Handle timer, int client)
+{
+	recentTeleports[client]--;
 }
 
 
