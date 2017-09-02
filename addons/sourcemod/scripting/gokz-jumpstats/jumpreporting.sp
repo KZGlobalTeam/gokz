@@ -16,16 +16,19 @@ static char tierColours[DISTANCETIER_COUNT][] =  { "{grey}", "{blue}", "{green}"
 
 void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
-	if (jumpType != JumpType_Invalid)
-	{
-		DoConsoleReport(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
-	}
-	
 	int tier = GetDistanceTier(jumpType, GOKZ_GetOption(client, Option_Mode), distance, offset);
 	if (tier != DistanceTier_None)
 	{
-		DoChatReport(client, jumpType, distance, height, preSpeed, maxSpeed, strafes, sync, tier);
-		PlayJumpstatSound(client, tier);
+		// Report the jump to the client and their spectators
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if (i == client || IsValidClient(i) && GetObserverTarget(i) == client)
+			{
+				DoChatReport(i, client, jumpType, distance, height, preSpeed, maxSpeed, strafes, sync, tier);
+				DoConsoleReport(i, client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
+				PlayJumpstatSound(client, tier);
+			}
+		}
 	}
 }
 
@@ -41,27 +44,43 @@ void OnMapStart_JumpReporting()
 
 // =========================  CONSOLE REPORT  ========================= //
 
-static void DoConsoleReport(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
+static void DoConsoleReport(int client, int jumper, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
-	PrintToConsole(client, 
-		"You did: %s (%s). Here's your stats report.\n\tDistance:\t%f\n\tOffset:\t\t%f\n\tHeight:\t\t%f\n\tAirtime:\t%f\n\tStrafes:\t%d\n\tPre Speed:\t%f\n\tMax Speed:\t%f\n\tSync:\t\t%f%%\n", 
-		gC_JumpTypes[jumpType], 
-		gC_JumpTypesShort[jumpType], 
+	PrintToConsole(client, "%t", "Console Jump Report", 
+		jumper, 
 		distance, 
-		offset, 
-		height, 
-		duration, 
-		strafes, 
-		preSpeed, 
-		maxSpeed, 
-		sync);
+		gC_JumpTypes[jumpType], 
+		gC_ModeNames[GOKZ_GetOption(jumper, Option_Mode)], 
+		offset, "Offset", 
+		height, "Height", 
+		RoundFloat(preSpeed), "Pre", 
+		RoundFloat(maxSpeed), "Max", 
+		strafes, "Strafes", 
+		sync, "Sync", 
+		duration, "Airtime");
+	PrintToConsole(client, "  #. %12t%12t%12t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)");
+	if (GetStrafeAirtime(jumper, 0) > 0.001)
+	{
+		PrintToConsole(client, "  0. -           -           -           %3d%%", RoundFloat(GetStrafeAirtime(jumper, 0)));
+	}
+	for (int strafe = 1; strafe <= strafes && strafe < MAX_TRACKED_STRAFES; strafe++)
+	{
+		PrintToConsole(client, 
+			" %2d. %3d%%        %-11.3f %-11.3f %3d%%", 
+			strafe, 
+			RoundFloat(GetStrafeSync(jumper, strafe)), 
+			GetStrafeGain(jumper, strafe), 
+			GetStrafeLoss(jumper, strafe), 
+			RoundFloat(GetStrafeAirtime(jumper, strafe)));
+	}
+	PrintToConsole(client, ""); // New line
 }
 
 
 
 // =========================  CHAT REPORT  ========================= //
 
-static void DoChatReport(int client, int jumpType, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync, int tier)
+static void DoChatReport(int client, int jumper, int jumpType, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync, int tier)
 {
 	GOKZ_PrintToChat(client, true, 
 		"%s%s{grey}: %s%s {grey}[%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
@@ -70,7 +89,7 @@ static void DoChatReport(int client, int jumpType, float distance, float height,
 		tierColours[tier], 
 		GetDistanceString(distance), 
 		GetStrafesString(strafes), 
-		GetPreSpeedString(client, preSpeed), 
+		GetPreSpeedString(jumper, preSpeed), 
 		GetMaxSpeedString(maxSpeed), 
 		GetHeightString(height), 
 		GetSyncString(sync));

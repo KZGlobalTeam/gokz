@@ -6,8 +6,7 @@
 
 
 
-#define BHOP_ON_GROUND_TICKS 5
-#define WEIRDJUMP_MAX_FALL_OFFSET 64.0
+static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded speed
 
 
 
@@ -23,19 +22,24 @@ void OnStartTouchGround_JumpTracking(int client)
 
 void OnPlayerRunCmd_JumpTracking(int client)
 {
-	if (!IsPlayerAlive(client) || !GetValidJump(client))
+	if (!IsPlayerAlive(client))
 	{
 		return;
 	}
 	
-	CheckGravity(client);
-	CheckBaseVelocity(client);
+	if (GetValidJump(client))
+	{
+		CheckGravity(client);
+		CheckBaseVelocity(client);
+		
+		UpdateHeight(client);
+		UpdateMaxSpeed(client);
+		UpdateStrafes(client);
+		UpdateSync(client);
+		UpdateDuration(client);
+	}
 	
-	UpdateHeight(client);
-	UpdateMaxSpeed(client);
-	UpdateStrafes(client);
-	UpdateSync(client);
-	UpdateDuration(client);
+	lastTickSpeed[client] = Movement_GetSpeed(client);
 }
 
 void OnJumpInvalidated_JumpTracking(int client)
@@ -281,12 +285,17 @@ static void EndOffset(int client)
 
 // =========================  DURATION  ========================= //
 
-static float durationLast[MAXPLAYERS + 1];
+static int durationTicksLast[MAXPLAYERS + 1];
 static int durationTicksCurrent[MAXPLAYERS + 1];
 
 float GetDuration(int client)
 {
-	return durationLast[client];
+	return durationTicksLast[client] * GetTickInterval();
+}
+
+int GetDurationTicks(int client)
+{
+	return durationTicksLast[client];
 }
 
 static void BeginDuration(int client)
@@ -296,7 +305,7 @@ static void BeginDuration(int client)
 
 static void EndDuration(int client)
 {
-	durationLast[client] = durationTicksCurrent[client] * GetTickInterval();
+	durationTicksLast[client] = durationTicksCurrent[client];
 }
 
 static int GetDurationTicksCurrent(int client)
@@ -373,16 +382,47 @@ static void UpdateMaxSpeed(int client)
 static int strafesLast[MAXPLAYERS + 1];
 static int strafesCurrent[MAXPLAYERS + 1];
 static int strafesDirection[MAXPLAYERS + 1];
+static int strafesTicks[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
+static int strafesGainTicks[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
+static float strafesGain[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
+static float strafesLoss[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
 
 int GetStrafes(int client)
 {
 	return strafesLast[client];
 }
 
+float GetStrafeAirtime(int client, int strafe)
+{
+	return float(strafesTicks[client][strafe]) / float(GetDurationTicks(client)) * 100.0;
+}
+
+float GetStrafeSync(int client, int strafe)
+{
+	return float(strafesGainTicks[client][strafe]) / float(strafesTicks[client][strafe]) * 100.0;
+}
+
+float GetStrafeGain(int client, int strafe)
+{
+	return strafesGain[client][strafe];
+}
+
+float GetStrafeLoss(int client, int strafe)
+{
+	return strafesLoss[client][strafe];
+}
+
 static void BeginStrafes(int client)
 {
 	strafesCurrent[client] = 0;
 	strafesDirection[client] = StrafeDirection_None;
+	for (int strafe = 0; strafe < MAX_TRACKED_STRAFES; strafe++)
+	{
+		strafesTicks[client][strafe] = 0;
+		strafesGainTicks[client][strafe] = 0;
+		strafesGain[client][strafe] = 0.0;
+		strafesLoss[client][strafe] = 0.0;
+	}
 }
 
 static void EndStrafes(int client)
@@ -403,6 +443,20 @@ static void UpdateStrafes(int client)
 		strafesDirection[player.id] = StrafeDirection_Right;
 		strafesCurrent[player.id]++;
 	}
+	
+	if (strafesCurrent[client] < MAX_TRACKED_STRAFES)
+	{
+		strafesTicks[client][strafesCurrent[client]]++;
+		if (player.speed > lastTickSpeed[client])
+		{
+			strafesGainTicks[client][strafesCurrent[client]]++;
+			strafesGain[client][strafesCurrent[client]] += player.speed - lastTickSpeed[client];
+		}
+		else
+		{
+			strafesLoss[client][strafesCurrent[client]] += lastTickSpeed[client] - player.speed;
+		}
+	}
 }
 
 
@@ -416,7 +470,6 @@ static void UpdateStrafes(int client)
 */
 
 static float syncLast[MAXPLAYERS + 1];
-static float syncLastTickSpeed[MAXPLAYERS + 1]; // Last recorded speed
 static int syncGainTicksCurrent[MAXPLAYERS + 1];
 
 float GetSync(int client)
@@ -437,9 +490,8 @@ static void EndSync(int client)
 static void UpdateSync(int client)
 {
 	float speed = Movement_GetSpeed(client);
-	if (speed > syncLastTickSpeed[client])
+	if (speed > lastTickSpeed[client])
 	{
 		syncGainTicksCurrent[client]++;
 	}
-	syncLastTickSpeed[client] = speed;
 } 

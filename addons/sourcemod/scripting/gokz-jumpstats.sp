@@ -23,6 +23,10 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
+#define BHOP_ON_GROUND_TICKS 5
+#define WEIRDJUMP_MAX_FALL_OFFSET 64.0
+#define MAX_TRACKED_STRAFES 32
+
 bool gB_LateLoad;
 int gI_TouchingEntities[MAXPLAYERS + 1];
 
