@@ -132,8 +132,8 @@ static void CheckBaseVelocity(int client)
 	it will be of the Other type.
 */
 
-static int jumpTypeLast[MAXPLAYERS + 1];
-static int jumpTypeCurrent[MAXPLAYERS + 1];
+static int jumpTypeLast[MAXPLAYERS + 1] =  { JumpType_Invalid, ... };
+static int jumpTypeCurrent[MAXPLAYERS + 1] =  { JumpType_Invalid, ... };
 
 int GetType(int client)
 {

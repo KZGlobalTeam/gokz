@@ -429,7 +429,7 @@ static void InvalidateJump(int client)
 
 void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
-	// Make sure leaving the ground wasn't caused anything fishy
+	// Make sure leaving the ground wasn't caused by anything fishy
 	if (Movement_GetMoveType(client) == MOVETYPE_WALK && recentTeleports[client] == 0)
 	{
 		validJump[client] = true;
