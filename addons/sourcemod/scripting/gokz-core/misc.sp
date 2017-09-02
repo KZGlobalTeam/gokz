@@ -333,7 +333,7 @@ void JoinTeam(int client, int team)
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
 	}
-	else if (team == CS_TEAM_CT || team == CS_TEAM_T && (GetClientTeam(client) != CS_TEAM_CT || GetClientTeam(client) != CS_TEAM_T))
+	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
 	{
 		// Switch teams without killing them (no death notice)
 		CS_SwitchTeam(client, team);
