@@ -29,9 +29,13 @@
     {
         "en"        "Max"
     }
-    "Strafes"
+    "Strafes" // Plural
     {
         "en"        "Strafes"
+    }
+    "Strafe" // Singular
+    {
+        "en"        "Strafe"
     }
     "Sync"
     {
@@ -40,6 +44,10 @@
     "Airtime"
     {
         "en"        "Airtime"
+    }
+    "units"
+    {
+        "en"        "units"
     }
     
     // Headers 
