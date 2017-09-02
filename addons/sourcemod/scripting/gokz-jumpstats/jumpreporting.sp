@@ -26,7 +26,7 @@ void OnLanding_JumpReporting(int client, int jumpType, float distance, float off
 			{
 				DoChatReport(i, client, jumpType, distance, height, preSpeed, maxSpeed, strafes, sync, tier);
 				DoConsoleReport(i, client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
-				PlayJumpstatSound(client, tier);
+				PlayJumpstatSound(i, tier);
 			}
 		}
 	}
