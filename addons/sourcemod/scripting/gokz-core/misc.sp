@@ -326,14 +326,14 @@ static float savedAngles[MAXPLAYERS + 1][3];
 
 void JoinTeam(int client, int team)
 {
-	if (team == CS_TEAM_SPECTATOR)
+	if (team == CS_TEAM_SPECTATOR && GetClientTeam(client) != CS_TEAM_SPECTATOR)
 	{
 		Movement_GetOrigin(client, savedOrigin[client]);
 		Movement_GetEyeAngles(client, savedAngles[client]);
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
 	}
-	else if (team == CS_TEAM_CT || team == CS_TEAM_T)
+	else if (team == CS_TEAM_CT || team == CS_TEAM_T && (GetClientTeam(client) != CS_TEAM_CT || GetClientTeam(client) != CS_TEAM_T))
 	{
 		// Switch teams without killing them (no death notice)
 		CS_SwitchTeam(client, team);
