@@ -4,6 +4,7 @@
 
  * **Timer** - Times runs by automatically detecting the use of start and end buttons in KZ maps.
  * **Movement Modes** - Custom movement mechanics. Includes Vanilla, SimpleKZ and KZTimer modes.
+ * **Jumpstats** - Detailed statistics of your jumps and each individual air strafe.
  * **Customisable Experience** - Tonnes of options to provide the best possible experience for players. 
  * **Database Support** - Store player times, options and more using either a MySQL or SQLite database.
  * Map bonus support, HUD, teleport menu, noclip, !goto, !measure and much, much more.
