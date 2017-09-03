@@ -324,6 +324,11 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 
+void SetupClientJoinTeam(int client)
+{
+	hasSavedPosition[client] = false;
+}
+
 void JoinTeam(int client, int team)
 {
 	if (team == CS_TEAM_SPECTATOR && GetClientTeam(client) != CS_TEAM_SPECTATOR)
@@ -361,6 +366,8 @@ void OnTimerStart_JoinTeam(int client)
 
 // =========================  CHAT PROCESSING  ========================= //
 
+#define MAX_MESSAGE_LENGTH 128
+
 Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 {
 	if (!GetConVarBool(gCV_ChatProcessing))
@@ -368,40 +375,42 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 		return Plugin_Continue;
 	}
 	
-	if (gB_BaseComm && BaseComm_IsClientGagged(client))
+	if (gB_BaseComm && BaseComm_IsClientGagged(client)
+		 || message[0] == '@' // Assume basechat is in use
+		 || IsChatTrigger())
 	{
 		return Plugin_Handled;
 	}
 	
-	// Change to lower case and resend (potential) command messages
-	if ((message[0] == '/' || message[0] == '!') && IsCharUpper(message[1]))
-	{
-		char newMessage[128];
-		int length = strlen(message);
-		for (int i = 0; i <= length; i++)
-		{
-			newMessage[i] = CharToLower(message[i]);
-		}
-		FakeClientCommand(client, "say %s", newMessage);
-		return Plugin_Handled;
-	}
+	char sanitisedMessage[MAX_MESSAGE_LENGTH];
+	strcopy(sanitisedMessage, sizeof(sanitisedMessage), message);
+	SanitiseChatInput(sanitisedMessage, sizeof(sanitisedMessage));
 	
-	// Don't print the message if it is a chat trigger, or starts with @, or is empty
-	if (IsChatTrigger() || message[0] == '@' || !message[0])
+	char sanitisedName[MAX_NAME_LENGTH];
+	GetClientName(client, sanitisedName, sizeof(sanitisedName));
+	SanitiseChatInput(sanitisedName, sizeof(sanitisedName));
+	
+	if (TrimString(sanitisedMessage) == 0)
 	{
 		return Plugin_Handled;
 	}
 	
-	// Print the message to chat
 	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
 	{
-		GOKZ_PrintToChatAll(false, "{bluegrey}%N{default} : %s", client, message);
+		GOKZ_PrintToChatAll(false, "{bluegrey}%N{default} : %s", client, sanitisedMessage);
 	}
 	else
 	{
-		GOKZ_PrintToChatAll(false, "{lime}%N{default} : %s", client, message);
+		GOKZ_PrintToChatAll(false, "{lime}%N{default} : %s", client, sanitisedMessage);
 	}
 	return Plugin_Handled;
+}
+
+static void SanitiseChatInput(char[] message, int maxlength)
+{
+	Color_StripFromChatText(message, message, maxlength);
+	CRemoveColors(message, maxlength);
+	ReplaceString(message, maxlength, "%", "");
 }
 
 

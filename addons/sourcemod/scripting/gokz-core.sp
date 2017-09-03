@@ -109,10 +109,6 @@ void OnLateLoad()
 		if (IsClientInGame(client))
 		{
 			OnClientPutInServer(client);
-			if (IsClientAuthorized(client))
-			{
-				OnClientPostAdminCheck(client);
-			}
 		}
 	}
 }
@@ -128,18 +124,12 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "basecomm"))
-	{
-		gB_BaseComm = true;
-	}
+	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "basecomm"))
-	{
-		gB_BaseComm = false;
-	}
+	gB_BaseComm = gB_BaseComm && !StrEqual(name, "basecomm");
 }
 
 
@@ -154,14 +144,25 @@ public void OnClientPutInServer(int client)
 	SetupClientBhopTriggers(client);
 	SetupClientHidePlayers(client);
 	SetupClientTeleports(client);
+	SetupClientJoinTeam(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	
+	if (!gB_ClientIsSetUp[client] && IsClientAuthorized(client))
+	{
+		gB_ClientIsSetUp[client] = true;
+		Call_GOKZ_OnClientSetup(client);
+	}
 }
 
-public void OnClientPostAdminCheck(int client)
+public void OnClientAuthorized(int client, const char[] auth)
 {
-	gB_ClientIsSetUp[client] = true;
-	Call_GOKZ_OnClientSetup(client);
+	// Be careful about late loading if you are going to put anything else here
+	if (!gB_ClientIsSetUp[client] && IsClientInGame(client))
+	{
+		gB_ClientIsSetUp[client] = true;
+		Call_GOKZ_OnClientSetup(client);
+	}
 }
 
 public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
@@ -178,7 +179,7 @@ public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcas
 }
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
-	if (OnClientSayCommand_ChatProcessing(client, sArgs) == Plugin_Handled)
+	if (IsValidClient(client) && OnClientSayCommand_ChatProcessing(client, sArgs) == Plugin_Handled)
 	{
 		return Plugin_Handled;
 	}

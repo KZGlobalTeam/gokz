@@ -268,4 +268,34 @@ stock float CalcDeltaAngle(float startAngle, float endAngle)
 		difference - 360;
 	}
 	return difference;
+}
+
+/**
+ * Strips all color control characters in a string.
+ * The Output buffer can be the same as the input buffer.
+ * Original code by Psychonic, thanks.
+ * Source: smlib
+ *
+ * @param input				Input String.
+ * @param output			Output String.
+ * @param size				Max Size of the Output string
+ * @noreturn
+ */
+stock void Color_StripFromChatText(const char[] input, char[] output, int size)
+{
+	int x = 0;
+	for (int i = 0; input[i] != '\0'; i++) {
+		
+		if (x + 1 == size) {
+			break;
+		}
+		
+		int character = input[i];
+		
+		if (character > 0x08) {
+			output[x++] = character;
+		}
+	}
+	
+	output[x] = '\0';
 } 
