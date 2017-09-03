@@ -109,10 +109,6 @@ void OnLateLoad()
 		if (IsClientInGame(client))
 		{
 			OnClientPutInServer(client);
-			if (IsClientAuthorized(client))
-			{
-				OnClientPostAdminCheck(client);
-			}
 		}
 	}
 }
@@ -150,12 +146,22 @@ public void OnClientPutInServer(int client)
 	SetupClientTeleports(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	
+	if (!gB_ClientIsSetUp[client] && IsClientAuthorized(client))
+	{
+		gB_ClientIsSetUp[client] = true;
+		Call_GOKZ_OnClientSetup(client);
+	}
 }
 
-public void OnClientPostAdminCheck(int client)
+public void OnClientAuthorized(int client, const char[] auth)
 {
-	gB_ClientIsSetUp[client] = true;
-	Call_GOKZ_OnClientSetup(client);
+	// Be careful about late loading if you are going to put anything else here
+	if (!gB_ClientIsSetUp[client] && IsClientInGame(client))
+	{
+		gB_ClientIsSetUp[client] = true;
+		Call_GOKZ_OnClientSetup(client);
+	}
 }
 
 public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
