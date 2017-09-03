@@ -326,14 +326,14 @@ static float savedAngles[MAXPLAYERS + 1][3];
 
 void JoinTeam(int client, int team)
 {
-	if (team == CS_TEAM_SPECTATOR)
+	if (team == CS_TEAM_SPECTATOR && GetClientTeam(client) != CS_TEAM_SPECTATOR)
 	{
 		Movement_GetOrigin(client, savedOrigin[client]);
 		Movement_GetEyeAngles(client, savedAngles[client]);
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
 	}
-	else if (team == CS_TEAM_CT || team == CS_TEAM_T)
+	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
 	{
 		// Switch teams without killing them (no death notice)
 		CS_SwitchTeam(client, team);
@@ -408,61 +408,85 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 
 // =========================  VALID JUMP TRACKING  ========================= //
 
+#define VALID_JUMP_TAKEOFF_GRACE_TICKS 2 // Ticks after takeoff when velocity can be affected
+
 static bool validJump[MAXPLAYERS + 1];
+static int recentTeleports[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
 	return validJump[client];
 }
 
-void OnStopTouchGround_ValidJump(int client)
+static void InvalidateJump(int client)
 {
-	if (Movement_GetMoveType(client) == MOVETYPE_WALK)
+	if (validJump[client])
+	{
+		validJump[client] = false;
+		Call_GOKZ_OnJumpInvalidated(client);
+	}
+}
+
+void OnStopTouchGround_ValidJump(int client, bool jumped)
+{
+	// Make sure leaving the ground wasn't caused by anything fishy
+	if (Movement_GetMoveType(client) == MOVETYPE_WALK && recentTeleports[client] == 0)
 	{
 		validJump[client] = true;
+		Call_GOKZ_OnJumpValidated(client, jumped, false);
+	}
+	else
+	{
+		InvalidateJump(client);
 	}
 }
 
 void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
 {
-	if (newMoveType != MOVETYPE_WALK)
-	{
-		validJump[client] = false;
-	}
-	else if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
+	if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
 	{
 		validJump[client] = true;
+		Call_GOKZ_OnJumpValidated(client, false, true);
 	}
+	else
+	{
+		InvalidateJump(client);
+	}
+}
+
+void OnPlayerDisconnect_ValidJump(int client)
+{
+	InvalidateJump(client);
 }
 
 void OnPlayerSpawn_ValidJump(int client)
 {
-	validJump[client] = false;
+	InvalidateJump(client);
 }
 
-void OnPrevCheckpoint_ValidJump(int client)
+void OnPlayerDeath_ValidJump(int client)
 {
-	validJump[client] = false;
+	InvalidateJump(client);
 }
 
-void OnNextCheckpoint_ValidJump(int client)
+void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 {
-	validJump[client] = false;
+	if (origin)
+	{
+		InvalidateJump(client);
+	}
+	else if (velocity && gI_OldTickCount[client] - Movement_GetTakeoffTick(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
+	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
+		InvalidateJump(client);
+	}
+	// Count recent teleports
+	recentTeleports[client]++;
+	CreateTimer(0.1, Timer_DecrementRecentTeleports, client);
 }
 
-void OnTeleportToCheckpoint_ValidJump(int client)
+public Action Timer_DecrementRecentTeleports(Handle timer, int client)
 {
-	validJump[client] = false;
-}
-
-void OnTeleportToStart_ValidJump(int client)
-{
-	validJump[client] = false;
-}
-
-void OnUndoTeleport_ValidJump(int client)
-{
-	validJump[client] = false;
+	recentTeleports[client]--;
 }
 
 

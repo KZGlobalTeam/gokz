@@ -98,9 +98,9 @@ public void OnLibraryRemoved(const char[] name)
 
 // =========================  CLIENT  ========================= //
 
-public void OnClientPostAdminCheck(int client)
+public void OnClientPutInServer(int client)
 {
-	SDKHook(client, SDKHook_PreThinkPost, OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -117,7 +117,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gF_OldAngles[client] = angles;
 }
 
-public void OnClientPreThink_Post(int client)
+public void SDKHook_OnClientPreThink_Post(int client)
 {
 	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
@@ -162,7 +162,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	}
 }
 
-public void Movement_OnChangeMoveType(int client, MoveType newMoveType)
+public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
 {
 	if (!IsUsingMode(client))
 	{

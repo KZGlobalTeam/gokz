@@ -445,6 +445,26 @@ forward Action GOKZ_OnUndoTeleport(int client);
  */
 forward void GOKZ_OnUndoTeleport_Post(int client);
 
+/**
+ * Called when player's begins a jump that is deemed valid.
+ * A jump is deemed invalid if the player is teleported.
+ *
+ * @param client		Client index.
+ * @param jumped		Whether player jumped.
+ * @param ladderJump	Whether it was a ladder jump.
+ * @noreturn
+ */
+forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
+
+/**
+ * Called when player's current jump is invalidated.
+ * A jump is deemed invalid if the player is teleported.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnJumpInvalidated(int client);
+
 
 
 // =========================  NATIVES  ========================= //
@@ -514,6 +534,31 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 			SetGlobalTransTarget(client);
 			VFormat(buffer, sizeof(buffer), format, 3);
 			GOKZ_PrintToChat(client, addPrefix, buffer);
+		}
+	}
+}
+
+/**
+ * Prints a chat message to those spectating the client, formatting colours 
+ * and optionally adding the chat prefix. If using the chat prefix, specify 
+ * a colour at the beginning of the message.
+ *
+ * @param client		Client index.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ * @noreturn
+ */
+stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] format, any...)
+{
+	char buffer[1024];
+	for (int target = 1; target <= MaxClients; target++)
+	{
+		if (IsClientInGame(target) && GetObserverTarget(target) == client)
+		{
+			SetGlobalTransTarget(target);
+			VFormat(buffer, sizeof(buffer), format, 4);
+			GOKZ_PrintToChat(target, addPrefix, buffer);
 		}
 	}
 }
@@ -736,6 +781,15 @@ native float GOKZ_GetTakeoffSpeed(int client);
  * @noreturn		
  */
 native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
+
+/**
+ * Gets whether the player's current or last jump/airtime is valid.
+ * A jump is deemed invalid if the player is teleported.
+ *
+ * @param client		Client index.
+ * @noreturn			Validity of player's current or last jump.
+ */
+native bool GOKZ_GetValidJump(int client);
 
 
 
@@ -1028,6 +1082,12 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 		public set(float value) {
 			GOKZ_SetTakeoffSpeed(this.id, value);
+		}
+	}
+	
+	property bool validJump {
+		public get() {
+			return GOKZ_GetValidJump(this.id);
 		}
 	}
 	

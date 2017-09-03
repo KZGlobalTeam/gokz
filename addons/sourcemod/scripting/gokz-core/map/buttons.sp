@@ -36,19 +36,19 @@ void OnEntitySpawned_MapButtons(int entity)
 	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
 	if (StrEqual("climb_startbutton", tempString))
 	{
-		SDKHook(entity, SDKHook_UsePost, OnStartButtonPress);
+		SDKHook(entity, SDKHook_UsePost, SDKHook_OnStartButtonPress);
 	}
 	else if (StrEqual("climb_endbutton", tempString))
 	{
-		SDKHook(entity, SDKHook_Use, OnEndButtonPress);
+		SDKHook(entity, SDKHook_Use, SDKHook_OnEndButtonPress);
 	}
 	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
 	{
-		SDKHook(entity, SDKHook_UsePost, OnBonusStartButtonPress);
+		SDKHook(entity, SDKHook_UsePost, SDKHook_OnBonusStartButtonPress);
 	}
 	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
 	{
-		SDKHook(entity, SDKHook_UsePost, OnBonusEndButtonPress);
+		SDKHook(entity, SDKHook_UsePost, SDKHook_OnBonusEndButtonPress);
 	}
 }
 
@@ -56,7 +56,7 @@ void OnEntitySpawned_MapButtons(int entity)
 
 // =========================  HANDLERS  ========================= //
 
-public void OnStartButtonPress(int entity, int activator, int caller, UseType type, float value)
+public void SDKHook_OnStartButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
 	if (!IsValidEntity(caller) || !IsValidClient(activator))
 	{
@@ -67,7 +67,7 @@ public void OnStartButtonPress(int entity, int activator, int caller, UseType ty
 	OnStartButtonPress_VirtualButtons(activator, 0);
 }
 
-public void OnEndButtonPress(int entity, int activator, int caller, UseType type, float value)
+public void SDKHook_OnEndButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
 	if (!IsValidEntity(caller) || !IsValidClient(activator))
 	{
@@ -78,7 +78,7 @@ public void OnEndButtonPress(int entity, int activator, int caller, UseType type
 	OnEndButtonPress_VirtualButtons(activator, 0);
 }
 
-public void OnBonusStartButtonPress(int entity, int activator, int caller, UseType type, float value)
+public void SDKHook_OnBonusStartButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
 	if (!IsValidEntity(entity) || !IsValidClient(activator))
 	{
@@ -99,7 +99,7 @@ public void OnBonusStartButtonPress(int entity, int activator, int caller, UseTy
 	}
 }
 
-public void OnBonusEndButtonPress(int entity, int activator, int caller, UseType type, float value)
+public void SDKHook_OnBonusEndButtonPress(int entity, int activator, int caller, UseType type, float value)
 {
 	if (!IsValidEntity(entity) || !IsValidClient(activator))
 	{
