@@ -6,7 +6,8 @@
 
 
 
-static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded speed
+static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded horizontal speed
+static float lastTickVerticalVelocity[MAXPLAYERS + 1];
 
 
 
@@ -20,7 +21,7 @@ void OnStartTouchGround_JumpTracking(int client)
 	EndJumpstat(client);
 }
 
-void OnPlayerRunCmd_JumpTracking(int client)
+void OnPlayerRunCmd_JumpTracking(int client, int tickcount)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -31,6 +32,7 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	{
 		CheckGravity(client);
 		CheckBaseVelocity(client);
+		CheckVerticalVelocity(client, tickcount);
 		
 		UpdateHeight(client);
 		UpdateMaxSpeed(client);
@@ -40,6 +42,7 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	}
 	
 	lastTickSpeed[client] = Movement_GetSpeed(client);
+	lastTickVerticalVelocity[client] = Movement_GetVerticalVelocity(client);
 }
 
 void OnJumpInvalidated_JumpTracking(int client)
@@ -101,6 +104,20 @@ static void CheckBaseVelocity(int client)
 	float baseVelocity[3];
 	Movement_GetBaseVelocity(client, baseVelocity);
 	if (baseVelocity[0] != 0.0 || baseVelocity[1] != 0.0 || baseVelocity[2] != 0.0)
+	{
+		InvalidateJump(client);
+	}
+}
+
+static void CheckVerticalVelocity(int client, int tickcount)
+{
+	// No wukkas if just took off or just landed
+	if (tickcount - Movement_GetTakeoffTick(client) <= 1 || tickcount - Movement_GetLandingTick(client) <= 1)
+	{
+		return;
+	}
+	// If vertical velocity has gone up, then something fishy has happened
+	if (lastTickVerticalVelocity[client] < Movement_GetVerticalVelocity(client))
 	{
 		InvalidateJump(client);
 	}
