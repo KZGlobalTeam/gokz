@@ -7,6 +7,7 @@
 
 
 
+#define TIERS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"
 #define LADDERJUMP_OFFSET_ALLOWANCE 2.0 // How much offset ladder jumps are allowed to have
 
 static float distanceTiers[JUMPTYPE_COUNT - 2][MODE_COUNT][DISTANCETIER_COUNT];
@@ -50,7 +51,7 @@ void OnMapStart_DistanceTiers()
 {
 	if (!LoadDistanceTiers())
 	{
-		SetFailState("Invalid or missing cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg");
+		SetFailState("Invalid or missing %s", TIERS_CFG_PATH);
 	}
 }
 
@@ -61,7 +62,7 @@ void OnMapStart_DistanceTiers()
 static bool LoadDistanceTiers()
 {
 	KeyValues kv = new KeyValues("tiers");
-	if (!kv.ImportFromFile("cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"))
+	if (!kv.ImportFromFile(TIERS_CFG_PATH))
 	{
 		return false;
 	}
