@@ -22,6 +22,42 @@ void CompletionMVPStarsUpdateAll()
 	}
 }
 
+
+
+// =========================  ANNOUNCEMENTS  ========================= //
+
+void OnMapStart_Announcements()
+{
+	if (!LoadSounds())
+	{
+		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
+	}
+}
+
+static bool LoadSounds()
+{
+	KeyValues kv = new KeyValues("sounds");
+	if (!kv.ImportFromFile(SOUNDS_CFG_PATH))
+	{
+		return false;
+	}
+	
+	char downloadPath[256];
+	
+	kv.GetString("beatrecord", gC_BeatRecordSound, sizeof(gC_BeatRecordSound));
+	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", gC_BeatRecordSound);
+	AddFileToDownloadsTable(downloadPath);
+	PrecacheSoundAny(gC_BeatRecordSound);
+	
+	kv.Close();
+	return true;
+}
+
+static void PlayBeatRecordSound()
+{
+	EmitSoundToAllAny(gC_BeatRecordSound);
+}
+
 void AnnounceNewTime(
 	int client, 
 	int course, 
@@ -120,7 +156,6 @@ void AnnounceNewTime(
 					client, course, GOKZ_FormatTime(runTime), GOKZ_FormatTime(pbDiff), rank, maxRank, gC_ModeNamesShort[mode]);
 			}
 		}
-		
 	}
 }
 
@@ -162,4 +197,6 @@ void AnnounceNewRecord(int client, int course, int mode, KZRecordType recordType
 			}
 		}
 	}
+	
+	PlayBeatRecordSound(); // Play sound!
 } 

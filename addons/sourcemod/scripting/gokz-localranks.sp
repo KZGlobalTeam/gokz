@@ -4,6 +4,7 @@
 #include <sdktools>
 
 #include <colorvariables>
+#include <emitsoundany>
 #include <gokz>
 
 #include <gokz/core>
@@ -24,6 +25,8 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
+#define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
+
 Handle gH_OnTimeProcessed;
 Handle gH_OnNewRecord;
 
@@ -40,6 +43,8 @@ int g_MapTopMode[MAXPLAYERS + 1];
 Menu gH_PlayerTopMenu[MAXPLAYERS + 1];
 Menu gH_PlayerTopSubMenu[MAXPLAYERS + 1];
 int g_PlayerTopMode[MAXPLAYERS + 1];
+
+char gC_BeatRecordSound[256];
 
 #include "gokz-localranks/database/sql.sp"
 
@@ -150,6 +155,15 @@ public void GOKZ_LR_OnNewRecord(int client, int steamID, int mapID, int course, 
 	}
 	
 	AnnounceNewRecord(client, course, mode, recordType);
+}
+
+
+
+// =========================  OTHER  ========================= //
+
+public void OnMapStart()
+{
+	OnMapStart_Announcements();
 }
 
 
