@@ -324,6 +324,11 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 
+void SetupClientJoinTeam(int client)
+{
+	hasSavedPosition[client] = false;
+}
+
 void JoinTeam(int client, int team)
 {
 	if (team == CS_TEAM_SPECTATOR && GetClientTeam(client) != CS_TEAM_SPECTATOR)

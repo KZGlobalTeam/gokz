@@ -144,6 +144,7 @@ public void OnClientPutInServer(int client)
 	SetupClientBhopTriggers(client);
 	SetupClientHidePlayers(client);
 	SetupClientTeleports(client);
+	SetupClientJoinTeam(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 	
