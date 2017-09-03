@@ -20,8 +20,8 @@
 ### Plugin Installation
 
  * Download and extract ```GOKZ-vX.X.X.zip``` from the latest GitHub release to ```csgo/``` in the server directory.
- * ConVar config files are also generated in that directory after starting the plugins.
  * Add a MySQL/SQLite database called ```gokz``` to ```csgo/addons/sourcemod/configs/databases.cfg```.
+ * Various config files including the auto-generated ConVar config files can be found in ```csgo/cfg/sourcemod/gokz```.
  * Use ```!updatemappool``` to populate the ranked map pool with those in ```csgo/cfg/sourcemod/gokz/mappool.cfg```.
  
 ### Mapping
