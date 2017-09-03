@@ -170,8 +170,8 @@
 	"PB Time - NUB"
 	{
 		// NUB PB: 01:23.45 (5 TP) [#4/123]
-		"#format"	"{1:s},{2:d},{3:s},{4:d},{5:d}"
-		"en"		"{yellow}NUB PB{grey}: {default}{1}{grey} ({yellow}{2} TP{grey}) [#{default}{4}{grey}/{5}]"
+		"#format"	"{1:s},{2:d},{3:d},{4:d}"
+		"en"		"{yellow}NUB PB{grey}: {default}{1}{grey} ({yellow}{2} TP{grey}) [#{default}{3}{grey}/{4}]"
 	}
 	"PB Time - NUB and PRO"
 	{
