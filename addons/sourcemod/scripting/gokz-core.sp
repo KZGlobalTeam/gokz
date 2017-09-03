@@ -128,18 +128,12 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "basecomm"))
-	{
-		gB_BaseComm = true;
-	}
+	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "basecomm"))
-	{
-		gB_BaseComm = false;
-	}
+	gB_BaseComm = gB_BaseComm && !StrEqual(name, "basecomm");
 }
 
 
@@ -178,7 +172,7 @@ public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcas
 }
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
-	if (OnClientSayCommand_ChatProcessing(client, sArgs) == Plugin_Handled)
+	if (IsValidClient(client) && OnClientSayCommand_ChatProcessing(client, sArgs) == Plugin_Handled)
 	{
 		return Plugin_Handled;
 	}
