@@ -20,7 +20,7 @@ int GetDistanceTier(int jumpType, int mode, float distance, float offset)
 {
 	// No tiers given for 'Invalid' jumps.
 	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
-		 || jumpType != JumpType_LadderJump && FloatAbs(offset) >= 0.01
+		 || jumpType != JumpType_LadderJump && FloatAbs(offset) > EPSILON
 		 || FloatAbs(offset) >= LADDERJUMP_OFFSET_ALLOWANCE)
 	{
 		// TODO Give a tier to "Other" jumps
