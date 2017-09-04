@@ -21,18 +21,18 @@ void OnStartTouchGround_JumpTracking(int client)
 	EndJumpstat(client);
 }
 
-void OnPlayerRunCmd_JumpTracking(int client, int tickcount)
+void OnPlayerRunCmd_JumpTracking(int client)
 {
 	if (!IsPlayerAlive(client))
 	{
 		return;
 	}
 	
-	if (GetValidJump(client))
+	if ((!Movement_GetOnGround(client) || Movement_GetMoveType(client) != MOVETYPE_WALK) && GetValidJump(client))
 	{
 		CheckGravity(client);
 		CheckBaseVelocity(client);
-		CheckVerticalVelocity(client, tickcount);
+		CheckVerticalVelocity(client);
 		
 		UpdateHeight(client);
 		UpdateMaxSpeed(client);
@@ -109,15 +109,16 @@ static void CheckBaseVelocity(int client)
 	}
 }
 
-static void CheckVerticalVelocity(int client, int tickcount)
+static void CheckVerticalVelocity(int client)
 {
+	float verticalVelocity = Movement_GetVerticalVelocity(client);
 	// No wukkas if just took off or just landed
-	if (tickcount - Movement_GetTakeoffTick(client) <= 1 || tickcount - Movement_GetLandingTick(client) <= 1)
+	if (FloatAbs(verticalVelocity) < EPSILON || FloatAbs(lastTickVerticalVelocity[client]) < EPSILON)
 	{
 		return;
 	}
-	// If vertical velocity has gone up, then something fishy has happened
-	if (lastTickVerticalVelocity[client] < Movement_GetVerticalVelocity(client))
+	// If vertical velocity has gone up, then something fishy has happened e.g. (crouch) jumpbug
+	if (lastTickVerticalVelocity[client] < verticalVelocity)
 	{
 		InvalidateJump(client);
 	}
@@ -198,7 +199,7 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 	}
 	else if (HitBhop(client))
 	{
-		if (FloatAbs(GetOffset(client)) <= 0.1) // Check for no offset
+		if (FloatAbs(GetOffset(client)) < EPSILON) // Check for no offset
 		{
 			switch (GetType(client))
 			{
