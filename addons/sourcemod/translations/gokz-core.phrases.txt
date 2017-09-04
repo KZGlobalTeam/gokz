@@ -170,9 +170,9 @@
 	}
 	"Measure Result"
 	{
-		// Distance - Horizontal: 123.45, Vertical: 12.34.
-		"#format"	"{1:.2f},{2:.2f}"
-		"en"		"{default}Distance{grey} - Horizontal: {default}{1}{grey}, Vertical: {default}{2}{grey}"
+		// Distance - Horizontal: 123.45 (121.11), Vertical: 12.34.
+		"#format"	"{1:.1f},{2:.1f},{3:.1f}"
+		"en"		"{default}Distance{grey} - Horizontal: {default}{1}{grey} ({default}{2}{grey}), Vertical: {default}{3}{grey}"
 	}
 	"Measure Failure (Points Not Set)"
 	{

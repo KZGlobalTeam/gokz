@@ -66,8 +66,9 @@ public int MenuHandler_Measure(Handle menu, MenuAction action, int param1, int p
 				if (measurePosSet[param1][0] && measurePosSet[param1][1])
 				{
 					float horizontalDist = GetVectorHorizontalDistance(measurePos[param1][0], measurePos[param1][1]);
+					float effectiveDist = CalcEffectiveDistance(measurePos[param1][0], measurePos[param1][1]);
 					float verticalDist = measurePos[param1][1][2] - measurePos[param1][0][2];
-					GOKZ_PrintToChat(param1, true, "%t", "Measure Result", horizontalDist, verticalDist);
+					GOKZ_PrintToChat(param1, true, "%t", "Measure Result", horizontalDist, effectiveDist, verticalDist);
 					MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
 				}
 				else
@@ -254,4 +255,35 @@ static void P2PXBeam(int client, int arg)
 		MeasureBeam(client, Origin0, Origin1, 0.97, 2.0, 255, 0, 0);
 		MeasureBeam(client, Origin2, Origin3, 0.97, 2.0, 255, 0, 0);
 	}
+}
+
+// Calculates the minimum equivalent jumpstat distance to go between the two points
+static float CalcEffectiveDistance(const float pointA[3], const float pointB[3])
+{
+	float Ax = FloatMin(pointA[0], pointB[0]);
+	float Bx = FloatMax(pointA[0], pointB[0]);
+	float Ay = FloatMin(pointA[1], pointB[1]);
+	float By = FloatMax(pointA[1], pointB[1]);
+	
+	if (Bx - Ax < 32.0)
+	{
+		Ax = Bx;
+	}
+	else
+	{
+		Ax = Ax + 16.0;
+		Bx = Bx - 16.0;
+	}
+	
+	if (By - Ay < 32.0)
+	{
+		Ay = By;
+	}
+	else
+	{
+		Ay = Ay + 16.0;
+		By = By - 16.0;
+	}
+	
+	return SquareRoot(Pow(Ax - Bx, 2.0) + Pow(Ay - By, 2.0)) + 32.0;
 } 
