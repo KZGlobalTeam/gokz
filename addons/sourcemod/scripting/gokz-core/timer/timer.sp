@@ -6,6 +6,7 @@
 
 
 
+#define TIMER_START_MIN_TICKS_ON_GROUND 4
 #define MODE_VANILLA_SOUND_START "buttons/button9.wav"
 #define MODE_VANILLA_SOUND_END "buttons/bell1.wav"
 #define MODE_SIMPLEKZ_SOUND_START "buttons/button9.wav"
@@ -56,7 +57,7 @@ int GetCurrentTimeType(int client)
 void TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
-		 || !Movement_GetOnGround(client) && !allowOffGround
+		 || (!Movement_GetOnGround(client) || GetGameTickCount() - Movement_GetLandingTick(client) <= TIMER_START_MIN_TICKS_ON_GROUND) && !allowOffGround
 		 || (Movement_GetMoveType(client) != MOVETYPE_WALK && Movement_GetMoveType(client) != MOVETYPE_NONE)
 		 || timerRunning[client] && currentTime[client] < 0.05)
 	{
