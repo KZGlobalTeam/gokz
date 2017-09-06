@@ -58,6 +58,14 @@ void OnStartTouch_JumpTracking(int client)
 	}
 }
 
+void OnOptionChanged_JumpTracking(int client, Option option)
+{
+	if (option == Option_Mode)
+	{
+		InvalidateJump(client);
+	}
+}
+
 static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 {
 	BeginType(client, jumped, ladderJump);
