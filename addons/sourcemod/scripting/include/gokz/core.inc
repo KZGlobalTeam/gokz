@@ -647,6 +647,14 @@ native float GOKZ_GetCurrentTime(int client);
 native int GOKZ_GetCheckpointCount(int client);
 
 /**
+ * Gets the player's current teleport count.
+ *
+ * @param client    	Client index.
+ * @return				Player's current teleport count.
+ */
+native int GOKZ_GetTeleportCount(int client);
+
+/**
  * Teleports the player to start, or respawns them.
  *
  * @param client    	Client index.
@@ -897,6 +905,12 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 	property int checkpointCount {
 		public get() {
 			return GOKZ_GetCheckpointCount(this.id);
+		}
+	}
+	
+	property int teleportCount {
+		public get() {
+			return GOKZ_GetTeleportCount(this.id);
 		}
 	}
 	
@@ -1167,6 +1181,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetPaused");
 	MarkNativeAsOptional("GOKZ_GetCurrentTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
+	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

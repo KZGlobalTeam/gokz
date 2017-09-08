@@ -35,6 +35,7 @@ void CreateNatives()
 	CreateNative("GOKZ_GetPaused", Native_GetPaused);
 	CreateNative("GOKZ_GetCurrentTime", Native_GetCurrentTime);
 	CreateNative("GOKZ_GetCheckpointCount", Native_GetCheckpointCount);
+	CreateNative("GOKZ_GetTeleportCount", Native_GetTeleportCount);
 	CreateNative("GOKZ_GetOption", Native_GetOption);
 	CreateNative("GOKZ_SetOption", Native_SetOption);
 	CreateNative("GOKZ_GetHitPerf", Native_GetHitPerf);
@@ -178,6 +179,11 @@ public int Native_GetCurrentTime(Handle plugin, int numParams)
 public int Native_GetCheckpointCount(Handle plugin, int numParams)
 {
 	return GetCheckpointCount(GetNativeCell(1));
+}
+
+public int Native_GetTeleportCount(Handle plugin, int numParams)
+{
+	return GetTeleportCount(GetNativeCell(1));
 }
 
 public int Native_GetOption(Handle plugin, int numParams)
