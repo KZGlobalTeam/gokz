@@ -146,14 +146,14 @@ public void DB_TxnSuccess_ProcessTimerEnd(Handle db, DataPack data, int numQueri
 	bool newWRPro = (firstTimePro || pbDiffPro < 0) && rankPro == 1;
 	if (newWR && newWRPro)
 	{
-		Call_OnNewRecord(client, steamID, mapID, course, mode, style, KZRecordType_NubAndPro);
+		Call_OnNewRecord(client, steamID, mapID, course, mode, style, RecordType_NubAndPro);
 	}
 	else if (newWR)
 	{
-		Call_OnNewRecord(client, steamID, mapID, course, mode, style, KZRecordType_Nub);
+		Call_OnNewRecord(client, steamID, mapID, course, mode, style, RecordType_Nub);
 	}
 	else if (newWRPro)
 	{
-		Call_OnNewRecord(client, steamID, mapID, course, mode, style, KZRecordType_Pro);
+		Call_OnNewRecord(client, steamID, mapID, course, mode, style, RecordType_Pro);
 	}
 } 

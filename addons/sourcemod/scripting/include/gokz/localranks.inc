@@ -13,11 +13,12 @@
 
 // =========================  ENUMERATIONS  ========================= //
 
-enum KZRecordType
+enum
 {
-	KZRecordType_Nub = 0, 
-	KZRecordType_Pro, 
-	KZRecordType_NubAndPro
+	RecordType_Nub = 0, 
+	RecordType_Pro, 
+	RecordType_NubAndPro, 
+	RECORD_COUNT
 }
 
 
@@ -82,7 +83,20 @@ forward void GOKZ_LR_OnNewRecord(
 	int course, 
 	int mode, 
 	int style, 
-	KZRecordType recordType);
+	int recordType);
+
+/**
+ * Called when a player misses a local record.
+ *
+ * @param client			Client index.
+ * @param float				Record time missed.
+ * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
+ * @param mode				Player's movement mode.
+ * @param style				Player's movement style.
+ * @param recordType		Type of record.
+ * @noreturn
+ */
+forward void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int mode, int style, int recordType);
 
 
 

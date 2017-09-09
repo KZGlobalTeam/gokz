@@ -33,6 +33,7 @@ Regex gRE_BonusStartButton;
 
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
+bool gB_MapSetUp;
 int gI_DBCurrentMapID;
 
 #include "gokz-localdb/api.sp"

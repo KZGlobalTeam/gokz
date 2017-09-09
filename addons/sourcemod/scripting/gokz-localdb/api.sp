@@ -61,6 +61,7 @@ void CreateNatives()
 {
 	CreateNative("GOKZ_DB_GetDatabase", Native_GetDatabase);
 	CreateNative("GOKZ_DB_GetDatabaseType", Native_GetDatabaseType);
+	CreateNative("GOKZ_DB_GetMapSetUp", Native_GetMapSetUp);
 	CreateNative("GOKZ_DB_GetCurrentMapID", Native_GetCurrentMapID);
 }
 
@@ -72,6 +73,11 @@ public int Native_GetDatabase(Handle plugin, int numParams)
 public int Native_GetDatabaseType(Handle plugin, int numParams)
 {
 	return view_as<int>(g_DBType);
+}
+
+public int Native_GetMapSetUp(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_MapSetUp);
 }
 
 public int Native_GetCurrentMapID(Handle plugin, int numParams)

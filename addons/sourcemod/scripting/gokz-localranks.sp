@@ -27,8 +27,7 @@ public Plugin myinfo =
 
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
-Handle gH_OnTimeProcessed;
-Handle gH_OnNewRecord;
+bool gB_LateLoad;
 
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
@@ -44,6 +43,10 @@ Menu gH_PlayerTopMenu[MAXPLAYERS + 1];
 Menu gH_PlayerTopSubMenu[MAXPLAYERS + 1];
 int g_PlayerTopMode[MAXPLAYERS + 1];
 
+bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+float gF_RecordTimesCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+bool gB_RecordMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
+
 char gC_BeatRecordSound[256];
 
 #include "gokz-localranks/database/sql.sp"
@@ -53,6 +56,7 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/database.sp"
 #include "gokz-localranks/misc.sp"
 
+#include "gokz-localranks/database/cache_records.sp"
 #include "gokz-localranks/database/create_tables.sp"
 #include "gokz-localranks/database/get_completion.sp"
 #include "gokz-localranks/database/open_maptop.sp"
@@ -74,6 +78,7 @@ char gC_BeatRecordSound[256];
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("gokz-localranks");
+	gB_LateLoad = late;
 	return APLRes_Success;
 }
 
@@ -92,11 +97,29 @@ public void OnPluginStart()
 	CreateCommands();
 	
 	TryGetDatabaseInfo();
+	
+	if (gB_LateLoad)
+	{
+		OnLateLoad();
+	}
+}
+
+void OnLateLoad()
+{
+	if (GOKZ_DB_GetMapSetUp())
+	{
+		GOKZ_DB_OnMapSetup(GOKZ_DB_GetCurrentMapID());
+	}
 }
 
 
 
 // =========================  GOKZ  ========================= //
+
+public void GOKZ_OnTimerStart_Post(int client, int course)
+{
+	ResetRecordMissed(client);
+}
 
 public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int teleportsUsed)
 {
@@ -110,6 +133,11 @@ public void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType)
 	g_DBType = DBType;
 	DB_CreateTables();
 	CompletionMVPStarsUpdateAll();
+}
+
+public void GOKZ_DB_OnMapSetup(int mapID)
+{
+	DB_CacheRecords(mapID);
 }
 
 public void GOKZ_DB_OnTimeInserted(int client, int steamID, int mapID, int course, int mode, int style, int runTimeMS, int teleportsUsed)
@@ -147,7 +175,7 @@ public void GOKZ_LR_OnTimeProcessed(
 	}
 }
 
-public void GOKZ_LR_OnNewRecord(int client, int steamID, int mapID, int course, int mode, int style, KZRecordType recordType)
+public void GOKZ_LR_OnNewRecord(int client, int steamID, int mapID, int course, int mode, int style, int recordType)
 {
 	if (mapID != GOKZ_DB_GetCurrentMapID())
 	{
@@ -155,11 +183,17 @@ public void GOKZ_LR_OnNewRecord(int client, int steamID, int mapID, int course, 
 	}
 	
 	AnnounceNewRecord(client, course, mode, recordType);
+	DB_CacheRecords(mapID);
 }
 
 
 
 // =========================  OTHER  ========================= //
+
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	UpdateRecordMissed(client);
+}
 
 public void OnMapStart()
 {
