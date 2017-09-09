@@ -9,6 +9,7 @@
 #endif
 #define _gokz_core_included_
 
+#include <gokz>
 #include <movementapi>
 
 
