@@ -465,6 +465,14 @@ forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
  */
 forward void GOKZ_OnJumpInvalidated(int client);
 
+/**
+ * Called when a player has been switched to a team.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnJoinTeam(int client, int team);
+
 
 
 // =========================  NATIVES  ========================= //

@@ -311,6 +311,11 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 	OnOptionChanged_Pistol(client, option);
 }
 
+public void GOKZ_OnJoinTeam(int client, int team)
+{
+	OnJoinTeam_Pause(client, team);
+}
+
 
 
 // =========================  OTHER  ========================= //

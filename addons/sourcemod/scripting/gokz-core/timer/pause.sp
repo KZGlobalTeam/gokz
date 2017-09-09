@@ -167,4 +167,22 @@ void OnPlayerSpawn_Pause(int client)
 	
 	// Call Post Forward
 	Call_GOKZ_OnResume_Post(client);
+}
+
+void OnJoinTeam_Pause(int client, int team)
+{
+	// Only handle joining spectators. Joining other teams is handled by OnPlayerSpawn.
+	if (team == CS_TEAM_SPECTATOR)
+	{
+		paused[client] = true;
+		
+		if (GetTimerRunning(client))
+		{
+			hasPausedInThisRun[client] = true;
+			lastPauseTime[client] = GetEngineTime();
+		}
+		
+		// Call Post Forward
+		Call_GOKZ_OnPause_Post(client);
+	}
 } 

@@ -32,6 +32,7 @@ static Handle H_OnUndoTeleport;
 static Handle H_OnUndoTeleport_Post;
 static Handle H_OnJumpValidated;
 static Handle H_OnJumpInvalidated;
+static Handle H_OnJoinTeam;
 
 
 
@@ -63,6 +64,7 @@ void CreateGlobalForwards()
 	H_OnUndoTeleport_Post = CreateGlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
 	H_OnJumpValidated = CreateGlobalForward("GOKZ_OnJumpValidated", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	H_OnJumpInvalidated = CreateGlobalForward("GOKZ_OnJumpInvalidated", ET_Ignore, Param_Cell);
+	H_OnJoinTeam = CreateGlobalForward("GOKZ_OnJoinTeam", ET_Ignore, Param_Cell, Param_Cell);
 }
 
 void Call_GOKZ_OnClientSetup(int client)
@@ -261,5 +263,13 @@ void Call_GOKZ_OnJumpInvalidated(int client)
 {
 	Call_StartForward(H_OnJumpInvalidated);
 	Call_PushCell(client);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnJoinTeam(int client, int team)
+{
+	Call_StartForward(H_OnJoinTeam);
+	Call_PushCell(client);
+	Call_PushCell(team);
 	Call_Finish();
 } 
