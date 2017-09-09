@@ -135,6 +135,20 @@ char sql_getwrspro[] =
 ..."WHERE MapCourses.MapID=%d AND Times.Teleports=0 "
 ..."GROUP BY MapCourses.Course, Times.Mode";
 
+char sql_getpbs[] = 
+"SELECT MIN(Times.RunTime), MapCourses.Course, Times.Mode "
+..."FROM Times "
+..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
+..."WHERE Times.SteamID32=%d AND MapCourses.MapID=%d "
+..."GROUP BY MapCourses.Course, Times.Mode";
+
+char sql_getpbspro[] = 
+"SELECT MIN(Times.RunTime), MapCourses.Course, Times.Mode "
+..."FROM Times "
+..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
+..."WHERE Times.SteamID32=%d AND MapCourses.MapID=%d AND Times.Teleports=0 "
+..."GROUP BY MapCourses.Course, Times.Mode";
+
 char sql_getmaprank[] = 
 "SELECT COUNT(*) "
 ..."FROM "

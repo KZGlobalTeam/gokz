@@ -37,11 +37,11 @@ enum
  * @param runTime		Player's end time.
  * @param teleportsUsed	Number of teleportsUsed used by player.
  * @param firstTime		Whether this is player's first time on this course.
- * @param pbDiff		Difference between new time and PB in seconds.
+ * @param pbDiff		Difference between new time and PB in seconds (-'ve means beat PB).
  * @param rank			New rank of the player's PB time.
  * @param maxRank		New total number of players with times.
  * @param firstTimePro	Whether this is player's first PRO time on this course.
- * @param pbDiffPro		Difference between new time and PRO PB seconds.
+ * @param pbDiffPro		Difference between new time and PRO PB in seconds (-'ve means beat PB).
  * @param rankPro		New rank of the player's PB PRO time.
  * @param maxRankPro	New total number of players with PRO times.
  * @noreturn
@@ -87,9 +87,10 @@ forward void GOKZ_LR_OnNewRecord(
 
 /**
  * Called when a player misses a local record.
+ * Is called regardless of player's current run type.
  *
  * @param client			Client index.
- * @param float				Record time missed.
+ * @param recordTime		Record time missed.
  * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
@@ -97,6 +98,20 @@ forward void GOKZ_LR_OnNewRecord(
  * @noreturn
  */
 forward void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int mode, int style, int recordType);
+
+/**
+ * Called when a player misses their personal best time.
+ * Is called regardless of player's current run type.
+ *
+ * @param client			Client index.
+ * @param pbTime			Personal best time missed.
+ * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
+ * @param mode				Player's movement mode.
+ * @param style				Player's movement style.
+ * @param recordType		Type of record.
+ * @noreturn
+ */
+forward void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, int style, int recordType);
 
 
 

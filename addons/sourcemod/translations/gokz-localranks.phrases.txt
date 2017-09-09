@@ -265,6 +265,24 @@
 		"#format"	"{1:s},{2:d},{3:d},{4:d},{5:d},{6:d},{7:d},{8:d},{9:d},{10:s}"
 		"en"		"{lime}{1}{grey} has beaten {default}{2}{grey}/{default}{3}{grey} and {blue}PRO{grey}'d {default}{4}{grey}/{default}{5}{grey} maps, and has beaten {default}{6}{grey}/{default}{7}{grey} and {blue}PRO{grey}'d {default}{8}{grey}/{default}{9}{grey} bonuses [{purple}{10}{grey}]."
 	}
+    "Missed PB (NUB)"
+    {
+        // You missed your best NUB time (01:23.45).
+        "#format"   "{1:s}"
+        "en"        "{grey}You missed your best {yellow}NUB {grey}time ({red}{1}{grey})."
+    }
+    "Missed PB (PRO)"
+    {
+        // You missed your best PRO time (01:23.45).
+        "#format"   "{1:s}"
+        "en"        "{grey}You missed your best {blue}PRO {grey}time ({red}{1}{grey})."      
+    }
+    "Missed PB (NUB and PRO)"
+    {
+        // You missed your best NUB/PRO time (01:23.45).
+        "#format"   "{1:s}"
+        "en"        "{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({red}{1}{grey})."      
+    }
 
 	
 	// Map Top Menu ////////////////////////////////////////////////////////////

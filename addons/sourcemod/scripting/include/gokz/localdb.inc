@@ -121,11 +121,19 @@ native void GOKZ_DB_GetDatabase(Database &database);
 native DatabaseType GOKZ_DB_GetDatabaseType();
 
 /**
- * Gets whether GOKZ local DB is set up for the current map.
+ * Gets whether client has been set up for GOKZ Local DB.
  *
- * @return				MapID from the "Maps" table.
+ * @param client		Client index.
+ * @return				Whether GOKZ Local DB has set up the client.
  */
-native int GOKZ_DB_GetMapSetUp();
+native bool GOKZ_DB_IsClientSetUp(int client);
+
+/**
+ * Gets whether GOKZ Local DB is set up for the current map.
+ *
+ * @return				Whether GOKZ Local DB has set up the current map.
+ */
+native bool GOKZ_DB_IsMapSetUp();
 
 /**
  * Gets the current map's MapID as in the "Maps" table.
@@ -154,7 +162,8 @@ public void __pl_gokz_localdb_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_DB_GetDatabase");
 	MarkNativeAsOptional("GOKZ_DB_GetDatabaseType");
-	MarkNativeAsOptional("GOKZ_DB_GetMapSetUp");
+	MarkNativeAsOptional("GOKZ_DB_IsClientSetUp");
+	MarkNativeAsOptional("GOKZ_DB_IsMapSetUp");
 	MarkNativeAsOptional("GOKZ_DB_GetCurrentMapID");
 }
 #endif

@@ -23,16 +23,12 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-Handle gH_OnDatabaseConnect;
-Handle gH_OnClientSetup;
-Handle gH_OnMapSetup;
-Handle gH_OnTimeInserted;
-
 bool gB_LateLoad;
 Regex gRE_BonusStartButton;
 
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
+bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
 
@@ -118,6 +114,7 @@ public void OnClientDisconnect(int client)
 	}
 	
 	DB_SaveOptions(client);
+	gB_ClientSetUp[client] = false;
 }
 
 public void OnMapStart()

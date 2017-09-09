@@ -47,6 +47,10 @@ bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 float gF_RecordTimesCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_RecordMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
 
+bool gB_PBExistsCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+float gF_PBTimesCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+bool gB_PBMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
+
 char gC_BeatRecordSound[256];
 
 #include "gokz-localranks/database/sql.sp"
@@ -56,6 +60,7 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/database.sp"
 #include "gokz-localranks/misc.sp"
 
+#include "gokz-localranks/database/cache_pbs.sp"
 #include "gokz-localranks/database/cache_records.sp"
 #include "gokz-localranks/database/create_tables.sp"
 #include "gokz-localranks/database/get_completion.sp"
@@ -106,9 +111,17 @@ public void OnPluginStart()
 
 void OnLateLoad()
 {
-	if (GOKZ_DB_GetMapSetUp())
+	if (GOKZ_DB_IsMapSetUp())
 	{
 		GOKZ_DB_OnMapSetup(GOKZ_DB_GetCurrentMapID());
+	}
+	
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (GOKZ_DB_IsClientSetUp(client))
+		{
+			GOKZ_DB_OnClientSetup(client, GetSteamAccountID(client));
+		}
 	}
 }
 
@@ -119,6 +132,7 @@ void OnLateLoad()
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	ResetRecordMissed(client);
+	ResetPBMissed(client);
 }
 
 public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int teleportsUsed)
@@ -138,6 +152,22 @@ public void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType)
 public void GOKZ_DB_OnMapSetup(int mapID)
 {
 	DB_CacheRecords(mapID);
+	
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (GOKZ_DB_IsClientSetUp(client))
+		{
+			DB_CachePBs(client, GetSteamAccountID(client));
+		}
+	}
+}
+
+public void GOKZ_DB_OnClientSetup(int client, int steamID)
+{
+	if (GOKZ_DB_IsMapSetUp())
+	{
+		DB_CachePBs(client, steamID);
+	}
 }
 
 public void GOKZ_DB_OnTimeInserted(int client, int steamID, int mapID, int course, int mode, int style, int runTimeMS, int teleportsUsed)
@@ -169,9 +199,16 @@ public void GOKZ_LR_OnTimeProcessed(
 	}
 	
 	AnnounceNewTime(client, course, mode, runTime, teleportsUsed, firstTime, pbDiff, rank, maxRank, firstTimePro, pbDiffPro, rankPro, maxRankPro);
+	
 	if (course == 0 && mode == GOKZ_GetDefaultMode() && firstTimePro)
 	{
 		CompletionMVPStarsUpdate(client);
+	}
+	
+	// If new PB, update PB cache
+	if (firstTime || firstTimePro || pbDiff < 0.0 || pbDiffPro < 0.0)
+	{
+		DB_CachePBs(client, GetSteamAccountID(client));
 	}
 }
 
@@ -186,6 +223,11 @@ public void GOKZ_LR_OnNewRecord(int client, int steamID, int mapID, int course, 
 	DB_CacheRecords(mapID);
 }
 
+public void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, int style, int recordType)
+{
+	DoPBMissedReport(client, pbTime, recordType);
+}
+
 
 
 // =========================  OTHER  ========================= //
@@ -193,6 +235,7 @@ public void GOKZ_LR_OnNewRecord(int client, int steamID, int mapID, int course, 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	UpdateRecordMissed(client);
+	UpdatePBMissed(client);
 }
 
 public void OnMapStart()
