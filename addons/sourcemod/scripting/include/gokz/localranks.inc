@@ -86,7 +86,7 @@ forward void GOKZ_LR_OnNewRecord(
 	int recordType);
 
 /**
- * Called when a player misses a local record.
+ * Called when a player misses the server record time.
  * Is called regardless of player's current run type.
  *
  * @param client			Client index.
@@ -115,6 +115,28 @@ forward void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, 
 
 
 
+// =========================  NATIVES  ========================= //
+
+/**
+ * Gets whether player has missed the server record time.
+ *
+ * @param client		Client index.
+ * @param timeType		Which record time i.e. NUB or PRO.
+ * @return				Whether player has missed the server record time.
+ */
+native bool GOKZ_LR_GetRecordMissed(int client, int timeType);
+
+/**
+ * Gets whether player has missed their personal best time.
+ *
+ * @param client		Client index.
+ * @param timeType		Which PB time i.e. NUB or PRO.
+ * @return				Whether player has missed their PB time.
+ */
+native bool GOKZ_LR_GetPBMissed(int client, int timeType);
+
+
+
 // =========================  DEPENDENCY  ========================= //
 
 public SharedPlugin __pl_gokz_localranks = 
@@ -126,4 +148,12 @@ public SharedPlugin __pl_gokz_localranks =
 	#else
 	required = 0, 
 	#endif
-}; 
+};
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_localdb_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_LR_GetRecordMissed");
+	MarkNativeAsOptional("GOKZ_LR_GetPBMissed");
+}
+#endif

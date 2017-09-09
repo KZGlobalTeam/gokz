@@ -82,6 +82,7 @@ char gC_BeatRecordSound[256];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-localranks");
 	gB_LateLoad = late;
 	return APLRes_Success;

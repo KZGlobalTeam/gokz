@@ -96,4 +96,24 @@ void Call_OnPBMissed(int client, float pbTime, int course, int mode, int style, 
 	Call_PushCell(style);
 	Call_PushCell(recordType);
 	Call_Finish();
+}
+
+
+
+// =========================  FORWARDS  ========================= //
+
+void CreateNatives()
+{
+	CreateNative("GOKZ_LR_GetRecordMissed", Native_GetRecordMissed);
+	CreateNative("GOKZ_LR_GetPBMissed", Native_GetPBMissed);
+}
+
+public int Native_GetRecordMissed(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_RecordMissed[GetNativeCell(1)][GetNativeCell(2)]);
+}
+
+public int Native_GetPBMissed(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_PBMissed[GetNativeCell(1)][GetNativeCell(2)]);
 } 

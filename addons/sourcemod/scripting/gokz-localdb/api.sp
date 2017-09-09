@@ -85,8 +85,7 @@ public int Native_GetDatabaseType(Handle plugin, int numParams)
 
 public int Native_IsClientSetUp(Handle plugin, int numParams)
 {
-	int client = GetNativeCell(1);
-	return view_as<int>(gB_ClientSetUp[client]);
+	return view_as<int>(gB_ClientSetUp[GetNativeCell(1)]);
 }
 
 public int Native_IsMapSetUp(Handle plugin, int numParams)
