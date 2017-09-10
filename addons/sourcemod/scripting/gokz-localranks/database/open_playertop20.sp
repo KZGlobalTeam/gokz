@@ -40,7 +40,7 @@ public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueri
 {
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
-	KZRecordType timeType = data.ReadCell();
+	int timeType = data.ReadCell();
 	int mode = data.ReadCell();
 	data.Close();
 	

@@ -159,21 +159,21 @@ void AnnounceNewTime(
 	}
 }
 
-void AnnounceNewRecord(int client, int course, int mode, KZRecordType recordType)
+void AnnounceNewRecord(int client, int course, int mode, int recordType)
 {
 	if (course == 0)
 	{
 		switch (recordType)
 		{
-			case KZRecordType_Nub:
+			case RecordType_Nub:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "New Record (NUB)", client, gC_ModeNamesShort[mode]);
 			}
-			case KZRecordType_Pro:
+			case RecordType_Pro:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "New Record (PRO)", client, gC_ModeNamesShort[mode]);
 			}
-			case KZRecordType_NubAndPro:
+			case RecordType_NubAndPro:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "New Record (NUB and PRO)", client, gC_ModeNamesShort[mode]);
 			}
@@ -183,15 +183,15 @@ void AnnounceNewRecord(int client, int course, int mode, KZRecordType recordType
 	{
 		switch (recordType)
 		{
-			case KZRecordType_Nub:
+			case RecordType_Nub:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "New Bonus Record (NUB)", client, course, gC_ModeNamesShort[mode]);
 			}
-			case KZRecordType_Pro:
+			case RecordType_Pro:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "New Bonus Record (PRO)", client, course, gC_ModeNamesShort[mode]);
 			}
-			case KZRecordType_NubAndPro:
+			case RecordType_NubAndPro:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "New Bonus Record (NUB and PRO)", client, course, course, gC_ModeNamesShort[mode]);
 			}
@@ -199,4 +199,121 @@ void AnnounceNewRecord(int client, int course, int mode, KZRecordType recordType
 	}
 	
 	PlayBeatRecordSound(); // Play sound!
+}
+
+
+
+// =========================  MISSED RECORD TRACKING  ========================= //
+
+void ResetRecordMissed(int client)
+{
+	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
+	{
+		gB_RecordMissed[client][timeType] = false;
+	}
+}
+
+void UpdateRecordMissed(int client)
+{
+	if (!GOKZ_GetTimerRunning(client) || gB_RecordMissed[client][TimeType_Nub] && gB_RecordMissed[client][TimeType_Pro])
+	{
+		return;
+	}
+	
+	int course = GOKZ_GetCurrentCourse(client);
+	int mode = GOKZ_GetOption(client, Option_Mode);
+	float currentTime = GOKZ_GetCurrentTime(client);
+	
+	bool nubRecordExists = gB_RecordExistsCache[course][mode][TimeType_Nub];
+	float nubRecordTime = gF_RecordTimesCache[course][mode][TimeType_Nub];
+	bool nubRecordMissed = gB_RecordMissed[client][TimeType_Nub];
+	bool proRecordExists = gB_RecordExistsCache[course][mode][TimeType_Pro];
+	float proRecordTime = gF_RecordTimesCache[course][mode][TimeType_Pro];
+	bool proRecordMissed = gB_RecordMissed[client][TimeType_Pro];
+	
+	if (nubRecordExists && !nubRecordMissed && currentTime >= nubRecordTime)
+	{
+		gB_RecordMissed[client][TimeType_Nub] = true;
+		
+		// Check if nub record is also the pro record, and call the forward appropriately
+		if (proRecordExists && FloatAbs(nubRecordTime - proRecordTime) < EPSILON)
+		{
+			gB_RecordMissed[client][TimeType_Pro] = true;
+			Call_OnRecordMissed(client, nubRecordTime, course, mode, Style_Normal, RecordType_NubAndPro);
+		}
+		else
+		{
+			Call_OnRecordMissed(client, nubRecordTime, course, mode, Style_Normal, RecordType_Nub);
+		}
+	}
+	else if (proRecordExists && !proRecordMissed && currentTime >= proRecordTime)
+	{
+		gB_RecordMissed[client][TimeType_Pro] = true;
+		Call_OnRecordMissed(client, proRecordTime, course, mode, Style_Normal, RecordType_Pro);
+	}
+}
+
+
+
+// =========================  MISSED PB TRACKING  ========================= //
+
+#define MISSED_PB_SOUND "buttons/button18.wav"
+
+void ResetPBMissed(int client)
+{
+	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
+	{
+		gB_PBMissed[client][timeType] = false;
+	}
+}
+
+void UpdatePBMissed(int client)
+{
+	if (!GOKZ_GetTimerRunning(client) || gB_PBMissed[client][TimeType_Nub] && gB_PBMissed[client][TimeType_Pro])
+	{
+		return;
+	}
+	
+	int course = GOKZ_GetCurrentCourse(client);
+	int mode = GOKZ_GetOption(client, Option_Mode);
+	float currentTime = GOKZ_GetCurrentTime(client);
+	
+	bool nubPBExists = gB_PBExistsCache[client][course][mode][TimeType_Nub];
+	float nubPBTime = gF_PBTimesCache[client][course][mode][TimeType_Nub];
+	bool nubPBMissed = gB_PBMissed[client][TimeType_Nub];
+	bool proPBExists = gB_PBExistsCache[client][course][mode][TimeType_Pro];
+	float proPBTime = gF_PBTimesCache[client][course][mode][TimeType_Pro];
+	bool proPBMissed = gB_PBMissed[client][TimeType_Pro];
+	
+	if (nubPBExists && !nubPBMissed && currentTime >= nubPBTime)
+	{
+		gB_PBMissed[client][TimeType_Nub] = true;
+		
+		// Check if nub PB is also the pro PB, and call the forward appropriately
+		if (proPBExists && FloatAbs(nubPBTime - proPBTime) < EPSILON)
+		{
+			gB_PBMissed[client][TimeType_Pro] = true;
+			Call_OnPBMissed(client, nubPBTime, course, mode, Style_Normal, RecordType_NubAndPro);
+		}
+		else
+		{
+			Call_OnPBMissed(client, nubPBTime, course, mode, Style_Normal, RecordType_Nub);
+		}
+	}
+	else if (proPBExists && !proPBMissed && currentTime >= proPBTime)
+	{
+		gB_PBMissed[client][TimeType_Pro] = true;
+		Call_OnPBMissed(client, proPBTime, course, mode, Style_Normal, RecordType_Pro);
+	}
+}
+
+void DoPBMissedReport(int client, float pbTime, int recordType)
+{
+	switch (recordType)
+	{
+		case RecordType_Nub:GOKZ_PrintToChat(client, true, "%t", "Missed PB (NUB)", GOKZ_FormatTime(pbTime));
+		case RecordType_Pro:GOKZ_PrintToChat(client, true, "%t", "Missed PB (PRO)", GOKZ_FormatTime(pbTime));
+		case RecordType_NubAndPro:GOKZ_PrintToChat(client, true, "%t", "Missed PB (NUB and PRO)", GOKZ_FormatTime(pbTime));
+	}
+	EmitSoundToClient(client, MISSED_PB_SOUND);
 } 

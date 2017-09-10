@@ -9,6 +9,7 @@
 #endif
 #define _gokz_core_included_
 
+#include <gokz>
 #include <movementapi>
 
 
@@ -446,6 +447,15 @@ forward Action GOKZ_OnUndoTeleport(int client);
 forward void GOKZ_OnUndoTeleport_Post(int client);
 
 /**
+ * Called when a player has performed a counted teleport (teleport count went up)
+ * i.e. a catch-all for teleport to checkpoint, teleport to start, undo teleport etc.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnCountedTeleport_Post(int client);
+
+/**
  * Called when player's begins a jump that is deemed valid.
  * A jump is deemed invalid if the player is teleported.
  *
@@ -464,6 +474,14 @@ forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
  * @noreturn
  */
 forward void GOKZ_OnJumpInvalidated(int client);
+
+/**
+ * Called when a player has been switched to a team.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnJoinTeam(int client, int team);
 
 
 
@@ -645,6 +663,14 @@ native float GOKZ_GetCurrentTime(int client);
  * @return				Player's current checkpoint count.
  */
 native int GOKZ_GetCheckpointCount(int client);
+
+/**
+ * Gets the player's current teleport count.
+ *
+ * @param client    	Client index.
+ * @return				Player's current teleport count.
+ */
+native int GOKZ_GetTeleportCount(int client);
 
 /**
  * Teleports the player to start, or respawns them.
@@ -897,6 +923,12 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 	property int checkpointCount {
 		public get() {
 			return GOKZ_GetCheckpointCount(this.id);
+		}
+	}
+	
+	property int teleportCount {
+		public get() {
+			return GOKZ_GetTeleportCount(this.id);
 		}
 	}
 	
@@ -1167,6 +1199,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetPaused");
 	MarkNativeAsOptional("GOKZ_GetCurrentTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
+	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

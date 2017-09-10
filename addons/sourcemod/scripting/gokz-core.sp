@@ -165,16 +165,10 @@ public void OnClientAuthorized(int client, const char[] auth)
 	}
 }
 
-public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
+public void OnClientDisconnect(int client)
 {
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (!IsValidClient(client))
-	{
-		return;
-	}
-	PrintDisconnectMessage(client, event);
-	OnPlayerDisconnect_Timer(client);
-	OnPlayerDisconnect_ValidJump(client);
+	OnClientDisconnect_Timer(client);
+	OnClientDisconnect_ValidJump(client);
 	gB_ClientIsSetUp[client] = false;
 }
 
@@ -184,6 +178,28 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	OnPlayerRunCmd_Timer(client);
+	OnPlayerRunCmd_TPMenu(client);
+	OnPlayerRunCmd_InfoPanel(client, cmdnum);
+	OnPlayerRunCmd_SpeedText(client, cmdnum);
+	OnPlayerRunCmd_TimerText(client, cmdnum);
+	OnPlayerRunCmd_JumpBeam(client);
+	UpdateOldVariables(client, tickcount);
+	return Plugin_Continue;
+}
+
+public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
+{
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	PrintDisconnectMessage(client, event);
 }
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn hook
@@ -211,18 +227,6 @@ public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) //
 public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team hook
 {
 	SetEventBroadcast(event, true); // Block join team messages
-	return Plugin_Continue;
-}
-
-public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
-{
-	OnPlayerRunCmd_Timer(client);
-	OnPlayerRunCmd_TPMenu(client);
-	OnPlayerRunCmd_InfoPanel(client, cmdnum);
-	OnPlayerRunCmd_SpeedText(client, cmdnum);
-	OnPlayerRunCmd_TimerText(client, cmdnum);
-	OnPlayerRunCmd_JumpBeam(client);
-	UpdateOldVariables(client, tickcount);
 	return Plugin_Continue;
 }
 
@@ -311,6 +315,11 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 	OnOptionChanged_Pistol(client, option);
 }
 
+public void GOKZ_OnJoinTeam(int client, int team)
+{
+	OnJoinTeam_Pause(client, team);
+}
+
 
 
 // =========================  OTHER  ========================= //
@@ -327,12 +336,6 @@ public void OnMapStart()
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 {
 	return Plugin_Handled; // Stop round from ever ending
-}
-
-public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start hook
-{
-	OnRoundStart_Timer();
-	OnRoundStart_ForceAllTalk();
 }
 
 public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char[] soundEntry, int &seed)
@@ -355,6 +358,12 @@ public void OnEntitySpawned(int entity)
 	OnEntitySpawned_MapBhopTriggers(entity);
 }
 
+public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start hook
+{
+	OnRoundStart_Timer();
+	OnRoundStart_ForceAllTalk();
+}
+
 
 
 // =========================  PRIVATE  ========================= //
@@ -375,11 +384,11 @@ static void CreateMenus()
 
 static void CreateHooks()
 {
+	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Pre);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
-	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
-	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
+	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
 	// Setup DHooks OnTeleport

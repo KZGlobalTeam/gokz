@@ -337,6 +337,7 @@ void JoinTeam(int client, int team)
 		Movement_GetEyeAngles(client, savedAngles[client]);
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
+		Call_GOKZ_OnJoinTeam(client, team);
 	}
 	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
 	{
@@ -353,6 +354,7 @@ void JoinTeam(int client, int team)
 		{
 			TimerStop(client);
 		}
+		Call_GOKZ_OnJoinTeam(client, team);
 	}
 	UpdateTPMenu(client);
 }
@@ -463,7 +465,7 @@ void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMo
 	}
 }
 
-void OnPlayerDisconnect_ValidJump(int client)
+void OnClientDisconnect_ValidJump(int client)
 {
 	InvalidateJump(client);
 }

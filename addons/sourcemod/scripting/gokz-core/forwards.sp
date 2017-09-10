@@ -30,8 +30,10 @@ static Handle H_OnTeleportToStart;
 static Handle H_OnTeleportToStart_Post;
 static Handle H_OnUndoTeleport;
 static Handle H_OnUndoTeleport_Post;
+static Handle H_OnCountedTeleport_Post;
 static Handle H_OnJumpValidated;
 static Handle H_OnJumpInvalidated;
+static Handle H_OnJoinTeam;
 
 
 
@@ -61,14 +63,25 @@ void CreateGlobalForwards()
 	H_OnTeleportToStart_Post = CreateGlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnUndoTeleport = CreateGlobalForward("GOKZ_OnUndoTeleport", ET_Hook, Param_Cell);
 	H_OnUndoTeleport_Post = CreateGlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
+	H_OnCountedTeleport_Post = CreateGlobalForward("GOKZ_OnCountedTeleport_Post", ET_Ignore, Param_Cell);
 	H_OnJumpValidated = CreateGlobalForward("GOKZ_OnJumpValidated", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	H_OnJumpInvalidated = CreateGlobalForward("GOKZ_OnJumpInvalidated", ET_Ignore, Param_Cell);
+	H_OnJoinTeam = CreateGlobalForward("GOKZ_OnJoinTeam", ET_Ignore, Param_Cell, Param_Cell);
 }
 
 void Call_GOKZ_OnClientSetup(int client)
 {
 	Call_StartForward(H_OnClientSetup);
 	Call_PushCell(client);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnOptionChanged(int client, Option option, int optionValue)
+{
+	Call_StartForward(H_OnOptionChanged);
+	Call_PushCell(client);
+	Call_PushCell(option);
+	Call_PushCell(optionValue);
 	Call_Finish();
 }
 
@@ -229,7 +242,7 @@ void Call_GOKZ_OnUndoTeleport(int client, Action &result)
 {
 	Call_StartForward(H_OnUndoTeleport);
 	Call_PushCell(client);
-	Call_Finish();
+	Call_Finish(result);
 }
 
 void Call_GOKZ_OnUndoTeleport_Post(int client)
@@ -239,12 +252,10 @@ void Call_GOKZ_OnUndoTeleport_Post(int client)
 	Call_Finish();
 }
 
-void Call_GOKZ_OnOptionChanged(int client, Option option, int optionValue)
+void Call_GOKZ_OnCountedTeleport_Post(int client)
 {
-	Call_StartForward(H_OnOptionChanged);
+	Call_StartForward(H_OnCountedTeleport_Post);
 	Call_PushCell(client);
-	Call_PushCell(option);
-	Call_PushCell(optionValue);
 	Call_Finish();
 }
 
@@ -261,5 +272,13 @@ void Call_GOKZ_OnJumpInvalidated(int client)
 {
 	Call_StartForward(H_OnJumpInvalidated);
 	Call_PushCell(client);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnJoinTeam(int client, int team)
+{
+	Call_StartForward(H_OnJoinTeam);
+	Call_PushCell(client);
+	Call_PushCell(team);
 	Call_Finish();
 } 
