@@ -516,6 +516,9 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	{
 		EmitSoundToClient(client, SOUND_TELEPORT);
 	}
+	
+	// Call Post Foward
+	Call_GOKZ_OnCountedTeleport_Post(client);
 }
 
 public Action Timer_RemoveBoosts(Handle timer, int userid)

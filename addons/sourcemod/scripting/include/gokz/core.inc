@@ -447,6 +447,15 @@ forward Action GOKZ_OnUndoTeleport(int client);
 forward void GOKZ_OnUndoTeleport_Post(int client);
 
 /**
+ * Called when a player has performed a counted teleport (teleport count went up)
+ * i.e. a catch-all for teleport to checkpoint, teleport to start, undo teleport etc.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnCountedTeleport_Post(int client);
+
+/**
  * Called when player's begins a jump that is deemed valid.
  * A jump is deemed invalid if the player is teleported.
  *
