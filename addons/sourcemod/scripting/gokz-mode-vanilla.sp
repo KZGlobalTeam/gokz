@@ -4,10 +4,11 @@
 #include <sdkhooks>
 
 #include <gokz>
-#include <movementapi>
 
+#include <movementapi>
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -19,9 +20,11 @@ public Plugin myinfo =
 	name = "GOKZ Mode - Vanilla", 
 	author = "DanZay", 
 	description = "GOKZ Mode Module - Vanilla", 
-	version = "0.14.0", 
+	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://45.32.245.115/updater/gokz-mode-vanilla.txt"
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
@@ -44,6 +47,11 @@ public void OnPluginStart()
 	}
 	
 	CreateConVars();
+	
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnPluginEnd()
@@ -69,6 +77,10 @@ public void OnLibraryAdded(const char[] name)
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_Vanilla, true);
+	}
+	else if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
