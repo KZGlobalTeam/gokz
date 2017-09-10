@@ -465,7 +465,7 @@ void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMo
 	}
 }
 
-void OnPlayerDisconnect_ValidJump(int client)
+void OnClientDisconnect_ValidJump(int client)
 {
 	InvalidateJump(client);
 }

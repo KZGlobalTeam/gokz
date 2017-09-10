@@ -167,8 +167,8 @@ public void OnClientAuthorized(int client, const char[] auth)
 
 public void OnClientDisconnect(int client)
 {
-	OnPlayerDisconnect_Timer(client);
-	OnPlayerDisconnect_ValidJump(client);
+	OnClientDisconnect_Timer(client);
+	OnClientDisconnect_ValidJump(client);
 	gB_ClientIsSetUp[client] = false;
 }
 

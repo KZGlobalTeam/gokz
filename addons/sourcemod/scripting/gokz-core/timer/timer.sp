@@ -197,7 +197,7 @@ void OnTeleportToStart_Timer(int client, bool customPos)
 	}
 }
 
-void OnPlayerDisconnect_Timer(int client)
+void OnClientDisconnect_Timer(int client)
 {
 	TimerStop(client);
 }
