@@ -24,7 +24,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-mode-kztimer.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-kztimer.txt"
 
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
@@ -58,6 +58,7 @@ public void OnPluginStart()
 	
 	CreateConVars();
 	
+	// Updater
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -88,6 +89,7 @@ public void OnLibraryAdded(const char[] name)
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_KZTimer, true);
 	}
+	// Updater
 	else if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

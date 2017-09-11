@@ -27,7 +27,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-localranks.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-localranks.txt"
 
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
@@ -108,6 +108,7 @@ public void OnPluginStart()
 	
 	TryGetDatabaseInfo();
 	
+	// Updater
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -137,6 +138,7 @@ void OnLateLoad()
 
 public void OnLibraryAdded(const char[] name)
 {
+	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

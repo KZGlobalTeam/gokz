@@ -29,7 +29,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-core.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-core.txt"
 
 bool gB_LateLoad;
 bool gB_BaseComm;
@@ -99,6 +99,7 @@ public void OnPluginStart()
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 	
+	// Updater
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -133,6 +134,7 @@ public void OnAllPluginsLoaded()
 public void OnLibraryAdded(const char[] name)
 {
 	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
+	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

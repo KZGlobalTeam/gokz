@@ -25,7 +25,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-jumpstats.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-jumpstats.txt"
 
 #define BHOP_ON_GROUND_TICKS 5
 #define WEIRDJUMP_MAX_FALL_OFFSET 64.0
@@ -62,6 +62,7 @@ public void OnPluginStart()
 	
 	CreateGlobalForwards();
 	
+	// Updater
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -86,6 +87,7 @@ void OnLateLoad()
 
 public void OnLibraryAdded(const char[] name)
 {
+	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

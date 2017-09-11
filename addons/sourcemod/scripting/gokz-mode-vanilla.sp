@@ -24,7 +24,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-mode-vanilla.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-vanilla.txt"
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
@@ -78,6 +78,7 @@ public void OnLibraryAdded(const char[] name)
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_Vanilla, true);
 	}
+	// Updater
 	else if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -86,6 +87,7 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
+	// Updater
 	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = false;

@@ -24,7 +24,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-mode-simplekz.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-simplekz.txt"
 
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
@@ -62,6 +62,7 @@ public void OnPluginStart()
 	
 	CreateConVars();
 	
+	// Updater
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -100,6 +101,7 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
+	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

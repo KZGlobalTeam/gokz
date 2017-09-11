@@ -25,7 +25,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://45.32.245.115/updater/gokz-localdb.txt"
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-localdb.txt"
 
 bool gB_LateLoad;
 Regex gRE_BonusStartButton;
@@ -73,6 +73,7 @@ public void OnPluginStart()
 	
 	DB_SetupDatabase();
 	
+	// Updater
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -97,6 +98,7 @@ void OnLateLoad()
 
 public void OnLibraryAdded(const char[] name)
 {
+	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
