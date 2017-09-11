@@ -17,7 +17,8 @@
  * 128 Tick
  * [MovementAPI Plugin](https://github.com/danzayau/MovementAPI)
  * [DHooks Extension](https://forums.alliedmods.net/showthread.php?t=180114)
- * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (optional - prevents "Datatable warning" server console spam)
+ * Optional - [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (prevent "Datatable warning" server console spam)
+ * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (auto-update the plugins)
 
 ### Plugin Installation
 

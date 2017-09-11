@@ -8,6 +8,8 @@
 
 #include <gokz/core>
 #include <gokz/localdb>
+#undef REQUIRE_PLUGIN
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -19,9 +21,11 @@ public Plugin myinfo =
 	name = "GOKZ Local DB", 
 	author = "DanZay", 
 	description = "GOKZ Local Database Module", 
-	version = "0.14.0", 
+	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-localdb.txt"
 
 bool gB_LateLoad;
 Regex gRE_BonusStartButton;
@@ -69,6 +73,12 @@ public void OnPluginStart()
 	
 	DB_SetupDatabase();
 	
+	// Updater
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	
 	if (gB_LateLoad)
 	{
 		OnLateLoad();
@@ -83,6 +93,15 @@ void OnLateLoad()
 		{
 			GOKZ_OnClientSetup(client);
 		}
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	// Updater
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 

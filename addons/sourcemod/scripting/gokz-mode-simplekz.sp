@@ -4,10 +4,11 @@
 #include <sdkhooks>
 
 #include <gokz>
-#include <movementapi>
 
+#include <movementapi>
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -19,9 +20,11 @@ public Plugin myinfo =
 	name = "GOKZ Mode - SimpleKZ", 
 	author = "DanZay", 
 	description = "GOKZ Mode Module - SimpleKZ", 
-	version = "0.14.0", 
+	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-simplekz.txt"
 
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
@@ -58,6 +61,12 @@ public void OnPluginStart()
 	}
 	
 	CreateConVars();
+	
+	// Updater
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnPluginEnd()
@@ -84,13 +93,18 @@ public void OnLibraryAdded(const char[] name)
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
 	}
+	else if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
+	// Updater
+	if (StrEqual(name, "updater"))
 	{
-		gB_GOKZCore = false;
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 

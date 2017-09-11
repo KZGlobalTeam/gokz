@@ -8,6 +8,8 @@
 #include <movementapi>
 #include <gokz/core>
 #include <gokz/jumpstats>
+#undef REQUIRE_PLUGIN
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -19,9 +21,11 @@ public Plugin myinfo =
 	name = "GOKZ Jumpstats", 
 	author = "DanZay", 
 	description = "GOKZ Jumpstats Module", 
-	version = "0.14.0", 
+	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-jumpstats.txt"
 
 #define BHOP_ON_GROUND_TICKS 5
 #define WEIRDJUMP_MAX_FALL_OFFSET 64.0
@@ -58,6 +62,12 @@ public void OnPluginStart()
 	
 	CreateGlobalForwards();
 	
+	// Updater
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	
 	if (gB_LateLoad)
 	{
 		OnLateLoad();
@@ -72,6 +82,15 @@ void OnLateLoad()
 		{
 			OnClientPutInServer(client);
 		}
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	// Updater
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 

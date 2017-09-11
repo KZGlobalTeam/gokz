@@ -4,10 +4,11 @@
 #include <sdkhooks>
 
 #include <gokz>
-#include <movementapi>
 
+#include <movementapi>
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -19,9 +20,11 @@ public Plugin myinfo =
 	name = "GOKZ Mode - KZTimer", 
 	author = "DanZay", 
 	description = "GOKZ Mode Module - KZTimer", 
-	version = "0.14.0", 
+	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-kztimer.txt"
 
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
@@ -54,6 +57,12 @@ public void OnPluginStart()
 	}
 	
 	CreateConVars();
+	
+	// Updater
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnPluginEnd()
@@ -79,6 +88,11 @@ public void OnLibraryAdded(const char[] name)
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_KZTimer, true);
+	}
+	// Updater
+	else if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
