@@ -272,7 +272,7 @@ char sql_getaverage[] =
 ..."FROM Times "
 ..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
 ..."WHERE MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d "
-..."GROUP BY Times.SteamID32)";
+..."GROUP BY Times.SteamID32) AS PBTimes";
 
 char sql_getaverage_pro[] = 
 "SELECT AVG(PBTime) "
@@ -281,4 +281,4 @@ char sql_getaverage_pro[] =
 ..."FROM Times "
 ..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
 ..."WHERE MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d AND Times.Teleports=0 "
-..."GROUP BY Times.SteamID32)"; 
+..."GROUP BY Times.SteamID32) AS PBTimes"; 

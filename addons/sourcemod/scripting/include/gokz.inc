@@ -13,7 +13,7 @@
 
 // =========================  DEFINITIONS  ========================= //
 
-#define GOKZ_VERSION "0.15.1"
+#define GOKZ_VERSION "0.15.2"
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
