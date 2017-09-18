@@ -2,7 +2,7 @@
 	Mapping API - Buttons
 	
 	Hooks between func_buttons and GOKZ.
-	Not using HookEntityInput because it sometimes drops inputs.
+	Not using HookSingleEntityOutput because it sometimes drops fails. Source: george.
 	Not using SDKHooks because doesn't call when input is via trigger_multiple output.
 	Credits to george.
 */
@@ -48,18 +48,27 @@ void OnEntitySpawned_MapButtons(int entity)
 
 void OnAcceptInput_MapButtons(int entity, Handle params)
 {
-	if (DHookIsNullParam(params, 2))
+	char tempString[32];
+	
+	// Check input type is "Use"/"use" or "Press"/"press"
+	DHookGetParamString(params, 1, tempString, sizeof(tempString));
+	if (!StrEqual(tempString, "Use", false) && !StrEqual(tempString, "Press", false))
 	{
 		return;
 	}
 	
+	// Check entity and activator validity
+	if (DHookIsNullParam(params, 2))
+	{
+		return;
+	}
 	int activator = DHookGetParam(params, 2);
 	if (!IsValidEntity(entity) || !IsValidClient(activator))
 	{
 		return;
 	}
 	
-	char tempString[32];
+	// Process button press
 	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
 	if (StrEqual("climb_startbutton", tempString))
 	{
