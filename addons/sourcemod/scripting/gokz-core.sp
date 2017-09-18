@@ -34,6 +34,7 @@ public Plugin myinfo =
 bool gB_LateLoad;
 bool gB_BaseComm;
 Handle gH_DHooks_OnTeleport;
+Handle gH_DHooks_OnAcceptInput;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
@@ -252,6 +253,12 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	return MRES_Ignored;
 }
 
+public MRESReturn DHooks_OnAcceptInput(int entity, Handle ret, Handle params)
+{
+	OnAcceptInput_MapButtons(entity, params);
+	return MRES_Ignored;
+}
+
 
 
 // =========================  MOVEMENTAPI  ========================= //
@@ -405,15 +412,27 @@ static void CreateHooks()
 	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
-	// Setup DHooks OnTeleport
 	Handle gameData = LoadGameConfigFile("sdktools.games");
-	int offset = GameConfGetOffset(gameData, "Teleport");
-	gameData.Close();
+	int offset;
+	
+	// Setup DHooks OnTeleport for Players
+	offset = GameConfGetOffset(gameData, "Teleport");
 	gH_DHooks_OnTeleport = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnTeleport);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_ObjectPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
+	
+	// Setup DHooks OnAcceptInput for Buttons
+	offset = GameConfGetOffset(gameData, "AcceptInput");
+	gH_DHooks_OnAcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, DHooks_OnAcceptInput);
+	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_CharPtr);
+	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_CBaseEntity);
+	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_CBaseEntity);
+	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_Object, 20, DHookPass_ByVal | DHookPass_ODTOR | DHookPass_OCTOR | DHookPass_OASSIGNOP);
+	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_Int);
+	
+	gameData.Close();
 }
 
 static void UpdateOldVariables(int client, int tickcount)

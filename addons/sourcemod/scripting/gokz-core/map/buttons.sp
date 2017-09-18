@@ -2,6 +2,9 @@
 	Mapping API - Buttons
 	
 	Hooks between func_buttons and GOKZ.
+	Not using HookSingleEntityOutput because it sometimes drops fails. Source: george.
+	Not using SDKHooks because doesn't call when input is via trigger_multiple output.
+	Credits to george.
 */
 
 
@@ -34,60 +37,50 @@ void OnEntitySpawned_MapButtons(int entity)
 	}
 	
 	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	if (StrEqual("climb_startbutton", tempString))
+	if (StrEqual("climb_startbutton", tempString)
+		 || StrEqual("climb_endbutton", tempString)
+		 || MatchRegex(RE_BonusStartButton, tempString) > 0
+		 || MatchRegex(RE_BonusEndButton, tempString) > 0)
 	{
-		SDKHook(entity, SDKHook_UsePost, SDKHook_OnStartButtonPress);
-	}
-	else if (StrEqual("climb_endbutton", tempString))
-	{
-		SDKHook(entity, SDKHook_Use, SDKHook_OnEndButtonPress);
-	}
-	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
-	{
-		SDKHook(entity, SDKHook_UsePost, SDKHook_OnBonusStartButtonPress);
-	}
-	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
-	{
-		SDKHook(entity, SDKHook_UsePost, SDKHook_OnBonusEndButtonPress);
+		DHookEntity(gH_DHooks_OnAcceptInput, false, entity);
 	}
 }
 
-
-
-// =========================  HANDLERS  ========================= //
-
-public void SDKHook_OnStartButtonPress(int entity, int activator, int caller, UseType type, float value)
+void OnAcceptInput_MapButtons(int entity, Handle params)
 {
-	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	char tempString[32];
+	
+	// Check input type is "Use"/"use" or "Press"/"press"
+	DHookGetParamString(params, 1, tempString, sizeof(tempString));
+	if (!StrEqual(tempString, "Use", false) && !StrEqual(tempString, "Press", false))
 	{
 		return;
 	}
 	
-	TimerStart(activator, 0);
-	OnStartButtonPress_VirtualButtons(activator, 0);
-}
-
-public void SDKHook_OnEndButtonPress(int entity, int activator, int caller, UseType type, float value)
-{
-	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	// Check entity and activator validity
+	if (DHookIsNullParam(params, 2))
 	{
 		return;
 	}
-	
-	TimerEnd(activator, 0);
-	OnEndButtonPress_VirtualButtons(activator, 0);
-}
-
-public void SDKHook_OnBonusStartButtonPress(int entity, int activator, int caller, UseType type, float value)
-{
+	int activator = DHookGetParam(params, 2);
 	if (!IsValidEntity(entity) || !IsValidClient(activator))
 	{
 		return;
 	}
 	
-	char tempString[32];
+	// Process button press
 	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	if (MatchRegex(RE_BonusStartButton, tempString) > 0)
+	if (StrEqual("climb_startbutton", tempString))
+	{
+		TimerStart(activator, 0);
+		OnStartButtonPress_VirtualButtons(activator, 0);
+	}
+	else if (StrEqual("climb_endbutton", tempString))
+	{
+		TimerEnd(activator, 0);
+		OnEndButtonPress_VirtualButtons(activator, 0);
+	}
+	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
 	{
 		GetRegexSubString(RE_BonusStartButton, 1, tempString, sizeof(tempString));
 		int course = StringToInt(tempString);
@@ -97,19 +90,7 @@ public void SDKHook_OnBonusStartButtonPress(int entity, int activator, int calle
 			OnStartButtonPress_VirtualButtons(activator, course);
 		}
 	}
-}
-
-public void SDKHook_OnBonusEndButtonPress(int entity, int activator, int caller, UseType type, float value)
-{
-	if (!IsValidEntity(entity) || !IsValidClient(activator))
-	{
-		return;
-	}
-	
-	char tempString[32];
-	
-	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	if (MatchRegex(RE_BonusEndButton, tempString) > 0)
+	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
 	{
 		GetRegexSubString(RE_BonusEndButton, 1, tempString, sizeof(tempString));
 		int course = StringToInt(tempString);
