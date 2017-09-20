@@ -627,4 +627,24 @@ static void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 	{
 		colour =  { 0, 255, 0, 100 }; // Green
 	}
+}
+
+
+
+// =========================  CLAN TAG  ========================= //
+
+void UpdateClanTag(int client)
+{
+	if (!IsFakeClient(client))
+	{
+		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetOption(client, Option_Mode)]);
+	}
+}
+
+void OnOptionChanged_ClanTag(int client, Option option)
+{
+	if (option == Option_Mode)
+	{
+		UpdateClanTag(client);
+	}
 } 

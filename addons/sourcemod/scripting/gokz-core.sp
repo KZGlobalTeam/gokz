@@ -203,6 +203,17 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
+public Action OnClientCommandKeyValues(int client, KeyValues kv)
+{
+	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
+	char cmd[64];
+	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
+	{
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
+}
+
 public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -330,6 +341,7 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 	OnOptionChanged_TPMenu(client, option);
 	OnOptionChanged_HideWeapon(client, option);
 	OnOptionChanged_Pistol(client, option);
+	OnOptionChanged_ClanTag(client, option);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)
