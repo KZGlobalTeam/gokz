@@ -49,24 +49,17 @@ float gF_OldAngles[MAXPLAYERS + 1][3];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
 	RegPluginLibrary("gokz-mode-vanilla");
 	return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateConVars();
-	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 }
 
 public void OnPluginEnd()
@@ -83,6 +76,10 @@ public void OnAllPluginsLoaded()
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
+	}
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
@@ -101,10 +98,9 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
-	// Updater
-	if (StrEqual(name, "updater"))
+	if (StrEqual(name, "gokz-core"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		gB_GOKZCore = false;
 	}
 }
 

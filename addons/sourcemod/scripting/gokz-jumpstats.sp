@@ -45,6 +45,10 @@ int gI_TouchingEntities[MAXPLAYERS + 1];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
 	CreateNatives();
 	RegPluginLibrary("gokz-jumpstats");
 	gB_LateLoad = late;
@@ -53,20 +57,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	LoadTranslations("gokz-jumpstats.phrases");
 	
 	CreateGlobalForwards();
-	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 	
 	if (gB_LateLoad)
 	{
@@ -85,9 +78,16 @@ void OnLateLoad()
 	}
 }
 
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
 public void OnLibraryAdded(const char[] name)
 {
-	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

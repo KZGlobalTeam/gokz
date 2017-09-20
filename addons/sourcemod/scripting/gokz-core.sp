@@ -74,6 +74,10 @@ int gI_OldTickCount[MAXPLAYERS + 1];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
 	gB_LateLoad = late;
@@ -82,11 +86,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	LoadTranslations("common.phrases");
 	LoadTranslations("gokz-core.phrases");
 	
@@ -99,12 +98,6 @@ public void OnPluginStart()
 	CreateCommandListeners();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
-	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 	
 	if (gB_LateLoad)
 	{
@@ -130,12 +123,15 @@ public void OnAllPluginsLoaded()
 	{
 		SetFailState("At least one GOKZ mode plugin is required.");
 	}
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
 {
 	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
-	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
