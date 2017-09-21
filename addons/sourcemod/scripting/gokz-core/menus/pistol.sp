@@ -6,8 +6,6 @@
 
 
 
-static Menu pistolMenu[MAXPLAYERS + 1];
-
 static char pistolNames[PISTOL_COUNT][] = 
 {
 	"P2000 / USP-S", 
@@ -24,23 +22,12 @@ static char pistolNames[PISTOL_COUNT][] =
 
 // =========================  PUBLIC  ========================= //
 
-void CreateMenusPistol()
-{
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		pistolMenu[client] = new Menu(MenuHandler_Pistol);
-	}
-}
-
 void DisplayPistolMenu(int client, int atItem = 0)
 {
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
-	PistolMenuUpdate(client, pistolMenu[client]);
-	pistolMenu[client].DisplayAt(client, atItem, MENU_TIME_FOREVER);
+	Menu menu = new Menu(MenuHandler_Pistol);
+	menu.SetTitle("%T", "Pistol Menu - Title", client);
+	PistolMenuAddItems(client, menu);
+	menu.DisplayAt(client, atItem, MENU_TIME_FOREVER);
 }
 
 
@@ -53,11 +40,15 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 	{
 		SetOption(param1, Option_Pistol, param2);
 		UpdatePistol(param1);
-		DisplayPistolMenu(param1, param2 / 6 * 6);
+		DisplayPistolMenu(param1, param2 / 6 * 6); // Re-display menu at same spot
 	}
 	else if (action == MenuAction_Cancel && GetCameFromOptionsMenu(param1))
 	{
 		DisplayOptionsMenu(param1, 6);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
 	}
 }
 
@@ -65,12 +56,20 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 
 // =========================  PRIVATE  ========================= //
 
-static void PistolMenuUpdate(int client, Menu menu)
+static void PistolMenuAddItems(int client, Menu menu)
 {
-	menu.SetTitle("%T", "Pistol Menu - Title", client);
-	menu.RemoveAllItems();
+	int selectedPistol = GOKZ_GetOption(client, Option_Pistol);
+	char display[32];
+	
 	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)
 	{
-		menu.AddItem("", pistolNames[pistol]);
+		FormatEx(display, sizeof(display), "%s", pistolNames[pistol]);
+		// Add asterisk to selected pistol
+		if (pistol == selectedPistol)
+		{
+			Format(display, sizeof(display), "%s*", display);
+		}
+		
+		menu.AddItem("", display, ITEMDRAW_DEFAULT);
 	}
 } 

@@ -8,7 +8,10 @@
 
 
 
-static Menu measureMenu[MAXPLAYERS + 1];
+#define ITEM_INFO_POINT_A "a"
+#define ITEM_INFO_POINT_B "b"
+#define ITEM_INFO_GET_DISTANCE "get"
+
 static int glowSprite;
 static bool measurePosSet[MAXPLAYERS + 1][2];
 static float measurePos[MAXPLAYERS + 1][2][3];
@@ -19,19 +22,17 @@ static Handle P2PGreen[MAXPLAYERS + 1];
 
 // =========================  PUBLIC  ========================= //
 
-void CreateMenusMeasure()
+void DisplayMeasureMenu(int client, bool reset = true)
 {
-	for (int client = 1; client <= MaxClients; client++)
+	if (reset)
 	{
-		measureMenu[client] = new Menu(MenuHandler_Measure);
+		MeasureResetPos(client);
 	}
-}
-
-void DisplayMeasureMenu(int client)
-{
-	MeasureResetPos(client);
-	MeasureMenuUpdate(client, measureMenu[client]);
-	measureMenu[client].Display(client, MENU_TIME_FOREVER);
+	
+	Menu menu = new Menu(MenuHandler_Measure);
+	menu.SetTitle("%T", "Measure Menu - Title", client);
+	MeasureMenuAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 
@@ -47,42 +48,48 @@ void OnMapStart_Measure()
 
 // =========================  HANDLER  ========================= //
 
-public int MenuHandler_Measure(Handle menu, MenuAction action, int param1, int param2)
+public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
-		switch (param2)
+		char info[16];
+		menu.GetItem(param2, info, sizeof(info));
+		
+		if (StrEqual(info, ITEM_INFO_POINT_A, false))
 		{
-			case 0: // Point A (Green)
+			MeasureGetPos(param1, 0);
+		}
+		else if (StrEqual(info, ITEM_INFO_POINT_B, false))
+		{
+			MeasureGetPos(param1, 1);
+		}
+		else if (StrEqual(info, ITEM_INFO_GET_DISTANCE, false))
+		{
+			// Find Distance
+			if (measurePosSet[param1][0] && measurePosSet[param1][1])
 			{
-				MeasureGetPos(param1, 0);
+				float horizontalDist = GetVectorHorizontalDistance(measurePos[param1][0], measurePos[param1][1]);
+				float effectiveDist = CalcEffectiveDistance(measurePos[param1][0], measurePos[param1][1]);
+				float verticalDist = measurePos[param1][1][2] - measurePos[param1][0][2];
+				GOKZ_PrintToChat(param1, true, "%t", "Measure Result", horizontalDist, effectiveDist, verticalDist);
+				MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
 			}
-			case 1: // Point B (Red)
+			else
 			{
-				MeasureGetPos(param1, 1);
-			}
-			case 2:
-			{  // Find Distance
-				if (measurePosSet[param1][0] && measurePosSet[param1][1])
-				{
-					float horizontalDist = GetVectorHorizontalDistance(measurePos[param1][0], measurePos[param1][1]);
-					float effectiveDist = CalcEffectiveDistance(measurePos[param1][0], measurePos[param1][1]);
-					float verticalDist = measurePos[param1][1][2] - measurePos[param1][0][2];
-					GOKZ_PrintToChat(param1, true, "%t", "Measure Result", horizontalDist, effectiveDist, verticalDist);
-					MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
-				}
-				else
-				{
-					GOKZ_PrintToChat(param1, true, "%t", "Measure Failure (Points Not Set)");
-					PlayErrorSound(param1);
-				}
+				GOKZ_PrintToChat(param1, true, "%t", "Measure Failure (Points Not Set)");
+				PlayErrorSound(param1);
 			}
 		}
-		DisplayMenu(measureMenu[param1], param1, MENU_TIME_FOREVER);
+		
+		DisplayMeasureMenu(param1, false);
 	}
 	else if (action == MenuAction_Cancel)
 	{
 		MeasureResetPos(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
 	}
 }
 
@@ -90,18 +97,16 @@ public int MenuHandler_Measure(Handle menu, MenuAction action, int param1, int p
 
 // =========================  PRIVATE  ========================= //
 
-static void MeasureMenuUpdate(int client, Menu menu)
+static void MeasureMenuAddItems(int client, Menu menu)
 {
-	menu.SetTitle("%T", "Measure Menu - Title", client);
+	char display[32];
 	
-	char temp[32];
-	menu.RemoveAllItems();
-	FormatEx(temp, sizeof(temp), "%T", "Measure Menu - Point A", client);
-	menu.AddItem("", temp);
-	FormatEx(temp, sizeof(temp), "%T", "Measure Menu - Point B", client);
-	menu.AddItem("", temp);
-	FormatEx(temp, sizeof(temp), "%T", "Measure Menu - Get Distance", client);
-	menu.AddItem("", temp);
+	FormatEx(display, sizeof(display), "%T", "Measure Menu - Point A", client);
+	menu.AddItem(ITEM_INFO_POINT_A, display);
+	FormatEx(display, sizeof(display), "%T", "Measure Menu - Point B", client);
+	menu.AddItem(ITEM_INFO_POINT_B, display);
+	FormatEx(display, sizeof(display), "%T", "Measure Menu - Get Distance", client);
+	menu.AddItem(ITEM_INFO_GET_DISTANCE, display);
 }
 
 static void MeasureGetPos(int client, int arg)

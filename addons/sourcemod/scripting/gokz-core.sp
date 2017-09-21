@@ -90,7 +90,6 @@ public void OnPluginStart()
 	LoadTranslations("gokz-core.phrases");
 	
 	CreateRegexes();
-	CreateMenus();
 	CreateGlobalForwards();
 	CreateHooks();
 	CreateConVars();
@@ -400,15 +399,6 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 static void CreateRegexes()
 {
 	CreateRegexesMapButtons();
-}
-
-static void CreateMenus()
-{
-	CreateMenusMeasure();
-	CreateMenusMode();
-	CreateMenusOptions();
-	CreateMenusPistol();
-	CreateMenusTP();
 }
 
 static void CreateHooks()
