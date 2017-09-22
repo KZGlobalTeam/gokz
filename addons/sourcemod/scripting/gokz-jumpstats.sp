@@ -106,6 +106,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 public void OnClientPutInServer(int client)
 {
+	gI_TouchingEntities[client] = 0;
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
 }
