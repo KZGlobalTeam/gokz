@@ -80,50 +80,111 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "No Times Found");
 			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "No Times Found (PRO)");
 		}
-		MapTopMenuDisplay(client);
+		DisplayMapTopMenu(client);
 		return;
 	}
 	
-	RemoveAllMenuItems(gH_MapTopSubMenu[client]);
+	Menu menu = new Menu(MenuHandler_MapTopSubmenu);
+	menu.Pagination = 5;
 	
 	// Set submenu title
 	if (course == 0)
 	{
-		SetMenuTitle(gH_MapTopSubMenu[client], "%T", "Map Top Submenu - Title", client, 
+		menu.SetTitle("%T", "Map Top Submenu - Title", client, 
 			gC_TimeTypeNames[timeType], mapName, gC_ModeNames[mode]);
 	}
 	else
 	{
-		SetMenuTitle(gH_MapTopSubMenu[client], "%T", "Map Top Submenu - Title (Bonus)", client, 
+		menu.SetTitle("%T", "Map Top Submenu - Title (Bonus)", client, 
 			gC_TimeTypeNames[timeType], mapName, course, gC_ModeNames[mode]);
 	}
 	
 	// Add submenu items
-	char newMenuItem[256], playerName[33];
+	char display[256], playerName[33];
 	float runTime;
 	int teleports, rank = 0;
 	
 	while (SQL_FetchRow(results[2]))
 	{
 		rank++;
-		SQL_FetchString(results[2], 0, playerName, sizeof(playerName));
-		runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 1));
+		SQL_FetchString(results[2], 1, playerName, sizeof(playerName));
+		runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 2));
 		switch (timeType)
 		{
 			case TimeType_Nub:
 			{
-				teleports = SQL_FetchInt(results[2], 2);
-				FormatEx(newMenuItem, sizeof(newMenuItem), "#%-2d   %11s  %d TP      %s", 
+				teleports = SQL_FetchInt(results[2], 3);
+				FormatEx(display, sizeof(display), "#%-2d   %11s  %d TP      %s", 
 					rank, GOKZ_FormatTime(runTime), teleports, playerName);
 			}
 			case TimeType_Pro:
 			{
-				FormatEx(newMenuItem, sizeof(newMenuItem), "#%-2d   %11s   %s", 
+				FormatEx(display, sizeof(display), "#%-2d   %11s   %s", 
 					rank, GOKZ_FormatTime(runTime), playerName);
 			}
 		}
-		AddMenuItem(gH_MapTopSubMenu[client], "", newMenuItem, ITEMDRAW_DISABLED);
+		menu.AddItem(IntToStringEx(SQL_FetchInt(results[2], 0)), display, ITEMDRAW_DISABLED);
 	}
 	
-	DisplayMenu(gH_MapTopSubMenu[client], client, MENU_TIME_FOREVER);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+
+
+// =========================  MENUS  ========================= //
+
+void DisplayMapTopMenu(int client)
+{
+	Menu menu = new Menu(MenuHandler_MapTop);
+	if (gI_MapTopCourse[client] == 0)
+	{
+		menu.SetTitle("%T", "Map Top Menu - Title", client, 
+			gC_MapTopMapName[client], gC_ModeNames[g_MapTopMode[client]]);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Map Top Menu - Title (Bonus)", client, 
+			gC_MapTopMapName[client], gI_MapTopCourse[client], gC_ModeNames[g_MapTopMode[client]]);
+	}
+	MapTopMenuAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+static void MapTopMenuAddItems(int client, Menu menu)
+{
+	char display[32];
+	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
+	{
+		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top 20", client, gC_TimeTypeNames[timeType]);
+		menu.AddItem("", display, ITEMDRAW_DEFAULT);
+	}
+}
+
+
+
+// =========================  MENU HANDLERS  ========================= //
+
+public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		DB_OpenMapTop20(param1, gI_MapTopMapID[param1], gI_MapTopCourse[param1], g_MapTopMode[param1], param2);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	// Menu item info is player's SteamID32, but is currently not used
+	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayMapTopMenu(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 } 

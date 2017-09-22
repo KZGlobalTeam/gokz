@@ -66,7 +66,7 @@ public void DB_TxnSuccess_OpenMapTopMenu(Handle db, DataPack data, int numQuerie
 	gI_MapTopMapID[client] = mapID;
 	gI_MapTopCourse[client] = course;
 	g_MapTopMode[client] = mode;
-	MapTopMenuDisplay(client);
+	DisplayMapTopMenu(client);
 }
 
 void DB_OpenMapTop_FindMap(int client, const char[] mapSearch, int course, int mode)

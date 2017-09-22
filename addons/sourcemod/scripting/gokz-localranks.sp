@@ -36,15 +36,11 @@ bool gB_LateLoad;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 
-Menu gH_MapTopMenu[MAXPLAYERS + 1];
-Menu gH_MapTopSubMenu[MAXPLAYERS + 1];
 char gC_MapTopMapName[MAXPLAYERS + 1][64];
 int gI_MapTopMapID[MAXPLAYERS + 1];
 int gI_MapTopCourse[MAXPLAYERS + 1];
 int g_MapTopMode[MAXPLAYERS + 1];
 
-Menu gH_PlayerTopMenu[MAXPLAYERS + 1];
-Menu gH_PlayerTopSubMenu[MAXPLAYERS + 1];
 int g_PlayerTopMode[MAXPLAYERS + 1];
 
 bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
@@ -77,9 +73,6 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/database/process_new_time.sp"
 #include "gokz-localranks/database/update_ranked_map_pool.sp"
 
-#include "gokz-localranks/menus/maptop.sp"
-#include "gokz-localranks/menus/playertop.sp"
-
 
 
 // =========================  PLUGIN  ========================= //
@@ -102,7 +95,6 @@ public void OnPluginStart()
 	LoadTranslations("gokz-core.phrases");
 	LoadTranslations("gokz-localranks.phrases");
 	
-	CreateMenus();
 	CreateGlobalForwards();
 	CreateCommands();
 	
@@ -266,12 +258,6 @@ public void OnMapStart()
 
 
 // =========================  PRIVATE  ========================= //
-
-static void CreateMenus()
-{
-	MapTopMenuCreateMenus();
-	PlayerTopMenuCreateMenus();
-}
 
 static void TryGetDatabaseInfo()
 {

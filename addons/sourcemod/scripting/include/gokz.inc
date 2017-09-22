@@ -300,4 +300,17 @@ stock void Color_StripFromChatText(const char[] input, char[] output, int size)
 	}
 	
 	output[x] = '\0';
+}
+
+/**
+ * Returns an integer as a string.
+ *
+ * @param num				Integer to stringify.
+ * @return					Integer as a string.
+ */
+stock char[] IntToStringEx(int num)
+{
+	char string[12];
+	IntToString(num, string, sizeof(string));
+	return string;
 } 
