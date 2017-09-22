@@ -49,6 +49,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
+	
 	CreateNatives();
 	RegPluginLibrary("gokz-jumpstats");
 	gB_LateLoad = late;

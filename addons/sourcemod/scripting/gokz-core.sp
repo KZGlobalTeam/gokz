@@ -78,6 +78,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
+	
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
 	gB_LateLoad = late;
@@ -89,8 +90,8 @@ public void OnPluginStart()
 	LoadTranslations("common.phrases");
 	LoadTranslations("gokz-core.phrases");
 	
-	CreateRegexes();
 	CreateGlobalForwards();
+	CreateRegexes();
 	CreateHooks();
 	CreateConVars();
 	CreateCommands();

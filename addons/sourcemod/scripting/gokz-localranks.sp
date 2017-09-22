@@ -100,12 +100,6 @@ public void OnPluginStart()
 	
 	TryGetDatabaseInfo();
 	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-	
 	if (gB_LateLoad)
 	{
 		OnLateLoad();
@@ -128,9 +122,16 @@ void OnLateLoad()
 	}
 }
 
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
 public void OnLibraryAdded(const char[] name)
 {
-	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);

@@ -145,7 +145,7 @@ static void OptionsMenuAddToggle(int client, Menu menu, Option option, const cha
 			optionPhrase, client, 
 			"Options Menu - Enabled", client);
 	}
-	menu.AddItem(GetOptionIntAsString(option), display);
+	menu.AddItem(IntToStringEx(view_as<int>(option)), display);
 }
 
 static void OptionsMenuAddPistol(int client, Menu menu)
@@ -153,7 +153,7 @@ static void OptionsMenuAddPistol(int client, Menu menu)
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Pistol", 
 		client, pistolNames[GetOption(client, Option_Pistol)]);
-	menu.AddItem(GetOptionIntAsString(Option_Pistol), display);
+	menu.AddItem(IntToStringEx(view_as<int>(Option_Pistol)), display);
 }
 
 static void OptionsMenuAddShowingKeys(int client, Menu menu)
@@ -162,7 +162,7 @@ static void OptionsMenuAddShowingKeys(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Show Keys", client, 
 		phrasesShowingKeys[GetOption(client, Option_ShowingKeys)], client);
-	menu.AddItem(GetOptionIntAsString(Option_ShowingKeys), display);
+	menu.AddItem(IntToStringEx(view_as<int>(Option_ShowingKeys)), display);
 }
 
 static void OptionsMenuAddTimerText(int client, Menu menu)
@@ -171,7 +171,7 @@ static void OptionsMenuAddTimerText(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Timer Text", client, 
 		phrasesTimerText[GetOption(client, Option_TimerText)], client);
-	menu.AddItem(GetOptionIntAsString(Option_TimerText), display);
+	menu.AddItem(IntToStringEx(view_as<int>(Option_TimerText)), display);
 }
 
 static void OptionsMenuAddSpeedText(int client, Menu menu)
@@ -180,7 +180,7 @@ static void OptionsMenuAddSpeedText(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Speed Text", client, 
 		phrasesSpeedText[GetOption(client, Option_SpeedText)], client);
-	menu.AddItem(GetOptionIntAsString(Option_SpeedText), display);
+	menu.AddItem(IntToStringEx(view_as<int>(Option_SpeedText)), display);
 }
 
 static void OptionsMenuAddJumpBeam(int client, Menu menu)
@@ -189,12 +189,5 @@ static void OptionsMenuAddJumpBeam(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Jump Beam", client, 
 		phrasesJumpBeam[GetOption(client, Option_JumpBeam)], client);
-	menu.AddItem(GetOptionIntAsString(Option_JumpBeam), display);
-}
-
-static char[] GetOptionIntAsString(Option option)
-{
-	char string[4];
-	IntToString(view_as<int>(option), string, sizeof(string));
-	return string;
+	menu.AddItem(IntToStringEx(view_as<int>(Option_JumpBeam)), display);
 } 
