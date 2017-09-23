@@ -28,41 +28,53 @@ void OnPlayerRunCmd_JumpTracking(int client)
 		return;
 	}
 	
-	if ((!Movement_GetOnGround(client) || Movement_GetMoveType(client) != MOVETYPE_WALK) && GetValidJump(client))
+	if (!Movement_GetOnGround(client) && GetValidJumpstat(client))
 	{
-		CheckGravity(client);
-		CheckBaseVelocity(client);
-		CheckVerticalVelocity(client);
-		
-		UpdateHeight(client);
-		UpdateMaxSpeed(client);
-		UpdateStrafes(client);
-		UpdateSync(client);
-		UpdateDuration(client);
+		if (CheckGravity(client) && CheckBaseVelocity(client))
+		{
+			// Passed all checks
+			UpdateHeight(client);
+			UpdateMaxSpeed(client);
+			UpdateStrafes(client);
+			UpdateSync(client);
+			UpdateDuration(client);
+		}
+		else
+		{
+			InvalidateJumpstat(client);
+		}
 	}
 	
 	lastTickSpeed[client] = Movement_GetSpeed(client);
 	lastTickVerticalVelocity[client] = Movement_GetVerticalVelocity(client);
 }
 
-void OnJumpInvalidated_JumpTracking(int client)
-{
-	InvalidateJump(client);
-}
-
 void OnStartTouch_JumpTracking(int client)
 {
 	if (!Movement_GetOnGround(client))
 	{
-		InvalidateJump(client);
+		InvalidateJumpstat(client);
 	}
+}
+
+void OnPlayerJump_JumpTracking(int client, bool jumpbug)
+{
+	if (jumpbug)
+	{
+		InvalidateJumpstat(client);
+	}
+}
+
+void OnJumpInvalidated_JumpTracking(int client)
+{
+	InvalidateJumpstat(client);
 }
 
 void OnOptionChanged_JumpTracking(int client, Option option)
 {
 	if (option == Option_Mode)
 	{
-		InvalidateJump(client);
+		InvalidateJumpstat(client);
 	}
 }
 
@@ -97,39 +109,26 @@ static void EndJumpstat(int client)
 
 // =========================  CHECKS  ========================= //
 
-static void CheckGravity(int client)
+static bool CheckGravity(int client)
 {
 	float gravity = Movement_GetGravity(client);
 	// Allow 1.0 and 0.0 gravity as both values appear during normal gameplay
 	if (gravity != 1.0 && gravity != 0.0)
 	{
-		InvalidateJump(client);
+		return false;
 	}
+	return true;
 }
 
-static void CheckBaseVelocity(int client)
+static bool CheckBaseVelocity(int client)
 {
 	float baseVelocity[3];
 	Movement_GetBaseVelocity(client, baseVelocity);
 	if (baseVelocity[0] != 0.0 || baseVelocity[1] != 0.0 || baseVelocity[2] != 0.0)
 	{
-		InvalidateJump(client);
+		return false;
 	}
-}
-
-static void CheckVerticalVelocity(int client)
-{
-	float verticalVelocity = Movement_GetVerticalVelocity(client);
-	// No wukkas if just took off or just landed
-	if (FloatAbs(verticalVelocity) < EPSILON || FloatAbs(lastTickVerticalVelocity[client]) < EPSILON)
-	{
-		return;
-	}
-	// If vertical velocity has gone up, then something fishy has happened e.g. (crouch) jumpbug
-	if (lastTickVerticalVelocity[client] < verticalVelocity)
-	{
-		InvalidateJump(client);
-	}
+	return true;
 }
 
 
@@ -166,14 +165,14 @@ int GetType(int client)
 	return jumpTypeLast[client];
 }
 
-bool GetValidJump(int client)
+bool GetValidJumpstat(int client)
 {
 	return jumpTypeCurrent[client] != JumpType_Invalid;
 }
 
-void InvalidateJump(int client)
+void InvalidateJumpstat(int client)
 {
-	if (GetValidJump(client))
+	if (GetValidJumpstat(client))
 	{
 		jumpTypeLast[client] = JumpType_Invalid;
 		jumpTypeCurrent[client] = JumpType_Invalid;

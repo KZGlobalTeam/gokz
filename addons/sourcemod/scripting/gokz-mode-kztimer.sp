@@ -38,6 +38,7 @@ float gF_PreVelModLastChange[MAXPLAYERS + 1];
 int gI_PreTickCounter[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
+bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
 
@@ -45,24 +46,18 @@ float gF_OldAngles[MAXPLAYERS + 1][3];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
+	
 	RegPluginLibrary("gokz-mode-vanilla");
 	return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateConVars();
-	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 }
 
 public void OnPluginEnd()
@@ -80,6 +75,10 @@ public void OnAllPluginsLoaded()
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_KZTimer, true);
 	}
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -89,7 +88,6 @@ public void OnLibraryAdded(const char[] name)
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_KZTimer, true);
 	}
-	// Updater
 	else if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -123,8 +121,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = new KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player);
-	gI_OldButtons[client] = buttons;
-	gF_OldAngles[client] = angles;
+	if (gB_Jumpbugged[player.id])
+	{
+		TweakJumpbug(player);
+	}
+	
+	gB_Jumpbugged[player.id] = false;
+	gI_OldButtons[player.id] = buttons;
+	gF_OldAngles[player.id] = angles;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -168,6 +172,19 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	if (jumpbug)
+	{
+		gB_Jumpbugged[client] = true;
 	}
 }
 
@@ -341,14 +358,7 @@ static void TweakJump(KZPlayer player)
 	{
 		if (player.takeoffSpeed > PERF_SPEED_CAP)
 		{
-			float velocity[3], baseVelocity[3], newVelocity[3];
-			player.GetVelocity(velocity);
-			player.GetBaseVelocity(baseVelocity);
-			player.GetLandingVelocity(newVelocity);
-			newVelocity[2] = velocity[2];
-			SetVectorHorizontalLength(newVelocity, PERF_SPEED_CAP);
-			AddVectors(newVelocity, baseVelocity, newVelocity);
-			player.SetVelocity(newVelocity);
+			Movement_SetSpeed(player.id, PERF_SPEED_CAP, true);
 			if (gB_GOKZCore)
 			{
 				player.gokzHitPerf = true;
@@ -365,6 +375,19 @@ static void TweakJump(KZPlayer player)
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+static void TweakJumpbug(KZPlayer player)
+{
+	if (player.speed > PERF_SPEED_CAP)
+	{
+		Movement_SetSpeed(player.id, PERF_SPEED_CAP, true);
+	}
+	if (gB_GOKZCore)
+	{
+		player.gokzHitPerf = true;
+		player.gokzTakeoffSpeed = player.speed;
 	}
 }
 

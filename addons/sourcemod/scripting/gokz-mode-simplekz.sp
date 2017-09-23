@@ -32,7 +32,7 @@ public Plugin myinfo =
 #define PRE_MINIMUM_DELTA_ANGLE 0.4
 #define PRE_VELMOD_INCREMENT 0.0014 // Per tick when prestrafing
 #define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
-#define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - calculated 0.104velmod/94ticks
+#define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
 
 float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.4, 0.0 };
 bool gB_GOKZCore;
@@ -42,6 +42,7 @@ float gF_PreVelModLanding[MAXPLAYERS + 1];
 bool gB_PreTurningLeft[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
+bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
 
@@ -49,24 +50,18 @@ float gF_OldAngles[MAXPLAYERS + 1][3];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
+	
 	RegPluginLibrary("gokz-mode-vanilla");
 	return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateConVars();
-	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 }
 
 public void OnPluginEnd()
@@ -83,6 +78,10 @@ public void OnAllPluginsLoaded()
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
+	}
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
@@ -101,10 +100,9 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
-	// Updater
-	if (StrEqual(name, "updater"))
+	if (StrEqual(name, "gokz-core"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		gB_GOKZCore = false;
 	}
 }
 
@@ -127,8 +125,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = new KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player, angles);
-	gI_OldButtons[client] = buttons;
-	gF_OldAngles[client] = angles;
+	if (gB_Jumpbugged[player.id])
+	{
+		TweakJumpbug(player);
+	}
+	
+	gB_Jumpbugged[player.id] = false;
+	gI_OldButtons[player.id] = buttons;
+	gF_OldAngles[player.id] = angles;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -173,6 +177,19 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	if (jumpbug)
+	{
+		gB_Jumpbugged[client] = true;
 	}
 }
 
@@ -254,9 +271,7 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 		gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT_MIDAIR;
 	}
 	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier
-	else if (FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE
-		 && ((player.buttons & IN_FORWARD && !(player.buttons & IN_BACK)) || (!(player.buttons & IN_FORWARD) && player.buttons & IN_BACK))
-		 && ((player.buttons & IN_MOVELEFT && !(player.buttons & IN_MOVERIGHT)) || (!(player.buttons & IN_MOVELEFT) && player.buttons & IN_MOVERIGHT)))
+	else if (FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE && ValidPrestrafeButtons(player))
 	{
 		// If player changes their prestrafe direction, reset it
 		if (player.turningLeft && !gB_PreTurningLeft[player.id] || player.turningRight && gB_PreTurningLeft[player.id])
@@ -282,6 +297,13 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	}
 	
 	return gF_PreVelMod[player.id];
+}
+
+static bool ValidPrestrafeButtons(KZPlayer player)
+{
+	bool forwardOrBack = player.buttons & IN_FORWARD && !(player.buttons & IN_BACK) || !(player.buttons & IN_FORWARD) && player.buttons & IN_BACK;
+	bool leftOrRight = player.buttons & IN_MOVELEFT && !(player.buttons & IN_MOVERIGHT) || !(player.buttons & IN_MOVELEFT) && player.buttons & IN_MOVERIGHT;
+	return forwardOrBack && leftOrRight;
 }
 
 static float CalcWeaponVelMod(KZPlayer player)
@@ -318,14 +340,7 @@ static void TweakJump(KZPlayer player)
 	{
 		if (!player.hitPerf || player.takeoffSpeed > SPEED_NORMAL)
 		{
-			float velocity[3], baseVelocity[3], newVelocity[3];
-			player.GetVelocity(velocity);
-			player.GetBaseVelocity(baseVelocity);
-			player.GetLandingVelocity(newVelocity);
-			newVelocity[2] = velocity[2];
-			SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
-			AddVectors(newVelocity, baseVelocity, newVelocity);
-			player.SetVelocity(newVelocity);
+			Movement_SetSpeed(player.id, CalcTweakedTakeoffSpeed(player), true);
 			// Restore prestrafe lost due to briefly being on the ground
 			gF_PreVelMod[player.id] = gF_PreVelModLanding[player.id];
 			if (gB_GOKZCore)
@@ -347,11 +362,28 @@ static void TweakJump(KZPlayer player)
 	}
 }
 
+static void TweakJumpbug(KZPlayer player)
+{
+	if (player.speed > SPEED_NORMAL)
+	{
+		Movement_SetSpeed(player.id, CalcTweakedTakeoffSpeed(player, true), true);
+	}
+	if (gB_GOKZCore)
+	{
+		player.gokzHitPerf = true;
+		player.gokzTakeoffSpeed = player.speed;
+	}
+}
+
 // Takeoff speed assuming player has met the conditions to need tweaking
-static float CalcTweakedTakeoffSpeed(KZPlayer player)
+static float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 {
 	// Formula
-	if (player.landingSpeed > SPEED_NORMAL)
+	if (jumpbug)
+	{
+		return FloatMin(player.speed, (0.2 * player.speed + 200) * gF_PreVelMod[player.id]);
+	}
+	else if (player.landingSpeed > SPEED_NORMAL)
 	{
 		return FloatMin(player.landingSpeed, (0.2 * player.landingSpeed + 200) * gF_PreVelModLanding[player.id]);
 	}

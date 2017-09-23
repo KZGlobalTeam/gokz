@@ -63,5 +63,5 @@ void CreateNatives()
 
 public int Native_InvalidateJump(Handle plugin, int numParams)
 {
-	InvalidateJump(GetNativeCell(1));
+	InvalidateJumpstat(GetNativeCell(1));
 } 

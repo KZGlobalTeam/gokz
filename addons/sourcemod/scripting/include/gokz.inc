@@ -13,7 +13,7 @@
 
 // =========================  DEFINITIONS  ========================= //
 
-#define GOKZ_VERSION "0.15.3"
+#define GOKZ_VERSION "0.15.4"
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
@@ -300,4 +300,17 @@ stock void Color_StripFromChatText(const char[] input, char[] output, int size)
 	}
 	
 	output[x] = '\0';
+}
+
+/**
+ * Returns an integer as a string.
+ *
+ * @param num				Integer to stringify.
+ * @return					Integer as a string.
+ */
+stock char[] IntToStringEx(int num)
+{
+	char string[12];
+	IntToString(num, string, sizeof(string));
+	return string;
 } 

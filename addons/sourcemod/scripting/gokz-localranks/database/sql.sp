@@ -94,7 +94,7 @@ char sql_getpbpro[] =
 ..."LIMIT %d";
 
 char sql_getmaptop[] = 
-"SELECT Players.Alias, Times.RunTime, Times.Teleports "
+"SELECT Players.SteamID32, Players.Alias, Times.RunTime, Times.Teleports "
 ..."FROM Times "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."INNER JOIN "
@@ -108,7 +108,7 @@ char sql_getmaptop[] =
 ..."LIMIT %d";
 
 char sql_getmaptoppro[] = 
-"SELECT Players.Alias, Times.RunTime, Times.Teleports "
+"SELECT Players.SteamID32, Players.Alias, Times.RunTime, Times.Teleports "
 ..."FROM Times "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."INNER JOIN "
@@ -229,8 +229,8 @@ char sql_getcount_bonusescompletedpro[] =
 ..."INNER JOIN Maps ON Maps.MapID=MapCourses.MapID "
 ..."WHERE Maps.InRankedPool=1 AND MapCourses.Course>0 AND Times.SteamID32=%d AND Times.Mode=%d AND Times.Teleports=0";
 
-char sql_gettopplayers_map[] = 
-"SELECT Players.Alias, COUNT(*) AS RecordCount "
+char sql_gettopplayers[] = 
+"SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount "
 ..."FROM "
 ..."(SELECT Times.SteamID32 "
 ..."FROM Times "
@@ -247,8 +247,8 @@ char sql_gettopplayers_map[] =
 ..."ORDER BY RecordCount DESC "
 ..."LIMIT 20";
 
-char sql_gettopplayers_pro[] = 
-"SELECT Players.Alias, COUNT(*) AS RecordCount "
+char sql_gettopplayerspro[] = 
+"SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount "
 ..."FROM "
 ..."(SELECT Times.SteamID32 "
 ..."FROM Times "

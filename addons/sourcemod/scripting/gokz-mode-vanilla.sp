@@ -35,23 +35,18 @@ ConVar gCV_ModeCVar[MODECVAR_COUNT];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
+	
 	RegPluginLibrary("gokz-mode-vanilla");
 	return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateConVars();
-	
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 }
 
 public void OnPluginEnd()
@@ -69,6 +64,10 @@ public void OnAllPluginsLoaded()
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_Vanilla, true);
 	}
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -78,7 +77,6 @@ public void OnLibraryAdded(const char[] name)
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_Vanilla, true);
 	}
-	// Updater
 	else if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -87,7 +85,6 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
-	// Updater
 	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = false;
@@ -144,6 +141,21 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	KZPlayer player = new KZPlayer(client);
+	if (jumpbug)
+	{
+		player.gokzHitPerf = true;
+		player.gokzTakeoffSpeed = player.speed;
 	}
 }
 

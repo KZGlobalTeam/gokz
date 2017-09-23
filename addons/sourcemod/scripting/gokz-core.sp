@@ -74,6 +74,11 @@ int gI_OldTickCount[MAXPLAYERS + 1];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
+	
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
 	gB_LateLoad = late;
@@ -82,29 +87,17 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	LoadTranslations("common.phrases");
 	LoadTranslations("gokz-core.phrases");
 	
-	CreateRegexes();
-	CreateMenus();
 	CreateGlobalForwards();
+	CreateRegexes();
 	CreateHooks();
 	CreateConVars();
 	CreateCommands();
 	CreateCommandListeners();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
-	
-	// Updater
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 	
 	if (gB_LateLoad)
 	{
@@ -130,12 +123,15 @@ public void OnAllPluginsLoaded()
 	{
 		SetFailState("At least one GOKZ mode plugin is required.");
 	}
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
 {
 	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
-	// Updater
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -162,22 +158,12 @@ public void OnClientPutInServer(int client)
 	SetupClientJoinTeam(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
-	
-	if (!gB_ClientIsSetUp[client] && IsClientAuthorized(client))
-	{
-		gB_ClientIsSetUp[client] = true;
-		Call_GOKZ_OnClientSetup(client);
-	}
 }
 
-public void OnClientAuthorized(int client, const char[] auth)
+public void OnClientPostAdminCheck(int client)
 {
-	// Be careful about late loading if you are going to put anything else here
-	if (!gB_ClientIsSetUp[client] && IsClientInGame(client))
-	{
-		gB_ClientIsSetUp[client] = true;
-		Call_GOKZ_OnClientSetup(client);
-	}
+	gB_ClientIsSetUp[client] = true;
+	Call_GOKZ_OnClientSetup(client);
 }
 
 public void OnClientDisconnect(int client)
@@ -207,6 +193,17 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
+public Action OnClientCommandKeyValues(int client, KeyValues kv)
+{
+	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
+	char cmd[64];
+	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
+	{
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
+}
+
 public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -230,6 +227,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	UpdateGodMode(client);
 	UpdatePlayerCollision(client);
 	UpdateTPMenu(client);
+	UpdateClanTag(client);
 }
 
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death hook
@@ -334,6 +332,7 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 	OnOptionChanged_TPMenu(client, option);
 	OnOptionChanged_HideWeapon(client, option);
 	OnOptionChanged_Pistol(client, option);
+	OnOptionChanged_ClanTag(client, option);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)
@@ -392,15 +391,6 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 static void CreateRegexes()
 {
 	CreateRegexesMapButtons();
-}
-
-static void CreateMenus()
-{
-	CreateMenusMeasure();
-	CreateMenusMode();
-	CreateMenusOptions();
-	CreateMenusPistol();
-	CreateMenusTP();
 }
 
 static void CreateHooks()
