@@ -158,22 +158,12 @@ public void OnClientPutInServer(int client)
 	SetupClientJoinTeam(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
-	
-	if (!gB_ClientIsSetUp[client] && IsClientAuthorized(client))
-	{
-		gB_ClientIsSetUp[client] = true;
-		Call_GOKZ_OnClientSetup(client);
-	}
 }
 
-public void OnClientAuthorized(int client, const char[] auth)
+public void OnClientPostAdminCheck(int client)
 {
-	// Be careful about late loading if you are going to put anything else here
-	if (!gB_ClientIsSetUp[client] && IsClientInGame(client))
-	{
-		gB_ClientIsSetUp[client] = true;
-		Call_GOKZ_OnClientSetup(client);
-	}
+	gB_ClientIsSetUp[client] = true;
+	Call_GOKZ_OnClientSetup(client);
 }
 
 public void OnClientDisconnect(int client)
@@ -237,6 +227,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	UpdateGodMode(client);
 	UpdatePlayerCollision(client);
 	UpdateTPMenu(client);
+	UpdateClanTag(client);
 }
 
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death hook
