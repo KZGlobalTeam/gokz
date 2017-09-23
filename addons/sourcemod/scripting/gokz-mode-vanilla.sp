@@ -144,6 +144,21 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	}
 }
 
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	KZPlayer player = new KZPlayer(client);
+	if (jumpbug)
+	{
+		player.gokzHitPerf = true;
+		player.gokzTakeoffSpeed = player.speed;
+	}
+}
+
 public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 {
 	// Make sure velocity modifier is reset to 1.0 when switching modes
