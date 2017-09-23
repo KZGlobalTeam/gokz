@@ -32,7 +32,7 @@ public Plugin myinfo =
 #define PRE_MINIMUM_DELTA_ANGLE 0.4
 #define PRE_VELMOD_INCREMENT 0.0014 // Per tick when prestrafing
 #define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
-#define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - calculated 0.104velmod/94ticks
+#define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
 
 float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.4, 0.0 };
 bool gB_GOKZCore;
@@ -271,9 +271,7 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 		gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT_MIDAIR;
 	}
 	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier
-	else if (FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE
-		 && ((player.buttons & IN_FORWARD && !(player.buttons & IN_BACK)) || (!(player.buttons & IN_FORWARD) && player.buttons & IN_BACK))
-		 && ((player.buttons & IN_MOVELEFT && !(player.buttons & IN_MOVERIGHT)) || (!(player.buttons & IN_MOVELEFT) && player.buttons & IN_MOVERIGHT)))
+	else if (FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE && ValidPrestrafeButtons(player))
 	{
 		// If player changes their prestrafe direction, reset it
 		if (player.turningLeft && !gB_PreTurningLeft[player.id] || player.turningRight && gB_PreTurningLeft[player.id])
@@ -299,6 +297,13 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	}
 	
 	return gF_PreVelMod[player.id];
+}
+
+static bool ValidPrestrafeButtons(KZPlayer player)
+{
+	bool forwardOrBack = player.buttons & IN_FORWARD && !(player.buttons & IN_BACK) || !(player.buttons & IN_FORWARD) && player.buttons & IN_BACK;
+	bool leftOrRight = player.buttons & IN_MOVELEFT && !(player.buttons & IN_MOVERIGHT) || !(player.buttons & IN_MOVELEFT) && player.buttons & IN_MOVERIGHT;
+	return forwardOrBack && leftOrRight;
 }
 
 static float CalcWeaponVelMod(KZPlayer player)
