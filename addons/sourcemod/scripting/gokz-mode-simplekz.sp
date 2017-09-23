@@ -42,6 +42,7 @@ float gF_PreVelModLanding[MAXPLAYERS + 1];
 bool gB_PreTurningLeft[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
+bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
 
@@ -124,8 +125,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = new KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player, angles);
-	gI_OldButtons[client] = buttons;
-	gF_OldAngles[client] = angles;
+	if (gB_Jumpbugged[player.id])
+	{
+		TweakJumpbug(player);
+	}
+	
+	gB_Jumpbugged[player.id] = false;
+	gI_OldButtons[player.id] = buttons;
+	gF_OldAngles[player.id] = angles;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -170,6 +177,19 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	if (jumpbug)
+	{
+		gB_Jumpbugged[client] = true;
 	}
 }
 
@@ -344,11 +364,28 @@ static void TweakJump(KZPlayer player)
 	}
 }
 
+static void TweakJumpbug(KZPlayer player)
+{
+	if (player.speed > SPEED_NORMAL)
+	{
+		Movement_SetSpeed(player.id, CalcTweakedTakeoffSpeed(player, true), true);
+	}
+	if (gB_GOKZCore)
+	{
+		player.gokzHitPerf = true;
+		player.gokzTakeoffSpeed = player.speed;
+	}
+}
+
 // Takeoff speed assuming player has met the conditions to need tweaking
-static float CalcTweakedTakeoffSpeed(KZPlayer player)
+static float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 {
 	// Formula
-	if (player.landingSpeed > SPEED_NORMAL)
+	if (jumpbug)
+	{
+		return FloatMin(player.speed, (0.2 * player.speed + 200) * gF_PreVelMod[player.id]);
+	}
+	else if (player.landingSpeed > SPEED_NORMAL)
 	{
 		return FloatMin(player.landingSpeed, (0.2 * player.landingSpeed + 200) * gF_PreVelModLanding[player.id]);
 	}

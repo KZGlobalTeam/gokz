@@ -78,6 +78,55 @@ stock void Movement_GetOrigin(int client, float result[3])
 }
 
 /**
+ * Gets the player's origin.
+ * If the player is on the ground, a trace hull is used to find the
+ * exact height of the ground the player is standing on. This is thus
+ * more accurate than Movement_GetOrigin when player is on ground.
+ *
+ * @param client        Client index.
+ * @param result        Resultant vector.
+ * @noreturn
+ */
+stock void Movement_GetOriginEx(int client, float result[3])
+{
+	if (!Movement_GetOnGround(client))
+	{
+		GetClientAbsOrigin(client, result);
+		return;
+	}
+	
+	// Get the coordinate of the solid beneath the player's origin
+	// More accurate than GetClientAbsOrigin when on ground
+	float startPosition[3], endPosition[3];
+	GetClientAbsOrigin(client, startPosition);
+	endPosition = startPosition;
+	endPosition[2] = startPosition[2] - 2.0; // Should be less than 2.0 units away
+	Handle trace = TR_TraceHullFilterEx(
+		startPosition, 
+		endPosition, 
+		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
+		view_as<float>( { 16.0, 16.0, 72.0 } ), 
+		MASK_PLAYERSOLID, 
+		TraceEntityFilterPlayers, 
+		client);
+	if (TR_DidHit(trace))
+	{
+		TR_GetEndPosition(result, trace);
+		result[2] = result[2] - 0.03125; // Get rid of the offset
+	}
+	else
+	{
+		result = startPosition; // Fallback to GetClientAbsOrigin
+	}
+	delete trace;
+}
+
+public bool TraceEntityFilterPlayers(int entity, int contentsMask)
+{
+	return entity > MaxClients;
+}
+
+/**
  * Sets the player's origin by teleporting them.
  *
  * @param client		Client index.
@@ -138,7 +187,7 @@ stock void Movement_SetSpeed(int client, float value, bool applyBaseVel = false)
 {
 	float velocity[3];
 	Movement_GetVelocity(client, velocity);
-	AdjustVectorSpeed(velocity, value, velocity)
+	SetVectorHorizontalLength(velocity, value)
 	if (applyBaseVel)
 	{
 		float baseVelocity[3];

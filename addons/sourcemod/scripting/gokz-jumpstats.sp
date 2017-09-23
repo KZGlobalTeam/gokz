@@ -131,6 +131,11 @@ public void Movement_OnStartTouchGround(int client)
 	OnStartTouchGround_JumpTracking(client);
 }
 
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	OnPlayerJump_JumpTracking(client, jumpbug);
+}
+
 
 
 // =========================  GOKZ  ========================= //

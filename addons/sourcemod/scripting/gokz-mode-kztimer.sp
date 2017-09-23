@@ -38,6 +38,7 @@ float gF_PreVelModLastChange[MAXPLAYERS + 1];
 int gI_PreTickCounter[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
+bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
 
@@ -120,8 +121,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = new KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player);
-	gI_OldButtons[client] = buttons;
-	gF_OldAngles[client] = angles;
+	if (gB_Jumpbugged[player.id])
+	{
+		TweakJumpbug(player);
+	}
+	
+	gB_Jumpbugged[player.id] = false;
+	gI_OldButtons[player.id] = buttons;
+	gF_OldAngles[player.id] = angles;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -165,6 +172,19 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+public void Movement_OnPlayerJump(int client, bool jumpbug)
+{
+	if (!IsUsingMode(client))
+	{
+		return;
+	}
+	
+	if (jumpbug)
+	{
+		gB_Jumpbugged[client] = true;
 	}
 }
 
@@ -362,6 +382,19 @@ static void TweakJump(KZPlayer player)
 	{
 		player.gokzHitPerf = false;
 		player.gokzTakeoffSpeed = player.takeoffSpeed;
+	}
+}
+
+static void TweakJumpbug(KZPlayer player)
+{
+	if (player.speed > PERF_SPEED_CAP)
+	{
+		Movement_SetSpeed(player.id, PERF_SPEED_CAP, true);
+	}
+	if (gB_GOKZCore)
+	{
+		player.gokzHitPerf = true;
+		player.gokzTakeoffSpeed = player.speed;
 	}
 }
 
