@@ -144,14 +144,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	OnPlayerRunCmd_Recording(client, buttons);
 	OnPlayerRunCmd_Playback(client, buttons);
-	if (GetEntityFlags(client) & FL_SWIM)
-	{
-		PrintHintText(client, "hello");
-	}
-	else
-	{
-		//PrintHintText(client, "rip");
-	}
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)

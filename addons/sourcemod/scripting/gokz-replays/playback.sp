@@ -228,13 +228,15 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	
 	// GOKZ version
 	file.ReadInt8(length);
-	char[] gokzVersion = new char[length];
+	char[] gokzVersion = new char[length + 1];
 	file.ReadString(gokzVersion, length, length);
+	gokzVersion[length] = '\0';
 	
 	// Map name 
 	file.ReadInt8(length);
-	char[] mapName = new char[length];
+	char[] mapName = new char[length + 1];
 	file.ReadString(mapName, length, length);
+	mapName[length] = '\0';
 	
 	// Some integers...
 	file.ReadInt32(botCourse[bot]);
@@ -252,17 +254,20 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	
 	// SteamID2 
 	file.ReadInt8(length);
-	char[] steamID2 = new char[length];
+	char[] steamID2 = new char[length + 1];
 	file.ReadString(steamID2, length, length);
+	steamID2[length] = '\0';
 	
 	// IP
 	file.ReadInt8(length);
-	char[] IP = new char[length];
+	char[] IP = new char[length + 1];
 	file.ReadString(IP, length, length);
+	IP[length] = '\0';
 	
 	// Alias
 	file.ReadInt8(length);
 	file.ReadString(botAlias[bot], sizeof(botAlias[]), length);
+	botAlias[bot][length] = '\0';
 	
 	// Read tick data
 	file.ReadInt32(length);
@@ -287,7 +292,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 		playbackTickData[bot].Set(i, view_as<float>(tickData[2]), 2); // origin[2]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[3]), 3); // angles[0]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[4]), 4); // angles[1]
-		playbackTickData[bot].Set(i, view_as<int>(tickData[5]), 5); // buttons (with unused entity flags on the end)
+		playbackTickData[bot].Set(i, view_as<int>(tickData[5]), 5); // buttons (with entity flags at the end)
 	}
 	
 	playbackTick[bot] = 0;
