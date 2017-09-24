@@ -1,0 +1,40 @@
+"Phrases"
+{	
+	// Chat Messages ////////////////////////////////////////////////////////////
+    "No Replays Found (Map)"
+    {
+        "en"        "{darkred}No replays on this map were found."
+    }
+    "No Replays Found (Mode)"
+    {
+        // No Vanilla replays on this map were found.
+        "#format"   "{1:s}"
+        "en"        "{darkred}No {purple}{1} {darkred}replays on this map were found."
+    }
+    "No Bots Available"
+    {
+        "en"		"There are currently no replay bots available."
+    }
+
+	// Replay Menu ////////////////////////////////////////////////////////////
+    "Replay Menu - Title"
+    {
+        // Load a Replay
+        //
+        // Map - kz_map
+    	// Mode - Vanilla
+        //
+        "#format"	"{1:s},{2:s}"
+        "en"        "Load a Replay\n \nMap - {1}\nMode - {2}\n "
+    }
+    "Replay Menu (Mode) - Title"
+	{
+    	// Load a Replay
+        //
+        // Map - kz_map
+		//
+        // Select a Mode
+		"#format"	"{1:s}"
+		"en"		"Load a Replay\n \nMap - {1}\n \nSelect a Mode"
+	}
+}
