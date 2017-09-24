@@ -43,7 +43,7 @@ void OnMapStart_ReplayCache()
 	
 	while (dir.GetNext(file, sizeof(file)))
 	{
-		// Credit to Influx Timer - https://github.com/TotallyMehis/Influx-Timer
+		// Some credit to Influx Timer - https://github.com/TotallyMehis/Influx-Timer
 		
 		// Check file extension
 		length = strlen(file);
@@ -60,8 +60,11 @@ void OnMapStart_ReplayCache()
 			continue;
 		}
 		
+		// Remove file extension
+		Format(file, dotpos + 1, file);
+		
 		// Break down file name into pieces
-		if (ExplodeString(file, "_", pieces, sizeof(pieces), sizeof(pieces[])) < sizeof(pieces))
+		if (ExplodeString(file, "_", pieces, sizeof(pieces), sizeof(pieces[])) != sizeof(pieces))
 		{
 			continue;
 		}
