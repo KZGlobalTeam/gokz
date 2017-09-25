@@ -108,7 +108,7 @@ char sql_getmaptop[] =
 ..."LIMIT %d";
 
 char sql_getmaptoppro[] = 
-"SELECT Players.SteamID32, Players.Alias, Times.RunTime, Times.Teleports "
+"SELECT Players.SteamID32, Players.Alias, Times.RunTime "
 ..."FROM Times "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."INNER JOIN "
