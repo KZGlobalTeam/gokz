@@ -2,9 +2,6 @@
 	Mapping API - Buttons
 	
 	Hooks between func_buttons and GOKZ.
-	Not using HookSingleEntityOutput because it sometimes drops fails. Source: george.
-	Not using SDKHooks because doesn't call when input is via trigger_multiple output.
-	Credits to george.
 */
 
 
@@ -31,72 +28,94 @@ void OnEntitySpawned_MapButtons(int entity)
 	char tempString[32];
 	
 	GetEntityClassname(entity, tempString, sizeof(tempString));
-	if (!StrEqual("func_button", tempString))
+	if (!StrEqual("func_button", tempString, false))
 	{
 		return;
 	}
 	
 	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	if (StrEqual("climb_startbutton", tempString)
-		 || StrEqual("climb_endbutton", tempString)
-		 || MatchRegex(RE_BonusStartButton, tempString) > 0
-		 || MatchRegex(RE_BonusEndButton, tempString) > 0)
+	if (StrEqual("climb_startbutton", tempString, false))
 	{
-		DHookEntity(gH_DHooks_OnAcceptInput, false, entity);
+		HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
+	}
+	else if (StrEqual("climb_endbutton", tempString, false))
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
+	}
+	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
+	}
+	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
 	}
 }
 
-void OnAcceptInput_MapButtons(int entity, Handle params)
+
+
+// =========================  HANDLERS  ========================= //
+
+public void OnStartButtonPress(const char[] name, int caller, int activator, float delay)
 {
+	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	{
+		return;
+	}
+	
+	GOKZ_StartTimer(activator, 0);
+	OnStartButtonPress_VirtualButtons(activator, 0);
+}
+
+public void OnEndButtonPress(const char[] name, int caller, int activator, float delay)
+{
+	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	{
+		return;
+	}
+	
+	GOKZ_EndTimer(activator, 0);
+	OnEndButtonPress_VirtualButtons(activator, 0);
+}
+
+public void OnBonusStartButtonPress(const char[] name, int caller, int activator, float delay)
+{
+	if (!IsValidEntity(caller) || !IsValidClient(activator)) {
+		return;
+	}
+	
 	char tempString[32];
+	GetEntPropString(caller, Prop_Data, "m_iName", tempString, sizeof(tempString));
 	
-	// Check input type is "Use"/"use" or "Press"/"press"
-	DHookGetParamString(params, 1, tempString, sizeof(tempString));
-	if (!StrEqual(tempString, "Use", false) && !StrEqual(tempString, "Press", false))
-	{
-		return;
-	}
-	
-	// Check entity and activator validity
-	if (DHookIsNullParam(params, 2))
-	{
-		return;
-	}
-	int activator = DHookGetParam(params, 2);
-	if (!IsValidEntity(entity) || !IsValidClient(activator))
-	{
-		return;
-	}
-	
-	// Process button press
-	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	if (StrEqual("climb_startbutton", tempString))
-	{
-		TimerStart(activator, 0);
-		OnStartButtonPress_VirtualButtons(activator, 0);
-	}
-	else if (StrEqual("climb_endbutton", tempString))
-	{
-		TimerEnd(activator, 0);
-		OnEndButtonPress_VirtualButtons(activator, 0);
-	}
-	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
+	if (MatchRegex(RE_BonusStartButton, tempString) > 0)
 	{
 		GetRegexSubString(RE_BonusStartButton, 1, tempString, sizeof(tempString));
 		int course = StringToInt(tempString);
 		if (course > 0 && course < MAX_COURSES)
 		{
-			TimerStart(activator, course);
+			GOKZ_StartTimer(activator, course);
 			OnStartButtonPress_VirtualButtons(activator, course);
 		}
 	}
-	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
+}
+
+public void OnBonusEndButtonPress(const char[] name, int caller, int activator, float delay)
+{
+	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	{
+		return;
+	}
+	
+	char tempString[32];
+	GetEntPropString(caller, Prop_Data, "m_iName", tempString, sizeof(tempString));
+	
+	if (MatchRegex(RE_BonusEndButton, tempString) > 0)
 	{
 		GetRegexSubString(RE_BonusEndButton, 1, tempString, sizeof(tempString));
 		int course = StringToInt(tempString);
 		if (course > 0 && course < MAX_COURSES)
 		{
-			TimerEnd(activator, course);
+			GOKZ_EndTimer(activator, course);
 			OnEndButtonPress_VirtualButtons(activator, course);
 		}
 	}
