@@ -8,6 +8,7 @@
 
 // =========================  PUBLIC  ========================= //
 
+// Adds a replay to the cache
 void AddToReplayInfoCache(int course, int mode, int style, int timeType)
 {
 	int index = g_ReplayInfoCache.Length;
@@ -16,6 +17,12 @@ void AddToReplayInfoCache(int course, int mode, int style, int timeType)
 	g_ReplayInfoCache.Set(index, mode, 1);
 	g_ReplayInfoCache.Set(index, style, 2);
 	g_ReplayInfoCache.Set(index, timeType, 3);
+}
+
+// Use this to sort the cache after finished adding to it
+void SortReplayInfoCache()
+{
+	SortADTArrayCustom(g_ReplayInfoCache, SortFunc_ReplayInfoCache);
 }
 
 
@@ -39,7 +46,7 @@ void OnMapStart_ReplayCache()
 	
 	// We want to find files that look like "0_KZT_NRM_PRO.rec"
 	char file[PLATFORM_MAX_PATH], pieces[4][16];
-	int replays = 0, length, dotpos, course, mode, style, timeType;
+	int length, dotpos, course, mode, style, timeType;
 	
 	while (dir.GetNext(file, sizeof(file)))
 	{
@@ -80,14 +87,56 @@ void OnMapStart_ReplayCache()
 		}
 		
 		// Add it to the cache
-		g_ReplayInfoCache.Resize(replays + 1);
-		g_ReplayInfoCache.Set(replays, course, 0);
-		g_ReplayInfoCache.Set(replays, mode, 1);
-		g_ReplayInfoCache.Set(replays, style, 2);
-		g_ReplayInfoCache.Set(replays, timeType, 3);
-		
-		replays++;
+		AddToReplayInfoCache(course, mode, style, timeType);
 	}
+	
+	SortReplayInfoCache();
+}
+
+
+
+// =========================  SORT FUNCTION  ========================= //
+
+public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle hndl)
+{
+	// Do not expect any indexes to be 'equal'	
+	int replayInfo1[REPLAY_CACHE_BLOCKSIZE], replayInfo2[REPLAY_CACHE_BLOCKSIZE];
+	g_ReplayInfoCache.GetArray(index1, replayInfo1);
+	g_ReplayInfoCache.GetArray(index2, replayInfo2);
+	
+	// Compare courses - lower course number goes first
+	if (replayInfo1[0] < replayInfo2[0])
+	{
+		return -1;
+	}
+	else if (replayInfo1[0] > replayInfo2[0])
+	{
+		return 1;
+	}
+	// Same course, so compare mode
+	else if (replayInfo1[1] < replayInfo2[1])
+	{
+		return -1;
+	}
+	else if (replayInfo1[1] > replayInfo2[1])
+	{
+		return 1;
+	}
+	// Same course and mode, so compare style
+	else if (replayInfo1[2] < replayInfo2[2])
+	{
+		return -1;
+	}
+	else if (replayInfo1[2] > replayInfo2[2])
+	{
+		return 1;
+	}
+	// Same course, mode and style so compare time type, assuming can't be identical
+	else if (replayInfo1[3] == TimeType_Pro)
+	{
+		return 1;
+	}
+	return -1;
 }
 
 

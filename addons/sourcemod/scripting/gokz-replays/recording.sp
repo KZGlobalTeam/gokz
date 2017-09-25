@@ -52,6 +52,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	else
 	{  // New replay so add it to replay info cache
 		AddToReplayInfoCache(course, mode, style, timeType);
+		SortReplayInfoCache();
 	}
 	
 	File file = OpenFile(path, "wb");
