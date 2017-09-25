@@ -358,7 +358,15 @@ static void TweakJump(KZPlayer player)
 	{
 		if (player.takeoffSpeed > PERF_SPEED_CAP)
 		{
-			Movement_SetSpeed(player.id, PERF_SPEED_CAP, true);
+			// Note that resulting velocity has same direction as landing velocity, not current velocity
+			float velocity[3], baseVelocity[3], newVelocity[3];
+			player.GetVelocity(velocity);
+			player.GetBaseVelocity(baseVelocity);
+			player.GetLandingVelocity(newVelocity);
+			newVelocity[2] = velocity[2];
+			SetVectorHorizontalLength(newVelocity, PERF_SPEED_CAP);
+			AddVectors(newVelocity, baseVelocity, newVelocity);
+			player.SetVelocity(newVelocity);
 			if (gB_GOKZCore)
 			{
 				player.gokzHitPerf = true;

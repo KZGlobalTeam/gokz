@@ -340,7 +340,15 @@ static void TweakJump(KZPlayer player)
 	{
 		if (!player.hitPerf || player.takeoffSpeed > SPEED_NORMAL)
 		{
-			Movement_SetSpeed(player.id, CalcTweakedTakeoffSpeed(player), true);
+			// Note that resulting velocity has same direction as landing velocity, not current velocity
+			float velocity[3], baseVelocity[3], newVelocity[3];
+			player.GetVelocity(velocity);
+			player.GetBaseVelocity(baseVelocity);
+			player.GetLandingVelocity(newVelocity);
+			newVelocity[2] = velocity[2];
+			SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
+			AddVectors(newVelocity, baseVelocity, newVelocity);
+			player.SetVelocity(newVelocity);
 			// Restore prestrafe lost due to briefly being on the ground
 			gF_PreVelMod[player.id] = gF_PreVelModLanding[player.id];
 			if (gB_GOKZCore)
