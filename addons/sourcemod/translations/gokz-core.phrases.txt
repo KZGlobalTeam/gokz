@@ -202,6 +202,12 @@
 	{
 		"en"		"{grey}You have cleared your custom start position."
 	}
+    "Invalid Bonus Number"
+	{
+		// 'asdf' is not a valid bonus number.
+		"#format"	"{1:s}"
+		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
+	}
 	
 	
 	// Option Change Chat Messages ////////////////////////////////////////////////////////////

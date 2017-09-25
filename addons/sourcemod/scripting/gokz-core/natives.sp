@@ -43,6 +43,7 @@ void CreateNatives()
 	CreateNative("GOKZ_GetTakeoffSpeed", Native_GetTakeoffSpeed);
 	CreateNative("GOKZ_SetTakeoffSpeed", Native_SetTakeoffSpeed);
 	CreateNative("GOKZ_GetValidJump", Native_GetValidJump);
+	CreateNative("GOKZ_JoinTeam", Native_JoinTeam);
 }
 
 public int Native_GetModeLoaded(Handle plugin, int numParams)
@@ -219,4 +220,9 @@ public int Native_SetTakeoffSpeed(Handle plugin, int numParams)
 public int Native_GetValidJump(Handle plugin, int numParams)
 {
 	return view_as<int>(GetValidJump(GetNativeCell(1)));
+}
+
+public int Native_JoinTeam(Handle plugin, int numParams)
+{
+	JoinTeam(GetNativeCell(1), GetNativeCell(2));
 } 
