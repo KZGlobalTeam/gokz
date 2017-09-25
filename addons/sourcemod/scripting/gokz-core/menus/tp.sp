@@ -26,6 +26,7 @@ static bool TPMenuIsShowing[MAXPLAYERS + 1];
 // Update the TP menu i.e. item text, item disabled/enabled
 void UpdateTPMenu(int client)
 {
+	// Only cancel the menu if we know it's the TP menu
 	if (TPMenuIsShowing[client])
 	{
 		CancelClientMenu(client);
@@ -97,7 +98,6 @@ void OnPlayerRunCmd_TPMenu(int client)
 	
 	// Checks option and that no other menu is open instead of rudely interrupting it
 	if (GetOption(client, Option_ShowingTPMenu) == ShowingTPMenu_Enabled
-		 && !TPMenuIsShowing[client]
 		 && GetClientMenu(client) == MenuSource_None)
 	{
 		DisplayTPMenu(client);
