@@ -24,7 +24,7 @@ public Plugin myinfo =
 };
 
 #define MAX_BOTS 2
-#define TICK_DATA_BLOCKSIZE 6
+#define TICK_DATA_BLOCKSIZE 7
 #define REPLAY_CACHE_BLOCKSIZE 4
 #define PLAYBACK_BREATHER_TIME 2.0
 

@@ -3,11 +3,11 @@
 	// Chat Messages ////////////////////////////////////////////////////////////
     "No Replays Found (Map)"
     {
-        "en"        "{darkred}No replays on this map were found."
+        "en"        "{darkred}No replays for this map were found."
     }
     "No Replays Found (Mode)"
     {
-        // No Vanilla replays on this map were found.
+        // No Vanilla replays for this map were found.
         "#format"   "{1:s}"
         "en"        "{darkred}No {purple}{1} {darkred}replays on this map were found."
     }

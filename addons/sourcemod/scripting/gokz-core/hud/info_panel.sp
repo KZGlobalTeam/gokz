@@ -26,7 +26,7 @@ void UpdateInfoPanel(int client)
 	else
 	{
 		KZPlayer targetPlayer = new KZPlayer(player.observerTarget);
-		if (targetPlayer.id != -1)
+		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
 			PrintHintText(player.id, "%s", GetInfoPanel(player, targetPlayer));
 		}

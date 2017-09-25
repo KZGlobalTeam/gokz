@@ -146,7 +146,7 @@ void OnPlayerRunCmd_Recording(int client, int buttons)
 		float origin[3], angles[3];
 		Movement_GetOrigin(client, origin);
 		Movement_GetEyeAngles(client, angles);
-		PutFlagsOnEndOfButtonsBitsum(client, buttons);
+		int flags = GetEntityFlags(client);
 		
 		recordedTickData[client].Set(tick, origin[0], 0);
 		recordedTickData[client].Set(tick, origin[1], 1);
@@ -155,6 +155,7 @@ void OnPlayerRunCmd_Recording(int client, int buttons)
 		recordedTickData[client].Set(tick, angles[1], 4);
 		// Don't bother tracking eye angle roll (angles[2]) - not used
 		recordedTickData[client].Set(tick, buttons, 5);
+		recordedTickData[client].Set(tick, flags, 6);
 	}
 }
 
@@ -216,48 +217,5 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 		{
 			DiscardRecording(client);
 		}
-	}
-}
-
-
-
-// =========================  PRIVATE  ========================= //
-
-/**
- * Sets the last bits of the buttons bitsum to contain the values of the 
- * client's FL_ONGROUND, FL_DUCKING and FL_WATERJUMP entity flags.
- * This is used to save some entity flags to the replay files without
- * needing to write an additional integer per tick.
- *
- * FL_ONGROUND 	(1 << 31)
- * FL_DUCKING 	(1 << 30)
- * FL_WATERJUMP (1 << 29)
- */
-void PutFlagsOnEndOfButtonsBitsum(int client, int &buttons)
-{
-	int flags = GetEntityFlags(client);
-	if (flags & FL_ONGROUND)
-	{
-		buttons |= (1 << 31);
-	}
-	else
-	{
-		buttons &= ~(1 << 31);
-	}
-	if (flags & FL_DUCKING)
-	{
-		buttons |= (1 << 30);
-	}
-	else
-	{
-		buttons &= ~(1 << 30);
-	}
-	if (flags & FL_WATERJUMP)
-	{
-		buttons |= (1 << 29);
-	}
-	else
-	{
-		buttons &= ~(1 << 30);
 	}
 } 

@@ -14,7 +14,7 @@
 // =========================  DEFINITIONS  ========================= //
 
 #define REPLAY_DIRECTORY "data/gokz-replays" // In Path_SM
-#define REPLAY_FILE_EXTENSION "rec"
+#define REPLAY_FILE_EXTENSION "replay"
 #define REPLAY_MAGIC_NUMBER 0x676F6B7A
 #define REPLAY_FORMAT_VERSION 0x01
 

@@ -111,18 +111,19 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 		}
 		
 		int size = playbackTickData[bot].Length;
-		float origin[3], angles[3];
+		float repOrigin[3], repAngles[3];
+		int repButtons, repFlags;
 		
 		// If first or last frame of the playback
-		if (playbackTick[bot] == 1 || playbackTick[bot] == (size - 1))
+		if (playbackTick[bot] == 0 || playbackTick[bot] == (size - 1))
 		{
 			// Move the bot and pause them at that tick
-			origin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
-			origin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
-			origin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
-			angles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
-			angles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
-			TeleportEntity(client, origin, angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+			repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
+			repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
+			repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
+			repAngles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
+			repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
+			TeleportEntity(client, repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 			
 			if (!inBreather[bot])
 			{
@@ -134,37 +135,45 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			{
 				// End the breather period
 				inBreather[bot] = false;
-				// Start the bot if first tick. Reset bot if last tick.
+				// Start the bot if first tick. Clear bot if last tick.
 				playbackTick[bot]++;
 				if (playbackTick[bot] == size)
 				{
-					//playbackTick[bot] = 1;
 					playbackTickData[bot].Clear(); // Clear it all out
 					botDataLoaded[bot] = false;
 					ResetBotStuff(bot);
 				}
 			}
 		}
-		else if (playbackTick[bot] > 0)
+		else
 		{
 			// Load in the next tick	
-			origin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
-			origin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
-			origin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
-			angles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
-			angles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
-			buttons = playbackTickData[bot].Get(playbackTick[bot], 5);
-			// Skip entity flags as they don't seem to affect playback positively
+			repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
+			repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
+			repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
+			repAngles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
+			repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
+			repButtons = playbackTickData[bot].Get(playbackTick[bot], 5);
+			repFlags = playbackTickData[bot].Get(playbackTick[bot], 6);
 			
 			// Set velocity to travel from current origin to recorded origin
 			float currentOrigin[3], velocity[3];
 			Movement_GetOrigin(client, currentOrigin);
-			MakeVectorFromPoints(currentOrigin, origin, velocity);
+			MakeVectorFromPoints(currentOrigin, repOrigin, velocity);
 			ScaleVector(velocity, TICKRATE);
-			TeleportEntity(client, NULL_VECTOR, angles, velocity);
+			TeleportEntity(client, NULL_VECTOR, repAngles, velocity);
 			
-			// STOP SHOOTING... please...
-			buttons &= ~IN_ATTACK;
+			// Should the bot be ducking?!
+			if (repButtons & IN_DUCK || repFlags & FL_DUCKING)
+			{
+				buttons |= IN_DUCK;
+			}
+			
+			// If the replay file says the bot's on the ground, then fine!
+			if (repFlags & FL_ONGROUND)
+			{
+				SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
+			}
 			
 			// Set move type for MAXIMUM SMOOTHNESS!
 			if (Movement_GetOnGround(client))
@@ -177,10 +186,6 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			}
 			
 			playbackTick[bot]++;
-		}
-		else
-		{
-			playbackTick[bot] = 1;
 		}
 		
 		break;
@@ -292,7 +297,8 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 		playbackTickData[bot].Set(i, view_as<float>(tickData[2]), 2); // origin[2]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[3]), 3); // angles[0]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[4]), 4); // angles[1]
-		playbackTickData[bot].Set(i, view_as<int>(tickData[5]), 5); // buttons (with entity flags at the end)
+		playbackTickData[bot].Set(i, view_as<int>(tickData[5]), 5); // buttons
+		playbackTickData[bot].Set(i, view_as<int>(tickData[6]), 6); // flags
 	}
 	
 	playbackTick[bot] = 0;
