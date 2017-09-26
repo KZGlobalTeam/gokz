@@ -187,6 +187,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	OnPlayerRunCmd_Recording(client, buttons);
 	OnPlayerRunCmd_Playback(client, buttons);
+	return Plugin_Continue;
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)

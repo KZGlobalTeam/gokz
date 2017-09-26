@@ -91,6 +91,7 @@ public Action Timer_SpectateBot(Handle timer, DataPack data)
 		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
 		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", botClient);
 	}
+	return Plugin_Continue;
 }
 
 
