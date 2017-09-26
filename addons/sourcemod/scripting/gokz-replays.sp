@@ -1,6 +1,7 @@
 #include <sourcemod>
 
 #include <cstrike>
+#include <sdkhooks>
 #include <sdktools>
 
 #include <gokz>
@@ -107,7 +108,7 @@ public void OnConfigsExecuted()
 public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int playersNum, bool reliable, bool init)
 {
 	// Name change supression
-	// Credit to bhoptimer - https://github.com/shavitush/bhoptimer
+	// Credit to shavit's simple bhop timer - https://github.com/shavitush/bhoptimer
 	if (!gB_HideNameChange)
 	{
 		return Plugin_Continue;
@@ -119,6 +120,31 @@ public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int pl
 	if (StrEqual(msgName, "#Cstrike_Name_Change"))
 	{
 		gB_HideNameChange = false;
+		return Plugin_Handled;
+	}
+	
+	return Plugin_Continue;
+}
+
+public void OnEntityCreated(int entity, const char[] classname)
+{
+	// Block trigger and door interaction for bots
+	// Credit to shavit's simple bhop timer - https://github.com/shavitush/bhoptimer
+	
+	// trigger_once | trigger_multiple.. etc
+	// func_door | func_door_rotating
+	if (StrContains(classname, "trigger_") != -1 || StrContains(classname, "_door") != -1)
+	{
+		SDKHook(entity, SDKHook_StartTouch, HookTriggers);
+		SDKHook(entity, SDKHook_EndTouch, HookTriggers);
+		SDKHook(entity, SDKHook_Touch, HookTriggers);
+	}
+}
+
+public Action HookTriggers(int entity, int other)
+{
+	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
+	{
 		return Plugin_Handled;
 	}
 	

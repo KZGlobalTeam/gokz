@@ -169,15 +169,11 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 				buttons |= IN_DUCK;
 			}
 			
-			// If the replay file says the bot's on the ground, then fine!
-			if (repFlags & FL_ONGROUND)
+			// If the replay file says the bot's on the ground, then fine! Unless you're going too fast...
+			// Note that we don't mind if replay file says bot isn't on ground but the bot is.
+			if (repFlags & FL_ONGROUND && Movement_GetSpeed(client) < SPEED_NORMAL * 2)
 			{
 				SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
-			}
-			
-			// Set move type for MAXIMUM SMOOTHNESS!
-			if (Movement_GetOnGround(client))
-			{
 				Movement_SetMoveType(client, MOVETYPE_WALK);
 			}
 			else
