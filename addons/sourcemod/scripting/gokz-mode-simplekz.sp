@@ -338,7 +338,7 @@ static float CalcWeaponVelMod(KZPlayer player)
 
 static void TweakJump(KZPlayer player)
 {
-	if (player.takeoffTick - player.landingTick <= PERF_TICKS)
+	if (player.takeoffCmdNum - player.landingCmdNum <= PERF_TICKS)
 	{
 		if (!player.hitPerf || player.takeoffSpeed > SPEED_NORMAL)
 		{

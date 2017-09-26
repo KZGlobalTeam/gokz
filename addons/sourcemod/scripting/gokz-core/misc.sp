@@ -486,7 +486,7 @@ void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 	{
 		InvalidateJump(client);
 	}
-	else if (velocity && gI_OldTickCount[client] - Movement_GetTakeoffTick(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
+	else if (velocity && gI_OldCmdNum[client] - Movement_GetTakeoffCmdNum(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
 	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
 		InvalidateJump(client);
 	}

@@ -231,7 +231,7 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 
 static bool HitBhop(int client)
 {
-	return Movement_GetTakeoffTick(client) - Movement_GetLandingTick(client) <= BHOP_ON_GROUND_TICKS;
+	return Movement_GetTakeoffCmdNum(client) - Movement_GetLandingCmdNum(client) <= BHOP_ON_GROUND_TICKS;
 }
 
 static bool ValidWeirdJumpDropDistance(int client)

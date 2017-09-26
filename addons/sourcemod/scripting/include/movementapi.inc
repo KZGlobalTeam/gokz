@@ -157,12 +157,20 @@ native void Movement_GetTakeoffVelocity(int client, float result[3]);
 native float Movement_GetTakeoffSpeed(int client);
 
 /**
- * Gets player's tick count at the time of their last takeoff.
+ * Gets player's 'tickcount' at the time of their last takeoff.
  *
  * @param client    	Client index.
- * @return        		Player's last takeoff tick count.
+ * @return        		Player's last takeoff 'tickcount'.
  */
 native int Movement_GetTakeoffTick(int client);
+
+/**
+ * Gets player's 'cmdnum' at the time of their last takeoff.
+ *
+ * @param client    	Client index.
+ * @return        		Player's last takeoff 'cmdnum'.
+ */
+native int Movement_GetTakeoffCmdNum(int client);
 
 /**
  * Gets the player's origin at the time of their last landing.
@@ -191,12 +199,20 @@ native void Movement_GetLandingVelocity(int client, float result[3]);
 native float Movement_GetLandingSpeed(int client);
 
 /**
- * Gets player's tick count at the time of their last landing.
+ * Gets player's 'tickcount' at the time of their last landing.
  *
  * @param client    	Client index.
- * @return        		Player's last takeoff tick count.
+ * @return        		Player's last landing 'tickcount'.
  */
 native int Movement_GetLandingTick(int client);
+
+/**
+ * Gets player's 'cmdnum' at the time of their last landing.
+ *
+ * @param client    	Client index.
+ * @return        		Player's last landing 'cmdnum'.
+ */
+native int Movement_GetLandingCmdNum(int client);
 
 /**
  * Gets whether player is turning their aim horizontally.
@@ -270,6 +286,12 @@ methodmap MovementAPIPlayer __nullable__ < MovementPlayer {
 		}
 	}
 	
+	property int takeoffCmdNum {
+		public get() {
+			return Movement_GetTakeoffCmdNum(this.id);
+		}
+	}
+	
 	public void GetLandingOrigin(float buffer[3]) {
 		Movement_GetLandingOrigin(this.id, buffer);
 	}
@@ -287,6 +309,12 @@ methodmap MovementAPIPlayer __nullable__ < MovementPlayer {
 	property int landingTick {
 		public get() {
 			return Movement_GetLandingTick(this.id);
+		}
+	}
+	
+	property int landingCmdNum {
+		public get() {
+			return Movement_GetLandingCmdNum(this.id);
 		}
 	}
 	
