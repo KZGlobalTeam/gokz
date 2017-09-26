@@ -161,6 +161,7 @@ public void OnClientPutInServer(int client)
 
 public void OnClientPostAdminCheck(int client)
 {
+	UpdateClanTag(client);
 	gB_ClientIsSetUp[client] = true;
 	Call_GOKZ_OnClientSetup(client);
 }
@@ -226,7 +227,6 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	UpdateGodMode(client);
 	UpdatePlayerCollision(client);
 	UpdateTPMenu(client);
-	UpdateClanTag(client);
 }
 
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death hook
