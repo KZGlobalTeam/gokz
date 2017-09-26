@@ -20,7 +20,8 @@ static char radioCommands[][] =
 
 void CreateCommands()
 {
-	RegConsoleCmd("sm_menu", CommandToggleMenu, "[KZ] Toggle the visibility of the teleport menu.");
+	RegConsoleCmd("sm_menu", CommandToggleMenuSimple, "[KZ] Toggle the simple teleport menu.");
+	RegConsoleCmd("sm_adv", CommandToggleMenuAdvanced, "[KZ] Toggle the advanced teleport menu.");
 	RegConsoleCmd("sm_checkpoint", CommandMakeCheckpoint, "[KZ] Set a checkpoint.");
 	RegConsoleCmd("sm_gocheck", CommandTeleportToCheckpoint, "[KZ] Teleport to your current checkpoint.");
 	RegConsoleCmd("sm_prev", CommandPrevCheckpoint, "[KZ] Go back a checkpoint.");
@@ -83,9 +84,29 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	return Plugin_Handled;
 }
 
-public Action CommandToggleMenu(int client, int args)
+public Action CommandToggleMenuSimple(int client, int args)
 {
-	CycleOption(client, Option_ShowingTPMenu, true);
+	if (GOKZ_GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Simple)
+	{
+		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Disabled, true);
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandToggleMenuAdvanced(int client, int args)
+{
+	if (GOKZ_GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Advanced)
+	{
+		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Advanced, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Disabled, true);
+	}
 	return Plugin_Handled;
 }
 

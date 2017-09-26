@@ -96,8 +96,9 @@ enum
 enum
 {
 	ShowingTPMenu_Disabled = 0, 
-	ShowingTPMenu_Enabled, 
-	SHOWINGTPMENU_COUNT
+	ShowingTPMenu_Simple, 
+	ShowingTPMenu_Advanced, 
+	TPMENU_COUNT
 }
 
 enum

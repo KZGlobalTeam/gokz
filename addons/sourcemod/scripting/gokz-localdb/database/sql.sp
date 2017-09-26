@@ -94,8 +94,8 @@ char mysql_options_create[] =
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
 char sql_options_insert[] = 
-"INSERT INTO Options (SteamID32, Mode) "
-..."VALUES (%d, %d)";
+"INSERT INTO Options (SteamID32) "
+..."VALUES (%d)";
 
 char sql_options_update[] = 
 "UPDATE Options "

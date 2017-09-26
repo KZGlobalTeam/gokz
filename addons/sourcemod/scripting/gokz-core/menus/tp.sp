@@ -97,7 +97,7 @@ void OnPlayerRunCmd_TPMenu(int client)
 	}
 	
 	// Checks option and that no other menu is open instead of rudely interrupting it
-	if (GetOption(client, Option_ShowingTPMenu) == ShowingTPMenu_Enabled
+	if (GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled
 		 && GetClientMenu(client) == MenuSource_None)
 	{
 		DisplayTPMenu(client);
@@ -129,13 +129,26 @@ static void DisplayTPMenu(int client)
 
 static void TPMenuAddItems(int client, Menu menu)
 {
-	TPMenuAddItemCheckpoint(client, menu);
-	TPMenuAddItemTeleport(client, menu);
-	TPMenuAddIdisplayrevCheckpoint(client, menu);
-	TPMenuAddItemNextCheckpoint(client, menu);
-	TPMenuAddItemUndo(client, menu);
-	TPMenuAddIdisplayause(client, menu);
-	TPMenuAddItemStart(client, menu);
+	switch (GOKZ_GetOption(client, Option_ShowingTPMenu))
+	{
+		case ShowingTPMenu_Simple:
+		{
+			TPMenuAddItemCheckpoint(client, menu);
+			TPMenuAddItemTeleport(client, menu);
+			TPMenuAddItemPause(client, menu);
+			TPMenuAddItemStart(client, menu);
+		}
+		case ShowingTPMenu_Advanced:
+		{
+			TPMenuAddItemCheckpoint(client, menu);
+			TPMenuAddItemTeleport(client, menu);
+			TPMenuAddItemPrevCheckpoint(client, menu);
+			TPMenuAddItemNextCheckpoint(client, menu);
+			TPMenuAddItemUndo(client, menu);
+			TPMenuAddItemPause(client, menu);
+			TPMenuAddItemStart(client, menu);
+		}
+	}
 }
 
 static void TPMenuAddItemCheckpoint(int client, Menu menu)
@@ -159,7 +172,7 @@ static void TPMenuAddItemTeleport(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddIdisplayrevCheckpoint(int client, Menu menu)
+static void TPMenuAddItemPrevCheckpoint(int client, Menu menu)
 {
 	char display[16];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", client);
@@ -201,7 +214,7 @@ static void TPMenuAddItemUndo(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddIdisplayause(int client, Menu menu)
+static void TPMenuAddItemPause(int client, Menu menu)
 {
 	char display[16];
 	if (GetPaused(client))
