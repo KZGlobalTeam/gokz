@@ -28,6 +28,7 @@ public Plugin myinfo =
 #define TICK_DATA_BLOCKSIZE 7
 #define REPLAY_CACHE_BLOCKSIZE 4
 #define PLAYBACK_BREATHER_TIME 2.0
+#define BASE_NAV_FILE_PATH "maps/gokz-replays.nav"
 
 bool gB_LateLoad;
 char gC_CurrentMap[64];
@@ -90,6 +91,11 @@ void OnLateLoad()
 public void OnMapStart()
 {
 	UpdateCurrentMap();
+	if (!CheckForNavFile())
+	{
+		GenerateNavFile();
+		return;
+	}
 	CreateReplaysDirectory(gC_CurrentMap);
 	OnMapStart_ReplayCache();
 }
@@ -262,4 +268,81 @@ static void CreateReplaysDirectory(const char[] map)
 	{
 		CreateDirectory(path, 511);
 	}
+}
+
+static bool CheckForNavFile()
+{
+	// Make sure there's a nav file
+	// Credit to shavit's simple bhop timer - https://github.com/shavitush/bhoptimer
+	
+	char mapPath[PLATFORM_MAX_PATH];
+	GetCurrentMap(mapPath, sizeof(mapPath));
+	
+	char navFilePath[PLATFORM_MAX_PATH];
+	FormatEx(navFilePath, PLATFORM_MAX_PATH, "maps/%s.nav", mapPath);
+	
+	return FileExists(navFilePath);
+}
+
+static void GenerateNavFile()
+{
+	// Generate (copy a) .nav file for the map
+	// Credit to shavit's simple bhop timer - https://github.com/shavitush/bhoptimer
+	
+	char mapPath[PLATFORM_MAX_PATH];
+	GetCurrentMap(mapPath, sizeof(mapPath));
+	
+	char[] navFilePath = new char[PLATFORM_MAX_PATH];
+	FormatEx(navFilePath, PLATFORM_MAX_PATH, "maps/%s.nav", mapPath);
+	
+	if (!FileExists(BASE_NAV_FILE_PATH))
+	{
+		SetFailState("Could not generate .nav file because \"%s\" does not exist.", BASE_NAV_FILE_PATH);
+	}
+	File_Copy(BASE_NAV_FILE_PATH, navFilePath);
+	ForceChangeLevel(gC_CurrentMap, "[gokz-replays] Generate .nav file.");
+}
+
+/*
+ * Copies file source to destination
+ * Based on code of javalia:
+ * http://forums.alliedmods.net/showthread.php?t=159895
+ *
+ * Credit to shavit's simple bhop timer - https://github.com/shavitush/bhoptimer
+ *
+ * @param source		Input file
+ * @param destination	Output file
+ */
+bool File_Copy(const char[] source, const char[] destination)
+{
+	File file_source = OpenFile(source, "rb");
+	
+	if (file_source == null)
+	{
+		return false;
+	}
+	
+	File file_destination = OpenFile(destination, "wb");
+	
+	if (file_destination == null)
+	{
+		delete file_source;
+		
+		return false;
+	}
+	
+	int[] buffer = new int[32];
+	int cache = 0;
+	
+	while (!IsEndOfFile(file_source))
+	{
+		cache = ReadFile(file_source, buffer, 32, 1);
+		
+		file_destination.Write(buffer, cache, 1);
+	}
+	
+	delete file_source;
+	delete file_destination;
+	
+	return true;
 } 
