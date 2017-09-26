@@ -95,7 +95,7 @@ static void SetDefaultOptions(int client)
 	SetOption(client, Option_Pistol, Pistol_USP);
 	SetOption(client, Option_CheckpointMessages, CheckpointMessages_Disabled);
 	SetOption(client, Option_CheckpointSounds, CheckpointSounds_Enabled);
-	SetOption(client, Option_TeleportSounds, TeleportSounds_Enabled);
+	SetOption(client, Option_TeleportSounds, TeleportSounds_Disabled);
 	SetOption(client, Option_ErrorSounds, ErrorSounds_Enabled);
 	SetOption(client, Option_TimerText, TimerText_InfoPanel);
 	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
