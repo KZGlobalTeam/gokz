@@ -119,7 +119,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	KZPlayer player = new KZPlayer(client);
@@ -133,6 +133,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gB_Jumpbugged[player.id] = false;
 	gI_OldButtons[player.id] = buttons;
 	gF_OldAngles[player.id] = angles;
+	
+	return Plugin_Continue;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
