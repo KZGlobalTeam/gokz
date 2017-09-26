@@ -249,6 +249,7 @@ static void UpdateCurrentMap()
 {
 	GetCurrentMap(gC_CurrentMap, sizeof(gC_CurrentMap));
 	GetMapDisplayName(gC_CurrentMap, gC_CurrentMap, sizeof(gC_CurrentMap));
+	String_ToLower(gC_CurrentMap, gC_CurrentMap, sizeof(gC_CurrentMap));
 }
 
 static void CreateReplaysDirectory(const char[] map)
