@@ -263,19 +263,19 @@
     {
         // You missed your best NUB time (01:23.45).
         "#format"   "{1:s}"
-        "en"        "{grey}You missed your best {yellow}NUB {grey}time ({red}{1}{grey})."
+        "en"        "{grey}You missed your best {yellow}NUB {grey}time ({lightred}{1}{grey})."
     }
     "Missed PB (PRO)"
     {
         // You missed your best PRO time (01:23.45).
         "#format"   "{1:s}"
-        "en"        "{grey}You missed your best {blue}PRO {grey}time ({red}{1}{grey})."      
+        "en"        "{grey}You missed your best {blue}PRO {grey}time ({lightred}{1}{grey})."      
     }
     "Missed PB (NUB and PRO)"
     {
         // You missed your best NUB/PRO time (01:23.45).
         "#format"   "{1:s}"
-        "en"        "{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({red}{1}{grey})."      
+        "en"        "{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({lightred}{1}{grey})."      
     }
 
 	

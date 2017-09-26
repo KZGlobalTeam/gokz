@@ -5,7 +5,7 @@
 	{
 		// You fell too for for a valid Weird Jump (96.0/64.0).
 		"#format"	"{1:.1f},{2:.1f}"
-		"en"		"{grey}You fell too far for a valid Weird Jump ({red}{1}{grey}/{green}{2}{grey})."
+		"en"		"{grey}You fell too far for a valid Weird Jump ({lightred}{1}{grey}/{green}{2}{grey})."
 	}
     "Console Jump Report"
     {

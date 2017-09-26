@@ -13,7 +13,7 @@
     }
     "No Bots Available"
     {
-        "en"		"There are currently no replay bots available."
+        "en"		"{darkred}There are currently no replay bots available."
     }
 
 	// Replay Menu ////////////////////////////////////////////////////////////
