@@ -9,6 +9,8 @@
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
+#undef REQUIRE_PLUGIN
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -23,6 +25,8 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-replays.txt"
 
 #define MAX_BOTS 2
 #define TICK_DATA_BLOCKSIZE 7
@@ -81,6 +85,22 @@ void OnLateLoad()
 		{
 			OnClientPutInServer(client);
 		}
+	}
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
