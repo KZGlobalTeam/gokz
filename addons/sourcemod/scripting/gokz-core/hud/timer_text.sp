@@ -25,7 +25,7 @@ void UpdateTimerText(int client)
 	else
 	{
 		KZPlayer targetPlayer = new KZPlayer(player.observerTarget);
-		if (targetPlayer.id != -1)
+		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
 			TimerTextShow(player, targetPlayer);
 		}

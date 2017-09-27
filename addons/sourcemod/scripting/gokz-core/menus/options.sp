@@ -8,6 +8,13 @@
 
 static bool cameFromOptionsMenu[MAXPLAYERS + 1];
 
+static char phrasesTPMenu[TPMENU_COUNT][] = 
+{
+	"Options Menu - Disabled", 
+	"Options Menu - Simple", 
+	"Options Menu - Advanced"
+};
+
 static char phrasesShowingKeys[SHOWINGKEYS_COUNT][] = 
 {
 	"Options Menu - Spectating", 
@@ -111,7 +118,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 
 static void OptionsMenuAddItems(int client, Menu menu)
 {
-	OptionsMenuAddToggle(client, menu, Option_ShowingTPMenu, "Options Menu - Teleport Menu");
+	OptionsMenuAddTPMenu(client, menu);
 	OptionsMenuAddToggle(client, menu, Option_ShowingInfoPanel, "Options Menu - Info Panel");
 	OptionsMenuAddTimerText(client, menu);
 	OptionsMenuAddSpeedText(client, menu);
@@ -154,6 +161,15 @@ static void OptionsMenuAddPistol(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Pistol", 
 		client, pistolNames[GetOption(client, Option_Pistol)]);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_Pistol)), display);
+}
+
+static void OptionsMenuAddTPMenu(int client, Menu menu)
+{
+	char display[32];
+	FormatEx(display, sizeof(display), "%T - %T", 
+		"Options Menu - Teleport Menu", client, 
+		phrasesTPMenu[GetOption(client, Option_ShowingTPMenu)], client);
+	menu.AddItem(IntToStringEx(view_as<int>(Option_ShowingTPMenu)), display);
 }
 
 static void OptionsMenuAddShowingKeys(int client, Menu menu)

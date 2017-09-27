@@ -41,10 +41,10 @@ public void DB_TxnSuccess_LoadOptions(Handle db, int userid, int numQueries, Han
 		Transaction txn = SQL_CreateTransaction();
 		
 		// Insert options
-		FormatEx(query, sizeof(query), sql_options_insert, GetSteamAccountID(client), GOKZ_GetDefaultMode());
+		FormatEx(query, sizeof(query), sql_options_insert, GetSteamAccountID(client));
 		txn.AddQuery(query);
 		
-		SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_InsertOptions, DB_TxnFailure_Generic, userid, DBPrio_High);
+		SQL_ExecuteTransaction(gH_DB, txn, _, DB_TxnFailure_Generic, _, DBPrio_High);
 	}
 	else if (SQL_FetchRow(results[0]))
 	{
@@ -67,16 +67,4 @@ public void DB_TxnSuccess_LoadOptions(Handle db, int userid, int numQueries, Han
 		player.speedText = SQL_FetchInt(results[0], 15);
 		player.jumpBeam = SQL_FetchInt(results[0], 16);
 	}
-}
-
-public void DB_TxnSuccess_InsertOptions(Handle db, int userid, int numQueries, Handle[] results, any[] queryData)
-{
-	int client = GetClientOfUserId(userid);
-	
-	if (!IsValidClient(client))
-	{
-		return;
-	}
-	
-	DB_LoadOptions(client);
 } 

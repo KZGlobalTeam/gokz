@@ -29,7 +29,7 @@ public Plugin myinfo =
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
-#define PRE_MINIMUM_DELTA_ANGLE 0.4
+#define PRE_MINIMUM_DELTA_ANGLE 0.3515625 // Calculated 45 degrees/128 ticks 
 #define PRE_VELMOD_INCREMENT 0.0014 // Per tick when prestrafing
 #define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
 #define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
@@ -119,7 +119,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	KZPlayer player = new KZPlayer(client);
@@ -133,6 +133,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gB_Jumpbugged[player.id] = false;
 	gI_OldButtons[player.id] = buttons;
 	gF_OldAngles[player.id] = angles;
+	
+	return Plugin_Continue;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -336,11 +338,19 @@ static float CalcWeaponVelMod(KZPlayer player)
 
 static void TweakJump(KZPlayer player)
 {
-	if (player.takeoffTick - player.landingTick <= PERF_TICKS)
+	if (player.takeoffCmdNum - player.landingCmdNum <= PERF_TICKS)
 	{
 		if (!player.hitPerf || player.takeoffSpeed > SPEED_NORMAL)
 		{
-			Movement_SetSpeed(player.id, CalcTweakedTakeoffSpeed(player), true);
+			// Note that resulting velocity has same direction as landing velocity, not current velocity
+			float velocity[3], baseVelocity[3], newVelocity[3];
+			player.GetVelocity(velocity);
+			player.GetBaseVelocity(baseVelocity);
+			player.GetLandingVelocity(newVelocity);
+			newVelocity[2] = velocity[2];
+			SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
+			AddVectors(newVelocity, baseVelocity, newVelocity);
+			player.SetVelocity(newVelocity);
 			// Restore prestrafe lost due to briefly being on the ground
 			gF_PreVelMod[player.id] = gF_PreVelModLanding[player.id];
 			if (gB_GOKZCore)

@@ -249,6 +249,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	UpdateRecordMissed(client);
 	UpdatePBMissed(client);
+	return Plugin_Continue;
 }
 
 public void OnMapStart()

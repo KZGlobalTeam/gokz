@@ -202,16 +202,26 @@
 	{
 		"en"		"{grey}You have cleared your custom start position."
 	}
+    "Invalid Bonus Number"
+	{
+		// 'asdf' is not a valid bonus number.
+		"#format"	"{1:s}"
+		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
+	}
 	
 	
 	// Option Change Chat Messages ////////////////////////////////////////////////////////////
-	"Option - Teleport Menu - Enable"
-	{
-		"en"		"{grey}Your teleport menu has been enabled."
-	}
 	"Option - Teleport Menu - Disable"
 	{
-		"en"		"{grey}Your teleport menu has been disabled."
+		"en"		"{grey}The teleport menu has been disabled."
+	}
+    "Option - Teleport Menu - Enable (Simple)"
+	{
+		"en"		"{grey}The simple teleport menu has been enabled."
+	}
+    "Option - Teleport Menu - Enable (Advanced)"
+	{
+		"en"		"{grey}The advanced teleport menu has been enabled."
 	}
 	"Option - Show Players - Enable"
 	{
@@ -396,6 +406,14 @@
 	"Options Menu - Ground"
 	{
 		"en"		"Ground"
+	}
+    "Options Menu - Simple"
+	{
+		"en"		"Simple"
+	}
+    "Options Menu - Advanced"
+	{
+		"en"		"Advanced"
 	}
 	"Options Menu - Teleport Menu"
 	{

@@ -34,11 +34,10 @@ public Plugin myinfo =
 bool gB_LateLoad;
 bool gB_BaseComm;
 Handle gH_DHooks_OnTeleport;
-Handle gH_DHooks_OnAcceptInput;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
-int gI_OldTickCount[MAXPLAYERS + 1];
+int gI_OldCmdNum[MAXPLAYERS + 1];
 
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
@@ -162,6 +161,7 @@ public void OnClientPutInServer(int client)
 
 public void OnClientPostAdminCheck(int client)
 {
+	UpdateClanTag(client);
 	gB_ClientIsSetUp[client] = true;
 	Call_GOKZ_OnClientSetup(client);
 }
@@ -189,7 +189,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
-	UpdateOldVariables(client, tickcount);
+	UpdateOldVariables(client, cmdnum);
 	return Plugin_Continue;
 }
 
@@ -227,7 +227,6 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	UpdateGodMode(client);
 	UpdatePlayerCollision(client);
 	UpdateTPMenu(client);
-	UpdateClanTag(client);
 }
 
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death hook
@@ -248,12 +247,6 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	bool origin = !DHookIsNullParam(params, 1); // Origin affected
 	bool velocity = !DHookIsNullParam(params, 3); // Velocity affected
 	OnTeleport_ValidJump(client, origin, velocity);
-	return MRES_Ignored;
-}
-
-public MRESReturn DHooks_OnAcceptInput(int entity, Handle ret, Handle params)
-{
-	OnAcceptInput_MapButtons(entity, params);
 	return MRES_Ignored;
 }
 
@@ -413,24 +406,15 @@ static void CreateHooks()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
-	// Setup DHooks OnAcceptInput for Buttons
-	offset = GameConfGetOffset(gameData, "AcceptInput");
-	gH_DHooks_OnAcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, DHooks_OnAcceptInput);
-	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_CharPtr);
-	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_CBaseEntity);
-	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_CBaseEntity);
-	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_Object, 20, DHookPass_ByVal | DHookPass_ODTOR | DHookPass_OCTOR | DHookPass_OASSIGNOP);
-	DHookAddParam(gH_DHooks_OnAcceptInput, HookParamType_Int);
-	
 	gameData.Close();
 }
 
-static void UpdateOldVariables(int client, int tickcount)
+static void UpdateOldVariables(int client, int cmdnum)
 {
 	if (IsPlayerAlive(client))
 	{
 		Movement_GetOrigin(client, gF_OldOrigin[client]);
 		gB_OldDucking[client] = Movement_GetDucking(client);
-		gI_OldTickCount[client] = tickcount;
+		gI_OldCmdNum[client] = cmdnum;
 	}
 } 

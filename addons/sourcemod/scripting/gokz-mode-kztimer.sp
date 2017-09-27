@@ -115,7 +115,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	KZPlayer player = new KZPlayer(client);
@@ -129,6 +129,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gB_Jumpbugged[player.id] = false;
 	gI_OldButtons[player.id] = buttons;
 	gF_OldAngles[player.id] = angles;
+	
+	return Plugin_Continue;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -358,7 +360,15 @@ static void TweakJump(KZPlayer player)
 	{
 		if (player.takeoffSpeed > PERF_SPEED_CAP)
 		{
-			Movement_SetSpeed(player.id, PERF_SPEED_CAP, true);
+			// Note that resulting velocity has same direction as landing velocity, not current velocity
+			float velocity[3], baseVelocity[3], newVelocity[3];
+			player.GetVelocity(velocity);
+			player.GetBaseVelocity(baseVelocity);
+			player.GetLandingVelocity(newVelocity);
+			newVelocity[2] = velocity[2];
+			SetVectorHorizontalLength(newVelocity, PERF_SPEED_CAP);
+			AddVectors(newVelocity, baseVelocity, newVelocity);
+			player.SetVelocity(newVelocity);
 			if (gB_GOKZCore)
 			{
 				player.gokzHitPerf = true;

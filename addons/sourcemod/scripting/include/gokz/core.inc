@@ -96,8 +96,9 @@ enum
 enum
 {
 	ShowingTPMenu_Disabled = 0, 
-	ShowingTPMenu_Enabled, 
-	SHOWINGTPMENU_COUNT
+	ShowingTPMenu_Simple, 
+	ShowingTPMenu_Advanced, 
+	TPMENU_COUNT
 }
 
 enum
@@ -227,6 +228,11 @@ stock char gC_ModeNamesShort[MODE_COUNT][] =
 	"VNL", 
 	"SKZ", 
 	"KZT"
+};
+
+stock char gC_StyleNamesShort[STYLE_COUNT][] = 
+{
+	"NRM"
 };
 
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
@@ -557,31 +563,6 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 }
 
 /**
- * Prints a chat message to those spectating the client, formatting colours 
- * and optionally adding the chat prefix. If using the chat prefix, specify 
- * a colour at the beginning of the message.
- *
- * @param client		Client index.
- * @param addPrefix		Whether to add the chat prefix.
- * @param format		Formatting rules.
- * @param any			Variable number of format parameters.
- * @noreturn
- */
-stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] format, any...)
-{
-	char buffer[1024];
-	for (int target = 1; target <= MaxClients; target++)
-	{
-		if (IsClientInGame(target) && GetObserverTarget(target) == client)
-		{
-			SetGlobalTransTarget(target);
-			VFormat(buffer, sizeof(buffer), format, 4);
-			GOKZ_PrintToChat(target, addPrefix, buffer);
-		}
-	}
-}
-
-/**
  * Starts the player's timer for a course on the current map.
  *
  * @param client    	Client index.
@@ -813,9 +794,73 @@ native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
  * A jump is deemed invalid if the player is teleported.
  *
  * @param client		Client index.
- * @noreturn			Validity of player's current or last jump.
+ * @return				Validity of player's current or last jump.
  */
 native bool GOKZ_GetValidJump(int client);
+
+/**
+ * Has the client switch to a team via GOKZ Core.
+ *
+ * @param client		Client index.
+ * @param team			Which team to switch to.
+ * @noreturn
+ */
+native void GOKZ_JoinTeam(int client, int team);
+
+
+
+// =========================  STOCKS  ========================= //
+
+/**
+ * Prints a chat message to those spectating the client, formatting colours 
+ * and optionally adding the chat prefix. If using the chat prefix, specify 
+ * a colour at the beginning of the message.
+ *
+ * @param client		Client index.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ * @noreturn
+ */
+stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] format, any...)
+{
+	char buffer[1024];
+	for (int target = 1; target <= MaxClients; target++)
+	{
+		if (IsClientInGame(target) && GetObserverTarget(target) == client)
+		{
+			SetGlobalTransTarget(target);
+			VFormat(buffer, sizeof(buffer), format, 4);
+			GOKZ_PrintToChat(target, addPrefix, buffer);
+		}
+	}
+}
+
+/**
+ * Gets the time type given a teleport count.
+ *
+ * @param teleports		Teleport count.
+ * @return				Time type.
+ */
+stock int GOKZ_GetTimeType(int teleportCount)
+{
+	if (teleportCount == 0)
+	{
+		return TimeType_Pro;
+	}
+	return TimeType_Nub;
+}
+
+/**
+ * Gets the player's current time type.
+ *
+ * @param client		Client index.
+ * @return				Player's current time type.
+ */
+stock int GOKZ_GetCurrentTimeType(int client)
+{
+	return GOKZ_GetTimeType(GOKZ_GetTeleportCount(client));
+}
 
 
 
@@ -1206,5 +1251,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetHitPerf");
 	MarkNativeAsOptional("GOKZ_GetTakeoffSpeed");
 	MarkNativeAsOptional("GOKZ_SetTakeoffSpeed");
+	MarkNativeAsOptional("GOKZ_GetValidJump");
+	MarkNativeAsOptional("GOKZ_JoinTeam");
 }
 #endif

@@ -62,7 +62,7 @@ char sqlite_options_create[] =
 ..."Pistol INTEGER NOT NULL DEFAULT '0', "
 ..."CheckpointMessages INTEGER NOT NULL DEFAULT '0', "
 ..."CheckpointSounds INTEGER NOT NULL DEFAULT '1', "
-..."TeleportSounds INTEGER NOT NULL DEFAULT '1', "
+..."TeleportSounds INTEGER NOT NULL DEFAULT '0', "
 ..."ErrorSounds INTEGER NOT NULL DEFAULT '1', "
 ..."TimerText INTEGER NOT NULL DEFAULT '1', "
 ..."SpeedText INTEGER NOT NULL DEFAULT '1', "
@@ -94,8 +94,8 @@ char mysql_options_create[] =
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
 char sql_options_insert[] = 
-"INSERT INTO Options (SteamID32, Mode) "
-..."VALUES (%d, %d)";
+"INSERT INTO Options (SteamID32) "
+..."VALUES (%d)";
 
 char sql_options_update[] = 
 "UPDATE Options "

@@ -7,6 +7,7 @@
  * **Jumpstats** - Detailed statistics of your jumps and each individual air strafe.
  * **Customisable Experience** - Tonnes of options to provide the best possible experience for players. 
  * **Database Support** - Store player times, options and more using either a MySQL or SQLite database.
+ * **Replays** - Record replays of the server's fastest times and have bots replay them.
  * Map bonus support, HUD, teleport menu, noclip, !goto, !measure and much, much more.
 
 ## Usage
@@ -22,6 +23,7 @@
 
 ### Plugin Installation
 
+ * Ensure your server is up to date and meets the above requirements.
  * Download and extract the latest ```GOKZ-vX.X.X.zip``` from downloads tab to ```csgo/``` in the server directory.
  * Add a MySQL/SQLite database called ```gokz``` to ```csgo/addons/sourcemod/configs/databases.cfg```.
  * Various config files including the auto-generated ConVar config files can be found in ```csgo/cfg/sourcemod/gokz```.

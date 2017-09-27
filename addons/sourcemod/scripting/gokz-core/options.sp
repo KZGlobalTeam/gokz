@@ -12,7 +12,7 @@ static int optionCounts[OPTION_COUNT] =
 {
 	MODE_COUNT, 
 	STYLE_COUNT, 
-	SHOWINGTPMENU_COUNT, 
+	TPMENU_COUNT, 
 	SHOWINGINFOPANEL_COUNT, 
 	SHOWINGKEYS_COUNT, 
 	SHOWINGPLAYERS_COUNT, 
@@ -85,7 +85,7 @@ static void SetDefaultOptions(int client)
 {
 	SetOption(client, Option_Mode, GetConVarInt(gCV_DefaultMode));
 	SetOption(client, Option_Style, Style_Normal);
-	SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Enabled);
+	SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
 	SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
 	SetOption(client, Option_ShowingKeys, ShowingKeys_Spectating);
 	SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
@@ -95,7 +95,7 @@ static void SetDefaultOptions(int client)
 	SetOption(client, Option_Pistol, Pistol_USP);
 	SetOption(client, Option_CheckpointMessages, CheckpointMessages_Disabled);
 	SetOption(client, Option_CheckpointSounds, CheckpointSounds_Enabled);
-	SetOption(client, Option_TeleportSounds, TeleportSounds_Enabled);
+	SetOption(client, Option_TeleportSounds, TeleportSounds_Disabled);
 	SetOption(client, Option_ErrorSounds, ErrorSounds_Enabled);
 	SetOption(client, Option_TimerText, TimerText_InfoPanel);
 	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
@@ -142,9 +142,13 @@ static void PrintOptionChangeMessage(int client, Option option) {
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Disable");
 				}
-				case ShowingTPMenu_Enabled:
+				case ShowingTPMenu_Simple:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable (Simple)");
+				}
+				case ShowingTPMenu_Advanced:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable (Advanced)");
 				}
 			}
 		}

@@ -18,7 +18,8 @@
 ### Options
 
  * ```!options``` - Open the options menu.
- * ```!menu``` - Toggle the visibility of the teleport menu.
+ * ```!menu``` - Toggle the visibility of the simple teleport menu.
+ * ```!adv``` - Toggle the visibility of the advanced teleport menu.
  * ```!hide``` - Toggles the visibility of other players.
  * ```!speed``` - Toggle visibility of the centre information panel.
  * ```!hideweapon``` - Toggle visibility of your weapon.
