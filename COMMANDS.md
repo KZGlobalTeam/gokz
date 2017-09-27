@@ -55,3 +55,7 @@ These commands return results based on your currently selected mode.
  * ```!avg``` - Prints the average map run time to chat. Usage ```!avg <map>```
  * ```!bavg``` - Prints the average bonus run time to chat. Usage ```!bavg <#bonus> <map>```
  * ```!pc``` - Prints map completion to chat. Usage: ```!pc <player>```
+ 
+## GOKZ Replays
+
+ * ```!replay``` - Opens the replay loading menu.

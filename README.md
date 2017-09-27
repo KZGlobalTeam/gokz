@@ -7,7 +7,7 @@
  * **Jumpstats** - Detailed statistics of your jumps and each individual air strafe.
  * **Customisable Experience** - Tonnes of options to provide the best possible experience for players. 
  * **Database Support** - Store player times, options and more using either a MySQL or SQLite database.
- * **Replays** - Record replays of the server's fastest times and have bots replay them.
+ * **Replays** - Record replays of the server's fastest times and use bots to play them back.
  * Map bonus support, HUD, teleport menu, noclip, !goto, !measure and much, much more.
 
 ## Usage
