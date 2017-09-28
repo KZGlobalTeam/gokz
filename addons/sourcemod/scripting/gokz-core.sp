@@ -96,26 +96,24 @@ public void OnPluginStart()
 	CreateHudSynchronizers();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
+}
+
+public void OnAllPluginsLoaded()
+{
+	OnAllPluginsLoaded_Modes();
+	gB_BaseComm = LibraryExists("basecomm");
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 	
+	// Handle late loading here now that all the modes have been loaded
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
 		{
 			OnClientPutInServer(client);
 		}
-	}
-}
-
-public void OnAllPluginsLoaded()
-{
-	gB_BaseComm = LibraryExists("basecomm");
-	if (GetLoadedModeCount() <= 0)
-	{
-		SetFailState("At least one GOKZ mode plugin is required.");
-	}
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
@@ -331,6 +329,11 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 public void GOKZ_OnJoinTeam(int client, int team)
 {
 	OnJoinTeam_Pause(client, team);
+}
+
+public void GOKZ_OnModeUnloaded(int mode)
+{
+	OnModeUnloaded_Options(mode);
 }
 
 

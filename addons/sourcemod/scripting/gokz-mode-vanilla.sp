@@ -39,8 +39,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
-	
-	RegPluginLibrary("gokz-mode-vanilla");
 	return APLRes_Success;
 }
 

@@ -489,6 +489,22 @@ forward void GOKZ_OnJumpInvalidated(int client);
  */
 forward void GOKZ_OnJoinTeam(int client, int team);
 
+/**
+ * Called when a mode has been loaded.
+ *
+ * @param mode			Mode loaded.
+ * @noreturn
+ */
+forward void GOKZ_OnModeLoaded(int mode);
+
+/**
+ * Called when a mode has been unloaded.
+ *
+ * @param mode			Mode unloaded.
+ * @noreturn
+ */
+forward void GOKZ_OnModeUnloaded(int mode);
+
 
 
 // =========================  NATIVES  ========================= //

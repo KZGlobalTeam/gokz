@@ -40,20 +40,24 @@ int GetOption(int client, Option option)
 
 void SetOption(int client, Option option, int optionValue, bool printMessage = false)
 {
-	if (GetOption(client, option) == optionValue)
-	{
-		return;
-	}
-	
+	// Handle unique case of modes, where some values may not be available
 	if (option == Option_Mode && !GetModeLoaded(optionValue))
 	{
 		if (printMessage)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", optionValue);
 		}
-		SetToLoadedMode(client, printMessage);
+		SetOption(client, Option_Mode, GetALoadedMode(), printMessage);
+		return;
 	}
 	
+	// Don't need to do anything if their option is already set at that value
+	if (GetOption(client, option) == optionValue)
+	{
+		return;
+	}
+	
+	// Set the option otherwise
 	options[option][client] = optionValue;
 	if (printMessage)
 	{
@@ -75,6 +79,17 @@ void CycleOption(int client, Option option, bool printMessage = false)
 void SetupClientOptions(int client)
 {
 	SetDefaultOptions(client);
+}
+
+void OnModeUnloaded_Options(int mode)
+{
+	for (int client = 1; client < MaxClients; client++)
+	{
+		if (IsClientInGame(client) && GetOption(client, Option_Mode) == mode)
+		{
+			SetOption(client, Option_Mode, GetALoadedMode(), true);
+		}
+	}
 }
 
 
@@ -100,25 +115,6 @@ static void SetDefaultOptions(int client)
 	SetOption(client, Option_TimerText, TimerText_InfoPanel);
 	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
 	SetOption(client, Option_JumpBeam, JumpBeam_Disabled);
-}
-
-// Set client to a mode that is loaded
-static void SetToLoadedMode(int client, bool printMessage = false)
-{
-	// Their mode is already loaded so don't change it
-	if (GOKZ_GetModeLoaded(GetOption(client, Option_Mode)))
-	{
-		return;
-	}
-	
-	// Find a mode that is loaded
-	for (int mode = 0; mode < MODE_COUNT; mode++)
-	{
-		if (GOKZ_GetModeLoaded(mode))
-		{
-			SetOption(client, Option_Mode, mode, printMessage);
-		}
-	}
 }
 
 static void PrintOptionChangeMessage(int client, Option option) {
