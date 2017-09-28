@@ -2,13 +2,28 @@
 	Information Panel
 	
 	Centre information panel (hint text).
+	
+	This is updated every ~0.1s and whenever player has taken off 
+	so that they get to see updated pre-speed as soon as possible.
 */
 
 
 
-// =========================  PUBLIC  ========================= //
+// =========================  LISTENERS  ========================= //
 
-void UpdateInfoPanel(int client)
+void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
+{
+	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum - 1)
+	{
+		UpdateInfoPanel(client);
+	}
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static void UpdateInfoPanel(int client)
 {
 	KZPlayer player = new KZPlayer(client);
 	
@@ -32,22 +47,6 @@ void UpdateInfoPanel(int client)
 		}
 	}
 }
-
-
-
-// =========================  LISTENERS  ========================= //
-
-void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
-{
-	if (cmdnum % 12 == 0)
-	{
-		UpdateInfoPanel(client);
-	}
-}
-
-
-
-// =========================  PRIVATE  ========================= //
 
 static bool NothingEnabledInInfoPanel(KZPlayer player)
 {

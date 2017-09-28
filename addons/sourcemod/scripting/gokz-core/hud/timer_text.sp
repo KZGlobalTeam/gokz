@@ -2,13 +2,64 @@
 	Timer Text
 	
 	Uses ShowHudText to show current run time somewhere on the screen.
+	
+	This is updated every ~0.25s and whenever timer is started, stopped etc.
 */
+
+
+
+static Handle timerHudSynchronizer;
 
 
 
 // =========================  PUBLIC  ========================= //
 
-void UpdateTimerText(int client)
+void CreateHudSynchronizerTimerText()
+{
+	timerHudSynchronizer = CreateHudSynchronizer();
+}
+
+
+
+// =========================  LISTENERS  ========================= //
+
+void OnPlayerRunCmd_TimerText(int client, int cmdnum)
+{
+	if (cmdnum % 32 == 0)
+	{
+		UpdateTimerText(client);
+	}
+}
+
+void OnOptionChanged_TimerText(int client, Option option)
+{
+	if (option == Option_TimerText)
+	{
+		ClearTimerText(client);
+		UpdateTimerText(client);
+	}
+}
+
+void OnTimerStart_TimerText(int client)
+{
+	UpdateTimerText(client);
+}
+
+void OnTimerEnd_TimerText(int client)
+{
+	ClearTimerText(client);
+}
+
+void OnTimerStopped_TimerText(int client)
+{
+	ClearTimerText(client);
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static void UpdateTimerText(int client)
 {
 	KZPlayer player = new KZPlayer(client);
 	
@@ -32,21 +83,10 @@ void UpdateTimerText(int client)
 	}
 }
 
-
-
-// =========================  LISTENERS  ========================= //
-
-void OnPlayerRunCmd_TimerText(int client, int cmdnum)
+static void ClearTimerText(int client)
 {
-	if (cmdnum % 32 == 0)
-	{
-		UpdateTimerText(client);
-	}
+	ClearSyncHud(client, timerHudSynchronizer);
 }
-
-
-
-// =========================  PRIVATE  ========================= //
 
 static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 {
@@ -66,13 +106,13 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 	{
 		case TimerText_Top:
 		{
-			SetHudTextParams(-1.0, 0.013, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.013, 2.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
 		}
 		case TimerText_Bottom:
 		{
-			SetHudTextParams(-1.0, 0.957, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.957, 2.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
 		}
 	}
 	
-	ShowHudText(player.id, 0, GOKZ_FormatTime(targetPlayer.currentTime, false));
+	ShowSyncHudText(player.id, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.currentTime, false));
 } 

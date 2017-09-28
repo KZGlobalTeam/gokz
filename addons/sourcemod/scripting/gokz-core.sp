@@ -95,6 +95,7 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateCommands();
 	CreateCommandListeners();
+	CreateHudSynchronizers();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 	
@@ -280,12 +281,19 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_JoinTeam(client);
 	OnTimerStart_Pause(client);
 	OnTimerStart_Teleports(client);
+	OnTimerStart_TimerText(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	OnTimerEnd_SlayOnEnd(client);
+	OnTimerEnd_TimerText(client);
+}
+
+public void GOKZ_OnTimerStopped(int client)
+{
+	OnTimerStopped_TimerText(client);
 }
 
 public void GOKZ_OnMakeCheckpoint_Post(int client)
@@ -326,6 +334,8 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 	OnOptionChanged_HideWeapon(client, option);
 	OnOptionChanged_Pistol(client, option);
 	OnOptionChanged_ClanTag(client, option);
+	OnOptionChanged_SpeedText(client, option);
+	OnOptionChanged_TimerText(client, option);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)
@@ -407,6 +417,12 @@ static void CreateHooks()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
 	gameData.Close();
+}
+
+static void CreateHudSynchronizers()
+{
+	CreateHudSynchronizerSpeedText();
+	CreateHudSynchronizerTimerText();
 }
 
 static void UpdateOldVariables(int client, int cmdnum)
