@@ -394,7 +394,7 @@ static void CreateHooks()
 	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Post);
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
-	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Post);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_Post);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
