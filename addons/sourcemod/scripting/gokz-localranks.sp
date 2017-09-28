@@ -31,8 +31,6 @@ public Plugin myinfo =
 
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
-bool gB_LateLoad;
-
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 
@@ -79,19 +77,18 @@ char gC_BeatRecordSound[256];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	CreateNatives();
-	RegPluginLibrary("gokz-localranks");
-	gB_LateLoad = late;
-	return APLRes_Success;
-}
-
-public void OnPluginStart()
-{
 	if (GetEngineVersion() != Engine_CSGO)
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
 	
+	CreateNatives();
+	RegPluginLibrary("gokz-localranks");
+	return APLRes_Success;
+}
+
+public void OnPluginStart()
+{
 	LoadTranslations("gokz-core.phrases");
 	LoadTranslations("gokz-localranks.phrases");
 	
@@ -100,14 +97,6 @@ public void OnPluginStart()
 	
 	TryGetDatabaseInfo();
 	
-	if (gB_LateLoad)
-	{
-		OnLateLoad();
-	}
-}
-
-void OnLateLoad()
-{
 	if (GOKZ_DB_IsMapSetUp())
 	{
 		GOKZ_DB_OnMapSetup(GOKZ_DB_GetCurrentMapID());

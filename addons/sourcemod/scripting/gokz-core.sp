@@ -31,7 +31,6 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-core.txt"
 
-bool gB_LateLoad;
 bool gB_BaseComm;
 Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
@@ -80,7 +79,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
-	gB_LateLoad = late;
 	return APLRes_Success;
 }
 
@@ -99,14 +97,6 @@ public void OnPluginStart()
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 	
-	if (gB_LateLoad)
-	{
-		OnLateLoad();
-	}
-}
-
-void OnLateLoad()
-{
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
@@ -398,11 +388,11 @@ static void CreateRegexes()
 
 static void CreateHooks()
 {
-	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
-	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Pre);
-	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
-	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
-	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
+	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Post);
+	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
+	HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Post);
+	HookEvent("round_start", OnRoundStart, EventHookMode_Post);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
 	Handle gameData = LoadGameConfigFile("sdktools.games");
