@@ -362,6 +362,13 @@ static void SetBotStuff(int bot)
 	{
 		GOKZ_JoinTeam(client, CS_TEAM_T);
 	}
+	
+	// Pull out the bot's knife
+	int weapon = GetPlayerWeaponSlot(client, 2);
+	if (weapon != -1)
+	{
+		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+	}
 }
 
 // Returns the number of bots that are currently replaying
