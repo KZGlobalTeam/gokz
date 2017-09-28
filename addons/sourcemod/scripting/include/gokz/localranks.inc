@@ -29,7 +29,7 @@ enum
  * Called when a player's time has been processed by GOKZ Local Ranks.
  *
  * @param client		Client index.
- * @param steamID		SteamID32 of the player.
+ * @param steamID		SteamID32 of the player (from GetSteamAccountID()).
  * @param mapID 		MapID from the "Maps" database table.
  * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode			Player's movement mode.
@@ -68,7 +68,7 @@ forward void GOKZ_LR_OnTimeProcessed(
  * Called when a player sets a new local record.
  *
  * @param client			Client index.
- * @param steamID			SteamID32 of the player.
+ * @param steamID			SteamID32 of the player (from GetSteamAccountID()).
  * @param mapID 			MapID from the "Maps" table.
  * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode				Player's movement mode.

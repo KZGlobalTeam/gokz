@@ -1,7 +1,7 @@
 /*
 	Speed Text
 	
-	Uses ShowHudText to show current speed somewhere on the screen.
+	Uses ShowSyncHudText to show current speed somewhere on the screen.
 	
 	This is updated every ~0.1s and whenever player has taken off 
 	so that they get to see updated pre-speed as soon as possible.

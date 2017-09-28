@@ -64,7 +64,7 @@ forward void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType);
  * At this point, the player is present and updated in the "Players" table.
  *
  * @param client		Client index.
- * @param steamID		SteamID32 of the player.
+ * @param steamID		SteamID32 of the player (from GetSteamAccountID()).
  * @noreturn
  */
 forward void GOKZ_DB_OnClientSetup(int client, int steamID);
@@ -82,7 +82,7 @@ forward void GOKZ_DB_OnMapSetup(int mapID);
  * Called when a time has been inserted into the database.
  *
  * @param client			Client index.
- * @param steamID			SteamID32 of the player.
+ * @param steamID			SteamID32 of the player (from GetSteamAccountID()).
  * @param mapID				MapID from the "Maps" table.
  * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode				Player's movement mode.

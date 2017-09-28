@@ -1,7 +1,7 @@
 /*
 	Timer Text
 	
-	Uses ShowHudText to show current run time somewhere on the screen.
+	Uses ShowSyncHudText to show current run time somewhere on the screen.
 	
 	This is updated every ~0.25s and whenever timer is started, stopped etc.
 */
