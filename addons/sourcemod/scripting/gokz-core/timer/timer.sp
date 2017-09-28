@@ -35,6 +35,11 @@ float GetCurrentTime(int client)
 	return currentTime[client];
 }
 
+float SetCurrentTime(int client, float time)
+{
+	currentTime[client] = time;
+}
+
 int GetCurrentCourse(int client)
 {
 	return currentCourse[client];

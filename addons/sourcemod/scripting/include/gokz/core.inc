@@ -484,6 +484,16 @@ forward void GOKZ_OnModeLoaded(int mode);
  */
 forward void GOKZ_OnModeUnloaded(int mode);
 
+/**
+ * Called when a plugin other than gokz-core calls a native 
+ * that may affect the player's timer or teleport count in 
+ * their favour e.g. GOKZ_StartTimer, GOKZ_EndTimer,
+ * GOKZ_SetCurrentTime and GOKZ_SetTeleportCount.
+ *
+ * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
+ */
+forward Action GOKZ_OnTimerNativeCalledExternally();
+
 
 
 // =========================  NATIVES  ========================= //
@@ -559,21 +569,23 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 
 /**
  * Starts the player's timer for a course on the current map.
+ * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @noreturn
+ * @return				Whether native was allowed to proceed.
  */
-native void GOKZ_StartTimer(int client, int course);
+native bool GOKZ_StartTimer(int client, int course);
 
 /**
  * Ends the player's timer for a course on the current map.
+ * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @noreturn
+ * @return				Whether native was allowed to proceed.
  */
-native void GOKZ_EndTimer(int client, int course);
+native bool GOKZ_EndTimer(int client, int course);
 
 /**
  * Forces the player's timer to stop. Intended for run invalidation.
@@ -633,6 +645,16 @@ native bool GOKZ_GetPaused(int client);
 native float GOKZ_GetCurrentTime(int client);
 
 /**
+ * Gets the player's current run time.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client    	Client index.
+ * @param time			Run time to set to.
+ * @return				Whether native was allowed to proceed.
+ */
+native bool GOKZ_SetCurrentTime(int client, float time);
+
+/**
  * Gets the player's current checkpoint count.
  *
  * @param client    	Client index.
@@ -641,12 +663,32 @@ native float GOKZ_GetCurrentTime(int client);
 native int GOKZ_GetCheckpointCount(int client);
 
 /**
+ * Sets the player's current checkpoint count.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client    	Client index.
+ * @param cpCount		Checkpoint count to set to.
+ * @return				Whether native was allowed to proceed.
+ */
+native int GOKZ_SetCheckpointCount(int client, int cpCount);
+
+/**
  * Gets the player's current teleport count.
  *
  * @param client    	Client index.
  * @return				Player's current teleport count.
  */
 native int GOKZ_GetTeleportCount(int client);
+
+/**
+ * Sets the player's current teleport count.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client    	Client index.
+ * @param tpCount		Teleport count to set to.
+ * @return				Whether native was allowed to proceed.
+ */
+native bool GOKZ_SetTeleportCount(int client, int tpCount);
 
 /**
  * Teleports the player to start, or respawns them.
@@ -958,17 +1000,26 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		public get() {
 			return GOKZ_GetCurrentTime(this.id);
 		}
+		public set(float value) {
+			GOKZ_SetCurrentTime(this.id, value);
+		}
 	}
 	
 	property int checkpointCount {
 		public get() {
 			return GOKZ_GetCheckpointCount(this.id);
 		}
+		public set(int value) {
+			GOKZ_SetCheckpointCount(this.id, value);
+		}
 	}
 	
 	property int teleportCount {
 		public get() {
 			return GOKZ_GetTeleportCount(this.id);
+		}
+		public set(int value) {
+			GOKZ_SetTeleportCount(this.id, value);
 		}
 	}
 	
@@ -1250,8 +1301,11 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetCurrentCourse");
 	MarkNativeAsOptional("GOKZ_GetPaused");
 	MarkNativeAsOptional("GOKZ_GetCurrentTime");
+	MarkNativeAsOptional("GOKZ_SetCurrentTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
+	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
+	MarkNativeAsOptional("GOKZ_SetTeleportCount");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

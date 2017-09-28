@@ -36,6 +36,7 @@ static Handle H_OnJumpInvalidated;
 static Handle H_OnJoinTeam;
 static Handle H_OnModeLoaded;
 static Handle H_OnModeUnloaded;
+static Handle H_OnTimerNativeCalledExternally;
 
 
 
@@ -71,6 +72,7 @@ void CreateGlobalForwards()
 	H_OnJoinTeam = CreateGlobalForward("GOKZ_OnJoinTeam", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnModeLoaded = CreateGlobalForward("GOKZ_OnModeLoaded", ET_Ignore, Param_Cell);
 	H_OnModeUnloaded = CreateGlobalForward("GOKZ_OnModeUnloaded", ET_Ignore, Param_Cell);
+	H_OnTimerNativeCalledExternally = CreateGlobalForward("GOKZ_OnTimerNativeCalledExternally", ET_Event);
 }
 
 void Call_GOKZ_OnClientSetup(int client)
@@ -299,4 +301,10 @@ void Call_GOKZ_OnModeUnloaded(int mode)
 	Call_StartForward(H_OnModeUnloaded);
 	Call_PushCell(mode);
 	Call_Finish();
+}
+
+void Call_GOKZ_OnTimerNativeCalledExternally(Action &result)
+{
+	Call_StartForward(H_OnTimerNativeCalledExternally);
+	Call_Finish(result);
 } 

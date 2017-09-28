@@ -31,6 +31,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-core.txt"
 
+Handle g_ThisPlugin;
 bool gB_BaseComm;
 Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
@@ -77,6 +78,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 		SetFailState("This plugin is only for CS:GO.");
 	}
 	
+	g_ThisPlugin = myself;
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
 	return APLRes_Success;

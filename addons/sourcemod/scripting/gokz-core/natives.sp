@@ -34,8 +34,11 @@ void CreateNatives()
 	CreateNative("GOKZ_GetCurrentCourse", Native_GetCurrentCourse);
 	CreateNative("GOKZ_GetPaused", Native_GetPaused);
 	CreateNative("GOKZ_GetCurrentTime", Native_GetCurrentTime);
+	CreateNative("GOKZ_SetCurrentTime", Native_SetCurrentTime);
 	CreateNative("GOKZ_GetCheckpointCount", Native_GetCheckpointCount);
+	CreateNative("GOKZ_SetCheckpointCount", Native_SetCheckpointCount);
 	CreateNative("GOKZ_GetTeleportCount", Native_GetTeleportCount);
+	CreateNative("GOKZ_SetTeleportCount", Native_SetTeleportCount);
 	CreateNative("GOKZ_GetOption", Native_GetOption);
 	CreateNative("GOKZ_SetOption", Native_SetOption);
 	CreateNative("GOKZ_GetHitPerf", Native_GetHitPerf);
@@ -84,12 +87,24 @@ public int Native_PrintToChat(Handle plugin, int numParams)
 
 public int Native_StartTimer(Handle plugin, int numParams)
 {
+	if (BlockedExternallyCalledTimerNative(plugin))
+	{
+		return view_as<int>(false);
+	}
+	
 	TimerStart(GetNativeCell(1), GetNativeCell(2));
+	return view_as<int>(true);
 }
 
 public int Native_EndTimer(Handle plugin, int numParams)
 {
+	if (BlockedExternallyCalledTimerNative(plugin))
+	{
+		return view_as<int>(false);
+	}
+	
 	TimerEnd(GetNativeCell(1), GetNativeCell(2));
+	return view_as<int>(true);
 }
 
 public int Native_StopTimer(Handle plugin, int numParams)
@@ -177,14 +192,47 @@ public int Native_GetCurrentTime(Handle plugin, int numParams)
 	return view_as<int>(GetCurrentTime(GetNativeCell(1)));
 }
 
+public int Native_SetCurrentTime(Handle plugin, int numParams)
+{
+	if (BlockedExternallyCalledTimerNative(plugin))
+	{
+		return view_as<int>(false);
+	}
+	
+	SetCurrentTime(GetNativeCell(1), view_as<float>(GetNativeCell(2)));
+	return view_as<int>(true);
+}
+
 public int Native_GetCheckpointCount(Handle plugin, int numParams)
 {
 	return GetCheckpointCount(GetNativeCell(1));
 }
 
+public int Native_SetCheckpointCount(Handle plugin, int numParams)
+{
+	if (BlockedExternallyCalledTimerNative(plugin))
+	{
+		return view_as<int>(false);
+	}
+	
+	SetCheckpointCount(GetNativeCell(1), GetNativeCell(2));
+	return view_as<int>(true);
+}
+
 public int Native_GetTeleportCount(Handle plugin, int numParams)
 {
 	return GetTeleportCount(GetNativeCell(1));
+}
+
+public int Native_SetTeleportCount(Handle plugin, int numParams)
+{
+	if (BlockedExternallyCalledTimerNative(plugin))
+	{
+		return view_as<int>(false);
+	}
+	
+	SetTeleportCount(GetNativeCell(1), GetNativeCell(2));
+	return view_as<int>(true);
 }
 
 public int Native_GetOption(Handle plugin, int numParams)
@@ -225,4 +273,23 @@ public int Native_GetValidJump(Handle plugin, int numParams)
 public int Native_JoinTeam(Handle plugin, int numParams)
 {
 	JoinTeam(GetNativeCell(1), GetNativeCell(2));
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static bool BlockedExternallyCalledTimerNative(Handle plugin)
+{
+	if (plugin != g_ThisPlugin)
+	{
+		Action result;
+		Call_GOKZ_OnTimerNativeCalledExternally(result);
+		if (result != Plugin_Continue)
+		{
+			return true;
+		}
+	}
+	
+	return false;
 } 
