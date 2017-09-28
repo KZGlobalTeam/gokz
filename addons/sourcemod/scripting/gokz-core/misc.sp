@@ -412,7 +412,8 @@ static void SanitiseChatInput(char[] message, int maxlength)
 {
 	Color_StripFromChatText(message, message, maxlength);
 	CRemoveColors(message, maxlength);
-	ReplaceString(message, maxlength, "%", "");
+	// Chat gets double formatted, so replace '%' with '%%%%' to end up with '%'
+	ReplaceString(message, maxlength, "%", "%%%%");
 }
 
 
