@@ -1174,6 +1174,18 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 	}
 	
+	property bool inGame {
+		public get() {
+			return IsClientInGame(this.id);
+		}
+	}
+	
+	property bool authorized {
+		public get() {
+			return IsClientAuthorized(this.id);
+		}
+	}
+	
 	property bool fake {
 		public get() {
 			return IsFakeClient(this.id);

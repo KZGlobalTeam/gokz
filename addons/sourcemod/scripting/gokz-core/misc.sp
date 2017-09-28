@@ -513,32 +513,36 @@ void OnMapStart_JumpBeam()
 	jumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
 }
 
-void OnPlayerRunCmd_JumpBeam(int client)
+void OnPlayerRunCmd_JumpBeam(int targetClient)
 {
+	// In this case, spectators are handled from the target 
+	// client's OnPlayerRunCmd call, otherwise the jump 
+	// beam will be all broken up.
 	
-	KZPlayer player = new KZPlayer(client);
-	KZPlayer targetPlayer;
+	KZPlayer targetPlayer = new KZPlayer(targetClient);
 	
-	if (player.fake || player.jumpBeam == JumpBeam_Disabled)
+	if (targetPlayer.fake || !targetPlayer.alive || targetPlayer.onGround || !targetPlayer.validJump)
 	{
 		return;
 	}
 	
-	// Determine target player
-	if (player.alive)
+	// Send to self
+	SendJumpBeam(targetPlayer, targetPlayer);
+	
+	// Send to spectators
+	for (int client = 1; client <= MaxClients; client++)
 	{
-		targetPlayer = player;
-	}
-	else
-	{
-		targetPlayer = new KZPlayer(player.observerTarget);
-		if (targetPlayer.id == -1)
+		KZPlayer player = new KZPlayer(client);
+		if (player.inGame && !player.alive && player.observerTarget == targetClient)
 		{
-			return;
+			SendJumpBeam(player, targetPlayer);
 		}
 	}
-	
-	if (!GetValidJump(targetPlayer.id) || targetPlayer.onGround)
+}
+
+static void SendJumpBeam(KZPlayer player, KZPlayer targetPlayer)
+{
+	if (player.jumpBeam == JumpBeam_Disabled)
 	{
 		return;
 	}
@@ -621,11 +625,11 @@ static void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 {
 	if (targetPlayer.ducking)
 	{
-		colour =  { 255, 0, 0, 100 }; // Red
+		colour =  { 255, 0, 0, 110 }; // Red
 	}
 	else
 	{
-		colour =  { 0, 255, 0, 100 }; // Green
+		colour =  { 0, 255, 0, 110 }; // Green
 	}
 }
 
