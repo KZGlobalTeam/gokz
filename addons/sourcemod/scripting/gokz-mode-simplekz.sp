@@ -34,7 +34,8 @@ public Plugin myinfo =
 #define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
 #define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
 
-float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.4, 0.0 };
+float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.4, 0.0, 301.993377 };
+
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
 float gF_PreVelMod[MAXPLAYERS + 1];
@@ -223,27 +224,11 @@ static bool IsUsingMode(int client)
 
 static void CreateConVars()
 {
-	gCV_ModeCVar[ModeCVar_Accelerate] = FindConVar("sv_accelerate");
-	gCV_ModeCVar[ModeCVar_Friction] = FindConVar("sv_friction");
-	gCV_ModeCVar[ModeCVar_AirAccelerate] = FindConVar("sv_airaccelerate");
-	gCV_ModeCVar[ModeCVar_LadderScaleSpeed] = FindConVar("sv_ladder_scale_speed");
-	gCV_ModeCVar[ModeCVar_MaxVelocity] = FindConVar("sv_maxvelocity");
-	gCV_ModeCVar[ModeCVar_Gravity] = FindConVar("sv_gravity");
-	gCV_ModeCVar[ModeCVar_EnableBunnyhopping] = FindConVar("sv_enablebunnyhopping");
-	gCV_ModeCVar[ModeCVar_AutoBunnyhopping] = FindConVar("sv_autobunnyhopping");
-	gCV_ModeCVar[ModeCVar_StaminaMax] = FindConVar("sv_staminamax");
-	gCV_ModeCVar[ModeCVar_StaminaLandCost] = FindConVar("sv_staminalandcost");
-	gCV_ModeCVar[ModeCVar_StaminaJumpCost] = FindConVar("sv_staminajumpcost");
-	gCV_ModeCVar[ModeCVar_StaminaRecoveryRate] = FindConVar("sv_staminarecoveryrate");
-	gCV_ModeCVar[ModeCVar_MaxSpeed] = FindConVar("sv_maxspeed");
-	gCV_ModeCVar[ModeCVar_WaterAccelerate] = FindConVar("sv_wateraccelerate");
-	gCV_ModeCVar[ModeCVar_TimeBetweenDucks] = FindConVar("sv_timebetweenducks");
-	gCV_ModeCVar[ModeCVar_AccelerateUseWeaponSpeed] = FindConVar("sv_accelerate_use_weapon_speed");
-	
-	// Remove these notify flags because these ConVars are being set constantly
-	for (int i = 0; i < MODECVAR_COUNT; i++)
+	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
 	{
-		gCV_ModeCVar[i].Flags &= ~FCVAR_NOTIFY;
+		gCV_ModeCVar[cvar] = FindConVar(gC_ModeCVars[cvar]);
+		// Remove notify flags because these ConVars are being set constantly
+		gCV_ModeCVar[cvar].Flags &= ~FCVAR_NOTIFY;
 	}
 }
 

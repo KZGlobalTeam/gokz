@@ -31,27 +31,6 @@ enum
 
 enum
 {
-	ModeCVar_Accelerate = 0, 
-	ModeCVar_Friction, 
-	ModeCVar_AirAccelerate, 
-	ModeCVar_LadderScaleSpeed, 
-	ModeCVar_MaxVelocity, 
-	ModeCVar_Gravity, 
-	ModeCVar_EnableBunnyhopping, 
-	ModeCVar_AutoBunnyhopping, 
-	ModeCVar_StaminaMax, 
-	ModeCVar_StaminaLandCost, 
-	ModeCVar_StaminaJumpCost, 
-	ModeCVar_StaminaRecoveryRate, 
-	ModeCVar_MaxSpeed, 
-	ModeCVar_WaterAccelerate, 
-	ModeCVar_TimeBetweenDucks, 
-	ModeCVar_AccelerateUseWeaponSpeed, 
-	MODECVAR_COUNT
-}
-
-enum
-{
 	MapPrefix_Other = 0, 
 	MapPrefix_KZPro, 
 	MAPPREFIX_COUNT
