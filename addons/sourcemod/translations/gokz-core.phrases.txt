@@ -1,27 +1,5 @@
 "Phrases"
 {
-	// General
-	"Mode - Vanilla"
-	{
-		"en"		"Vanilla"
-	}
-	"Mode - SimpleKZ"
-	{
-		"en"		"SimpleKZ"
-	}
-	"Mode - KZTimer"
-	{
-		"en"		"KZTimer"
-	}
-	"Time Type - NUB"
-	{
-		"en"		"NUB"
-	}
-	"Time Type - PRO"
-	{
-		"en"		"PRO"
-	}
-
 	// General Chat Messages ////////////////////////////////////////////////////////////
 	"Beat Map (NUB)"
 	{

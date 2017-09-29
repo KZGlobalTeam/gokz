@@ -27,14 +27,14 @@ enum
 	TimeType_Nub = 0, 
 	TimeType_Pro, 
 	TIMETYPE_COUNT
-}
+};
 
 enum
 {
 	MapPrefix_Other = 0, 
 	MapPrefix_KZPro, 
 	MAPPREFIX_COUNT
-}
+};
 
 enum Option
 {
@@ -56,7 +56,7 @@ enum Option
 	Option_SpeedText, 
 	Option_JumpBeam, 
 	OPTION_COUNT
-}
+};
 
 enum
 {
@@ -64,13 +64,13 @@ enum
 	Mode_SimpleKZ, 
 	Mode_KZTimer, 
 	MODE_COUNT
-}
+};
 
 enum
 {
 	Style_Normal = 0, 
 	STYLE_COUNT
-}
+};
 
 enum
 {
@@ -78,14 +78,14 @@ enum
 	ShowingTPMenu_Simple, 
 	ShowingTPMenu_Advanced, 
 	TPMENU_COUNT
-}
+};
 
 enum
 {
 	ShowingInfoPanel_Disabled = 0, 
 	ShowingInfoPanel_Enabled, 
 	SHOWINGINFOPANEL_COUNT
-}
+};
 
 enum
 {
@@ -93,35 +93,35 @@ enum
 	ShowingKeys_Always, 
 	ShowingKeys_Disabled, 
 	SHOWINGKEYS_COUNT
-}
+};
 
 enum
 {
 	ShowingPlayers_Disabled = 0, 
 	ShowingPlayers_Enabled, 
 	SHOWINGPLAYERS_COUNT
-}
+};
 
 enum
 {
 	ShowingWeapon_Disabled = 0, 
 	ShowingWeapon_Enabled, 
 	SHOWINGWEAPON_COUNT
-}
+};
 
 enum
 {
 	AutoRestart_Disabled = 0, 
 	AutoRestart_Enabled, 
 	AUTORESTART_COUNT
-}
+};
 
 enum
 {
 	SlayOnEnd_Disabled = 0, 
 	SlayOnEnd_Enabled, 
 	SLAYONEND_COUNT
-}
+};
 
 enum
 {
@@ -134,35 +134,35 @@ enum
 	Pistol_FiveSeveN, 
 	Pistol_Tec9, 
 	PISTOL_COUNT
-}
+};
 
 enum
 {
 	CheckpointMessages_Disabled = 0, 
 	CheckpointMessages_Enabled, 
 	CHECKPOINTMESSAGES_COUNT
-}
+};
 
 enum
 {
 	CheckpointSounds_Disabled = 0, 
 	CheckpointSounds_Enabled, 
 	CHECKPOINTSOUNDS_COUNT
-}
+};
 
 enum
 {
 	TeleportSounds_Disabled = 0, 
 	TeleportSounds_Enabled, 
 	TELEPORTSOUNDS_COUNT
-}
+};
 
 enum
 {
 	ErrorSounds_Disabled = 0, 
 	ErrorSounds_Enabled, 
 	ERRORSOUNDS_COUNT
-}
+};
 
 enum
 {
@@ -171,7 +171,7 @@ enum
 	TimerText_Bottom, 
 	TimerText_Top, 
 	TIMERTEXT_COUNT
-}
+};
 
 enum
 {
@@ -179,7 +179,7 @@ enum
 	SpeedText_InfoPanel, 
 	SpeedText_Bottom, 
 	SPEEDTEXT_COUNT
-}
+};
 
 enum
 {
@@ -189,7 +189,29 @@ enum
 	JumpBeam_FeetAndHead, 
 	JumpBeam_Ground, 
 	JUMPBEAM_COUNT
-}
+};
+
+enum
+{
+	ModeCVar_Accelerate = 0, 
+	ModeCVar_Friction, 
+	ModeCVar_AirAccelerate, 
+	ModeCVar_LadderScaleSpeed, 
+	ModeCVar_MaxVelocity, 
+	ModeCVar_Gravity, 
+	ModeCVar_EnableBunnyhopping, 
+	ModeCVar_AutoBunnyhopping, 
+	ModeCVar_StaminaMax, 
+	ModeCVar_StaminaLandCost, 
+	ModeCVar_StaminaJumpCost, 
+	ModeCVar_StaminaRecoveryRate, 
+	ModeCVar_MaxSpeed, 
+	ModeCVar_WaterAccelerate, 
+	ModeCVar_TimeBetweenDucks, 
+	ModeCVar_AccelerateUseWeaponSpeed, 
+	ModeCVar_JumpImpulse, 
+	MODECVAR_COUNT
+};
 
 
 
@@ -230,6 +252,27 @@ stock char gC_PistolNames[PISTOL_COUNT][] =
 	"CZ75-Auto", 
 	"Five-SeveN", 
 	"Tec-9"
+};
+
+stock char gC_ModeCVars[MODECVAR_COUNT][] = 
+{
+	"sv_accelerate", 
+	"sv_friction", 
+	"sv_airaccelerate", 
+	"sv_ladder_scale_speed", 
+	"sv_maxvelocity", 
+	"sv_gravity", 
+	"sv_enablebunnyhopping", 
+	"sv_autobunnyhopping", 
+	"sv_staminamax", 
+	"sv_staminalandcost", 
+	"sv_staminajumpcost", 
+	"sv_staminarecoveryrate", 
+	"sv_maxspeed", 
+	"sv_wateraccelerate", 
+	"sv_timebetweenducks", 
+	"sv_accelerate_use_weapon_speed", 
+	"sv_jump_impulse"
 };
 
 

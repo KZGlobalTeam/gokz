@@ -32,54 +32,11 @@ enum ObsMode
 	ObsMode_InEye,  // Follow a player in first person view
 	ObsMode_Chase,  // Follow a player in third person view
 	ObsMode_Roaming // Free roaming
-}
-
-enum
-{
-	ModeCVar_Accelerate = 0, 
-	ModeCVar_Friction, 
-	ModeCVar_AirAccelerate, 
-	ModeCVar_LadderScaleSpeed, 
-	ModeCVar_MaxVelocity, 
-	ModeCVar_Gravity, 
-	ModeCVar_EnableBunnyhopping, 
-	ModeCVar_AutoBunnyhopping, 
-	ModeCVar_StaminaMax, 
-	ModeCVar_StaminaLandCost, 
-	ModeCVar_StaminaJumpCost, 
-	ModeCVar_StaminaRecoveryRate, 
-	ModeCVar_MaxSpeed, 
-	ModeCVar_WaterAccelerate, 
-	ModeCVar_TimeBetweenDucks, 
-	ModeCVar_AccelerateUseWeaponSpeed, 
-	ModeCVar_JumpImpulse, 
-	MODECVAR_COUNT
-}
+};
 
 
 
 // =========================  DATA  ========================= //
-
-stock char gC_ModeCVars[MODECVAR_COUNT][] = 
-{
-	"sv_accelerate", 
-	"sv_friction", 
-	"sv_airaccelerate", 
-	"sv_ladder_scale_speed", 
-	"sv_maxvelocity", 
-	"sv_gravity", 
-	"sv_enablebunnyhopping", 
-	"sv_autobunnyhopping", 
-	"sv_staminamax", 
-	"sv_staminalandcost", 
-	"sv_staminajumpcost", 
-	"sv_staminarecoveryrate", 
-	"sv_maxspeed", 
-	"sv_wateraccelerate", 
-	"sv_timebetweenducks", 
-	"sv_accelerate_use_weapon_speed", 
-	"sv_jump_impulse"
-};
 
 stock char gC_WeaponNames[][] = 
 {

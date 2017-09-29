@@ -7,7 +7,6 @@
 
 
 static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded horizontal speed
-static float lastTickVerticalVelocity[MAXPLAYERS + 1];
 static int lastPlayerJumpTick[MAXPLAYERS + 1];
 
 
@@ -47,7 +46,6 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	}
 	
 	lastTickSpeed[client] = Movement_GetSpeed(client);
-	lastTickVerticalVelocity[client] = Movement_GetVerticalVelocity(client);
 }
 
 void OnStartTouch_JumpTracking(int client)

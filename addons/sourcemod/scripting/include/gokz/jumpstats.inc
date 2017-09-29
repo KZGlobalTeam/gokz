@@ -25,14 +25,14 @@ enum
 	JumpType_Fall, 
 	JumpType_Other, 
 	JUMPTYPE_COUNT
-}
+};
 
 enum
 {
 	StrafeDirection_None, 
 	StrafeDirection_Left, 
 	StrafeDirection_Right
-}
+};
 
 enum
 {
@@ -43,7 +43,7 @@ enum
 	DistanceTier_Godlike, 
 	DistanceTier_Ownage, 
 	DISTANCETIER_COUNT
-}
+};
 
 
 
@@ -59,7 +59,7 @@ stock char gC_JumpTypes[JUMPTYPE_COUNT][] =
 	"Ladderhop", 
 	"Fall", 
 	"Unknown Jump"
-}
+};
 
 stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] = 
 {
@@ -71,7 +71,7 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"LAH", 
 	"FL", 
 	"??"
-}
+};
 
 
 

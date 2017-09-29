@@ -18,8 +18,8 @@ enum
 	RecordType_Nub = 0, 
 	RecordType_Pro, 
 	RecordType_NubAndPro, 
-	RECORD_COUNT
-}
+	RECORDTYPE_COUNT
+};
 
 
 
