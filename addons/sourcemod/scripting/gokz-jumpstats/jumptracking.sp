@@ -87,7 +87,7 @@ static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 	BeginSync(client);
 	BeginDuration(client);
 	
-	Call_OnTakeoff(client, GetType(client));
+	Call_OnTakeoff(client, GetCurrentType(client));
 }
 
 static void EndJumpstat(int client)
@@ -163,6 +163,11 @@ static int jumpTypeCurrent[MAXPLAYERS + 1] =  { JumpType_Invalid, ... };
 int GetType(int client)
 {
 	return jumpTypeLast[client];
+}
+
+int GetCurrentType(int client)
+{
+	return jumpTypeCurrent[client];
 }
 
 bool GetValidJumpstat(int client)
