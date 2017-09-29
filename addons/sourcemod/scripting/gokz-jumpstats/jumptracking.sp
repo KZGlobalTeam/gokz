@@ -205,7 +205,7 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 	}
 	else if (ladderJump)
 	{
-		if (GetGameTickCount() - lastPlayerJumpTick[client] <= 3)
+		if (GetGameTickCount() - lastPlayerJumpTick[client] <= BHOP_ON_GROUND_TICKS)
 		{
 			return JumpType_Ladderhop;
 		}
