@@ -46,18 +46,6 @@ static char phrasesJumpBeam[JUMPBEAM_COUNT][] =
 	"Options Menu - Ground"
 };
 
-static char pistolNames[PISTOL_COUNT][] = 
-{
-	"P2000 / USP-S", 
-	"Glock-18", 
-	"P250", 
-	"Dual Berettas", 
-	"Deagle", 
-	"CZ75-Auto", 
-	"Five-SeveN", 
-	"Tec-9"
-};
-
 
 
 // =========================  PUBLIC  ========================= //
@@ -91,6 +79,11 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 		
 		switch (option)
 		{
+			case Option_Mode:
+			{
+				cameFromOptionsMenu[param1] = true;
+				DisplayModeMenu(param1);
+			}
 			case Option_Pistol:
 			{
 				cameFromOptionsMenu[param1] = true;
@@ -100,7 +93,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 			case Option_SlayOnEnd:CycleOption(param1, Option_SlayOnEnd, true);
 			default:CycleOption(param1, option, false);
 		}
-		if (param2 != 11) // Pistol
+		if (option != Option_Mode && option != Option_Pistol)
 		{
 			// Reopen the menu at the same place
 			DisplayOptionsMenu(param1, param2 / 6 * 6);
@@ -118,17 +111,18 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 
 static void OptionsMenuAddItems(int client, Menu menu)
 {
+	OptionsMenuAddMode(client, menu);
 	OptionsMenuAddTPMenu(client, menu);
 	OptionsMenuAddToggle(client, menu, Option_ShowingInfoPanel, "Options Menu - Info Panel");
 	OptionsMenuAddTimerText(client, menu);
 	OptionsMenuAddSpeedText(client, menu);
 	OptionsMenuAddShowingKeys(client, menu);
-	OptionsMenuAddToggle(client, menu, Option_ShowingPlayers, "Options Menu - Show Players");
 	OptionsMenuAddToggle(client, menu, Option_CheckpointMessages, "Options Menu - Checkpoint Messages");
 	OptionsMenuAddToggle(client, menu, Option_CheckpointSounds, "Options Menu - Checkpoint Sounds");
 	OptionsMenuAddToggle(client, menu, Option_TeleportSounds, "Options Menu - Teleport Sounds");
 	OptionsMenuAddToggle(client, menu, Option_ErrorSounds, "Options Menu - Error Sounds");
 	OptionsMenuAddToggle(client, menu, Option_ShowingWeapon, "Options Menu - Show Weapon");
+	OptionsMenuAddToggle(client, menu, Option_ShowingPlayers, "Options Menu - Show Players");
 	OptionsMenuAddPistol(client, menu);
 	OptionsMenuAddToggle(client, menu, Option_AutoRestart, "Options Menu - Auto Restart");
 	OptionsMenuAddToggle(client, menu, Option_SlayOnEnd, "Options Menu - Slay On End");
@@ -155,11 +149,19 @@ static void OptionsMenuAddToggle(int client, Menu menu, Option option, const cha
 	menu.AddItem(IntToStringEx(view_as<int>(option)), display);
 }
 
+static void OptionsMenuAddMode(int client, Menu menu)
+{
+	char display[32];
+	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Mode", 
+		client, gC_ModeNames[GetOption(client, Option_Mode)]);
+	menu.AddItem(IntToStringEx(view_as<int>(Option_Mode)), display);
+}
+
 static void OptionsMenuAddPistol(int client, Menu menu)
 {
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Pistol", 
-		client, pistolNames[GetOption(client, Option_Pistol)]);
+		client, gC_PistolNames[GetOption(client, Option_Pistol)]);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_Pistol)), display);
 }
 

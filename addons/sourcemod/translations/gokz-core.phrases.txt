@@ -415,6 +415,10 @@
 	{
 		"en"		"Advanced"
 	}
+    "Options Menu - Mode"
+    {
+        "en"        "Mode"
+    }
 	"Options Menu - Teleport Menu"
 	{
 		"en"		"Teleport menu"

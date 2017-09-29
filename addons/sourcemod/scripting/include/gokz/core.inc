@@ -220,6 +220,18 @@ stock char gC_TimeTypeNames[TIMETYPE_COUNT][] =
 	"PRO"
 };
 
+stock char gC_PistolNames[PISTOL_COUNT][] = 
+{
+	"P2000 / USP-S", 
+	"Glock-18", 
+	"P250", 
+	"Dual Berettas", 
+	"Deagle", 
+	"CZ75-Auto", 
+	"Five-SeveN", 
+	"Tec-9"
+};
+
 
 
 // =========================  FORWARDS  ========================= //
