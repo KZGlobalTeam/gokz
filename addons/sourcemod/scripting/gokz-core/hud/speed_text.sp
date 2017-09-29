@@ -97,11 +97,11 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 		{
 			if (IsPlayerAlive(player.id))
 			{
-				SetHudTextParams(-1.0, 0.75, 2.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.75, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 			else
 			{
-				SetHudTextParams(-1.0, 0.595, 2.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.595, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 		}
 	}

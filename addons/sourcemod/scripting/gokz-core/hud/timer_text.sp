@@ -106,11 +106,11 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 	{
 		case TimerText_Top:
 		{
-			SetHudTextParams(-1.0, 0.013, 2.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.013, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 		}
 		case TimerText_Bottom:
 		{
-			SetHudTextParams(-1.0, 0.957, 2.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.957, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 		}
 	}
 	
