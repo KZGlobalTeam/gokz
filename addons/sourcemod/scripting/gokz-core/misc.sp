@@ -420,10 +420,19 @@ static void SanitiseChatInput(char[] message, int maxlength)
 
 // =========================  VALID JUMP TRACKING  ========================= //
 
-#define VALID_JUMP_TAKEOFF_GRACE_TICKS 2 // Ticks after takeoff when velocity can be affected
+/*
+	Valid jump tracking is intended to detect when the player
+	has performed a normal jump that hasn't been affected by
+	(unexpected) teleports or other cases that may result in
+	the player becoming airborne, such as spawning.
+	
+	There are ways to trick the plugin, but it is rather
+	unlikely to happen during normal gameplay.
+*/
 
 static bool validJump[MAXPLAYERS + 1];
-static int recentTeleports[MAXPLAYERS + 1];
+static int lastOriginTeleportTick[MAXPLAYERS + 1];
+static int lastVelocityTeleportTick[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -442,7 +451,7 @@ static void InvalidateJump(int client)
 void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
 	// Make sure leaving the ground wasn't caused by anything fishy
-	if (Movement_GetMoveType(client) == MOVETYPE_WALK && recentTeleports[client] == 0)
+	if (IsValidStopTouchGround(client))
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
@@ -451,6 +460,31 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	{
 		InvalidateJump(client);
 	}
+}
+
+static bool IsValidStopTouchGround(int client)
+{
+	if (Movement_GetMoveType(client) != MOVETYPE_WALK)
+	{
+		return false;
+	}
+	
+	// Return false if there was a recent teleport
+	
+	int originTpTicks = GetGameTickCount() - lastOriginTeleportTick[client];
+	if (originTpTicks <= 2)
+	{
+		return false;
+	}
+	
+	// Allow 0 ticks since last velocity teleport in case mode has set speed already
+	int velocityTpTicks = GetGameTickCount() - lastVelocityTeleportTick[client];
+	if (velocityTpTicks <= 2 && velocityTpTicks != 0)
+	{
+		return false;
+	}
+	
+	return true;
 }
 
 void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
@@ -485,20 +519,18 @@ void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 {
 	if (origin)
 	{
+		lastOriginTeleportTick[client] = GetGameTickCount();
 		InvalidateJump(client);
 	}
-	else if (velocity && gI_OldCmdNum[client] - Movement_GetTakeoffCmdNum(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
-	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
-		InvalidateJump(client);
+	else if (velocity)
+	{
+		lastVelocityTeleportTick[client] = GetGameTickCount();
+		// Allow short grace period for velocity so that modes may set player speed
+		if (GetGameTickCount() - Movement_GetTakeoffTick(client) > 1)
+		{
+			InvalidateJump(client);
+		}
 	}
-	// Count recent teleports
-	recentTeleports[client]++;
-	CreateTimer(0.1, Timer_DecrementRecentTeleports, client);
-}
-
-public Action Timer_DecrementRecentTeleports(Handle timer, int client)
-{
-	recentTeleports[client]--;
 }
 
 

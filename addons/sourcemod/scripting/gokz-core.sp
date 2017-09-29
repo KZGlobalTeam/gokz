@@ -37,7 +37,6 @@ Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
-int gI_OldCmdNum[MAXPLAYERS + 1];
 
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
@@ -180,7 +179,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
-	UpdateOldVariables(client, cmdnum);
+	UpdateOldVariables(client);
 	return Plugin_Continue;
 }
 
@@ -420,12 +419,11 @@ static void CreateHudSynchronizers()
 	CreateHudSynchronizerTimerText();
 }
 
-static void UpdateOldVariables(int client, int cmdnum)
+static void UpdateOldVariables(int client)
 {
 	if (IsPlayerAlive(client))
 	{
 		Movement_GetOrigin(client, gF_OldOrigin[client]);
 		gB_OldDucking[client] = Movement_GetDucking(client);
-		gI_OldCmdNum[client] = cmdnum;
 	}
 } 
