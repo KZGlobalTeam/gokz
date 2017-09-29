@@ -431,6 +431,7 @@ static void SanitiseChatInput(char[] message, int maxlength)
 */
 
 static bool validJump[MAXPLAYERS + 1];
+static int lastJumpTick[MAXPLAYERS + 1];
 static int lastOriginTeleportTick[MAXPLAYERS + 1];
 static int lastVelocityTeleportTick[MAXPLAYERS + 1];
 
@@ -454,6 +455,7 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	if (IsValidStopTouchGround(client))
 	{
 		validJump[client] = true;
+		lastJumpTick[client] = GetGameTickCount();
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
 	}
 	else

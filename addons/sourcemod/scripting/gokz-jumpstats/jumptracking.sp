@@ -8,6 +8,7 @@
 
 static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded horizontal speed
 static float lastTickVerticalVelocity[MAXPLAYERS + 1];
+static int lastPlayerJumpTick[MAXPLAYERS + 1];
 
 
 
@@ -63,6 +64,7 @@ void OnPlayerJump_JumpTracking(int client, bool jumpbug)
 	{
 		InvalidateJumpstat(client);
 	}
+	lastPlayerJumpTick[client] = GetGameTickCount();
 }
 
 void OnJumpInvalidated_JumpTracking(int client)
@@ -203,7 +205,14 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 	}
 	else if (ladderJump)
 	{
-		return JumpType_LadderJump;
+		if (GetGameTickCount() - lastPlayerJumpTick[client] <= 3)
+		{
+			return JumpType_Ladderhop;
+		}
+		else
+		{
+			return JumpType_LadderJump;
+		}
 	}
 	else if (!jumped)
 	{

@@ -21,6 +21,7 @@ enum
 	JumpType_MultiBhop, 
 	JumpType_WeirdJump, 
 	JumpType_LadderJump, 
+	JumpType_Ladderhop, 
 	JumpType_Fall, 
 	JumpType_Other, 
 	JUMPTYPE_COUNT
@@ -55,6 +56,7 @@ stock char gC_JumpTypes[JUMPTYPE_COUNT][] =
 	"Multi Bunnyhop", 
 	"Weird Jump", 
 	"Ladder Jump", 
+	"Ladderhop", 
 	"Fall", 
 	"Unknown Jump"
 }
@@ -66,6 +68,7 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"MBH", 
 	"WJ", 
 	"LAJ", 
+	"LAH", 
 	"FL", 
 	"??"
 }
@@ -75,7 +78,7 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 // =========================  OTHER  ========================= //
 
 // Used and recommended for key value files
-stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump" };
+stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "ladderhop" };
 stock char gC_KeysMode[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
 stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =  { "meh", "impressive", "perfect", "godlike", "ownage" };
 
