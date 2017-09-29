@@ -141,7 +141,6 @@ public void OnClientPutInServer(int client)
 	SetupClientOptions(client);
 	SetupClientTimer(client);
 	SetupClientPause(client);
-	SetupClientBhopTriggers(client);
 	SetupClientHidePlayers(client);
 	SetupClientTeleports(client);
 	SetupClientJoinTeam(client);
