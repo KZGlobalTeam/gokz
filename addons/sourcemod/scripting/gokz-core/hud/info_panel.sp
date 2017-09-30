@@ -9,6 +9,17 @@
 
 
 
+// =========================  PUBLIC  ========================= //
+
+bool IsDrawingInfoPanel(int client)
+{
+	KZPlayer player = new KZPlayer(client);
+	return player.showingInfoPanel != ShowingInfoPanel_Disabled
+	 && !NothingEnabledInInfoPanel(player);
+}
+
+
+
 // =========================  LISTENERS  ========================= //
 
 void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
@@ -27,9 +38,7 @@ static void UpdateInfoPanel(int client)
 {
 	KZPlayer player = new KZPlayer(client);
 	
-	if (player.fake
-		 || player.showingInfoPanel == ShowingInfoPanel_Disabled
-		 || NothingEnabledInInfoPanel(player))
+	if (player.fake || !IsDrawingInfoPanel(player.id))
 	{
 		return;
 	}
