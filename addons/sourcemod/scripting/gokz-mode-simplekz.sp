@@ -42,7 +42,9 @@ float gF_PreVelMod[MAXPLAYERS + 1];
 float gF_PreVelModLanding[MAXPLAYERS + 1];
 bool gB_PreTurningLeft[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
+bool gB_OldOnGround[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
+float gF_OldVelocity[MAXPLAYERS + 1][3];
 bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
@@ -115,6 +117,29 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
+// =========================  GENERAL  ========================= //
+
+public void OnGameFrame()
+{
+	/* 
+		Why are we using OnGameFrame() for slope boost fix?
+		
+		MovementAPI measures landing speed, calls forwards etc. during 
+		OnPlayerRunCmd.	We want the slope fix to apply it's speed before 
+		MovementAPI does this, so that we can apply tweaks based on the 
+		'fixed' landing speed.
+	*/
+	for (int client = 1; client < MaxClients; client++)
+	{
+		if (IsClientInGame(client) && IsPlayerAlive(client) && IsUsingMode(client))
+		{
+			SlopeFix(client);
+		}
+	}
+}
+
+
+
 // =========================  CLIENT  ========================= //
 
 public void OnClientPutInServer(int client)
@@ -139,7 +164,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	
 	gB_Jumpbugged[player.id] = false;
 	gI_OldButtons[player.id] = buttons;
+	gB_OldOnGround[player.id] = Movement_GetOnGround(client);
 	gF_OldAngles[player.id] = angles;
+	Movement_GetVelocity(client, gF_OldVelocity[client]);
 	
 	return Plugin_Continue;
 }
@@ -389,6 +416,90 @@ static float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 		return FloatMin(player.landingSpeed, (0.2 * player.landingSpeed + 200) * gF_PreVelModLanding[player.id]);
 	}
 	return player.landingSpeed;
+}
+
+
+
+// SLOPEFIX
+// ORIGINAL AUTHORS : Mev & Blacky
+// URL : https://forums.alliedmods.net/showthread.php?p=2322788
+// NOTE : Modified by DanZay for this plugin
+
+void SlopeFix(int client)
+{
+	// Check if player landed on the ground
+	if (Movement_GetOnGround(client) && !gB_OldOnGround[client])
+	{
+		// Set up and do tracehull to find out if the player landed on a slope
+		float vPos[3];
+		GetEntPropVector(client, Prop_Data, "m_vecOrigin", vPos);
+		
+		float vMins[3];
+		GetEntPropVector(client, Prop_Send, "m_vecMins", vMins);
+		
+		float vMaxs[3];
+		GetEntPropVector(client, Prop_Send, "m_vecMaxs", vMaxs);
+		
+		float vEndPos[3];
+		vEndPos[0] = vPos[0];
+		vEndPos[1] = vPos[1];
+		vEndPos[2] = vPos[2] - FindConVar("sv_maxvelocity").FloatValue;
+		
+		TR_TraceHullFilter(vPos, vEndPos, vMins, vMaxs, MASK_PLAYERSOLID_BRUSHONLY, TraceRayDontHitSelf, client);
+		
+		if (TR_DidHit())
+		{
+			// Gets the normal vector of the surface under the player
+			float vPlane[3], vLast[3];
+			TR_GetPlaneNormal(INVALID_HANDLE, vPlane);
+			
+			// Make sure it's not flat ground and not a surf ramp (1.0 = flat ground, < 0.7 = surf ramp)
+			if (0.7 <= vPlane[2] < 1.0)
+			{
+				/*
+					Copy the ClipVelocity function from sdk2013 
+					(https://mxr.alliedmods.net/hl2sdk-sdk2013/source/game/shared/gamemovement.cpp#3145)
+					With some minor changes to make it actually work
+					*/
+				vLast[0] = gF_OldVelocity[client][0];
+				vLast[1] = gF_OldVelocity[client][1];
+				vLast[2] = gF_OldVelocity[client][2];
+				vLast[2] -= (FindConVar("sv_gravity").FloatValue * GetTickInterval() * 0.5);
+				
+				float fBackOff = GetVectorDotProduct(vLast, vPlane);
+				
+				float change, vVel[3];
+				for (int i; i < 2; i++)
+				{
+					change = vPlane[i] * fBackOff;
+					vVel[i] = vLast[i] - change;
+				}
+				
+				float fAdjust = GetVectorDotProduct(vVel, vPlane);
+				if (fAdjust < 0.0)
+				{
+					for (int i; i < 2; i++)
+					{
+						vVel[i] -= (vPlane[i] * fAdjust);
+					}
+				}
+				
+				vVel[2] = 0.0;
+				vLast[2] = 0.0;
+				
+				// Make sure the player is going down a ramp by checking if they actually will gain speed from the boost
+				if (GetVectorLength(vVel) > GetVectorLength(vLast))
+				{
+					TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, vVel);
+				}
+			}
+		}
+	}
+}
+
+public bool TraceRayDontHitSelf(int entity, int mask, any data)
+{
+	return entity != data && !(0 < entity <= MaxClients);
 }
 
 
