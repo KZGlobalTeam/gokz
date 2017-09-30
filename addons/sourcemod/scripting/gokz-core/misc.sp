@@ -117,14 +117,7 @@ void PrintConnectMessage(int client)
 
 void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconnect event
 {
-	if (!gCV_gokz_connection_messages.BoolValue)
-	{
-		return;
-	}
-	
-	SetEventBroadcast(event, true);
-	
-	if (IsFakeClient(client))
+	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
 	{
 		return;
 	}
@@ -158,7 +151,7 @@ void OnTimerEnd_SlayOnEnd(int client)
 public Action Timer_SlayPlayer(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client) && IsPlayerAlive(client))
+	if (IsValidClient(client))
 	{
 		ForcePlayerSuicide(client);
 	}
@@ -357,7 +350,7 @@ void JoinTeam(int client, int team)
 	}
 	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
 	{
-		// Switch teams without killing them (no death notice)
+		ForcePlayerSuicide(client);
 		CS_SwitchTeam(client, team);
 		CS_RespawnPlayer(client);
 		if (hasSavedPosition[client])

@@ -193,17 +193,18 @@ public Action OnClientCommandKeyValues(int client, KeyValues kv)
 	return Plugin_Continue;
 }
 
-public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
+public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect pre hook
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (!IsValidClient(client))
+	if (IsValidClient(client))
 	{
-		return;
+		SetEventBroadcast(event, true); // Block the game printing a disconnect message
+		PrintDisconnectMessage(client, event);
 	}
-	PrintDisconnectMessage(client, event);
+	return Plugin_Continue;
 }
 
-public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn hook
+public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	OnPlayerSpawn_Modes(client);
@@ -218,14 +219,16 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	UpdateTPMenu(client);
 }
 
-public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death hook
+public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
+	SetEventBroadcast(event, true); // Block death notices
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	OnPlayerDeath_Timer(client);
 	OnPlayerDeath_ValidJump(client);
+	return Plugin_Continue;
 }
 
-public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team hook
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team pre hook
 {
 	SetEventBroadcast(event, true); // Block join team messages
 	return Plugin_Continue;
@@ -374,7 +377,7 @@ public void OnEntitySpawned(int entity)
 	OnEntitySpawned_MapBhopTriggers(entity);
 }
 
-public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start hook
+public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start post no copy hook
 {
 	OnRoundStart_Timer();
 	OnRoundStart_ForceAllTalk();
@@ -391,11 +394,11 @@ static void CreateRegexes()
 
 static void CreateHooks()
 {
-	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Post);
+	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
-	HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
+	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
-	HookEvent("round_start", OnRoundStart, EventHookMode_Post);
+	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
 	Handle gameData = LoadGameConfigFile("sdktools.games");
