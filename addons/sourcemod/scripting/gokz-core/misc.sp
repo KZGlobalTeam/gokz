@@ -204,15 +204,36 @@ Action OnNormalSound_StopSounds(int entity)
 
 // =========================  PLAYER MODELS  ========================= //
 
-static char playerModelT[256];
-static char playerModelCT[256];
+#define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
+#define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
 
 void UpdatePlayerModel(int client)
 {
+	if (gCV_gokz_player_models.BoolValue)
+	{
+		// Do this after a delay so that gloves apply correctly after spawning
+		CreateTimer(0.1, Timer_UpdatePlayerModel, GetClientUserId(client));
+	}
+}
+
+public Action Timer_UpdatePlayerModel(Handle timer, int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
 	switch (GetClientTeam(client))
 	{
-		case CS_TEAM_T:SetEntityModel(client, playerModelT);
-		case CS_TEAM_CT:SetEntityModel(client, playerModelCT);
+		case CS_TEAM_T:
+		{
+			SetEntityModel(client, PLAYER_MODEL_T);
+		}
+		case CS_TEAM_CT:
+		{
+			SetEntityModel(client, PLAYER_MODEL_CT);
+		}
 	}
 	
 	UpdatePlayerModelAlpha(client);
@@ -221,20 +242,15 @@ void UpdatePlayerModel(int client)
 void UpdatePlayerModelAlpha(int client)
 {
 	SetEntityRenderMode(client, RENDER_TRANSCOLOR);
-	SetEntityRenderColor(client, _, _, _, gCV_PlayerModelAlpha.IntValue);
+	SetEntityRenderColor(client, _, _, _, gCV_gokz_player_models_alpha.IntValue);
 }
 
 void OnMapStart_PlayerModel()
 {
 	SetConVarInt(gCV_DisableImmunityAlpha, 1); // Ensures player transparency works	
 	
-	GetConVarString(gCV_PlayerModelT, playerModelT, sizeof(playerModelT));
-	GetConVarString(gCV_PlayerModelCT, playerModelCT, sizeof(playerModelCT));
-	
-	PrecacheModel(playerModelT, true);
-	AddFileToDownloadsTable(playerModelT);
-	PrecacheModel(playerModelCT, true);
-	AddFileToDownloadsTable(playerModelCT);
+	PrecacheModel(PLAYER_MODEL_T, true);
+	PrecacheModel(PLAYER_MODEL_CT, true);
 }
 
 
