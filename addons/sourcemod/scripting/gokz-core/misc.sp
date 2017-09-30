@@ -107,7 +107,7 @@ void OnOptionChanged_HideWeapon(int client, Option option)
 
 void PrintConnectMessage(int client)
 {
-	if (!GetConVarBool(gCV_ConnectionMessages) || IsFakeClient(client))
+	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
 	{
 		return;
 	}
@@ -117,7 +117,7 @@ void PrintConnectMessage(int client)
 
 void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconnect event
 {
-	if (!GetConVarBool(gCV_ConnectionMessages))
+	if (!gCV_gokz_connection_messages.BoolValue)
 	{
 		return;
 	}
@@ -140,7 +140,7 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 
 void OnRoundStart_ForceAllTalk()
 {
-	SetConVarInt(gCV_FullAlltalk, 1);
+	gCV_sv_full_alltalk.IntValue = 1;
 }
 
 
@@ -247,7 +247,7 @@ void UpdatePlayerModelAlpha(int client)
 
 void OnMapStart_PlayerModel()
 {
-	SetConVarInt(gCV_DisableImmunityAlpha, 1); // Ensures player transparency works	
+	gCV_sv_disable_immunity_alpha.IntValue = 1; // Ensures player transparency works	
 	
 	PrecacheModel(PLAYER_MODEL_T, true);
 	PrecacheModel(PLAYER_MODEL_CT, true);
@@ -388,7 +388,7 @@ void OnTimerStart_JoinTeam(int client)
 
 Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 {
-	if (!GetConVarBool(gCV_ChatProcessing))
+	if (!gCV_gokz_chat_processing.BoolValue)
 	{
 		return Plugin_Continue;
 	}

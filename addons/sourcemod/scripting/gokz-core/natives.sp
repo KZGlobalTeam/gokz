@@ -66,7 +66,7 @@ public int Native_GetLoadedModeCount(Handle plugin, int numParams)
 
 public int Native_GetDefaultMode(Handle plugin, int numParams)
 {
-	return gCV_DefaultMode.IntValue;
+	return gCV_gokz_default_mode.IntValue;
 }
 
 public int Native_PrintToChat(Handle plugin, int numParams)
@@ -79,7 +79,7 @@ public int Native_PrintToChat(Handle plugin, int numParams)
 	if (addPrefix)
 	{
 		char prefix[64];
-		gCV_ChatPrefix.GetString(prefix, sizeof(prefix));
+		gCV_gokz_chat_prefix.GetString(prefix, sizeof(prefix));
 		Format(buffer, sizeof(buffer), "%s%s", prefix, buffer);
 	}
 	CPrintToChat(client, "%s", buffer);

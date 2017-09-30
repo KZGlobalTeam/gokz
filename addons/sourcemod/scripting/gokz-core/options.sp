@@ -98,7 +98,7 @@ void OnModeUnloaded_Options(int mode)
 
 static void SetDefaultOptions(int client)
 {
-	SetOption(client, Option_Mode, GetConVarInt(gCV_DefaultMode));
+	SetOption(client, Option_Mode, GOKZ_GetDefaultMode());
 	SetOption(client, Option_Style, Style_Normal);
 	SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
 	SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
