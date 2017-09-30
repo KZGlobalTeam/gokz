@@ -30,7 +30,7 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	
 	if (!Movement_GetOnGround(client) && GetValidJumpstat(client))
 	{
-		if (CheckGravity(client) && CheckBaseVelocity(client))
+		if (CheckGravity(client) && CheckBaseVelocity(client) && CheckInWater(client))
 		{
 			// Passed all checks
 			UpdateHeight(client);
@@ -129,6 +129,12 @@ static bool CheckBaseVelocity(int client)
 		return false;
 	}
 	return true;
+}
+
+static bool CheckInWater(int client)
+{
+	int waterLevel = GetEntProp(client, Prop_Data, "m_nWaterLevel");
+	return waterLevel == 0;
 }
 
 
