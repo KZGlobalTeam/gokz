@@ -235,11 +235,11 @@
 	}
 	"Option - Slay On End - Enable"
 	{
-		"en"		"{grey}You will now be slain after finishing a time. This helps de-glitch your demo recordings."
+		"en"		"{grey}You will now be slain shortly after completing a course. This helps de-glitch POV demo recordings."
 	}
 	"Option - Slay On End - Disable"
 	{
-		"en"		"{grey}You will no longer be slain after finishing a time."
+		"en"		"{grey}You will no longer be slain after completing a course."
 	}
 	
 	
