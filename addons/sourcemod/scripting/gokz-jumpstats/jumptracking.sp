@@ -7,7 +7,7 @@
 
 
 static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded horizontal speed
-static float lastTickVerticalVelocity[MAXPLAYERS + 1];
+static int lastPlayerJumpTick[MAXPLAYERS + 1];
 
 
 
@@ -30,7 +30,7 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	
 	if (!Movement_GetOnGround(client) && GetValidJumpstat(client))
 	{
-		if (CheckGravity(client) && CheckBaseVelocity(client))
+		if (CheckGravity(client) && CheckBaseVelocity(client) && CheckInWater(client))
 		{
 			// Passed all checks
 			UpdateHeight(client);
@@ -46,7 +46,6 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	}
 	
 	lastTickSpeed[client] = Movement_GetSpeed(client);
-	lastTickVerticalVelocity[client] = Movement_GetVerticalVelocity(client);
 }
 
 void OnStartTouch_JumpTracking(int client)
@@ -63,6 +62,7 @@ void OnPlayerJump_JumpTracking(int client, bool jumpbug)
 	{
 		InvalidateJumpstat(client);
 	}
+	lastPlayerJumpTick[client] = GetGameTickCount();
 }
 
 void OnJumpInvalidated_JumpTracking(int client)
@@ -87,7 +87,7 @@ static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 	BeginSync(client);
 	BeginDuration(client);
 	
-	Call_OnTakeoff(client, GetType(client));
+	Call_OnTakeoff(client, GetCurrentType(client));
 }
 
 static void EndJumpstat(int client)
@@ -131,6 +131,12 @@ static bool CheckBaseVelocity(int client)
 	return true;
 }
 
+static bool CheckInWater(int client)
+{
+	int waterLevel = GetEntProp(client, Prop_Data, "m_nWaterLevel");
+	return waterLevel == 0;
+}
+
 
 
 // =========================  TYPE  ========================= //
@@ -163,6 +169,11 @@ static int jumpTypeCurrent[MAXPLAYERS + 1] =  { JumpType_Invalid, ... };
 int GetType(int client)
 {
 	return jumpTypeLast[client];
+}
+
+int GetCurrentType(int client)
+{
+	return jumpTypeCurrent[client];
 }
 
 bool GetValidJumpstat(int client)
@@ -198,7 +209,14 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 	}
 	else if (ladderJump)
 	{
-		return JumpType_LadderJump;
+		if (GetGameTickCount() - lastPlayerJumpTick[client] <= BHOP_ON_GROUND_TICKS)
+		{
+			return JumpType_Ladderhop;
+		}
+		else
+		{
+			return JumpType_LadderJump;
+		}
 	}
 	else if (!jumped)
 	{

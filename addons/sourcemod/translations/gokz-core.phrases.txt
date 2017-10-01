@@ -1,27 +1,5 @@
 "Phrases"
 {
-	// General
-	"Mode - Vanilla"
-	{
-		"en"		"Vanilla"
-	}
-	"Mode - SimpleKZ"
-	{
-		"en"		"SimpleKZ"
-	}
-	"Mode - KZTimer"
-	{
-		"en"		"KZTimer"
-	}
-	"Time Type - NUB"
-	{
-		"en"		"NUB"
-	}
-	"Time Type - PRO"
-	{
-		"en"		"PRO"
-	}
-
 	// General Chat Messages ////////////////////////////////////////////////////////////
 	"Beat Map (NUB)"
 	{
@@ -257,11 +235,11 @@
 	}
 	"Option - Slay On End - Enable"
 	{
-		"en"		"{grey}You will now be slain after finishing a time. This helps de-glitch your demo recordings."
+		"en"		"{grey}You will now be slain shortly after completing a course. This helps de-glitch POV demo recordings."
 	}
 	"Option - Slay On End - Disable"
 	{
-		"en"		"{grey}You will no longer be slain after finishing a time."
+		"en"		"{grey}You will no longer be slain after completing a course."
 	}
 	
 	
@@ -415,6 +393,10 @@
 	{
 		"en"		"Advanced"
 	}
+    "Options Menu - Mode"
+    {
+        "en"        "Mode"
+    }
 	"Options Menu - Teleport Menu"
 	{
 		"en"		"Teleport menu"

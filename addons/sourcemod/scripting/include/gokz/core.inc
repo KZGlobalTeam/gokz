@@ -27,35 +27,14 @@ enum
 	TimeType_Nub = 0, 
 	TimeType_Pro, 
 	TIMETYPE_COUNT
-}
-
-enum
-{
-	ModeCVar_Accelerate = 0, 
-	ModeCVar_Friction, 
-	ModeCVar_AirAccelerate, 
-	ModeCVar_LadderScaleSpeed, 
-	ModeCVar_MaxVelocity, 
-	ModeCVar_Gravity, 
-	ModeCVar_EnableBunnyhopping, 
-	ModeCVar_AutoBunnyhopping, 
-	ModeCVar_StaminaMax, 
-	ModeCVar_StaminaLandCost, 
-	ModeCVar_StaminaJumpCost, 
-	ModeCVar_StaminaRecoveryRate, 
-	ModeCVar_MaxSpeed, 
-	ModeCVar_WaterAccelerate, 
-	ModeCVar_TimeBetweenDucks, 
-	ModeCVar_AccelerateUseWeaponSpeed, 
-	MODECVAR_COUNT
-}
+};
 
 enum
 {
 	MapPrefix_Other = 0, 
 	MapPrefix_KZPro, 
 	MAPPREFIX_COUNT
-}
+};
 
 enum Option
 {
@@ -77,7 +56,7 @@ enum Option
 	Option_SpeedText, 
 	Option_JumpBeam, 
 	OPTION_COUNT
-}
+};
 
 enum
 {
@@ -85,13 +64,13 @@ enum
 	Mode_SimpleKZ, 
 	Mode_KZTimer, 
 	MODE_COUNT
-}
+};
 
 enum
 {
 	Style_Normal = 0, 
 	STYLE_COUNT
-}
+};
 
 enum
 {
@@ -99,14 +78,14 @@ enum
 	ShowingTPMenu_Simple, 
 	ShowingTPMenu_Advanced, 
 	TPMENU_COUNT
-}
+};
 
 enum
 {
 	ShowingInfoPanel_Disabled = 0, 
 	ShowingInfoPanel_Enabled, 
 	SHOWINGINFOPANEL_COUNT
-}
+};
 
 enum
 {
@@ -114,35 +93,35 @@ enum
 	ShowingKeys_Always, 
 	ShowingKeys_Disabled, 
 	SHOWINGKEYS_COUNT
-}
+};
 
 enum
 {
 	ShowingPlayers_Disabled = 0, 
 	ShowingPlayers_Enabled, 
 	SHOWINGPLAYERS_COUNT
-}
+};
 
 enum
 {
 	ShowingWeapon_Disabled = 0, 
 	ShowingWeapon_Enabled, 
 	SHOWINGWEAPON_COUNT
-}
+};
 
 enum
 {
 	AutoRestart_Disabled = 0, 
 	AutoRestart_Enabled, 
 	AUTORESTART_COUNT
-}
+};
 
 enum
 {
 	SlayOnEnd_Disabled = 0, 
 	SlayOnEnd_Enabled, 
 	SLAYONEND_COUNT
-}
+};
 
 enum
 {
@@ -155,35 +134,35 @@ enum
 	Pistol_FiveSeveN, 
 	Pistol_Tec9, 
 	PISTOL_COUNT
-}
+};
 
 enum
 {
 	CheckpointMessages_Disabled = 0, 
 	CheckpointMessages_Enabled, 
 	CHECKPOINTMESSAGES_COUNT
-}
+};
 
 enum
 {
 	CheckpointSounds_Disabled = 0, 
 	CheckpointSounds_Enabled, 
 	CHECKPOINTSOUNDS_COUNT
-}
+};
 
 enum
 {
 	TeleportSounds_Disabled = 0, 
 	TeleportSounds_Enabled, 
 	TELEPORTSOUNDS_COUNT
-}
+};
 
 enum
 {
 	ErrorSounds_Disabled = 0, 
 	ErrorSounds_Enabled, 
 	ERRORSOUNDS_COUNT
-}
+};
 
 enum
 {
@@ -192,7 +171,7 @@ enum
 	TimerText_Bottom, 
 	TimerText_Top, 
 	TIMERTEXT_COUNT
-}
+};
 
 enum
 {
@@ -200,7 +179,7 @@ enum
 	SpeedText_InfoPanel, 
 	SpeedText_Bottom, 
 	SPEEDTEXT_COUNT
-}
+};
 
 enum
 {
@@ -210,7 +189,29 @@ enum
 	JumpBeam_FeetAndHead, 
 	JumpBeam_Ground, 
 	JUMPBEAM_COUNT
-}
+};
+
+enum
+{
+	ModeCVar_Accelerate = 0, 
+	ModeCVar_Friction, 
+	ModeCVar_AirAccelerate, 
+	ModeCVar_LadderScaleSpeed, 
+	ModeCVar_MaxVelocity, 
+	ModeCVar_Gravity, 
+	ModeCVar_EnableBunnyhopping, 
+	ModeCVar_AutoBunnyhopping, 
+	ModeCVar_StaminaMax, 
+	ModeCVar_StaminaLandCost, 
+	ModeCVar_StaminaJumpCost, 
+	ModeCVar_StaminaRecoveryRate, 
+	ModeCVar_MaxSpeed, 
+	ModeCVar_WaterAccelerate, 
+	ModeCVar_TimeBetweenDucks, 
+	ModeCVar_AccelerateUseWeaponSpeed, 
+	ModeCVar_JumpImpulse, 
+	MODECVAR_COUNT
+};
 
 
 
@@ -239,6 +240,39 @@ stock char gC_TimeTypeNames[TIMETYPE_COUNT][] =
 {
 	"NUB", 
 	"PRO"
+};
+
+stock char gC_PistolNames[PISTOL_COUNT][] = 
+{
+	"P2000 / USP-S", 
+	"Glock-18", 
+	"P250", 
+	"Dual Berettas", 
+	"Deagle", 
+	"CZ75-Auto", 
+	"Five-SeveN", 
+	"Tec-9"
+};
+
+stock char gC_ModeCVars[MODECVAR_COUNT][] = 
+{
+	"sv_accelerate", 
+	"sv_friction", 
+	"sv_airaccelerate", 
+	"sv_ladder_scale_speed", 
+	"sv_maxvelocity", 
+	"sv_gravity", 
+	"sv_enablebunnyhopping", 
+	"sv_autobunnyhopping", 
+	"sv_staminamax", 
+	"sv_staminalandcost", 
+	"sv_staminajumpcost", 
+	"sv_staminarecoveryrate", 
+	"sv_maxspeed", 
+	"sv_wateraccelerate", 
+	"sv_timebetweenducks", 
+	"sv_accelerate_use_weapon_speed", 
+	"sv_jump_impulse"
 };
 
 
@@ -489,6 +523,33 @@ forward void GOKZ_OnJumpInvalidated(int client);
  */
 forward void GOKZ_OnJoinTeam(int client, int team);
 
+/**
+ * Called when a mode has been loaded.
+ *
+ * @param mode			Mode loaded.
+ * @noreturn
+ */
+forward void GOKZ_OnModeLoaded(int mode);
+
+/**
+ * Called when a mode has been unloaded.
+ *
+ * @param mode			Mode unloaded.
+ * @noreturn
+ */
+forward void GOKZ_OnModeUnloaded(int mode);
+
+/**
+ * Called when a plugin other than gokz-core calls a native 
+ * that may affect the player's timer or teleport count in 
+ * their favour e.g. GOKZ_StartTimer, GOKZ_EndTimer,
+ * GOKZ_SetCurrentTime and GOKZ_SetTeleportCount.
+ *
+ * @param plugin		Handle of the calling plugin.
+ * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
+ */
+forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
+
 
 
 // =========================  NATIVES  ========================= //
@@ -515,7 +576,7 @@ native void GOKZ_SetModeLoaded(int mode, bool enabled);
  *
  * @return				Number of loaded modes.
  */
-native int GOKZ_GetLoadedModeCount(int mode);
+native int GOKZ_GetLoadedModeCount();
 
 /**
  * Gets the default movement mode as set by convar gokz_default_mode.
@@ -527,7 +588,7 @@ native int GOKZ_GetDefaultMode();
 /**
  * Prints a message to a client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
- * the beginning of the message.
+ * the beginning of the message e.g. "{default}Hello!".
  *
  * @param client		Client index.
  * @param addPrefix		Whether to add the chat prefix.
@@ -538,47 +599,24 @@ native int GOKZ_GetDefaultMode();
 native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, any...);
 
 /**
- * Prints a message to all clients' chat, formatting colours and optionally 
- * adding the chat prefix. If using the chat prefix, specify a colour at 
- * the beginning of the message.
- *
- * @param client		Client index.
- * @param addPrefix		Whether to add the chat prefix.
- * @param format		Formatting rules.
- * @param any			Variable number of format parameters.
- * @noreturn
- */
-stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
-{
-	char buffer[1024];
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		if (IsClientInGame(client))
-		{
-			SetGlobalTransTarget(client);
-			VFormat(buffer, sizeof(buffer), format, 3);
-			GOKZ_PrintToChat(client, addPrefix, buffer);
-		}
-	}
-}
-
-/**
  * Starts the player's timer for a course on the current map.
+ * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @noreturn
+ * @return				Whether native was allowed to proceed.
  */
-native void GOKZ_StartTimer(int client, int course);
+native bool GOKZ_StartTimer(int client, int course);
 
 /**
  * Ends the player's timer for a course on the current map.
+ * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @noreturn
+ * @return				Whether native was allowed to proceed.
  */
-native void GOKZ_EndTimer(int client, int course);
+native bool GOKZ_EndTimer(int client, int course);
 
 /**
  * Forces the player's timer to stop. Intended for run invalidation.
@@ -638,6 +676,16 @@ native bool GOKZ_GetPaused(int client);
 native float GOKZ_GetCurrentTime(int client);
 
 /**
+ * Gets the player's current run time.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client    	Client index.
+ * @param time			Run time to set to.
+ * @return				Whether native was allowed to proceed.
+ */
+native bool GOKZ_SetCurrentTime(int client, float time);
+
+/**
  * Gets the player's current checkpoint count.
  *
  * @param client    	Client index.
@@ -646,12 +694,32 @@ native float GOKZ_GetCurrentTime(int client);
 native int GOKZ_GetCheckpointCount(int client);
 
 /**
+ * Sets the player's current checkpoint count.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client    	Client index.
+ * @param cpCount		Checkpoint count to set to.
+ * @return				Whether native was allowed to proceed.
+ */
+native int GOKZ_SetCheckpointCount(int client, int cpCount);
+
+/**
  * Gets the player's current teleport count.
  *
  * @param client    	Client index.
  * @return				Player's current teleport count.
  */
 native int GOKZ_GetTeleportCount(int client);
+
+/**
+ * Sets the player's current teleport count.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client    	Client index.
+ * @param tpCount		Teleport count to set to.
+ * @return				Whether native was allowed to proceed.
+ */
+native bool GOKZ_SetTeleportCount(int client, int tpCount);
 
 /**
  * Teleports the player to start, or respawns them.
@@ -812,9 +880,34 @@ native void GOKZ_JoinTeam(int client, int team);
 // =========================  STOCKS  ========================= //
 
 /**
+ * Prints a message to all clients' chat, formatting colours and optionally 
+ * adding the chat prefix. If using the chat prefix, specify a colour at 
+ * the beginning of the message e.g. "{default}Hello!".
+ *
+ * @param client		Client index.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ * @noreturn
+ */
+stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
+{
+	char buffer[1024];
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client))
+		{
+			SetGlobalTransTarget(client);
+			VFormat(buffer, sizeof(buffer), format, 3);
+			GOKZ_PrintToChat(client, addPrefix, buffer);
+		}
+	}
+}
+
+/**
  * Prints a chat message to those spectating the client, formatting colours 
  * and optionally adding the chat prefix. If using the chat prefix, specify 
- * a colour at the beginning of the message.
+ * a colour at the beginning of the message e.g. "{default}Hello!".
  *
  * @param client		Client index.
  * @param addPrefix		Whether to add the chat prefix.
@@ -963,17 +1056,26 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		public get() {
 			return GOKZ_GetCurrentTime(this.id);
 		}
+		public set(float value) {
+			GOKZ_SetCurrentTime(this.id, value);
+		}
 	}
 	
 	property int checkpointCount {
 		public get() {
 			return GOKZ_GetCheckpointCount(this.id);
 		}
+		public set(int value) {
+			GOKZ_SetCheckpointCount(this.id, value);
+		}
 	}
 	
 	property int teleportCount {
 		public get() {
 			return GOKZ_GetTeleportCount(this.id);
+		}
+		public set(int value) {
+			GOKZ_SetTeleportCount(this.id, value);
 		}
 	}
 	
@@ -1174,6 +1276,18 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 	}
 	
+	property bool inGame {
+		public get() {
+			return IsClientInGame(this.id);
+		}
+	}
+	
+	property bool authorized {
+		public get() {
+			return IsClientAuthorized(this.id);
+		}
+	}
+	
 	property bool fake {
 		public get() {
 			return IsFakeClient(this.id);
@@ -1243,8 +1357,11 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetCurrentCourse");
 	MarkNativeAsOptional("GOKZ_GetPaused");
 	MarkNativeAsOptional("GOKZ_GetCurrentTime");
+	MarkNativeAsOptional("GOKZ_SetCurrentTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
+	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
+	MarkNativeAsOptional("GOKZ_SetTeleportCount");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

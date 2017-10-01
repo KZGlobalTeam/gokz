@@ -34,7 +34,6 @@ public Plugin myinfo =
 #define PLAYBACK_BREATHER_TIME 2.0
 #define BASE_NAV_FILE_PATH "maps/gokz-replays.nav"
 
-bool gB_LateLoad;
 char gC_CurrentMap[64];
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
@@ -53,32 +52,23 @@ ConVar gCV_bot_quota;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	RegPluginLibrary("gokz-replays");
-	gB_LateLoad = late;
-	return APLRes_Success;
-}
-
-public void OnPluginStart()
-{
 	if (GetEngineVersion() != Engine_CSGO)
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
 	
+	RegPluginLibrary("gokz-replays");
+	return APLRes_Success;
+}
+
+public void OnPluginStart()
+{
 	LoadTranslations("gokz-replays.phrases");
 	
 	CreateConVars();
 	CreateCommands();
 	CreateHooks();
 	
-	if (gB_LateLoad)
-	{
-		OnLateLoad();
-	}
-}
-
-void OnLateLoad()
-{
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))

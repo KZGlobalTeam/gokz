@@ -36,9 +36,19 @@ int GetCheckpointCount(int client)
 	return checkpointCount[client];
 }
 
+void SetCheckpointCount(int client, int cpCount)
+{
+	checkpointCount[client] = cpCount;
+}
+
 int GetTeleportCount(int client)
 {
 	return teleportCount[client];
+}
+
+void SetTeleportCount(int client, int tpCount)
+{
+	teleportCount[client] = tpCount;
 }
 
 void SetupClientTeleports(int client)

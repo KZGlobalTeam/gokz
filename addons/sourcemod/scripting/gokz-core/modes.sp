@@ -21,20 +21,45 @@ bool GetModeLoaded(int mode)
 
 void SetModeLoaded(int mode, bool loaded)
 {
-	modeLoaded[mode] = loaded;
+	if (!modeLoaded[mode] && loaded)
+	{
+		modeLoaded[mode] = true;
+		Call_GOKZ_OnModeLoaded(mode);
+	}
+	else if (modeLoaded[mode] && !loaded)
+	{
+		modeLoaded[mode] = false;
+		if (GetLoadedModeCount() == 0)
+		{
+			SetFailState("All modes were unloaded. At least one GOKZ mode plugin is required.");
+		}
+		Call_GOKZ_OnModeUnloaded(mode);
+	}
 }
 
 int GetLoadedModeCount()
 {
 	int count = 0;
-	for (int i = 0; i < MODE_COUNT; i++)
+	for (int mode = 0; mode < MODE_COUNT; mode++)
 	{
-		if (modeLoaded[i])
+		if (modeLoaded[mode])
 		{
 			count++;
 		}
 	}
 	return count;
+}
+
+int GetALoadedMode()
+{
+	for (int mode = 0; mode < MODE_COUNT; mode++)
+	{
+		if (GOKZ_GetModeLoaded(mode))
+		{
+			return mode;
+		}
+	}
+	return -1; // Uh-oh
 }
 
 bool GetGOKZHitPerf(int client)
@@ -61,7 +86,15 @@ void SetGOKZTakeoffSpeed(int client, float takeoffSpeed)
 
 // =========================  LISTENERS  ========================= //
 
-public void OnPlayerSpawn_Modes(int client)
+void OnAllPluginsLoaded_Modes()
+{
+	if (GetLoadedModeCount() <= 0)
+	{
+		SetFailState("At least one GOKZ mode plugin is required.");
+	}
+}
+
+void OnPlayerSpawn_Modes(int client)
 {
 	GOKZHitPerf[client] = false;
 	GOKZTakeoffSpeed[client] = 0.0;

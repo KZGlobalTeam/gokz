@@ -31,7 +31,6 @@ public Plugin myinfo =
 #define WEIRDJUMP_MAX_FALL_OFFSET 64.0
 #define MAX_TRACKED_STRAFES 32
 
-bool gB_LateLoad;
 int gI_TouchingEntities[MAXPLAYERS + 1];
 
 #include "gokz-jumpstats/api.sp"
@@ -52,7 +51,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	
 	CreateNatives();
 	RegPluginLibrary("gokz-jumpstats");
-	gB_LateLoad = late;
 	return APLRes_Success;
 }
 
@@ -62,14 +60,6 @@ public void OnPluginStart()
 	
 	CreateGlobalForwards();
 	
-	if (gB_LateLoad)
-	{
-		OnLateLoad();
-	}
-}
-
-void OnLateLoad()
-{
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))

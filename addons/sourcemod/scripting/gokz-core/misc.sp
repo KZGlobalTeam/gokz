@@ -107,7 +107,7 @@ void OnOptionChanged_HideWeapon(int client, Option option)
 
 void PrintConnectMessage(int client)
 {
-	if (!GetConVarBool(gCV_ConnectionMessages) || IsFakeClient(client))
+	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
 	{
 		return;
 	}
@@ -117,14 +117,7 @@ void PrintConnectMessage(int client)
 
 void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconnect event
 {
-	if (!GetConVarBool(gCV_ConnectionMessages))
-	{
-		return;
-	}
-	
-	SetEventBroadcast(event, true);
-	
-	if (IsFakeClient(client))
+	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
 	{
 		return;
 	}
@@ -140,7 +133,7 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 
 void OnRoundStart_ForceAllTalk()
 {
-	SetConVarInt(gCV_FullAlltalk, 1);
+	gCV_sv_full_alltalk.IntValue = 1;
 }
 
 
@@ -158,7 +151,7 @@ void OnTimerEnd_SlayOnEnd(int client)
 public Action Timer_SlayPlayer(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client) && IsPlayerAlive(client))
+	if (IsValidClient(client))
 	{
 		ForcePlayerSuicide(client);
 	}
@@ -204,15 +197,36 @@ Action OnNormalSound_StopSounds(int entity)
 
 // =========================  PLAYER MODELS  ========================= //
 
-static char playerModelT[256];
-static char playerModelCT[256];
+#define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
+#define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
 
 void UpdatePlayerModel(int client)
 {
+	if (gCV_gokz_player_models.BoolValue)
+	{
+		// Do this after a delay so that gloves apply correctly after spawning
+		CreateTimer(0.1, Timer_UpdatePlayerModel, GetClientUserId(client));
+	}
+}
+
+public Action Timer_UpdatePlayerModel(Handle timer, int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
 	switch (GetClientTeam(client))
 	{
-		case CS_TEAM_T:SetEntityModel(client, playerModelT);
-		case CS_TEAM_CT:SetEntityModel(client, playerModelCT);
+		case CS_TEAM_T:
+		{
+			SetEntityModel(client, PLAYER_MODEL_T);
+		}
+		case CS_TEAM_CT:
+		{
+			SetEntityModel(client, PLAYER_MODEL_CT);
+		}
 	}
 	
 	UpdatePlayerModelAlpha(client);
@@ -221,20 +235,15 @@ void UpdatePlayerModel(int client)
 void UpdatePlayerModelAlpha(int client)
 {
 	SetEntityRenderMode(client, RENDER_TRANSCOLOR);
-	SetEntityRenderColor(client, _, _, _, gCV_PlayerModelAlpha.IntValue);
+	SetEntityRenderColor(client, _, _, _, gCV_gokz_player_models_alpha.IntValue);
 }
 
 void OnMapStart_PlayerModel()
 {
-	SetConVarInt(gCV_DisableImmunityAlpha, 1); // Ensures player transparency works	
+	gCV_sv_disable_immunity_alpha.IntValue = 1; // Ensures player transparency works	
 	
-	GetConVarString(gCV_PlayerModelT, playerModelT, sizeof(playerModelT));
-	GetConVarString(gCV_PlayerModelCT, playerModelCT, sizeof(playerModelCT));
-	
-	PrecacheModel(playerModelT, true);
-	AddFileToDownloadsTable(playerModelT);
-	PrecacheModel(playerModelCT, true);
-	AddFileToDownloadsTable(playerModelCT);
+	PrecacheModel(PLAYER_MODEL_T, true);
+	PrecacheModel(PLAYER_MODEL_CT, true);
 }
 
 
@@ -341,7 +350,7 @@ void JoinTeam(int client, int team)
 	}
 	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
 	{
-		// Switch teams without killing them (no death notice)
+		ForcePlayerSuicide(client);
 		CS_SwitchTeam(client, team);
 		CS_RespawnPlayer(client);
 		if (hasSavedPosition[client])
@@ -372,7 +381,7 @@ void OnTimerStart_JoinTeam(int client)
 
 Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 {
-	if (!GetConVarBool(gCV_ChatProcessing))
+	if (!gCV_gokz_chat_processing.BoolValue)
 	{
 		return Plugin_Continue;
 	}
@@ -412,17 +421,28 @@ static void SanitiseChatInput(char[] message, int maxlength)
 {
 	Color_StripFromChatText(message, message, maxlength);
 	CRemoveColors(message, maxlength);
-	ReplaceString(message, maxlength, "%", "");
+	// Chat gets double formatted, so replace '%' with '%%%%' to end up with '%'
+	ReplaceString(message, maxlength, "%", "%%%%");
 }
 
 
 
 // =========================  VALID JUMP TRACKING  ========================= //
 
-#define VALID_JUMP_TAKEOFF_GRACE_TICKS 2 // Ticks after takeoff when velocity can be affected
+/*
+	Valid jump tracking is intended to detect when the player
+	has performed a normal jump that hasn't been affected by
+	(unexpected) teleports or other cases that may result in
+	the player becoming airborne, such as spawning.
+	
+	There are ways to trick the plugin, but it is rather
+	unlikely to happen during normal gameplay.
+*/
 
 static bool validJump[MAXPLAYERS + 1];
-static int recentTeleports[MAXPLAYERS + 1];
+static int lastJumpTick[MAXPLAYERS + 1];
+static int lastOriginTeleportTick[MAXPLAYERS + 1];
+static int lastVelocityTeleportTick[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -441,15 +461,41 @@ static void InvalidateJump(int client)
 void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
 	// Make sure leaving the ground wasn't caused by anything fishy
-	if (Movement_GetMoveType(client) == MOVETYPE_WALK && recentTeleports[client] == 0)
+	if (IsValidStopTouchGround(client))
 	{
 		validJump[client] = true;
+		lastJumpTick[client] = GetGameTickCount();
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
 	}
 	else
 	{
 		InvalidateJump(client);
 	}
+}
+
+static bool IsValidStopTouchGround(int client)
+{
+	if (Movement_GetMoveType(client) != MOVETYPE_WALK)
+	{
+		return false;
+	}
+	
+	// Return false if there was a recent teleport
+	
+	int originTpTicks = GetGameTickCount() - lastOriginTeleportTick[client];
+	if (originTpTicks <= 2)
+	{
+		return false;
+	}
+	
+	// Allow 0 ticks since last velocity teleport in case mode has set speed already
+	int velocityTpTicks = GetGameTickCount() - lastVelocityTeleportTick[client];
+	if (velocityTpTicks <= 2 && velocityTpTicks != 0)
+	{
+		return false;
+	}
+	
+	return true;
 }
 
 void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
@@ -484,20 +530,18 @@ void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 {
 	if (origin)
 	{
+		lastOriginTeleportTick[client] = GetGameTickCount();
 		InvalidateJump(client);
 	}
-	else if (velocity && gI_OldCmdNum[client] - Movement_GetTakeoffCmdNum(client) > VALID_JUMP_TAKEOFF_GRACE_TICKS)
-	{  // Allow grace period after takeoff so that modes may adjust takeoff speed
-		InvalidateJump(client);
+	else if (velocity)
+	{
+		lastVelocityTeleportTick[client] = GetGameTickCount();
+		// Allow short grace period for velocity so that modes may set player speed
+		if (GetGameTickCount() - Movement_GetTakeoffTick(client) > 1)
+		{
+			InvalidateJump(client);
+		}
 	}
-	// Count recent teleports
-	recentTeleports[client]++;
-	CreateTimer(0.1, Timer_DecrementRecentTeleports, client);
-}
-
-public Action Timer_DecrementRecentTeleports(Handle timer, int client)
-{
-	recentTeleports[client]--;
 }
 
 
@@ -513,32 +557,36 @@ void OnMapStart_JumpBeam()
 	jumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
 }
 
-void OnPlayerRunCmd_JumpBeam(int client)
+void OnPlayerRunCmd_JumpBeam(int targetClient)
 {
+	// In this case, spectators are handled from the target 
+	// client's OnPlayerRunCmd call, otherwise the jump 
+	// beam will be all broken up.
 	
-	KZPlayer player = new KZPlayer(client);
-	KZPlayer targetPlayer;
+	KZPlayer targetPlayer = new KZPlayer(targetClient);
 	
-	if (player.fake || player.jumpBeam == JumpBeam_Disabled)
+	if (targetPlayer.fake || !targetPlayer.alive || targetPlayer.onGround || !targetPlayer.validJump)
 	{
 		return;
 	}
 	
-	// Determine target player
-	if (player.alive)
+	// Send to self
+	SendJumpBeam(targetPlayer, targetPlayer);
+	
+	// Send to spectators
+	for (int client = 1; client <= MaxClients; client++)
 	{
-		targetPlayer = player;
-	}
-	else
-	{
-		targetPlayer = new KZPlayer(player.observerTarget);
-		if (targetPlayer.id == -1)
+		KZPlayer player = new KZPlayer(client);
+		if (player.inGame && !player.alive && player.observerTarget == targetClient)
 		{
-			return;
+			SendJumpBeam(player, targetPlayer);
 		}
 	}
-	
-	if (!GetValidJump(targetPlayer.id) || targetPlayer.onGround)
+}
+
+static void SendJumpBeam(KZPlayer player, KZPlayer targetPlayer)
+{
+	if (player.jumpBeam == JumpBeam_Disabled)
 	{
 		return;
 	}
@@ -621,11 +669,11 @@ static void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 {
 	if (targetPlayer.ducking)
 	{
-		colour =  { 255, 0, 0, 100 }; // Red
+		colour =  { 255, 0, 0, 110 }; // Red
 	}
 	else
 	{
-		colour =  { 0, 255, 0, 100 }; // Green
+		colour =  { 0, 255, 0, 110 }; // Green
 	}
 }
 

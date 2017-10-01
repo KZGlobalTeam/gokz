@@ -1,14 +1,51 @@
 /*
 	Speed Text
 	
-	Uses ShowHudText to show current speed somewhere on the screen.
+	Uses ShowSyncHudText to show current speed somewhere on the screen.
+	
+	This is updated every ~0.1s and whenever player has taken off 
+	so that they get to see updated pre-speed as soon as possible.
 */
+
+
+
+static Handle speedHudSynchronizer;
 
 
 
 // =========================  PUBLIC  ========================= //
 
-void UpdateSpeedText(int client)
+void CreateHudSynchronizerSpeedText()
+{
+	speedHudSynchronizer = CreateHudSynchronizer();
+}
+
+
+
+// =========================  LISTENERS  ========================= //
+
+void OnPlayerRunCmd_SpeedText(int client, int cmdnum)
+{
+	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum - 1)
+	{
+		UpdateSpeedText(client);
+	}
+}
+
+void OnOptionChanged_SpeedText(int client, Option option)
+{
+	if (option == Option_SpeedText)
+	{
+		ClearSpeedText(client);
+		UpdateSpeedText(client);
+	}
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static void UpdateSpeedText(int client)
 {
 	KZPlayer player = new KZPlayer(client);
 	
@@ -32,21 +69,10 @@ void UpdateSpeedText(int client)
 	}
 }
 
-
-
-// =========================  LISTENERS  ========================= //
-
-void OnPlayerRunCmd_SpeedText(int client, int cmdnum)
+static void ClearSpeedText(int client)
 {
-	if (cmdnum % 3 == 0)
-	{
-		UpdateSpeedText(client);
-	}
+	ClearSyncHud(client, speedHudSynchronizer);
 }
-
-
-
-// =========================  PRIVATE  ========================= //
 
 static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 {
@@ -69,26 +95,31 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 	{
 		case SpeedText_Bottom:
 		{
+			// Set params based on the available screen space at max scaling HUD
 			if (IsPlayerAlive(player.id))
 			{
-				SetHudTextParams(-1.0, 0.75, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.749, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+			}
+			else if (!IsDrawingInfoPanel(player.id))
+			{
+				SetHudTextParams(-1.0, 0.638, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 			else
 			{
-				SetHudTextParams(-1.0, 0.595, 0.5, colour[0], colour[1], colour[2], colour[3], 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.597, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 		}
 	}
 	
 	if (targetPlayer.onGround || targetPlayer.onLadder || targetPlayer.noclipping)
 	{
-		ShowHudText(player.id, 1, 
+		ShowSyncHudText(player.id, speedHudSynchronizer, 
 			"%.0f", 
 			RoundFloat(targetPlayer.speed * 10) / 10.0);
 	}
 	else
 	{
-		ShowHudText(player.id, 1, 
+		ShowSyncHudText(player.id, speedHudSynchronizer, 
 			"%.0f\n(%.0f)", 
 			RoundFloat(targetPlayer.speed * 10) / 10.0, 
 			RoundFloat(targetPlayer.gokzTakeoffSpeed * 10) / 10.0);

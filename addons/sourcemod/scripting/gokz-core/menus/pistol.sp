@@ -44,7 +44,8 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 	}
 	else if (action == MenuAction_Cancel && GetCameFromOptionsMenu(param1))
 	{
-		DisplayOptionsMenu(param1, 6);
+		// Reopen the options menu at the page this option is on
+		DisplayOptionsMenu(param1, 12);
 	}
 	else if (action == MenuAction_End)
 	{

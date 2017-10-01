@@ -31,13 +31,12 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-core.txt"
 
-bool gB_LateLoad;
+Handle g_ThisPlugin;
 bool gB_BaseComm;
 Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
-int gI_OldCmdNum[MAXPLAYERS + 1];
 
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
@@ -78,9 +77,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 		SetFailState("This plugin is only for CS:GO.");
 	}
 	
+	g_ThisPlugin = myself;
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
-	gB_LateLoad = late;
 	return APLRes_Success;
 }
 
@@ -95,36 +94,27 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateCommands();
 	CreateCommandListeners();
+	CreateHudSynchronizers();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
-	
-	if (gB_LateLoad)
-	{
-		OnLateLoad();
-	}
 }
 
-void OnLateLoad()
+public void OnAllPluginsLoaded()
 {
+	OnAllPluginsLoaded_Modes();
+	gB_BaseComm = LibraryExists("basecomm");
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	
+	// Handle late loading here now that all the modes have been loaded
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
 		{
 			OnClientPutInServer(client);
 		}
-	}
-}
-
-public void OnAllPluginsLoaded()
-{
-	gB_BaseComm = LibraryExists("basecomm");
-	if (GetLoadedModeCount() <= 0)
-	{
-		SetFailState("At least one GOKZ mode plugin is required.");
-	}
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
@@ -151,7 +141,6 @@ public void OnClientPutInServer(int client)
 	SetupClientOptions(client);
 	SetupClientTimer(client);
 	SetupClientPause(client);
-	SetupClientBhopTriggers(client);
 	SetupClientHidePlayers(client);
 	SetupClientTeleports(client);
 	SetupClientJoinTeam(client);
@@ -189,7 +178,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
-	UpdateOldVariables(client, cmdnum);
+	UpdateOldVariables(client);
 	return Plugin_Continue;
 }
 
@@ -204,17 +193,18 @@ public Action OnClientCommandKeyValues(int client, KeyValues kv)
 	return Plugin_Continue;
 }
 
-public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect hook
+public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect pre hook
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (!IsValidClient(client))
+	if (IsValidClient(client))
 	{
-		return;
+		SetEventBroadcast(event, true); // Block the game printing a disconnect message
+		PrintDisconnectMessage(client, event);
 	}
-	PrintDisconnectMessage(client, event);
+	return Plugin_Continue;
 }
 
-public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn hook
+public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	OnPlayerSpawn_Modes(client);
@@ -229,14 +219,16 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	UpdateTPMenu(client);
 }
 
-public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death hook
+public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
+	SetEventBroadcast(event, true); // Block death notices
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	OnPlayerDeath_Timer(client);
 	OnPlayerDeath_ValidJump(client);
+	return Plugin_Continue;
 }
 
-public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team hook
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team pre hook
 {
 	SetEventBroadcast(event, true); // Block join team messages
 	return Plugin_Continue;
@@ -280,12 +272,19 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_JoinTeam(client);
 	OnTimerStart_Pause(client);
 	OnTimerStart_Teleports(client);
+	OnTimerStart_TimerText(client);
 	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	OnTimerEnd_SlayOnEnd(client);
+	OnTimerEnd_TimerText(client);
+}
+
+public void GOKZ_OnTimerStopped(int client)
+{
+	OnTimerStopped_TimerText(client);
 }
 
 public void GOKZ_OnMakeCheckpoint_Post(int client)
@@ -326,11 +325,18 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 	OnOptionChanged_HideWeapon(client, option);
 	OnOptionChanged_Pistol(client, option);
 	OnOptionChanged_ClanTag(client, option);
+	OnOptionChanged_SpeedText(client, option);
+	OnOptionChanged_TimerText(client, option);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)
 {
 	OnJoinTeam_Pause(client, team);
+}
+
+public void GOKZ_OnModeUnloaded(int mode)
+{
+	OnModeUnloaded_Options(mode);
 }
 
 
@@ -371,7 +377,7 @@ public void OnEntitySpawned(int entity)
 	OnEntitySpawned_MapBhopTriggers(entity);
 }
 
-public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start hook
+public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start post no copy hook
 {
 	OnRoundStart_Timer();
 	OnRoundStart_ForceAllTalk();
@@ -389,10 +395,10 @@ static void CreateRegexes()
 static void CreateHooks()
 {
 	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
-	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Pre);
+	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
-	HookEvent("round_start", OnRoundStart, EventHookMode_Pre);
+	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
 	Handle gameData = LoadGameConfigFile("sdktools.games");
@@ -409,12 +415,17 @@ static void CreateHooks()
 	gameData.Close();
 }
 
-static void UpdateOldVariables(int client, int cmdnum)
+static void CreateHudSynchronizers()
+{
+	CreateHudSynchronizerSpeedText();
+	CreateHudSynchronizerTimerText();
+}
+
+static void UpdateOldVariables(int client)
 {
 	if (IsPlayerAlive(client))
 	{
 		Movement_GetOrigin(client, gF_OldOrigin[client]);
 		gB_OldDucking[client] = Movement_GetDucking(client);
-		gI_OldCmdNum[client] = cmdnum;
 	}
 } 

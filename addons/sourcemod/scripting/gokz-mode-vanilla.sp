@@ -39,14 +39,20 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
-	
-	RegPluginLibrary("gokz-mode-vanilla");
 	return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
 	CreateConVars();
+	
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client))
+		{
+			OnClientPutInServer(client);
+		}
+	}
 }
 
 public void OnPluginEnd()
@@ -183,27 +189,11 @@ static bool IsUsingMode(int client)
 
 static void CreateConVars()
 {
-	gCV_ModeCVar[ModeCVar_Accelerate] = FindConVar("sv_accelerate");
-	gCV_ModeCVar[ModeCVar_Friction] = FindConVar("sv_friction");
-	gCV_ModeCVar[ModeCVar_AirAccelerate] = FindConVar("sv_airaccelerate");
-	gCV_ModeCVar[ModeCVar_LadderScaleSpeed] = FindConVar("sv_ladder_scale_speed");
-	gCV_ModeCVar[ModeCVar_MaxVelocity] = FindConVar("sv_maxvelocity");
-	gCV_ModeCVar[ModeCVar_Gravity] = FindConVar("sv_gravity");
-	gCV_ModeCVar[ModeCVar_EnableBunnyhopping] = FindConVar("sv_enablebunnyhopping");
-	gCV_ModeCVar[ModeCVar_AutoBunnyhopping] = FindConVar("sv_autobunnyhopping");
-	gCV_ModeCVar[ModeCVar_StaminaMax] = FindConVar("sv_staminamax");
-	gCV_ModeCVar[ModeCVar_StaminaLandCost] = FindConVar("sv_staminalandcost");
-	gCV_ModeCVar[ModeCVar_StaminaJumpCost] = FindConVar("sv_staminajumpcost");
-	gCV_ModeCVar[ModeCVar_StaminaRecoveryRate] = FindConVar("sv_staminarecoveryrate");
-	gCV_ModeCVar[ModeCVar_MaxSpeed] = FindConVar("sv_maxspeed");
-	gCV_ModeCVar[ModeCVar_WaterAccelerate] = FindConVar("sv_wateraccelerate");
-	gCV_ModeCVar[ModeCVar_TimeBetweenDucks] = FindConVar("sv_timebetweenducks");
-	gCV_ModeCVar[ModeCVar_AccelerateUseWeaponSpeed] = FindConVar("sv_accelerate_use_weapon_speed");
-	
-	// Remove these notify flags because these ConVars are being set constantly
-	for (int i = 0; i < MODECVAR_COUNT; i++)
+	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
 	{
-		gCV_ModeCVar[i].Flags &= ~FCVAR_NOTIFY;
+		gCV_ModeCVar[cvar] = FindConVar(gC_ModeCVars[cvar]);
+		// Remove notify flags because these ConVars are being set constantly
+		gCV_ModeCVar[cvar].Flags &= ~FCVAR_NOTIFY;
 	}
 }
 

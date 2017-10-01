@@ -27,7 +27,6 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-localdb.txt"
 
-bool gB_LateLoad;
 Regex gRE_BonusStartButton;
 
 Database gH_DB = null;
@@ -62,7 +61,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	
 	CreateNatives();
 	RegPluginLibrary("gokz-localdb");
-	gB_LateLoad = late;
 	return APLRes_Success;
 }
 
@@ -73,14 +71,6 @@ public void OnPluginStart()
 	
 	DB_SetupDatabase();
 	
-	if (gB_LateLoad)
-	{
-		OnLateLoad();
-	}
-}
-
-void OnLateLoad()
-{
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (GOKZ_IsClientSetUp(client))
