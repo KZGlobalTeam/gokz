@@ -105,7 +105,7 @@ public Action CommandToggleAdvancedMenu(int client, int args)
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Disabled, true);
+		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple, true);
 	}
 	return Plugin_Handled;
 }
