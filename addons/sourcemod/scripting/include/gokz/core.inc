@@ -575,7 +575,7 @@ native void GOKZ_SetModeLoaded(int mode, bool enabled);
  *
  * @return				Number of loaded modes.
  */
-native int GOKZ_GetLoadedModeCount(int mode);
+native int GOKZ_GetLoadedModeCount();
 
 /**
  * Gets the default movement mode as set by convar gokz_default_mode.
@@ -587,7 +587,7 @@ native int GOKZ_GetDefaultMode();
 /**
  * Prints a message to a client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
- * the beginning of the message.
+ * the beginning of the message e.g. "{default}Hello!".
  *
  * @param client		Client index.
  * @param addPrefix		Whether to add the chat prefix.
@@ -596,31 +596,6 @@ native int GOKZ_GetDefaultMode();
  * @noreturn
  */
 native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, any...);
-
-/**
- * Prints a message to all clients' chat, formatting colours and optionally 
- * adding the chat prefix. If using the chat prefix, specify a colour at 
- * the beginning of the message.
- *
- * @param client		Client index.
- * @param addPrefix		Whether to add the chat prefix.
- * @param format		Formatting rules.
- * @param any			Variable number of format parameters.
- * @noreturn
- */
-stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
-{
-	char buffer[1024];
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		if (IsClientInGame(client))
-		{
-			SetGlobalTransTarget(client);
-			VFormat(buffer, sizeof(buffer), format, 3);
-			GOKZ_PrintToChat(client, addPrefix, buffer);
-		}
-	}
-}
 
 /**
  * Starts the player's timer for a course on the current map.
@@ -904,9 +879,34 @@ native void GOKZ_JoinTeam(int client, int team);
 // =========================  STOCKS  ========================= //
 
 /**
+ * Prints a message to all clients' chat, formatting colours and optionally 
+ * adding the chat prefix. If using the chat prefix, specify a colour at 
+ * the beginning of the message e.g. "{default}Hello!".
+ *
+ * @param client		Client index.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ * @noreturn
+ */
+stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
+{
+	char buffer[1024];
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client))
+		{
+			SetGlobalTransTarget(client);
+			VFormat(buffer, sizeof(buffer), format, 3);
+			GOKZ_PrintToChat(client, addPrefix, buffer);
+		}
+	}
+}
+
+/**
  * Prints a chat message to those spectating the client, formatting colours 
  * and optionally adding the chat prefix. If using the chat prefix, specify 
- * a colour at the beginning of the message.
+ * a colour at the beginning of the message e.g. "{default}Hello!".
  *
  * @param client		Client index.
  * @param addPrefix		Whether to add the chat prefix.
