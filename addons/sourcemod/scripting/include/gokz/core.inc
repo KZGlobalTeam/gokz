@@ -545,9 +545,10 @@ forward void GOKZ_OnModeUnloaded(int mode);
  * their favour e.g. GOKZ_StartTimer, GOKZ_EndTimer,
  * GOKZ_SetCurrentTime and GOKZ_SetTeleportCount.
  *
+ * @param plugin		Handle of the calling plugin.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
-forward Action GOKZ_OnTimerNativeCalledExternally();
+forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
 
 
 

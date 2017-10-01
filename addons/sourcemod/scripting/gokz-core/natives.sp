@@ -284,7 +284,7 @@ static bool BlockedExternallyCalledTimerNative(Handle plugin)
 	if (plugin != g_ThisPlugin)
 	{
 		Action result;
-		Call_GOKZ_OnTimerNativeCalledExternally(result);
+		Call_GOKZ_OnTimerNativeCalledExternally(plugin, result);
 		if (result != Plugin_Continue)
 		{
 			return true;
