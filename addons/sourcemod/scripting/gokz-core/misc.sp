@@ -379,7 +379,7 @@ void OnTimerStart_JoinTeam(int client)
 
 #define MAX_MESSAGE_LENGTH 128
 
-Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
+Action OnClientSayCommand_ChatProcessing(int client, const char[] command, const char[] message)
 {
 	if (!gCV_gokz_chat_processing.BoolValue)
 	{
@@ -387,7 +387,7 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 	}
 	
 	if (gB_BaseComm && BaseComm_IsClientGagged(client)
-		 || message[0] == '@' // Assume basechat is in use
+		 || UsedBaseChat(client, command, message)
 		 || IsChatTrigger())
 	{
 		return Plugin_Handled;
@@ -408,13 +408,33 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 	
 	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
 	{
-		GOKZ_PrintToChatAll(false, "{bluegrey}%N{default} : %s", client, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{bluegrey}%s{default} : %s", sanitisedName, sanitisedMessage);
 	}
 	else
 	{
-		GOKZ_PrintToChatAll(false, "{lime}%N{default} : %s", client, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{lime}%s{default} : %s", sanitisedName, sanitisedMessage);
 	}
 	return Plugin_Handled;
+}
+
+static bool UsedBaseChat(int client, const char[] command, const char[] message)
+{
+	// Assuming base chat is in use, check if message will get processed by basechat
+	if (message[0] != '@')
+	{
+		return false;
+	}
+	
+	if (strcmp(command, "say_team", false) == 0)
+	{
+		return true;
+	}
+	else if (strcmp(command, "say", false) == 0 && CheckCommandAccess(client, "sm_say", ADMFLAG_CHAT))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 static void SanitiseChatInput(char[] message, int maxlength)
