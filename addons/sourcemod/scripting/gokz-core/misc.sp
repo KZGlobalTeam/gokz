@@ -393,6 +393,15 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] command, const
 		return Plugin_Handled;
 	}
 	
+	// Resend messages that may have been a command with capital letters
+	if ((message[0] == '!' || message[0] == '/') && IsCharUpper(message[1]))
+	{
+		char loweredMessage[MAX_MESSAGE_LENGTH];
+		String_ToLower(message, loweredMessage, sizeof(loweredMessage));
+		FakeClientCommand(client, "say %s", loweredMessage);
+		return Plugin_Handled;
+	}
+	
 	char sanitisedMessage[MAX_MESSAGE_LENGTH];
 	strcopy(sanitisedMessage, sizeof(sanitisedMessage), message);
 	SanitiseChatInput(sanitisedMessage, sizeof(sanitisedMessage));
