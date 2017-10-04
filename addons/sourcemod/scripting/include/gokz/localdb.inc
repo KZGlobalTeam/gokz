@@ -22,42 +22,16 @@ enum DatabaseType
 
 
 
-// =========================  STOCKS  ========================= //
-
-/**
- * Converts a time float (seconds) to an integer (milliseconds).
- *
- * @param time			Time in seconds.
- * @return				Time in milliseconds.
- */
-stock int GOKZ_DB_TimeFloatToInt(float time)
-{
-	return RoundFloat(time * 1000.0);
-}
-
-/**
- * Converts a time integer (milliseconds) to a float (seconds).
- *
- * @param time			Time in milliseconds.
- * @return				Time in seconds.
- */
-stock float GOKZ_DB_TimeIntToFloat(int time)
-{
-	return time / 1000.0;
-}
-
-
-
 // =========================  FORWARDS  ========================= //
 
 /**
  * Called when gokz-localdb has connected to the database.
+ * Use GOKZ_DB_GetDatabase to get a clone of the database handle.
  *
- * @param database		Database handle.
  * @param DBType		Database type.
  * @noreturn
  */
-forward void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType);
+forward void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType);
 
 /**
  * Called when a player is ready for database interaction.
@@ -106,12 +80,12 @@ forward void GOKZ_DB_OnTimeInserted(
 // =========================  NATIVES  ========================= //
 
 /**
- * Gets the GOKZ local database handle.
+ * Gets a clone of the GOKZ local database handle.
  *
  * @param database		Database handle (null if connection hasn't been made).
  * @noreturn
  */
-native void GOKZ_DB_GetDatabase(Database &database);
+native Database GOKZ_DB_GetDatabase();
 
 /**
  * Gets the GOKZ local database type.
@@ -141,6 +115,32 @@ native bool GOKZ_DB_IsMapSetUp();
  * @return				MapID from the "Maps" table.
  */
 native int GOKZ_DB_GetCurrentMapID();
+
+
+
+// =========================  STOCKS  ========================= //
+
+/**
+ * Converts a time float (seconds) to an integer (milliseconds).
+ *
+ * @param time			Time in seconds.
+ * @return				Time in milliseconds.
+ */
+stock int GOKZ_DB_TimeFloatToInt(float time)
+{
+	return RoundFloat(time * 1000.0);
+}
+
+/**
+ * Converts a time integer (milliseconds) to a float (seconds).
+ *
+ * @param time			Time in milliseconds.
+ * @return				Time in seconds.
+ */
+stock float GOKZ_DB_TimeIntToFloat(int time)
+{
+	return time / 1000.0;
+}
 
 
 
