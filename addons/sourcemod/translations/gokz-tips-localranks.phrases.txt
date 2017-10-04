@@ -1,0 +1,27 @@
+"Phrases"
+{	
+    "!wr"
+    {
+        "en"        "{grey}You can type {default}!wr <map> {grey}to see the map's best times for the mode you are currently playing."
+    }
+    "!maptop"
+    {
+        "en"        "{grey}Check out a map's top times for your current selected mode by typing {default}!maptop <map>."
+    }
+    "!avg"
+    {
+        "en"        "{grey}Want to see if you are above average? Type {default}!avg <map> {grey}to see the average finish time."
+    }
+    "!pc"
+    {
+        "en"        "{grey}Want to check how many maps you've beaten? Type {default}!pc <player> {grey}to find out!"
+    }
+    "Bonus Commands"
+    {
+        "en"        "{grey}For bonuses, you can use {default}!bwr <bonus>{grey}, {default}!bmaptop <bonus> {grey}and so on instead of the normal commands."
+    }
+    "MVP Stars"
+    {
+        "en"        "{grey}You are awarded 1 MVP star for each percent of maps you have PRO ran on the server's default mode."
+    }
+}
