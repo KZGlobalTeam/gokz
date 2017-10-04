@@ -26,7 +26,8 @@ static int optionCounts[OPTION_COUNT] =
 	ERRORSOUNDS_COUNT, 
 	TIMERTEXT_COUNT, 
 	SPEEDTEXT_COUNT, 
-	JUMPBEAM_COUNT
+	JUMPBEAM_COUNT, 
+	HELPANDTIPS_COUNT
 };
 
 
@@ -115,6 +116,7 @@ static void SetDefaultOptions(int client)
 	SetOption(client, Option_TimerText, TimerText_InfoPanel);
 	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
 	SetOption(client, Option_JumpBeam, JumpBeam_Disabled);
+	SetOption(client, Option_HelpAndTips, HelpAndTips_Enabled);
 }
 
 static void PrintOptionChangeMessage(int client, Option option) {

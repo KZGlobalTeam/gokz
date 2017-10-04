@@ -55,6 +55,7 @@ enum Option
 	Option_TimerText, 
 	Option_SpeedText, 
 	Option_JumpBeam, 
+	Option_HelpAndTips, 
 	OPTION_COUNT
 };
 
@@ -189,6 +190,13 @@ enum
 	JumpBeam_FeetAndHead, 
 	JumpBeam_Ground, 
 	JUMPBEAM_COUNT
+};
+
+enum
+{
+	HelpAndTips_Disabled = 0, 
+	HelpAndTips_Enabled, 
+	HELPANDTIPS_COUNT
 };
 
 enum
@@ -1240,6 +1248,15 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 		public set(int value) {
 			this.SetOption(Option_JumpBeam, value);
+		}
+	}
+	
+	property int helpAndTips {
+		public get() {
+			return this.GetOption(Option_HelpAndTips);
+		}
+		public set(int value) {
+			this.SetOption(Option_HelpAndTips, value);
 		}
 	}
 	

@@ -1,0 +1,7 @@
+"Phrases"
+{	
+    "!replay"
+    {
+        "en"        "{grey}Type {default}!replay {grey}to watch the server's fastest runs."
+    }
+}

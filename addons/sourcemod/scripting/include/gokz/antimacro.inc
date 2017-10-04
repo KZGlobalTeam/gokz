@@ -98,54 +98,6 @@ native float GOKZ_AM_GetAverageJumpInputs(int client, int sampleSize);
 
 
 
-// =========================  STOCKS  ========================= //
-
-/**
- * Increment an index, looping back to 0 if the max value is reached.
- *
- * @param index			Current index.
- * @param buffer		Max value of index.
- * @return				Current index incremented, or 0 if max value is reached.
- */
-stock int NextIndex(int index, int max)
-{
-	index++;
-	if (index == max)
-	{
-		return 0;
-	}
-	return index;
-}
-
-/**
- * Reorders an array with current index at the front, and previous 
- * values after, including looping back to the end after reaching
- * the start of the array.
- *
- * @param input			Array to reorder.
- * @param inputSize		Size of input array.
- * @param buffer		Output buffer.
- * @param bufferSize	Size of buffer.
- * @param index			Index of current/most recent value of input array.
- * @noreturn
- */
-stock void SortByRecent(const int[] input, int inputSize, int[] buffer, int bufferSize, int index)
-{
-	int reorderedIndex = 0;
-	for (int i = index; reorderedIndex < bufferSize && i >= 0; i--)
-	{
-		buffer[reorderedIndex] = input[i];
-		reorderedIndex++;
-	}
-	for (int i = inputSize - 1; reorderedIndex < bufferSize && i > index; i--)
-	{
-		buffer[reorderedIndex] = input[i];
-		reorderedIndex++;
-	}
-}
-
-
-
 // =========================  DEPENDENCY  ========================= //
 
 public SharedPlugin __pl_gokz_antimacro = 

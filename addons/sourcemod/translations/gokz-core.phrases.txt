@@ -457,4 +457,8 @@
 	{
 		"en"		"Jump beam"
 	}
+    "Options Menu - Help and Tips"
+    {
+        "en"        "Help and tips"
+    }
 }

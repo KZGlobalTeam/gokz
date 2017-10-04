@@ -1,0 +1,55 @@
+"Phrases"
+{	
+    "!options"
+    {
+        "en"        "{grey}Open the {default}!options {grey}menu to easily view and change all the settings available to you."
+    }
+    "!menu"
+    {
+        "en"        "{grey}Type {default}!menu {grey}to open or close your teleport menu."
+    }
+    "!adv"
+    {
+        "en"        "{grey}Think you're an advanced user? Type {default}!adv {grey}to bring up the fancy, advanced checkpoint and teleport menu."
+    }
+    "!mode"
+    {
+        "en"        "{grey}The {default}!mode {grey}menu is where you can easily switch between the different movement modes."
+    }
+    "!pistol"
+    {
+        "en"        "{grey}Do you yearn to be different for no reason? Change your pistol by through the {default}!pistol {grey}menu."
+    }
+    "!nc"
+    {
+        "en"        "Use {default}!nc {grey}or bind a key to {default}+noclip {grey}to fly around the map. Beware - this will invalidate your run."
+    }
+    "Quick Switch Mode"
+    {
+        "en"        "{grey}You can quickswitch to the Vanilla mode by typing {default}!v{grey}, KZTimer mode by typing {default}!k{grey} and so on."
+    }
+    "Hide Clutter"
+    {
+        "en"        "{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 0 {grey}in console to cleanse yourself."
+    }
+    "!stopsound"
+    {
+        "en"        "{grey}Getting annoyed by obnoxious music from the map? Use {default}!stopsound {grey}to make it stop!"
+    }
+    "!spec"
+    {
+        "en"        "{grey}Wanna watch somebody better than you? Type {default}!spec <player>{grey}, and {default}!resume {grey}to get back to where you left off."
+    }
+    "!measure"
+    {
+        "en"        "{grey}Having trouble with a jump? Use the {default}!measure {grey}menu to find out if it's only a 230 and you are just that bad."
+    }
+    "!goto"
+    {
+        "en"        "{grey}Type {default}!goto {grey}to teleport to another player. This will stop your timer and require you to restart your run."
+    }
+    "Custom Start Position"
+    {
+        "en"        "{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to create and remove custom start teleport locations."
+    }
+}
