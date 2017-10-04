@@ -30,7 +30,7 @@
     }
     "Hide Clutter"
     {
-        "en"        "{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 0 {grey}in console to cleanse yourself."
+        "en"        "{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 1 {grey}in console to cleanse yourself."
     }
     "!stopsound"
     {
