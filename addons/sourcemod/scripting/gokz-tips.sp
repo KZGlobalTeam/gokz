@@ -58,12 +58,20 @@ public void OnAllPluginsLoaded()
 {
 	gB_GOKZLocalRanks = LibraryExists("gokz-localranks");
 	gB_GOKZReplays = LibraryExists("gokz-replays");
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
 {
 	gB_GOKZLocalRanks = gB_GOKZLocalRanks || StrEqual(name, "gokz-localranks");
 	gB_GOKZReplays = gB_GOKZReplays || StrEqual(name, "gokz-replays");
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public void OnLibraryRemoved(const char[] name)
