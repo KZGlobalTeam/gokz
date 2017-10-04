@@ -154,6 +154,7 @@ public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float of
 
 
 // =========================  OTHER  ========================= //
+
 public void OnMapStart()
 {
 	OnMapStart_DistanceTiers();
