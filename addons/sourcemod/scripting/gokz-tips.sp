@@ -177,7 +177,8 @@ public Action Timer_PrintTip(Handle timer)
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (IsClientInGame(client))
+		KZPlayer player = new KZPlayer(client);
+		if (player.inGame && player.helpAndTips != HelpAndTips_Disabled)
 		{
 			GOKZ_PrintToChat(client, true, "%t", tip);
 		}
