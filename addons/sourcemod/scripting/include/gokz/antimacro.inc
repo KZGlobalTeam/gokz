@@ -37,6 +37,14 @@ forward void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[]
 // =========================  NATIVES  ========================= //
 
 /**
+ * Gets the number of recent bhop samples available for the player.
+ *
+ * @param client		Client index.
+ * @return				Number of bhop samples available.
+ */
+native int GOKZ_AM_GetSampleSize(int client);
+
+/**
  * Gets whether the player hit a perfect bhop for a number of 
  * recent bhops. Buffer must be large enough to fit the sample
  * size.
@@ -49,12 +57,14 @@ forward void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[]
 native int GOKZ_AM_GetHitPerf(int client, bool[] buffer, int sampleSize);
 
 /**
- * Gets the number of recent bhop samples available for the player.
+ * Gets the player's number of perfect bhops out of a sample 
+ * size of bhops.
  *
  * @param client		Client index.
- * @return				Number of bhop samples available.
+ * @param sampleSize	Maximum recent bhop samples to include in calculation.
+ * @return				Player's number of perfect bhops.
  */
-native int GOKZ_AM_GetSampleSize(int client);
+native int GOKZ_AM_GetPerfCount(int client, int sampleSize);
 
 /**
  * Gets the player's ratio of perfect bhops to normal bhops.
@@ -64,16 +74,6 @@ native int GOKZ_AM_GetSampleSize(int client);
  * @return				Player's ratio of perfect bhops to normal bhops.
  */
 native float GOKZ_AM_GetPerfRatio(int client, int sampleSize);
-
-/**
- * Gets the player's number of perfect bhops out of a sample 
- * size of bhops.
- *
- * @param client		Client index.
- * @param sampleSize	Maximum recent bhop samples to include in calculation.
- * @return				Player's number of perfect bhops.
- */
-native int GOKZ_AM_GetPerfCount(int client, int sampleSize);
 
 /**
  * Gets the player's jump input counts for a number of recent 
@@ -163,9 +163,10 @@ public SharedPlugin __pl_gokz_antimacro =
 public void __pl_gokz_antimacro_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_AM_GetSampleSize");
-	MarkNativeAsOptional("GOKZ_AM_GetPerfRatio");
-	MarkNativeAsOptional("GOKZ_AM_GetPerfCount");
-	MarkNativeAsOptional("GOKZ_AM_GetJumpInputs");
 	MarkNativeAsOptional("GOKZ_AM_GetHitPerf");
+	MarkNativeAsOptional("GOKZ_AM_GetPerfCount");
+	MarkNativeAsOptional("GOKZ_AM_GetPerfRatio");
+	MarkNativeAsOptional("GOKZ_AM_GetJumpInputs");
+	MarkNativeAsOptional("GOKZ_AM_GetAverageJumpInputs");
 }
 #endif
