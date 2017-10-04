@@ -37,6 +37,18 @@ forward void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[]
 // =========================  NATIVES  ========================= //
 
 /**
+ * Gets whether the player hit a perfect bhop for a number of 
+ * recent bhops. Buffer must be large enough to fit the sample
+ * size.
+ *
+ * @param client		Client index.
+ * @param buffer		Buffer for perfect bhop booleans, with the first element being the most recent bhop.
+ * @param sampleSize	Maximum recent bhop samples.
+ * @return				Number of bhop samples.
+ */
+native int GOKZ_AM_GetHitPerf(int client, bool[] buffer, int sampleSize);
+
+/**
  * Gets the number of recent bhop samples available for the player.
  *
  * @param client		Client index.
@@ -54,7 +66,8 @@ native int GOKZ_AM_GetSampleSize(int client);
 native float GOKZ_AM_GetPerfRatio(int client, int sampleSize);
 
 /**
- * Gets the player's number of perfect bhops out of a sample size of bhops.
+ * Gets the player's number of perfect bhops out of a sample 
+ * size of bhops.
  *
  * @param client		Client index.
  * @param sampleSize	Maximum recent bhop samples to include in calculation.
@@ -63,8 +76,8 @@ native float GOKZ_AM_GetPerfRatio(int client, int sampleSize);
 native int GOKZ_AM_GetPerfCount(int client, int sampleSize);
 
 /**
- * Gets the player's jump input counts for a number of recent bhops.
- * Buffer must be large enough to fit the sample size.
+ * Gets the player's jump input counts for a number of recent 
+ * bhops. Buffer must be large enough to fit the sample size.
  *
  * @param client		Client index.
  * @param buffer		Buffer for jump input counts, with the first element being the most recent bhop.
@@ -74,16 +87,14 @@ native int GOKZ_AM_GetPerfCount(int client, int sampleSize);
 native int GOKZ_AM_GetJumpInputs(int client, int[] buffer, int sampleSize);
 
 /**
- * Gets whether the player hit a perfect bhop for a number of recent bhops.
- * Buffer must be large enough to fit the sample size.
+ * Gets the player's average number of jump inputs for a number 
+ * of recent bhops.
  *
  * @param client		Client index.
- * @param buffer		Buffer for perfect bhop booleans, with the first element being the most recent bhop.
- * @param sampleSize	Maximum recent bhop samples.
- * @return				Number of bhop samples.
+ * @param sampleSize	Maximum recent bhop samples to include in calculation.
+ * @return				Player's average number of jump inputs.
  */
-native int GOKZ_AM_GetHitPerf(int client, bool[] buffer, int sampleSize);
-
+native float GOKZ_AM_GetAverageJumpInputs(int client, int sampleSize);
 
 
 

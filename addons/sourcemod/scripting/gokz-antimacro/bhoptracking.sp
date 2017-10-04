@@ -9,43 +9,6 @@
 
 // =========================  PUBLIC  ========================= //
 
-// Returns the ratio of perfect bunnyhops to total bunnyhops
-float GetPerfRatio(int client, int sampleSize = BHOP_SAMPLES)
-{
-	bool[] perfs = new bool[sampleSize];
-	GOKZ_AM_GetHitPerf(client, perfs, sampleSize);
-	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
-	int bhopCount = 0, perfCount = 0;
-	
-	for (int i = 0; i < maxIndex; i++)
-	{
-		bhopCount++;
-		if (perfs[i])
-		{
-			perfCount++;
-		}
-	}
-	return float(perfCount) / float(bhopCount);
-}
-
-// Returns the number of perfect bunnyhops in a sample size
-int GetPerfCount(int client, int sampleSize = BHOP_SAMPLES)
-{
-	bool[] perfs = new bool[sampleSize];
-	GOKZ_AM_GetHitPerf(client, perfs, sampleSize);
-	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
-	int perfCount = 0;
-	
-	for (int i = 0; i < maxIndex; i++)
-	{
-		if (perfs[i])
-		{
-			perfCount++;
-		}
-	}
-	return perfCount;
-}
-
 // Generate 'scroll pattern' report
 char[] GenerateBhopPatternReport(int client, int sampleSize = BHOP_SAMPLES, bool colours = true)
 {
@@ -58,19 +21,19 @@ char[] GenerateBhopPatternReport(int client, int sampleSize = BHOP_SAMPLES, bool
 	
 	for (int i = 0; i < maxIndex; i++)
 	{
-		if (perfs[i])
+		if (colours)
 		{
 			Format(report, sizeof(report), "%s %s%d", 
 				report, 
-				colours ? "{green}" : "P", 
+				perfs[i] ? "{green}" : "{default}", 
 				jumpInputs[i]);
 		}
 		else
 		{
-			Format(report, sizeof(report), "%s %s%d", 
+			Format(report, sizeof(report), "%s %d%s", 
 				report, 
-				colours ? "{default}" : "", 
-				jumpInputs[i]);
+				jumpInputs[i], 
+				perfs[i] ? "*" : "");
 		}
 	}
 	
@@ -117,38 +80,55 @@ static void CheckForBhopMacro(int client)
 	}
 	
 	int perfCount = GOKZ_AM_GetPerfCount(client, 20);
-	float perfRatio = GOKZ_AM_GetPerfRatio(client, 20);
-	int repeatingJumpInput = CheckForRepeatingJumpInputCount(client, 20);
-	
-	// TODO Don't make these checks up.
+	float averageJumpInputs = GOKZ_AM_GetAverageJumpInputs(client, 20);
 	
 	// Check #1
-	if (perfCount >= 17) // 85%
+	if (perfCount >= 17)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
-			"Perfs: %.2f%% (20 samples), Pattern: %s", 
-			perfRatio * 100, 
+			"High perf ratio - Perfs: %d/20, Pattern: %s", 
+			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
 		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
 		return;
 	}
 	
 	// Check #2	
-	if (perfCount >= 14 && repeatingJumpInput >= 2) // 70%
+	if (perfCount >= 10 && CheckForRepeatingJumpInputsCount(client, 0.85, 20) >= 2)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
-			"Perfs: %.2f%% (20 samples), Pattern: %s", 
-			perfRatio * 100, 
+			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
+			perfCount, 
+			GenerateBhopPatternReport(client, 20, false));
+		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
+		return;
+	}
+	
+	// Check #3
+	if (perfCount >= 15 && averageJumpInputs <= 2)
+	{
+		char details[128];
+		FormatEx(details, sizeof(details), 
+			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
+			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
 		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
 		return;
 	}
 }
 
-// Returns -1, or the repeating input if there if there is a input repeating more than 75% of the time
-static int CheckForRepeatingJumpInputCount(int client, int sampleSize = BHOP_SAMPLES)
+/**
+ * Returns -1, or the repeating input count if there if there is 
+ * an input count that repeats for more than the provided ratio.
+ *
+ * @param client		Client index.
+ * @param ratio			Minimum ratio to be considered 'repeating'.
+ * @param sampleSize	Maximum recent bhop samples to include in calculation.
+ * @return				The repeating input, or else -1.
+ */
+static int CheckForRepeatingJumpInputsCount(int client, float ratio = 0.5, int sampleSize = BHOP_SAMPLES)
 {
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
 	int[] jumpInputs = new int[sampleSize];
@@ -162,11 +142,11 @@ static int CheckForRepeatingJumpInputCount(int client, int sampleSize = BHOP_SAM
 		jumpInputsFrequency[jumpInputs[i]]++;
 	}
 	
-	// Returns i if more than 75% of the sample size is the same IN_JUMP count
-	int threshold = RoundToCeil(float(sampleSize) * 0.75);
+	// Returns i if more than the given ratio of the sample size has the same jump input count
+	int threshold = RoundToCeil(float(sampleSize) * ratio);
 	for (int i = 1; i < maxJumpInputs; i++)
 	{
-		if (jumpInputsFrequency[i] > threshold)
+		if (jumpInputsFrequency[i] >= threshold)
 		{
 			return i;
 		}
