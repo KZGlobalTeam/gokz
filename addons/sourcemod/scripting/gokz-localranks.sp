@@ -95,7 +95,13 @@ public void OnPluginStart()
 	CreateGlobalForwards();
 	CreateCommands();
 	
-	TryGetDatabaseInfo();
+	gH_DB = GOKZ_DB_GetDatabase();
+	if (gH_DB != null)
+	{
+		g_DBType = GOKZ_DB_GetDatabaseType();
+		DB_CreateTables();
+		CompletionMVPStarsUpdateAll();
+	}
 	
 	if (GOKZ_DB_IsMapSetUp())
 	{
@@ -143,9 +149,9 @@ public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int tel
 	return Plugin_Stop;
 }
 
-public void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType)
+public void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType)
 {
-	gH_DB = database;
+	gH_DB = GOKZ_DB_GetDatabase();
 	g_DBType = DBType;
 	DB_CreateTables();
 	CompletionMVPStarsUpdateAll();
@@ -244,19 +250,4 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public void OnMapStart()
 {
 	OnMapStart_Announcements();
-}
-
-
-
-// =========================  PRIVATE  ========================= //
-
-static void TryGetDatabaseInfo()
-{
-	GOKZ_DB_GetDatabase(gH_DB);
-	if (gH_DB != null)
-	{
-		g_DBType = GOKZ_DB_GetDatabaseType();
-		DB_CreateTables();
-		CompletionMVPStarsUpdateAll();
-	}
 } 

@@ -163,7 +163,7 @@ public void OnClientDisconnect(int client)
 }
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
-	if (IsValidClient(client) && OnClientSayCommand_ChatProcessing(client, sArgs) == Plugin_Handled)
+	if (IsValidClient(client) && OnClientSayCommand_ChatProcessing(client, command, sArgs) == Plugin_Handled)
 	{
 		return Plugin_Handled;
 	}

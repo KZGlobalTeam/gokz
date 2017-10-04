@@ -17,7 +17,7 @@ Handle H_OnTimeInserted;
 
 void CreateGlobalForwards()
 {
-	H_OnDatabaseConnect = CreateGlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnDatabaseConnect = CreateGlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell);
 	H_OnClientSetup = CreateGlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnMapSetup = CreateGlobalForward("GOKZ_DB_OnMapSetup", ET_Ignore, Param_Cell);
 	H_OnTimeInserted = CreateGlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
@@ -26,7 +26,6 @@ void CreateGlobalForwards()
 void Call_OnDatabaseConnect()
 {
 	Call_StartForward(H_OnDatabaseConnect);
-	Call_PushCell(gH_DB);
 	Call_PushCell(g_DBType);
 	Call_Finish();
 }
@@ -75,7 +74,7 @@ void CreateNatives()
 
 public int Native_GetDatabase(Handle plugin, int numParams)
 {
-	SetNativeCellRef(1, gH_DB);
+	return view_as<int>(CloneHandle(gH_DB));
 }
 
 public int Native_GetDatabaseType(Handle plugin, int numParams)
