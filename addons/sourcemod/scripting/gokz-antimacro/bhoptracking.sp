@@ -9,6 +9,26 @@
 
 // =========================  PUBLIC  ========================= //
 
+void PrintBhopCheckToChat(int client, int target)
+{
+	GOKZ_PrintToChat(client, true, 
+		"{lime}%N {grey}[{lime}%d%%%% {grey}Perfs | {lime}%.1f {grey}Average]", 
+		target, 
+		RoundFloat(GOKZ_AM_GetPerfRatio(target, 20) * 100.0), 
+		GOKZ_AM_GetAverageJumpInputs(target, 20));
+	GOKZ_PrintToChat(client, false, " {grey}Pattern - %s", GenerateBhopPatternReport(target, 20));
+}
+
+void PrintBhopCheckToConsole(int client, int target)
+{
+	PrintToConsole(client, 
+		"%N [%d% Perfs | %.1f Average]\n Pattern - %s", 
+		target, 
+		RoundFloat(GOKZ_AM_GetPerfRatio(target, 20) * 100.0), 
+		GOKZ_AM_GetAverageJumpInputs(target, 20), 
+		GenerateBhopPatternReport(target, 20, false));
+}
+
 // Generate 'scroll pattern' report
 char[] GenerateBhopPatternReport(int client, int sampleSize = BHOP_SAMPLES, bool colours = true)
 {
@@ -23,19 +43,21 @@ char[] GenerateBhopPatternReport(int client, int sampleSize = BHOP_SAMPLES, bool
 	{
 		if (colours)
 		{
-			Format(report, sizeof(report), "%s %s%d", 
+			Format(report, sizeof(report), "%s%s%d ", 
 				report, 
 				perfs[i] ? "{green}" : "{default}", 
 				jumpInputs[i]);
 		}
 		else
 		{
-			Format(report, sizeof(report), "%s %d%s", 
+			Format(report, sizeof(report), "%s%d%s ", 
 				report, 
 				jumpInputs[i], 
 				perfs[i] ? "*" : "");
 		}
 	}
+	
+	TrimString(report);
 	
 	return report;
 }

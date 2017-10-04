@@ -19,26 +19,60 @@ void CreateCommands()
 
 public Action CommandBhopCheck(int client, int args)
 {
-	// TODO Make this user friendly
-	
-	if (GOKZ_AM_GetSampleSize(client) == 0)
+	if (args == 0)
 	{
-		GOKZ_PrintToChat(client, true, "NO SAMPLES");
+		if (GOKZ_AM_GetSampleSize(client) == 0)
+		{
+			GOKZ_PrintToChat(client, true, "{grey}You have not bhopped enough for a bhop check.");
+		}
+		else
+		{
+			PrintBhopCheckToChat(client, client);
+		}
 		return Plugin_Handled;
 	}
 	
-	GOKZ_PrintToChat(client, true, "SAMPLES | RATIO | PATTERN");
-	int sampleSizes[] =  { 1, 3, 5, 10, 15, 20 };
-	for (int i = 0; i < sizeof(sampleSizes); i++)
+	char arg[65];
+	GetCmdArg(1, arg, sizeof(arg));
+	char targetName[MAX_TARGET_LENGTH];
+	int targetList[MAXPLAYERS], targetCount;
+	bool tnIsML;
+	
+	if ((targetCount = ProcessTargetString(
+				arg, 
+				client, 
+				targetList, 
+				MAXPLAYERS, 
+				COMMAND_FILTER_NO_IMMUNITY | COMMAND_FILTER_NO_BOTS | COMMAND_FILTER_CONNECTED, 
+				targetName, 
+				sizeof(targetName), 
+				tnIsML)) <= 0)
 	{
-		GOKZ_PrintToChat(client, false, "%d | %.3f | %s", 
-			sampleSizes[i], 
-			GOKZ_AM_GetPerfRatio(client, sampleSizes[i]), 
-			GenerateBhopPatternReport(client, sampleSizes[i]));
-		PrintToConsole(client, "%d | %.3f | %s", 
-			sampleSizes[i], 
-			GOKZ_AM_GetPerfRatio(client, sampleSizes[i]), 
-			GenerateBhopPatternReport(client, sampleSizes[i], false));
+		ReplyToTargetError(client, targetCount);
+		return Plugin_Handled;
 	}
+	
+	if (targetCount >= 2)
+	{
+		GOKZ_PrintToChat(client, true, "{grey}See console for output.");
+		for (int i = 0; i < targetCount; i++)
+		{
+			if (GOKZ_AM_GetSampleSize(targetList[i]) == 0)
+			{
+				PrintToConsole(client, "%n has not bhopped enough for a bhop check. Skipping...", targetList[i]);
+				continue;
+			}
+			PrintBhopCheckToConsole(client, targetList[i]);
+		}
+	}
+	else
+	{
+		if (GOKZ_AM_GetSampleSize(targetList[0]) == 0)
+		{
+			GOKZ_PrintToChat(client, true, "{lime}%N {grey}has not bhopped enough for a bhop check.", targetList[0]);
+		}
+		PrintBhopCheckToChat(client, targetList[0]);
+	}
+	
 	return Plugin_Handled;
 } 
