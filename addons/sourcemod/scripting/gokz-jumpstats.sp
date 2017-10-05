@@ -34,9 +34,12 @@ public Plugin myinfo =
 int gI_TouchingEntities[MAXPLAYERS + 1];
 
 #include "gokz-jumpstats/api.sp"
+#include "gokz-jumpstats/commands.sp"
 #include "gokz-jumpstats/distancetiers.sp"
 #include "gokz-jumpstats/jumpreporting.sp"
 #include "gokz-jumpstats/jumptracking.sp"
+#include "gokz-jumpstats/options.sp"
+#include "gokz-jumpstats/optionsmenu.sp"
 
 
 
@@ -56,9 +59,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-core.phrases");
 	LoadTranslations("gokz-jumpstats.phrases");
 	
 	CreateGlobalForwards();
+	CreateCommands();
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -100,6 +105,7 @@ public void OnClientPutInServer(int client)
 	gI_TouchingEntities[client] = 0;
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
+	OnClientPutInServer_Options(client);
 }
 
 public void SDKHook_StartTouch_Callback(int client, int touched)

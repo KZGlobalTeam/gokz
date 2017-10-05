@@ -120,6 +120,44 @@ char sql_options_get[] =
 
 
 
+// =========================  JUMPSTATS OPTIONS  ========================= //
+
+char sqlite_jsoptions_create[] = 
+"CREATE TABLE IF NOT EXISTS JumpstatsOptions ("
+..."SteamID32 INTEGER NOT NULL, "
+..."MasterSwitch INTEGER NOT NULL DEFAULT '1', "
+..."ChatTier INTEGER NOT NULL DEFAULT '1', "
+..."ConsoleTier INTEGER NOT NULL DEFAULT '2', "
+..."SoundTier INTEGER NOT NULL DEFAULT '2', "
+..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
+..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char mysql_jsoptions_create[] = 
+"CREATE TABLE IF NOT EXISTS JumpstatsOptions ("
+..."SteamID32 INTEGER UNSIGNED NOT NULL, "
+..."MasterSwitch TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."ChatTier TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."ConsoleTier TINYINT UNSIGNED NOT NULL DEFAULT '2', "
+..."SoundTier TINYINT UNSIGNED NOT NULL DEFAULT '2', "
+..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
+..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char sql_jsoptions_insert[] = 
+"INSERT INTO JumpstatsOptions (SteamID32) "
+..."VALUES (%d)";
+
+char sql_jsoptions_update[] = 
+"UPDATE JumpstatsOptions "
+..."SET MasterSwitch=%d, ChatTier=%d, ConsoleTier=%d, SoundTier=%d "
+..."WHERE SteamID32=%d";
+
+char sql_jsoptions_get[] = 
+"SELECT MasterSwitch, ChatTier, ConsoleTier, SoundTier "
+..."FROM JumpstatsOptions "
+..."WHERE SteamID32=%d";
+
+
+
 // =========================  MAPS  ========================= //
 
 char sqlite_maps_create[] = 
