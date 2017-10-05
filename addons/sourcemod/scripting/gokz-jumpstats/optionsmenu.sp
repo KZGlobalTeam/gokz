@@ -29,7 +29,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 		menu.GetItem(param2, info, sizeof(info));
 		JSOption option = view_as<JSOption>(StringToInt(info));
 		
-		CycleOption(param1, option, true);
+		CycleOption(param1, option);
 		DisplayOptionsMenu(param1, param2 / 6 * 6);
 	}
 	else if (action == MenuAction_End)
