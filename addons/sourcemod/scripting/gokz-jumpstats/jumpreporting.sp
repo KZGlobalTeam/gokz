@@ -8,7 +8,8 @@
 
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-sounds.cfg"
 
-static char tierColours[DISTANCETIER_COUNT][] =  { "{grey}", "{blue}", "{green}", "{darkred}", "{gold}" };
+static char tierColours[DISTANCETIER_COUNT][] =  { "{grey}", "{grey}", "{blue}", "{green}", "{darkred}", "{gold}" };
+static char sounds[DISTANCETIER_COUNT][256];
 
 
 
@@ -17,17 +18,19 @@ static char tierColours[DISTANCETIER_COUNT][] =  { "{grey}", "{blue}", "{green}"
 void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
 	int tier = GetDistanceTier(jumpType, GOKZ_GetOption(client, Option_Mode), distance, offset);
-	if (tier != DistanceTier_None)
+	if (tier == DistanceTier_None)
 	{
-		// Report the jump to the client and their spectators
-		for (int i = 1; i <= MaxClients; i++)
+		return;
+	}
+	
+	// Report the jumpstat to the client and their spectators
+	DoJumpstatsReport(client, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
+	
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && GetObserverTarget(i) == client)
 		{
-			if (i == client || IsValidClient(i) && GetObserverTarget(i) == client)
-			{
-				DoChatReport(i, client, jumpType, distance, height, preSpeed, maxSpeed, strafes, sync, tier);
-				DoConsoleReport(i, client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
-				PlayJumpstatSound(i, tier);
-			}
+			DoJumpstatsReport(i, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
 		}
 	}
 }
@@ -42,10 +45,31 @@ void OnMapStart_JumpReporting()
 
 
 
-// =========================  CONSOLE REPORT  ========================= //
+// =========================  PRIVATE  ========================= //
 
-static void DoConsoleReport(int client, int jumper, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
+static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
+	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
+	{
+		return;
+	}
+	
+	DoChatReport(client, jumper, jumpType, tier, distance, height, preSpeed, maxSpeed, strafes, sync);
+	DoConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
+	PlayJumpstatSound(client, tier);
+}
+
+
+
+// CONSOLE REPORT
+
+static void DoConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
+{
+	if (GOKZ_JS_GetOption(client, JSOption_MinConsoleTier) > tier)
+	{
+		return;
+	}
+	
 	PrintToConsole(client, "%t", "Console Jump Report", 
 		jumper, 
 		distance, 
@@ -78,10 +102,15 @@ static void DoConsoleReport(int client, int jumper, int jumpType, float distance
 
 
 
-// =========================  CHAT REPORT  ========================= //
+// CHAT REPORT
 
-static void DoChatReport(int client, int jumper, int jumpType, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync, int tier)
+static void DoChatReport(int client, int jumper, int jumpType, int tier, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync)
 {
+	if (GOKZ_JS_GetOption(client, JSOption_MinChatTier) > tier)
+	{
+		return;
+	}
+	
 	GOKZ_PrintToChat(client, true, 
 		"%s%s{grey}: %s%s {grey}[%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
 		tierColours[tier], 
@@ -146,16 +175,15 @@ static char[] GetSyncString(int client, float sync)
 
 
 
-// =========================  SOUNDS  ========================= //
-
-static char sounds[DISTANCETIER_COUNT][256];
+// SOUNDS
 
 void PlayJumpstatSound(int client, int tier)
 {
-	if (tier <= DistanceTier_Meh || tier >= DISTANCETIER_COUNT)
+	if (tier <= DistanceTier_Meh || GOKZ_JS_GetOption(client, JSOption_MinSoundTier) > tier)
 	{
-		return; // No sound available for specified tier
+		return;
 	}
+	
 	EmitSoundToClientAny(client, sounds[tier]);
 }
 

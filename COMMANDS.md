@@ -59,3 +59,7 @@ These commands return results based on your currently selected mode.
 ## GOKZ Replays
 
  * ```!replay``` - Opens the replay loading menu.
+ 
+## GOKZ Jumpstats
+
+ * ```!jumpstats```/```!js```/```!ljstats``` - Opens the jumpstats options menu.

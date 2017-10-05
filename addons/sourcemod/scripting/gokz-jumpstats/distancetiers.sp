@@ -67,7 +67,7 @@ static bool LoadDistanceTiers()
 		return false;
 	}
 	
-	for (int jumpType = 0; jumpType < JUMPTYPE_COUNT - 2; jumpType++)
+	for (int jumpType = 0; jumpType < sizeof(gC_KeysJumpType); jumpType++)
 	{
 		if (!kv.JumpToKey(gC_KeysJumpType[jumpType]))
 		{
@@ -79,7 +79,7 @@ static bool LoadDistanceTiers()
 			{
 				return false;
 			}
-			for (int tier = 0; tier < DISTANCETIER_COUNT; tier++)
+			for (int tier = DistanceTier_Meh; tier < DISTANCETIER_COUNT; tier++)
 			{
 				distanceTiers[jumpType][mode][tier] = kv.GetFloat(gC_KeysDistanceTier[tier]);
 			}
