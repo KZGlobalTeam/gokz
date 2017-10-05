@@ -75,6 +75,7 @@ public int Native_PrintToChat(Handle plugin, int numParams)
 	bool addPrefix = GetNativeCell(2);
 	
 	char buffer[1024];
+	SetGlobalTransTarget(client);
 	FormatNativeString(0, 3, 4, sizeof(buffer), _, buffer);
 	if (addPrefix)
 	{
