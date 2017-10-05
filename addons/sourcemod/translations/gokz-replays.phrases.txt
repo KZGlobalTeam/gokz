@@ -16,6 +16,7 @@
         "en"		"{darkred}There are currently no replay bots available."
     }
 
+    
 	// Replay Menu ////////////////////////////////////////////////////////////
     "Replay Menu - Title"
     {

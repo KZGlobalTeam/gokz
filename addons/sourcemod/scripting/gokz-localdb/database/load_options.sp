@@ -2,11 +2,6 @@
 	Database - Load Options
 	
 	Load player options from database.
-	
-	Notes:
-	Inserts the player into the options table if they aren't found,
-	then tries to load their options again. This will result in the
-	options loaded being the default values in the database.
 */
 
 

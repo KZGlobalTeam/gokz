@@ -14,7 +14,7 @@
     }
     "!pc"
     {
-        "en"        "{grey}Want to check how many maps you've beaten? Type {default}!pc <player> {grey}to find out!"
+        "en"        "{grey}Want to check how many maps and bonuses you've beaten? Type {default}!pc <player> {grey}to find out!"
     }
     "Bonus Commands"
     {
@@ -22,6 +22,6 @@
     }
     "MVP Stars"
     {
-        "en"        "{grey}You are awarded 1 MVP star for each percent of maps you have PRO ran on the server's default mode."
+        "en"        "{grey}Your MVP stars represent the percentage of maps and bonuses you've PRO ran on the server's default mode."
     }
 }

@@ -22,7 +22,7 @@
     }
     "!nc"
     {
-        "en"        "Use {default}!nc {grey}or bind a key to {default}+noclip {grey}to fly around the map. Beware - this will invalidate your run."
+        "en"        "Use {default}!nc {grey}or bind a key to {default}+noclip {grey}to fly around the map."
     }
     "Quick Switch Mode"
     {
@@ -30,7 +30,7 @@
     }
     "Hide Clutter"
     {
-        "en"        "{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 1 {grey}in console to cleanse yourself."
+        "en"        "{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 1 {grey}in console to clean it all up."
     }
     "!stopsound"
     {
