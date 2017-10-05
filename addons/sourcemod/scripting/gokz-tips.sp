@@ -20,9 +20,11 @@ public Plugin myinfo =
 #define TIPS_CORE "gokz-tips-core.phrases.txt"
 #define TIPS_LOCALRANKS "gokz-tips-localranks.phrases.txt"
 #define TIPS_REPLAYS "gokz-tips-replays.phrases.txt"
+#define TIPS_JUMPSTATS "gokz-tips-jumpstats.phrases.txt"
 
 bool gB_GOKZLocalRanks;
 bool gB_GOKZReplays;
+bool gB_GOKZJumpstats;
 ConVar gCV_gokz_tips_interval;
 ArrayList g_TipPhrases;
 int gI_CurrentTip;
@@ -46,6 +48,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-tips-core.phrases");
 	LoadTranslations("gokz-tips-localranks.phrases");
 	LoadTranslations("gokz-tips-replays.phrases");
+	LoadTranslations("gokz-tips-jumpstats.phrases");
 	
 	CreateConVars();
 	
@@ -58,6 +61,7 @@ public void OnAllPluginsLoaded()
 {
 	gB_GOKZLocalRanks = LibraryExists("gokz-localranks");
 	gB_GOKZReplays = LibraryExists("gokz-replays");
+	gB_GOKZJumpstats = LibraryExists("gokz-jumpstats");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -68,6 +72,7 @@ public void OnLibraryAdded(const char[] name)
 {
 	gB_GOKZLocalRanks = gB_GOKZLocalRanks || StrEqual(name, "gokz-localranks");
 	gB_GOKZReplays = gB_GOKZReplays || StrEqual(name, "gokz-replays");
+	gB_GOKZJumpstats = gB_GOKZJumpstats || StrEqual(name, "gokz-jumpstats");
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -78,6 +83,7 @@ public void OnLibraryRemoved(const char[] name)
 {
 	gB_GOKZLocalRanks = gB_GOKZLocalRanks && !StrEqual(name, "gokz-localranks");
 	gB_GOKZReplays = gB_GOKZReplays && !StrEqual(name, "gokz-replays");
+	gB_GOKZJumpstats = gB_GOKZJumpstats && !StrEqual(name, "gokz-jumpstats");
 }
 
 
@@ -95,7 +101,7 @@ public void OnMapStart()
 
 static void CreateConVars()
 {
-	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "60", "How often GOKZ tips are printed to chat.", _, true, 30.0, false);
+	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "60", "How often GOKZ tips are printed to chat in seconds.", _, true, 5.0, false);
 	gCV_gokz_tips_interval.AddChangeHook(OnConVarChanged);
 }
 
@@ -132,6 +138,12 @@ static void LoadTipPhrases()
 	if (gB_GOKZReplays)
 	{
 		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_REPLAYS);
+		LoadTipPhrasesFromFile(tipsPath);
+	}
+	
+	if (gB_GOKZJumpstats)
+	{
+		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_JUMPSTATS);
 		LoadTipPhrasesFromFile(tipsPath);
 	}
 	

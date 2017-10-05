@@ -6,11 +6,11 @@
     }
     "!maptop"
     {
-        "en"        "{grey}Check out a map's top times for your current selected mode by typing {default}!maptop <map>."
+        "en"        "{grey}Check out a map's top times for your currently selected mode by typing {default}!maptop <map>."
     }
     "!avg"
     {
-        "en"        "{grey}Want to see if you are above average? Type {default}!avg <map> {grey}to see the average finish time."
+        "en"        "{grey}Want to see if you're above average? Type {default}!avg <map> {grey}to see the average finish time."
     }
     "!pc"
     {

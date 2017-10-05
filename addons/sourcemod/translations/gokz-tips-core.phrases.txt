@@ -2,7 +2,7 @@
 {	
     "!options"
     {
-        "en"        "{grey}Open the {default}!options {grey}menu to easily view and change all the settings available to you."
+        "en"        "{grey}Open the {default}!options {grey}menu to easily view and change most of the settings available to you."
     }
     "!menu"
     {
@@ -18,7 +18,7 @@
     }
     "!pistol"
     {
-        "en"        "{grey}Do you yearn to be different for no reason? Change your pistol by through the {default}!pistol {grey}menu."
+        "en"        "{grey}Do you yearn to be different for no reason? Change your pistol through the {default}!pistol {grey}menu."
     }
     "!nc"
     {
@@ -26,7 +26,7 @@
     }
     "Quick Switch Mode"
     {
-        "en"        "{grey}You can quickswitch to the Vanilla mode by typing {default}!v{grey}, KZTimer mode by typing {default}!k{grey} and so on."
+        "en"        "{grey}You can quickly switch to the Vanilla mode by typing {default}!v{grey}, KZTimer mode by typing {default}!k{grey} and so on."
     }
     "Hide Clutter"
     {
@@ -34,7 +34,7 @@
     }
     "!stopsound"
     {
-        "en"        "{grey}Getting annoyed by obnoxious music from the map? Use {default}!stopsound {grey}to make it stop!"
+        "en"        "{grey}Getting annoyed by obnoxious music and sounds from the map? Use {default}!stopsound {grey}to make it stop!"
     }
     "!spec"
     {
@@ -46,10 +46,22 @@
     }
     "!goto"
     {
-        "en"        "{grey}Type {default}!goto {grey}to teleport to another player. This will stop your timer and require you to restart your run."
+        "en"        "{grey}Type {default}!goto <player> {grey}to teleport to another player."
     }
     "Custom Start Position"
     {
         "en"        "{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to create and remove custom start teleport locations."
+    }
+    "Tips Options"
+    {
+        "en"        "{grey}Tired of seeing tips flooding your chat? You can turn them off in your {default}!options {grey}menu."
+    }
+    "Auto-Restart"
+    {
+        "en"        "{grey}Tired of pressing E? Enable the auto restart option!"
+    }
+    "Not a Tip"
+    {
+        "en"        "{grey}This isn't a tip. I just wanted to let you know that you're doing great! Keep it up, future record holder!"
     }
 }
