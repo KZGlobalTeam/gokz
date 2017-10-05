@@ -82,7 +82,7 @@ forward void GOKZ_DB_OnTimeInserted(
 /**
  * Gets a clone of the GOKZ local database handle.
  *
- * @param database		Database handle (null if connection hasn't been made).
+ * @param database		Database handle (INVALID_HANDLE if connection hasn't been made).
  * @noreturn
  */
 native Database GOKZ_DB_GetDatabase();

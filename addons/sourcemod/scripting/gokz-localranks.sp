@@ -96,7 +96,7 @@ public void OnPluginStart()
 	CreateCommands();
 	
 	gH_DB = GOKZ_DB_GetDatabase();
-	if (gH_DB != null)
+	if (gH_DB != INVALID_HANDLE)
 	{
 		g_DBType = GOKZ_DB_GetDatabaseType();
 		DB_CreateTables();

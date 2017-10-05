@@ -74,6 +74,10 @@ void CreateNatives()
 
 public int Native_GetDatabase(Handle plugin, int numParams)
 {
+	if (gH_DB == null)
+	{
+		return view_as<int>(INVALID_HANDLE);
+	}
 	return view_as<int>(CloneHandle(gH_DB));
 }
 
