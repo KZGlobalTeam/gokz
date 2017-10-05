@@ -65,7 +65,8 @@ static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, fl
 
 static void DoConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
-	if (GOKZ_JS_GetOption(client, JSOption_MinConsoleTier) > tier)
+	int minConsoleTier = GOKZ_JS_GetOption(client, JSOption_MinConsoleTier);
+	if (minConsoleTier == 0 || minConsoleTier > tier) // 0 means disabled
 	{
 		return;
 	}
@@ -106,7 +107,8 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 
 static void DoChatReport(int client, int jumper, int jumpType, int tier, float distance, float preSpeed, float maxSpeed, int strafes, float sync)
 {
-	if (GOKZ_JS_GetOption(client, JSOption_MinChatTier) > tier)
+	int minChatTier = GOKZ_JS_GetOption(client, JSOption_MinChatTier);
+	if (minChatTier == 0 || minChatTier > tier) // 0 means disabled
 	{
 		return;
 	}
