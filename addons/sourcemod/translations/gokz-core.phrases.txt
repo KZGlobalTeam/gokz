@@ -57,6 +57,10 @@
 	{
 		"en"		"{grey}This server isn't connected to a {default}SimpleKZ{grey} database."
 	}
+    "See Console"
+    {
+        "en"        "{grey}See console for command output."
+    }
 	
 	
 	// Command Chat Messages ////////////////////////////////////////////////////////////

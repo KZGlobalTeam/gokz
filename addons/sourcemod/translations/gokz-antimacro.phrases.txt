@@ -1,0 +1,31 @@
+"Phrases"
+{
+    "Not Enough Bhops"
+    {
+    	// Bill has not bhopped enough for a bhop check.
+		"#format"	"{1:N}"
+        "en"        "{lime}{1} {grey}has not bhopped enough for a bhop check."
+    }
+    "Not Enough Bhops (Self)"
+    {
+        "en"        "{grey}You have not bhopped enough for a bhop check."
+    }
+    "Not Enough Bhops (Console)"
+    {
+    	// Bill has not bhopped enough for a bhop check. Skipping...
+		"#format"	"{1:N}"
+        "en"        "{1} has not bhopped enough for a bhop check. Skipping..."
+    }
+    "Perfs"
+    {
+        "en"        "Perfs"
+    }
+    "Average"
+    {
+        "en"        "Average"
+    }
+    "Pattern"
+    {
+        "en"        "Pattern"
+    }
+}

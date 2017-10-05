@@ -10,7 +10,7 @@
 
 void CreateCommands()
 {
-	RegConsoleCmd("sm_bhopcheck", CommandBhopCheck, "[KZ] Prints your bunnyhop stats report including perf ratio and scroll pattern.");
+	RegConsoleCmd("sm_bhopcheck", CommandBhopCheck, "[KZ] Shows bunnyhop stats report including perf ratio and scroll pattern.");
 }
 
 
@@ -23,7 +23,7 @@ public Action CommandBhopCheck(int client, int args)
 	{
 		if (GOKZ_AM_GetSampleSize(client) == 0)
 		{
-			GOKZ_PrintToChat(client, true, "{grey}You have not bhopped enough for a bhop check.");
+			GOKZ_PrintToChat(client, true, "%t", "Not Enough Bhops (Self)");
 		}
 		else
 		{
@@ -54,12 +54,12 @@ public Action CommandBhopCheck(int client, int args)
 	
 	if (targetCount >= 2)
 	{
-		GOKZ_PrintToChat(client, true, "{grey}See console for output.");
+		GOKZ_PrintToChat(client, true, "%t", "See Console");
 		for (int i = 0; i < targetCount; i++)
 		{
 			if (GOKZ_AM_GetSampleSize(targetList[i]) == 0)
 			{
-				PrintToConsole(client, "%n has not bhopped enough for a bhop check. Skipping...", targetList[i]);
+				PrintToConsole(client, "%t", "Not Enough Bhops (Console)", targetList[i]);
 				continue;
 			}
 			PrintBhopCheckToConsole(client, targetList[i]);
@@ -69,7 +69,7 @@ public Action CommandBhopCheck(int client, int args)
 	{
 		if (GOKZ_AM_GetSampleSize(targetList[0]) == 0)
 		{
-			GOKZ_PrintToChat(client, true, "{lime}%N {grey}has not bhopped enough for a bhop check.", targetList[0]);
+			GOKZ_PrintToChat(client, true, "%t", "Not Enough Bhops", targetList[0]);
 		}
 		PrintBhopCheckToChat(client, targetList[0]);
 	}

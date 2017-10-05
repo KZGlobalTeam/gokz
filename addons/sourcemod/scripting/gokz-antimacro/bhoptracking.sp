@@ -12,20 +12,28 @@
 void PrintBhopCheckToChat(int client, int target)
 {
 	GOKZ_PrintToChat(client, true, 
-		"{lime}%N {grey}[{lime}%d%%%% {grey}Perfs | {lime}%.1f {grey}Average]", 
+		"{lime}%N {grey}[{lime}%d%%%% {grey}%t | {lime}%.1f {grey}%t]", 
 		target, 
 		RoundFloat(GOKZ_AM_GetPerfRatio(target, 20) * 100.0), 
-		GOKZ_AM_GetAverageJumpInputs(target, 20));
-	GOKZ_PrintToChat(client, false, " {grey}Pattern - %s", GenerateBhopPatternReport(target, 20));
+		"Perfs", 
+		GOKZ_AM_GetAverageJumpInputs(target, 20), 
+		"Average");
+	GOKZ_PrintToChat(client, false, 
+		" {grey}%t - %s", 
+		"Pattern", 
+		GenerateBhopPatternReport(target, 20));
 }
 
 void PrintBhopCheckToConsole(int client, int target)
 {
 	PrintToConsole(client, 
-		"%N [%d% Perfs | %.1f Average]\n Pattern - %s", 
+		"%N [%d%% %t | %.1f %t]\n %t - %s", 
 		target, 
 		RoundFloat(GOKZ_AM_GetPerfRatio(target, 20) * 100.0), 
+		"Perfs", 
 		GOKZ_AM_GetAverageJumpInputs(target, 20), 
+		"Average", 
+		"Pattern", 
 		GenerateBhopPatternReport(target, 20, false));
 }
 
