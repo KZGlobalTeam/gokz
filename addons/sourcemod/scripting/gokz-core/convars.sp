@@ -4,19 +4,17 @@
 	ConVars for server control over features of the plugin.
 */
 
+#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
 
+// =========================  CONVARS  ========================= //
 
 ConVar gCV_gokz_chat_processing;
 ConVar gCV_gokz_chat_prefix;
 ConVar gCV_gokz_connection_messages;
-ConVar gCV_gokz_default_mode;
 ConVar gCV_gokz_player_models;
 ConVar gCV_gokz_player_models_alpha;
-
 ConVar gCV_sv_disable_immunity_alpha;
 ConVar gCV_sv_full_alltalk;
-
-
 
 // =========================  PUBLIC  ========================= //
 
@@ -25,13 +23,29 @@ void CreateConVars()
 	gCV_gokz_chat_processing = CreateConVar("gokz_chat_processing", "1", "Whether GOKZ processes player chat messages.", _, true, 0.0, true, 1.0);
 	gCV_gokz_chat_prefix = CreateConVar("gokz_chat_prefix", "{grey}[{green}KZ{grey}] ", "Chat prefix used for GOKZ messages.");
 	gCV_gokz_connection_messages = CreateConVar("gokz_connection_messages", "1", "Whether GOKZ handles connection and disconnection messages.", _, true, 0.0, true, 1.0);
-	gCV_gokz_default_mode = CreateConVar("gokz_default_mode", "1", "Default movement mode (0 = Vanilla, 1 = SimpleKZ, 2 = KZTimer).", _, true, 0.0, true, 2.0);
 	gCV_gokz_player_models = CreateConVar("gokz_player_models", "1", "Whether GOKZ sets player's models upon spawning.", _, true, 0.0, true, 1.0);
 	gCV_gokz_player_models_alpha = CreateConVar("gokz_player_models_alpha", "65", "Amount of alpha (transparency) to set player models to.", _, true, 0.0, true, 255.0);
 	gCV_sv_disable_immunity_alpha = FindConVar("sv_disable_immunity_alpha");
 	gCV_sv_full_alltalk = FindConVar("sv_full_alltalk");
 	
 	HookConVarChange(gCV_gokz_player_models_alpha, OnConVarChanged);
+}
+
+void LoadDefaultOptions()
+{
+	KeyValues kv = new KeyValues("options");
+
+	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	{
+		LogError("Cant read default options cfg file!");
+		return;
+	}
+
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		optionsValue[option] = kv.GetNum(gC_OptionsType[option]);
+	}
+	kv.GoBack();
 }
 
 

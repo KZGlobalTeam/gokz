@@ -283,7 +283,27 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_jump_impulse"
 };
 
-
+stock char gC_OptionsType[OPTION_COUNT][] =
+{
+	"mode",
+	"style",
+	"tpmenu",
+	"infopanel",
+	"showkeys",
+	"showplayers",
+	"showweapon",
+	"autorestart",
+	"slayonend",
+	"pistol",
+	"checkpointmessages",
+	"checkpointsounds",
+	"teleportsounds",
+	"errorsounds",
+	"timertext",
+	"speedtext",
+	"jumpbeam",
+	"helpandtips"
+};
 
 // =========================  FORWARDS  ========================= //
 

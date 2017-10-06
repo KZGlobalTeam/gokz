@@ -66,7 +66,7 @@ public int Native_GetLoadedModeCount(Handle plugin, int numParams)
 
 public int Native_GetDefaultMode(Handle plugin, int numParams)
 {
-	return gCV_gokz_default_mode.IntValue;
+	return optionsValue[Option_Mode];
 }
 
 public int Native_PrintToChat(Handle plugin, int numParams)

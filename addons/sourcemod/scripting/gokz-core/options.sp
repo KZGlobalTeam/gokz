@@ -99,24 +99,24 @@ void OnModeUnloaded_Options(int mode)
 
 static void SetDefaultOptions(int client)
 {
-	SetOption(client, Option_Mode, GOKZ_GetDefaultMode());
-	SetOption(client, Option_Style, Style_Normal);
-	SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
-	SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
-	SetOption(client, Option_ShowingKeys, ShowingKeys_Spectating);
-	SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
-	SetOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled);
-	SetOption(client, Option_AutoRestart, AutoRestart_Disabled);
-	SetOption(client, Option_SlayOnEnd, SlayOnEnd_Disabled);
-	SetOption(client, Option_Pistol, Pistol_USP);
-	SetOption(client, Option_CheckpointMessages, CheckpointMessages_Disabled);
-	SetOption(client, Option_CheckpointSounds, CheckpointSounds_Enabled);
-	SetOption(client, Option_TeleportSounds, TeleportSounds_Disabled);
-	SetOption(client, Option_ErrorSounds, ErrorSounds_Enabled);
-	SetOption(client, Option_TimerText, TimerText_InfoPanel);
-	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
-	SetOption(client, Option_JumpBeam, JumpBeam_Disabled);
-	SetOption(client, Option_HelpAndTips, HelpAndTips_Enabled);
+	SetOption(client, Option_Mode, optionsValue[Option_Mode]);
+	SetOption(client, Option_Style, optionsValue[Option_Style]);
+	SetOption(client, Option_ShowingTPMenu, optionsValue[Option_ShowingTPMenu]);
+	SetOption(client, Option_ShowingInfoPanel, optionsValue[Option_ShowingInfoPanel]);
+	SetOption(client, Option_ShowingKeys, optionsValue[Option_ShowingKeys]);
+	SetOption(client, Option_ShowingPlayers, optionsValue[Option_ShowingPlayers]);
+	SetOption(client, Option_ShowingWeapon, optionsValue[Option_ShowingWeapon]);
+	SetOption(client, Option_AutoRestart, optionsValue[Option_AutoRestart]);
+	SetOption(client, Option_SlayOnEnd, optionsValue[Option_SlayOnEnd]);
+	SetOption(client, Option_Pistol, optionsValue[Option_Pistol]);
+	SetOption(client, Option_CheckpointMessages, optionsValue[Option_CheckpointMessages]);
+	SetOption(client, Option_CheckpointSounds, optionsValue[Option_CheckpointSounds]);
+	SetOption(client, Option_TeleportSounds, optionsValue[Option_TeleportSounds]);
+	SetOption(client, Option_ErrorSounds, optionsValue[Option_ErrorSounds]);
+	SetOption(client, Option_TimerText, optionsValue[Option_TimerText]);
+	SetOption(client, Option_SpeedText, optionsValue[Option_SpeedText]);
+	SetOption(client, Option_JumpBeam, optionsValue[Option_JumpBeam]);
+	SetOption(client, Option_HelpAndTips, optionsValue[Option_HelpAndTips]);
 }
 
 static void PrintOptionChangeMessage(int client, Option option) {

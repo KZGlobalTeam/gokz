@@ -38,6 +38,8 @@ bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
 
+int optionsValue[OPTION_COUNT];
+
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
 #include "gokz-core/forwards.sp"
@@ -95,7 +97,8 @@ public void OnPluginStart()
 	CreateCommands();
 	CreateCommandListeners();
 	CreateHudSynchronizers();
-	
+	LoadDefaultOptions();
+
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 }
 
