@@ -38,7 +38,7 @@ bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
 
-int optionsValue[OPTION_COUNT];
+int defaultOption[OPTION_COUNT];
 
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
@@ -94,10 +94,10 @@ public void OnPluginStart()
 	CreateRegexes();
 	CreateHooks();
 	CreateConVars();
+	LoadDefaults();
 	CreateCommands();
 	CreateCommandListeners();
 	CreateHudSynchronizers();
-	LoadDefaultOptions();
 
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 }
@@ -431,4 +431,4 @@ static void UpdateOldVariables(int client)
 		Movement_GetOrigin(client, gF_OldOrigin[client]);
 		gB_OldDucking[client] = Movement_GetDucking(client);
 	}
-} 
+}

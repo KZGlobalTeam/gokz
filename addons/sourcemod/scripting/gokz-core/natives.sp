@@ -66,7 +66,7 @@ public int Native_GetLoadedModeCount(Handle plugin, int numParams)
 
 public int Native_GetDefaultMode(Handle plugin, int numParams)
 {
-	return optionsValue[Option_Mode];
+	return defaultOption[Option_Mode];
 }
 
 public int Native_PrintToChat(Handle plugin, int numParams)

@@ -4,8 +4,6 @@
 	ConVars for server control over features of the plugin.
 */
 
-#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
-
 // =========================  CONVARS  ========================= //
 
 ConVar gCV_gokz_chat_processing;
@@ -30,25 +28,6 @@ void CreateConVars()
 	
 	HookConVarChange(gCV_gokz_player_models_alpha, OnConVarChanged);
 }
-
-void LoadDefaultOptions()
-{
-	KeyValues kv = new KeyValues("options");
-
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
-	{
-		LogError("Cant read default options cfg file!");
-		return;
-	}
-
-	for (Option option; option < OPTION_COUNT; option++)
-	{
-		optionsValue[option] = kv.GetNum(gC_OptionsType[option]);
-	}
-	kv.GoBack();
-}
-
-
 
 // =========================  LISTENERS  ========================= //
 

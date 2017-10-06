@@ -4,7 +4,7 @@
 	Player options to customise their experience.
 */
 
-
+#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
 
 static int options[OPTION_COUNT][MAXPLAYERS + 1];
 
@@ -33,6 +33,22 @@ static int optionCounts[OPTION_COUNT] =
 
 
 // =========================  PUBLIC  ========================= //
+
+void LoadDefaults()
+{
+	KeyValues kv = new KeyValues("options");
+
+	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	{
+		LogError("Cant read default options cfg file!");
+		return;
+	}
+
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		defaultOption[option] = kv.GetNum(gC_OptionsType[option]);
+	}
+}
 
 int GetOption(int client, Option option)
 {
@@ -99,24 +115,24 @@ void OnModeUnloaded_Options(int mode)
 
 static void SetDefaultOptions(int client)
 {
-	SetOption(client, Option_Mode, optionsValue[Option_Mode]);
-	SetOption(client, Option_Style, optionsValue[Option_Style]);
-	SetOption(client, Option_ShowingTPMenu, optionsValue[Option_ShowingTPMenu]);
-	SetOption(client, Option_ShowingInfoPanel, optionsValue[Option_ShowingInfoPanel]);
-	SetOption(client, Option_ShowingKeys, optionsValue[Option_ShowingKeys]);
-	SetOption(client, Option_ShowingPlayers, optionsValue[Option_ShowingPlayers]);
-	SetOption(client, Option_ShowingWeapon, optionsValue[Option_ShowingWeapon]);
-	SetOption(client, Option_AutoRestart, optionsValue[Option_AutoRestart]);
-	SetOption(client, Option_SlayOnEnd, optionsValue[Option_SlayOnEnd]);
-	SetOption(client, Option_Pistol, optionsValue[Option_Pistol]);
-	SetOption(client, Option_CheckpointMessages, optionsValue[Option_CheckpointMessages]);
-	SetOption(client, Option_CheckpointSounds, optionsValue[Option_CheckpointSounds]);
-	SetOption(client, Option_TeleportSounds, optionsValue[Option_TeleportSounds]);
-	SetOption(client, Option_ErrorSounds, optionsValue[Option_ErrorSounds]);
-	SetOption(client, Option_TimerText, optionsValue[Option_TimerText]);
-	SetOption(client, Option_SpeedText, optionsValue[Option_SpeedText]);
-	SetOption(client, Option_JumpBeam, optionsValue[Option_JumpBeam]);
-	SetOption(client, Option_HelpAndTips, optionsValue[Option_HelpAndTips]);
+	SetOption(client, Option_Mode, defaultOption[Option_Mode]);
+	SetOption(client, Option_Style, defaultOption[Option_Style]);
+	SetOption(client, Option_ShowingTPMenu, defaultOption[Option_ShowingTPMenu]);
+	SetOption(client, Option_ShowingInfoPanel, defaultOption[Option_ShowingInfoPanel]);
+	SetOption(client, Option_ShowingKeys, defaultOption[Option_ShowingKeys]);
+	SetOption(client, Option_ShowingPlayers, defaultOption[Option_ShowingPlayers]);
+	SetOption(client, Option_ShowingWeapon, defaultOption[Option_ShowingWeapon]);
+	SetOption(client, Option_AutoRestart, defaultOption[Option_AutoRestart]);
+	SetOption(client, Option_SlayOnEnd, defaultOption[Option_SlayOnEnd]);
+	SetOption(client, Option_Pistol, defaultOption[Option_Pistol]);
+	SetOption(client, Option_CheckpointMessages, defaultOption[Option_CheckpointMessages]);
+	SetOption(client, Option_CheckpointSounds, defaultOption[Option_CheckpointSounds]);
+	SetOption(client, Option_TeleportSounds, defaultOption[Option_TeleportSounds]);
+	SetOption(client, Option_ErrorSounds, defaultOption[Option_ErrorSounds]);
+	SetOption(client, Option_TimerText, defaultOption[Option_TimerText]);
+	SetOption(client, Option_SpeedText, defaultOption[Option_SpeedText]);
+	SetOption(client, Option_JumpBeam, defaultOption[Option_JumpBeam]);
+	SetOption(client, Option_HelpAndTips, defaultOption[Option_HelpAndTips]);
 }
 
 static void PrintOptionChangeMessage(int client, Option option) {
