@@ -22,7 +22,7 @@
     }
     "!nc"
     {
-        "en"        "Use {default}!nc {grey}or bind a key to {default}+noclip {grey}to fly around the map."
+        "en"        "Use {default}!nc {grey}as a toggle or bind a key to {default}+noclip {grey}and hold it to fly around the map."
     }
     "Quick Switch Mode"
     {
@@ -67,5 +67,9 @@
     "!panel"
     {
         "en"        "{grey}You can toggle your centre panel entirely by typing {default}!panel{grey}."
+    }
+    "Binding Teleport Commands"
+    {
+        "en"        "{grey}You can bind keys to {default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {grey}sm_start {grey}and more instead of using the teleport menu."
     }
 }
