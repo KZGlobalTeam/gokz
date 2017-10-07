@@ -11,7 +11,6 @@ void CreateNatives()
 	CreateNative("GOKZ_GetModeLoaded", Native_GetModeLoaded);
 	CreateNative("GOKZ_SetModeLoaded", Native_SetModeLoaded);
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
-	CreateNative("GOKZ_GetDefaultMode", Native_GetDefaultMode);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
 	
 	CreateNative("GOKZ_StartTimer", Native_StartTimer);
@@ -39,6 +38,7 @@ void CreateNatives()
 	CreateNative("GOKZ_SetCheckpointCount", Native_SetCheckpointCount);
 	CreateNative("GOKZ_GetTeleportCount", Native_GetTeleportCount);
 	CreateNative("GOKZ_SetTeleportCount", Native_SetTeleportCount);
+	CreateNative("GOKZ_GetDefaultOption", Native_GetDefaultOption);
 	CreateNative("GOKZ_GetOption", Native_GetOption);
 	CreateNative("GOKZ_SetOption", Native_SetOption);
 	CreateNative("GOKZ_GetHitPerf", Native_GetHitPerf);
@@ -62,11 +62,6 @@ public int Native_SetModeLoaded(Handle plugin, int numParams)
 public int Native_GetLoadedModeCount(Handle plugin, int numParams)
 {
 	return GetLoadedModeCount();
-}
-
-public int Native_GetDefaultMode(Handle plugin, int numParams)
-{
-	return gCV_gokz_default_mode.IntValue;
 }
 
 public int Native_PrintToChat(Handle plugin, int numParams)
@@ -234,6 +229,11 @@ public int Native_SetTeleportCount(Handle plugin, int numParams)
 	
 	SetTeleportCount(GetNativeCell(1), GetNativeCell(2));
 	return view_as<int>(true);
+}
+
+public int Native_GetDefaultOption(Handle plugin, int numParams)
+{
+	return GetDefaultOption(GetNativeCell(1));
 }
 
 public int Native_GetOption(Handle plugin, int numParams)

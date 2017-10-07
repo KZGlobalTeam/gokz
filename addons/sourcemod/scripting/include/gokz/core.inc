@@ -262,6 +262,10 @@ stock char gC_PistolNames[PISTOL_COUNT][] =
 	"Tec-9"
 };
 
+
+
+// =========================  OTHER  ========================= //
+
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
 {
 	"sv_accelerate", 
@@ -281,6 +285,29 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_timebetweenducks", 
 	"sv_accelerate_use_weapon_speed", 
 	"sv_jump_impulse"
+};
+
+// Used and recommended for key value files
+stock char gC_KeysOptions[OPTION_COUNT][] = 
+{
+	"mode", 
+	"style", 
+	"tpmenu", 
+	"infopanel", 
+	"showkeys", 
+	"showplayers", 
+	"showweapon", 
+	"autorestart", 
+	"slayonend", 
+	"pistol", 
+	"checkpointmessages", 
+	"checkpointsounds", 
+	"teleportsounds", 
+	"errorsounds", 
+	"timertext", 
+	"speedtext", 
+	"jumpbeam", 
+	"helpandtips"
 };
 
 
@@ -587,13 +614,6 @@ native void GOKZ_SetModeLoaded(int mode, bool enabled);
 native int GOKZ_GetLoadedModeCount();
 
 /**
- * Gets the default movement mode as set by convar gokz_default_mode.
- *
- * @return				Default movement mode.
- */
-native int GOKZ_GetDefaultMode();
-
-/**
  * Prints a message to a client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
  * the beginning of the message e.g. "{default}Hello!".
@@ -808,6 +828,14 @@ native void GOKZ_TogglePause(int client);
  * @noreturn
  */
 native void GOKZ_PlayErrorSound(int client);
+
+/**
+ * Gets the default option value as set by a config file.
+ *
+ * @param option		GOKZ option.
+ * @return				Default option value.
+ */
+native int GOKZ_GetDefaultOption(Option option);
 
 /**
  * Gets the current value of a player's option.
@@ -1351,7 +1379,6 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetModeLoaded");
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
-	MarkNativeAsOptional("GOKZ_GetDefaultMode");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
 	
 	MarkNativeAsOptional("GOKZ_StartTimer");
@@ -1379,6 +1406,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_SetTeleportCount");
+	MarkNativeAsOptional("GOKZ_GetDefaultOption");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

@@ -350,6 +350,7 @@ public void OnMapStart()
 	OnMapStart_KZConfig();
 	OnMapStart_Prefix();
 	OnMapStart_JumpBeam();
+	OnMapStart_Options();
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)

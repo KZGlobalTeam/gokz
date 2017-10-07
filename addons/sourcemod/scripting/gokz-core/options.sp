@@ -4,8 +4,9 @@
 	Player options to customise their experience.
 */
 
+#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
 
-
+static int defaultOptions[OPTION_COUNT];
 static int options[OPTION_COUNT][MAXPLAYERS + 1];
 
 static int optionCounts[OPTION_COUNT] = 
@@ -33,6 +34,7 @@ static int optionCounts[OPTION_COUNT] =
 
 
 // =========================  PUBLIC  ========================= //
+
 
 int GetOption(int client, Option option)
 {
@@ -73,6 +75,11 @@ void CycleOption(int client, Option option, bool printMessage = false)
 	SetOption(client, option, (GetOption(client, option) + 1) % optionCounts[option], printMessage);
 }
 
+int GetDefaultOption(Option option)
+{
+	return defaultOptions[option];
+}
+
 
 
 // =========================  LISTENERS  ========================= //
@@ -93,30 +100,37 @@ void OnModeUnloaded_Options(int mode)
 	}
 }
 
+void OnMapStart_Options()
+{
+	LoadDefaultOptions();
+}
+
 
 
 // =========================  PRIVATE  ========================= //
 
+static void LoadDefaultOptions()
+{
+	KeyValues kv = new KeyValues("options");
+	
+	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	{
+		LogError("Can't read default options cfg file!");
+		return;
+	}
+	
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		defaultOptions[option] = kv.GetNum(gC_KeysOptions[option]);
+	}
+}
+
 static void SetDefaultOptions(int client)
 {
-	SetOption(client, Option_Mode, GOKZ_GetDefaultMode());
-	SetOption(client, Option_Style, Style_Normal);
-	SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
-	SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
-	SetOption(client, Option_ShowingKeys, ShowingKeys_Spectating);
-	SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
-	SetOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled);
-	SetOption(client, Option_AutoRestart, AutoRestart_Disabled);
-	SetOption(client, Option_SlayOnEnd, SlayOnEnd_Disabled);
-	SetOption(client, Option_Pistol, Pistol_USP);
-	SetOption(client, Option_CheckpointMessages, CheckpointMessages_Disabled);
-	SetOption(client, Option_CheckpointSounds, CheckpointSounds_Enabled);
-	SetOption(client, Option_TeleportSounds, TeleportSounds_Disabled);
-	SetOption(client, Option_ErrorSounds, ErrorSounds_Enabled);
-	SetOption(client, Option_TimerText, TimerText_InfoPanel);
-	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
-	SetOption(client, Option_JumpBeam, JumpBeam_Disabled);
-	SetOption(client, Option_HelpAndTips, HelpAndTips_Enabled);
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		SetOption(client, option, GetDefaultOption(option));
+	}
 }
 
 static void PrintOptionChangeMessage(int client, Option option) {

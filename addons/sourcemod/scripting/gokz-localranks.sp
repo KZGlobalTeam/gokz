@@ -208,7 +208,7 @@ public void GOKZ_LR_OnTimeProcessed(
 	
 	AnnounceNewTime(client, course, mode, runTime, teleportsUsed, firstTime, pbDiff, rank, maxRank, firstTimePro, pbDiffPro, rankPro, maxRankPro);
 	
-	if (course == 0 && mode == GOKZ_GetDefaultMode() && firstTimePro)
+	if (course == 0 && mode == GOKZ_GetDefaultOption(Option_Mode) && firstTimePro)
 	{
 		CompletionMVPStarsUpdate(client);
 	}
