@@ -175,6 +175,7 @@ public void GOKZ_DB_OnClientSetup(int client, int steamID)
 	if (GOKZ_DB_IsMapSetUp())
 	{
 		DB_CachePBs(client, steamID);
+		CompletionMVPStarsUpdate(client);
 	}
 }
 
@@ -208,7 +209,7 @@ public void GOKZ_LR_OnTimeProcessed(
 	
 	AnnounceNewTime(client, course, mode, runTime, teleportsUsed, firstTime, pbDiff, rank, maxRank, firstTimePro, pbDiffPro, rankPro, maxRankPro);
 	
-	if (course == 0 && mode == GOKZ_GetDefaultOption(Option_Mode) && firstTimePro)
+	if (mode == GOKZ_GetDefaultOption(Option_Mode) && firstTimePro)
 	{
 		CompletionMVPStarsUpdate(client);
 	}
