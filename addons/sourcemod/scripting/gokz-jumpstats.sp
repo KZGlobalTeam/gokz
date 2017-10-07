@@ -165,4 +165,5 @@ public void OnMapStart()
 {
 	OnMapStart_DistanceTiers();
 	OnMapStart_JumpReporting();
+	OnMapStart_Options();
 } 

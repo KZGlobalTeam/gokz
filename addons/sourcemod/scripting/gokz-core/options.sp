@@ -4,6 +4,8 @@
 	Player options to customise their experience.
 */
 
+
+
 #define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
 
 static int defaultOptions[OPTION_COUNT];
@@ -115,7 +117,7 @@ static void LoadDefaultOptions()
 	
 	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
 	{
-		LogError("Can't read default options cfg file!");
+		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
 		return;
 	}
 	

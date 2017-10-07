@@ -69,9 +69,15 @@ void Call_OnJumpInvalidated(int client)
 
 void CreateNatives()
 {
+	CreateNative("GOKZ_JS_GetDefaultOption", Native_GetDefaultOption);
 	CreateNative("GOKZ_JS_GetOption", Native_GetOption);
 	CreateNative("GOKZ_JS_SetOption", Native_SetOption);
 	CreateNative("GOKZ_JS_InvalidateJump", Native_InvalidateJump);
+}
+
+public int Native_GetDefaultOption(Handle plugin, int numParams)
+{
+	return GetDefaultOption(GetNativeCell(1));
 }
 
 public int Native_GetOption(Handle plugin, int numParams)

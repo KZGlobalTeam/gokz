@@ -107,6 +107,7 @@ stock char gC_DistanceTiers[DISTANCETIER_COUNT][] =
 stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "ladderhop" };
 stock char gC_KeysMode[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
 stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =  { "none", "meh", "impressive", "perfect", "godlike", "ownage" };
+stock char gC_KeysJSOptions[JSOPTION_COUNT][] =  { "masterswitch", "chatreport", "consolereport", "sounds" };
 
 
 
@@ -161,6 +162,14 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
 // =========================  NATIVES  ========================= //
 
 /**
+ * Gets the default jumpstats option value as set by a config file.
+ *
+ * @param option		GOKZ Jumpstats option.
+ * @return				Default option value.
+ */
+native int GOKZ_JS_GetDefaultOption(JSOption option);
+
+/**
  * Gets the current value of a player's jumpstats option.
  *
  * @param client		Client index.
@@ -206,6 +215,9 @@ public SharedPlugin __pl_gokz_jumpstats =
 #if !defined REQUIRE_PLUGIN
 public void __pl_gokz_jumpstats_SetNTVOptional()
 {
+	MarkNativeAsOptional("GOKZ_JS_GetDefaultOptions");
+	MarkNativeAsOptional("GOKZ_JS_GetOption");
+	MarkNativeAsOptional("GOKZ_JS_SetOption");
 	MarkNativeAsOptional("GOKZ_JS_InvalidateJump");
 }
 #endif

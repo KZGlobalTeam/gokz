@@ -6,6 +6,9 @@
 
 
 
+#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-options.cfg"
+
+static int defaultOptions[JSOPTION_COUNT];
 static int options[JSOPTION_COUNT][MAXPLAYERS + 1];
 
 static int optionCounts[JSOPTION_COUNT] = 
@@ -54,6 +57,11 @@ void CycleOption(int client, JSOption option, bool printMessage = false)
 	SetOption(client, option, (GetOption(client, option) + 1) % optionCounts[option], printMessage);
 }
 
+int GetDefaultOption(JSOption option)
+{
+	return defaultOptions[option];
+}
+
 
 
 // =========================  LISTENERS  ========================= //
@@ -63,16 +71,37 @@ void OnClientPutInServer_Options(int client)
 	SetDefaultOptions(client);
 }
 
+void OnMapStart_Options()
+{
+	LoadDefaultOptions();
+}
+
 
 
 // =========================  PRIVATE  ========================= //
 
+static void LoadDefaultOptions()
+{
+	KeyValues kv = new KeyValues("options");
+	
+	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	{
+		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
+		return;
+	}
+	
+	for (JSOption option; option < JSOPTION_COUNT; option++)
+	{
+		defaultOptions[option] = kv.GetNum(gC_KeysJSOptions[option]);
+	}
+}
+
 static void SetDefaultOptions(int client)
 {
-	SetOption(client, JSOption_JumpstatsMaster, JumpstatsMaster_Enabled);
-	SetOption(client, JSOption_MinChatTier, DistanceTier_Meh);
-	SetOption(client, JSOption_MinConsoleTier, DistanceTier_Impressive);
-	SetOption(client, JSOption_MinSoundTier, DistanceTier_Impressive);
+	for (JSOption option; option < JSOPTION_COUNT; option++)
+	{
+		SetOption(client, option, GetDefaultOption(option));
+	}
 }
 
 static void PrintOptionChangeMessage(int client, JSOption option)
