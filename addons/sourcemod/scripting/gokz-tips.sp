@@ -131,7 +131,7 @@ public Action Timer_PrintTip(Handle timer)
 
 static void CreateConVars()
 {
-	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "60", "How often GOKZ tips are printed to chat in seconds.", _, true, 5.0, false);
+	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 5.0, false);
 	gCV_gokz_tips_interval.AddChangeHook(OnConVarChanged);
 }
 
