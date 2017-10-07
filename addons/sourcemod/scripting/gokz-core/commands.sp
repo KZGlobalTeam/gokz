@@ -28,6 +28,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
+	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
 	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
 	RegConsoleCmd("sm_ssp", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
@@ -51,10 +52,13 @@ void CreateCommands()
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
 	RegConsoleCmd("sm_mode", CommandMode, "[KZ] Open the movement mode selection menu.");
 	RegConsoleCmd("sm_vanilla", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
+	RegConsoleCmd("sm_vnl", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
 	RegConsoleCmd("sm_v", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
 	RegConsoleCmd("sm_simplekz", CommandSimpleKZ, "[KZ] Switch to the SimpleKZ mode.");
+	RegConsoleCmd("sm_skz", CommandSimpleKZ, "[KZ] Switch to the SimpleKZ mode.");
 	RegConsoleCmd("sm_s", CommandSimpleKZ, "[KZ] Switch to the SimpleKZ mode.");
 	RegConsoleCmd("sm_kztimer", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
+	RegConsoleCmd("sm_kzt", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
 	RegConsoleCmd("sm_k", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
 }
 
