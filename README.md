@@ -1,4 +1,4 @@
-# GOKZ Plugin Package (CS:GO)
+# GOKZ SourceMod Plugin Package (CS:GO)
 
 ## Features
 
@@ -40,4 +40,4 @@ To add a timer button to a map, use a ```func_button``` with a specific name.
  
 **NOTE:** Enable both the ```Don't move``` and ```Toggle``` flags to avoid any usability issues.
 
-### [Commands](COMMANDS.md)
+### [Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)
