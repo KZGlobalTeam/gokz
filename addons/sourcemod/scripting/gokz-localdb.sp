@@ -113,7 +113,7 @@ public void OnLibraryRemoved(const char[] name)
 
 public void GOKZ_OnClientSetup(int client)
 {
-	if (IsFakeClient(client))
+	if (IsFakeClient(client) || gH_DB == null)
 	{
 		return;
 	}

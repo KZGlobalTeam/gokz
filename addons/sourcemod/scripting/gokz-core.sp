@@ -115,6 +115,10 @@ public void OnAllPluginsLoaded()
 		if (IsClientInGame(client))
 		{
 			OnClientPutInServer(client);
+			if (IsClientAuthorized(client))
+			{
+				OnClientPostAdminCheck(client);
+			}
 		}
 	}
 }
