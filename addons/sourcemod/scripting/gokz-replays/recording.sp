@@ -32,7 +32,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 {
 	if (!recording[client])
 	{
-		return;
+		return false;
 	}
 	
 	// Prepare data
@@ -56,6 +56,11 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	}
 	
 	File file = OpenFile(path, "wb");
+	if (file == null)
+	{
+		LogError("Couldn't create/open replay file to write to: %s", path);
+		return false;
+	}
 	
 	// Prepare more data
 	char steamID2[24], ip[16], alias[MAX_NAME_LENGTH];
@@ -97,6 +102,8 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	// Discard recorded data
 	recordedTickData[client].Clear();
 	recording[client] = false;
+	
+	return true;
 }
 
 void DiscardRecording(int client)
