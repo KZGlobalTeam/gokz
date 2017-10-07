@@ -566,7 +566,7 @@ void OnTeleport_ValidJump(int client, bool origin, bool velocity)
 	{
 		lastVelocityTeleportTick[client] = GetGameTickCount();
 		// Allow short grace period for velocity so that modes may set player speed
-		if (GetGameTickCount() - Movement_GetTakeoffTick(client) > 1)
+		if (GetGameTickCount() - Movement_GetTakeoffTick(client) > 2)
 		{
 			InvalidateJump(client);
 		}
