@@ -6,6 +6,7 @@
 
 #define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
 
+static int defaultOptions[OPTION_COUNT];
 static int options[OPTION_COUNT][MAXPLAYERS + 1];
 
 static int optionCounts[OPTION_COUNT] = 
@@ -34,21 +35,6 @@ static int optionCounts[OPTION_COUNT] =
 
 // =========================  PUBLIC  ========================= //
 
-void LoadDefaults()
-{
-	KeyValues kv = new KeyValues("options");
-
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
-	{
-		LogError("Cant read default options cfg file!");
-		return;
-	}
-
-	for (Option option; option < OPTION_COUNT; option++)
-	{
-		defaultOption[option] = kv.GetNum(gC_OptionsType[option]);
-	}
-}
 
 int GetOption(int client, Option option)
 {
@@ -89,6 +75,11 @@ void CycleOption(int client, Option option, bool printMessage = false)
 	SetOption(client, option, (GetOption(client, option) + 1) % optionCounts[option], printMessage);
 }
 
+int GetDefaultOption(Option option)
+{
+	return defaultOptions[option];
+}
+
 
 
 // =========================  LISTENERS  ========================= //
@@ -109,30 +100,37 @@ void OnModeUnloaded_Options(int mode)
 	}
 }
 
+void OnMapStart_Options()
+{
+	LoadDefaultOptions();
+}
+
 
 
 // =========================  PRIVATE  ========================= //
 
+static void LoadDefaultOptions()
+{
+	KeyValues kv = new KeyValues("options");
+	
+	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	{
+		LogError("Can't read default options cfg file!");
+		return;
+	}
+	
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		defaultOptions[option] = kv.GetNum(gC_KeysOptions[option]);
+	}
+}
+
 static void SetDefaultOptions(int client)
 {
-	SetOption(client, Option_Mode, defaultOption[Option_Mode]);
-	SetOption(client, Option_Style, defaultOption[Option_Style]);
-	SetOption(client, Option_ShowingTPMenu, defaultOption[Option_ShowingTPMenu]);
-	SetOption(client, Option_ShowingInfoPanel, defaultOption[Option_ShowingInfoPanel]);
-	SetOption(client, Option_ShowingKeys, defaultOption[Option_ShowingKeys]);
-	SetOption(client, Option_ShowingPlayers, defaultOption[Option_ShowingPlayers]);
-	SetOption(client, Option_ShowingWeapon, defaultOption[Option_ShowingWeapon]);
-	SetOption(client, Option_AutoRestart, defaultOption[Option_AutoRestart]);
-	SetOption(client, Option_SlayOnEnd, defaultOption[Option_SlayOnEnd]);
-	SetOption(client, Option_Pistol, defaultOption[Option_Pistol]);
-	SetOption(client, Option_CheckpointMessages, defaultOption[Option_CheckpointMessages]);
-	SetOption(client, Option_CheckpointSounds, defaultOption[Option_CheckpointSounds]);
-	SetOption(client, Option_TeleportSounds, defaultOption[Option_TeleportSounds]);
-	SetOption(client, Option_ErrorSounds, defaultOption[Option_ErrorSounds]);
-	SetOption(client, Option_TimerText, defaultOption[Option_TimerText]);
-	SetOption(client, Option_SpeedText, defaultOption[Option_SpeedText]);
-	SetOption(client, Option_JumpBeam, defaultOption[Option_JumpBeam]);
-	SetOption(client, Option_HelpAndTips, defaultOption[Option_HelpAndTips]);
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		SetOption(client, option, GetDefaultOption(option));
+	}
 }
 
 static void PrintOptionChangeMessage(int client, Option option) {
