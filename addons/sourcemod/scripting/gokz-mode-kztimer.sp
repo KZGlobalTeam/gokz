@@ -24,7 +24,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-kztimer.txt"
+#define UPDATE_URL "http://updater.simplekz.com/gokz-mode-kztimer.txt"
 
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250

@@ -6,6 +6,8 @@
 #include <movementapi>
 #include <gokz/core>
 #include <gokz/antimacro>
+#undef REQUIRE_PLUGIN
+#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -20,6 +22,8 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATE_URL "http://updater.simplekz.com/gokz-antimacro.txt"
 
 #define BUTTON_SAMPLES 16
 #define BHOP_GROUND_TICKS 4
@@ -58,6 +62,22 @@ public void OnPluginStart()
 	
 	CreateGlobalForwards();
 	CreateCommands();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 

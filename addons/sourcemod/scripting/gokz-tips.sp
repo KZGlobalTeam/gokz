@@ -15,7 +15,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-tips.txt"
+#define UPDATE_URL "http://updater.simplekz.com/gokz-tips.txt"
 
 #define TIPS_CORE "gokz-tips-core.phrases.txt"
 #define TIPS_LOCALRANKS "gokz-tips-localranks.phrases.txt"

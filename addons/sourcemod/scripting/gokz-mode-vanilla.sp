@@ -24,7 +24,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-vanilla.txt"
+#define UPDATE_URL "http://updater.simplekz.com/gokz-mode-vanilla.txt"
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];

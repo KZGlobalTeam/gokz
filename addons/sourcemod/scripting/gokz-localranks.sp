@@ -27,7 +27,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-localranks.txt"
+#define UPDATE_URL "http://updater.simplekz.com/gokz-localranks.txt"
 
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
