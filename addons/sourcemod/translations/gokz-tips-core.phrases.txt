@@ -64,4 +64,8 @@
     {
         "en"        "{grey}This isn't a tip. I just wanted to let you know that you're doing great! Keep it up, future record holder!"
     }
+    "!panel"
+    {
+        "en"        "{grey}You can toggle your centre panel entirely by typing {default}!panel{grey}."
+    }
 }

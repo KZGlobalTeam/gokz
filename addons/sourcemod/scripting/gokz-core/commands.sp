@@ -41,6 +41,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open up the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
+	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
 	RegConsoleCmd("sm_speed", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 	RegConsoleCmd("sm_measure", CommandMeasureMenu, "[KZ] Open the measurement menu.");
