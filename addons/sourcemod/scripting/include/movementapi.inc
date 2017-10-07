@@ -24,29 +24,14 @@
 	
 	Perfect Bunnyhop (Perf)
 	When the player has jumped in the tick after landing and keeps their speed.
+    
+    Jumpbug
+    When the player is never seen as 'on ground' when bunnyhopping. This is achievable by uncrouching and jumping at the same time. A jumpbug results in unusual behaviour such as maintaining horizontal speed and not receiving fall damage.
 */
 
 
 
 // =========================  FORWARDS  ========================= //
-
-/**
- * Called when an alive player presses a button.
- *
- * @param client		Client index.
- * @param button		Button pressed e.g. IN_FORWARD, IN_LEFT.
- * @noreturn
- */
-forward void Movement_OnButtonPress(int client, int button);
-
-/**
- * Called when an alive player releases a button.
- *
- * @param client		Client index.
- * @param button		Button released e.g. IN_FORWARD, IN_LEFT.
- * @noreturn
- */
-forward void Movement_OnButtonRelease(int client, int button);
 
 /**
  * Called when a player starts ducking.
@@ -361,10 +346,12 @@ public void __pl_movementapi_SetNTVOptional()
 	MarkNativeAsOptional("Movement_GetTakeoffVelocity");
 	MarkNativeAsOptional("Movement_GetTakeoffSpeed");
 	MarkNativeAsOptional("Movement_GetTakeoffTick");
+	MarkNativeAsOptional("Movement_GetTakeoffCmdNum");
 	MarkNativeAsOptional("Movement_GetLandingOrigin");
 	MarkNativeAsOptional("Movement_GetLandingVelocity");
 	MarkNativeAsOptional("Movement_GetLandingSpeed");
 	MarkNativeAsOptional("Movement_GetLandingTick");
+	MarkNativeAsOptional("Movement_GetLandingCmdNum");
 	MarkNativeAsOptional("Movement_GetTurning");
 	MarkNativeAsOptional("Movement_GetTurningLeft");
 	MarkNativeAsOptional("Movement_GetTurningRight");
