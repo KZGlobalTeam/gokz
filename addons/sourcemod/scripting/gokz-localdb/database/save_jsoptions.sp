@@ -17,7 +17,7 @@ void DB_SaveJSOptions(int client)
 	
 	Transaction txn = SQL_CreateTransaction();
 	
-	// Update options
+	// Update jumpstats options
 	FormatEx(query, sizeof(query), 
 		sql_jsoptions_update, 
 		GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster), 

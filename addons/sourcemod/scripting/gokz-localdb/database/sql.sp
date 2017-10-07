@@ -129,8 +129,8 @@ char sqlite_jsoptions_create[] =
 ..."ChatTier INTEGER NOT NULL DEFAULT '1', "
 ..."ConsoleTier INTEGER NOT NULL DEFAULT '2', "
 ..."SoundTier INTEGER NOT NULL DEFAULT '2', "
-..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
-..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+..."CONSTRAINT PK_JSOptions PRIMARY KEY (SteamID32), "
+..."CONSTRAINT FK_JSOptions_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
 char mysql_jsoptions_create[] = 
 "CREATE TABLE IF NOT EXISTS JumpstatsOptions ("
@@ -139,8 +139,8 @@ char mysql_jsoptions_create[] =
 ..."ChatTier TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."ConsoleTier TINYINT UNSIGNED NOT NULL DEFAULT '2', "
 ..."SoundTier TINYINT UNSIGNED NOT NULL DEFAULT '2', "
-..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
-..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+..."CONSTRAINT PK_JSOptions PRIMARY KEY (SteamID32), "
+..."CONSTRAINT FK_JSOptions_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
 char sql_jsoptions_insert[] = 
 "INSERT INTO JumpstatsOptions (SteamID32) "

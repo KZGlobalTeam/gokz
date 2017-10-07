@@ -43,6 +43,7 @@ public void DB_TxnSuccess_LoadOptions(Handle db, int userid, int numQueries, Han
 	}
 	else if (SQL_FetchRow(results[0]))
 	{
+		// Doing this without a for loop in case things deviate from the enum
 		KZPlayer player = new KZPlayer(client);
 		player.mode = SQL_FetchInt(results[0], 0);
 		player.style = SQL_FetchInt(results[0], 1);
