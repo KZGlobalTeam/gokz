@@ -37,6 +37,7 @@ Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
+int gI_OldButtons[MAXPLAYERS + 1];
 
 #include "gokz-core/commands.sp"
 #include "gokz-core/convars.sp"
@@ -172,13 +173,14 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	OnPlayerRunCmd_Timer(client);
+	OnPlayerRunCmd_Timer(client); // This should be first!
 	OnPlayerRunCmd_TPMenu(client);
 	OnPlayerRunCmd_InfoPanel(client, cmdnum);
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
-	UpdateOldVariables(client);
+	OnPlayerRunCmd_VirtualButtons(client, buttons);
+	UpdateOldVariables(client, buttons); // This should be last!
 	return Plugin_Continue;
 }
 
@@ -245,11 +247,6 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 
 
 // =========================  MOVEMENTAPI  ========================= //
-
-public void Movement_OnButtonPress(int client, int button)
-{
-	OnButtonPress_VirtualButtons(client, button);
-}
 
 public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
 {
@@ -422,11 +419,12 @@ static void CreateHudSynchronizers()
 	CreateHudSynchronizerTimerText();
 }
 
-static void UpdateOldVariables(int client)
+static void UpdateOldVariables(int client, int buttons)
 {
 	if (IsPlayerAlive(client))
 	{
 		Movement_GetOrigin(client, gF_OldOrigin[client]);
 		gB_OldDucking[client] = Movement_GetDucking(client);
 	}
+	gI_OldButtons[client] = buttons;
 } 
