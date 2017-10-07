@@ -45,10 +45,10 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	LoadTranslations("gokz-tips-core.phrases");
-	LoadTranslations("gokz-tips-localranks.phrases");
-	LoadTranslations("gokz-tips-replays.phrases");
-	LoadTranslations("gokz-tips-jumpstats.phrases");
+	LoadTranslations(TIPS_CORE);
+	LoadTranslations(TIPS_LOCALRANKS);
+	LoadTranslations(TIPS_REPLAYS);
+	LoadTranslations(TIPS_JUMPSTATS);
 	
 	CreateConVars();
 	
@@ -93,6 +93,36 @@ public void OnLibraryRemoved(const char[] name)
 public void OnMapStart()
 {
 	LoadTipPhrases();
+}
+
+
+
+// =========================  TIPS TIMER  ========================= //
+
+static void CreateTipsTimer()
+{
+	if (gH_TipTimer != null)
+	{
+		gH_TipTimer.Close();
+	}
+	gH_TipTimer = CreateTimer(gCV_gokz_tips_interval.FloatValue, Timer_PrintTip, _, TIMER_REPEAT);
+}
+
+public Action Timer_PrintTip(Handle timer)
+{
+	char tip[256];
+	g_TipPhrases.GetString(gI_CurrentTip, tip, sizeof(tip));
+	
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		KZPlayer player = new KZPlayer(client);
+		if (player.inGame && player.helpAndTips != HelpAndTips_Disabled)
+		{
+			GOKZ_PrintToChat(client, true, "%t", tip);
+		}
+	}
+	
+	gI_CurrentTip = NextIndex(gI_CurrentTip, g_TipPhrases.Length);
 }
 
 
@@ -150,7 +180,7 @@ static void LoadTipPhrases()
 	ShuffleTipPhrases();
 }
 
-void LoadTipPhrasesFromFile(const char[] filePath)
+static void LoadTipPhrasesFromFile(const char[] filePath)
 {
 	KeyValues kv = new KeyValues("Phrases");
 	if (!kv.ImportFromFile(filePath))
@@ -167,7 +197,7 @@ void LoadTipPhrasesFromFile(const char[] filePath)
 	} while (kv.GotoNextKey(true));
 }
 
-void ShuffleTipPhrases()
+static void ShuffleTipPhrases()
 {
 	for (int i = g_TipPhrases.Length - 1; i >= 1; i--)
 	{
@@ -179,30 +209,4 @@ void ShuffleTipPhrases()
 		g_TipPhrases.SetString(i, tempStringJ);
 		g_TipPhrases.SetString(j, tempStringI);
 	}
-}
-
-void CreateTipsTimer()
-{
-	if (gH_TipTimer != null)
-	{
-		gH_TipTimer.Close();
-	}
-	gH_TipTimer = CreateTimer(gCV_gokz_tips_interval.FloatValue, Timer_PrintTip, _, TIMER_REPEAT);
-}
-
-public Action Timer_PrintTip(Handle timer)
-{
-	char tip[256];
-	g_TipPhrases.GetString(gI_CurrentTip, tip, sizeof(tip));
-	
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		KZPlayer player = new KZPlayer(client);
-		if (player.inGame && player.helpAndTips != HelpAndTips_Disabled)
-		{
-			GOKZ_PrintToChat(client, true, "%t", tip);
-		}
-	}
-	
-	gI_CurrentTip = NextIndex(gI_CurrentTip, g_TipPhrases.Length);
 } 
