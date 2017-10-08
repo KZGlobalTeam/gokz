@@ -10,7 +10,7 @@
     }
     "!adv"
     {
-        "en"        "{grey}Think you're an advanced user? Type {default}!adv {grey}to bring up the fancy, advanced checkpoint and teleport menu."
+        "en"        "{grey}Use {default}!adv {grey}to bring up the advanced teleport menu."
     }
     "!mode"
     {
@@ -18,15 +18,15 @@
     }
     "!pistol"
     {
-        "en"        "{grey}Do you yearn to be different for no reason? Change your pistol through the {default}!pistol {grey}menu."
+        "en"        "{grey}You can switch pistols through the {default}!pistol {grey}menu."
     }
     "!nc"
     {
-        "en"        "Use {default}!nc {grey}as a toggle or bind a key to {default}+noclip {grey}and hold it to fly around the map."
+        "en"        "Use {default}!nc {grey}as a toggle or bind a key to {default}+noclip {grey}and hold it to be able to fly around the map."
     }
     "Quick Switch Mode"
     {
-        "en"        "{grey}You can quickly switch to the Vanilla mode by typing {default}!v{grey}, KZTimer mode by typing {default}!k{grey} and so on."
+        "en"        "{grey}You can quickly switch to the Vanilla mode by typing {default}!v{grey}, KZTimer mode by typing {default}!k{grey}, and so on."
     }
     "Hide Clutter"
     {
@@ -38,11 +38,11 @@
     }
     "!spec"
     {
-        "en"        "{grey}Wanna watch somebody better than you? Type {default}!spec <player>{grey}, and {default}!resume {grey}to get back to where you left off."
+        "en"        "{grey}Type {default}!spec <player>{grey} to start watching a fellow player, and {default}!resume {grey}to get back to where you left off."
     }
     "!measure"
     {
-        "en"        "{grey}Having trouble with a jump? Use the {default}!measure {grey}menu to find out if it's only a 230 and you are just that bad."
+        "en"        "{grey}Having trouble with a jump? Use the {default}!measure {grey}menu to find out exactly how long it is."
     }
     "!goto"
     {
@@ -66,10 +66,10 @@
     }
     "!panel"
     {
-        "en"        "{grey}You can toggle your centre panel entirely by typing {default}!panel{grey}."
+        "en"        "{grey}You can toggle your centre panel by typing {default}!panel{grey}."
     }
     "Binding Teleport Commands"
     {
-        "en"        "{grey}You can bind keys to {default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {grey}sm_start {grey}and more instead of using the teleport menu."
+        "en"        "{grey}You can bind keys to {default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {default}sm_start{grey}, and more instead of using the teleport menu."
     }
 }
