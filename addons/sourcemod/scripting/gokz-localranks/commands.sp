@@ -28,6 +28,11 @@ void CreateCommands()
 
 public Action CommandTop(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	// Open player top for the player's selected mode
 	g_PlayerTopMode[client] = GOKZ_GetOption(client, Option_Mode);
 	DisplayPlayerTopMenu(client);
@@ -36,6 +41,11 @@ public Action CommandTop(int client, int args)
 
 public Action CommandMapTop(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Open map top for current map and their current mode
 		DB_OpenMapTop(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetOption(client, Option_Mode));
@@ -51,6 +61,11 @@ public Action CommandMapTop(int client, int args)
 
 public Action CommandBMapTop(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Open Bonus 1 top for current map and their current mode		
 		DB_OpenMapTop(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetOption(client, Option_Mode));
@@ -89,6 +104,11 @@ public Action CommandBMapTop(int client, int args)
 
 public Action CommandPB(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Print their PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetOption(client, Option_Mode));
@@ -109,7 +129,13 @@ public Action CommandPB(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action CommandBPB(int client, int args) {
+public Action CommandBPB(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Print their Bonus 1 PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetOption(client, Option_Mode));
@@ -164,6 +190,11 @@ public Action CommandBPB(int client, int args) {
 
 public Action CommandWR(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Print record times for current map and their current mode
 		DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetOption(client, Option_Mode));
@@ -179,6 +210,11 @@ public Action CommandWR(int client, int args)
 
 public Action CommandBWR(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Print Bonus 1 record times for current map and their current mode
 		DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetOption(client, Option_Mode));
@@ -217,6 +253,11 @@ public Action CommandBWR(int client, int args)
 
 public Action CommandAVG(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Print average times for current map and their current mode
 		DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetOption(client, Option_Mode));
@@ -232,6 +273,11 @@ public Action CommandAVG(int client, int args)
 
 public Action CommandBAVG(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args == 0)
 	{  // Print Bonus 1 average times for current map and their current mode
 		DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetOption(client, Option_Mode));
@@ -270,6 +316,11 @@ public Action CommandBAVG(int client, int args)
 
 public Action CommandPC(int client, int args)
 {
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
 	if (args < 1)
 	{
 		DB_GetCompletion(client, GetSteamAccountID(client), GOKZ_GetOption(client, Option_Mode), true);
@@ -290,4 +341,26 @@ public Action CommandPC(int client, int args)
 public Action CommandUpdateMapPool(int client, int args)
 {
 	DB_UpdateRankedMapPool(client);
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+bool IsSpammingCommands(int client, bool printMessage = true)
+{
+	float currentTime = GetEngineTime();
+	float timeSinceLastCommand = currentTime - gF_LastCommandTime[client];
+	if (timeSinceLastCommand < COMMAND_COOLDOWN)
+	{
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Please Wait Before Using Command", COMMAND_COOLDOWN - timeSinceLastCommand);
+		}
+		return true;
+	}
+	
+	// Not spamming commands - all good!
+	gF_LastCommandTime[client] = currentTime;
+	return false;
 } 

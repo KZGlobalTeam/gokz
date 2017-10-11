@@ -29,10 +29,13 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.simplekz.com/gokz-localranks.txt"
 
+#define COMMAND_COOLDOWN 2.5
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
+
+float gF_LastCommandTime[MAXPLAYERS + 1];
 
 char gC_MapTopMapName[MAXPLAYERS + 1][64];
 int gI_MapTopMapID[MAXPLAYERS + 1];

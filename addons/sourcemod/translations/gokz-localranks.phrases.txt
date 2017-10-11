@@ -1,6 +1,12 @@
 "Phrases"
 {	
 	// Chat Messages ////////////////////////////////////////////////////////////
+    "Please Wait Before Using Command"
+	{
+        // Please wait 2.5 seconds before using that command.
+        "#format"   "{1:.1f}"
+        "en"        "{grey}Please wait {default}{1} {grey}seconds before using that command."
+    }
 	"Player Not Found"
 	{
 		// Your search for player 'Bill' returned with no results.
