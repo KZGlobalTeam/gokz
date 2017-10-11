@@ -1,0 +1,140 @@
+/*
+	Database - Open Recent Records
+	
+	Opens the menu with a list of recently broken records for 
+	the given mode and time type.
+*/
+
+
+
+void DB_OpenRecentRecords(int client, int mode, int timeType)
+{
+	char query[1024];
+	
+	DataPack data = new DataPack();
+	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(mode);
+	data.WriteCell(timeType);
+	
+	Transaction txn = SQL_CreateTransaction();
+	
+	switch (timeType)
+	{
+		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getrecentrecords, mode, 20);
+		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getrecentrecords_pro, mode, 20);
+	}
+	txn.AddQuery(query);
+	
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenRecentRecords, DB_TxnFailure_Generic, data, DBPrio_Low);
+}
+
+public void DB_TxnSuccess_OpenRecentRecords(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int mode = data.ReadCell();
+	int timeType = data.ReadCell();
+	data.Close();
+	
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
+	// Check if there are any times
+	if (SQL_GetRowCount(results[0]) == 0)
+	{
+		switch (timeType)
+		{
+			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "No Times Found");
+			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "No Times Found (PRO)");
+		}
+		return;
+	}
+	
+	Menu menu = new Menu(MenuHandler_RecentRecordsSubmenu);
+	menu.Pagination = 5;
+	
+	// Set submenu title
+	menu.SetTitle("%T", "Recent Records Submenu - Title", client, 
+		gC_TimeTypeNames[timeType], gC_ModeNames[mode]);
+	
+	// Add submenu items
+	char display[256], mapName[64], playerName[33];
+	int course;
+	float runTime;
+	
+	while (SQL_FetchRow(results[0]))
+	{
+		SQL_FetchString(results[0], 0, mapName, sizeof(mapName));
+		course = SQL_FetchInt(results[0], 1);
+		SQL_FetchString(results[0], 3, playerName, sizeof(playerName));
+		runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[0], 4));
+		
+		if (course == 0)
+		{
+			FormatEx(display, sizeof(display), "%s - %s (%s)", 
+				mapName, playerName, GOKZ_FormatTime(runTime));
+		}
+		else
+		{
+			FormatEx(display, sizeof(display), "%s B%d - %s (%s)", 
+				mapName, course, playerName, GOKZ_FormatTime(runTime));
+		}
+		
+		menu.AddItem(IntToStringEx(SQL_FetchInt(results[0], 2)), display, ITEMDRAW_DISABLED);
+	}
+	
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+
+
+// =========================  MENUS  ========================= //
+
+void DisplayRecentRecordsMenu(int client)
+{
+	Menu menu = new Menu(MenuHandler_RecentRecords);
+	menu.SetTitle("%T", "Recent Records Menu - Title", client, gC_ModeNames[g_MapTopMode[client]]);
+	RecentRecordsMenuAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+static void RecentRecordsMenuAddItems(int client, Menu menu)
+{
+	char display[32];
+	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
+	{
+		FormatEx(display, sizeof(display), "%T", "Recent Records Menu - Record Type", client, gC_TimeTypeNames[timeType]);
+		menu.AddItem("", display, ITEMDRAW_DEFAULT);
+	}
+}
+
+
+
+// =========================  MENU HANDLERS  ========================= //
+
+public int MenuHandler_RecentRecords(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		DB_OpenRecentRecords(param1, g_RecentRecordsMode[param1], param2);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+public int MenuHandler_RecentRecordsSubmenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	// TODO Menu item info is course's MapCourseID, but is currently not used
+	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayRecentRecordsMenu(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+} 

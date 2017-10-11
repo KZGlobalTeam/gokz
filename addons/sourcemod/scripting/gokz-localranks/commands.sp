@@ -18,6 +18,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_avg", CommandAVG, "[KZ] Prints the average map run time to chat. Usage !avg <map>");
 	RegConsoleCmd("sm_bavg", CommandBAVG, "[KZ] Prints the average bonus run time to chat. Usage !bavg <#bonus> <map>");
 	RegConsoleCmd("sm_pc", CommandPC, "[KZ] Prints map completion to chat. Usage: !pc <player>");
+	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Opens a menu showing recently broken records.");
+	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Opens a menu showing recently broken records.");
 	
 	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Updates the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
 }
@@ -331,6 +333,19 @@ public Action CommandPC(int client, int args)
 		GetCmdArg(1, argPlayer, sizeof(argPlayer));
 		DB_GetCompletion_FindPlayer(client, argPlayer, GOKZ_GetOption(client, Option_Mode));
 	}
+	return Plugin_Handled;
+}
+
+public Action CommandRecentRecords(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+	
+	// Open recent records for the player's selected mode
+	g_RecentRecordsMode[client] = GOKZ_GetOption(client, Option_Mode);
+	DisplayRecentRecordsMenu(client);
 	return Plugin_Handled;
 }
 

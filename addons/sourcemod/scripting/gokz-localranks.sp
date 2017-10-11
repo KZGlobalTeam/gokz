@@ -44,6 +44,8 @@ int g_MapTopMode[MAXPLAYERS + 1];
 
 int g_PlayerTopMode[MAXPLAYERS + 1];
 
+int g_RecentRecordsMode[MAXPLAYERS + 1];
+
 bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 float gF_RecordTimesCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_RecordMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
@@ -68,6 +70,7 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/database/open_maptop.sp"
 #include "gokz-localranks/database/open_maptop20.sp"
 #include "gokz-localranks/database/open_playertop20.sp"
+#include "gokz-localranks/database/open_recent_records.sp"
 #include "gokz-localranks/database/print_average.sp"
 #include "gokz-localranks/database/print_pbs.sp"
 #include "gokz-localranks/database/print_records.sp"
