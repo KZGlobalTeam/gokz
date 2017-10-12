@@ -9,6 +9,7 @@
 #define PAUSE_COOLDOWN 1.0
 
 static bool paused[MAXPLAYERS + 1];
+static bool pausedOnLadder[MAXPLAYERS + 1];
 static float lastPauseTime[MAXPLAYERS + 1];
 static bool hasPausedInThisRun[MAXPLAYERS + 1];
 static float lastResumeTime[MAXPLAYERS + 1];
@@ -21,6 +22,11 @@ static bool hasResumedInThisRun[MAXPLAYERS + 1];
 bool GetPaused(int client)
 {
 	return paused[client];
+}
+
+void SetPausedOnLadder(int client, bool onLadder)
+{
+	pausedOnLadder[client] = onLadder;
 }
 
 void Pause(int client)
@@ -55,6 +61,7 @@ void Pause(int client)
 	
 	// Pause
 	paused[client] = true;
+	pausedOnLadder[client] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
 	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 	Movement_SetMoveType(client, MOVETYPE_NONE);
 	if (GetTimerRunning(client))
@@ -90,7 +97,14 @@ void Resume(int client)
 	}
 	
 	// Resume
-	Movement_SetMoveType(client, MOVETYPE_WALK);
+	if (pausedOnLadder[client])
+	{
+		Movement_SetMoveType(client, MOVETYPE_LADDER);
+	}
+	else
+	{
+		Movement_SetMoveType(client, MOVETYPE_WALK);
+	}
 	paused[client] = false;
 	if (GetTimerRunning(client))
 	{
