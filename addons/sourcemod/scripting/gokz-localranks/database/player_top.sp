@@ -1,10 +1,12 @@
 /*
-	Database - Open Player Top 20
+	Database - Player Top
 	
 	Opens the menu with top 20 record holders for the time type and given mode.
-	See also:
-		menus/playertop.sp
 */
+
+
+
+static int playerTopMode[MAXPLAYERS + 1];
 
 
 
@@ -56,7 +58,7 @@ public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueri
 			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "Player Top - No Times");
 			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "Player Top - No Times (PRO)");
 		}
-		DisplayPlayerTopMenu(client);
+		DisplayPlayerTopMenu(client, playerTopMode[client]);
 		return;
 	}
 	
@@ -86,10 +88,12 @@ public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueri
 
 // =========================  MENUS  ========================= //
 
-void DisplayPlayerTopMenu(int client)
+void DisplayPlayerTopMenu(int client, int mode)
 {
+	playerTopMode[client] = mode;
+	
 	Menu menu = new Menu(MenuHandler_PlayerTop);
-	menu.SetTitle("%T", "Player Top Menu - Title", client, gC_ModeNames[g_PlayerTopMode[client]]);
+	menu.SetTitle("%T", "Player Top Menu - Title", client, gC_ModeNames[mode]);
 	PlayerTopMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -112,7 +116,7 @@ public int MenuHandler_PlayerTop(Menu menu, MenuAction action, int param1, int p
 {
 	if (action == MenuAction_Select)
 	{
-		DB_OpenPlayerTop20(param1, param2, g_PlayerTopMode[param1]);
+		DB_OpenPlayerTop20(param1, param2, playerTopMode[param1]);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -125,7 +129,7 @@ public int MenuHandler_PlayerTopSubmenu(Menu menu, MenuAction action, int param1
 	// Menu item info is player's SteamID32, but is currently not used
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
-		DisplayPlayerTopMenu(param1);
+		DisplayPlayerTopMenu(param1, playerTopMode[param1]);
 	}
 	else if (action == MenuAction_End)
 	{

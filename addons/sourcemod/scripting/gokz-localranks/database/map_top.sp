@@ -1,12 +1,121 @@
 /*
-	Database - Open Map Top 20
+	Database - Map Top
 	
 	Opens the menu with the top 20 times for the map course and given mode.
-	See also:
-		menus/maptop.sp
 */
 
 
+
+static char mapTopMap[MAXPLAYERS + 1][64];
+static int mapTopMapID[MAXPLAYERS + 1];
+static int mapTopCourse[MAXPLAYERS + 1];
+static int mapTopMode[MAXPLAYERS + 1];
+
+
+
+// =========================  MAP TOP  ========================= //
+
+void DB_OpenMapTop(int client, int mapID, int course, int mode)
+{
+	char query[1024];
+	
+	DataPack data = new DataPack();
+	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(mapID);
+	data.WriteCell(course);
+	data.WriteCell(mode);
+	
+	Transaction txn = SQL_CreateTransaction();
+	
+	// Retrieve Map Name of MapID
+	FormatEx(query, sizeof(query), sql_maps_getname, mapID);
+	txn.AddQuery(query);
+	// Check for existence of map course with that MapID and Course
+	FormatEx(query, sizeof(query), sql_mapcourses_findid, mapID, course);
+	txn.AddQuery(query);
+	
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTopMenu, DB_TxnFailure_Generic, data, DBPrio_Low);
+}
+
+public void DB_TxnSuccess_OpenMapTopMenu(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int mapID = data.ReadCell();
+	int course = data.ReadCell();
+	int mode = data.ReadCell();
+	data.Close();
+	
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
+	// Get name of map
+	if (SQL_FetchRow(results[0]))
+	{
+		SQL_FetchString(results[0], 0, mapTopMap[client], sizeof(mapTopMap[]));
+	}
+	// Check if the map course exists in the database
+	if (SQL_GetRowCount(results[1]) == 0)
+	{
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Main Course Not Found", mapTopMap[client]);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Bonus Not Found", mapTopMap[client], course);
+		}
+		return;
+	}
+	
+	mapTopMapID[client] = mapID;
+	mapTopCourse[client] = course;
+	mapTopMode[client] = mode;
+	DisplayMapTopMenu(client);
+}
+
+void DB_OpenMapTop_FindMap(int client, const char[] mapSearch, int course, int mode)
+{
+	DataPack data = new DataPack();
+	data.WriteCell(GetClientUserId(client));
+	data.WriteString(mapSearch);
+	data.WriteCell(course);
+	data.WriteCell(mode);
+	
+	DB_FindMap(mapSearch, DB_TxnSuccess_OpenMapTopMenu_FindMap, data, DBPrio_Low);
+}
+
+public void DB_TxnSuccess_OpenMapTopMenu_FindMap(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	char mapSearch[33];
+	data.ReadString(mapSearch, sizeof(mapSearch));
+	int course = data.ReadCell();
+	int mode = data.ReadCell();
+	data.Close();
+	
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
+	if (SQL_GetRowCount(results[0]) == 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Map Not Found", mapSearch);
+		return;
+	}
+	else if (SQL_FetchRow(results[0]))
+	{  // Result is the MapID
+		DB_OpenMapTop(client, SQL_FetchInt(results[0], 0), course, mode);
+	}
+}
+
+
+
+// =========================  MAP TOP 20  ========================= //
 
 void DB_OpenMapTop20(int client, int mapID, int course, int mode, int timeType)
 {
@@ -136,15 +245,15 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 void DisplayMapTopMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_MapTop);
-	if (gI_MapTopCourse[client] == 0)
+	if (mapTopCourse[client] == 0)
 	{
 		menu.SetTitle("%T", "Map Top Menu - Title", client, 
-			gC_MapTopMapName[client], gC_ModeNames[g_MapTopMode[client]]);
+			mapTopMap[client], gC_ModeNames[mapTopMode[client]]);
 	}
 	else
 	{
 		menu.SetTitle("%T", "Map Top Menu - Title (Bonus)", client, 
-			gC_MapTopMapName[client], gI_MapTopCourse[client], gC_ModeNames[g_MapTopMode[client]]);
+			mapTopMap[client], mapTopCourse[client], gC_ModeNames[mapTopMode[client]]);
 	}
 	MapTopMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -168,7 +277,7 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 {
 	if (action == MenuAction_Select)
 	{
-		DB_OpenMapTop20(param1, gI_MapTopMapID[param1], gI_MapTopCourse[param1], g_MapTopMode[param1], param2);
+		DB_OpenMapTop20(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], param2);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -178,7 +287,7 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 
 public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, int param2)
 {
-	// Menu item info is player's SteamID32, but is currently not used
+	// TODO Menu item info is player's SteamID32, but is currently not used
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
 		DisplayMapTopMenu(param1);

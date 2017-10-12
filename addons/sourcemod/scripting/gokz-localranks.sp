@@ -30,30 +30,17 @@ public Plugin myinfo =
 #define UPDATE_URL "http://updater.simplekz.com/gokz-localranks.txt"
 
 #define COMMAND_COOLDOWN 2.5
+#define MAP_POOL_CFG_PATH "cfg/sourcemod/gokz/mappool.cfg"
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
-
-float gF_LastCommandTime[MAXPLAYERS + 1];
-
-char gC_MapTopMapName[MAXPLAYERS + 1][64];
-int gI_MapTopMapID[MAXPLAYERS + 1];
-int gI_MapTopCourse[MAXPLAYERS + 1];
-int g_MapTopMode[MAXPLAYERS + 1];
-
-int g_PlayerTopMode[MAXPLAYERS + 1];
-
-int g_RecentRecordsMode[MAXPLAYERS + 1];
-
 bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 float gF_RecordTimesCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_RecordMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
-
 bool gB_PBExistsCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 float gF_PBTimesCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_PBMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
-
 char gC_BeatRecordSound[256];
 
 #include "gokz-localranks/database/sql.sp"
@@ -62,19 +49,17 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/commands.sp"
 #include "gokz-localranks/database.sp"
 #include "gokz-localranks/misc.sp"
-
 #include "gokz-localranks/database/cache_pbs.sp"
 #include "gokz-localranks/database/cache_records.sp"
 #include "gokz-localranks/database/create_tables.sp"
 #include "gokz-localranks/database/get_completion.sp"
-#include "gokz-localranks/database/open_maptop.sp"
-#include "gokz-localranks/database/open_maptop20.sp"
-#include "gokz-localranks/database/open_playertop20.sp"
-#include "gokz-localranks/database/open_recent_records.sp"
+#include "gokz-localranks/database/map_top.sp"
+#include "gokz-localranks/database/player_top.sp"
 #include "gokz-localranks/database/print_average.sp"
 #include "gokz-localranks/database/print_pbs.sp"
 #include "gokz-localranks/database/print_records.sp"
 #include "gokz-localranks/database/process_new_time.sp"
+#include "gokz-localranks/database/recent_records.sp"
 #include "gokz-localranks/database/update_ranked_map_pool.sp"
 
 

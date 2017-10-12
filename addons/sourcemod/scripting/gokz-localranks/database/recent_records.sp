@@ -1,9 +1,13 @@
 /*
-	Database - Open Recent Records
+	Database - Recent Records
 	
-	Opens the menu with a list of recently broken records for 
-	the given mode and time type.
+	Opens the menu with a list of recently broken records for the given mode 
+	and time type.
 */
+
+
+
+static int recentRecordsMode[MAXPLAYERS + 1];
 
 
 
@@ -92,10 +96,12 @@ public void DB_TxnSuccess_OpenRecentRecords(Handle db, DataPack data, int numQue
 
 // =========================  MENUS  ========================= //
 
-void DisplayRecentRecordsMenu(int client)
+void DisplayRecentRecordsMenu(int client, int mode)
 {
+	recentRecordsMode[client] = mode;
+	
 	Menu menu = new Menu(MenuHandler_RecentRecords);
-	menu.SetTitle("%T", "Recent Records Menu - Title", client, gC_ModeNames[g_MapTopMode[client]]);
+	menu.SetTitle("%T", "Recent Records Menu - Title", client, gC_ModeNames[mode]);
 	RecentRecordsMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -118,7 +124,7 @@ public int MenuHandler_RecentRecords(Menu menu, MenuAction action, int param1, i
 {
 	if (action == MenuAction_Select)
 	{
-		DB_OpenRecentRecords(param1, g_RecentRecordsMode[param1], param2);
+		DB_OpenRecentRecords(param1, recentRecordsMode[param1], param2);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -131,7 +137,7 @@ public int MenuHandler_RecentRecordsSubmenu(Menu menu, MenuAction action, int pa
 	// TODO Menu item info is course's MapCourseID, but is currently not used
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
-		DisplayRecentRecordsMenu(param1);
+		DisplayRecentRecordsMenu(param1, recentRecordsMode[param1]);
 	}
 	else if (action == MenuAction_End)
 	{

@@ -6,6 +6,10 @@
 
 
 
+static float lastCommandTime[MAXPLAYERS + 1];
+
+
+
 void CreateCommands()
 {
 	RegConsoleCmd("sm_top", CommandTop, "[KZ] Opens a menu showing the top record holders.");
@@ -36,8 +40,7 @@ public Action CommandTop(int client, int args)
 	}
 	
 	// Open player top for the player's selected mode
-	g_PlayerTopMode[client] = GOKZ_GetOption(client, Option_Mode);
-	DisplayPlayerTopMenu(client);
+	DisplayPlayerTopMenu(client, GOKZ_GetOption(client, Option_Mode));
 	return Plugin_Handled;
 }
 
@@ -344,8 +347,7 @@ public Action CommandRecentRecords(int client, int args)
 	}
 	
 	// Open recent records for the player's selected mode
-	g_RecentRecordsMode[client] = GOKZ_GetOption(client, Option_Mode);
-	DisplayRecentRecordsMenu(client);
+	DisplayRecentRecordsMenu(client, GOKZ_GetOption(client, Option_Mode));
 	return Plugin_Handled;
 }
 
@@ -365,7 +367,7 @@ public Action CommandUpdateMapPool(int client, int args)
 bool IsSpammingCommands(int client, bool printMessage = true)
 {
 	float currentTime = GetEngineTime();
-	float timeSinceLastCommand = currentTime - gF_LastCommandTime[client];
+	float timeSinceLastCommand = currentTime - lastCommandTime[client];
 	if (timeSinceLastCommand < COMMAND_COOLDOWN)
 	{
 		if (printMessage)
@@ -376,6 +378,6 @@ bool IsSpammingCommands(int client, bool printMessage = true)
 	}
 	
 	// Not spamming commands - all good!
-	gF_LastCommandTime[client] = currentTime;
+	lastCommandTime[client] = currentTime;
 	return false;
 } 

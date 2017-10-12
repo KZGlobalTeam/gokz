@@ -7,19 +7,15 @@
 
 
 
-#define FILE_PATH_MAPPOOL "cfg/sourcemod/gokz/mappool.cfg"
-
-
-
 void DB_UpdateRankedMapPool(int client)
 {
-	Handle file = OpenFile(FILE_PATH_MAPPOOL, "r");
+	Handle file = OpenFile(MAP_POOL_CFG_PATH, "r");
 	if (file == null)
 	{
-		LogError("There was a problem opening file: %s", FILE_PATH_MAPPOOL);
+		LogError("There was a problem opening file: %s", MAP_POOL_CFG_PATH);
 		if (IsValidClient(client))
 		{
-			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file: %s", FILE_PATH_MAPPOOL);
+			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file: %s", MAP_POOL_CFG_PATH);
 		}
 		return;
 	}
