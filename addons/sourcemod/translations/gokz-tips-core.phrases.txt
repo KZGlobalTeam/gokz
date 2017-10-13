@@ -74,6 +74,6 @@
     }
     "!specs"
     {
-        "en"        "{grey}Check who's snooping around by typing {default}!specs{grey}.
+        "en"        "{grey}Check who's snooping around by typing {default}!specs{grey}."
     }
 }

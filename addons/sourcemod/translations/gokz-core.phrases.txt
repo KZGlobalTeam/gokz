@@ -67,13 +67,25 @@
     }
     "Spectator List (None)"
     {
-        "en"        "{grey}There are currently no spectators."
+        "en"        "{grey}There is no one spectating right now."
     }
     "Spectator List"
     {
-        // Spectators (3) - Alice, Bob, Charlie
+        // All spectators (3) - Alice, Bob, Charlie
         "#format"   "{1:d},{2:s}"
-        "en"        "{grey}Spectators ({default}{1}{grey}) - {2}"
+        "en"        "{grey}All spectators ({default}{1}{grey}) - {2}"
+    }
+    "Target Spectator List (None)"
+    {
+        // No one is spectating Bill right now.
+        "#format"   "{1:N}"
+        "en"        "{grey}There is no one spectating {lime}{1}{grey} right now."
+    }
+    "Target Spectator List"
+    {
+        // Spectating Bill (2) - Alice, Charlie
+        "#format"   "{1:N},{2:d},{3:s}"
+        "en"        "{grey}Spectating {lime}{1}{grey} ({default}{2}{grey}) - {3}"
     }
 	
 	

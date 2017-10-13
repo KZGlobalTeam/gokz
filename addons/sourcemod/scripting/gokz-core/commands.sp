@@ -41,6 +41,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
 	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
 	RegConsoleCmd("sm_specs", CommandSpecs, "[KZ] List currently spectating players in chat.");
+	RegConsoleCmd("sm_speclist", CommandSpecs, "[KZ] List currently spectating players in chat.");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open up the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
@@ -265,6 +266,10 @@ public Action CommandSpecs(int client, int args)
 	int specs = 0;
 	char specNames[1024];
 	
+	int target = IsPlayerAlive(client) ? client : GetObserverTarget(client);
+	int targetSpecs = 0;
+	char targetSpecNames[1024];
+	
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsClientInGame(i) && !IsFakeClient(i) && GetClientTeam(i) == CS_TEAM_SPECTATOR)
@@ -278,6 +283,19 @@ public Action CommandSpecs(int client, int args)
 			{
 				Format(specNames, sizeof(specNames), "%s{grey}, {lime}%N", specNames, i);
 			}
+			
+			if (target != -1 && GetObserverTarget(i) == target)
+			{
+				targetSpecs++;
+				if (targetSpecs == 1)
+				{
+					FormatEx(targetSpecNames, sizeof(targetSpecNames), "{lime}%N", i);
+				}
+				else
+				{
+					Format(targetSpecNames, sizeof(targetSpecNames), "%s{grey}, {lime}%N", targetSpecNames, i);
+				}
+			}
 		}
 	}
 	
@@ -288,6 +306,14 @@ public Action CommandSpecs(int client, int args)
 	else
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Spectator List", specs, specNames);
+		if (targetSpecs == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Target Spectator List (None)", target);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Target Spectator List", target, targetSpecs, targetSpecNames);
+		}
 	}
 }
 
