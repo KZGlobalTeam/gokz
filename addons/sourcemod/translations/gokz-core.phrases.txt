@@ -61,6 +61,16 @@
     {
         "en"        "{grey}See console for command output."
     }
+    "Spectator List (None)"
+    {
+        "en"        "{grey}There are currently no spectators."
+    }
+    "Spectator List"
+    {
+        // Spectators (3) - Alice, Bob, Charlie
+        "#format"   "{1:d},{2:s}"
+        "en"        "{grey}Spectators ({default}{1}{grey}) - {2}"
+    }
 	
 	
 	// Command Chat Messages ////////////////////////////////////////////////////////////

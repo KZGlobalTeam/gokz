@@ -72,4 +72,8 @@
     {
         "en"        "{grey}You can bind keys to {default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {default}sm_start{grey}, and more instead of using the teleport menu."
     }
+    "!specs"
+    {
+        "en"        "{grey}Check who's snooping around by typing {default}!specs{grey}.
+    }
 }
