@@ -1,6 +1,12 @@
 "Phrases"
 {	
 	// Chat Messages ////////////////////////////////////////////////////////////
+    "Please Wait Before Using Command"
+	{
+        // Please wait 2.5 seconds before using that command.
+        "#format"   "{1:.1f}"
+        "en"        "{grey}Please wait {default}{1} {grey}seconds before using that command."
+    }
 	"Player Not Found"
 	{
 		// Your search for player 'Bill' returned with no results.
@@ -342,11 +348,38 @@
 	}
 	"Player Top Submenu - Title"
 	{
-		// Top 20 Pro Record Holders
+		// Top 20 PRO Record Holders
 		//
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s}"
 		"en"		"Top 20 {1:s} Record Holders\n \nMode - {2}\n "
 	}
+    
+    
+    // Recent Records Menu ////////////////////////////////////////////////////////////
+    "Recent Records Menu - Title"
+    {
+        // Recently Broken Records
+        //
+        // Mode - Vanilla
+        //
+        "#format"   "{1:s}"
+        "en"        "Recently Broken Records\n \nMode - {1}\n "
+    }
+    "Recent Records Menu - Record Type"
+	{
+		// PRO Records
+		"#format"	"{1:s}"
+		"en"		"{1} Records"
+	}
+    "Recent Records Submenu - Title"
+    {
+        // Recently Broken PRO Records
+        //
+        // Mode - Vanilla
+        //
+        "#format"   "{1:s},{2:s}"
+        "en"        "Recently Broken {1} Records\n \nMode - {2}\n "
+    }
 }

@@ -281,4 +281,32 @@ char sql_getaverage_pro[] =
 ..."FROM Times "
 ..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
 ..."WHERE MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d AND Times.Teleports=0 "
-..."GROUP BY Times.SteamID32) AS PBTimes"; 
+..."GROUP BY Times.SteamID32) AS PBTimes";
+
+char sql_getrecentrecords[] = 
+"SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.RunTime "
+..."FROM Times AS a "
+..."INNER JOIN Players ON a.SteamID32=Players.SteamID32 "
+..."INNER JOIN MapCourses ON a.MapCourseID=MapCourses.MapCourseID "
+..."INNER JOIN Maps ON MapCourses.MapID=Maps.MapID "
+..."WHERE a.Mode=%d "
+..."AND NOT EXISTS "
+..."(SELECT * "
+..."FROM Times AS b "
+..."WHERE a.MapCourseID=b.MapCourseID AND a.Mode=b.Mode AND a.Created>b.Created AND a.RunTime>b.RunTime) "
+..."ORDER BY a.Created DESC "
+..."LIMIT %d";
+
+char sql_getrecentrecords_pro[] = 
+"SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.RunTime "
+..."FROM Times AS a "
+..."INNER JOIN Players ON a.SteamID32=Players.SteamID32 "
+..."INNER JOIN MapCourses ON a.MapCourseID=MapCourses.MapCourseID "
+..."INNER JOIN Maps ON MapCourses.MapID=Maps.MapID "
+..."WHERE a.Mode=%d AND a.Teleports=0 "
+..."AND NOT EXISTS "
+..."(SELECT * "
+..."FROM Times AS b "
+..."WHERE b.Teleports=0 AND a.MapCourseID=b.MapCourseID AND a.Mode=b.Mode AND a.Created>b.Created AND a.RunTime>b.RunTime) "
+..."ORDER BY a.Created DESC "
+..."LIMIT %d"; 
