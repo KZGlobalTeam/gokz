@@ -61,6 +61,10 @@
     {
         "en"        "{grey}See console for command output."
     }
+    "No Players Found"
+    {
+        "en"        "{darkred}No players were found."
+    }
     "Spectator List (None)"
     {
         "en"        "{grey}There are currently no spectators."
@@ -140,10 +144,10 @@
 		"#format"	"{1:N}"
 		"en"		"{grey}You have teleported to {lime}{1}{grey}."
 	}
-	"Goto Failure (Didn't Specify Player)"
-	{
-		"en"		"{darkred}Please specify a player to go to."
-	}
+    "Goto Failure (Invalid Player)"
+    {
+        "en"        "{darkred}The player you specified is no longer valid."
+    }
 	"Goto Failure (Not Yourself)"
 	{
 		"en"		"{darkred}You can't teleport to yourself."
@@ -345,11 +349,14 @@
 	}
 	
 	
-	// Pistol Menu ////////////////////////////////////////////////////////////
-	"Pistol Menu - Title"
+	// Goto Menu ////////////////////////////////////////////////////////////
+	"Goto Menu - Title"
 	{
-		"en"		"Pick a Pistol"
+		"en"		"Go to Player"
 	}
+    
+    
+    // Options Menu ////////////////////////////////////////////////////////////
 	
 	
 	// Options Menu ////////////////////////////////////////////////////////////

@@ -434,11 +434,26 @@ bool CanUndoTeleport(int client, bool showError = false)
 
 // GOTO
 
-void GotoPlayer(int client, int target)
+// Returns whether teleport to target was successful
+bool GotoPlayer(int client, int target, bool printMessage = true)
 {
-	if (!IsPlayerAlive(target) || client == target)
+	if (target == client)
 	{
-		return;
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Not Yourself)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (!IsPlayerAlive(target))
+	{
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Dead)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
 	}
 	
 	float targetOrigin[3];
@@ -461,6 +476,14 @@ void GotoPlayer(int client, int target)
 	TeleportDo(client, targetOrigin, targetAngles);
 	
 	GOKZ_PrintToChat(client, true, "%t", "Goto Success", target);
+	
+	if (GetTimerRunning(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
+		GOKZ_StopTimer(client);
+	}
+	
+	return true;
 }
 
 

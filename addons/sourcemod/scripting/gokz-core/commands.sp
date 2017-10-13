@@ -203,13 +203,12 @@ public Action CommandStopSound(int client, int args)
 
 public Action CommandGoto(int client, int args)
 {
-	// If no arguments, respond with error message
+	// If no arguments, display the menu
 	if (args < 1)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Didn't Specify Player)");
-		GOKZ_PlayErrorSound(client);
+		DisplayGotoMenu(client);
 	}
-	// Otherwise try to teleport to the player
+	// Otherwise try to teleport to the specified player
 	else
 	{
 		char specifiedPlayer[MAX_NAME_LENGTH];
@@ -218,25 +217,7 @@ public Action CommandGoto(int client, int args)
 		int target = FindTarget(client, specifiedPlayer, false, false);
 		if (target != -1)
 		{
-			if (target == client)
-			{
-				GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Not Yourself)");
-				GOKZ_PlayErrorSound(client);
-			}
-			else if (!IsPlayerAlive(target))
-			{
-				GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Dead)");
-				GOKZ_PlayErrorSound(client);
-			}
-			else
-			{
-				GotoPlayer(client, target);
-				if (GetTimerRunning(client))
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
-					GOKZ_StopTimer(client);
-				}
-			}
+			GotoPlayer(client, target);
 		}
 	}
 	return Plugin_Handled;
