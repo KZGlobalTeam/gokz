@@ -22,6 +22,7 @@ static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
+static bool checkpointOnLadder[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
 static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
 static float undoOrigin[MAXPLAYERS + 1][3];
@@ -85,6 +86,7 @@ void MakeCheckpoint(int client)
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
+	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
 	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_CHECKPOINT);
@@ -109,7 +111,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (!Movement_GetOnGround(client))
+	if (!Movement_GetOnGround(client) && Movement_GetMoveType(client) != MOVETYPE_LADDER)
 	{
 		if (showError)
 		{
@@ -148,8 +150,7 @@ void TeleportToCheckpoint(int client)
 		return;
 	}
 	
-	// Teleport to Checkpoint
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
 	Call_GOKZ_OnTeleportToCheckpoint_Post(client);
@@ -208,7 +209,7 @@ void PrevCheckpoint(int client)
 	storedCheckpointCount[client]--;
 	checkpointPrevCount[client]++;
 	checkpointIndex[client] = PrevIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
 	Call_GOKZ_OnPrevCheckpoint_Post(client);
@@ -258,7 +259,7 @@ void NextCheckpoint(int client)
 	storedCheckpointCount[client]++;
 	checkpointPrevCount[client]--;
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
 	Call_GOKZ_OnNextCheckpoint_Post(client);
@@ -529,6 +530,28 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	
 	// Call Post Foward
 	Call_GOKZ_OnCountedTeleport_Post(client);
+}
+
+static void CheckpointTeleportDo(int client)
+{
+	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	
+	// Handle ladder stuff
+	if (checkpointOnLadder[client][checkpointIndex[client]])
+	{
+		if (!GOKZ_GetPaused(client))
+		{
+			Movement_SetMoveType(client, MOVETYPE_LADDER);
+		}
+		else
+		{
+			SetPausedOnLadder(client, true);
+		}
+	}
+	else if (GOKZ_GetPaused(client))
+	{
+		SetPausedOnLadder(client, false);
+	}
 }
 
 public Action Timer_RemoveBoosts(Handle timer, int userid)

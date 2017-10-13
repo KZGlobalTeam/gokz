@@ -257,6 +257,12 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	OnChangeMoveType_Timer(client, newMoveType);
 	OnChangeMoveType_Pause(client, newMoveType);
 	OnChangeMoveType_ValidJump(client, oldMoveType, newMoveType);
+	OnChangeMoveType_MapBhopTriggers(client, newMoveType);
+}
+
+public void Movement_OnStartTouchGround(int client)
+{
+	OnStartTouchGround_MapBhopTriggers(client);
 }
 
 public void Movement_OnStopTouchGround(int client, bool jumped)

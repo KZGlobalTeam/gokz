@@ -332,6 +332,7 @@ static void GivePistol(int client, int pistol)
 static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
+static bool savedOnLadder[MAXPLAYERS + 1];
 
 void SetupClientJoinTeam(int client)
 {
@@ -344,6 +345,7 @@ void JoinTeam(int client, int team)
 	{
 		Movement_GetOrigin(client, savedOrigin[client]);
 		Movement_GetEyeAngles(client, savedAngles[client]);
+		savedOnLadder[client] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
 		Call_GOKZ_OnJoinTeam(client, team);
@@ -357,6 +359,10 @@ void JoinTeam(int client, int team)
 		{
 			Movement_SetOrigin(client, savedOrigin[client]);
 			Movement_SetEyeAngles(client, savedAngles[client]);
+			if (savedOnLadder[client])
+			{
+				Movement_SetMoveType(client, MOVETYPE_LADDER);
+			}
 			hasSavedPosition[client] = false;
 		}
 		else
