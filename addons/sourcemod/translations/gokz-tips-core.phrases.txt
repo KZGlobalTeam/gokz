@@ -26,7 +26,7 @@
     }
     "Quick Switch Mode"
     {
-        "en"        "{grey}You can quickly switch to the Vanilla mode by typing {default}!v{grey}, KZTimer mode by typing {default}!k{grey}, and so on."
+        "en"        "{grey}You can switch to a mode by typing its abbreviation. For example, type {default}!s{grey}/{default}!skz{grey} to switch to {purple}SimpleKZ{grey}."
     }
     "Hide Clutter"
     {
