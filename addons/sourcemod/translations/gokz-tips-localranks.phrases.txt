@@ -18,7 +18,7 @@
     }
     "Bonus Commands"
     {
-        "en"        "{grey}For bonuses, you can use {default}!bwr <bonus>{grey}, {default}!bmaptop <bonus> {grey}, and so on instead of the normal commands."
+        "en"        "{grey}For bonuses, you can use {default}!bwr <bonus>{grey}, {default}!bmaptop <bonus>{grey}, and so on instead of the normal commands."
     }
     "MVP Stars"
     {
