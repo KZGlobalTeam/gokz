@@ -62,6 +62,7 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/menus/mode.sp"
 #include "gokz-core/menus/options.sp"
 #include "gokz-core/menus/pistol.sp"
+#include "gokz-core/menus/spec.sp"
 #include "gokz-core/menus/tp.sp"
 
 #include "gokz-core/timer/pause.sp"

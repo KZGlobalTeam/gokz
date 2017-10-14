@@ -75,6 +75,10 @@
         "#format"   "{1:d},{2:s}"
         "en"        "{grey}All spectators ({default}{1}{grey}) - {2}"
     }
+    "Player No Longer Valid"
+    {
+        "en"        "{darkred}The player you specified is no longer valid."
+    }
     "Target Spectator List (None)"
     {
         // No one is spectating Bill right now.
@@ -156,10 +160,6 @@
 		"#format"	"{1:N}"
 		"en"		"{grey}You have teleported to {lime}{1}{grey}."
 	}
-    "Goto Failure (Invalid Player)"
-    {
-        "en"        "{darkred}The player you specified is no longer valid."
-    }
 	"Goto Failure (Not Yourself)"
 	{
 		"en"		"{darkred}You can't teleport to yourself."
@@ -365,6 +365,13 @@
 	"Goto Menu - Title"
 	{
 		"en"		"Go to Player"
+	}
+    
+    
+    // Spec Menu ////////////////////////////////////////////////////////////
+	"Spec Menu - Title"
+	{
+		"en"		"Spectate a Player"
 	}
     
     

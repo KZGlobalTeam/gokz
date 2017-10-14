@@ -204,7 +204,7 @@ public Action CommandStopSound(int client, int args)
 
 public Action CommandGoto(int client, int args)
 {
-	// If no arguments, display the menu
+	// If no arguments, display the goto menu
 	if (args < 1)
 	{
 		DisplayGotoMenu(client);
@@ -226,10 +226,10 @@ public Action CommandGoto(int client, int args)
 
 public Action CommandSpec(int client, int args)
 {
-	// If no arguments, just join spectators
+	// If no arguments, display the spec menu
 	if (args < 1)
 	{
-		JoinTeam(client, CS_TEAM_SPECTATOR);
+		DisplaySpecMenu(client);
 	}
 	// Otherwise try to spectate the player
 	else
@@ -240,22 +240,7 @@ public Action CommandSpec(int client, int args)
 		int target = FindTarget(client, specifiedPlayer, false, false);
 		if (target != -1)
 		{
-			if (target == client)
-			{
-				GOKZ_PrintToChat(client, true, "%t", "Spectate Failure (Not Yourself)");
-				GOKZ_PlayErrorSound(client);
-			}
-			else if (!IsPlayerAlive(target))
-			{
-				GOKZ_PrintToChat(client, true, "%t", "Spectate Failure (Dead)");
-				GOKZ_PlayErrorSound(client);
-			}
-			else
-			{
-				JoinTeam(client, CS_TEAM_SPECTATOR);
-				SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
-				SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", target);
-			}
+			SpectatePlayer(client, target);
 		}
 	}
 	return Plugin_Handled;
