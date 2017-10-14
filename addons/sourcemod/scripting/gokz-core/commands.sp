@@ -45,7 +45,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open up the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
-	RegConsoleCmd("sm_speed", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
+	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 	RegConsoleCmd("sm_measure", CommandMeasureMenu, "[KZ] Open the measurement menu.");
 	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
@@ -317,6 +317,33 @@ public Action CommandToggleShowPlayers(int client, int args)
 public Action CommandToggleInfoPanel(int client, int args)
 {
 	CycleOption(client, Option_ShowingInfoPanel, true);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleSpeed(int client, int args)
+{
+	int speedText = GOKZ_GetOption(client, Option_SpeedText);
+	int infoPanel = GOKZ_GetOption(client, Option_ShowingInfoPanel);
+	
+	if (speedText == SpeedText_Disabled)
+	{
+		if (infoPanel == ShowingInfoPanel_Enabled)
+		{
+			GOKZ_SetOption(client, Option_SpeedText, SpeedText_InfoPanel, true);
+		}
+		else
+		{
+			GOKZ_SetOption(client, Option_SpeedText, SpeedText_Bottom, true);
+		}
+	}
+	else if (infoPanel == ShowingInfoPanel_Disabled && speedText == SpeedText_InfoPanel)
+	{
+		GOKZ_SetOption(client, Option_SpeedText, SpeedText_Bottom, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_SpeedText, SpeedText_Disabled, true);
+	}
 	return Plugin_Handled;
 }
 
