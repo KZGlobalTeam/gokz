@@ -42,7 +42,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
 	RegConsoleCmd("sm_specs", CommandSpecs, "[KZ] List currently spectating players in chat.");
 	RegConsoleCmd("sm_speclist", CommandSpecs, "[KZ] List currently spectating players in chat.");
-	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open up the options menu.");
+	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
 	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
