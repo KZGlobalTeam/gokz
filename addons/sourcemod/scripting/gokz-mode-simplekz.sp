@@ -351,7 +351,6 @@ static float CalcWeaponVelMod(KZPlayer player)
 }
 
 
-
 // JUMPING
 
 static void TweakJump(KZPlayer player)
@@ -417,7 +416,6 @@ static float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 	}
 	return player.landingSpeed;
 }
-
 
 
 // SLOPEFIX
@@ -501,7 +499,6 @@ public bool TraceRayDontHitSelf(int entity, int mask, any data)
 {
 	return entity != data && !(0 < entity <= MaxClients);
 }
-
 
 
 // OTHER
