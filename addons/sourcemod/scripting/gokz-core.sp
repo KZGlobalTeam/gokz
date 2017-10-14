@@ -215,24 +215,30 @@ public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadc
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	OnPlayerSpawn_Modes(client);
-	OnPlayerSpawn_Pause(client);
-	OnPlayerSpawn_ValidJump(client);
-	UpdateCSGOHUD(client);
-	UpdateHideWeapon(client);
-	UpdatePistol(client);
-	UpdatePlayerModel(client);
-	UpdateGodMode(client);
-	UpdatePlayerCollision(client);
-	UpdateTPMenu(client);
+	if (IsValidClient(client))
+	{
+		OnPlayerSpawn_Modes(client);
+		OnPlayerSpawn_Pause(client);
+		OnPlayerSpawn_ValidJump(client);
+		UpdateCSGOHUD(client);
+		UpdateHideWeapon(client);
+		UpdatePistol(client);
+		UpdatePlayerModel(client);
+		UpdateGodMode(client);
+		UpdatePlayerCollision(client);
+		UpdateTPMenu(client);
+	}
 }
 
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
 	SetEventBroadcast(event, true); // Block death notices
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	OnPlayerDeath_Timer(client);
-	OnPlayerDeath_ValidJump(client);
+	if (IsValidClient(client))
+	{
+		OnPlayerDeath_Timer(client);
+		OnPlayerDeath_ValidJump(client);
+	}
 	return Plugin_Continue;
 }
 
