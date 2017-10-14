@@ -371,7 +371,7 @@
     // Spec Menu ////////////////////////////////////////////////////////////
 	"Spec Menu - Title"
 	{
-		"en"		"Spectate a Player"
+		"en"		"Spectate Player"
 	}
     
     

@@ -60,7 +60,7 @@ public int MenuHandler_Goto(Menu menu, MenuAction action, int param1, int param2
 // Returns number of items added to the menu
 static int GotoMenuAddItems(int client, Menu menu)
 {
-	char display[MAX_NAME_LENGTH];
+	char display[MAX_NAME_LENGTH + 4];
 	int targetCount = 0;
 	
 	for (int i = 1; i <= MaxClients; i++)
@@ -70,7 +70,15 @@ static int GotoMenuAddItems(int client, Menu menu)
 			continue;
 		}
 		
-		FormatEx(display, sizeof(display), "%N", i);
+		if (IsFakeClient(i))
+		{
+			FormatEx(display, sizeof(display), "BOT %N", i);
+		}
+		else
+		{
+			FormatEx(display, sizeof(display), "%N", i);
+		}
+		
 		menu.AddItem(IntToStringEx(GetClientUserId(i)), display, ITEMDRAW_DEFAULT);
 		targetCount++;
 	}
