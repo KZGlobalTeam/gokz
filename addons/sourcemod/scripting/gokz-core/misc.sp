@@ -475,9 +475,9 @@ static void SanitiseChatInput(char[] message, int maxlength)
 */
 
 static bool validJump[MAXPLAYERS + 1];
-static int lastJumpTick[MAXPLAYERS + 1];
-static int lastOriginTeleportTick[MAXPLAYERS + 1];
-static int lastVelocityTeleportTick[MAXPLAYERS + 1];
+static float lastStopTouchGroundTime[MAXPLAYERS + 1];
+static float lastOriginTeleportTime[MAXPLAYERS + 1];
+static float lastOnGroundVelocityTeleportTime[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -499,13 +499,13 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	if (IsValidStopTouchGround(client))
 	{
 		validJump[client] = true;
-		lastJumpTick[client] = GetGameTickCount();
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
 	}
 	else
 	{
 		InvalidateJump(client);
 	}
+	lastStopTouchGroundTime[client] = GetEngineTime();
 }
 
 static bool IsValidStopTouchGround(int client)
@@ -515,17 +515,14 @@ static bool IsValidStopTouchGround(int client)
 		return false;
 	}
 	
-	// Return false if there was a recent teleport
-	
-	int originTpTicks = GetGameTickCount() - lastOriginTeleportTick[client];
-	if (originTpTicks <= 2)
+	// Return false if there was a recent origin teleport
+	if (GetEngineTime() - lastOriginTeleportTime[client] < GetTickInterval() * 2.0)
 	{
 		return false;
 	}
 	
-	// Allow 0 ticks since last velocity teleport in case mode has set speed already
-	int velocityTpTicks = GetGameTickCount() - lastVelocityTeleportTick[client];
-	if (velocityTpTicks <= 2 && velocityTpTicks != 0)
+	// Return flase if there was a recent grounded velocity teleport
+	if (GetEngineTime() - lastOnGroundVelocityTeleportTime[client] < GetTickInterval())
 	{
 		return false;
 	}
@@ -561,20 +558,24 @@ void OnPlayerDeath_ValidJump(int client)
 	InvalidateJump(client);
 }
 
-void OnTeleport_ValidJump(int client, bool origin, bool velocity)
+void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 {
-	if (origin)
+	if (originTp)
 	{
-		lastOriginTeleportTick[client] = GetGameTickCount();
+		lastOriginTeleportTime[client] = GetEngineTime();
 		InvalidateJump(client);
 	}
-	else if (velocity)
+	else if (velocityTp)
 	{
-		lastVelocityTeleportTick[client] = GetGameTickCount();
 		// Allow short grace period for velocity so that modes may set player speed
-		if (GetGameTickCount() - Movement_GetTakeoffTick(client) > 2)
+		if (GetEngineTime() - lastStopTouchGroundTime[client] > GetTickInterval() * 2)
 		{
 			InvalidateJump(client);
+		}
+		
+		if (Movement_GetOnGround(client))
+		{
+			lastOnGroundVelocityTeleportTime[client] = GetEngineTime();
 		}
 	}
 }

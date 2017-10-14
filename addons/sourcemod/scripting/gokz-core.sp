@@ -243,9 +243,9 @@ public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcas
 
 public MRESReturn DHooks_OnTeleport(int client, Handle params)
 {
-	bool origin = !DHookIsNullParam(params, 1); // Origin affected
-	bool velocity = !DHookIsNullParam(params, 3); // Velocity affected
-	OnTeleport_ValidJump(client, origin, velocity);
+	bool originTp = !DHookIsNullParam(params, 1); // Origin affected
+	bool velocityTp = !DHookIsNullParam(params, 3); // Velocity affected
+	OnTeleport_ValidJump(client, originTp, velocityTp);
 	return MRES_Ignored;
 }
 
