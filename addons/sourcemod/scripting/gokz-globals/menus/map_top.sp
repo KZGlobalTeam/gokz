@@ -77,7 +77,7 @@ public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int 
 		char info[8];
 		menu.GetItem(param2, info, sizeof(info));
 		int timeType = StringToInt(info);
-		GetMapTop(param1, mapTopMap[param1], mapTopMode[param1], timeType);
+		GetMapTop(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -107,13 +107,13 @@ static void MapTopMenuAddItems(int client, Menu menu)
 	}
 }
 
-static void GetMapTop(int client, const char[] map, int mode, int timeType)
+static void GetMapTop(int client, const char[] map, int course, int mode, int timeType)
 {
 	DataPack dp = new DataPack();
 	dp.WriteCell(GetClientUserId(client));
 	dp.WriteCell(timeType);
 	
-	GlobalAPI_GetRecordTopEx(map, 0, GetGlobalMode(mode), timeType == TimeType_Pro, 128, 20, GetMapTopCallback, dp);
+	GlobalAPI_GetRecordTopEx(map, course, GetGlobalMode(mode), timeType == TimeType_Pro, 128, 20, GetMapTopCallback, dp);
 }
 
 public int GetMapTopCallback(bool failure, const char[] top, DataPack dp)
