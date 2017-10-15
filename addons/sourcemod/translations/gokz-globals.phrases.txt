@@ -1,0 +1,143 @@
+"Phrases"
+{
+    // Chat Messages ////////////////////////////////////////////////////////////
+    "No Global Times Found"
+    {
+        "en"        "{grey}No global times were found!"
+    }
+    "No Global Times Found (PRO)"
+    {
+        "en"        "{grey}No global {blue}PRO{grey} times were found!"
+    }
+    "New Global Top Time (NUB)"
+    {
+        // linus is now #2 in the GLOBAL NUB TOP [SKZ]
+        "#format"    "{1:N},{2:d},{3:s}"
+        "en"        "{lime}{1}{grey} is now #{default}{2} {grey}in the {red}GLOBAL NUB TOP {grey}[{purple}{3}{grey}]"
+    }
+    "New Global Top Time (PRO)"
+    {
+        // linus is now #2 in the GLOBAL PRO TOP [SKZ]
+        "#format"    "{1:N},{2:d},{3:s}"
+        "en"        "{lime}{1}{grey} is now #{default}{2} {grey}in the {darkred}GLOBAL PRO TOP {grey}[{purple}{3}{grey}]"
+    }
+    "New Global Top Bonus Time (NUB)"
+    {
+        // linus is now #2 in the Bonus 1 GLOBAL NUB TOP [SKZ]
+        "#format"    "{1:N},{2:d},{3:d},{4:s}"
+        "en"        "{lime}{1}{grey} is now #{default}{2} {grey}in the {bluegrey}Bonus {3} {red}GLOBAL NUB TOP {grey}[{purple}{4}{grey}]"
+    }
+    "New Global Top Bonus Time (PRO)"
+    {
+        // linus is now #2 in the Bonus 1 GLOBAL PRO TOP [SKZ]
+        "#format"    "{1:N},{2:d},{3:d},{4:s}"
+        "en"        "{lime}{1}{grey} is now #{default}{2} {grey}in the {bluegrey}Bonus {3} {darkred}GLOBAL PRO TOP {grey}[{purple}{4}{grey}]"
+    }
+    "New Global Record (NUB)"
+	{
+		// Bill set a new GLOBAL NUB RECORD [Mode]
+		"#format"	"{1:N},{2:s}"
+		"en"		"{lime}{1}{grey} set a new {red}GLOBAL NUB RECORD {grey}[{purple}{2}{grey}]"
+	}
+    "New Global Record (PRO)"
+	{
+		// Bill set a new GLOBAL PRO RECORD [Mode]
+		"#format"	"{1:N},{2:s}"
+		"en"		"{lime}{1}{grey} set a new {darkred}GLOBAL PRO RECORD {grey}[{purple}{2}{grey}]"
+	}
+    "New Global Bonus Record (NUB)"
+	{
+		// Bill set a new Bonus 1 GLOBAL NUB RECORD [Mode]
+		"#format"	"{1:N},{2:d},{3:s}"
+		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {red}GLOBAL NUB RECORD {grey}[{purple}{3}{grey}]"
+	}
+    "New Global Bonus Record (PRO)"
+	{
+		// Bill set a new Bonus 1 GLOBAL PRO RECORD [Mode]
+		"#format"	"{1:N},{2:d},{3:s}"
+		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {darkred}GLOBAL PRO RECORD {grey}[{purple}{3}{grey}]"
+	}
+    "GWR Header"
+    {
+        // Global Records on kz_map [SKZ]
+        "#format"    "{1:s},{2:s}"
+        "en"        "{grey}Global Records on {default}{1} {grey}[{purple}{2}{grey}]"
+    }
+    "GWR Header (Bonus)"
+    {
+        // Global Records on kz_map Bonus 1 [SKZ]
+        "#format"    "{1:s},{2:d},{3:s}"
+        "en"        "{grey}Global Records on {default}{1} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
+    }
+    "GWR Time - NUB"
+    {
+        // GLOBAL NUB RECORD: 01:23.45 by linus
+        "#format"    "{1:s},{2:s}"
+        "en"        "{red}GLOBAL NUB RECORD{grey}: {default}{1}{grey} by {lime}{2}"
+    }
+    "GWR Time - PRO"
+    {
+        // GLOBAL PRO RECORD: 01:23.45 by linus
+        "#format"    "{1:s},{2:s}"
+        "en"        "{darkred}GLOBAL PRO RECORD{grey}: {default}{1}{grey} by {lime}{2}"
+    }
+    "GWR Time - No PRO Time"
+    {
+        "en"        "{darkred}GLOBAL PRO RECORD{grey}: None... yet."
+    }
+    "Global Check"
+    {
+        // Global Check - API [X] | Version [X] | Map [X]
+        "#format"    "{1:s},{2:s},{3:s}"
+        "en"        "{grey}Global Check - {default}API {grey}[{1}{grey}] | {default}Version {Grey}[{2}{grey}] | {default}Map {grey}[{3}{grey}]"
+    }
+    "Map Tier"
+    {
+        // kz_map - Tier 3
+        "#format"    "{1:s},{2:d}"
+        "en"        "{default}{1} {grey}- {yellow}Tier {2}{grey}"
+    }
+
+
+    // Global Top Menu ////////////////////////////////////////////////////////////
+    "Global Map Top Menu - Title"
+    {
+        // Global Map Top
+        //
+        // Map - kz_map
+        // Mode - Vanilla
+		//
+		"#format"	"{1:s},{2:s}"
+		"en"		"Global Map Top\n \nMap - {1}\nMode - {2}\n "
+    }
+    "Global Map Top Menu - Title (Bonus)"
+    {
+        // Global Map Top
+        //
+        // Map - kz_map (Bonus 1)
+        // Mode - Vanilla
+		//
+		"#format"	"{1:s},{2:d},{3:s}"
+		"en"		"Global Map Top\n \nMap - {1} (Bonus {2})\nMode - {3}\n "
+    }
+    "Global Map Top Submenu - Title"
+    {
+		// Top Global PRO Times
+		//
+		// Map - kz_map
+		// Mode - Vanilla
+		//
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"Top Global {1} Times\n \nMap - {2}\nMode - {3}\n "	
+    }
+    "Global Map Top Submenu - Title (Bonus)"
+    {
+		// Top Global PRO Times
+		//
+		// Map - kz_map (Bonus 1)
+		// Mode - Vanilla
+		//
+		"#format"	"{1:s},{2:s},{3:d},{4:s}"
+		"en"		"Top Global {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
+    }
+}

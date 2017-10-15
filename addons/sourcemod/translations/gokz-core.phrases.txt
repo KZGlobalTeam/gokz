@@ -79,6 +79,10 @@
     {
         "en"        "{darkred}The player you specified is no longer valid."
     }
+    "Please Wait Before Using Command Again"
+    {
+        "en"        "{grey}Please wait before using that command again."
+    }
     "Target Spectator List (None)"
     {
         // No one is spectating Bill right now.
