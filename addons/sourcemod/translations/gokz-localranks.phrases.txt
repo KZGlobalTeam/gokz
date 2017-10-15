@@ -45,37 +45,37 @@
 	}
 	"New Record (NUB)"
 	{
-		// Bill set a new NUB RECORD [Mode]!
+		// Bill set a new NUB RECORD [Mode]
 		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {yellow}NUB RECORD {grey}[{purple}{2}{grey}]"
 	}
 	"New Record (PRO)"
 	{
-		// Bill set a new PRO RECORD [Mode]!
+		// Bill set a new PRO RECORD [Mode]
 		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {blue}PRO RECORD {grey}[{purple}{2}{grey}]"
 	}
 	"New Record (NUB and PRO)"
 	{
-		// Bill set a new NUB/PRO RECORD [Mode]!
+		// Bill set a new NUB/PRO RECORD [Mode]
 		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {yellow}NUB{grey}/{blue}PRO RECORD{grey} [{purple}{2}{grey}]"
 	}
 	"New Bonus Record (NUB)"
 	{
-		// Bill set a new Bonus 1 NUB RECORD [Mode]!
+		// Bill set a new Bonus 1 NUB RECORD [Mode]
 		"#format"	"{1:N},{2:d},{3:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {yellow}NUB RECORD{grey} [{purple}{3}{grey}]"
 	}
 	"New Bonus Record (PRO)"
 	{
-		// Bill set a new Bonus 1 PRO RECORD [Mode]!
+		// Bill set a new Bonus 1 PRO RECORD [Mode]
 		"#format"	"{1:N},{2:d},{3:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {blue}PRO RECORD{grey} [{purple}{3}{grey}]"
 	}
 	"New Bonus Record (NUB and PRO)"
 	{
-		// Bill set a new Bonus 1 NUB/PRO RECORD [Mode]!
+		// Bill set a new Bonus 1 NUB/PRO RECORD [Mode]
 		"#format"	"{1:N},{2:d},{3:d},{4:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {yellow}NUB{grey}/{blue}PRO RECORD{grey} [{purple}{4}{grey}]"
 	}
