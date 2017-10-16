@@ -100,6 +100,24 @@
 
 
     // Global Top Menu ////////////////////////////////////////////////////////////
+    "Global Map Top Mode Menu - Title"
+    {
+        // Global Map Top
+        //
+        // Map - kz_map
+		//
+		"#format"	"{1:s}"
+		"en"		"Global Map Top\n \nMap - {1}\n "
+    }
+    "Global Map Top Mode Menu - Title (Bonus)"
+    {
+        // Global Map Top
+        //
+        // Map - kz_map (Bonus 1)
+		//
+		"#format"	"{1:s},{2:d}"
+		"en"		"Global Map Top\n \nMap - {1} (Bonus {2})\n "
+    }
     "Global Map Top Menu - Title"
     {
         // Global Map Top
@@ -140,4 +158,10 @@
 		"#format"	"{1:s},{2:s},{3:d},{4:s}"
 		"en"		"Top Global {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
     }
+    "Global Map Top Menu - Top"
+	{
+		// Top PRO
+		"#format"	"{1:s}"
+		"en"		"Top {1}"
+	}
 }

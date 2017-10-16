@@ -100,13 +100,13 @@ public Action CommandMapTop(int client, int args)
 {
 	if (args <= 0)
 	{  // Open global map top for current map
-		DisplayMapTopMenu(client, gC_CurrentMap, 0, GOKZ_GetOption(client, Option_Mode));
+		DisplayMapTopModeMenu(client, gC_CurrentMap, 0);
 	}
 	else if (args >= 1)
 	{  // Open global map top for specified map
 		char argMap[64];
 		GetCmdArg(1, argMap, sizeof(argMap));
-		DisplayMapTopMenu(client, argMap, 0, GOKZ_GetOption(client, Option_Mode));
+		DisplayMapTopModeMenu(client, argMap, 0);
 	}
 	return Plugin_Handled;
 }
@@ -114,17 +114,17 @@ public Action CommandMapTop(int client, int args)
 public Action CommandBonusMapTop(int client, int args)
 {
 	if (args == 0)
-	{  // Open global Bonus 1 top for current map and their current mode		
-		DisplayMapTopMenu(client, gC_CurrentMap, 1, GOKZ_GetOption(client, Option_Mode));
+	{  // Open global Bonus 1 top for current map		
+		DisplayMapTopModeMenu(client, gC_CurrentMap, 1);
 	}
 	else if (args == 1)
-	{  // Open specified global Bonus # top for current map and their current mode
+	{  // Open specified global Bonus # top for current map
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
 		if (bonus > 0)
 		{
-			DisplayMapTopMenu(client, gC_CurrentMap, bonus, GOKZ_GetOption(client, Option_Mode));
+			DisplayMapTopModeMenu(client, gC_CurrentMap, bonus);
 		}
 		else
 		{
@@ -132,14 +132,14 @@ public Action CommandBonusMapTop(int client, int args)
 		}
 	}
 	else if (args >= 2)
-	{  // Open specified global Bonus # top for specified map and their current mode
+	{  // Open specified global Bonus # top for specified map
 		char argBonus[4], argMap[33];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
 		if (bonus > 0)
 		{
-			DisplayMapTopMenu(client, argMap, bonus, GOKZ_GetOption(client, Option_Mode));
+			DisplayMapTopModeMenu(client, argMap, bonus);
 		}
 		else
 		{

@@ -14,6 +14,24 @@ static int mapTopMode[MAXPLAYERS + 1];
 
 // =========================  PUBLIC  ========================= //
 
+void DisplayMapTopModeMenu(int client, const char[] map, int course)
+{
+	FormatEx(mapTopMap[client], sizeof(mapTopMap[]), map);
+	mapTopCourse[client] = course;
+	
+	Menu menu = new Menu(MenuHandler_MapTopModeMenu);
+	if (course == 0)
+	{
+		menu.SetTitle("%T", "Global Map Top Mode Menu - Title", client, map);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Global Map Top Mode Menu - Title (Bonus)", client, map, course);
+	}
+	MapTopModeMenuAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
 void DisplayMapTopMenu(int client, const char[] map, int course, int mode)
 {
 	FormatEx(mapTopMap[client], sizeof(mapTopMap[]), map);
@@ -70,6 +88,21 @@ void DisplayMapTopSubmenu(int client, const char[] top, int timeType)
 
 // =========================  HANDLERS  ========================= //
 
+public int MenuHandler_MapTopModeMenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char info[8];
+		menu.GetItem(param2, info, sizeof(info));
+		int mode = StringToInt(info);
+		DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mode);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
 public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
@@ -97,12 +130,29 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 
 // =========================  PRIVATE  ========================= //
 
+static void MapTopModeMenuAddItems(int client, Menu menu)
+{
+	int selectedMode = GOKZ_GetOption(client, Option_Mode);
+	char display[32];
+	for (int mode = 0; mode < MODE_COUNT; mode++)
+	{
+		FormatEx(display, sizeof(display), "%s", gC_ModeNames[mode]);
+		// Add asterisk to selected mode
+		if (mode == selectedMode)
+		{
+			Format(display, sizeof(display), "%s*", display);
+		}
+		
+		menu.AddItem(IntToStringEx(mode), display);
+	}
+}
+
 static void MapTopMenuAddItems(int client, Menu menu)
 {
+	char display[32];
 	for (int i = 0; i < TIMETYPE_COUNT; i++)
 	{
-		char display[128];
-		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top 20", client, gC_TimeTypeNames[i]);
+		FormatEx(display, sizeof(display), "%T", "Global Map Top Menu - Top", client, gC_TimeTypeNames[i]);
 		menu.AddItem(IntToStringEx(i), display);
 	}
 }
