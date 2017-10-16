@@ -57,7 +57,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
 	LoadTranslations("gokz-core.phrases");
-	LoadTranslations("gokz-localranks.phrases");
 	LoadTranslations("gokz-globals.phrases");
 	
 	CreateGlobalForwards();
