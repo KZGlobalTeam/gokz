@@ -87,7 +87,7 @@ public void OnMapStart()
 	PrecacheSounds();
 }
 
-public void API_OnAPIKeyReloaded()
+public void GlobalAPI_OnAPIKeyReloaded()
 {
 	GlobalAPI API;
 	API.GetAuthStatus(OnAuthStatusCallback);

@@ -95,7 +95,13 @@
     {
         // kz_map - Tier 3
         "#format"    "{1:s},{2:d}"
-        "en"        "{default}{1} {grey}- {yellow}Tier {2}{grey}"
+        "en"        "{default}{1} {grey}- {yellow}Tier {2}"
+    }
+    "Map Tier (Unknown)"
+    {
+        // kz_map - Tier Unknown
+        "#format"    "{1:s}"
+        "en"        "{default}{1} {grey}- {yellow}Tier Unknown"
     }
 
 

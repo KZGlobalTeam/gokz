@@ -33,7 +33,15 @@ public Action CommandGlobalCheck(int client, int args)
 
 public Action CommandTier(int client, int args)
 {
-	GOKZ_PrintToChat(client, true, "%t", "Map Tier", gC_CurrentMap, GlobalAPI_GetMapTier());
+	int tier = GlobalAPI_GetMapTier();
+	if (tier != -1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Map Tier", gC_CurrentMap, tier);
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Map Tier (Unknown)", gC_CurrentMap);
+	}
 	return Plugin_Handled;
 }
 

@@ -26,7 +26,7 @@ enum GlobalMode
 	GlobalMode_KZTimer
 };
 
-// ======================= NATIVES ====================== //
+// ======================= CALLBACKS ====================== //
 
 //Get
 typedef GetRecordTopCallback = function int(bool bFailure, const char[] top, any data);
@@ -36,6 +36,8 @@ typedef GetModeInfoCallback = function int(bool bFailure, const char[] name, int
 //Post
 typedef PostRecordCallback = function int(bool bFailure, int place, int top_place, int top_overall_place, any data);
 typedef PostBanCallback = function int(bool bFailure, any data);
+
+// ======================= NATIVES ====================== //
 
 /**
  * Sends a record to the Global API.
@@ -112,14 +114,14 @@ native int GlobalAPI_GetRecordCount(const char[] recordsString);
 /**
  * Gets the server's current tickrate
  *
- * @return				returned tickrate
+ * @return				-1 if failed to get tickrate, otherwise server's tickrate
  */
 native int GlobalAPI_GetTickrate();
 
 /**
  * Gets the current map's mapid
  *
- * @return				returned map id
+ * @return				-1 if failed to get mapid, otherwise map's ID from API
  */
 native int GlobalAPI_GetMapID();
 
@@ -128,7 +130,7 @@ native int GlobalAPI_GetMapID();
  *
  * @buffer				buffer to store the mapname in
  * @size				size of the buffer
- * @return				returned map name
+ * @return				Empty buffer ("") if failed to get map name, otherwise current map's name
  */
 native int GlobalAPI_GetMapName(char[] buffer, int size);
 
@@ -137,28 +139,28 @@ native int GlobalAPI_GetMapName(char[] buffer, int size);
  *
  * @buffer				buffer to store the mappath in
  * @size				size of the buffer
- * @return				returned map path
+ * @return				Empty buffer ("") if failed to get map path, otherwise current map's path
  */
 native int GlobalAPI_GetMapPath(char[] buffer, int size);
 
 /**
  * Gets the current map's difficulty
  *
- * @return				returned difficulty id
+ * @return				-1 if failed to get map tier, otherwise map's tier from API
  */
 native int GlobalAPI_GetMapTier();
 
 /**
  * Gets the current map's filesize
  *
- * @return				returned map filesize
+ * @return				-1 if failed to get map filesize, otherwise map's filesize from API
  */
 native int GlobalAPI_GetMapFilesize();
 
 /**
- * Gets the current map's filesize
+ * Gets the current map's global status
  *
- * @return				returns true if map is validated, false otherwise
+ * @return				true if map is validated, false otherwise
  */
 native bool GlobalAPI_GetMapGlobalStatus();
 
@@ -167,7 +169,7 @@ native bool GlobalAPI_GetMapGlobalStatus();
  *
  * @buffer				buffer to store the apikey in
  * @size				size of the buffer
- * @return				returned api key
+ * @return				Empty buffer ("") if failed to get api key, otherwise current api key
  */
 native int GlobalAPI_GetAPIKey(char[] buffer, int size);
 
@@ -175,7 +177,7 @@ native int GlobalAPI_GetAPIKey(char[] buffer, int size);
  * Gets authstatus on given authentication type
  *
  * @param callback		Callback function when API call finishes
- * @return				returns true if authtype is validated, false otherwise
+ * @return				true if api key is validated, otherwise false
  */
 native int GlobalAPI_GetAuthStatus(GetAuthStatusCallback onComplete = INVALID_FUNCTION);
 
@@ -299,6 +301,32 @@ methodmap APIRecord < Handle
 
 	public native int Stage();
 }
+
+// ======================= FORWARDS ====================== //
+
+
+/**
+ * Called whenever the API Key is reloaded
+ *
+ * @noreturn
+ */
+forward void GlobalAPI_OnAPIKeyReloaded();
+
+/**
+ * Called whenever KickIfBanned cvar is changed
+ *
+ * @param kickifbanned		new value of kickifbanned cvar
+ * @noreturn
+ */
+forward void GlobalAPI_OnKickIfBanned_Changed(bool kickifbanned);
+
+/**
+ * Called whenever Development mode cvar is changed
+ *
+ * @param developmentmode	new value of developmentmode cvar
+ * @noreturn
+ */
+forward void GlobalAPI_OnDevelopmentMode_Changed(bool developmentmode);
 
 // ======================= PLUGIN INFO ====================== //
 
