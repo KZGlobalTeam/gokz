@@ -9,6 +9,8 @@
 #endif
 #define _gokz_globals_included_
 
+#include <GlobalAPI-Core>
+
 
 
 // =========================  FORWARDS  ========================= //
@@ -16,15 +18,42 @@
 /**
  * Called when a player sets a new global top time.
  *
- * @param client			Client index.
- * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
- * @param mode				Player's movement mode.
- * @param timeType			Time type i.e. NUB or PRO.
- * @param rank				Ranking within the same time type.
- * @param rankOverall		Overall (NUB and PRO) ranking (0 if not ranked high enough).
+ * @param client		Client index.
+ * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
+ * @param mode			Player's movement mode.
+ * @param timeType		Time type i.e. NUB or PRO.
+ * @param rank			Ranking within the same time type.
+ * @param rankOverall	Overall (NUB and PRO) ranking (0 if not ranked high enough).
  * @noreturn
  */
 forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall);
+
+
+
+// =========================  NATIVES  ========================= //
+
+/**
+ * Prints to chat the global records for a map, course and mode.
+ *
+ * @param client		Client index.
+ * @param map	    	Map name or "" for current map.
+ * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
+ * @param mode			GOKZ mode.
+ * @noreturn
+ */
+native void GOKZ_GL_PrintRecords(int client, const char[] map = "", int course, int mode);
+
+/**
+ * Opens up the global map top menu for a map, course and mode.
+ *
+ * @param client		Client index.
+ * @param map	    	Map name or "" for current map.
+ * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
+ * @param mode			GOKZ mode.
+ * @param timeType		Type of time i.e. NUB or PRO.
+ * @noreturn
+ */
+native void GOKZ_GL_DisplayMapTopMenu(int client, const char[] map = "", int course, int mode, int timeType);
 
 
 
@@ -36,7 +65,7 @@ forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType
  * @param mode	    	GOKZ mode.
  * @return				Global mode enumeration equivalent.		
  */
-stock GlobalMode GetGlobalMode(int mode)
+stock GlobalMode GOKZ_GL_GetGlobalMode(int mode)
 {
 	switch (mode)
 	{
@@ -45,4 +74,27 @@ stock GlobalMode GetGlobalMode(int mode)
 		case Mode_KZTimer:return GlobalMode_KZTimer;
 	}
 	return GlobalMode;
-} 
+}
+
+
+
+// =========================  DEPENDENCY  ========================= //
+
+public SharedPlugin __pl_gokz_globals = 
+{
+	name = "gokz-globals", 
+	file = "gokz-globals.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
+};
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_globals_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_GL_PrintRecords");
+	MarkNativeAsOptional("GOKZ_GL_DisplayMapTopMenu");
+}
+#endif

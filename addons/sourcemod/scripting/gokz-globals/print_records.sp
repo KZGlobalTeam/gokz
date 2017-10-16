@@ -30,12 +30,12 @@ void PrintRecords(int client, const char[] map, int course, int mode)
 	DataPack dpNUB = CreateDataPack();
 	dpNUB.WriteCell(GetClientUserId(client));
 	dpNUB.WriteCell(TimeType_Nub);
-	GlobalAPI_GetRecordTopEx(map, course, GetGlobalMode(mode), false, 128, 1, PrintRecordsCallback, dpNUB);
+	GlobalAPI_GetRecordTopEx(map, course, GOKZ_GL_GetGlobalMode(mode), false, 128, 1, PrintRecordsCallback, dpNUB);
 	
 	DataPack dpPRO = CreateDataPack();
 	dpPRO.WriteCell(GetClientUserId(client));
 	dpPRO.WriteCell(TimeType_Pro);
-	GlobalAPI_GetRecordTopEx(map, course, GetGlobalMode(mode), true, 128, 1, PrintRecordsCallback, dpPRO);
+	GlobalAPI_GetRecordTopEx(map, course, GOKZ_GL_GetGlobalMode(mode), true, 128, 1, PrintRecordsCallback, dpPRO);
 	
 	inProgress[client] = true;
 	waitingForOtherCallback[client] = true;

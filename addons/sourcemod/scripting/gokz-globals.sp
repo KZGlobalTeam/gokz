@@ -48,6 +48,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
+	
+	CreateNatives();
 	RegPluginLibrary("gokz-globals");
 	return APLRes_Success;
 }
@@ -84,6 +86,12 @@ public void OnMapStart()
 {
 	SetupAPI();
 	PrecacheSounds();
+}
+
+public void API_OnAPIKeyReloaded()
+{
+	GlobalAPI API;
+	API.GetAuthStatus(OnAuthStatusCallback);
 }
 
 public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)

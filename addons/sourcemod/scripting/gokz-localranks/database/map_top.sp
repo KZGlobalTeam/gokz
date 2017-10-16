@@ -262,10 +262,18 @@ void DisplayMapTopMenu(int client)
 static void MapTopMenuAddItems(int client, Menu menu)
 {
 	char display[32];
-	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
+	for (int i = 0; i < TIMETYPE_COUNT; i++)
 	{
-		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top 20", client, gC_TimeTypeNames[timeType]);
-		menu.AddItem("", display, ITEMDRAW_DEFAULT);
+		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top 20", client, gC_TimeTypeNames[i]);
+		menu.AddItem(IntToStringEx(i), display);
+	}
+	if (gB_GOKZGlobals)
+	{
+		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Global Top", client, gC_TimeTypeNames[TimeType_Nub]);
+		menu.AddItem("gnub", display);
+		
+		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Global Top", client, gC_TimeTypeNames[TimeType_Pro]);
+		menu.AddItem("gpro", display);
 	}
 }
 
@@ -277,7 +285,25 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 {
 	if (action == MenuAction_Select)
 	{
-		DB_OpenMapTop20(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], param2);
+		char info[8];
+		menu.GetItem(param2, info, sizeof(info));
+		
+		if (gB_GOKZGlobals)
+		{
+			if (StrEqual(info, "gnub"))
+			{
+				GOKZ_GL_DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], TimeType_Nub);
+			}
+			else if (StrEqual(info, "gpro"))
+			{
+				GOKZ_GL_DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], TimeType_Pro);
+			}
+		}
+		else
+		{
+			int timeType = StringToInt(info);
+			DB_OpenMapTop20(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
+		}
 	}
 	else if (action == MenuAction_End)
 	{

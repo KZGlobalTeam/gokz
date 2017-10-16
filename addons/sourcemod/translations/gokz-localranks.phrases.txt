@@ -1,12 +1,6 @@
 "Phrases"
 {	
 	// Chat Messages ////////////////////////////////////////////////////////////
-    "Please Wait Before Using Command"
-	{
-        // Please wait 2.5 seconds before using that command.
-        "#format"   "{1:.1f}"
-        "en"        "{grey}Please wait {default}{1} {grey}seconds before using that command."
-    }
 	"Player Not Found"
 	{
 		// Your search for player 'Bill' returned with no results.
@@ -311,6 +305,12 @@
 		// Top 20 PRO
 		"#format"	"{1:s}"
 		"en"		"Top 20 {1}"
+	}
+    "Map Top Menu - Global Top"
+	{
+        // Top 20 PRO
+		"#format"	"{1:s}"
+		"en"		"Global {1} Top"
 	}
 	"Map Top Submenu - Title"
 	{

@@ -35,8 +35,8 @@ void DisplayMapTopModeMenu(int client, const char[] map, int course)
 void DisplayMapTopMenu(int client, const char[] map, int course, int mode)
 {
 	FormatEx(mapTopMap[client], sizeof(mapTopMap[]), map);
-	mapTopMode[client] = mode;
 	mapTopCourse[client] = course;
+	mapTopMode[client] = mode;
 	
 	Menu menu = new Menu(MenuHandler_MapTopMenu);
 	if (course == 0)
@@ -51,37 +51,17 @@ void DisplayMapTopMenu(int client, const char[] map, int course, int mode)
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-void DisplayMapTopSubmenu(int client, const char[] top, int timeType)
+void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, int timeType)
 {
-	Menu menu = new Menu(MenuHandler_MapTopSubmenu);
-	if (mapTopCourse[client] == 0)
-	{
-		menu.SetTitle("%T", "Global Map Top Submenu - Title", client, 
-			gC_TimeTypeNames[timeType], mapTopMap[client], gC_ModeNames[mapTopMode[client]]);
-	}
-	else
-	{
-		menu.SetTitle("%T", "Global Map Top Submenu - Title (Bonus)", client, 
-			gC_TimeTypeNames[timeType], mapTopMap[client], mapTopCourse[client], gC_ModeNames[mapTopMode[client]]);
-	}
+	DataPack dp = new DataPack();
+	dp.WriteCell(GetClientUserId(client));
+	dp.WriteCell(timeType);
 	
-	if (MapTopSubmenuAddItems(menu, top) == 0)
-	{  // If no records found
-		if (timeType == TimeType_Pro)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "No Global Times Found (PRO)");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "%t", "No Global Times Found");
-		}
-		DisplayMapTopMenu(client, mapTopMap[client], mapTopCourse[client], mapTopMode[client]);
-	}
-	else
-	{
-		menu.Pagination = 5;
-		menu.Display(client, MENU_TIME_FOREVER);
-	}
+	FormatEx(mapTopMap[client], sizeof(mapTopMap[]), map);
+	mapTopCourse[client] = course;
+	mapTopMode[client] = mode;
+	
+	GlobalAPI_GetRecordTopEx(map, course, GOKZ_GL_GetGlobalMode(mode), timeType == TimeType_Pro, 128, 20, DisplayMapTopSubmenuCallback, dp);
 }
 
 
@@ -110,7 +90,7 @@ public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int 
 		char info[8];
 		menu.GetItem(param2, info, sizeof(info));
 		int timeType = StringToInt(info);
-		GetMapTop(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
+		DisplayMapTopSubmenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -157,16 +137,7 @@ static void MapTopMenuAddItems(int client, Menu menu)
 	}
 }
 
-static void GetMapTop(int client, const char[] map, int course, int mode, int timeType)
-{
-	DataPack dp = new DataPack();
-	dp.WriteCell(GetClientUserId(client));
-	dp.WriteCell(timeType);
-	
-	GlobalAPI_GetRecordTopEx(map, course, GetGlobalMode(mode), timeType == TimeType_Pro, 128, 20, GetMapTopCallback, dp);
-}
-
-public int GetMapTopCallback(bool failure, const char[] top, DataPack dp)
+public int DisplayMapTopSubmenuCallback(bool failure, const char[] top, DataPack dp)
 {
 	dp.Reset();
 	int client = GetClientOfUserId(dp.ReadCell());
@@ -184,7 +155,35 @@ public int GetMapTopCallback(bool failure, const char[] top, DataPack dp)
 		return;
 	}
 	
-	DisplayMapTopSubmenu(client, top, timeType);
+	Menu menu = new Menu(MenuHandler_MapTopSubmenu);
+	if (mapTopCourse[client] == 0)
+	{
+		menu.SetTitle("%T", "Global Map Top Submenu - Title", client, 
+			gC_TimeTypeNames[timeType], mapTopMap[client], gC_ModeNames[mapTopMode[client]]);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Global Map Top Submenu - Title (Bonus)", client, 
+			gC_TimeTypeNames[timeType], mapTopMap[client], mapTopCourse[client], gC_ModeNames[mapTopMode[client]]);
+	}
+	
+	if (MapTopSubmenuAddItems(menu, top) == 0)
+	{  // If no records found
+		if (timeType == TimeType_Pro)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Global Times Found (PRO)");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Global Times Found");
+		}
+		DisplayMapTopMenu(client, mapTopMap[client], mapTopCourse[client], mapTopMode[client]);
+	}
+	else
+	{
+		menu.Pagination = 5;
+		menu.Display(client, MENU_TIME_FOREVER);
+	}
 }
 
 // Returns number of record times added to the menu
