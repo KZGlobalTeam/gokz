@@ -58,7 +58,7 @@ public int Native_DisplayMapTopMenu(Handle plugin, int numParams)
 {
 	char pluginName[32];
 	GetPluginFilename(plugin, pluginName, sizeof(pluginName));
-	bool localRanksCall = StrEqual(pluginName, "gokz-localranks", false);
+	bool localRanksCall = StrEqual(pluginName, "gokz-localranks.smx", false);
 	
 	char map[33];
 	GetNativeString(2, map, sizeof(map));
