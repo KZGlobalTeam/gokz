@@ -5,6 +5,8 @@
 
 #include <GlobalAPI-Core>
 #include <gokz/core>
+#include <gokz/antimacro>
+#include <gokz/localranks>
 #include <gokz/replays>
 #include <gokz/globals>
 

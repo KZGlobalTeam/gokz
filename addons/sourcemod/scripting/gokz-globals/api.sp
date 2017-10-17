@@ -56,15 +56,19 @@ public int Native_PrintRecords(Handle plugin, int numParams)
 
 public int Native_DisplayMapTopMenu(Handle plugin, int numParams)
 {
+	char pluginName[32];
+	GetPluginFilename(plugin, pluginName, sizeof(pluginName));
+	bool localRanksCall = StrEqual(pluginName, "gokz-localranks", false);
+	
 	char map[33];
 	GetNativeString(2, map, sizeof(map));
 	
 	if (StrEqual(map, ""))
 	{
-		DisplayMapTopSubmenu(GetNativeCell(1), gC_CurrentMap, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5));
+		DisplayMapTopSubmenu(GetNativeCell(1), gC_CurrentMap, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5), localRanksCall);
 	}
 	else
 	{
-		DisplayMapTopSubmenu(GetNativeCell(1), map, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5));
+		DisplayMapTopSubmenu(GetNativeCell(1), map, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5), localRanksCall);
 	}
 } 

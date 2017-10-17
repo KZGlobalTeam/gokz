@@ -135,6 +135,15 @@ native bool GOKZ_LR_GetRecordMissed(int client, int timeType);
  */
 native bool GOKZ_LR_GetPBMissed(int client, int timeType);
 
+/**
+ * Reopens the map top menu with the already selected parameters.
+ * Don't use if the client hasn't opened the map top menu before.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+native void GOKZ_LR_ReopenMapTopMenu(int client);
+
 
 
 // =========================  DEPENDENCY  ========================= //
@@ -155,5 +164,6 @@ public void __pl_gokz_localdb_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_LR_GetRecordMissed");
 	MarkNativeAsOptional("GOKZ_LR_GetPBMissed");
+	MarkNativeAsOptional("GOKZ_LR_ReopenMapTopMenu");
 }
 #endif

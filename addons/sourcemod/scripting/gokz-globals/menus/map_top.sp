@@ -6,6 +6,7 @@
 
 
 
+static bool cameFromLocalRanks[MAXPLAYERS + 1];
 static char mapTopMap[MAXPLAYERS + 1][64];
 static int mapTopCourse[MAXPLAYERS + 1];
 static int mapTopMode[MAXPLAYERS + 1];
@@ -51,8 +52,10 @@ void DisplayMapTopMenu(int client, const char[] map, int course, int mode)
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, int timeType)
+void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, int timeType, bool fromLocalRanks = false)
 {
+	cameFromLocalRanks[client] = fromLocalRanks;
+	
 	DataPack dp = new DataPack();
 	dp.WriteCell(GetClientUserId(client));
 	dp.WriteCell(timeType);
@@ -92,6 +95,10 @@ public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int 
 		int timeType = StringToInt(info);
 		DisplayMapTopSubmenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
 	}
+	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayMapTopModeMenu(param1, mapTopMap[param1], mapTopCourse[param1]);
+	}
 	else if (action == MenuAction_End)
 	{
 		delete menu;
@@ -100,6 +107,17 @@ public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int 
 
 public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, int param2)
 {
+	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		if (cameFromLocalRanks[param1])
+		{
+			GOKZ_LR_ReopenMapTopMenu(param1);
+		}
+		else
+		{
+			DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1]);
+		}
+	}
 	if (action == MenuAction_End)
 	{
 		delete menu;
