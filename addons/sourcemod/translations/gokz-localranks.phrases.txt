@@ -314,23 +314,23 @@
 	}
 	"Map Top Submenu - Title"
 	{
-		// Top 20 PRO Server Times
+		// Server Top 20 PRO Times
 		//
 		// Map - kz_map
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"Top 20 {1} Server Times\n \nMap - {2}\nMode - {3}\n "	
+		"en"		"Server Top 20 {1} Times\n \nMap - {2}\nMode - {3}\n "	
 	}
 	"Map Top Submenu - Title (Bonus)"
 	{
-		// Top 20 PRO Server Times
+		// Server Top 20 PRO Times
 		//
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:d},{4:s}"
-		"en"		"Top 20 {1} Server Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
+		"en"		"Server Top 20 {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
 	}
 
 	

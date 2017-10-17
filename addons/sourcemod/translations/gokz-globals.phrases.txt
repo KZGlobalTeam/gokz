@@ -146,23 +146,23 @@
     }
     "Global Map Top Submenu - Title"
     {
-		// Top Global PRO Times
+		// Global Top PRO Times
 		//
 		// Map - kz_map
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"Top Global {1} Times\n \nMap - {2}\nMode - {3}\n "	
+		"en"		"Global Top {1} Times\n \nMap - {2}\nMode - {3}\n "	
     }
     "Global Map Top Submenu - Title (Bonus)"
     {
-		// Top Global PRO Times
+		// Global Top PRO Times
 		//
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:d},{4:s}"
-		"en"		"Top Global {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
+		"en"		"Global Top {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
     }
     "Global Map Top Menu - Top"
 	{
