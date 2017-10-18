@@ -85,12 +85,6 @@
     {
         "en"        "{darkred}GLOBAL PRO RECORD{grey}: None... yet."
     }
-    "Global Check"
-    {
-        // Global Check - API [X] | Version [X] | Map [X]
-        "#format"    "{1:s},{2:s},{3:s}"
-        "en"        "{grey}Global Check - {default}API {grey}[{1}{grey}] | {default}Version {Grey}[{2}{grey}] | {default}Map {grey}[{3}{grey}]"
-    }
     "Map Tier"
     {
         // kz_map - Tier 3
@@ -102,6 +96,12 @@
         // kz_map - Tier Unknown
         "#format"    "{1:s}"
         "en"        "{default}{1} {grey}- {yellow}Tier Unknown"
+    }
+    "Global Check"
+    {
+        // Global Check [API X | GOKZ X | Enforcer X | Map X]
+        "#format"    "{1:s},{2:s},{3:s},{4:s}"
+        "en"        "{grey}Global Check [{default}API {grey}{1}{grey} | {default}GOKZ {Grey}{2}{grey} | {default}Enforcer {grey}{3}{grey} | {default}Map {grey}{4}{grey}]"
     }
 
 

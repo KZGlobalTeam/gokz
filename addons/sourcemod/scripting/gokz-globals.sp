@@ -18,7 +18,7 @@
 public Plugin myinfo = 
 {
 	name = "GOKZ Globals", 
-	author = "DanZay & Sikari", 
+	author = "DanZay", 
 	description = "GOKZ Globals Module", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
@@ -32,9 +32,11 @@ bool gB_APIKeyCheck = false;
 bool gB_VersionCheck = false;
 char gC_CurrentMap[64];
 char gC_CurrentMapPath[PLATFORM_MAX_PATH];
+bool gB_InValidRun[MAXPLAYERS + 1];
 
 #include "gokz-globals/api.sp"
 #include "gokz-globals/commands.sp"
+#include "gokz-globals/convars.sp"
 #include "gokz-globals/print_records.sp"
 #include "gokz-globals/misc.sp"
 #include "gokz-globals/send_time.sp"
@@ -62,6 +64,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-globals.phrases");
 	
 	CreateGlobalForwards();
+	CreateConVars();
 	CreateCommands();
 }
 
@@ -74,9 +77,17 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_PrintRecords(client);
 }
 
+public void GOKZ_OnTimerStart_Post(int client, int course)
+{
+	gB_InValidRun[client] = GlobalsEnabled();
+}
+
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
-	SendTime(client, course, time, teleportsUsed);
+	if (gB_InValidRun[client])
+	{
+		SendTime(client, course, time, teleportsUsed);
+	}
 }
 
 

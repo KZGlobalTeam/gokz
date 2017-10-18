@@ -9,7 +9,7 @@
 
 void SendTime(int client, int course, float time, int teleportsUsed)
 {
-	if (gB_APIKeyCheck && gB_VersionCheck && MapCheck())
+	if (GlobalsEnabled())
 	{
 		KZPlayer player = new KZPlayer(client);
 		int mode = player.mode;

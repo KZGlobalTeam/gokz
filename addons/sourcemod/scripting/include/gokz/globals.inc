@@ -13,6 +13,29 @@
 
 
 
+// =========================  ENUMERATIONS  ========================= //
+
+enum
+{
+	EnforcedCVar_Cheats = 0, 
+	EnforcedCVar_ClampUnsafeVelocities, 
+	EnforcedCVar_DropKnifeEnable, 
+	ENFORCEDCVAR_COUNT
+};
+
+
+
+// =========================  OTHER  ========================= //
+
+stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
+{
+	"sv_cheats", 
+	"sv_clamp_unsafe_velocities", 
+	"mp_drop_knife_enable"
+};
+
+
+
 // =========================  FORWARDS  ========================= //
 
 /**

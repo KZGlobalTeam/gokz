@@ -6,6 +6,11 @@
 
 
 
+bool GlobalsEnabled()
+{
+	return gB_APIKeyCheck && gB_VersionCheck && gCV_gokz_settings_enforcer.BoolValue && MapCheck();
+}
+
 bool MapCheck()
 {
 	return GlobalAPI_GetMapGlobalStatus()
@@ -18,6 +23,7 @@ void PrintGlobalCheck(int client)
 	GOKZ_PrintToChat(client, true, "%t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
 		gB_VersionCheck ? "{green}✓" : "{darkred}X", 
+		gCV_gokz_settings_enforcer.BoolValue ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X");
 }
 
