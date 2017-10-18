@@ -372,7 +372,7 @@ bool IsSpammingCommands(int client, bool printMessage = true)
 	{
 		if (printMessage)
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Please Wait Before Using Command", COMMAND_COOLDOWN - timeSinceLastCommand);
+			GOKZ_PrintToChat(client, true, "%t", "Please Wait Before Using Command", COMMAND_COOLDOWN - timeSinceLastCommand + 0.1);
 		}
 		return true;
 	}
