@@ -1,12 +1,6 @@
 "Phrases"
 {	
 	// Chat Messages ////////////////////////////////////////////////////////////
-    "Please Wait Before Using Command"
-	{
-        // Please wait 2.5 seconds before using that command.
-        "#format"   "{1:.1f}"
-        "en"        "{grey}Please wait {default}{1} {grey}seconds before using that command."
-    }
 	"Player Not Found"
 	{
 		// Your search for player 'Bill' returned with no results.
@@ -288,23 +282,23 @@
 	// Map Top Menu ////////////////////////////////////////////////////////////
 	"Map Top Menu - Title"
 	{
-        // Server Map Top
+        // Map Top
         //
 		// Map - kz_map
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s}"
-		"en"		"Server Map Top\n \nMap - {1}\nMode - {2}\n "
+		"en"		"Map Top\n \nMap - {1}\nMode - {2}\n "
 	}
 	"Map Top Menu - Title (Bonus)"
 	{
-        // Server Bonus Top
+        // Bonus Top
         //
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:d},{3:s}"
-		"en"		"Server Bonus Top\n \nMap - {1} (Bonus {2})\nMode - {3}\n "
+		"en"		"Bonus Top\n \nMap - {1} (Bonus {2})\nMode - {3}\n "
 	}
 	"Map Top Menu - Top 20"
 	{
@@ -312,37 +306,43 @@
 		"#format"	"{1:s}"
 		"en"		"Top 20 {1}"
 	}
+    "Map Top Menu - Global Top"
+	{
+        // Global Top PRO
+		"#format"	"{1:s}"
+		"en"		"Global Top {1}"
+	}
 	"Map Top Submenu - Title"
 	{
-		// Top 20 PRO Server Times
+		// Server Top 20 PRO Times
 		//
 		// Map - kz_map
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"Top 20 {1} Server Times\n \nMap - {2}\nMode - {3}\n "	
+		"en"		"Server Top 20 {1} Times\n \nMap - {2}\nMode - {3}\n "	
 	}
 	"Map Top Submenu - Title (Bonus)"
 	{
-		// Top 20 PRO Server Times
+		// Server Top 20 PRO Times
 		//
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:d},{4:s}"
-		"en"		"Top 20 {1} Server Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
+		"en"		"Server Top 20 {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
 	}
 
 	
 	// Player Top Menu ////////////////////////////////////////////////////////////
 	"Player Top Menu - Title"
 	{
-		// Top Server Record Holders
+		// Top Record Holders
 		//
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s}"
-		"en"		"Top Server Record Holders\n \nMode - {1}\n "
+		"en"		"Top Record Holders\n \nMode - {1}\n "
 	}
 	"Player Top Menu - Top 20"
 	{
@@ -364,12 +364,12 @@
     // Recent Records Menu ////////////////////////////////////////////////////////////
     "Recent Records Menu - Title"
     {
-        // Recently Broken Server Records
+        // Recently Broken Records
         //
         // Mode - Vanilla
         //
         "#format"   "{1:s}"
-        "en"        "Recently Broken Server Records\n \nMode - {1}\n "
+        "en"        "Recently Broken Records\n \nMode - {1}\n "
     }
     "Recent Records Menu - Record Type"
 	{

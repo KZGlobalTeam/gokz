@@ -4,7 +4,7 @@
 	ConVars for server control over features of the plugin.
 */
 
-// =========================  CONVARS  ========================= //
+
 
 ConVar gCV_gokz_chat_processing;
 ConVar gCV_gokz_chat_prefix;
@@ -13,6 +13,8 @@ ConVar gCV_gokz_player_models;
 ConVar gCV_gokz_player_models_alpha;
 ConVar gCV_sv_disable_immunity_alpha;
 ConVar gCV_sv_full_alltalk;
+
+
 
 // =========================  PUBLIC  ========================= //
 
@@ -28,6 +30,8 @@ void CreateConVars()
 	
 	HookConVarChange(gCV_gokz_player_models_alpha, OnConVarChanged);
 }
+
+
 
 // =========================  LISTENERS  ========================= //
 

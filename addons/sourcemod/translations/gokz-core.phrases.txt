@@ -75,10 +75,6 @@
         "#format"   "{1:d},{2:s}"
         "en"        "{grey}All spectators ({default}{1}{grey}) - {2}"
     }
-    "Player No Longer Valid"
-    {
-        "en"        "{darkred}The player you specified is no longer valid."
-    }
     "Target Spectator List (None)"
     {
         // No one is spectating Bill right now.
@@ -216,6 +212,20 @@
 		"#format"	"{1:s}"
 		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
 	}
+    "Player No Longer Valid"
+    {
+        "en"        "{darkred}The player you specified is no longer valid."
+    }
+    "Please Wait Before Using Command Again"
+    {
+        "en"        "{grey}Please wait before using that command again."
+    }
+    "Please Wait Before Using Command"
+	{
+        // Please wait 2.5 seconds before using that command.
+        "#format"   "{1:.1f}"
+        "en"        "{grey}Please wait {default}{1} {grey}seconds before using that command."
+    }
 	
 	
 	// Option Change Chat Messages ////////////////////////////////////////////////////////////

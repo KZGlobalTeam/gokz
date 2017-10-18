@@ -11,6 +11,7 @@
 #include <gokz/localdb>
 #include <gokz/localranks>
 #undef REQUIRE_PLUGIN
+#include <gokz/globals>
 #include <updater>
 
 #pragma newdecls required
@@ -33,6 +34,7 @@ public Plugin myinfo =
 #define MAP_POOL_CFG_PATH "cfg/sourcemod/gokz/mappool.cfg"
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
+bool gB_GOKZGlobals;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
@@ -110,6 +112,7 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
+	gB_GOKZGlobals = LibraryExists("gokz-globals");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -118,10 +121,16 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
+	gB_GOKZGlobals = gB_GOKZGlobals || StrEqual(name, "gokz-globals");
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	gB_GOKZGlobals = gB_GOKZGlobals && !StrEqual(name, "gokz-globals");
 }
 
 
