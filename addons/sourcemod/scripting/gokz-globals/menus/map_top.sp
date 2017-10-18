@@ -195,7 +195,15 @@ public int DisplayMapTopSubmenuCallback(bool failure, const char[] top, DataPack
 		{
 			GOKZ_PrintToChat(client, true, "%t", "No Global Times Found");
 		}
-		DisplayMapTopMenu(client, mapTopMap[client], mapTopCourse[client], mapTopMode[client]);
+		
+		if (cameFromLocalRanks[client])
+		{
+			GOKZ_LR_ReopenMapTopMenu(client);
+		}
+		else
+		{
+			DisplayMapTopMenu(client, mapTopMap[client], mapTopCourse[client], mapTopMode[client]);
+		}
 	}
 	else
 	{
