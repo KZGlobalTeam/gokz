@@ -27,6 +27,11 @@ void PrintGlobalCheck(int client)
 		MapCheck() ? "{green}✓" : "{darkred}X");
 }
 
+void InvalidateRun(int client)
+{
+	gB_InValidRun[client] = false;
+}
+
 void AnnounceNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall)
 {
 	bool newRecord = false;
