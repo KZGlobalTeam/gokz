@@ -10,7 +10,6 @@
 
 static int defaultOptions[JSOPTION_COUNT];
 static int options[JSOPTION_COUNT][MAXPLAYERS + 1];
-
 static int optionCounts[JSOPTION_COUNT] = 
 {
 	JUMPSTATSMASTER_COUNT, 

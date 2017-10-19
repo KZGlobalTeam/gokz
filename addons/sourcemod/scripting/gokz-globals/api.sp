@@ -6,7 +6,7 @@
 
 
 
-Handle H_OnNewTopTime;
+static Handle H_OnNewTopTime;
 
 
 

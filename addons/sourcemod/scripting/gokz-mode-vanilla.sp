@@ -185,6 +185,7 @@ static bool IsUsingMode(int client)
 }
 
 
+
 // CONVARS
 
 static void CreateConVars()

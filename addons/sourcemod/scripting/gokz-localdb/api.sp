@@ -6,10 +6,10 @@
 
 
 
-Handle H_OnDatabaseConnect;
-Handle H_OnClientSetup;
-Handle H_OnMapSetup;
-Handle H_OnTimeInserted;
+static Handle H_OnDatabaseConnect;
+static Handle H_OnClientSetup;
+static Handle H_OnMapSetup;
+static Handle H_OnTimeInserted;
 
 
 

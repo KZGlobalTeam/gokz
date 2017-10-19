@@ -227,6 +227,7 @@ static bool IsUsingMode(int client)
 }
 
 
+
 // CONVARS
 
 static void CreateConVars()
@@ -246,6 +247,7 @@ static void TweakConVars()
 		gCV_ModeCVar[i].FloatValue = gF_ModeCVarValues[i];
 	}
 }
+
 
 
 // VELOCITY MODIFIER
@@ -347,6 +349,7 @@ static float CalcWeaponVelMod(KZPlayer player)
 }
 
 
+
 // JUMPING
 
 static void TweakJump(KZPlayer player)
@@ -395,6 +398,7 @@ static void TweakJumpbug(KZPlayer player)
 		player.gokzTakeoffSpeed = player.speed;
 	}
 }
+
 
 
 // OTHER

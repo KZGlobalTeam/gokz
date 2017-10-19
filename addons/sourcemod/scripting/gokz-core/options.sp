@@ -37,7 +37,6 @@ static int optionCounts[OPTION_COUNT] =
 
 // =========================  PUBLIC  ========================= //
 
-
 int GetOption(int client, Option option)
 {
 	return options[option][client];

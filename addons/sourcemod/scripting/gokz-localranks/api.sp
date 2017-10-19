@@ -6,10 +6,10 @@
 
 
 
-Handle H_OnTimeProcessed;
-Handle H_OnNewRecord;
-Handle H_OnRecordMissed;
-Handle H_OnPBMissed;
+static Handle H_OnTimeProcessed;
+static Handle H_OnNewRecord;
+static Handle H_OnRecordMissed;
+static Handle H_OnPBMissed;
 
 
 

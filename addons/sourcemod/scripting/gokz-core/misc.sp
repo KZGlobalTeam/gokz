@@ -8,19 +8,20 @@
 
 // =========================  GOKZ.CFG  ========================= //
 
+#define GOKZ_CFG_PATH "sourcemod/gokz/gokz.cfg"
+
 void OnMapStart_KZConfig()
 {
-	char kzConfigPath[] = "sourcemod/gokz/gokz.cfg";
-	char kzConfigPathFull[64];
-	FormatEx(kzConfigPathFull, sizeof(kzConfigPathFull), "cfg/%s", kzConfigPath);
+	char gokzCfgFullPath[PLATFORM_MAX_PATH];
+	FormatEx(gokzCfgFullPath, sizeof(gokzCfgFullPath), "cfg/%s", GOKZ_CFG_PATH);
 	
-	if (FileExists(kzConfigPathFull))
+	if (FileExists(gokzCfgFullPath))
 	{
-		ServerCommand("exec %s", kzConfigPath);
+		ServerCommand("exec %s", GOKZ_CFG_PATH);
 	}
 	else
 	{
-		SetFailState("Failed to load config (cfg/%s not found).", kzConfigPath);
+		SetFailState("Failed to load config (%s not found).", gokzCfgFullPath);
 	}
 }
 
@@ -30,7 +31,8 @@ void OnMapStart_KZConfig()
 
 void UpdateGodMode(int client)
 {
-	SetEntProp(client, Prop_Data, "m_takedamage", 0, 1);
+	// Stop players from taking damage
+	SetEntProp(client, Prop_Data, "m_takedamage", 0);
 }
 
 
@@ -60,6 +62,7 @@ void ToggleNoclip(int client)
 
 void UpdatePlayerCollision(int client)
 {
+	// Let players go through other players
 	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 }
 
@@ -74,7 +77,7 @@ void SetupClientHidePlayers(int client)
 
 public Action OnSetTransmitClient(int entity, int client)
 {
-	if (GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
+	if (GOKZ_GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
 		 && entity != client
 		 && entity != GetObserverTarget(client))
 	{
@@ -90,7 +93,7 @@ public Action OnSetTransmitClient(int entity, int client)
 void UpdateHideWeapon(int client)
 {
 	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", 
-		GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
+		GOKZ_GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
 }
 
 void OnOptionChanged_HideWeapon(int client, Option option)
@@ -122,8 +125,8 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 		return;
 	}
 	
-	char reason[64];
-	GetEventString(event, "reason", reason, sizeof(reason));
+	char reason[128];
+	event.GetString("reason", reason, sizeof(reason));
 	GOKZ_PrintToChatAll(false, "%t", "Client Disconnection Message", client, reason);
 }
 
@@ -133,7 +136,7 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 
 void OnRoundStart_ForceAllTalk()
 {
-	gCV_sv_full_alltalk.IntValue = 1;
+	gCV_sv_full_alltalk.BoolValue = true;
 }
 
 
@@ -142,7 +145,7 @@ void OnRoundStart_ForceAllTalk()
 
 void OnTimerEnd_SlayOnEnd(int client)
 {
-	if (GetOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
+	if (GOKZ_GetOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
 	{
 		CreateTimer(3.0, Timer_SlayPlayer, GetClientUserId(client));
 	}
@@ -166,7 +169,7 @@ public Action Timer_SlayPlayer(Handle timer, int userid)
 
 void PlayErrorSound(int client)
 {
-	if (GetOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
+	if (GOKZ_GetOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_ERROR);
 	}
@@ -212,7 +215,7 @@ void UpdatePlayerModel(int client)
 public Action Timer_UpdatePlayerModel(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
 		return;
 	}
@@ -276,7 +279,7 @@ static int pistolTeams[PISTOL_COUNT] =
 
 void UpdatePistol(int client)
 {
-	GivePistol(client, GetOption(client, Option_Pistol));
+	GivePistol(client, GOKZ_GetOption(client, Option_Pistol));
 }
 
 void OnOptionChanged_Pistol(int client, Option option)
@@ -339,39 +342,42 @@ void SetupClientJoinTeam(int client)
 	hasSavedPosition[client] = false;
 }
 
-void JoinTeam(int client, int team)
+void JoinTeam(int client, int newTeam)
 {
-	if (team == CS_TEAM_SPECTATOR && GetClientTeam(client) != CS_TEAM_SPECTATOR)
+	KZPlayer player = new KZPlayer(client);
+	int currentTeam = GetClientTeam(client);
+	
+	if (newTeam == CS_TEAM_SPECTATOR && currentTeam != CS_TEAM_SPECTATOR)
 	{
-		Movement_GetOrigin(client, savedOrigin[client]);
-		Movement_GetEyeAngles(client, savedAngles[client]);
-		savedOnLadder[client] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
+		player.GetOrigin(savedOrigin[client]);
+		player.GetEyeAngles(savedAngles[client]);
+		savedOnLadder[client] = player.moveType == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
-		Call_GOKZ_OnJoinTeam(client, team);
+		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
-	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
+	else if (newTeam == CS_TEAM_CT && currentTeam != CS_TEAM_CT
+		 || newTeam == CS_TEAM_T && currentTeam != CS_TEAM_T)
 	{
 		ForcePlayerSuicide(client);
-		CS_SwitchTeam(client, team);
+		CS_SwitchTeam(client, newTeam);
 		CS_RespawnPlayer(client);
 		if (hasSavedPosition[client])
 		{
-			Movement_SetOrigin(client, savedOrigin[client]);
-			Movement_SetEyeAngles(client, savedAngles[client]);
+			player.SetOrigin(savedOrigin[client]);
+			player.SetEyeAngles(savedAngles[client]);
 			if (savedOnLadder[client])
 			{
-				Movement_SetMoveType(client, MOVETYPE_LADDER);
+				player.moveType = MOVETYPE_LADDER;
 			}
 			hasSavedPosition[client] = false;
 		}
 		else
 		{
-			TimerStop(client);
+			player.StopTimer();
 		}
-		Call_GOKZ_OnJoinTeam(client, team);
+		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
-	UpdateTPMenu(client);
 }
 
 void OnTimerStart_JoinTeam(int client)
@@ -383,32 +389,25 @@ void OnTimerStart_JoinTeam(int client)
 
 // =========================  CHAT PROCESSING  ========================= //
 
-#define MAX_MESSAGE_LENGTH 128
-
-Action OnClientSayCommand_ChatProcessing(int client, const char[] command, const char[] message)
+void OnClientSayCommand_ChatProcessing(int client, const char[] command, const char[] message)
 {
-	if (!gCV_gokz_chat_processing.BoolValue)
-	{
-		return Plugin_Continue;
-	}
-	
 	if (gB_BaseComm && BaseComm_IsClientGagged(client)
 		 || UsedBaseChat(client, command, message)
 		 || IsChatTrigger())
 	{
-		return Plugin_Handled;
+		return;
 	}
 	
 	// Resend messages that may have been a command with capital letters
 	if ((message[0] == '!' || message[0] == '/') && IsCharUpper(message[1]))
 	{
-		char loweredMessage[MAX_MESSAGE_LENGTH];
+		char loweredMessage[128];
 		String_ToLower(message, loweredMessage, sizeof(loweredMessage));
 		FakeClientCommand(client, "say %s", loweredMessage);
-		return Plugin_Handled;
+		return;
 	}
 	
-	char sanitisedMessage[MAX_MESSAGE_LENGTH];
+	char sanitisedMessage[128];
 	strcopy(sanitisedMessage, sizeof(sanitisedMessage), message);
 	SanitiseChatInput(sanitisedMessage, sizeof(sanitisedMessage));
 	
@@ -418,7 +417,7 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] command, const
 	
 	if (TrimString(sanitisedMessage) == 0)
 	{
-		return Plugin_Handled;
+		return;
 	}
 	
 	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
@@ -429,7 +428,6 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] command, const
 	{
 		GOKZ_PrintToChatAll(false, "{lime}%s{default} : %s", sanitisedName, sanitisedMessage);
 	}
-	return Plugin_Handled;
 }
 
 static bool UsedBaseChat(int client, const char[] command, const char[] message)

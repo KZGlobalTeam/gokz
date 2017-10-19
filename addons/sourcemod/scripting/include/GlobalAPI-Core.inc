@@ -97,17 +97,17 @@ native bool GlobalAPI_GetRecordTopEx(const char[] map, int stage, GlobalMode mod
 
 
 /**
- * @recordsString		string to obtain record from
- * @place				place we want to retrieve
- * @return				Handle to the wanted record place
+ * @sRecords			String to obtain record from
+ * @iPlace				Place we want to retrieve
+ * @return				-1 if invalid string given, otherwise JSON string of the wanted record
  */
 native Handle GlobalAPI_GetRecordByPlace(const char[] recordsString, int place);
 
 /**
  * Gets record count from the given string
  *
- * @recordsString		string to obtain record count from
- * @return				record count from the given string
+ * @sRecords			String to obtain record count from
+ * @return				-1 if invalid string given, otherwise record count from the given string
  */
 native int GlobalAPI_GetRecordCount(const char[] recordsString);
 
@@ -128,8 +128,8 @@ native int GlobalAPI_GetMapID();
 /**
  * Gets the current map's name
  *
- * @buffer				buffer to store the mapname in
- * @size				size of the buffer
+ * @sBuffer				Buffer to store the mapname in
+ * @iSize				Size of the buffer
  * @return				Empty buffer ("") if failed to get map name, otherwise current map's name
  */
 native int GlobalAPI_GetMapName(char[] buffer, int size);
@@ -137,8 +137,8 @@ native int GlobalAPI_GetMapName(char[] buffer, int size);
 /**
  * Gets the current map's path
  *
- * @buffer				buffer to store the mappath in
- * @size				size of the buffer
+ * @sBuffer				Buffer to store the mappath in
+ * @iSize				Size of the buffer
  * @return				Empty buffer ("") if failed to get map path, otherwise current map's path
  */
 native int GlobalAPI_GetMapPath(char[] buffer, int size);
@@ -160,15 +160,15 @@ native int GlobalAPI_GetMapFilesize();
 /**
  * Gets the current map's global status
  *
- * @return				true if map is validated, false otherwise
+ * @return				True if map is validated, false otherwise
  */
 native bool GlobalAPI_GetMapGlobalStatus();
 
 /**
  * Gets the server's current API Key
  *
- * @buffer				buffer to store the apikey in
- * @size				size of the buffer
+ * @sBuffer				Buffer to store the apikey in
+ * @iSize				Size of the buffer
  * @return				Empty buffer ("") if failed to get api key, otherwise current api key
  */
 native int GlobalAPI_GetAPIKey(char[] buffer, int size);
@@ -176,16 +176,16 @@ native int GlobalAPI_GetAPIKey(char[] buffer, int size);
 /**
  * Gets authstatus on given authentication type
  *
- * @param callback		Callback function when API call finishes
- * @return				true if api key is validated, otherwise false
+ * @param Callback		Callback function when API call finishes
+ * @return				True if api key is validated, otherwise false
  */
 native int GlobalAPI_GetAuthStatus(GetAuthStatusCallback onComplete = INVALID_FUNCTION);
 
 /**
  * Retrieves information on the given mode
  *
- * @param mode			Mode we want info of
- * @param callback		Callback function when API call finishes
+ * @param iMode			Mode we want info of
+ * @param Callback		Callback function when API call finishes
  * @noreturn
  */
 native int GlobalAPI_GetModeInfo(const char[] mode, GetModeInfoCallback onComplete = INVALID_FUNCTION);

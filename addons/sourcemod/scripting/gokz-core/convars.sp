@@ -28,7 +28,7 @@ void CreateConVars()
 	gCV_sv_disable_immunity_alpha = FindConVar("sv_disable_immunity_alpha");
 	gCV_sv_full_alltalk = FindConVar("sv_full_alltalk");
 	
-	HookConVarChange(gCV_gokz_player_models_alpha, OnConVarChanged);
+	gCV_gokz_player_models_alpha.AddChangeHook(OnConVarChanged);
 }
 
 

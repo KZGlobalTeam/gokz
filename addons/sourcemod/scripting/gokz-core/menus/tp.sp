@@ -112,6 +112,26 @@ void OnOptionChanged_TPMenu(int client, Option option)
 	}
 }
 
+void OnTimerStart_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnMakeCheckpoint_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnCountedTeleport_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnJoinTeam_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
 
 
 // =========================  PRIVATE  ========================= //

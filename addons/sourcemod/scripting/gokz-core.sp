@@ -169,9 +169,11 @@ public void OnClientDisconnect(int client)
 	gB_ClientIsSetUp[client] = false;
 }
 
-public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
-	if (IsValidClient(client) && OnClientSayCommand_ChatProcessing(client, command, sArgs) == Plugin_Handled)
+public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
+{
+	if (client != 0 && gCV_gokz_chat_processing.BoolValue)
 	{
+		OnClientSayCommand_ChatProcessing(client, command, sArgs);
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
@@ -193,7 +195,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public Action OnClientCommandKeyValues(int client, KeyValues kv)
 {
 	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
-	char cmd[64];
+	char cmd[16];
 	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
 	{
 		return Plugin_Handled;
@@ -203,10 +205,10 @@ public Action OnClientCommandKeyValues(int client, KeyValues kv)
 
 public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect pre hook
 {
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	event.BroadcastDisabled = true; // Block disconnection messages
+	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (IsValidClient(client))
 	{
-		SetEventBroadcast(event, true); // Block the game printing a disconnect message
 		PrintDisconnectMessage(client, event);
 	}
 	return Plugin_Continue;
@@ -214,7 +216,7 @@ public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadc
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (IsValidClient(client))
 	{
 		OnPlayerSpawn_Modes(client);
@@ -232,8 +234,8 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
-	SetEventBroadcast(event, true); // Block death notices
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	event.BroadcastDisabled = true; // Block death notices
+	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (IsValidClient(client))
 	{
 		OnPlayerDeath_Timer(client);
@@ -244,7 +246,7 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 
 public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team pre hook
 {
-	SetEventBroadcast(event, true); // Block join team messages
+	event.BroadcastDisabled = true; // Block join team messages
 	return Plugin_Continue;
 }
 
@@ -288,7 +290,7 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_Pause(client);
 	OnTimerStart_Teleports(client);
 	OnTimerStart_TimerText(client);
-	UpdateTPMenu(client);
+	OnTimerStart_TPMenu(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
@@ -304,33 +306,17 @@ public void GOKZ_OnTimerStopped(int client)
 
 public void GOKZ_OnMakeCheckpoint_Post(int client)
 {
-	UpdateTPMenu(client);
+	OnMakeCheckpoint_TPMenu(client);
 }
 
-public void GOKZ_OnTeleportToCheckpoint_Post(int client)
+public void GOKZ_OnCountedTeleport_Post(int client)
 {
-	UpdateTPMenu(client);
-}
-
-public void GOKZ_OnPrevCheckpoint_Post(int client)
-{
-	UpdateTPMenu(client);
-}
-
-public void GOKZ_OnNextCheckpoint_Post(int client)
-{
-	UpdateTPMenu(client);
+	OnCountedTeleport_TPMenu(client);
 }
 
 public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 {
 	OnTeleportToStart_Timer(client, customPos);
-	UpdateTPMenu(client);
-}
-
-public void GOKZ_OnUndoTeleport_Post(int client)
-{
-	UpdateTPMenu(client);
 }
 
 public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
@@ -347,6 +333,7 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 public void GOKZ_OnJoinTeam(int client, int team)
 {
 	OnJoinTeam_Pause(client, team);
+	OnJoinTeam_TPMenu(client);
 }
 
 public void GOKZ_OnModeUnloaded(int mode)
@@ -420,7 +407,7 @@ static void CreateHooks()
 	Handle gameData = LoadGameConfigFile("sdktools.games");
 	int offset;
 	
-	// Setup DHooks OnTeleport for Players
+	// Setup DHooks OnTeleport for players
 	offset = GameConfGetOffset(gameData, "Teleport");
 	gH_DHooks_OnTeleport = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnTeleport);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
