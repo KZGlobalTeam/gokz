@@ -244,6 +244,24 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	}
 }
 
+public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+{
+	if (option == Option_Mode && newValue == Mode_SimpleKZ)
+	{
+		// Make sure velocity modifier is reset to 1.0 when switching modes
+		Movement_SetVelocityModifier(client, 1.0);
+		ReplicateConVars(client);
+	}
+}
+
+public void GOKZ_OnClientSetup(int client)
+{
+	if (IsUsingMode(client))
+	{
+		ReplicateConVars(client);
+	}
+}
+
 
 
 // =========================  PRIVATE  ========================= //
@@ -260,11 +278,9 @@ static bool IsUsingMode(int client)
 
 static void CreateConVars()
 {
-	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
+	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
-		gCV_ModeCVar[cvar] = FindConVar(gC_ModeCVars[cvar]);
-		// Remove notify flags because these ConVars are being set constantly
-		gCV_ModeCVar[cvar].Flags &= ~FCVAR_NOTIFY;
+		gCV_ModeCVar[i] = FindConVar(gC_ModeCVars[i]);
 	}
 }
 
@@ -273,6 +289,23 @@ static void TweakConVars()
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
 		gCV_ModeCVar[i].FloatValue = gF_ModeCVarValues[i];
+	}
+}
+
+static void ReplicateConVars(int client)
+{
+	// Replicate convars only when player changes mode in GOKZ
+	// so that lagg isn't caused by other players using other
+	// modes, and also as an optimisation.
+	
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		gCV_ModeCVar[i].ReplicateToClient(client, FloatToStringEx(gF_ModeCVarValues[i]));
 	}
 }
 

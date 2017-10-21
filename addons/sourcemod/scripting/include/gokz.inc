@@ -317,6 +317,19 @@ stock char[] IntToStringEx(int num)
 }
 
 /**
+ * Returns a float as a string.
+ *
+ * @param num				Float to stringify.
+ * @return					Float as a string.
+ */
+stock char[] FloatToStringEx(float num)
+{
+	char string[32];
+	FloatToString(num, string, sizeof(string));
+	return string;
+}
+
+/**
  * Increment an index, looping back to 0 if the max value is reached.
  *
  * @param index			Current index.

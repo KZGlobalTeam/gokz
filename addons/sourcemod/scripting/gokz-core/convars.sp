@@ -29,6 +29,13 @@ void CreateConVars()
 	gCV_sv_full_alltalk = FindConVar("sv_full_alltalk");
 	
 	gCV_gokz_player_models_alpha.AddChangeHook(OnConVarChanged);
+	
+	// Remove unwanted flags from constantly changed mode convars - replication is done manually in mode plugins
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		FindConVar(gC_ModeCVars[i]).Flags &= ~FCVAR_NOTIFY;
+		FindConVar(gC_ModeCVars[i]).Flags &= ~FCVAR_REPLICATED;
+	}
 }
 
 
