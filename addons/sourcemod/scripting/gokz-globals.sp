@@ -28,8 +28,8 @@ public Plugin myinfo =
 
 #define RECORD_SOUND_PATH "gokz/holyshit.mp3"
 
-bool gB_APIKeyCheck = false;
-bool gB_VersionCheck = false;
+bool gB_APIKeyCheck;
+bool gB_ModeCheck[MODE_COUNT];
 char gC_CurrentMap[64];
 char gC_CurrentMapPath[PLATFORM_MAX_PATH];
 bool gB_InValidRun[MAXPLAYERS + 1];
@@ -79,7 +79,9 @@ public void OnClientPutInServer(int client)
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
-	gB_InValidRun[client] = GlobalsEnabled();
+	KZPlayer player = new KZPlayer(client);
+	int mode = player.mode;
+	gB_InValidRun[client] = GlobalsEnabled(mode);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
@@ -106,6 +108,11 @@ public void GlobalAPI_OnAPIKeyReloaded()
 	API.GetAuthStatus(OnAuthStatusCallback);
 }
 
+public void GOKZ_OnModeUnloaded(int mode)
+{
+	gB_ModeCheck[mode] = false;
+}
+
 public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)
 {
 	char pluginName[64];
@@ -129,14 +136,16 @@ static void SetupAPI()
 	API.GetMapName(gC_CurrentMap, sizeof(gC_CurrentMap));
 	API.GetMapPath(gC_CurrentMapPath, sizeof(gC_CurrentMapPath));
 	API.GetAuthStatus(OnAuthStatusCallback);
-	API.GetModeInfo("kz_simple", OnModeInfoCallback); // TODO Other modes/better version checking
+	API.GetModeInfo("kz_vanilla", OnModeInfoCallback);
+	API.GetModeInfo("kz_simple", OnModeInfoCallback);
+	API.GetModeInfo("kz_timer", OnModeInfoCallback);
 }
 
 public int OnAuthStatusCallback(bool failure, bool authenticated)
 {
 	if (failure)
 	{
-		LogError("Failed to check API key with global API.");
+		LogError("Failed to check API key with Global API.");
 		gB_APIKeyCheck = false;
 	}
 	else
@@ -153,19 +162,33 @@ public int OnModeInfoCallback(bool failure, const char[] name, int latest_versio
 {
 	if (failure)
 	{
-		LogError("Failed to check mode version with global API.");
-		gB_VersionCheck = false;
+		LogError("Failed to check a mode version with Global API.");
 	}
 	else
 	{
-		if (!StrEqual(GOKZ_VERSION, latest_version_description))
+		int mode;
+		if (StrEqual(name, "kz_vanilla"))
 		{
-			LogError("Global API requires GOKZ %s. You have GOKZ %s.", latest_version_description, GOKZ_VERSION);
-			gB_VersionCheck = false;
+			mode = Mode_Vanilla;
+		}
+		else if (StrEqual(name, "kz_simple"))
+		{
+			mode = Mode_SimpleKZ;
+		}
+		else if (StrEqual(name, "kz_timer"))
+		{
+			mode = Mode_KZTimer;
+		}
+		
+		if (latest_version == GOKZ_GetModeVersion(mode))
+		{
+			gB_ModeCheck[mode] = true;
 		}
 		else
 		{
-			gB_VersionCheck = true;
+			gB_ModeCheck[mode] = false;
+			LogError("Global API requires %s mode version %d (%s). You have version %d.", 
+				gC_ModeNames[mode], latest_version, latest_version_description, GOKZ_GetModeVersion(mode));
 		}
 	}
 }

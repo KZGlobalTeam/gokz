@@ -7,6 +7,7 @@
 
 
 static bool modeLoaded[MODE_COUNT];
+static int modeVersion[MODE_COUNT];
 static bool GOKZHitPerf[MAXPLAYERS + 1];
 static float GOKZTakeoffSpeed[MAXPLAYERS + 1];
 
@@ -19,11 +20,17 @@ bool GetModeLoaded(int mode)
 	return modeLoaded[mode];
 }
 
-void SetModeLoaded(int mode, bool loaded)
+int GetModeVersion(int mode)
+{
+	return modeLoaded[mode] ? modeVersion[mode] : -1;
+}
+
+void SetModeLoaded(int mode, bool loaded, int version = -1)
 {
 	if (!modeLoaded[mode] && loaded)
 	{
 		modeLoaded[mode] = true;
+		modeVersion[mode] = version;
 		Call_GOKZ_OnModeLoaded(mode);
 	}
 	else if (modeLoaded[mode] && !loaded)

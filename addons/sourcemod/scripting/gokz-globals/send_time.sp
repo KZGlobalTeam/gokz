@@ -9,11 +9,11 @@
 
 void SendTime(int client, int course, float time, int teleportsUsed)
 {
-	if (GlobalsEnabled())
+	KZPlayer player = new KZPlayer(client);
+	int mode = player.mode;
+	
+	if (GlobalsEnabled(mode))
 	{
-		KZPlayer player = new KZPlayer(client);
-		int mode = player.mode;
-		
 		DataPack dp = CreateDataPack();
 		dp.WriteCell(GetClientUserId(client));
 		dp.WriteCell(course);

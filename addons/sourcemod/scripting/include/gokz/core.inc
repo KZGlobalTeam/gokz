@@ -593,18 +593,27 @@ forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
  * Gets whether a mode is loaded.
  *
  * @param mode			Mode.
- * @return				Whether mode is enabled.
+ * @return				Whether mode is loaded.
  */
 native bool GOKZ_GetModeLoaded(int mode);
+
+/**
+ * Gets the version number of a loaded mode.
+ *
+ * @param mode			Mode.
+ * @return				Version number of the mode, or -1 if not loaded.
+ */
+native int GOKZ_GetModeVersion(int mode);
 
 /**
  * Sets whether a mode is loaded. To be used by mode plugins.
  *
  * @param mode			Mode.
- * @param enabled		Whether mode is enabled.
+ * @param loaded		Whether mode is loaded.
+ * @param version		Version number of the mode.
  * @noreturn
  */
-native void GOKZ_SetModeLoaded(int mode, bool enabled);
+native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
 
 /**
  * Gets the total number of loaded modes.
@@ -1377,6 +1386,7 @@ public SharedPlugin __pl_gokz_core =
 public void __pl_gokz_core_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_GetModeLoaded");
+	MarkNativeAsOptional("GOKZ_GetModeVersion");
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
 	MarkNativeAsOptional("GOKZ_PrintToChat");

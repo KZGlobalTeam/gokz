@@ -26,6 +26,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.simplekz.com/gokz-mode-kztimer.txt"
 
+#define MODE_VERSION 195
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
@@ -82,7 +83,7 @@ public void OnAllPluginsLoaded()
 	if (LibraryExists("gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_KZTimer, true);
+		GOKZ_SetModeLoaded(Mode_KZTimer, true, MODE_VERSION);
 	}
 	if (LibraryExists("updater"))
 	{
@@ -95,7 +96,7 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_KZTimer, true);
+		GOKZ_SetModeLoaded(Mode_KZTimer, true, MODE_VERSION);
 	}
 	else if (StrEqual(name, "updater"))
 	{

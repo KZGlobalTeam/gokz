@@ -26,6 +26,8 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.simplekz.com/gokz-mode-vanilla.txt"
 
+#define MODE_VERSION 0
+
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
 
@@ -68,7 +70,7 @@ public void OnAllPluginsLoaded()
 	if (LibraryExists("gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_Vanilla, true);
+		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
 	}
 	if (LibraryExists("updater"))
 	{
@@ -81,7 +83,7 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_Vanilla, true);
+		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
 	}
 	else if (StrEqual(name, "updater"))
 	{

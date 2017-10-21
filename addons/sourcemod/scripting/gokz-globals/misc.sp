@@ -6,9 +6,9 @@
 
 
 
-bool GlobalsEnabled()
+bool GlobalsEnabled(int mode)
 {
-	return gB_APIKeyCheck && gB_VersionCheck && gCV_gokz_settings_enforcer.BoolValue && MapCheck();
+	return gB_APIKeyCheck && gCV_gokz_settings_enforcer.BoolValue && MapCheck() && gB_ModeCheck[mode];
 }
 
 bool MapCheck()
@@ -22,9 +22,16 @@ void PrintGlobalCheck(int client)
 {
 	GOKZ_PrintToChat(client, true, "%t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
-		gB_VersionCheck ? "{green}✓" : "{darkred}X", 
 		gCV_gokz_settings_enforcer.BoolValue ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X");
+	
+	char modeCheck[256];
+	FormatEx(modeCheck, sizeof(modeCheck), "{purple}%s %s", gC_ModeNames[0], gB_ModeCheck[0] ? "{green}✓" : "{darkred}X");
+	for (int i = 1; i < MODE_COUNT; i++)
+	{
+		FormatEx(modeCheck, sizeof(modeCheck), "%s {grey}| {purple}%s %s", modeCheck, gC_ModeNames[i], gB_ModeCheck[i] ? "{green}✓" : "{darkred}X");
+	}
+	GOKZ_PrintToChat(client, false, "  %t", "Global Check (Modes)", modeCheck);
 }
 
 void InvalidateRun(int client)

@@ -60,25 +60,25 @@
     "GWR Header"
     {
         // Global Records on kz_map [SKZ]
-        "#format"    "{1:s},{2:s}"
+        "#format"   "{1:s},{2:s}"
         "en"        "{grey}Global Records on {default}{1} {grey}[{purple}{2}{grey}]"
     }
     "GWR Header (Bonus)"
     {
         // Global Records on kz_map Bonus 1 [SKZ]
-        "#format"    "{1:s},{2:d},{3:s}"
+        "#format"   "{1:s},{2:d},{3:s}"
         "en"        "{grey}Global Records on {default}{1} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
     }
     "GWR Time - NUB"
     {
         // GLOBAL NUB RECORD: 01:23.45 by linus
-        "#format"    "{1:s},{2:s}"
+        "#format"   "{1:s},{2:s}"
         "en"        "{red}GLOBAL NUB RECORD{grey}: {default}{1}{grey} by {lime}{2}"
     }
     "GWR Time - PRO"
     {
         // GLOBAL PRO RECORD: 01:23.45 by linus
-        "#format"    "{1:s},{2:s}"
+        "#format"   "{1:s},{2:s}"
         "en"        "{darkred}GLOBAL PRO RECORD{grey}: {default}{1}{grey} by {lime}{2}"
     }
     "GWR Time - No PRO Time"
@@ -94,14 +94,20 @@
     "Map Tier (Unknown)"
     {
         // kz_map - Tier Unknown
-        "#format"    "{1:s}"
+        "#format"   "{1:s}"
         "en"        "{default}{1} {grey}- {yellow}Tier Unknown"
     }
     "Global Check"
     {
-        // Global Check [API X | GOKZ X | Enforcer X | Map X]
-        "#format"    "{1:s},{2:s},{3:s},{4:s}"
-        "en"        "{grey}Global Check [{default}API {grey}{1}{grey} | {default}GOKZ {Grey}{2}{grey} | {default}Enforcer {grey}{3}{grey} | {default}Map {grey}{4}{grey}]"
+        // Global Check [API X | Enforcer X | Map X]
+        "#format"   "{1:s},{2:s},{3:s}"
+        "en"        "{grey}Global Check [{default}API Key {grey}{1}{grey} | {default}Settings Enforcer {grey}{2}{grey} | {default}Map {grey}{3}{grey}]"
+    }
+    "Global Check (Modes)"
+    {
+        // Modes [Vanilla X | SimpleKZ X | KZTimer X]
+        "#format"   "{1:s}"
+        "en"        "{grey}Modes [{1}{grey}]"
     }
 
 

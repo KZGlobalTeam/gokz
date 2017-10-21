@@ -9,6 +9,7 @@
 void CreateNatives()
 {
 	CreateNative("GOKZ_GetModeLoaded", Native_GetModeLoaded);
+	CreateNative("GOKZ_GetModeVersion", Native_GetModeVersion);
 	CreateNative("GOKZ_SetModeLoaded", Native_SetModeLoaded);
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
@@ -54,9 +55,14 @@ public int Native_GetModeLoaded(Handle plugin, int numParams)
 	return view_as<int>(GetModeLoaded(GetNativeCell(1)));
 }
 
+public int Native_GetModeVersion(Handle plugin, int numParams)
+{
+	return view_as<int>(GetModeVersion(GetNativeCell(1)));
+}
+
 public int Native_SetModeLoaded(Handle plugin, int numParams)
 {
-	SetModeLoaded(GetNativeCell(1), GetNativeCell(2));
+	SetModeLoaded(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3));
 }
 
 public int Native_GetLoadedModeCount(Handle plugin, int numParams)
