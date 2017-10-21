@@ -97,17 +97,15 @@
         "#format"   "{1:s}"
         "en"        "{default}{1} {grey}- {yellow}Tier Unknown"
     }
+    "Global Check Header"
+    {
+        "en"        "{grey}Global Records Availability Check"
+    }
     "Global Check"
     {
-        // Global Check [API X | Enforcer X | Map X]
+        // API Key X | Settings Enforcer X | Map X
         "#format"   "{1:s},{2:s},{3:s}"
-        "en"        "{grey}Global Check [{default}API Key {grey}{1}{grey} | {default}Settings Enforcer {grey}{2}{grey} | {default}Map {grey}{3}{grey}]"
-    }
-    "Global Check (Modes)"
-    {
-        // Modes [Vanilla X | SimpleKZ X | KZTimer X]
-        "#format"   "{1:s}"
-        "en"        "{grey}Modes [{1}{grey}]"
+        "en"        "{grey}API Key {1}{grey} | Settings Enforcer {2}{grey} | Map {3}"
     }
 
 
