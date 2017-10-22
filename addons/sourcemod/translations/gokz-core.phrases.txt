@@ -112,7 +112,7 @@
 	}
 	"Can't Teleport (Map)"
 	{
-		"en"		"{darkred}You can't teleport to your checkpoint in this area."
+		"en"		"{darkred}You can't teleport to your checkpoints in this area."
 	}
 	"Can't Prev CP (No Checkpoints)"
 	{

@@ -107,7 +107,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -116,7 +116,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Midair)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -125,7 +125,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Just Landed)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -163,16 +163,7 @@ bool CanTeleportToCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
-		}
-		return false;
-	}
-	if (checkpointCount[client] == 0)
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (No Checkpoints)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -181,7 +172,16 @@ bool CanTeleportToCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (Map)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (checkpointCount[client] == 0)
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (No Checkpoints)");
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -222,7 +222,16 @@ bool CanPrevCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (Map)");
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -231,7 +240,7 @@ bool CanPrevCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Prev CP (No Checkpoints)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -272,7 +281,16 @@ bool CanNextCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (Map)");
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -281,7 +299,7 @@ bool CanNextCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Next CP (No Checkpoints)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -343,7 +361,7 @@ void SetCustomStartPosition(int client)
 	if (!IsPlayerAlive(client))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-		PlayErrorSound(client);
+		GOKZ_PlayErrorSound(client);
 		return;
 	}
 	
@@ -397,7 +415,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -406,7 +424,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (No Teleports)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -415,7 +433,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (TP Was Midair)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -424,7 +442,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (Just Landed)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
