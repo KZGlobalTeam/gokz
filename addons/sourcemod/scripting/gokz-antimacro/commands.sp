@@ -43,7 +43,7 @@ public Action CommandBhopCheck(int client, int args)
 				client, 
 				targetList, 
 				MAXPLAYERS, 
-				COMMAND_FILTER_NO_IMMUNITY | COMMAND_FILTER_NO_BOTS | COMMAND_FILTER_CONNECTED, 
+				COMMAND_FILTER_NO_IMMUNITY | COMMAND_FILTER_NO_BOTS, 
 				targetName, 
 				sizeof(targetName), 
 				tnIsML)) <= 0)
@@ -60,18 +60,30 @@ public Action CommandBhopCheck(int client, int args)
 			if (GOKZ_AM_GetSampleSize(targetList[i]) == 0)
 			{
 				PrintToConsole(client, "%t", "Not Enough Bhops (Console)", targetList[i]);
-				continue;
 			}
-			PrintBhopCheckToConsole(client, targetList[i]);
+			else
+			{
+				PrintBhopCheckToConsole(client, targetList[i]);
+			}
 		}
 	}
 	else
 	{
 		if (GOKZ_AM_GetSampleSize(targetList[0]) == 0)
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Not Enough Bhops", targetList[0]);
+			if (targetList[0] == client)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Not Enough Bhops (Self)");
+			}
+			else
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Not Enough Bhops", targetList[0]);
+			}
 		}
-		PrintBhopCheckToChat(client, targetList[0]);
+		else
+		{
+			PrintBhopCheckToChat(client, targetList[0]);
+		}
 	}
 	
 	return Plugin_Handled;
