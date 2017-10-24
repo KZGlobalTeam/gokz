@@ -185,7 +185,7 @@ public int DisplayMapTopSubmenuCallback(bool failure, const char[] top, DataPack
 			gC_TimeTypeNames[timeType], mapTopMap[client], mapTopCourse[client], gC_ModeNames[mapTopMode[client]]);
 	}
 	
-	if (MapTopSubmenuAddItems(menu, top) == 0)
+	if (MapTopSubmenuAddItems(menu, top, timeType) == 0)
 	{  // If no records found
 		if (timeType == TimeType_Pro)
 		{
@@ -213,7 +213,7 @@ public int DisplayMapTopSubmenuCallback(bool failure, const char[] top, DataPack
 }
 
 // Returns number of record times added to the menu
-static int MapTopSubmenuAddItems(Menu menu, const char[] top)
+static int MapTopSubmenuAddItems(Menu menu, const char[] top, int timeType)
 {
 	APIRecordList records = new APIRecordList(top);
 	
@@ -235,8 +235,19 @@ static int MapTopSubmenuAddItems(Menu menu, const char[] top)
 		
 		record.PlayerName(playerName, sizeof(playerName));
 		
-		FormatEx(display, sizeof(display), "#%-2d   %11s   %s", 
-			i + 1, GOKZ_FormatTime(record.Time()), playerName);
+		switch (timeType)
+		{
+			case TimeType_Nub:
+			{
+				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP      %s", 
+					i + 1, GOKZ_FormatTime(record.Time()), record.Teleports(), playerName);
+			}
+			case TimeType_Pro:
+			{
+				FormatEx(display, sizeof(display), "#%-2d   %11s   %s", 
+					i + 1, GOKZ_FormatTime(record.Time()), playerName);
+			}
+		}
 		
 		menu.AddItem("", display, ITEMDRAW_DISABLED);
 	}

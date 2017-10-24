@@ -212,7 +212,8 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 	}
 	
 	// Add submenu items
-	char display[256], playerName[33];
+	char display[128];
+	char playerName[MAX_NAME_LENGTH];
 	float runTime;
 	int teleports, rank = 0;
 	
@@ -226,7 +227,7 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 			case TimeType_Nub:
 			{
 				teleports = SQL_FetchInt(results[2], 3);
-				FormatEx(display, sizeof(display), "#%-2d   %11s  %d TP      %s", 
+				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP      %s", 
 					rank, GOKZ_FormatTime(runTime), teleports, playerName);
 			}
 			case TimeType_Pro:
