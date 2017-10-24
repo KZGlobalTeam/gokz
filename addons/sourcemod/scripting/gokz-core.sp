@@ -186,6 +186,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	OnPlayerRunCmd_InfoPanel(client, cmdnum);
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
+	OnPlayerRunCmd_ValidJump(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
 	OnPlayerRunCmd_VirtualButtons(client, buttons);
 	UpdateOldVariables(client, buttons); // This should be last!

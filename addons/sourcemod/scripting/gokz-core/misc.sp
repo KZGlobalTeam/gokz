@@ -473,9 +473,7 @@ static void SanitiseChatInput(char[] message, int maxlength)
 */
 
 static bool validJump[MAXPLAYERS + 1];
-static float lastStopTouchGroundTime[MAXPLAYERS + 1];
-static float lastOriginTeleportTime[MAXPLAYERS + 1];
-static float lastOnGroundVelocityTeleportTime[MAXPLAYERS + 1];
+static bool velocityTeleported[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -503,7 +501,6 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	{
 		InvalidateJump(client);
 	}
-	lastStopTouchGroundTime[client] = GetEngineTime();
 }
 
 static bool IsValidStopTouchGround(int client)
@@ -512,20 +509,24 @@ static bool IsValidStopTouchGround(int client)
 	{
 		return false;
 	}
-	
-	// Return false if there was a recent origin teleport
-	if (GetEngineTime() - lastOriginTeleportTime[client] < GetTickInterval() * 2.0)
-	{
-		return false;
-	}
-	
-	// Return flase if there was a recent grounded velocity teleport
-	if (GetEngineTime() - lastOnGroundVelocityTeleportTime[client] < GetTickInterval())
-	{
-		return false;
-	}
-	
 	return true;
+}
+
+void OnPlayerRunCmd_ValidJump(int client, int cmdnum)
+{
+	if (velocityTeleported[client] && DidInvalidVelocityTeleport(client, cmdnum))
+	{
+		InvalidateJump(client);
+	}
+	velocityTeleported[client] = false;
+}
+
+static bool DidInvalidVelocityTeleport(int client, int cmdnum)
+{
+	// Return whether client didn't just hit a perf
+	return !Movement_GetJumped(client)
+	 || !GOKZ_GetHitPerf(client)
+	 || cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
 }
 
 void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
@@ -560,21 +561,11 @@ void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 {
 	if (originTp)
 	{
-		lastOriginTeleportTime[client] = GetEngineTime();
 		InvalidateJump(client);
 	}
-	else if (velocityTp)
+	if (velocityTp)
 	{
-		// Allow short grace period for velocity so that modes may set player speed
-		if (GetEngineTime() - lastStopTouchGroundTime[client] > GetTickInterval() * 2)
-		{
-			InvalidateJump(client);
-		}
-		
-		if (Movement_GetOnGround(client))
-		{
-			lastOnGroundVelocityTeleportTime[client] = GetEngineTime();
-		}
+		velocityTeleported[client] = true;
 	}
 }
 
