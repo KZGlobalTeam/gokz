@@ -682,8 +682,8 @@ static void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	
 	beamStart = gF_OldOrigin[targetPlayer.id];
 	beamEnd = origin;
-	beamStart[2] = takeoffOrigin[2];
-	beamEnd[2] = takeoffOrigin[2];
+	beamStart[2] = takeoffOrigin[2] + 0.1;
+	beamEnd[2] = takeoffOrigin[2] + 0.1;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
 	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
