@@ -171,8 +171,6 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 {
 	if (option == Option_Mode && newValue == Mode_Vanilla)
 	{
-		// Make sure velocity modifier is reset to 1.0 when switching modes
-		Movement_SetVelocityModifier(client, 1.0);
 		ReplicateConVars(client);
 	}
 }

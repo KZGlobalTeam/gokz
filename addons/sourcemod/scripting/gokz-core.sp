@@ -322,6 +322,7 @@ public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 {
 	OnOptionChanged_Timer(client, option);
+	OnOptionChanged_Mode(client, option);
 	OnOptionChanged_TPMenu(client, option);
 	OnOptionChanged_HideWeapon(client, option);
 	OnOptionChanged_Pistol(client, option);

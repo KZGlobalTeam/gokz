@@ -105,4 +105,14 @@ void OnPlayerSpawn_Modes(int client)
 {
 	GOKZHitPerf[client] = false;
 	GOKZTakeoffSpeed[client] = 0.0;
+}
+
+void OnOptionChanged_Mode(int client, Option option)
+{
+	if (option == Option_Mode)
+	{
+		// Remove speed when switching modes
+		Movement_SetVelocityModifier(client, 1.0);
+		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	}
 } 
