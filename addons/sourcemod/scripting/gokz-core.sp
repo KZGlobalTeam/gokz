@@ -29,7 +29,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.simplekz.com/gokz-core.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-core.txt"
 
 Handle g_ThisPlugin;
 bool gB_BaseComm;

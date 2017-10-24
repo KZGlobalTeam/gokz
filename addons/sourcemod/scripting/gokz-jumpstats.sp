@@ -25,7 +25,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.simplekz.com/gokz-jumpstats.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-jumpstats.txt"
 
 #define BHOP_ON_GROUND_TICKS 5
 #define WEIRDJUMP_MAX_FALL_OFFSET 64.0

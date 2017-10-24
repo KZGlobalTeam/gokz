@@ -24,7 +24,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.simplekz.com/gokz-globals.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-globals.txt"
 
 #define RECORD_SOUND_PATH "gokz/holyshit.mp3"
 

@@ -23,7 +23,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.simplekz.com/gokz-antimacro.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-antimacro.txt"
 
 #define BUTTON_SAMPLES 16
 #define BHOP_GROUND_TICKS 4
