@@ -33,6 +33,7 @@ public Plugin myinfo =
 int gI_ButtonCount[MAXPLAYERS + 1];
 int gI_ButtonsIndex[MAXPLAYERS + 1];
 int gI_Buttons[MAXPLAYERS + 1][BUTTON_SAMPLES];
+int gI_OldButtons[MAXPLAYERS + 1];
 
 int gI_BhopCount[MAXPLAYERS + 1];
 int gI_BhopIndex[MAXPLAYERS + 1];
@@ -91,7 +92,8 @@ public void OnClientPutInServer(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	OnPlayerRunCmd_BhopTracking(client, buttons, cmdnum);
+	OnPlayerRunCmd_BhopTracking(client, cmdnum);
+	gI_OldButtons[client] = buttons;
 	return Plugin_Continue;
 }
 

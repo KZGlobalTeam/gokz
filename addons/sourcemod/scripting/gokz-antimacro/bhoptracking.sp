@@ -79,7 +79,7 @@ void OnClientPutInServer_BhopTracking(int client)
 	ResetBhopStats(client);
 }
 
-void OnPlayerRunCmd_BhopTracking(int client, int buttons, int cmdnum)
+void OnPlayerRunCmd_BhopTracking(int client, int cmdnum)
 {
 	if (!IsPlayerAlive(client) || IsFakeClient(client))
 	{
@@ -94,7 +94,7 @@ void OnPlayerRunCmd_BhopTracking(int client, int buttons, int cmdnum)
 	}
 	
 	// Records buttons every tick (after checking if b-hop occurred)
-	RecordButtons(client, buttons);
+	RecordButtons(client, gI_OldButtons[client]);
 }
 
 
