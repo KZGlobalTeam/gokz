@@ -25,7 +25,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.global/gokz-antimacro.txt"
 
-#define BUTTON_SAMPLES 16
+#define BUTTON_SAMPLES 50
 #define BHOP_GROUND_TICKS 4
 #define BHOP_SAMPLES 32
 #define LOG_PATH "logs/gokz-antimacro.log"
@@ -37,8 +37,10 @@ int gI_OldButtons[MAXPLAYERS + 1];
 
 int gI_BhopCount[MAXPLAYERS + 1];
 int gI_BhopIndex[MAXPLAYERS + 1];
+int gI_BhopLastCmdnum[MAXPLAYERS + 1];
 bool gB_BhopHitPerf[MAXPLAYERS + 1][BHOP_SAMPLES];
-int gI_BhopJumpInputs[MAXPLAYERS + 1][BHOP_SAMPLES];
+int gI_BhopPreJumpInputs[MAXPLAYERS + 1][BHOP_SAMPLES];
+int gI_BhopPostJumpInputs[MAXPLAYERS + 1][BHOP_SAMPLES];
 
 #include "gokz-antimacro/api.sp"
 #include "gokz-antimacro/bhoptracking.sp"
