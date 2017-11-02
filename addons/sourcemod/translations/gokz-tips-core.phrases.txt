@@ -52,13 +52,13 @@
     {
         "en"        "{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to create and remove custom start teleport locations."
     }
-    "Tips Options"
+    "!tips"
     {
-        "en"        "{grey}Tired of seeing tips flooding your chat? You can turn them off in your {default}!options {grey}menu."
+        "en"        "{grey}Tired of seeing tips flooding your chat? You can easily toggle help and tips by typing {default}!tips{grey}."
     }
-    "Auto-Restart"
+    "!autorestart"
     {
-        "en"        "{grey}Tired of pressing E? Enable the auto restart option!"
+        "en"        "{grey}Tired of pressing E? Enable the {default}!autorestart {grey}option!"
     }
     "Not a Tip"
     {

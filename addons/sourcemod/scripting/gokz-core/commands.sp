@@ -48,6 +48,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
 	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
+	RegConsoleCmd("sm_tips", CommandToggleHelpAndTips, "[KZ] Toggle seeing help and tips.");
+	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_measure", CommandMeasureMenu, "[KZ] Open the measurement menu.");
 	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
@@ -311,13 +313,27 @@ public Action CommandOptions(int client, int args)
 
 public Action CommandToggleShowPlayers(int client, int args)
 {
-	CycleOption(client, Option_ShowingPlayers, true);
+	if (GOKZ_GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled)
+	{
+		GOKZ_SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled, true);
+	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleInfoPanel(int client, int args)
 {
-	CycleOption(client, Option_ShowingInfoPanel, true);
+	if (GOKZ_GetOption(client, Option_ShowingInfoPanel) == ShowingInfoPanel_Disabled)
+	{
+		GOKZ_SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Disabled, true);
+	}
 	return Plugin_Handled;
 }
 
@@ -350,7 +366,40 @@ public Action CommandToggleSpeed(int client, int args)
 
 public Action CommandToggleShowWeapon(int client, int args)
 {
-	CycleOption(client, Option_ShowingWeapon, true);
+	if (GOKZ_GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Disabled)
+	{
+		GOKZ_SetOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_ShowingWeapon, ShowingWeapon_Disabled, true);
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandToggleHelpAndTips(int client, int args)
+{
+	if (GOKZ_GetOption(client, Option_HelpAndTips) == HelpAndTips_Disabled)
+	{
+		GOKZ_SetOption(client, Option_HelpAndTips, HelpAndTips_Enabled, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_HelpAndTips, HelpAndTips_Disabled, true);
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandToggleAutoRestart(int client, int args)
+{
+	if (GOKZ_GetOption(client, Option_AutoRestart) == AutoRestart_Disabled)
+	{
+		GOKZ_SetOption(client, Option_AutoRestart, AutoRestart_Enabled, true);
+	}
+	else
+	{
+		GOKZ_SetOption(client, Option_AutoRestart, AutoRestart_Disabled, true);
+	}
 	return Plugin_Handled;
 }
 

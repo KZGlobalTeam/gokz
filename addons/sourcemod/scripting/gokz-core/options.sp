@@ -65,7 +65,7 @@ void SetOption(int client, Option option, int optionValue, bool printMessage = f
 	options[option][client] = optionValue;
 	if (printMessage)
 	{
-		PrintOptionChangeMessage(client, option);
+		PrintOptionChangeMessage(client, option, optionValue);
 	}
 	
 	Call_GOKZ_OnOptionChanged(client, option, optionValue);
@@ -134,7 +134,7 @@ static void SetDefaultOptions(int client)
 	}
 }
 
-static void PrintOptionChangeMessage(int client, Option option) {
+static void PrintOptionChangeMessage(int client, Option option, int optionValue) {
 	if (!IsClientInGame(client))
 	{
 		return;
@@ -149,7 +149,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingTPMenu:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingTPMenu_Disabled:
 				{
@@ -167,7 +167,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingInfoPanel:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingInfoPanel_Disabled:
 				{
@@ -181,7 +181,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingPlayers:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingPlayers_Disabled:
 				{
@@ -195,7 +195,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingWeapon:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingWeapon_Disabled:
 				{
@@ -209,7 +209,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_AutoRestart:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case AutoRestart_Disabled:
 				{
@@ -223,7 +223,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_SlayOnEnd:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case SlayOnEnd_Disabled:
 				{
@@ -232,6 +232,20 @@ static void PrintOptionChangeMessage(int client, Option option) {
 				case SlayOnEnd_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Enable");
+				}
+			}
+		}
+		case Option_HelpAndTips:
+		{
+			switch (optionValue)
+			{
+				case HelpAndTips_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Disable");
+				}
+				case HelpAndTips_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Enable");
 				}
 			}
 		}

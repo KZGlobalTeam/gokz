@@ -267,11 +267,11 @@
 	}
 	"Option - Auto Restart - Enable"
 	{
-		"en"		"{grey}Your timer will now restart when you teleport to start."
+		"en"		"{grey}Your timer will now restart upon teleporting to start."
 	}
 	"Option - Auto Restart - Disable"
 	{
-		"en"		"{grey}Your timer will no longer restart you teleport to start."
+		"en"		"{grey}Your timer will no longer restart upon teleporting to start."
 	}
 	"Option - Slay On End - Enable"
 	{
@@ -281,6 +281,14 @@
 	{
 		"en"		"{grey}You will no longer be slain after completing a course."
 	}
+    "Option - Help And Tips - Enable"
+    {
+        "en"        "{grey}You will now see help and tips."
+    }
+    "Option - Help And Tips - Disable"
+    {
+        "en"        "{grey}You will no longer see help and tips."
+    }
 	
 	
 	// Info Panel Text ////////////////////////////////////////////////////////////
