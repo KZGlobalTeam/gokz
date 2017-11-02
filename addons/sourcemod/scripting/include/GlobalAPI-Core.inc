@@ -15,7 +15,7 @@
 #endif
 #define _GlobalAPI_Core_included_
 
-#define GlobalAPI_Version "1.00"
+#define GlobalAPI_Version "1.0.1"
 
 // ======================= ENUMS ====================== //
 
@@ -31,7 +31,7 @@ enum GlobalMode
 //Get
 typedef GetRecordTopCallback = function int(bool bFailure, const char[] top, any data);
 typedef GetAuthStatusCallback = function int(bool bFailure, bool authenticated);
-typedef GetModeInfoCallback = function int(bool bFailure, const char[] name, int latest_version, const char[] latest_version_description);
+typedef GetModeInfoCallback = function int(bool bFailure, const char[] name, int latest_version, const char[] latest_version_description, any data);
 
 //Post
 typedef PostRecordCallback = function int(bool bFailure, int place, int top_place, int top_overall_place, any data);
@@ -186,9 +186,10 @@ native int GlobalAPI_GetAuthStatus(GetAuthStatusCallback onComplete = INVALID_FU
  *
  * @param iMode			Mode we want info of
  * @param Callback		Callback function when API call finishes
+ * @param data			An optional value to pass to the callback
  * @noreturn
  */
-native int GlobalAPI_GetModeInfo(const char[] mode, GetModeInfoCallback onComplete = INVALID_FUNCTION);
+native int GlobalAPI_GetModeInfo(GlobalMode mode, GetModeInfoCallback onComplete = INVALID_FUNCTION, any data = 0);
 
 // ======================= METHODMAP ====================== //
 
@@ -249,9 +250,9 @@ methodmap GlobalAPI
 		GlobalAPI_GetAuthStatus(onComplete);
 	}
 
-	public void GetModeInfo(const char[] mode, GetModeInfoCallback onComplete)
+	public void GetModeInfo(GlobalMode mode, GetModeInfoCallback onComplete, any data = 0)
 	{
-		GlobalAPI_GetModeInfo(mode, onComplete);
+		GlobalAPI_GetModeInfo(mode, onComplete, data);
 	}
 	
 	public int GetRecordCount(const char[] recordsString)
@@ -315,7 +316,7 @@ forward void GlobalAPI_OnAPIKeyReloaded();
 /**
  * Called whenever KickIfBanned cvar is changed
  *
- * @param kickifbanned		new value of kickifbanned cvar
+ * @param kickifbanned		New value of kickifbanned cvar
  * @noreturn
  */
 forward void GlobalAPI_OnKickIfBanned_Changed(bool kickifbanned);
@@ -323,10 +324,19 @@ forward void GlobalAPI_OnKickIfBanned_Changed(bool kickifbanned);
 /**
  * Called whenever Development mode cvar is changed
  *
- * @param developmentmode	new value of developmentmode cvar
+ * @param developmentmode	New value of developmentmode cvar
  * @noreturn
  */
 forward void GlobalAPI_OnDevelopmentMode_Changed(bool developmentmode);
+
+/**
+ * Called whenever a banned player joins the server
+ *
+ * @param client			Client index
+ * @param banned			Returns true if the player is banned, false otherwise
+ * @noreturn
+ */
+forward void GlobalAPI_OnPlayer_Joined(int client, bool banned);
 
 // ======================= PLUGIN INFO ====================== //
 

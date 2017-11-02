@@ -136,9 +136,9 @@ static void SetupAPI()
 	API.GetMapName(gC_CurrentMap, sizeof(gC_CurrentMap));
 	API.GetMapPath(gC_CurrentMapPath, sizeof(gC_CurrentMapPath));
 	API.GetAuthStatus(OnAuthStatusCallback);
-	API.GetModeInfo("kz_vanilla", OnModeInfoCallback);
-	API.GetModeInfo("kz_simple", OnModeInfoCallback);
-	API.GetModeInfo("kz_timer", OnModeInfoCallback);
+	API.GetModeInfo(GOKZ_GL_GetGlobalMode(Mode_Vanilla), OnModeInfoCallback, Mode_Vanilla);
+	API.GetModeInfo(GOKZ_GL_GetGlobalMode(Mode_SimpleKZ), OnModeInfoCallback, Mode_SimpleKZ);
+	API.GetModeInfo(GOKZ_GL_GetGlobalMode(Mode_KZTimer), OnModeInfoCallback, Mode_KZTimer);
 }
 
 public int OnAuthStatusCallback(bool failure, bool authenticated)
@@ -158,38 +158,21 @@ public int OnAuthStatusCallback(bool failure, bool authenticated)
 	}
 }
 
-public int OnModeInfoCallback(bool failure, const char[] name, int latest_version, const char[] latest_version_description)
+public int OnModeInfoCallback(bool failure, const char[] name, int latest_version, const char[] latest_version_description, int mode)
 {
 	if (failure)
 	{
 		LogError("Failed to check a mode version with Global API.");
 	}
+	else if (latest_version == GOKZ_GetModeVersion(mode))
+	{
+		gB_ModeCheck[mode] = true;
+	}
 	else
 	{
-		int mode;
-		if (StrEqual(name, "kz_vanilla"))
-		{
-			mode = Mode_Vanilla;
-		}
-		else if (StrEqual(name, "kz_simple"))
-		{
-			mode = Mode_SimpleKZ;
-		}
-		else if (StrEqual(name, "kz_timer"))
-		{
-			mode = Mode_KZTimer;
-		}
-		
-		if (latest_version == GOKZ_GetModeVersion(mode))
-		{
-			gB_ModeCheck[mode] = true;
-		}
-		else
-		{
-			gB_ModeCheck[mode] = false;
-			LogError("Global API requires %s mode version %d (%s). You have version %d.", 
-				gC_ModeNames[mode], latest_version, latest_version_description, GOKZ_GetModeVersion(mode));
-		}
+		gB_ModeCheck[mode] = false;
+		LogError("Global API requires %s mode version %d (%s). You have version %d (%s).", 
+			gC_ModeNames[mode], latest_version, latest_version_description, GOKZ_GetModeVersion(mode), GOKZ_VERSION);
 	}
 }
 
