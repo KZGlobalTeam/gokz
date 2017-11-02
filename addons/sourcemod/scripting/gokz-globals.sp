@@ -33,6 +33,7 @@ bool gB_ModeCheck[MODE_COUNT];
 char gC_CurrentMap[64];
 char gC_CurrentMapPath[PLATFORM_MAX_PATH];
 bool gB_InValidRun[MAXPLAYERS + 1];
+bool gB_GloballyVerified[MAXPLAYERS + 1];
 
 #include "gokz-globals/api.sp"
 #include "gokz-globals/commands.sp"
@@ -90,6 +91,22 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	{
 		SendTime(client, course, time, teleportsUsed);
 	}
+}
+
+public Action GOKZ_OnTimerEnd(int client, int course, float time, int teleportsUsed)
+{
+	if (!gB_GloballyVerified[client])
+	{
+		GOKZ_PrintToChat(client, true, "%t", "End Timer Blocked");
+		GOKZ_PlayErrorSound(client);
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
+}
+
+public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
+{
+	gB_GloballyVerified[client] = !banned;
 }
 
 

@@ -103,9 +103,13 @@
     }
     "Global Check"
     {
-        // API Key X | Settings Enforcer X | Map X
-        "#format"   "{1:s},{2:s},{3:s}"
-        "en"        "{grey}API Key {1}{grey} | Settings Enforcer {2}{grey} | Map {3}"
+        // API Key X | Settings Enforcer X | Map X | You X
+        "#format"   "{1:s},{2:s},{3:s},{4:s}"
+        "en"        "{grey}API Key {1}{grey} | Settings Enforcer {2}{grey} | Map {3}{grey} | You {4}"
+    }
+    "End Timer Blocked"
+    {
+        "en"        "{darkred}The end timer has been blocked because, unfortunately, you are globally banned."
     }
 
 

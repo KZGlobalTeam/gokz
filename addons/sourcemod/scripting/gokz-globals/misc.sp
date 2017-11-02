@@ -24,7 +24,8 @@ void PrintGlobalCheck(int client)
 	GOKZ_PrintToChat(client, false, "  %t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
 		gCV_gokz_settings_enforcer.BoolValue ? "{green}✓" : "{darkred}X", 
-		MapCheck() ? "{green}✓" : "{darkred}X");
+		MapCheck() ? "{green}✓" : "{darkred}X", 
+		gB_GloballyVerified[client] ? "{green}✓" : "{darkred}X");
 	
 	char modeCheck[256];
 	FormatEx(modeCheck, sizeof(modeCheck), "{purple}%s %s", gC_ModeNames[0], gB_ModeCheck[0] ? "{green}✓" : "{darkred}X");
