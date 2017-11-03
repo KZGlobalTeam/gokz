@@ -27,7 +27,7 @@ void DB_ProcessNewTime(int client, int steamID, int mapID, int course, int mode,
 	FormatEx(query, sizeof(query), sql_getpb, steamID, mapID, course, mode, 2);
 	txn.AddQuery(query);
 	// Get Rank
-	FormatEx(query, sizeof(query), sql_getmaprank, steamID, mapID, course, mode, mapID, course, mode);
+	FormatEx(query, sizeof(query), sql_getmaprank, mapID, course, mode, steamID, mapID, course, mode);
 	txn.AddQuery(query);
 	// Get Number of Players with Times
 	FormatEx(query, sizeof(query), sql_getlowestmaprank, mapID, course, mode);
@@ -39,7 +39,7 @@ void DB_ProcessNewTime(int client, int steamID, int mapID, int course, int mode,
 		FormatEx(query, sizeof(query), sql_getpbpro, steamID, mapID, course, mode, 2);
 		txn.AddQuery(query);
 		// Get PRO Rank
-		FormatEx(query, sizeof(query), sql_getmaprankpro, steamID, mapID, course, mode, mapID, course, mode);
+		FormatEx(query, sizeof(query), sql_getmaprankpro, mapID, course, mode, steamID, mapID, course, mode);
 		txn.AddQuery(query);
 		// Get Number of Players with PRO Times
 		FormatEx(query, sizeof(query), sql_getlowestmaprankpro, mapID, course, mode);

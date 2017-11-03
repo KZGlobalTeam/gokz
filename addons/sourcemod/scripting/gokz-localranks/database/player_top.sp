@@ -6,6 +6,8 @@
 
 
 
+#define PLAYER_TOP_SIZE 20
+
 static int playerTopMode[MAXPLAYERS + 1];
 
 
@@ -25,12 +27,12 @@ void DB_OpenPlayerTop20(int client, int timeType, int mode)
 	switch (timeType) {
 		case TimeType_Nub:
 		{
-			FormatEx(query, sizeof(query), sql_gettopplayers, mode);
+			FormatEx(query, sizeof(query), sql_gettopplayers, mode, PLAYER_TOP_SIZE);
 			txn.AddQuery(query);
 		}
 		case TimeType_Pro:
 		{
-			FormatEx(query, sizeof(query), sql_gettopplayerspro, mode);
+			FormatEx(query, sizeof(query), sql_gettopplayerspro, mode, PLAYER_TOP_SIZE);
 			txn.AddQuery(query);
 		}
 	}

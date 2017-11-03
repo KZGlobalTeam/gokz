@@ -14,6 +14,7 @@ char sqlite_players_create[] =
 ..."Alias TEXT, "
 ..."Country TEXT, "
 ..."IP TEXT, "
+..."Cheater INTEGER NOT NULL DEFAULT '0', "
 ..."LastPlayed TIMESTAMP, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
@@ -24,9 +25,20 @@ char mysql_players_create[] =
 ..."Alias VARCHAR(32), "
 ..."Country VARCHAR(45), "
 ..."IP VARCHAR(15), "
+..."Cheater TINYINT UNSIGNED NOT NULL DEFAULT '0', "
 ..."LastPlayed TIMESTAMP, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
+
+// 1.0.0 - Added Cheater column
+char sqlite_players_alter1[] = 
+"ALTER TABLE Players "
+..."ADD Cheater INTEGER NOT NULL DEFAULT '0'";
+
+// 1.0.0 - Added Cheater column
+char mysql_players_alter1[] = 
+"ALTER TABLE Players "
+..."ADD Cheater TINYINT UNSIGNED NOT NULL DEFAULT '0'";
 
 char sqlite_players_insert[] = 
 "INSERT OR IGNORE INTO Players (Alias, Country, IP, SteamID32, LastPlayed) "
@@ -42,6 +54,11 @@ char mysql_players_upsert[] =
 ..."VALUES ('%s', '%s', '%s', %d, CURRENT_TIMESTAMP) "
 ..."ON DUPLICATE KEY UPDATE "
 ..."SteamID32=VALUES(SteamID32), Alias=VALUES(Alias), Country=VALUES(Country), IP=VALUES(IP), LastPlayed=VALUES(LastPlayed)";
+
+char sql_players_update_cheater[] = 
+"UPDATE Players "
+..."SET Cheater=%d"
+..."WHERE SteamID32=%d";
 
 
 
@@ -95,11 +112,12 @@ char mysql_options_create[] =
 ..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
-// Alter 1 - 0.18.0 - Added help and tips option
+// 1.0.0 - Added HelpAndTips column
 char sqlite_options_alter1[] = 
 "ALTER TABLE Options "
 ..."ADD HelpAndTips INTEGER NOT NULL DEFAULT '1'";
 
+// 1.0.0 - Added HelpAndTips column
 char mysql_options_alter1[] = 
 "ALTER TABLE Options "
 ..."ADD HelpAndTips TINYINT UNSIGNED NOT NULL DEFAULT '1'";

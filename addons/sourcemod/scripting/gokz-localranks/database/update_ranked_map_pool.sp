@@ -12,48 +12,95 @@ void DB_UpdateRankedMapPool(int client)
 	Handle file = OpenFile(MAP_POOL_CFG_PATH, "r");
 	if (file == null)
 	{
-		LogError("There was a problem opening file: %s", MAP_POOL_CFG_PATH);
+		LogError("There was a problem opening file '%s'.", MAP_POOL_CFG_PATH);
 		if (IsValidClient(client))
 		{
-			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file: %s", MAP_POOL_CFG_PATH);
+			// TODO Translation phrases?
+			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file '%s'.", MAP_POOL_CFG_PATH);
 		}
 		return;
 	}
 	
-	char line[33], query[512];
+	char map[33];
+	ArrayList maps = new ArrayList(33, 0);
 	
-	Transaction txn = SQL_CreateTransaction();
-	
-	// Reset all maps to be unranked
-	txn.AddQuery(sql_maps_reset_mappool);
 	// Insert/Update maps in mappool.cfg to be ranked
-	while (ReadFileLine(file, line, sizeof(line)))
+	while (ReadFileLine(file, map, sizeof(map)))
 	{
-		TrimString(line);
-		if (line[0] == '\0' || line[0] == ';' || (line[0] == '/' && line[1] == '/'))
+		TrimString(map);
+		if (map[0] == '\0' || map[0] == ';' || (map[0] == '/' && map[1] == '/'))
 		{
 			continue;
 		}
-		String_ToLower(line, line, sizeof(line));
-		switch (g_DBType)
+		String_ToLower(map, map, sizeof(map));
+		maps.PushString(map);
+	}
+	file.Close();
+	
+	if (maps.Length == 0)
+	{
+		if (client == 0)
 		{
-			case DatabaseType_SQLite:
+			PrintToServer("No maps found in file '%s'.", MAP_POOL_CFG_PATH);
+		}
+		else
+		{
+			// TODO Translation phrases?
+			GOKZ_PrintToChat(client, true, "{darkred}No maps found in file '%s'.", MAP_POOL_CFG_PATH);
+			GOKZ_PlayErrorSound(client);
+		}
+		return;
+	}
+	
+	// Create VALUES e.g. (1,'kz_map1'),(1,'kz_map2')
+	int valuesSize = maps.Length * 40;
+	char[] values = new char[valuesSize];
+	maps.GetString(0, map, sizeof(map));
+	FormatEx(values, valuesSize, "(1,'%s')", map);
+	for (int i = 1; i < maps.Length; i++)
+	{
+		maps.GetString(i, map, sizeof(map));
+		Format(values, valuesSize, "%s,(1,'%s')", values, map);
+	}
+	
+	// Create query
+	int querySize = valuesSize + 128;
+	char[] query = new char[querySize];
+	
+	Transaction txn = SQL_CreateTransaction();
+	// Reset all maps to be unranked
+	txn.AddQuery(sql_maps_reset_mappool);
+	
+	switch (g_DBType)
+	{
+		case DatabaseType_SQLite:
+		{
+			// Create list of maps e.g. 'kz_map1','kz_map2'
+			int mapListSize = maps.Length * 36;
+			char[] mapList = new char[mapListSize];
+			maps.GetString(0, map, sizeof(map));
+			FormatEx(mapList, mapListSize, "'%s'", map);
+			for (int i = 1; i < maps.Length; i++)
 			{
-				// UPDATE OR IGNORE
-				FormatEx(query, sizeof(query), sqlite_maps_updateranked, 1, line);
-				txn.AddQuery(query);
-				// INSERT OR IGNORE
-				FormatEx(query, sizeof(query), sqlite_maps_insertranked, 1, line);
-				txn.AddQuery(query);
+				maps.GetString(i, map, sizeof(map));
+				Format(mapList, mapListSize, "%s,'%s'", mapList, map);
 			}
-			case DatabaseType_MySQL:
-			{
-				FormatEx(query, sizeof(query), mysql_maps_upsertranked, 1, line);
-				txn.AddQuery(query);
-			}
+			
+			// UPDATE OR IGNORE
+			FormatEx(query, querySize, sqlite_maps_updateranked, 1, mapList);
+			txn.AddQuery(query);
+			// INSERT OR IGNORE
+			FormatEx(query, querySize, sqlite_maps_insertranked, values);
+			txn.AddQuery(query);
+		}
+		case DatabaseType_MySQL:
+		{
+			FormatEx(query, querySize, mysql_maps_upsertranked, values);
+			txn.AddQuery(query);
 		}
 	}
 	
+	// Pass client user ID (or -1) as data
 	int data = -1;
 	if (IsValidClient(client))
 	{
@@ -61,8 +108,6 @@ void DB_UpdateRankedMapPool(int client)
 	}
 	
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_UpdateRankedMapPool, DB_TxnFailure_Generic, data, DBPrio_Low);
-	
-	CloseHandle(file);
 }
 
 public void DB_TxnSuccess_UpdateRankedMapPool(Handle db, int userid, int numQueries, Handle[] results, any[] queryData)
@@ -71,6 +116,7 @@ public void DB_TxnSuccess_UpdateRankedMapPool(Handle db, int userid, int numQuer
 	if (IsValidClient(client))
 	{
 		LogMessage("The ranked map pool was updated by %L.", client);
+		// TODO Translation phrases?
 		GOKZ_PrintToChat(client, true, "{grey}The ranked map pool was updated.");
 	}
 	else

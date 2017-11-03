@@ -6,6 +6,7 @@
 
 
 
+#define MAP_TOP_SIZE 20
 #define ITEM_INFO_GLOBAL_TOP_NUB "gn"
 #define ITEM_INFO_GLOBAL_TOP_PRO "gp"
 
@@ -142,8 +143,8 @@ void DB_OpenMapTop20(int client, int mapID, int course, int mode, int timeType)
 	// Get top 20 times for each time type
 	switch (timeType)
 	{
-		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getmaptop, mapID, course, mode, 20);
-		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getmaptoppro, mapID, course, mode, 20);
+		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getmaptop, mapID, course, mode, MAP_TOP_SIZE);
+		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getmaptoppro, mapID, course, mode, MAP_TOP_SIZE);
 	}
 	txn.AddQuery(query);
 	
