@@ -168,7 +168,7 @@ void OnPlayerRunCmd_Recording(int client, int buttons)
 
 void GOKZ_OnTimerStart_Recording(int client)
 {
-	if (IsFakeClient(client))
+	if (IsFakeClient(client) || GOKZ_DB_IsCheater(client))
 	{
 		return;
 	}

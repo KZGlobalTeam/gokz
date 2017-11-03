@@ -7,6 +7,7 @@
 #include <gokz>
 
 #include <gokz/core>
+#include <gokz/localdb>
 #include <gokz/localranks>
 #include <gokz/replays>
 #undef REQUIRE_PLUGIN
