@@ -86,11 +86,37 @@ void OnPlayerRunCmd_BhopTracking(int client, int cmdnum)
 		return;
 	}
 	
+	int nextIndex = NextIndex(gI_BhopIndex[client], BHOP_SAMPLES);
+	
 	// If bhop was last tick, then record the stats
 	if (HitBhop(client, cmdnum))
 	{
-		RecordBhopStats(client, Movement_GetHitPerf(client), CountJumpInputs(client));
+		if (cmdnum <= gI_BhopLastCmdnum[client] + BUTTON_SAMPLES)
+		{
+			// Record post bhop buttons since haven't for previous bhop
+			gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client, cmdnum - gI_BhopLastCmdnum[client]);
+			gI_BhopIndex[client] = nextIndex;
+			gI_BhopCount[client]++;
+			
+			// Records stats of the bhop
+			gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
+			gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client, cmdnum - gI_BhopLastCmdnum[client]);
+		}
+		else
+		{
+			// Records stats of the bhop
+			gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
+			gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client);
+		}
+		
 		CheckForBhopMacro(client);
+		gI_BhopLastCmdnum[client] = cmdnum;
+	}
+	else if (cmdnum == gI_BhopLastCmdnum[client] + BUTTON_SAMPLES)
+	{
+		gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client);
+		gI_BhopIndex[client] = nextIndex;
+		gI_BhopCount[client]++;
 	}
 	
 	// Records buttons every tick (after checking if b-hop occurred)
@@ -113,35 +139,47 @@ static void CheckForBhopMacro(int client)
 	float averageJumpInputs = GOKZ_AM_GetAverageJumpInputs(client, 20);
 	
 	// Check #1
-	if (perfCount >= 17)
+	if (perfCount >= 19)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
 			"High perf ratio - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
+		Call_OnPlayerSuspected(client, AMReason_BhopCheat, details);
 		return;
 	}
 	
-	// Check #2	
-	if (perfCount >= 10 && CheckForRepeatingJumpInputsCount(client, 0.85, 20) >= 2)
+	// Check #2
+	if (perfCount >= 16 && averageJumpInputs <= 2.0 + EPSILON)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
-			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
+			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
+			perfCount, 
+			GenerateBhopPatternReport(client, 20, false));
+		Call_OnPlayerSuspected(client, AMReason_BhopCheat, details);
+		return;
+	}
+	
+	// Check #3
+	if (perfCount >= 8 && averageJumpInputs >= 20.0 - EPSILON)
+	{
+		char details[128];
+		FormatEx(details, sizeof(details), 
+			"High pattern - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
 		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
 		return;
 	}
 	
-	// Check #3
-	if (perfCount >= 15 && averageJumpInputs <= 2)
+	// Check #4
+	if (perfCount >= 8 && CheckForRepeatingJumpInputsCount(client, 0.85, 20) >= 2)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
-			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
+			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
 		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
@@ -163,7 +201,7 @@ static int CheckForRepeatingJumpInputsCount(int client, float ratio = 0.5, int s
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
 	int[] jumpInputs = new int[sampleSize];
 	GOKZ_AM_GetJumpInputs(client, jumpInputs, sampleSize);
-	int maxJumpInputs = RoundToCeil(BUTTON_SAMPLES / 2.0);
+	int maxJumpInputs = BUTTON_SAMPLES + 1;
 	int[] jumpInputsFrequency = new int[maxJumpInputs];
 	
 	// Count up all the in jump patterns
@@ -172,8 +210,8 @@ static int CheckForRepeatingJumpInputsCount(int client, float ratio = 0.5, int s
 		jumpInputsFrequency[jumpInputs[i]]++;
 	}
 	
-	// Returns i if more than the given ratio of the sample size has the same jump input count
-	int threshold = RoundToCeil(float(sampleSize) * ratio);
+	// Returns i if the given ratio of the sample size has the same jump input count
+	int threshold = RoundFloat(float(sampleSize) * ratio);
 	for (int i = 1; i < maxJumpInputs; i++)
 	{
 		if (jumpInputsFrequency[i] >= threshold)
@@ -208,15 +246,6 @@ static int RecordButtons(int client, int buttons)
 	gI_ButtonsIndex[client] = NextIndex(gI_ButtonsIndex[client], BUTTON_SAMPLES);
 	gI_Buttons[client][gI_ButtonsIndex[client]] = buttons;
 	gI_ButtonCount[client]++;
-}
-
-// Records stats of the bhop
-static void RecordBhopStats(int client, bool hitPerf, int jumpInputs)
-{
-	gI_BhopIndex[client] = NextIndex(gI_BhopIndex[client], BHOP_SAMPLES);
-	gB_BhopHitPerf[client][gI_BhopIndex[client]] = hitPerf;
-	gI_BhopJumpInputs[client][gI_BhopIndex[client]] = jumpInputs;
-	gI_BhopCount[client]++;
 }
 
 // Counts the number of times buttons went from !IN_JUMP to IN_JUMP

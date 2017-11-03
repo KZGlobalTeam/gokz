@@ -38,6 +38,8 @@ void CreateNatives()
 	CreateNative("GOKZ_AM_GetPerfRatio", Native_GetPerfRatio);
 	CreateNative("GOKZ_AM_GetJumpInputs", Native_GetJumpInputs);
 	CreateNative("GOKZ_AM_GetAverageJumpInputs", Native_GetAverageJumpInputs);
+	CreateNative("GOKZ_AM_GetPreJumpInputs", Native_GetPreJumpInputs);
+	CreateNative("GOKZ_AM_GetPostJumpInputs", Native_GetPostJumpInputs);
 }
 
 public int Native_GetSampleSize(Handle plugin, int numParams)
@@ -110,8 +112,17 @@ public int Native_GetJumpInputs(Handle plugin, int numParams)
 		return 0;
 	}
 	
+	int[] preJumpInputs = new int[sampleSize];
+	SortByRecent(gI_BhopPreJumpInputs[client], BHOP_SAMPLES, preJumpInputs, sampleSize, gI_BhopIndex[client]);
+	int[] postJumpInputs = new int[sampleSize];
+	SortByRecent(gI_BhopPostJumpInputs[client], BHOP_SAMPLES, postJumpInputs, sampleSize, gI_BhopIndex[client]);
+	
 	int[] jumpInputs = new int[sampleSize];
-	SortByRecent(gI_BhopJumpInputs[client], BHOP_SAMPLES, jumpInputs, sampleSize, gI_BhopIndex[client]);
+	for (int i = 0; i < sampleSize; i++)
+	{
+		jumpInputs[i] = preJumpInputs[i] + postJumpInputs[i];
+	}
+	
 	SetNativeArray(2, jumpInputs, sampleSize);
 	return sampleSize;
 }
@@ -135,4 +146,36 @@ public int Native_GetAverageJumpInputs(Handle plugin, int numParams)
 		jumpInputCount += jumpInputs[i];
 	}
 	return view_as<int>(float(jumpInputCount) / float(sampleSize));
+}
+
+public int Native_GetPreJumpInputs(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	int sampleSize = IntMin(GOKZ_AM_GetSampleSize(client), GetNativeCell(3));
+	
+	if (sampleSize == 0)
+	{
+		return 0;
+	}
+	
+	int[] preJumpInputs = new int[sampleSize];
+	SortByRecent(gI_BhopPreJumpInputs[client], BHOP_SAMPLES, preJumpInputs, sampleSize, gI_BhopIndex[client]);
+	SetNativeArray(2, preJumpInputs, sampleSize);
+	return sampleSize;
+}
+
+public int Native_GetPostJumpInputs(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	int sampleSize = IntMin(GOKZ_AM_GetSampleSize(client), GetNativeCell(3));
+	
+	if (sampleSize == 0)
+	{
+		return 0;
+	}
+	
+	int[] postJumpInputs = new int[sampleSize];
+	SortByRecent(gI_BhopPostJumpInputs[client], BHOP_SAMPLES, postJumpInputs, sampleSize, gI_BhopIndex[client]);
+	SetNativeArray(2, postJumpInputs, sampleSize);
+	return sampleSize;
 } 
