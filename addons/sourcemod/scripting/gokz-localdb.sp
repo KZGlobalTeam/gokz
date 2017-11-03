@@ -94,8 +94,25 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	gB_GOKZJumpstats = gB_GOKZJumpstats || StrEqual(name, "gokz-jumpstats");
-	if (StrEqual(name, "updater"))
+	if (StrEqual(name, "gokz-jumpstats"))
+	{
+		gB_GOKZJumpstats = true;
+		
+		// Late-loading gokz-jumpstats options
+		if (gH_DB == null)
+		{
+			return;
+		}
+		
+		for (int client = 1; client <= MaxClients; client++)
+		{
+			if (GOKZ_IsClientSetUp(client) && !IsFakeClient(client))
+			{
+				DB_LoadJSOptions(client);
+			}
+		}
+	}
+	else if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
