@@ -21,7 +21,7 @@ void OnStartTouchGround_JumpTracking(int client)
 	EndJumpstat(client);
 }
 
-void OnPlayerRunCmd_JumpTracking(int client)
+void OnPlayerRunCmd_JumpTracking(int client, int cmdnum)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -30,18 +30,10 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	
 	if (!Movement_GetOnGround(client) && GetValidJumpstat(client))
 	{
-		if (CheckGravity(client) && CheckBaseVelocity(client) && CheckInWater(client))
+		// First tick is done when the jumpstat begins to ensure it is measured
+		if (cmdnum != Movement_GetTakeoffCmdNum(client))
 		{
-			// Passed all checks
-			UpdateHeight(client);
-			UpdateMaxSpeed(client);
-			UpdateStrafes(client);
-			UpdateSync(client);
-			UpdateDuration(client);
-		}
-		else
-		{
-			InvalidateJumpstat(client);
+			UpdateJumpstat(client);
 		}
 	}
 	
@@ -88,10 +80,14 @@ static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 	BeginDuration(client);
 	
 	Call_OnTakeoff(client, GetCurrentType(client));
+	
+	UpdateJumpstat(client); // Measure first tick of jumpstat
 }
 
 static void EndJumpstat(int client)
 {
+	UpdateJumpstat(client); // Measure last tick of jumpstat
+	
 	EndType(client);
 	EndDistance(client);
 	EndOffset(client);
@@ -103,6 +99,23 @@ static void EndJumpstat(int client)
 	
 	Call_OnLanding(client, GetType(client), GetDistance(client), GetOffset(client), GetHeight(client), 
 		GOKZ_GetTakeoffSpeed(client), GetMaxSpeed(client), GetStrafes(client), GetSync(client), GetDuration(client));
+}
+
+static void UpdateJumpstat(int client)
+{
+	if (CheckGravity(client) && CheckBaseVelocity(client) && CheckInWater(client))
+	{
+		// Passed all checks
+		UpdateHeight(client);
+		UpdateMaxSpeed(client);
+		UpdateStrafes(client);
+		UpdateSync(client);
+		UpdateDuration(client);
+	}
+	else
+	{
+		InvalidateJumpstat(client);
+	}
 }
 
 
