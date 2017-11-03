@@ -9,6 +9,7 @@
 #include <gokz/core>
 #include <gokz/localdb>
 #undef REQUIRE_PLUGIN
+#include <gokz/antimacro>
 #include <gokz/jumpstats>
 #include <updater>
 
@@ -33,6 +34,7 @@ Regex gRE_BonusStartButton;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
+bool gB_Cheater[MAXPLAYERS + 1];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
 
@@ -50,6 +52,7 @@ int gI_DBCurrentMapID;
 #include "gokz-localdb/database/setup_database.sp"
 #include "gokz-localdb/database/setup_map.sp"
 #include "gokz-localdb/database/setup_map_courses.sp"
+#include "gokz-localdb/database/set_cheater.sp"
 
 
 
@@ -118,7 +121,6 @@ public void OnLibraryAdded(const char[] name)
 	}
 }
 
-
 public void OnLibraryRemoved(const char[] name)
 {
 	gB_GOKZJumpstats = gB_GOKZJumpstats && !StrEqual(name, "gokz-replays");
@@ -173,6 +175,11 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	int mode = GOKZ_GetOption(client, Option_Mode);
 	int style = GOKZ_GetOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
+}
+
+public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
+{
+	DB_SetCheater(client, true);
 }
 
 

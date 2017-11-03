@@ -101,11 +101,11 @@ public void OnPluginStart()
 		GOKZ_DB_OnMapSetup(GOKZ_DB_GetCurrentMapID());
 	}
 	
-	for (int client = 1; client <= MaxClients; client++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (GOKZ_DB_IsClientSetUp(client))
+		if (GOKZ_DB_IsClientSetUp(i))
 		{
-			GOKZ_DB_OnClientSetup(client, GetSteamAccountID(client));
+			GOKZ_DB_OnClientSetup(i, GetSteamAccountID(i), GOKZ_DB_IsCheater(i));
 		}
 	}
 }
@@ -145,6 +145,11 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int teleportsUsed)
 {
+	if (GOKZ_DB_IsCheater(client))
+	{
+		return Plugin_Continue;
+	}
+	
 	// Block timer end messages from GOKZ Core - this plugin handles them
 	return Plugin_Stop;
 }
@@ -170,7 +175,7 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 	}
 }
 
-public void GOKZ_DB_OnClientSetup(int client, int steamID)
+public void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater)
 {
 	if (GOKZ_DB_IsMapSetUp())
 	{
@@ -181,6 +186,12 @@ public void GOKZ_DB_OnClientSetup(int client, int steamID)
 
 public void GOKZ_DB_OnTimeInserted(int client, int steamID, int mapID, int course, int mode, int style, int runTimeMS, int teleportsUsed)
 {
+	if (GOKZ_DB_IsCheater(client))
+	{
+		DB_CachePBs(client, GetSteamAccountID(client));
+		return;
+	}
+	
 	DB_ProcessNewTime(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
 }
 

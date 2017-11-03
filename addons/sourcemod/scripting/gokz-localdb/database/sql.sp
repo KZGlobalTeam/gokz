@@ -47,7 +47,7 @@ char sqlite_players_insert[] =
 char sqlite_players_update[] = 
 "UPDATE OR IGNORE Players "
 ..."SET Alias='%s', Country='%s', IP='%s', LastPlayed=CURRENT_TIMESTAMP "
-..."WHERE SteamID32=%d;";
+..."WHERE SteamID32=%d";
 
 char mysql_players_upsert[] = 
 "INSERT INTO Players (Alias, Country, IP, SteamID32, LastPlayed) "
@@ -55,9 +55,14 @@ char mysql_players_upsert[] =
 ..."ON DUPLICATE KEY UPDATE "
 ..."SteamID32=VALUES(SteamID32), Alias=VALUES(Alias), Country=VALUES(Country), IP=VALUES(IP), LastPlayed=VALUES(LastPlayed)";
 
-char sql_players_update_cheater[] = 
+char sql_players_get_cheater[] = 
+"SELECT Cheater "
+..."FROM Players "
+..."WHERE SteamID32=%d";
+
+char sql_players_set_cheater[] = 
 "UPDATE Players "
-..."SET Cheater=%d"
+..."SET Cheater=%d "
 ..."WHERE SteamID32=%d";
 
 

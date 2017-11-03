@@ -18,7 +18,7 @@ static Handle H_OnTimeInserted;
 void CreateGlobalForwards()
 {
 	H_OnDatabaseConnect = CreateGlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell);
-	H_OnClientSetup = CreateGlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnClientSetup = CreateGlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	H_OnMapSetup = CreateGlobalForward("GOKZ_DB_OnMapSetup", ET_Ignore, Param_Cell);
 	H_OnTimeInserted = CreateGlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
@@ -30,11 +30,12 @@ void Call_OnDatabaseConnect()
 	Call_Finish();
 }
 
-void Call_OnClientSetup(int client, int steamID)
+void Call_OnClientSetup(int client, int steamID, bool cheater)
 {
 	Call_StartForward(H_OnClientSetup);
 	Call_PushCell(client);
 	Call_PushCell(steamID);
+	Call_PushCell(cheater);
 	Call_Finish();
 }
 
@@ -70,6 +71,7 @@ void CreateNatives()
 	CreateNative("GOKZ_DB_IsClientSetUp", Native_IsClientSetUp);
 	CreateNative("GOKZ_DB_IsMapSetUp", Native_IsMapSetUp);
 	CreateNative("GOKZ_DB_GetCurrentMapID", Native_GetCurrentMapID);
+	CreateNative("GOKZ_DB_IsCheater", Native_IsCheater);
 }
 
 public int Native_GetDatabase(Handle plugin, int numParams)
@@ -99,4 +101,9 @@ public int Native_IsMapSetUp(Handle plugin, int numParams)
 public int Native_GetCurrentMapID(Handle plugin, int numParams)
 {
 	return gI_DBCurrentMapID;
+}
+
+public int Native_IsCheater(Handle plugin, int numParams)
+{
+	return gB_Cheater[GetNativeCell(1)];
 } 

@@ -39,9 +39,10 @@ forward void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType);
  *
  * @param client		Client index.
  * @param steamID		SteamID32 of the player (from GetSteamAccountID()).
+ * @param cheater		Whether player is marked as a cheater in the database.
  * @noreturn
  */
-forward void GOKZ_DB_OnClientSetup(int client, int steamID);
+forward void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater);
 
 /**
  * Called when the current map is ready for database interaction.
@@ -116,6 +117,14 @@ native bool GOKZ_DB_IsMapSetUp();
  */
 native int GOKZ_DB_GetCurrentMapID();
 
+/**
+ * Gets whether player is marked as a cheater in the database.
+ *
+ * @param client		Client index.
+ * @return				Whether player is marked as a cheater in the database.
+ */
+native bool GOKZ_DB_IsCheater(int client);
+
 
 
 // =========================  STOCKS  ========================= //
@@ -165,5 +174,6 @@ public void __pl_gokz_localdb_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_DB_IsClientSetUp");
 	MarkNativeAsOptional("GOKZ_DB_IsMapSetUp");
 	MarkNativeAsOptional("GOKZ_DB_GetCurrentMapID");
+	MarkNativeAsOptional("GOKZ_DB_IsCheater");
 }
 #endif

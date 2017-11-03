@@ -60,6 +60,9 @@ void DB_SetupClient(int client)
 		}
 	}
 	
+	FormatEx(query, sizeof(query), sql_players_get_cheater, steamID);
+	txn.AddQuery(query);
+	
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetupClient, DB_TxnFailure_Generic, data, DBPrio_High);
 }
 
@@ -75,6 +78,24 @@ public void DB_TxnSuccess_SetupClient(Handle db, DataPack data, int numQueries, 
 		return;
 	}
 	
+	switch (g_DBType)
+	{
+		case DatabaseType_SQLite:
+		{
+			if (SQL_FetchRow(results[2]))
+			{
+				gB_Cheater[client] = SQL_FetchInt(results[2], 0) == 1;
+			}
+		}
+		case DatabaseType_MySQL:
+		{
+			if (SQL_FetchRow(results[1]))
+			{
+				gB_Cheater[client] = SQL_FetchInt(results[1], 0) == 1;
+			}
+		}
+	}
+	
 	gB_ClientSetUp[client] = true;
-	Call_OnClientSetup(client, steamID);
+	Call_OnClientSetup(client, steamID, gB_Cheater[client]);
 } 
