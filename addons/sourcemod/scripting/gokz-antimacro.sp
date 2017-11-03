@@ -7,6 +7,7 @@
 #include <gokz/core>
 #include <gokz/antimacro>
 #undef REQUIRE_PLUGIN
+#include <sourcebans>
 #include <updater>
 
 #pragma newdecls required
@@ -30,6 +31,8 @@ public Plugin myinfo =
 #define BHOP_SAMPLES 20
 #define LOG_PATH "logs/gokz-antimacro.log"
 
+bool gB_SourceBans;
+
 int gI_ButtonCount[MAXPLAYERS + 1];
 int gI_ButtonsIndex[MAXPLAYERS + 1];
 int gI_Buttons[MAXPLAYERS + 1][BUTTON_SAMPLES];
@@ -45,6 +48,7 @@ int gI_BhopPostJumpInputs[MAXPLAYERS + 1][BHOP_SAMPLES];
 #include "gokz-antimacro/api.sp"
 #include "gokz-antimacro/bhoptracking.sp"
 #include "gokz-antimacro/commands.sp"
+#include "gokz-antimacro/convars.sp"
 
 
 
@@ -64,7 +68,10 @@ public void OnPluginStart()
 	LoadTranslations("gokz-antimacro.phrases");
 	
 	CreateGlobalForwards();
+	CreateConVars();
 	CreateCommands();
+	
+	AutoExecConfig(true, "gokz-antimacro", "sourcemod/gokz");
 }
 
 public void OnAllPluginsLoaded()
@@ -73,6 +80,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	gB_SourceBans = LibraryExists("sourcebans++");
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -80,6 +88,18 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
+	}
+	else if (StrEqual(name, "sourcebans++"))
+	{
+		gB_SourceBans = true;
+	}
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	if (StrEqual(name, "sourcebans++"))
+	{
+		gB_SourceBans = false;
 	}
 }
 
@@ -101,12 +121,54 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
 {
+	LogSuspicion(client, reason, details);
+	if (gCV_gokz_autoban.BoolValue)
+	{
+		BanSuspect(client, reason);
+	}
+}
+
+
+
+// =========================  PRIVATE  ========================= //
+
+static void LogSuspicion(int client, AMReason reason, const char[] details)
+{
 	char logPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, logPath, sizeof(logPath), LOG_PATH);
 	
 	switch (reason)
 	{
-		case AMReason_BhopCheat:LogToFileEx(logPath, "%L was suspected of bhop cheating. Details: %s", client, details);
+		case AMReason_BhopHack:LogToFileEx(logPath, "%L was suspected of bhop hacking. Details: %s", client, details);
 		case AMReason_BhopMacro:LogToFileEx(logPath, "%L was suspected of bhop macroing. Details: %s", client, details);
+	}
+}
+
+static void BanSuspect(int client, AMReason reason)
+{
+	switch (reason)
+	{
+		case AMReason_BhopHack:
+		{
+			if (gB_SourceBans)
+			{
+				SourceBans_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
+			}
+			else
+			{
+				BanClient(client, gCV_gokz_autoban_duration.IntValue, BANFLAG_AUTO, "gokz-antimacro - Bhop hacking", "You have been banned for using a bhop hack", "gokz-antimacro");
+			}
+		}
+		case AMReason_BhopMacro:
+		{
+			if (gB_SourceBans)
+			{
+				SourceBans_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
+			}
+			else
+			{
+				BanClient(client, gCV_gokz_autoban_duration.IntValue, BANFLAG_AUTO, "gokz-antimacro - Bhop macroing", "You have been banned for using a bhop macro", "gokz-antimacro");
+			}
+		}
 	}
 } 

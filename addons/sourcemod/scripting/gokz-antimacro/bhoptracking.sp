@@ -146,7 +146,7 @@ static void CheckForBhopMacro(int client)
 			"High perf ratio - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopCheat, details);
+		Call_OnPlayerSuspected(client, AMReason_BhopHack, details);
 		return;
 	}
 	
@@ -158,7 +158,7 @@ static void CheckForBhopMacro(int client)
 			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopCheat, details);
+		Call_OnPlayerSuspected(client, AMReason_BhopHack, details);
 		return;
 	}
 	

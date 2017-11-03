@@ -16,7 +16,7 @@
 enum AMReason
 {
 	AMReason_BhopMacro, 
-	AMReason_BhopCheat
+	AMReason_BhopHack
 };
 
 
