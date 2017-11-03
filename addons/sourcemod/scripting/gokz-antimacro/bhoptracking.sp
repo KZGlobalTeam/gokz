@@ -139,7 +139,7 @@ static void CheckForBhopMacro(int client)
 	float averageJumpInputs = GOKZ_AM_GetAverageJumpInputs(client, 20);
 	
 	// Check #1
-	if (perfCount >= 17)
+	if (perfCount >= 19)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
@@ -150,20 +150,8 @@ static void CheckForBhopMacro(int client)
 		return;
 	}
 	
-	// Check #2	
-	if (perfCount >= 10 && CheckForRepeatingJumpInputsCount(client, 0.85, 20) >= 2)
-	{
-		char details[128];
-		FormatEx(details, sizeof(details), 
-			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
-			perfCount, 
-			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
-		return;
-	}
-	
-	// Check #3
-	if (perfCount >= 15 && averageJumpInputs <= 2)
+	// Check #2
+	if (perfCount >= 16 && averageJumpInputs <= 2.0 + EPSILON)
 	{
 		char details[128];
 		FormatEx(details, sizeof(details), 
@@ -171,6 +159,30 @@ static void CheckForBhopMacro(int client)
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
 		Call_OnPlayerSuspected(client, AMReason_BhopCheat, details);
+		return;
+	}
+	
+	// Check #3
+	if (perfCount >= 8 && averageJumpInputs >= 20.0 - EPSILON)
+	{
+		char details[128];
+		FormatEx(details, sizeof(details), 
+			"High pattern - Perfs: %d/20, Pattern: %s", 
+			perfCount, 
+			GenerateBhopPatternReport(client, 20, false));
+		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
+		return;
+	}
+	
+	// Check #4
+	if (perfCount >= 8 && CheckForRepeatingJumpInputsCount(client, 0.85, 20) >= 2)
+	{
+		char details[128];
+		FormatEx(details, sizeof(details), 
+			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
+			perfCount, 
+			GenerateBhopPatternReport(client, 20, false));
+		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
 		return;
 	}
 }
@@ -198,8 +210,8 @@ static int CheckForRepeatingJumpInputsCount(int client, float ratio = 0.5, int s
 		jumpInputsFrequency[jumpInputs[i]]++;
 	}
 	
-	// Returns i if more than the given ratio of the sample size has the same jump input count
-	int threshold = RoundToCeil(float(sampleSize) * ratio);
+	// Returns i if the given ratio of the sample size has the same jump input count
+	int threshold = RoundFloat(float(sampleSize) * ratio);
 	for (int i = 1; i < maxJumpInputs; i++)
 	{
 		if (jumpInputsFrequency[i] >= threshold)

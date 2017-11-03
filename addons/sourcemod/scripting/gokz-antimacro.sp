@@ -27,7 +27,7 @@ public Plugin myinfo =
 
 #define BUTTON_SAMPLES 50
 #define BHOP_GROUND_TICKS 4
-#define BHOP_SAMPLES 32
+#define BHOP_SAMPLES 20
 #define LOG_PATH "logs/gokz-antimacro.log"
 
 int gI_ButtonCount[MAXPLAYERS + 1];
@@ -106,6 +106,7 @@ public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] 
 	
 	switch (reason)
 	{
-		case AMReason_BhopMacro:LogToFileEx(logPath, "%L was suspected of bhop cheating. Details: %s", client, details);
+		case AMReason_BhopCheat:LogToFileEx(logPath, "%L was suspected of bhop cheating. Details: %s", client, details);
+		case AMReason_BhopMacro:LogToFileEx(logPath, "%L was suspected of bhop macroing. Details: %s", client, details);
 	}
 } 
