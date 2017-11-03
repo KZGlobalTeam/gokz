@@ -165,19 +165,19 @@
 	{
 		// NUB PB: 01:23.45 (5 TP) [#4/123]
 		"#format"	"{1:s},{2:d},{3:d},{4:d}"
-		"en"		"{yellow}NUB PB{grey}: {default}{1}{grey} ({yellow}{2} TP{grey}) [#{default}{3}{grey}/{4}]"
+		"en"		"{yellow}NUB PB{grey}: {default}{1}{grey} ({yellow}{2} TP{grey}) [#{default}{3}{grey}/{default}{4}{grey}]"
 	}
 	"PB Time - NUB and PRO"
 	{
 		// NUB/PRO PB: 01:23.45 [NUB #4/123] [PRO #3/12]
 		"#format"	"{1:s},{2:d},{3:d},{4:d},{5:d}"
-		"en"		"{yellow}NUB{grey}/{blue}PRO PB{grey}: {default}{1}{grey} [{yellow}NUB{grey} #{default}{2}{grey}/{3}] [{blue}PRO{grey} #{default}{4}{grey}/{5}]"
+		"en"		"{yellow}NUB{grey}/{blue}PRO PB{grey}: {default}{1}{grey} [{yellow}NUB{grey} #{default}{2}{grey}/{default}{3}{grey}] [{blue}PRO{grey} #{default}{4}{grey}/{default}{5}{grey}]"
 	}
 	"PB Time - PRO"
 	{
 		// PRO PB: 01:23.45 [#4/123]
 		"#format"	"{1:s},{2:d},{3:d}"
-		"en"		"{blue}PRO PB{grey}: {default}{1}{grey} [#{default}{2}{grey}/{3}]"
+		"en"		"{blue}PRO PB{grey}: {default}{1}{grey} [#{default}{2}{grey}/{default}{3}{grey}]"
 	}
 	"PB Time - No PRO Time"
 	{
