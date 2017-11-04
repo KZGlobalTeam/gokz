@@ -146,7 +146,7 @@ static void CheckForBhopMacro(int client)
 			"High perf ratio - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopHack, details);
+		SuspectPlayer(client, AMReason_BhopHack, details);
 		return;
 	}
 	
@@ -158,7 +158,7 @@ static void CheckForBhopMacro(int client)
 			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopHack, details);
+		SuspectPlayer(client, AMReason_BhopHack, details);
 		return;
 	}
 	
@@ -170,7 +170,7 @@ static void CheckForBhopMacro(int client)
 			"High pattern - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
+		SuspectPlayer(client, AMReason_BhopMacro, details);
 		return;
 	}
 	
@@ -182,7 +182,7 @@ static void CheckForBhopMacro(int client)
 			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
 			perfCount, 
 			GenerateBhopPatternReport(client, 20, false));
-		Call_OnPlayerSuspected(client, AMReason_BhopMacro, details);
+		SuspectPlayer(client, AMReason_BhopMacro, details);
 		return;
 	}
 }

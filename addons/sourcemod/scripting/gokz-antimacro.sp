@@ -119,9 +119,16 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
-public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
+
+
+// =========================  PUBLIC  ========================= //
+
+void SuspectPlayer(int client, AMReason reason, const char[] details)
 {
 	LogSuspicion(client, reason, details);
+	
+	Call_OnPlayerSuspected(client, reason, details);
+	
 	if (gCV_gokz_autoban.BoolValue)
 	{
 		BanSuspect(client, reason);

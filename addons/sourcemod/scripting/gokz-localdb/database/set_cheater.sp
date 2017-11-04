@@ -8,6 +8,8 @@
 
 void DB_SetCheater(int client, bool cheater)
 {
+	gB_Cheater[client] = cheater;
+	
 	char query[128];
 	
 	Transaction txn = SQL_CreateTransaction();

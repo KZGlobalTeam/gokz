@@ -7,10 +7,10 @@
 #include <gokz>
 
 #include <gokz/core>
-#include <gokz/localdb>
 #include <gokz/localranks>
 #include <gokz/replays>
 #undef REQUIRE_PLUGIN
+#include <gokz/localdb>
 #include <updater>
 
 #pragma newdecls required
@@ -35,6 +35,7 @@ public Plugin myinfo =
 #define PLAYBACK_BREATHER_TIME 2.0
 #define BASE_NAV_FILE_PATH "maps/gokz-replays.nav"
 
+bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
@@ -85,6 +86,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -92,6 +94,18 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
+	}
+	else if (StrEqual(name, "gokz-localdb"))
+	{
+		gB_GOKZLocalDB = true;
+	}
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	if (StrEqual(name, "gokz-localdb"))
+	{
+		gB_GOKZLocalDB = false;
 	}
 }
 
@@ -277,6 +291,13 @@ static void CreateReplaysDirectory(const char[] map)
 	
 	// Create map's replay directory
 	BuildPath(Path_SM, path, sizeof(path), "%s/%s", REPLAY_DIRECTORY, map);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+	
+	// Create cheaters replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s", REPLAY_DIRECTORY_CHEATERS);
 	if (!DirExists(path))
 	{
 		CreateDirectory(path, 511);
