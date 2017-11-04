@@ -8,6 +8,11 @@
 
 void DB_SetCheater(int client, bool cheater)
 {
+	if (gB_Cheater[client] == cheater)
+	{
+		return;
+	}
+	
 	gB_Cheater[client] = cheater;
 	
 	char query[128];
