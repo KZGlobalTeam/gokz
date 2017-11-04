@@ -9,7 +9,6 @@
 #include <gokz/core>
 #include <gokz/localdb>
 #undef REQUIRE_PLUGIN
-#include <gokz/antimacro>
 #include <gokz/jumpstats>
 #include <updater>
 
@@ -175,11 +174,6 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	int mode = GOKZ_GetOption(client, Option_Mode);
 	int style = GOKZ_GetOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
-}
-
-public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
-{
-	DB_SetCheater(client, true);
 }
 
 

@@ -7,6 +7,7 @@
 #include <gokz/core>
 #include <gokz/antimacro>
 #undef REQUIRE_PLUGIN
+#include <gokz/localdb>
 #include <sourcebans>
 #include <updater>
 
@@ -31,6 +32,7 @@ public Plugin myinfo =
 #define BHOP_SAMPLES 20
 #define LOG_PATH "logs/gokz-antimacro.log"
 
+bool gB_GOKZLocalDB;
 bool gB_SourceBans;
 
 int gI_ButtonCount[MAXPLAYERS + 1];
@@ -80,6 +82,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 	gB_SourceBans = LibraryExists("sourcebans++");
 }
 
@@ -89,6 +92,10 @@ public void OnLibraryAdded(const char[] name)
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	else if (StrEqual(name, "gokz-localdb"))
+	{
+		gB_GOKZLocalDB = true;
+	}
 	else if (StrEqual(name, "sourcebans++"))
 	{
 		gB_SourceBans = true;
@@ -97,7 +104,11 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "sourcebans++"))
+	if (StrEqual(name, "gokz-localdb"))
+	{
+		gB_GOKZLocalDB = false;
+	}
+	else if (StrEqual(name, "sourcebans++"))
 	{
 		gB_SourceBans = false;
 	}
@@ -119,14 +130,22 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
+public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
+{
+	LogSuspicion(client, reason, details);
+	
+	if (gB_GOKZLocalDB)
+	{
+		GOKZ_DB_SetCheater(client, true);
+	}
+}
+
 
 
 // =========================  PUBLIC  ========================= //
 
 void SuspectPlayer(int client, AMReason reason, const char[] details)
 {
-	LogSuspicion(client, reason, details);
-	
 	Call_OnPlayerSuspected(client, reason, details);
 	
 	if (gCV_gokz_autoban.BoolValue)

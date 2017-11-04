@@ -72,6 +72,7 @@ void CreateNatives()
 	CreateNative("GOKZ_DB_IsMapSetUp", Native_IsMapSetUp);
 	CreateNative("GOKZ_DB_GetCurrentMapID", Native_GetCurrentMapID);
 	CreateNative("GOKZ_DB_IsCheater", Native_IsCheater);
+	CreateNative("GOKZ_DB_SetCheater", Native_SetCheater);
 }
 
 public int Native_GetDatabase(Handle plugin, int numParams)
@@ -106,4 +107,9 @@ public int Native_GetCurrentMapID(Handle plugin, int numParams)
 public int Native_IsCheater(Handle plugin, int numParams)
 {
 	return gB_Cheater[GetNativeCell(1)];
+}
+
+public int Native_SetCheater(Handle plugin, int numParams)
+{
+	DB_SetCheater(GetNativeCell(1), GetNativeCell(2));
 } 

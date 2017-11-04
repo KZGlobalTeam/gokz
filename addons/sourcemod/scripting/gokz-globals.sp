@@ -6,9 +6,11 @@
 #include <GlobalAPI-Core>
 #include <gokz/core>
 #include <gokz/antimacro>
-#include <gokz/localranks>
 #include <gokz/replays>
 #include <gokz/globals>
+#undef REQUIRE_PLUGIN
+#include <gokz/localdb>
+#include <gokz/localranks>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -28,6 +30,7 @@ public Plugin myinfo =
 
 #define RECORD_SOUND_PATH "gokz/holyshit.mp3"
 
+bool gB_GOKZLocalDB;
 bool gB_APIKeyCheck;
 bool gB_ModeCheck[MODE_COUNT];
 char gC_CurrentMap[64];
@@ -69,6 +72,27 @@ public void OnPluginStart()
 	CreateCommands();
 }
 
+public void OnAllPluginsLoaded()
+{
+	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "gokz-localdb"))
+	{
+		gB_GOKZLocalDB = true;
+	}
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	if (StrEqual(name, "gokz-localdb"))
+	{
+		gB_GOKZLocalDB = false;
+	}
+}
+
 
 
 // =========================  CLIENT  ========================= //
@@ -87,26 +111,20 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
-	if (gB_InValidRun[client])
+	if (gB_GloballyVerified[client] && gB_InValidRun[client])
 	{
 		SendTime(client, course, time, teleportsUsed);
 	}
 }
 
-public Action GOKZ_OnTimerEnd(int client, int course, float time, int teleportsUsed)
-{
-	if (!gB_GloballyVerified[client])
-	{
-		GOKZ_PrintToChat(client, true, "%t", "End Timer Blocked");
-		GOKZ_PlayErrorSound(client);
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
 public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
 {
 	gB_GloballyVerified[client] = !banned;
+	
+	if (banned && gB_GOKZLocalDB)
+	{
+		GOKZ_DB_SetCheater(client, true);
+	}
 }
 
 

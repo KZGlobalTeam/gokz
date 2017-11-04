@@ -189,10 +189,11 @@ public void GOKZ_DB_OnTimeInserted(int client, int steamID, int mapID, int cours
 	if (GOKZ_DB_IsCheater(client))
 	{
 		DB_CachePBs(client, GetSteamAccountID(client));
-		return;
 	}
-	
-	DB_ProcessNewTime(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
+	else
+	{
+		DB_ProcessNewTime(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
+	}
 }
 
 public void GOKZ_LR_OnTimeProcessed(

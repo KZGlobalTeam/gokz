@@ -160,7 +160,7 @@ public SharedPlugin __pl_gokz_localranks =
 };
 
 #if !defined REQUIRE_PLUGIN
-public void __pl_gokz_localdb_SetNTVOptional()
+public void __pl_gokz_localranks_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_LR_GetRecordMissed");
 	MarkNativeAsOptional("GOKZ_LR_GetPBMissed");

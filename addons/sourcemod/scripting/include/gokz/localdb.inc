@@ -125,6 +125,15 @@ native int GOKZ_DB_GetCurrentMapID();
  */
 native bool GOKZ_DB_IsCheater(int client);
 
+/**
+ * Sets wheter player is marked as a cheater in the database.
+ *
+ * @param client		Client index.
+ * @param cheater		Whether to mark the player as a cheater.
+ * @noreturn
+ */
+native void GOKZ_DB_SetCheater(int client, bool cheater);
+
 
 
 // =========================  STOCKS  ========================= //
@@ -175,5 +184,6 @@ public void __pl_gokz_localdb_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_DB_IsMapSetUp");
 	MarkNativeAsOptional("GOKZ_DB_GetCurrentMapID");
 	MarkNativeAsOptional("GOKZ_DB_IsCheater");
+	MarkNativeAsOptional("GOKZ_DB_SetCheater");
 }
 #endif
