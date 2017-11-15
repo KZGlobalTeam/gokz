@@ -229,8 +229,10 @@ static void ResetBhopStats(int client)
 {
 	gI_ButtonCount[client] = 0;
 	gI_ButtonsIndex[client] = 0;
+	gI_OldButtons[client] = 0;
 	gI_BhopCount[client] = 0;
 	gI_BhopIndex[client] = 0;
+	gI_BhopLastCmdnum[client] = 0;
 }
 
 // Returns true if ther was a jump last tick and was within a number of ticks after landing

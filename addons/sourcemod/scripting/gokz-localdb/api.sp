@@ -106,7 +106,7 @@ public int Native_GetCurrentMapID(Handle plugin, int numParams)
 
 public int Native_IsCheater(Handle plugin, int numParams)
 {
-	return gB_Cheater[GetNativeCell(1)];
+	return view_as<int>(gB_Cheater[GetNativeCell(1)]);
 }
 
 public int Native_SetCheater(Handle plugin, int numParams)
