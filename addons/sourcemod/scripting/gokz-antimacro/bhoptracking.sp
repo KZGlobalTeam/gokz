@@ -135,53 +135,54 @@ static void CheckForBhopMacro(int client)
 		return;
 	}
 	
-	int perfCount = GOKZ_AM_GetPerfCount(client, 20);
-	float averageJumpInputs = GOKZ_AM_GetAverageJumpInputs(client, 20);
+	int perfsOutOf20 = GOKZ_AM_GetPerfCount(client, 20);
+	float averageJumpInputsOutOf20 = GOKZ_AM_GetAverageJumpInputs(client, 20);
+	int perfsOutOf30 = GOKZ_AM_GetPerfCount(client, 30);
 	
 	// Check #1
-	if (perfCount >= 19)
+	if (perfsOutOf20 >= 19)
 	{
-		char details[128];
+		char details[256];
 		FormatEx(details, sizeof(details), 
 			"High perf ratio - Perfs: %d/20, Pattern: %s", 
-			perfCount, 
+			perfsOutOf20, 
 			GenerateBhopPatternReport(client, 20, false));
 		SuspectPlayer(client, AMReason_BhopHack, details);
 		return;
 	}
 	
 	// Check #2
-	if (perfCount >= 16 && averageJumpInputs <= 2.0 + EPSILON)
+	if (perfsOutOf20 >= 16 && averageJumpInputsOutOf20 <= 2.0 + EPSILON)
 	{
-		char details[128];
+		char details[256];
 		FormatEx(details, sizeof(details), 
 			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
-			perfCount, 
+			perfsOutOf20, 
 			GenerateBhopPatternReport(client, 20, false));
 		SuspectPlayer(client, AMReason_BhopHack, details);
 		return;
 	}
 	
 	// Check #3
-	if (perfCount >= 8 && averageJumpInputs >= 20.0 - EPSILON)
+	if (perfsOutOf20 >= 8 && averageJumpInputsOutOf20 >= 20.0 - EPSILON)
 	{
-		char details[128];
+		char details[256];
 		FormatEx(details, sizeof(details), 
 			"High pattern - Perfs: %d/20, Pattern: %s", 
-			perfCount, 
+			perfsOutOf20, 
 			GenerateBhopPatternReport(client, 20, false));
 		SuspectPlayer(client, AMReason_BhopMacro, details);
 		return;
 	}
 	
 	// Check #4
-	if (perfCount >= 8 && CheckForRepeatingJumpInputsCount(client, 0.85, 20) >= 2)
+	if (perfsOutOf30 >= 15 && CheckForRepeatingJumpInputsCount(client, 0.85, 30) >= 2)
 	{
-		char details[128];
+		char details[256];
 		FormatEx(details, sizeof(details), 
-			"Repeating pattern - Perfs: %d/20, Pattern: %s", 
-			perfCount, 
-			GenerateBhopPatternReport(client, 20, false));
+			"Repeating pattern - Perfs: %d/30, Pattern: %s", 
+			perfsOutOf30, 
+			GenerateBhopPatternReport(client, 30, false));
 		SuspectPlayer(client, AMReason_BhopMacro, details);
 		return;
 	}

@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define BUTTON_SAMPLES 50
 #define BHOP_GROUND_TICKS 4
-#define BHOP_SAMPLES 20
+#define BHOP_SAMPLES 30
 #define LOG_PATH "logs/gokz-antimacro.log"
 
 bool gB_GOKZLocalDB;
