@@ -371,4 +371,29 @@ stock void SortByRecent(const int[] input, int inputSize, int[] buffer, int buff
 		buffer[reorderedIndex] = input[i];
 		reorderedIndex++;
 	}
+}
+
+/**
+ * Returns the Steam account ID for a given SteamID2.
+ * Checks for invalid input are not very extensive.
+ *
+ * @param steamID2		SteamID2 to convert.
+ * @return				Steam account ID, or -1 if invalid.
+ */
+stock int Steam2ToSteamAccountID(const char[] steamID2)
+{
+	char pieces[3][16];
+	if (ExplodeString(steamID2, ":", pieces, sizeof(pieces), sizeof(pieces[])) != 3)
+	{
+		return -1;
+	}
+	
+	int IDNumberPart1 = StringToInt(pieces[1]);
+	int IDNumberPart2 = StringToInt(pieces[2]);
+	if (pieces[1][0] != '0' && IDNumberPart1 == 0 || IDNumberPart1 != 0 && IDNumberPart1 != 1 || IDNumberPart2 <= 0)
+	{
+		return -1;
+	}
+	
+	return IDNumberPart1 + (IDNumberPart2 << 1);
 } 

@@ -38,6 +38,7 @@ bool gB_MapSetUp;
 int gI_DBCurrentMapID;
 
 #include "gokz-localdb/api.sp"
+#include "gokz-localdb/commands.sp"
 #include "gokz-localdb/database.sp"
 
 #include "gokz-localdb/database/sql.sp"
@@ -73,6 +74,7 @@ public void OnPluginStart()
 {
 	CreateGlobalForwards();
 	CreateRegexes();
+	CreateCommands();
 }
 
 public void OnAllPluginsLoaded()
