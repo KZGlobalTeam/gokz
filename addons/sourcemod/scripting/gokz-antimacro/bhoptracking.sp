@@ -176,7 +176,7 @@ static void CheckForBhopMacro(int client)
 	}
 	
 	// Check #4
-	if (perfsOutOf30 >= 15 && CheckForRepeatingJumpInputsCount(client, 0.85, 30) >= 2)
+	if (perfsOutOf30 >= 10 && CheckForRepeatingJumpInputsCount(client, 0.85, 30) >= 14)
 	{
 		char details[256];
 		FormatEx(details, sizeof(details), 
