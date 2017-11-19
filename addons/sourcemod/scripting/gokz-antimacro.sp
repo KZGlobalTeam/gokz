@@ -133,11 +133,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
 {
 	LogSuspicion(client, reason, details);
-	
-	if (gB_GOKZLocalDB)
-	{
-		GOKZ_DB_SetCheater(client, true);
-	}
 }
 
 
@@ -150,6 +145,10 @@ void SuspectPlayer(int client, AMReason reason, const char[] details)
 	
 	if (gCV_gokz_autoban.BoolValue)
 	{
+		if (gB_GOKZLocalDB)
+		{
+			GOKZ_DB_SetCheater(client, true);
+		}
 		BanSuspect(client, reason);
 	}
 }
