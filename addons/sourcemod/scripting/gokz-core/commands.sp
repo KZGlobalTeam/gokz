@@ -210,7 +210,12 @@ public Action CommandGoto(int client, int args)
 	// If no arguments, display the goto menu
 	if (args < 1)
 	{
-		DisplayGotoMenu(client);
+		if (DisplayGotoMenu(client) == 0)
+		{
+			// No targets, so show error
+			GOKZ_PrintToChat(client, true, "%t", "No Players Found");
+			GOKZ_PlayErrorSound(client);
+		}
 	}
 	// Otherwise try to teleport to the specified player
 	else
@@ -232,7 +237,14 @@ public Action CommandSpec(int client, int args)
 	// If no arguments, display the spec menu
 	if (args < 1)
 	{
-		DisplaySpecMenu(client);
+		if (DisplaySpecMenu(client) == 0)
+		{
+			// No targets, so just join spec
+			if (GetClientTeam(client) != CS_TEAM_SPECTATOR)
+			{
+				JoinTeam(client, CS_TEAM_SPECTATOR);
+			}
+		}
 	}
 	// Otherwise try to spectate the player
 	else

@@ -8,20 +8,20 @@
 
 // =========================  PUBLIC  ========================= //
 
-void DisplayGotoMenu(int client)
+int DisplayGotoMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_Goto);
 	menu.SetTitle("%T", "Goto Menu - Title", client);
-	if (GotoMenuAddItems(client, menu) == 0)
+	int menuItems = GotoMenuAddItems(client, menu);
+	if (menuItems == 0)
 	{
 		delete menu;
-		GOKZ_PrintToChat(client, true, "%t", "No Players Found");
-		GOKZ_PlayErrorSound(client);
 	}
 	else
 	{
 		menu.Display(client, MENU_TIME_FOREVER);
 	}
+	return menuItems;
 }
 
 

@@ -8,20 +8,20 @@
 
 // =========================  PUBLIC  ========================= //
 
-void DisplaySpecMenu(int client)
+int DisplaySpecMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_Spec);
 	menu.SetTitle("%T", "Spec Menu - Title", client);
-	if (SpecMenuAddItems(client, menu) == 0)
+	int menuItems = SpecMenuAddItems(client, menu);
+	if (menuItems == 0)
 	{
 		delete menu;
-		GOKZ_PrintToChat(client, true, "%t", "No Players Found");
-		GOKZ_PlayErrorSound(client);
 	}
 	else
 	{
 		menu.Display(client, MENU_TIME_FOREVER);
 	}
+	return menuItems;
 }
 
 // Returns whether change to spectating the target was successful
