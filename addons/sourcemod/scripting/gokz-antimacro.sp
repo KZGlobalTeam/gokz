@@ -132,18 +132,18 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
-public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details)
+public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats)
 {
-	LogSuspicion(client, reason, details);
+	LogSuspicion(client, reason, notes, stats);
 }
 
 
 
 // =========================  PUBLIC  ========================= //
 
-void SuspectPlayer(int client, AMReason reason, const char[] details)
+void SuspectPlayer(int client, AMReason reason, const char[] notes, const char[] stats)
 {
-	Call_OnPlayerSuspected(client, reason, details);
+	Call_OnPlayerSuspected(client, reason, notes, stats);
 	
 	if (gCV_gokz_autoban.BoolValue)
 	{
@@ -159,15 +159,15 @@ void SuspectPlayer(int client, AMReason reason, const char[] details)
 
 // =========================  PRIVATE  ========================= //
 
-static void LogSuspicion(int client, AMReason reason, const char[] details)
+static void LogSuspicion(int client, AMReason reason, const char[] notes, const char[] stats)
 {
 	char logPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, logPath, sizeof(logPath), LOG_PATH);
 	
 	switch (reason)
 	{
-		case AMReason_BhopHack:LogToFileEx(logPath, "%L was suspected of bhop hacking. Details: %s", client, details);
-		case AMReason_BhopMacro:LogToFileEx(logPath, "%L was suspected of bhop macroing. Details: %s", client, details);
+		case AMReason_BhopHack:LogToFileEx(logPath, "%L was suspected of bhop hacking. Notes - %s, Stats - %s", client, notes, stats);
+		case AMReason_BhopMacro:LogToFileEx(logPath, "%L was suspected of bhop macroing. Notes - %s, Stats - %s", client, notes, stats);
 	}
 }
 

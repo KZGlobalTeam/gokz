@@ -6,7 +6,7 @@
 	
 */
 
-#include <SMJansson>
+#include <smjansson>
 
 // ======================= DOUBLE INCLUDE ====================== //
 
@@ -15,7 +15,7 @@
 #endif
 #define _GlobalAPI_Core_included_
 
-#define GlobalAPI_Version "1.0.1"
+#define GlobalAPI_Version "1.1.0"
 
 // ======================= ENUMS ====================== //
 

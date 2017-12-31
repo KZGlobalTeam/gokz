@@ -142,48 +142,48 @@ static void CheckForBhopMacro(int client)
 	// Check #1
 	if (perfsOutOf20 >= 19)
 	{
-		char details[256];
-		FormatEx(details, sizeof(details), 
-			"High perf ratio - Perfs: %d/20, Pattern: %s", 
+		char stats[256];
+		FormatEx(stats, sizeof(stats), 
+			"Perfs: %d/20, Scroll pattern: %s", 
 			perfsOutOf20, 
 			GenerateBhopPatternReport(client, 20, false));
-		SuspectPlayer(client, AMReason_BhopHack, details);
+		SuspectPlayer(client, AMReason_BhopHack, "High perf ratio", stats);
 		return;
 	}
 	
 	// Check #2
 	if (perfsOutOf20 >= 16 && averageJumpInputsOutOf20 <= 2.0 + EPSILON)
 	{
-		char details[256];
-		FormatEx(details, sizeof(details), 
-			"1's or 2's pattern - Perfs: %d/20, Pattern: %s", 
+		char stats[256];
+		FormatEx(stats, sizeof(stats), 
+			"Perfs: %d/20, Scroll pattern: %s", 
 			perfsOutOf20, 
 			GenerateBhopPatternReport(client, 20, false));
-		SuspectPlayer(client, AMReason_BhopHack, details);
+		SuspectPlayer(client, AMReason_BhopHack, "1's or 2's scroll pattern", stats);
 		return;
 	}
 	
 	// Check #3
 	if (perfsOutOf20 >= 8 && averageJumpInputsOutOf20 >= 20.0 - EPSILON)
 	{
-		char details[256];
-		FormatEx(details, sizeof(details), 
-			"High pattern - Perfs: %d/20, Pattern: %s", 
+		char stats[256];
+		FormatEx(stats, sizeof(stats), 
+			"Perfs: %d/20, Scroll pattern: %s", 
 			perfsOutOf20, 
 			GenerateBhopPatternReport(client, 20, false));
-		SuspectPlayer(client, AMReason_BhopMacro, details);
+		SuspectPlayer(client, AMReason_BhopMacro, "High scroll pattern", stats);
 		return;
 	}
 	
 	// Check #4
 	if (perfsOutOf30 >= 10 && CheckForRepeatingJumpInputsCount(client, 0.85, 30) >= 14)
 	{
-		char details[256];
-		FormatEx(details, sizeof(details), 
-			"Repeating pattern - Perfs: %d/30, Pattern: %s", 
+		char stats[256];
+		FormatEx(stats, sizeof(stats), 
+			"Perfs: %d/30, Scroll pattern: %s", 
 			perfsOutOf30, 
 			GenerateBhopPatternReport(client, 30, false));
-		SuspectPlayer(client, AMReason_BhopMacro, details);
+		SuspectPlayer(client, AMReason_BhopMacro, "Repeating scroll pattern", stats);
 		return;
 	}
 }

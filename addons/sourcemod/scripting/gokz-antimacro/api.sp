@@ -14,15 +14,16 @@ static Handle H_OnPlayerSuspected;
 
 void CreateGlobalForwards()
 {
-	H_OnPlayerSuspected = CreateGlobalForward("GOKZ_AM_OnPlayerSuspected", ET_Ignore, Param_Cell, Param_Cell, Param_String);
+	H_OnPlayerSuspected = CreateGlobalForward("GOKZ_AM_OnPlayerSuspected", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_String);
 }
 
-void Call_OnPlayerSuspected(int client, AMReason reason, const char[] details)
+void Call_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats)
 {
 	Call_StartForward(H_OnPlayerSuspected);
 	Call_PushCell(client);
 	Call_PushCell(reason);
-	Call_PushString(details);
+	Call_PushString(notes);
+	Call_PushString(stats);
 	Call_Finish();
 }
 

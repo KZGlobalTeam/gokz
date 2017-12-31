@@ -28,10 +28,11 @@ enum AMReason
  *
  * @param client		Client index.
  * @param reason		Reason for suspicion.
- * @param details		Additional details e.g. scroll pattern.
+ * @param notes			Additional reasoning, description etc.
+ * @param stats			Data supporting the suspicion e.g. scroll pattern.
  * @noreturn
  */
-forward void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] details);
+forward void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats);
 
 
 

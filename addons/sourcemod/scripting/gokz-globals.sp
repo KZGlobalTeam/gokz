@@ -119,6 +119,15 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	}
 }
 
+public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats)
+{
+	switch (reason)
+	{
+		case AMReason_BhopHack:GlobalAPI_BanPlayer(client, "bhop_hack", notes, stats);
+		case AMReason_BhopMacro:GlobalAPI_BanPlayer(client, "bhop_macro", notes, stats);
+	}
+}
+
 public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
 {
 	gB_GloballyVerified[client] = !banned;
