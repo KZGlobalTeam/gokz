@@ -10,6 +10,8 @@
 #include <gokz/core>
 #include <gokz/localdb>
 #include <gokz/localranks>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/globals>
 #include <updater>

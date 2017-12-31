@@ -8,6 +8,8 @@
 
 #include <gokz/core>
 #include <gokz/localdb>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/jumpstats>
 #include <updater>

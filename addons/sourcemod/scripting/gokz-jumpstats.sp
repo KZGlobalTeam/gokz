@@ -8,6 +8,8 @@
 #include <movementapi>
 #include <gokz/core>
 #include <gokz/jumpstats>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
 

@@ -11,6 +11,8 @@
 
 #include <movementapi>
 #include <gokz/core>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <basecomm>
 #include <updater>

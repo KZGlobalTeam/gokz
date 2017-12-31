@@ -9,6 +9,8 @@
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
 #include <updater>

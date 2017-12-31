@@ -6,6 +6,8 @@
 #include <gokz>
 
 #include <movementapi>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
 #include <updater>

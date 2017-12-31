@@ -6,6 +6,8 @@
 #include <movementapi>
 #include <gokz/core>
 #include <gokz/antimacro>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
 #include <sourcebans>

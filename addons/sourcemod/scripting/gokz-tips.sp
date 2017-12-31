@@ -1,6 +1,8 @@
 #include <sourcemod>
 
 #include <gokz/core>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
 

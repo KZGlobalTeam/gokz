@@ -8,6 +8,8 @@
 #include <gokz/antimacro>
 #include <gokz/replays>
 #include <gokz/globals>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
 #include <gokz/localranks>
