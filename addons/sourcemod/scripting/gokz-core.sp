@@ -153,6 +153,7 @@ public void OnClientPutInServer(int client)
 	SetupClientHidePlayers(client);
 	SetupClientTeleports(client);
 	SetupClientJoinTeam(client);
+	SetupClientFirstSpawn(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
@@ -225,6 +226,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		OnPlayerSpawn_Modes(client);
 		OnPlayerSpawn_Pause(client);
 		OnPlayerSpawn_ValidJump(client);
+		OnPlayerSpawn_FirstSpawn(client);
 		UpdateCSGOHUD(client);
 		UpdateHideWeapon(client);
 		UpdatePistol(client);

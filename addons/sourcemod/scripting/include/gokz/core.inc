@@ -559,6 +559,14 @@ forward void GOKZ_OnJumpInvalidated(int client);
 forward void GOKZ_OnJoinTeam(int client, int team);
 
 /**
+ * Called the first time the player spawns in on a team.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnFirstSpawn(int client);
+
+/**
  * Called when a mode has been loaded.
  *
  * @param mode			Mode loaded.
