@@ -16,6 +16,10 @@
     
     
     // Chat Messages ////////////////////////////////////////////////////////////
+    "Antimacro Warning"
+    {
+        "en"        "{darkred}WARNING! The use of software, macros, hyperscroll, or any other external assistance to aid character movement is strictly not allowed and may result in an automatic ban."
+    }
     "Not Enough Bhops"
     {
     	// Bill has not bhopped enough for a bhop check.

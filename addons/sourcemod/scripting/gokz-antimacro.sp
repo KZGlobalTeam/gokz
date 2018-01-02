@@ -132,6 +132,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
+public void GOKZ_OnFirstSpawn(int client)
+{
+	GOKZ_PrintToChat(client, false, "%t", "Antimacro Warning");
+}
+
 public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats)
 {
 	LogSuspicion(client, reason, notes, stats);
