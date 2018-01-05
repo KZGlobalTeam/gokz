@@ -734,9 +734,9 @@ void SetupClientFirstSpawn(int client)
 void OnPlayerSpawn_FirstSpawn(int client)
 {
 	int team = GetClientTeam(client);
-	if (team == CS_TEAM_CT || team == CS_TEAM_T && firstSpawn[client])
+	if (firstSpawn[client] && (team == CS_TEAM_CT || team == CS_TEAM_T))
 	{
-		firstSpawn[client] = false;
 		Call_GOKZ_OnFirstSpawn(client);
 	}
+	firstSpawn[client] = false;
 } 
