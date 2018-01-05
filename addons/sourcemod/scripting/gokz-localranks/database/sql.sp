@@ -100,7 +100,7 @@ char sql_getmaptop[] =
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."WHERE Players.Cheater=0 AND MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d "
 ..."GROUP BY MapCourses.MapID, MapCourses.Course, Times.Mode, Times.SteamID32 "
-..."ORDER BY Times.RunTime "
+..."ORDER BY PBTime "
 ..."LIMIT %d";
 
 char sql_getmaptoppro[] = 
@@ -110,7 +110,7 @@ char sql_getmaptoppro[] =
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."WHERE Players.Cheater=0 AND MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d AND Times.Teleports=0 "
 ..."GROUP BY MapCourses.MapID, MapCourses.Course, Times.Mode, Times.SteamID32 "
-..."ORDER BY Times.RunTime "
+..."ORDER BY PBTime "
 ..."LIMIT %d";
 
 char sql_getwrs[] = 
