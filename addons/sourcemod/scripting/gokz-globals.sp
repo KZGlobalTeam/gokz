@@ -210,7 +210,7 @@ public int OnModeInfoCallback(bool failure, const char[] name, int latest_versio
 	{
 		LogError("Failed to check a mode version with Global API.");
 	}
-	else if (latest_version == GOKZ_GetModeVersion(mode))
+	else if (latest_version <= GOKZ_GetModeVersion(mode))
 	{
 		gB_ModeCheck[mode] = true;
 	}
