@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.global/gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 0
+#define MODE_VERSION 1
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
