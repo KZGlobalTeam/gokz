@@ -172,7 +172,8 @@ static char[] GetSyncString(int client, float sync)
 
 void PlayJumpstatSound(int client, int tier)
 {
-	if (tier <= DistanceTier_Meh || GOKZ_JS_GetOption(client, JSOption_MinSoundTier) > tier)
+	int soundOption = GOKZ_JS_GetOption(client, JSOption_MinSoundTier);
+	if (tier <= DistanceTier_Meh || soundOption == DistanceTier_None || soundOption > tier)
 	{
 		return;
 	}
