@@ -6,10 +6,10 @@
 
 
 
-Handle H_OnTimeProcessed;
-Handle H_OnNewRecord;
-Handle H_OnRecordMissed;
-Handle H_OnPBMissed;
+static Handle H_OnTimeProcessed;
+static Handle H_OnNewRecord;
+static Handle H_OnRecordMissed;
+static Handle H_OnPBMissed;
 
 
 
@@ -106,6 +106,7 @@ void CreateNatives()
 {
 	CreateNative("GOKZ_LR_GetRecordMissed", Native_GetRecordMissed);
 	CreateNative("GOKZ_LR_GetPBMissed", Native_GetPBMissed);
+	CreateNative("GOKZ_LR_ReopenMapTopMenu", Native_ReopenMapTopMenu);
 }
 
 public int Native_GetRecordMissed(Handle plugin, int numParams)
@@ -116,4 +117,9 @@ public int Native_GetRecordMissed(Handle plugin, int numParams)
 public int Native_GetPBMissed(Handle plugin, int numParams)
 {
 	return view_as<int>(gB_PBMissed[GetNativeCell(1)][GetNativeCell(2)]);
+}
+
+public int Native_ReopenMapTopMenu(Handle plugin, int numParams)
+{
+	DisplayMapTopMenu(GetNativeCell(1));
 } 

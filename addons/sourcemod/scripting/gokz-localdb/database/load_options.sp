@@ -2,11 +2,6 @@
 	Database - Load Options
 	
 	Load player options from database.
-	
-	Notes:
-	Inserts the player into the options table if they aren't found,
-	then tries to load their options again. This will result in the
-	options loaded being the default values in the database.
 */
 
 
@@ -48,6 +43,7 @@ public void DB_TxnSuccess_LoadOptions(Handle db, int userid, int numQueries, Han
 	}
 	else if (SQL_FetchRow(results[0]))
 	{
+		// Doing this without a for loop in case things deviate from the enum
 		KZPlayer player = new KZPlayer(client);
 		player.mode = SQL_FetchInt(results[0], 0);
 		player.style = SQL_FetchInt(results[0], 1);
@@ -66,5 +62,6 @@ public void DB_TxnSuccess_LoadOptions(Handle db, int userid, int numQueries, Han
 		player.timerText = SQL_FetchInt(results[0], 14);
 		player.speedText = SQL_FetchInt(results[0], 15);
 		player.jumpBeam = SQL_FetchInt(results[0], 16);
+		player.helpAndTips = SQL_FetchInt(results[0], 17);
 	}
 } 

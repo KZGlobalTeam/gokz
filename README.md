@@ -1,4 +1,4 @@
-# GOKZ Plugin Package (CS:GO)
+# GOKZ SourceMod Plugin Package (CS:GO)
 
 ## Features
 
@@ -18,6 +18,7 @@
  * 128 Tick
  * [MovementAPI Plugin](https://github.com/danzayau/MovementAPI)
  * [DHooks Extension](https://forums.alliedmods.net/showthread.php?t=180114)
+ * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-global module)
  * Optional - [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (prevent "Datatable warning" server console spam)
  * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (auto-update the plugins)
 
@@ -40,4 +41,4 @@ To add a timer button to a map, use a ```func_button``` with a specific name.
  
 **NOTE:** Enable both the ```Don't move``` and ```Toggle``` flags to avoid any usability issues.
 
-### [Commands](COMMANDS.md)
+## [Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)

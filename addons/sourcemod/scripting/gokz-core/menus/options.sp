@@ -127,6 +127,7 @@ static void OptionsMenuAddItems(int client, Menu menu)
 	OptionsMenuAddToggle(client, menu, Option_AutoRestart, "Options Menu - Auto Restart");
 	OptionsMenuAddToggle(client, menu, Option_SlayOnEnd, "Options Menu - Slay On End");
 	OptionsMenuAddJumpBeam(client, menu);
+	OptionsMenuAddToggle(client, menu, Option_HelpAndTips, "Options Menu - Help and Tips");
 }
 
 static void OptionsMenuAddToggle(int client, Menu menu, Option option, const char[] optionPhrase)

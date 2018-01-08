@@ -1,18 +1,6 @@
 "Phrases"
 {	
-	// Chat Messages ////////////////////////////////////////////////////////////
-	"Dropped Too Far (Weird Jump)"
-	{
-		// You fell too for for a valid Weird Jump (96.0/64.0).
-		"#format"	"{1:.1f},{2:.1f}"
-		"en"		"{grey}You fell too far for a valid Weird Jump ({lightred}{1}{grey}/{green}{2}{grey})."
-	}
-    "Console Jump Report"
-    {
-        // Bill jumped 268.3480 units with a Long Jump [SimpleKZ | 0.00 Offset | 55.85 Height | 275 Pre | 337 Max | 8 Strafes | 61% Sync | 0.765 Airtime]
-        "#format"   "{1:N},{2:.4f},{3:s},{4:s},{5:.2f},{6:t},{7:.2f},{8:t},{9:d},{10:t},{11:d},{12:t},{13:d},{14:t},{15:.0f},{16:t},{17:.3f},{18:t}"
-        "en"        "{1} jumped {2} units with a {3} [{4} | {5} {6} | {7} {8} | {9} {10} | {11} {12} | {13} {14} | {15}%% {16} | {17} {18}]"
-    }
+	// General ////////////////////////////////////////////////////////////
     "Offset"
     {
         "en"        "Offset"
@@ -49,6 +37,30 @@
     {
         "en"        "units"
     }
+
+    
+	// Chat Messages ////////////////////////////////////////////////////////////
+	"Dropped Too Far (Weird Jump)"
+	{
+		// You fell too for for a valid Weird Jump (96.0/64.0).
+		"#format"	"{1:.1f},{2:.1f}"
+		"en"		"{grey}You fell too far for a valid Weird Jump ({lightred}{1}{grey}/{green}{2}{grey})."
+	}
+    "Console Jump Report"
+    {
+        // Bill jumped 268.3480 units with a Long Jump [SimpleKZ | 0.00 Offset | 55.85 Height | 275 Pre | 337 Max | 8 Strafes | 61% Sync | 0.765 Airtime]
+        "#format"   "{1:N},{2:.4f},{3:s},{4:s},{5:.2f},{6:t},{7:.2f},{8:t},{9:d},{10:t},{11:d},{12:t},{13:d},{14:t},{15:.0f},{16:t},{17:.3f},{18:t}"
+        "en"        "{1} jumped {2} units with a {3} [{4} | {5} {6} | {7} {8} | {9} {10} | {11} {12} | {13} {14} | {15}%% {16} | {17} {18}]"
+    }
+    "Jumpstats Option - Master Switch - Enable"
+	{
+		"en"		"{grey}You have enabled jumpstats reporting."
+	}
+    "Jumpstats Option - Master Switch - Disable"
+	{
+		"en"		"{grey}You have disabled all jumpstats reporting."
+	}
+    
     
     // Headers 
     // NOTE: For table formatting in console, these should be 12 characters long.
@@ -67,5 +79,28 @@
     "Airtime (Table)"
     {
         "en"        "Airtime     "
+    }
+    
+    
+    // Jumpstats Options Menu ////////////////////////////////////////////////////////////
+    "Jumpstats Options Menu - Title"
+	{
+		"en"		"Jumpstats Options"
+	}
+    "Jumpstats Options Menu - Master Switch"
+	{
+		"en"		"Jumpstats"
+	}
+    "Jumpstats Options Menu - Chat Report"
+	{
+		"en"		"Chat report"
+	}
+    "Jumpstats Options Menu - Console Report"
+	{
+		"en"		"Console report"
+	}
+    "Jumpstats Options Menu - Sounds"
+    {
+        "en"        "Sounds"
     }
 }

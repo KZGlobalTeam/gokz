@@ -9,13 +9,14 @@
     {
         // No Vanilla replays for this map were found.
         "#format"   "{1:s}"
-        "en"        "{darkred}No {purple}{1} {darkred}replays on this map were found."
+        "en"        "{darkred}No {1} replays on this map were found."
     }
     "No Bots Available"
     {
         "en"		"{darkred}There are currently no replay bots available."
     }
 
+    
 	// Replay Menu ////////////////////////////////////////////////////////////
     "Replay Menu - Title"
     {

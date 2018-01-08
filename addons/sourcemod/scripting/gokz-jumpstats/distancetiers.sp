@@ -20,8 +20,8 @@ int GetDistanceTier(int jumpType, int mode, float distance, float offset)
 {
 	// No tiers given for 'Invalid' jumps.
 	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
-		 || jumpType != JumpType_LadderJump && FloatAbs(offset) > EPSILON
-		 || FloatAbs(offset) >= LADDERJUMP_OFFSET_ALLOWANCE)
+		 || jumpType != JumpType_LadderJump && offset < -EPSILON
+		 || offset < -LADDERJUMP_OFFSET_ALLOWANCE)
 	{
 		// TODO Give a tier to "Other" jumps
 		// TODO Give a tier to offset jumps
@@ -67,7 +67,7 @@ static bool LoadDistanceTiers()
 		return false;
 	}
 	
-	for (int jumpType = 0; jumpType < JUMPTYPE_COUNT - 2; jumpType++)
+	for (int jumpType = 0; jumpType < sizeof(gC_KeysJumpType); jumpType++)
 	{
 		if (!kv.JumpToKey(gC_KeysJumpType[jumpType]))
 		{
@@ -79,7 +79,7 @@ static bool LoadDistanceTiers()
 			{
 				return false;
 			}
-			for (int tier = 0; tier < DISTANCETIER_COUNT; tier++)
+			for (int tier = DistanceTier_Meh; tier < DISTANCETIER_COUNT; tier++)
 			{
 				distanceTiers[jumpType][mode][tier] = kv.GetFloat(gC_KeysDistanceTier[tier]);
 			}

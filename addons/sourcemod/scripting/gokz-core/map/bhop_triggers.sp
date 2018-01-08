@@ -1,15 +1,19 @@
 /*
 	Bunnyhop Trigger Detection
 	
-	Detects when players are on bunnyhop triggers and
+	Detects when players are in bunnyhop/timed ladder triggers and
 	shouldn't be allowed to checkpoint.
 */
 
 
 
-#define BHOP_TRIG_DETECTION_TIME 0.15 // Time after touching trigger_multiple to block checkpoints
+// Times after touching trigger_multiple to block checkpoints
+#define BHOP_TRIG_DETECTION_TIME 0.15
+#define LADDER_TRIG_DETECTION_TIME 1.5
 
 static float lastTrigMultiTouchTime[MAXPLAYERS + 1];
+static float lastTouchGroundTime[MAXPLAYERS + 1];
+static float lastTouchLadderTime[MAXPLAYERS + 1];
 
 
 
@@ -17,21 +21,16 @@ static float lastTrigMultiTouchTime[MAXPLAYERS + 1];
 
 bool BhopTriggersJustTouched(int client)
 {
-	if (JustLanded(client)
-		 && GetEngineTime() - lastTrigMultiTouchTime[client] < BHOP_TRIG_DETECTION_TIME)
+	if (Movement_GetMoveType(client) == MOVETYPE_LADDER)
 	{
-		return true;
+		return GetEngineTime() - lastTouchLadderTime[client] < LADDER_TRIG_DETECTION_TIME
+		 && GetEngineTime() - lastTrigMultiTouchTime[client] < LADDER_TRIG_DETECTION_TIME;
 	}
-	return false;
-}
-
-static bool JustLanded(int client)
-{
-	// Includes safety check in case MovementAPI landing tick hasn't updated
-	// which was found to be a problem allowing the player to checkpoint
-	// at the exact time of landing.
-	return (GetGameTickCount() - Movement_GetLandingTick(client)) < (BHOP_TRIG_DETECTION_TIME / GetTickInterval())
-	 || Movement_GetTakeoffTick(client) > Movement_GetLandingTick(client);
+	else
+	{
+		return GetEngineTime() - lastTouchGroundTime[client] < BHOP_TRIG_DETECTION_TIME
+		 && GetEngineTime() - lastTrigMultiTouchTime[client] < BHOP_TRIG_DETECTION_TIME;
+	}
 }
 
 
@@ -59,4 +58,17 @@ public void OnTrigMultTouch_MapBhopTriggers(int entity, int other)
 	}
 	
 	lastTrigMultiTouchTime[other] = GetEngineTime();
+}
+
+void OnStartTouchGround_MapBhopTriggers(int client)
+{
+	lastTouchGroundTime[client] = GetEngineTime();
+}
+
+void OnChangeMoveType_MapBhopTriggers(int client, MoveType newMoveType)
+{
+	if (newMoveType == MOVETYPE_LADDER)
+	{
+		lastTouchLadderTime[client] = GetEngineTime();
+	}
 } 

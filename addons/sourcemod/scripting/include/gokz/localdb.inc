@@ -22,42 +22,16 @@ enum DatabaseType
 
 
 
-// =========================  STOCKS  ========================= //
-
-/**
- * Converts a time float (seconds) to an integer (milliseconds).
- *
- * @param time			Time in seconds.
- * @return				Time in milliseconds.
- */
-stock int GOKZ_DB_TimeFloatToInt(float time)
-{
-	return RoundFloat(time * 1000.0);
-}
-
-/**
- * Converts a time integer (milliseconds) to a float (seconds).
- *
- * @param time			Time in milliseconds.
- * @return				Time in seconds.
- */
-stock float GOKZ_DB_TimeIntToFloat(int time)
-{
-	return time / 1000.0;
-}
-
-
-
 // =========================  FORWARDS  ========================= //
 
 /**
  * Called when gokz-localdb has connected to the database.
+ * Use GOKZ_DB_GetDatabase to get a clone of the database handle.
  *
- * @param database		Database handle.
  * @param DBType		Database type.
  * @noreturn
  */
-forward void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType);
+forward void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType);
 
 /**
  * Called when a player is ready for database interaction.
@@ -65,9 +39,10 @@ forward void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType);
  *
  * @param client		Client index.
  * @param steamID		SteamID32 of the player (from GetSteamAccountID()).
+ * @param cheater		Whether player is marked as a cheater in the database.
  * @noreturn
  */
-forward void GOKZ_DB_OnClientSetup(int client, int steamID);
+forward void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater);
 
 /**
  * Called when the current map is ready for database interaction.
@@ -106,12 +81,12 @@ forward void GOKZ_DB_OnTimeInserted(
 // =========================  NATIVES  ========================= //
 
 /**
- * Gets the GOKZ local database handle.
+ * Gets a clone of the GOKZ local database handle.
  *
- * @param database		Database handle (null if connection hasn't been made).
+ * @param database		Database handle (INVALID_HANDLE if connection hasn't been made).
  * @noreturn
  */
-native void GOKZ_DB_GetDatabase(Database &database);
+native Database GOKZ_DB_GetDatabase();
 
 /**
  * Gets the GOKZ local database type.
@@ -142,6 +117,49 @@ native bool GOKZ_DB_IsMapSetUp();
  */
 native int GOKZ_DB_GetCurrentMapID();
 
+/**
+ * Gets whether player is marked as a cheater in the database.
+ *
+ * @param client		Client index.
+ * @return				Whether player is marked as a cheater in the database.
+ */
+native bool GOKZ_DB_IsCheater(int client);
+
+/**
+ * Sets wheter player is marked as a cheater in the database.
+ *
+ * @param client		Client index.
+ * @param cheater		Whether to mark the player as a cheater.
+ * @noreturn
+ */
+native void GOKZ_DB_SetCheater(int client, bool cheater);
+
+
+
+// =========================  STOCKS  ========================= //
+
+/**
+ * Converts a time float (seconds) to an integer (milliseconds).
+ *
+ * @param time			Time in seconds.
+ * @return				Time in milliseconds.
+ */
+stock int GOKZ_DB_TimeFloatToInt(float time)
+{
+	return RoundFloat(time * 1000.0);
+}
+
+/**
+ * Converts a time integer (milliseconds) to a float (seconds).
+ *
+ * @param time			Time in milliseconds.
+ * @return				Time in seconds.
+ */
+stock float GOKZ_DB_TimeIntToFloat(int time)
+{
+	return time / 1000.0;
+}
+
 
 
 // =========================  DEPENDENCY  ========================= //
@@ -165,5 +183,7 @@ public void __pl_gokz_localdb_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_DB_IsClientSetUp");
 	MarkNativeAsOptional("GOKZ_DB_IsMapSetUp");
 	MarkNativeAsOptional("GOKZ_DB_GetCurrentMapID");
+	MarkNativeAsOptional("GOKZ_DB_IsCheater");
+	MarkNativeAsOptional("GOKZ_DB_SetCheater");
 }
 #endif

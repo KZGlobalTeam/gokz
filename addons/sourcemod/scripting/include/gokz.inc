@@ -13,7 +13,7 @@
 
 // =========================  DEFINITIONS  ========================= //
 
-#define GOKZ_VERSION "0.17.1"
+#define GOKZ_VERSION "1.0.0"
 #define TICKRATE 128.0
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0
@@ -314,4 +314,86 @@ stock char[] IntToStringEx(int num)
 	char string[12];
 	IntToString(num, string, sizeof(string));
 	return string;
+}
+
+/**
+ * Returns a float as a string.
+ *
+ * @param num				Float to stringify.
+ * @return					Float as a string.
+ */
+stock char[] FloatToStringEx(float num)
+{
+	char string[32];
+	FloatToString(num, string, sizeof(string));
+	return string;
+}
+
+/**
+ * Increment an index, looping back to 0 if the max value is reached.
+ *
+ * @param index			Current index.
+ * @param buffer		Max value of index.
+ * @return				Current index incremented, or 0 if max value is reached.
+ */
+stock int NextIndex(int index, int max)
+{
+	index++;
+	if (index == max)
+	{
+		return 0;
+	}
+	return index;
+}
+
+/**
+ * Reorders an array with current index at the front, and previous 
+ * values after, including looping back to the end after reaching
+ * the start of the array.
+ *
+ * @param input			Array to reorder.
+ * @param inputSize		Size of input array.
+ * @param buffer		Output buffer.
+ * @param bufferSize	Size of buffer.
+ * @param index			Index of current/most recent value of input array.
+ * @noreturn
+ */
+stock void SortByRecent(const int[] input, int inputSize, int[] buffer, int bufferSize, int index)
+{
+	int reorderedIndex = 0;
+	for (int i = index; reorderedIndex < bufferSize && i >= 0; i--)
+	{
+		buffer[reorderedIndex] = input[i];
+		reorderedIndex++;
+	}
+	for (int i = inputSize - 1; reorderedIndex < bufferSize && i > index; i--)
+	{
+		buffer[reorderedIndex] = input[i];
+		reorderedIndex++;
+	}
+}
+
+/**
+ * Returns the Steam account ID for a given SteamID2.
+ * Checks for invalid input are not very extensive.
+ *
+ * @param steamID2		SteamID2 to convert.
+ * @return				Steam account ID, or -1 if invalid.
+ */
+stock int Steam2ToSteamAccountID(const char[] steamID2)
+{
+	char pieces[3][16];
+	if (ExplodeString(steamID2, ":", pieces, sizeof(pieces), sizeof(pieces[])) != 3)
+	{
+		return -1;
+	}
+	
+	int IDNumberPart1 = StringToInt(pieces[1]);
+	int IDNumberPart2 = StringToInt(pieces[2]);
+	if (pieces[1][0] != '0' && IDNumberPart1 == 0 || IDNumberPart1 != 0 && IDNumberPart1 != 1 || IDNumberPart2 <= 0)
+	{
+		return -1;
+	}
+	
+	return IDNumberPart1 + (IDNumberPart2 << 1);
 } 

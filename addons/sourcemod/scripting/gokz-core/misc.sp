@@ -8,19 +8,20 @@
 
 // =========================  GOKZ.CFG  ========================= //
 
+#define GOKZ_CFG_PATH "sourcemod/gokz/gokz.cfg"
+
 void OnMapStart_KZConfig()
 {
-	char kzConfigPath[] = "sourcemod/gokz/gokz.cfg";
-	char kzConfigPathFull[64];
-	FormatEx(kzConfigPathFull, sizeof(kzConfigPathFull), "cfg/%s", kzConfigPath);
+	char gokzCfgFullPath[PLATFORM_MAX_PATH];
+	FormatEx(gokzCfgFullPath, sizeof(gokzCfgFullPath), "cfg/%s", GOKZ_CFG_PATH);
 	
-	if (FileExists(kzConfigPathFull))
+	if (FileExists(gokzCfgFullPath))
 	{
-		ServerCommand("exec %s", kzConfigPath);
+		ServerCommand("exec %s", GOKZ_CFG_PATH);
 	}
 	else
 	{
-		SetFailState("Failed to load config (cfg/%s not found).", kzConfigPath);
+		SetFailState("Failed to load config (%s not found).", gokzCfgFullPath);
 	}
 }
 
@@ -30,7 +31,8 @@ void OnMapStart_KZConfig()
 
 void UpdateGodMode(int client)
 {
-	SetEntProp(client, Prop_Data, "m_takedamage", 0, 1);
+	// Stop players from taking damage
+	SetEntProp(client, Prop_Data, "m_takedamage", 0);
 }
 
 
@@ -60,6 +62,7 @@ void ToggleNoclip(int client)
 
 void UpdatePlayerCollision(int client)
 {
+	// Let players go through other players
 	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 }
 
@@ -74,7 +77,7 @@ void SetupClientHidePlayers(int client)
 
 public Action OnSetTransmitClient(int entity, int client)
 {
-	if (GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
+	if (GOKZ_GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
 		 && entity != client
 		 && entity != GetObserverTarget(client))
 	{
@@ -90,7 +93,7 @@ public Action OnSetTransmitClient(int entity, int client)
 void UpdateHideWeapon(int client)
 {
 	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", 
-		GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
+		GOKZ_GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
 }
 
 void OnOptionChanged_HideWeapon(int client, Option option)
@@ -122,8 +125,8 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 		return;
 	}
 	
-	char reason[64];
-	GetEventString(event, "reason", reason, sizeof(reason));
+	char reason[128];
+	event.GetString("reason", reason, sizeof(reason));
 	GOKZ_PrintToChatAll(false, "%t", "Client Disconnection Message", client, reason);
 }
 
@@ -133,7 +136,7 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 
 void OnRoundStart_ForceAllTalk()
 {
-	gCV_sv_full_alltalk.IntValue = 1;
+	gCV_sv_full_alltalk.BoolValue = true;
 }
 
 
@@ -142,7 +145,7 @@ void OnRoundStart_ForceAllTalk()
 
 void OnTimerEnd_SlayOnEnd(int client)
 {
-	if (GetOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
+	if (GOKZ_GetOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
 	{
 		CreateTimer(3.0, Timer_SlayPlayer, GetClientUserId(client));
 	}
@@ -166,7 +169,7 @@ public Action Timer_SlayPlayer(Handle timer, int userid)
 
 void PlayErrorSound(int client)
 {
-	if (GetOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
+	if (GOKZ_GetOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_ERROR);
 	}
@@ -212,7 +215,7 @@ void UpdatePlayerModel(int client)
 public Action Timer_UpdatePlayerModel(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
 		return;
 	}
@@ -276,7 +279,7 @@ static int pistolTeams[PISTOL_COUNT] =
 
 void UpdatePistol(int client)
 {
-	GivePistol(client, GetOption(client, Option_Pistol));
+	GivePistol(client, GOKZ_GetOption(client, Option_Pistol));
 }
 
 void OnOptionChanged_Pistol(int client, Option option)
@@ -332,40 +335,49 @@ static void GivePistol(int client, int pistol)
 static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
+static bool savedOnLadder[MAXPLAYERS + 1];
 
 void SetupClientJoinTeam(int client)
 {
 	hasSavedPosition[client] = false;
 }
 
-void JoinTeam(int client, int team)
+void JoinTeam(int client, int newTeam)
 {
-	if (team == CS_TEAM_SPECTATOR && GetClientTeam(client) != CS_TEAM_SPECTATOR)
+	KZPlayer player = new KZPlayer(client);
+	int currentTeam = GetClientTeam(client);
+	
+	if (newTeam == CS_TEAM_SPECTATOR && currentTeam != CS_TEAM_SPECTATOR)
 	{
-		Movement_GetOrigin(client, savedOrigin[client]);
-		Movement_GetEyeAngles(client, savedAngles[client]);
+		player.GetOrigin(savedOrigin[client]);
+		player.GetEyeAngles(savedAngles[client]);
+		savedOnLadder[client] = player.moveType == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
-		Call_GOKZ_OnJoinTeam(client, team);
+		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
-	else if ((team == CS_TEAM_CT && GetClientTeam(client) != CS_TEAM_CT) || (team == CS_TEAM_T && GetClientTeam(client) != CS_TEAM_T))
+	else if (newTeam == CS_TEAM_CT && currentTeam != CS_TEAM_CT
+		 || newTeam == CS_TEAM_T && currentTeam != CS_TEAM_T)
 	{
 		ForcePlayerSuicide(client);
-		CS_SwitchTeam(client, team);
+		CS_SwitchTeam(client, newTeam);
 		CS_RespawnPlayer(client);
 		if (hasSavedPosition[client])
 		{
-			Movement_SetOrigin(client, savedOrigin[client]);
-			Movement_SetEyeAngles(client, savedAngles[client]);
+			player.SetOrigin(savedOrigin[client]);
+			player.SetEyeAngles(savedAngles[client]);
+			if (savedOnLadder[client])
+			{
+				player.moveType = MOVETYPE_LADDER;
+			}
 			hasSavedPosition[client] = false;
 		}
 		else
 		{
-			TimerStop(client);
+			player.StopTimer();
 		}
-		Call_GOKZ_OnJoinTeam(client, team);
+		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
-	UpdateTPMenu(client);
 }
 
 void OnTimerStart_JoinTeam(int client)
@@ -377,23 +389,25 @@ void OnTimerStart_JoinTeam(int client)
 
 // =========================  CHAT PROCESSING  ========================= //
 
-#define MAX_MESSAGE_LENGTH 128
-
-Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
+void OnClientSayCommand_ChatProcessing(int client, const char[] command, const char[] message)
 {
-	if (!gCV_gokz_chat_processing.BoolValue)
-	{
-		return Plugin_Continue;
-	}
-	
 	if (gB_BaseComm && BaseComm_IsClientGagged(client)
-		 || message[0] == '@' // Assume basechat is in use
+		 || UsedBaseChat(client, command, message)
 		 || IsChatTrigger())
 	{
-		return Plugin_Handled;
+		return;
 	}
 	
-	char sanitisedMessage[MAX_MESSAGE_LENGTH];
+	// Resend messages that may have been a command with capital letters
+	if ((message[0] == '!' || message[0] == '/') && IsCharUpper(message[1]))
+	{
+		char loweredMessage[128];
+		String_ToLower(message, loweredMessage, sizeof(loweredMessage));
+		FakeClientCommand(client, "say %s", loweredMessage);
+		return;
+	}
+	
+	char sanitisedMessage[128];
 	strcopy(sanitisedMessage, sizeof(sanitisedMessage), message);
 	SanitiseChatInput(sanitisedMessage, sizeof(sanitisedMessage));
 	
@@ -403,18 +417,37 @@ Action OnClientSayCommand_ChatProcessing(int client, const char[] message)
 	
 	if (TrimString(sanitisedMessage) == 0)
 	{
-		return Plugin_Handled;
+		return;
 	}
 	
 	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
 	{
-		GOKZ_PrintToChatAll(false, "{bluegrey}%N{default} : %s", client, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{grey}*S* {lime}%s {default}: %s", sanitisedName, sanitisedMessage);
 	}
 	else
 	{
-		GOKZ_PrintToChatAll(false, "{lime}%N{default} : %s", client, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{lime}%s {default}: %s", sanitisedName, sanitisedMessage);
 	}
-	return Plugin_Handled;
+}
+
+static bool UsedBaseChat(int client, const char[] command, const char[] message)
+{
+	// Assuming base chat is in use, check if message will get processed by basechat
+	if (message[0] != '@')
+	{
+		return false;
+	}
+	
+	if (strcmp(command, "say_team", false) == 0)
+	{
+		return true;
+	}
+	else if (strcmp(command, "say", false) == 0 && CheckCommandAccess(client, "sm_say", ADMFLAG_CHAT))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 static void SanitiseChatInput(char[] message, int maxlength)
@@ -440,9 +473,7 @@ static void SanitiseChatInput(char[] message, int maxlength)
 */
 
 static bool validJump[MAXPLAYERS + 1];
-static int lastJumpTick[MAXPLAYERS + 1];
-static int lastOriginTeleportTick[MAXPLAYERS + 1];
-static int lastVelocityTeleportTick[MAXPLAYERS + 1];
+static bool velocityTeleported[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -464,7 +495,6 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	if (IsValidStopTouchGround(client))
 	{
 		validJump[client] = true;
-		lastJumpTick[client] = GetGameTickCount();
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
 	}
 	else
@@ -479,23 +509,24 @@ static bool IsValidStopTouchGround(int client)
 	{
 		return false;
 	}
-	
-	// Return false if there was a recent teleport
-	
-	int originTpTicks = GetGameTickCount() - lastOriginTeleportTick[client];
-	if (originTpTicks <= 2)
-	{
-		return false;
-	}
-	
-	// Allow 0 ticks since last velocity teleport in case mode has set speed already
-	int velocityTpTicks = GetGameTickCount() - lastVelocityTeleportTick[client];
-	if (velocityTpTicks <= 2 && velocityTpTicks != 0)
-	{
-		return false;
-	}
-	
 	return true;
+}
+
+void OnPlayerRunCmd_ValidJump(int client, int cmdnum)
+{
+	if (velocityTeleported[client] && DidInvalidVelocityTeleport(client, cmdnum))
+	{
+		InvalidateJump(client);
+	}
+	velocityTeleported[client] = false;
+}
+
+static bool DidInvalidVelocityTeleport(int client, int cmdnum)
+{
+	// Return whether client didn't just hit a perf
+	return !Movement_GetJumped(client)
+	 || !GOKZ_GetHitPerf(client)
+	 || cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
 }
 
 void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
@@ -526,21 +557,15 @@ void OnPlayerDeath_ValidJump(int client)
 	InvalidateJump(client);
 }
 
-void OnTeleport_ValidJump(int client, bool origin, bool velocity)
+void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 {
-	if (origin)
+	if (originTp)
 	{
-		lastOriginTeleportTick[client] = GetGameTickCount();
 		InvalidateJump(client);
 	}
-	else if (velocity)
+	if (velocityTp)
 	{
-		lastVelocityTeleportTick[client] = GetGameTickCount();
-		// Allow short grace period for velocity so that modes may set player speed
-		if (GetGameTickCount() - Movement_GetTakeoffTick(client) > 1)
-		{
-			InvalidateJump(client);
-		}
+		velocityTeleported[client] = true;
 	}
 }
 
@@ -657,8 +682,8 @@ static void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	
 	beamStart = gF_OldOrigin[targetPlayer.id];
 	beamEnd = origin;
-	beamStart[2] = takeoffOrigin[2];
-	beamEnd[2] = takeoffOrigin[2];
+	beamStart[2] = takeoffOrigin[2] + 0.1;
+	beamEnd[2] = takeoffOrigin[2] + 0.1;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
 	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
@@ -695,4 +720,23 @@ void OnOptionChanged_ClanTag(int client, Option option)
 	{
 		UpdateClanTag(client);
 	}
+}
+
+// =========================  FIRST SPAWN  ========================= //
+
+static bool firstSpawn[MAXPLAYERS + 1];
+
+void SetupClientFirstSpawn(int client)
+{
+	firstSpawn[client] = true;
+}
+
+void OnPlayerSpawn_FirstSpawn(int client)
+{
+	int team = GetClientTeam(client);
+	if (firstSpawn[client] && (team == CS_TEAM_CT || team == CS_TEAM_T))
+	{
+		Call_GOKZ_OnFirstSpawn(client);
+	}
+	firstSpawn[client] = false;
 } 

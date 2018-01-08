@@ -6,6 +6,9 @@
 
 
 
+#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
+
+static int defaultOptions[OPTION_COUNT];
 static int options[OPTION_COUNT][MAXPLAYERS + 1];
 
 static int optionCounts[OPTION_COUNT] = 
@@ -26,7 +29,8 @@ static int optionCounts[OPTION_COUNT] =
 	ERRORSOUNDS_COUNT, 
 	TIMERTEXT_COUNT, 
 	SPEEDTEXT_COUNT, 
-	JUMPBEAM_COUNT
+	JUMPBEAM_COUNT, 
+	HELPANDTIPS_COUNT
 };
 
 
@@ -61,7 +65,7 @@ void SetOption(int client, Option option, int optionValue, bool printMessage = f
 	options[option][client] = optionValue;
 	if (printMessage)
 	{
-		PrintOptionChangeMessage(client, option);
+		PrintOptionChangeMessage(client, option, optionValue);
 	}
 	
 	Call_GOKZ_OnOptionChanged(client, option, optionValue);
@@ -70,6 +74,11 @@ void SetOption(int client, Option option, int optionValue, bool printMessage = f
 void CycleOption(int client, Option option, bool printMessage = false)
 {
 	SetOption(client, option, (GetOption(client, option) + 1) % optionCounts[option], printMessage);
+}
+
+int GetDefaultOption(Option option)
+{
+	return defaultOptions[option];
 }
 
 
@@ -92,32 +101,40 @@ void OnModeUnloaded_Options(int mode)
 	}
 }
 
+void OnMapStart_Options()
+{
+	LoadDefaultOptions();
+}
+
 
 
 // =========================  PRIVATE  ========================= //
 
-static void SetDefaultOptions(int client)
+static void LoadDefaultOptions()
 {
-	SetOption(client, Option_Mode, GOKZ_GetDefaultMode());
-	SetOption(client, Option_Style, Style_Normal);
-	SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
-	SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
-	SetOption(client, Option_ShowingKeys, ShowingKeys_Spectating);
-	SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
-	SetOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled);
-	SetOption(client, Option_AutoRestart, AutoRestart_Disabled);
-	SetOption(client, Option_SlayOnEnd, SlayOnEnd_Disabled);
-	SetOption(client, Option_Pistol, Pistol_USP);
-	SetOption(client, Option_CheckpointMessages, CheckpointMessages_Disabled);
-	SetOption(client, Option_CheckpointSounds, CheckpointSounds_Enabled);
-	SetOption(client, Option_TeleportSounds, TeleportSounds_Disabled);
-	SetOption(client, Option_ErrorSounds, ErrorSounds_Enabled);
-	SetOption(client, Option_TimerText, TimerText_InfoPanel);
-	SetOption(client, Option_SpeedText, SpeedText_InfoPanel);
-	SetOption(client, Option_JumpBeam, JumpBeam_Disabled);
+	KeyValues kv = new KeyValues("options");
+	
+	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	{
+		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
+		return;
+	}
+	
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		defaultOptions[option] = kv.GetNum(gC_KeysOptions[option]);
+	}
 }
 
-static void PrintOptionChangeMessage(int client, Option option) {
+static void SetDefaultOptions(int client)
+{
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		SetOption(client, option, GetDefaultOption(option));
+	}
+}
+
+static void PrintOptionChangeMessage(int client, Option option, int optionValue) {
 	if (!IsClientInGame(client))
 	{
 		return;
@@ -132,7 +149,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingTPMenu:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingTPMenu_Disabled:
 				{
@@ -150,7 +167,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingInfoPanel:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingInfoPanel_Disabled:
 				{
@@ -164,7 +181,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingPlayers:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingPlayers_Disabled:
 				{
@@ -178,7 +195,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_ShowingWeapon:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case ShowingWeapon_Disabled:
 				{
@@ -192,7 +209,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_AutoRestart:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case AutoRestart_Disabled:
 				{
@@ -206,7 +223,7 @@ static void PrintOptionChangeMessage(int client, Option option) {
 		}
 		case Option_SlayOnEnd:
 		{
-			switch (GetOption(client, option))
+			switch (optionValue)
 			{
 				case SlayOnEnd_Disabled:
 				{
@@ -215,6 +232,20 @@ static void PrintOptionChangeMessage(int client, Option option) {
 				case SlayOnEnd_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Enable");
+				}
+			}
+		}
+		case Option_HelpAndTips:
+		{
+			switch (optionValue)
+			{
+				case HelpAndTips_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Disable");
+				}
+				case HelpAndTips_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Enable");
 				}
 			}
 		}

@@ -192,69 +192,16 @@ static char[] GetKeysString(KZPlayer player, KZPlayer targetPlayer)
 	}
 	else
 	{
+		int buttons = targetPlayer.buttons;
 		FormatEx(keysString, sizeof(keysString), 
-			" <b>%T</b>: <font color='#999999'>%c %c %c %c   %c %c</font>\n", 
+			" <b>%T</b>: <font color='#999999'>%c %c %c %c    %c %c</font>\n", 
 			"Info Panel Text - Keys", player.id, 
-			GetAString(targetPlayer), 
-			GetWString(targetPlayer), 
-			GetSString(targetPlayer), 
-			GetDString(targetPlayer), 
-			GetCrouchString(targetPlayer), 
-			GetJumpString(targetPlayer));
+			buttons & IN_MOVELEFT ? 'A' : '_', 
+			buttons & IN_FORWARD ? 'W' : '_', 
+			buttons & IN_BACK ? 'S' : '_', 
+			buttons & IN_MOVERIGHT ? 'D' : '_', 
+			buttons & IN_DUCK ? 'C' : '_', 
+			buttons & IN_JUMP ? 'J' : '_');
 	}
 	return keysString;
-}
-
-static int GetWString(KZPlayer targetPlayer)
-{
-	if (targetPlayer.buttons & IN_FORWARD)
-	{
-		return 'W';
-	}
-	return '_';
-}
-
-static int GetAString(KZPlayer targetPlayer)
-{
-	if (targetPlayer.buttons & IN_MOVELEFT)
-	{
-		return 'A';
-	}
-	return '_';
-}
-
-static int GetSString(KZPlayer targetPlayer)
-{
-	if (targetPlayer.buttons & IN_BACK)
-	{
-		return 'S';
-	}
-	return '_';
-}
-
-static int GetDString(KZPlayer targetPlayer)
-{
-	if (targetPlayer.buttons & IN_MOVERIGHT)
-	{
-		return 'D';
-	}
-	return '_';
-}
-
-static int GetCrouchString(KZPlayer targetPlayer)
-{
-	if (targetPlayer.buttons & IN_DUCK)
-	{
-		return 'C';
-	}
-	return '_';
-}
-
-static int GetJumpString(KZPlayer targetPlayer)
-{
-	if (targetPlayer.buttons & IN_JUMP)
-	{
-		return 'J';
-	}
-	return '_';
 } 

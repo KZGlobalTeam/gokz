@@ -6,6 +6,8 @@
 #include <gokz>
 
 #include <movementapi>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
 #include <updater>
@@ -24,7 +26,9 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-vanilla.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-mode-vanilla.txt"
+
+#define MODE_VERSION 1
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
@@ -68,7 +72,7 @@ public void OnAllPluginsLoaded()
 	if (LibraryExists("gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_Vanilla, true);
+		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
 	}
 	if (LibraryExists("updater"))
 	{
@@ -81,7 +85,7 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_Vanilla, true);
+		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
 	}
 	else if (StrEqual(name, "updater"))
 	{
@@ -167,10 +171,17 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 
 public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 {
-	// Make sure velocity modifier is reset to 1.0 when switching modes
 	if (option == Option_Mode && newValue == Mode_Vanilla)
 	{
-		Movement_SetVelocityModifier(client, 1.0);
+		ReplicateConVars(client);
+	}
+}
+
+public void GOKZ_OnClientSetup(int client)
+{
+	if (IsUsingMode(client))
+	{
+		ReplicateConVars(client);
 	}
 }
 
@@ -185,6 +196,7 @@ static bool IsUsingMode(int client)
 }
 
 
+
 // CONVARS
 
 static void CreateConVars()
@@ -192,8 +204,6 @@ static void CreateConVars()
 	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
 	{
 		gCV_ModeCVar[cvar] = FindConVar(gC_ModeCVars[cvar]);
-		// Remove notify flags because these ConVars are being set constantly
-		gCV_ModeCVar[cvar].Flags &= ~FCVAR_NOTIFY;
 	}
 }
 
@@ -202,5 +212,24 @@ static void TweakConVars()
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
 		gCV_ModeCVar[i].RestoreDefault();
+	}
+}
+
+static void ReplicateConVars(int client)
+{
+	// Replicate convars only when player changes mode in GOKZ
+	// so that lagg isn't caused by other players using other
+	// modes, and also as an optimisation.
+	
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
+	char defValue[32];
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		gCV_ModeCVar[i].GetDefault(defValue, sizeof(defValue));
+		gCV_ModeCVar[i].ReplicateToClient(client, defValue);
 	}
 } 

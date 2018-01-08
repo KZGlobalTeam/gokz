@@ -6,10 +6,10 @@
 
 
 
-Handle H_OnDatabaseConnect;
-Handle H_OnClientSetup;
-Handle H_OnMapSetup;
-Handle H_OnTimeInserted;
+static Handle H_OnDatabaseConnect;
+static Handle H_OnClientSetup;
+static Handle H_OnMapSetup;
+static Handle H_OnTimeInserted;
 
 
 
@@ -17,8 +17,8 @@ Handle H_OnTimeInserted;
 
 void CreateGlobalForwards()
 {
-	H_OnDatabaseConnect = CreateGlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnClientSetup = CreateGlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnDatabaseConnect = CreateGlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell);
+	H_OnClientSetup = CreateGlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	H_OnMapSetup = CreateGlobalForward("GOKZ_DB_OnMapSetup", ET_Ignore, Param_Cell);
 	H_OnTimeInserted = CreateGlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
@@ -26,16 +26,16 @@ void CreateGlobalForwards()
 void Call_OnDatabaseConnect()
 {
 	Call_StartForward(H_OnDatabaseConnect);
-	Call_PushCell(gH_DB);
 	Call_PushCell(g_DBType);
 	Call_Finish();
 }
 
-void Call_OnClientSetup(int client, int steamID)
+void Call_OnClientSetup(int client, int steamID, bool cheater)
 {
 	Call_StartForward(H_OnClientSetup);
 	Call_PushCell(client);
 	Call_PushCell(steamID);
+	Call_PushCell(cheater);
 	Call_Finish();
 }
 
@@ -71,11 +71,17 @@ void CreateNatives()
 	CreateNative("GOKZ_DB_IsClientSetUp", Native_IsClientSetUp);
 	CreateNative("GOKZ_DB_IsMapSetUp", Native_IsMapSetUp);
 	CreateNative("GOKZ_DB_GetCurrentMapID", Native_GetCurrentMapID);
+	CreateNative("GOKZ_DB_IsCheater", Native_IsCheater);
+	CreateNative("GOKZ_DB_SetCheater", Native_SetCheater);
 }
 
 public int Native_GetDatabase(Handle plugin, int numParams)
 {
-	SetNativeCellRef(1, gH_DB);
+	if (gH_DB == null)
+	{
+		return view_as<int>(INVALID_HANDLE);
+	}
+	return view_as<int>(CloneHandle(gH_DB));
 }
 
 public int Native_GetDatabaseType(Handle plugin, int numParams)
@@ -96,4 +102,14 @@ public int Native_IsMapSetUp(Handle plugin, int numParams)
 public int Native_GetCurrentMapID(Handle plugin, int numParams)
 {
 	return gI_DBCurrentMapID;
+}
+
+public int Native_IsCheater(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_Cheater[GetNativeCell(1)]);
+}
+
+public int Native_SetCheater(Handle plugin, int numParams)
+{
+	DB_SetCheater(GetNativeCell(1), GetNativeCell(2));
 } 

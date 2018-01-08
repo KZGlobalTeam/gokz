@@ -18,9 +18,9 @@ static int virtualEndCourse[MAXPLAYERS + 1];
 
 // =========================  LISTENERS  ========================= //
 
-void OnButtonPress_VirtualButtons(int client, int button)
+void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
 {
-	if (button == IN_USE)
+	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
 		if (GetHasStartedTimerThisMap(client) && InRangeOfStartButton(client))
 		{

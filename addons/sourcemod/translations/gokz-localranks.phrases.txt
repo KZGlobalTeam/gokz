@@ -39,37 +39,37 @@
 	}
 	"New Record (NUB)"
 	{
-		// Bill set a new NUB RECORD [Mode]!
+		// Bill set a new NUB RECORD [Mode]
 		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {yellow}NUB RECORD {grey}[{purple}{2}{grey}]"
 	}
 	"New Record (PRO)"
 	{
-		// Bill set a new PRO RECORD [Mode]!
+		// Bill set a new PRO RECORD [Mode]
 		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {blue}PRO RECORD {grey}[{purple}{2}{grey}]"
 	}
 	"New Record (NUB and PRO)"
 	{
-		// Bill set a new NUB/PRO RECORD [Mode]!
+		// Bill set a new NUB/PRO RECORD [Mode]
 		"#format"	"{1:N},{2:s}"
 		"en"		"{lime}{1}{grey} set a new {yellow}NUB{grey}/{blue}PRO RECORD{grey} [{purple}{2}{grey}]"
 	}
 	"New Bonus Record (NUB)"
 	{
-		// Bill set a new Bonus 1 NUB RECORD [Mode]!
+		// Bill set a new Bonus 1 NUB RECORD [Mode]
 		"#format"	"{1:N},{2:d},{3:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {yellow}NUB RECORD{grey} [{purple}{3}{grey}]"
 	}
 	"New Bonus Record (PRO)"
 	{
-		// Bill set a new Bonus 1 PRO RECORD [Mode]!
+		// Bill set a new Bonus 1 PRO RECORD [Mode]
 		"#format"	"{1:N},{2:d},{3:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {blue}PRO RECORD{grey} [{purple}{3}{grey}]"
 	}
 	"New Bonus Record (NUB and PRO)"
 	{
-		// Bill set a new Bonus 1 NUB/PRO RECORD [Mode]!
+		// Bill set a new Bonus 1 NUB/PRO RECORD [Mode]
 		"#format"	"{1:N},{2:d},{3:d},{4:s}"
 		"en"		"{lime}{1}{grey} set a new {bluegrey}Bonus {2} {yellow}NUB{grey}/{blue}PRO RECORD{grey} [{purple}{4}{grey}]"
 	}
@@ -165,19 +165,19 @@
 	{
 		// NUB PB: 01:23.45 (5 TP) [#4/123]
 		"#format"	"{1:s},{2:d},{3:d},{4:d}"
-		"en"		"{yellow}NUB PB{grey}: {default}{1}{grey} ({yellow}{2} TP{grey}) [#{default}{3}{grey}/{4}]"
+		"en"		"{yellow}NUB PB{grey}: {default}{1}{grey} ({yellow}{2} TP{grey}) [#{default}{3}{grey}/{default}{4}{grey}]"
 	}
 	"PB Time - NUB and PRO"
 	{
 		// NUB/PRO PB: 01:23.45 [NUB #4/123] [PRO #3/12]
 		"#format"	"{1:s},{2:d},{3:d},{4:d},{5:d}"
-		"en"		"{yellow}NUB{grey}/{blue}PRO PB{grey}: {default}{1}{grey} [{yellow}NUB{grey} #{default}{2}{grey}/{3}] [{blue}PRO{grey} #{default}{4}{grey}/{5}]"
+		"en"		"{yellow}NUB{grey}/{blue}PRO PB{grey}: {default}{1}{grey} [{yellow}NUB{grey} #{default}{2}{grey}/{default}{3}{grey}] [{blue}PRO{grey} #{default}{4}{grey}/{default}{5}{grey}]"
 	}
 	"PB Time - PRO"
 	{
 		// PRO PB: 01:23.45 [#4/123]
 		"#format"	"{1:s},{2:d},{3:d}"
-		"en"		"{blue}PRO PB{grey}: {default}{1}{grey} [#{default}{2}{grey}/{3}]"
+		"en"		"{blue}PRO PB{grey}: {default}{1}{grey} [#{default}{2}{grey}/{default}{3}{grey}]"
 	}
 	"PB Time - No PRO Time"
 	{
@@ -185,15 +185,15 @@
 	}
 	"WR Header"
 	{
-		// Server WRs on kz_map [Mode]
+		// Server Records on kz_map [Mode]
 		"#format"	"{1:s},{2:s}"
-		"en"		"{grey}Records on {default}{1} {grey}[{purple}{2}{grey}]"
+		"en"		"{grey}Server Records on {default}{1} {grey}[{purple}{2}{grey}]"
 	}
 	"WR Header (Bonus)"
 	{
-		// Server WRs on kz_map Bonus 1 [Mode]
+		// Server Records on kz_map Bonus 1 [Mode]
 		"#format"	"{1:s},{2:d},{3:s}"
-		"en"		"{grey}Records on {default}{1} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
+		"en"		"{grey}Server Records on {default}{1} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
 	}
 	"WR Time - NUB"
 	{
@@ -227,15 +227,15 @@
 	}
 	"Average Time Header"
 	{
-		// Average Times on kz_map [Mode]
+		// Server Average Times on kz_map [Mode]
 		"#format"	"{1:s},{2:s}"
-		"en"		"{grey}Average Times on {default}{1}{grey} {grey}[{purple}{2}{grey}]"
+		"en"		"{grey}Server Average Times on {default}{1}{grey} {grey}[{purple}{2}{grey}]"
 	}
 	"Average Time Header (Bonus)"
 	{
-		// Average Times on kz_map Bonus 1 [Mode]
+		// Server Average Times on kz_map Bonus 1 [Mode]
 		"#format"	"{1:s},{2:d},{3:s}"
-		"en"		"{grey}Average Times on {default}{1}{grey} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
+		"en"		"{grey}Server Average Times on {default}{1}{grey} {bluegrey}Bonus {2} {grey}[{purple}{3}{grey}]"
 	}
 	"Average Time - NUB"
 	{
@@ -282,45 +282,55 @@
 	// Map Top Menu ////////////////////////////////////////////////////////////
 	"Map Top Menu - Title"
 	{
+        // Map Top
+        //
 		// Map - kz_map
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s}"
-		"en"		"Map - {1}\nMode - {2}\n "
+		"en"		"Map Top\n \nMap - {1}\nMode - {2}\n "
 	}
 	"Map Top Menu - Title (Bonus)"
 	{
+        // Bonus Top
+        //
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:d},{3:s}"
-		"en"		"Map - {1} (Bonus {2})\nMode - {3}\n "
+		"en"		"Bonus Top\n \nMap - {1} (Bonus {2})\nMode - {3}\n "
 	}
 	"Map Top Menu - Top 20"
 	{
-		// Top 20 Pro
+		// Top 20 PRO
 		"#format"	"{1:s}"
 		"en"		"Top 20 {1}"
 	}
+    "Map Top Menu - Global Top"
+	{
+        // Global Top PRO
+		"#format"	"{1:s}"
+		"en"		"Global Top {1}"
+	}
 	"Map Top Submenu - Title"
 	{
-		// Top 20 Pro Times
+		// Server Top 20 PRO Times
 		//
 		// Map - kz_map
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"Top 20 {1} Times\n \nMap - {2}\nMode - {3}\n "	
+		"en"		"Server Top 20 {1} Times\n \nMap - {2}\nMode - {3}\n "	
 	}
 	"Map Top Submenu - Title (Bonus)"
 	{
-		// Top 20 Pro Times
+		// Server Top 20 PRO Times
 		//
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s},{3:d},{4:s}"
-		"en"		"Top 20 {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
+		"en"		"Server Top 20 {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "	
 	}
 
 	
@@ -342,11 +352,38 @@
 	}
 	"Player Top Submenu - Title"
 	{
-		// Top 20 Pro Record Holders
+		// Top 20 PRO Server Record Holders
 		//
 		// Mode - Vanilla
 		//
 		"#format"	"{1:s},{2:s}"
-		"en"		"Top 20 {1:s} Record Holders\n \nMode - {2}\n "
+		"en"		"Top 20 {1:s} Server Record Holders\n \nMode - {2}\n "
 	}
+    
+    
+    // Recent Records Menu ////////////////////////////////////////////////////////////
+    "Recent Records Menu - Title"
+    {
+        // Recently Broken Records
+        //
+        // Mode - Vanilla
+        //
+        "#format"   "{1:s}"
+        "en"        "Recently Broken Records\n \nMode - {1}\n "
+    }
+    "Recent Records Menu - Record Type"
+	{
+		// PRO Records
+		"#format"	"{1:s}"
+		"en"		"{1} Records"
+	}
+    "Recent Records Submenu - Title"
+    {
+        // Recently Broken PRO Server Records
+        //
+        // Mode - Vanilla
+        //
+        "#format"   "{1:s},{2:s}"
+        "en"        "Recently Broken {1} Server Records\n \nMode - {2}\n "
+    }
 }

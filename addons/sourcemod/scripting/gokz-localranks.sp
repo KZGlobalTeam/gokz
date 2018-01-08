@@ -10,7 +10,10 @@
 #include <gokz/core>
 #include <gokz/localdb>
 #include <gokz/localranks>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
+#include <gokz/globals>
 #include <updater>
 
 #pragma newdecls required
@@ -27,28 +30,21 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-localranks.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-localranks.txt"
 
+#define COMMAND_COOLDOWN 2.5
+#define MAP_POOL_CFG_PATH "cfg/sourcemod/gokz/mappool.cfg"
 #define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
 
+bool gB_GOKZGlobals;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
-
-char gC_MapTopMapName[MAXPLAYERS + 1][64];
-int gI_MapTopMapID[MAXPLAYERS + 1];
-int gI_MapTopCourse[MAXPLAYERS + 1];
-int g_MapTopMode[MAXPLAYERS + 1];
-
-int g_PlayerTopMode[MAXPLAYERS + 1];
-
 bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 float gF_RecordTimesCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_RecordMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
-
 bool gB_PBExistsCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 float gF_PBTimesCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_PBMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
-
 char gC_BeatRecordSound[256];
 
 #include "gokz-localranks/database/sql.sp"
@@ -57,18 +53,17 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/commands.sp"
 #include "gokz-localranks/database.sp"
 #include "gokz-localranks/misc.sp"
-
 #include "gokz-localranks/database/cache_pbs.sp"
 #include "gokz-localranks/database/cache_records.sp"
 #include "gokz-localranks/database/create_tables.sp"
 #include "gokz-localranks/database/get_completion.sp"
-#include "gokz-localranks/database/open_maptop.sp"
-#include "gokz-localranks/database/open_maptop20.sp"
-#include "gokz-localranks/database/open_playertop20.sp"
+#include "gokz-localranks/database/map_top.sp"
+#include "gokz-localranks/database/player_top.sp"
 #include "gokz-localranks/database/print_average.sp"
 #include "gokz-localranks/database/print_pbs.sp"
 #include "gokz-localranks/database/print_records.sp"
 #include "gokz-localranks/database/process_new_time.sp"
+#include "gokz-localranks/database/recent_records.sp"
 #include "gokz-localranks/database/update_ranked_map_pool.sp"
 
 
@@ -95,24 +90,31 @@ public void OnPluginStart()
 	CreateGlobalForwards();
 	CreateCommands();
 	
-	TryGetDatabaseInfo();
+	gH_DB = GOKZ_DB_GetDatabase();
+	if (gH_DB != INVALID_HANDLE)
+	{
+		g_DBType = GOKZ_DB_GetDatabaseType();
+		DB_CreateTables();
+		CompletionMVPStarsUpdateAll();
+	}
 	
 	if (GOKZ_DB_IsMapSetUp())
 	{
 		GOKZ_DB_OnMapSetup(GOKZ_DB_GetCurrentMapID());
 	}
 	
-	for (int client = 1; client <= MaxClients; client++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (GOKZ_DB_IsClientSetUp(client))
+		if (GOKZ_DB_IsClientSetUp(i))
 		{
-			GOKZ_DB_OnClientSetup(client, GetSteamAccountID(client));
+			GOKZ_DB_OnClientSetup(i, GetSteamAccountID(i), GOKZ_DB_IsCheater(i));
 		}
 	}
 }
 
 public void OnAllPluginsLoaded()
 {
+	gB_GOKZGlobals = LibraryExists("gokz-globals");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -121,10 +123,16 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
+	gB_GOKZGlobals = gB_GOKZGlobals || StrEqual(name, "gokz-globals");
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	gB_GOKZGlobals = gB_GOKZGlobals && !StrEqual(name, "gokz-globals");
 }
 
 
@@ -139,13 +147,18 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int teleportsUsed)
 {
+	if (GOKZ_DB_IsCheater(client))
+	{
+		return Plugin_Continue;
+	}
+	
 	// Block timer end messages from GOKZ Core - this plugin handles them
 	return Plugin_Stop;
 }
 
-public void GOKZ_DB_OnDatabaseConnect(Database database, DatabaseType DBType)
+public void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType)
 {
-	gH_DB = database;
+	gH_DB = GOKZ_DB_GetDatabase();
 	g_DBType = DBType;
 	DB_CreateTables();
 	CompletionMVPStarsUpdateAll();
@@ -164,17 +177,25 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 	}
 }
 
-public void GOKZ_DB_OnClientSetup(int client, int steamID)
+public void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater)
 {
 	if (GOKZ_DB_IsMapSetUp())
 	{
 		DB_CachePBs(client, steamID);
+		CompletionMVPStarsUpdate(client);
 	}
 }
 
 public void GOKZ_DB_OnTimeInserted(int client, int steamID, int mapID, int course, int mode, int style, int runTimeMS, int teleportsUsed)
 {
-	DB_ProcessNewTime(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
+	if (GOKZ_DB_IsCheater(client))
+	{
+		DB_CachePBs(client, GetSteamAccountID(client));
+	}
+	else
+	{
+		DB_ProcessNewTime(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
+	}
 }
 
 public void GOKZ_LR_OnTimeProcessed(
@@ -202,7 +223,7 @@ public void GOKZ_LR_OnTimeProcessed(
 	
 	AnnounceNewTime(client, course, mode, runTime, teleportsUsed, firstTime, pbDiff, rank, maxRank, firstTimePro, pbDiffPro, rankPro, maxRankPro);
 	
-	if (course == 0 && mode == GOKZ_GetDefaultMode() && firstTimePro)
+	if (mode == GOKZ_GetDefaultOption(Option_Mode) && firstTimePro)
 	{
 		CompletionMVPStarsUpdate(client);
 	}
@@ -244,19 +265,4 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public void OnMapStart()
 {
 	OnMapStart_Announcements();
-}
-
-
-
-// =========================  PRIVATE  ========================= //
-
-static void TryGetDatabaseInfo()
-{
-	GOKZ_DB_GetDatabase(gH_DB);
-	if (gH_DB != null)
-	{
-		g_DBType = GOKZ_DB_GetDatabaseType();
-		DB_CreateTables();
-		CompletionMVPStarsUpdateAll();
-	}
 } 

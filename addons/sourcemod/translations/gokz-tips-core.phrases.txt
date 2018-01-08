@@ -1,0 +1,79 @@
+"Phrases"
+{	
+    "!options"
+    {
+        "en"        "{grey}Open the {default}!options {grey}menu to easily view and change most of the settings available to you."
+    }
+    "!menu"
+    {
+        "en"        "{grey}Type {default}!menu {grey}to open or close your teleport menu."
+    }
+    "!adv"
+    {
+        "en"        "{grey}Use {default}!adv {grey}to bring up the advanced teleport menu."
+    }
+    "!mode"
+    {
+        "en"        "{grey}The {default}!mode {grey}menu is where you can easily switch between the different movement modes."
+    }
+    "!pistol"
+    {
+        "en"        "{grey}You can switch pistols through the {default}!pistol {grey}menu."
+    }
+    "!nc"
+    {
+        "en"        "Use {default}!nc {grey}as a toggle or bind a key to {default}+noclip {grey}and hold it to be able to fly around the map."
+    }
+    "Quick Switch Mode"
+    {
+        "en"        "{grey}You can switch to a mode by typing its abbreviation. For example, type {default}!s{grey}/{default}!skz{grey} to switch to {purple}SimpleKZ{grey}."
+    }
+    "Hide Clutter"
+    {
+        "en"        "{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 1 {grey}in console to clean it all up."
+    }
+    "!stopsound"
+    {
+        "en"        "{grey}Getting annoyed by obnoxious music and sounds from the map? Use {default}!stopsound {grey}to make it stop!"
+    }
+    "!spec"
+    {
+        "en"        "{grey}Type {default}!spec <player>{grey} to start watching a fellow player, and {default}!resume {grey}to get back to where you left off."
+    }
+    "!measure"
+    {
+        "en"        "{grey}Having trouble with a jump? Use the {default}!measure {grey}menu to find out exactly how long it is."
+    }
+    "!goto"
+    {
+        "en"        "{grey}Type {default}!goto <player> {grey}to teleport to another player."
+    }
+    "Custom Start Position"
+    {
+        "en"        "{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to create and remove custom start teleport locations."
+    }
+    "!tips"
+    {
+        "en"        "{grey}Tired of seeing tips flooding your chat? You can easily toggle help and tips by typing {default}!tips{grey}."
+    }
+    "!autorestart"
+    {
+        "en"        "{grey}Tired of pressing E? Enable the {default}!autorestart {grey}option!"
+    }
+    "Not a Tip"
+    {
+        "en"        "{grey}This isn't a tip. I just wanted to let you know that you're doing great! Keep it up, future record holder!"
+    }
+    "!panel"
+    {
+        "en"        "{grey}You can toggle your centre panel by typing {default}!panel{grey}."
+    }
+    "Binding Teleport Commands"
+    {
+        "en"        "{grey}You can bind keys to {default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {default}sm_start{grey}, and more instead of using the teleport menu."
+    }
+    "!specs"
+    {
+        "en"        "{grey}Check who's snooping around by typing {default}!specs{grey}."
+    }
+}

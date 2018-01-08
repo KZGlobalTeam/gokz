@@ -22,6 +22,7 @@ static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
+static bool checkpointOnLadder[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
 static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
 static float undoOrigin[MAXPLAYERS + 1][3];
@@ -85,6 +86,7 @@ void MakeCheckpoint(int client)
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
+	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
 	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_CHECKPOINT);
@@ -105,16 +107,16 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
-	if (!Movement_GetOnGround(client))
+	if (!Movement_GetOnGround(client) && Movement_GetMoveType(client) != MOVETYPE_LADDER)
 	{
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Midair)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -123,7 +125,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Just Landed)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -148,8 +150,7 @@ void TeleportToCheckpoint(int client)
 		return;
 	}
 	
-	// Teleport to Checkpoint
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
 	Call_GOKZ_OnTeleportToCheckpoint_Post(client);
@@ -162,16 +163,7 @@ bool CanTeleportToCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
-		}
-		return false;
-	}
-	if (checkpointCount[client] == 0)
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (No Checkpoints)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -180,7 +172,16 @@ bool CanTeleportToCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (Map)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (checkpointCount[client] == 0)
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (No Checkpoints)");
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -208,7 +209,7 @@ void PrevCheckpoint(int client)
 	storedCheckpointCount[client]--;
 	checkpointPrevCount[client]++;
 	checkpointIndex[client] = PrevIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
 	Call_GOKZ_OnPrevCheckpoint_Post(client);
@@ -221,7 +222,16 @@ bool CanPrevCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (Map)");
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -230,7 +240,7 @@ bool CanPrevCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Prev CP (No Checkpoints)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -258,7 +268,7 @@ void NextCheckpoint(int client)
 	storedCheckpointCount[client]++;
 	checkpointPrevCount[client]--;
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
 	Call_GOKZ_OnNextCheckpoint_Post(client);
@@ -271,7 +281,16 @@ bool CanNextCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Teleport (Map)");
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -280,7 +299,7 @@ bool CanNextCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Next CP (No Checkpoints)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -342,7 +361,7 @@ void SetCustomStartPosition(int client)
 	if (!IsPlayerAlive(client))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-		PlayErrorSound(client);
+		GOKZ_PlayErrorSound(client);
 		return;
 	}
 	
@@ -396,7 +415,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -405,7 +424,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (No Teleports)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -414,7 +433,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (TP Was Midair)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -423,7 +442,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (Just Landed)");
-			PlayErrorSound(client);
+			GOKZ_PlayErrorSound(client);
 		}
 		return false;
 	}
@@ -433,11 +452,26 @@ bool CanUndoTeleport(int client, bool showError = false)
 
 // GOTO
 
-void GotoPlayer(int client, int target)
+// Returns whether teleport to target was successful
+bool GotoPlayer(int client, int target, bool printMessage = true)
 {
-	if (!IsPlayerAlive(target) || client == target)
+	if (target == client)
 	{
-		return;
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Not Yourself)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (!IsPlayerAlive(target))
+	{
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Dead)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
 	}
 	
 	float targetOrigin[3];
@@ -460,6 +494,14 @@ void GotoPlayer(int client, int target)
 	TeleportDo(client, targetOrigin, targetAngles);
 	
 	GOKZ_PrintToChat(client, true, "%t", "Goto Success", target);
+	
+	if (GetTimerRunning(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
+		GOKZ_StopTimer(client);
+	}
+	
+	return true;
 }
 
 
@@ -529,6 +571,28 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	
 	// Call Post Foward
 	Call_GOKZ_OnCountedTeleport_Post(client);
+}
+
+static void CheckpointTeleportDo(int client)
+{
+	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	
+	// Handle ladder stuff
+	if (checkpointOnLadder[client][checkpointIndex[client]])
+	{
+		if (!GOKZ_GetPaused(client))
+		{
+			Movement_SetMoveType(client, MOVETYPE_LADDER);
+		}
+		else
+		{
+			SetPausedOnLadder(client, true);
+		}
+	}
+	else if (GOKZ_GetPaused(client))
+	{
+		SetPausedOnLadder(client, false);
+	}
 }
 
 public Action Timer_RemoveBoosts(Handle timer, int userid)

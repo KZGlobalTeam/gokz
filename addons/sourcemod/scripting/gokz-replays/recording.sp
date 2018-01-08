@@ -23,6 +23,11 @@ static ArrayList recordedTickData[MAXPLAYERS + 1];
 
 void StartRecording(int client)
 {
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
 	DiscardRecording(client);
 	recording[client] = true;
 	ResumeRecording(client);
@@ -32,7 +37,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 {
 	if (!recording[client])
 	{
-		return;
+		return false;
 	}
 	
 	// Prepare data
@@ -56,6 +61,11 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	}
 	
 	File file = OpenFile(path, "wb");
+	if (file == null)
+	{
+		LogError("Couldn't create/open replay file to write to: %s", path);
+		return false;
+	}
 	
 	// Prepare more data
 	char steamID2[24], ip[16], alias[MAX_NAME_LENGTH];
@@ -97,12 +107,95 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	// Discard recorded data
 	recordedTickData[client].Clear();
 	recording[client] = false;
+	
+	return true;
+}
+
+bool SaveRecordingCheater(int client)
+{
+	if (!recording[client])
+	{
+		return false;
+	}
+	
+	// Prepare data
+	int mode = GOKZ_GetOption(client, Option_Mode);
+	int style = GOKZ_GetOption(client, Option_Style);
+	
+	// Setup file path and file
+	int replayNumber = 0;
+	char path[PLATFORM_MAX_PATH];
+	do
+	{
+		BuildPath(Path_SM, path, sizeof(path), 
+			"%s/%d_%d.%s", 
+			REPLAY_DIRECTORY_CHEATERS, GetSteamAccountID(client), replayNumber, REPLAY_FILE_EXTENSION);
+		replayNumber++;
+	}
+	while (FileExists(path));
+	
+	File file = OpenFile(path, "wb");
+	if (file == null)
+	{
+		LogError("Couldn't create/open replay file to write to: %s", path);
+		return false;
+	}
+	
+	// Prepare more data
+	char steamID2[24], ip[16], alias[MAX_NAME_LENGTH];
+	GetClientAuthId(client, AuthId_Steam2, steamID2, sizeof(steamID2));
+	GetClientIP(client, ip, sizeof(ip));
+	GetClientName(client, alias, sizeof(alias));
+	int tickCount = recordedTickData[client].Length;
+	
+	// Write header
+	file.WriteInt32(REPLAY_MAGIC_NUMBER);
+	file.WriteInt8(REPLAY_FORMAT_VERSION);
+	file.WriteInt8(strlen(GOKZ_VERSION));
+	file.WriteString(GOKZ_VERSION, false);
+	file.WriteInt8(strlen(gC_CurrentMap));
+	file.WriteString(gC_CurrentMap, false);
+	file.WriteInt32(-1);
+	file.WriteInt32(mode);
+	file.WriteInt32(style);
+	file.WriteInt32(view_as<int>(float(-1)));
+	file.WriteInt32(-1);
+	file.WriteInt32(GetSteamAccountID(client));
+	file.WriteInt8(strlen(steamID2));
+	file.WriteString(steamID2, false);
+	file.WriteInt8(strlen(ip));
+	file.WriteString(ip, false);
+	file.WriteInt8(strlen(alias));
+	file.WriteString(alias, false);
+	file.WriteInt32(tickCount);
+	
+	// Write tick data
+	any tickData[TICK_DATA_BLOCKSIZE];
+	for (int i = 0; i < tickCount; i++)
+	{
+		recordedTickData[client].GetArray(i, tickData, TICK_DATA_BLOCKSIZE);
+		file.Write(tickData, TICK_DATA_BLOCKSIZE, 4);
+	}
+	file.Close();
+	
+	// Discard recorded data
+	recordedTickData[client].Clear();
+	recording[client] = false;
+	
+	return true;
 }
 
 void DiscardRecording(int client)
 {
-	recording[client] = false;
-	recordedTickData[client].Clear();
+	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
+	{
+		SaveRecordingCheater(client);
+	}
+	else
+	{
+		recording[client] = false;
+		recordedTickData[client].Clear();
+	}
 }
 
 void PauseRecording(int client)
@@ -161,22 +254,19 @@ void OnPlayerRunCmd_Recording(int client, int buttons)
 
 void GOKZ_OnTimerStart_Recording(int client)
 {
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
 	StartRecording(client);
 }
 
 void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
 {
-	if (IsFakeClient(client))
+	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
 	{
-		return;
+		SaveRecordingCheater(client);
 	}
-	
-	SaveRecording(client, course, time, teleportsUsed);
+	else
+	{
+		SaveRecording(client, course, time, teleportsUsed);
+	}
 }
 
 void GOKZ_OnPause_Recording(int client)

@@ -1,0 +1,7 @@
+"Phrases"
+{	
+    "!jumpstats"
+    {
+        "en"        "{grey}Want to filter out some of the jumpstats spam? Type {default}!jumpstats{grey}/{default}!js {grey}to change your jumpstats options!"
+    }
+}

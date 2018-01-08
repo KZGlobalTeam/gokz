@@ -57,6 +57,36 @@
 	{
 		"en"		"{grey}This server isn't connected to a {default}SimpleKZ{grey} database."
 	}
+    "See Console"
+    {
+        "en"        "{grey}See console for command output."
+    }
+    "No Players Found"
+    {
+        "en"        "{darkred}No players were found."
+    }
+    "Spectator List (None)"
+    {
+        "en"        "{grey}There is no one spectating right now."
+    }
+    "Spectator List"
+    {
+        // All spectators (3) - Alice, Bob, Charlie
+        "#format"   "{1:d},{2:s}"
+        "en"        "{grey}All spectators ({default}{1}{grey}) - {2}"
+    }
+    "Target Spectator List (None)"
+    {
+        // No one is spectating Bill right now.
+        "#format"   "{1:N}"
+        "en"        "{grey}There is no one spectating {lime}{1}{grey} right now."
+    }
+    "Target Spectator List"
+    {
+        // Spectating Bill (2) - Alice, Charlie
+        "#format"   "{1:N},{2:d},{3:s}"
+        "en"        "{grey}Spectating {lime}{1}{grey} ({default}{2}{grey}) - {3}"
+    }
 	
 	
 	// Command Chat Messages ////////////////////////////////////////////////////////////
@@ -82,7 +112,7 @@
 	}
 	"Can't Teleport (Map)"
 	{
-		"en"		"{darkred}You can't teleport to your checkpoint in this area."
+		"en"		"{darkred}You can't teleport to your checkpoints in this area."
 	}
 	"Can't Prev CP (No Checkpoints)"
 	{
@@ -125,10 +155,6 @@
 		// You have teleported to Bill.
 		"#format"	"{1:N}"
 		"en"		"{grey}You have teleported to {lime}{1}{grey}."
-	}
-	"Goto Failure (Didn't Specify Player)"
-	{
-		"en"		"{darkred}Please specify a player to go to."
 	}
 	"Goto Failure (Not Yourself)"
 	{
@@ -186,6 +212,20 @@
 		"#format"	"{1:s}"
 		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
 	}
+    "Player No Longer Valid"
+    {
+        "en"        "{darkred}The player you specified is no longer valid."
+    }
+    "Please Wait Before Using Command Again"
+    {
+        "en"        "{grey}Please wait before using that command again."
+    }
+    "Please Wait Before Using Command"
+	{
+        // Please wait 2.5 seconds before using that command.
+        "#format"   "{1:.1f}"
+        "en"        "{grey}Please wait {default}{1} {grey}seconds before using that command."
+    }
 	
 	
 	// Option Change Chat Messages ////////////////////////////////////////////////////////////
@@ -227,11 +267,11 @@
 	}
 	"Option - Auto Restart - Enable"
 	{
-		"en"		"{grey}Your timer will now restart when you teleport to start."
+		"en"		"{grey}Your timer will now restart upon teleporting to start."
 	}
 	"Option - Auto Restart - Disable"
 	{
-		"en"		"{grey}Your timer will no longer restart you teleport to start."
+		"en"		"{grey}Your timer will no longer restart upon teleporting to start."
 	}
 	"Option - Slay On End - Enable"
 	{
@@ -241,6 +281,14 @@
 	{
 		"en"		"{grey}You will no longer be slain after completing a course."
 	}
+    "Option - Help And Tips - Enable"
+    {
+        "en"        "{grey}You will now see help and tips."
+    }
+    "Option - Help And Tips - Disable"
+    {
+        "en"        "{grey}You will no longer see help and tips."
+    }
 	
 	
 	// Info Panel Text ////////////////////////////////////////////////////////////
@@ -304,12 +352,14 @@
 		"en"		"Respawn"
 	}
 	
+    
 	// Mode Menu ////////////////////////////////////////////////////////////
 	"Mode Menu - Title"
 	{
 		"en"		"Switch Modes"
 	}
 	
+    
 	// Measure Menu ////////////////////////////////////////////////////////////
 	"Measure Menu - Title"
 	{
@@ -329,11 +379,25 @@
 	}
 	
 	
-	// Pistol Menu ////////////////////////////////////////////////////////////
-	"Pistol Menu - Title"
+	// Goto Menu ////////////////////////////////////////////////////////////
+	"Goto Menu - Title"
 	{
-		"en"		"Pick a Pistol"
+		"en"		"Go to Player"
 	}
+    
+    
+    // Spec Menu ////////////////////////////////////////////////////////////
+	"Spec Menu - Title"
+	{
+		"en"		"Spectate Player"
+	}
+    
+    
+    // Pistol Menu ////////////////////////////////////////////////////////////
+    "Pistol Menu - Title"
+    {
+        "en"        "Pick a Pistol"
+    }
 	
 	
 	// Options Menu ////////////////////////////////////////////////////////////
@@ -457,4 +521,8 @@
 	{
 		"en"		"Jump beam"
 	}
+    "Options Menu - Help and Tips"
+    {
+        "en"        "Help and tips"
+    }
 }

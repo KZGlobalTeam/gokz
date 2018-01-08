@@ -8,6 +8,8 @@
 #include <movementapi>
 #include <gokz/core>
 #include <gokz/jumpstats>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
 
@@ -25,7 +27,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-jumpstats.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-jumpstats.txt"
 
 #define BHOP_ON_GROUND_TICKS 5
 #define WEIRDJUMP_MAX_FALL_OFFSET 64.0
@@ -34,9 +36,12 @@ public Plugin myinfo =
 int gI_TouchingEntities[MAXPLAYERS + 1];
 
 #include "gokz-jumpstats/api.sp"
+#include "gokz-jumpstats/commands.sp"
 #include "gokz-jumpstats/distancetiers.sp"
 #include "gokz-jumpstats/jumpreporting.sp"
 #include "gokz-jumpstats/jumptracking.sp"
+#include "gokz-jumpstats/options.sp"
+#include "gokz-jumpstats/optionsmenu.sp"
 
 
 
@@ -56,9 +61,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-core.phrases");
 	LoadTranslations("gokz-jumpstats.phrases");
 	
 	CreateGlobalForwards();
+	CreateCommands();
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -91,7 +98,7 @@ public void OnLibraryAdded(const char[] name)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	OnPlayerRunCmd_JumpTracking(client);
+	OnPlayerRunCmd_JumpTracking(client, cmdnum);
 	return Plugin_Continue;
 }
 
@@ -100,6 +107,7 @@ public void OnClientPutInServer(int client)
 	gI_TouchingEntities[client] = 0;
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
+	OnClientPutInServer_Options(client);
 }
 
 public void SDKHook_StartTouch_Callback(int client, int touched)
@@ -154,8 +162,10 @@ public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float of
 
 
 // =========================  OTHER  ========================= //
+
 public void OnMapStart()
 {
 	OnMapStart_DistanceTiers();
 	OnMapStart_JumpReporting();
+	OnMapStart_Options();
 } 

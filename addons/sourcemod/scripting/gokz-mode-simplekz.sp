@@ -6,6 +6,8 @@
 #include <gokz>
 
 #include <movementapi>
+
+#undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
 #include <updater>
@@ -24,8 +26,9 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://dzy.crabdance.com/updater/gokz-mode-simplekz.txt"
+#define UPDATE_URL "http://updater.gokz.global/gokz-mode-simplekz.txt"
 
+#define MODE_VERSION 1
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
@@ -34,7 +37,7 @@ public Plugin myinfo =
 #define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
 #define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
 
-float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.4, 0.0, 301.993377 };
+float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.0, 0.0, 301.993377 };
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
@@ -86,7 +89,7 @@ public void OnAllPluginsLoaded()
 	if (LibraryExists("gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, true, MODE_VERSION);
 	}
 	if (LibraryExists("updater"))
 	{
@@ -99,7 +102,7 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_SimpleKZ, true);
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, true, MODE_VERSION);
 	}
 	else if (StrEqual(name, "updater"))
 	{
@@ -244,6 +247,22 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	}
 }
 
+public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+{
+	if (option == Option_Mode && newValue == Mode_SimpleKZ)
+	{
+		ReplicateConVars(client);
+	}
+}
+
+public void GOKZ_OnClientSetup(int client)
+{
+	if (IsUsingMode(client))
+	{
+		ReplicateConVars(client);
+	}
+}
+
 
 
 // =========================  PRIVATE  ========================= //
@@ -255,15 +274,14 @@ static bool IsUsingMode(int client)
 }
 
 
+
 // CONVARS
 
 static void CreateConVars()
 {
-	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
+	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
-		gCV_ModeCVar[cvar] = FindConVar(gC_ModeCVars[cvar]);
-		// Remove notify flags because these ConVars are being set constantly
-		gCV_ModeCVar[cvar].Flags &= ~FCVAR_NOTIFY;
+		gCV_ModeCVar[i] = FindConVar(gC_ModeCVars[i]);
 	}
 }
 
@@ -274,6 +292,24 @@ static void TweakConVars()
 		gCV_ModeCVar[i].FloatValue = gF_ModeCVarValues[i];
 	}
 }
+
+static void ReplicateConVars(int client)
+{
+	// Replicate convars only when player changes mode in GOKZ
+	// so that lagg isn't caused by other players using other
+	// modes, and also as an optimisation.
+	
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		gCV_ModeCVar[i].ReplicateToClient(client, FloatToStringEx(gF_ModeCVarValues[i]));
+	}
+}
+
 
 
 // VELOCITY MODIFIER

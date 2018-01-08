@@ -14,6 +14,7 @@ char sqlite_players_create[] =
 ..."Alias TEXT, "
 ..."Country TEXT, "
 ..."IP TEXT, "
+..."Cheater INTEGER NOT NULL DEFAULT '0', "
 ..."LastPlayed TIMESTAMP, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
@@ -24,9 +25,20 @@ char mysql_players_create[] =
 ..."Alias VARCHAR(32), "
 ..."Country VARCHAR(45), "
 ..."IP VARCHAR(15), "
+..."Cheater TINYINT UNSIGNED NOT NULL DEFAULT '0', "
 ..."LastPlayed TIMESTAMP, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
+
+// 1.0.0 - Added Cheater column
+char sqlite_players_alter1[] = 
+"ALTER TABLE Players "
+..."ADD Cheater INTEGER NOT NULL DEFAULT '0'";
+
+// 1.0.0 - Added Cheater column
+char mysql_players_alter1[] = 
+"ALTER TABLE Players "
+..."ADD Cheater TINYINT UNSIGNED NOT NULL DEFAULT '0'";
 
 char sqlite_players_insert[] = 
 "INSERT OR IGNORE INTO Players (Alias, Country, IP, SteamID32, LastPlayed) "
@@ -35,13 +47,23 @@ char sqlite_players_insert[] =
 char sqlite_players_update[] = 
 "UPDATE OR IGNORE Players "
 ..."SET Alias='%s', Country='%s', IP='%s', LastPlayed=CURRENT_TIMESTAMP "
-..."WHERE SteamID32=%d;";
+..."WHERE SteamID32=%d";
 
 char mysql_players_upsert[] = 
 "INSERT INTO Players (Alias, Country, IP, SteamID32, LastPlayed) "
 ..."VALUES ('%s', '%s', '%s', %d, CURRENT_TIMESTAMP) "
 ..."ON DUPLICATE KEY UPDATE "
 ..."SteamID32=VALUES(SteamID32), Alias=VALUES(Alias), Country=VALUES(Country), IP=VALUES(IP), LastPlayed=VALUES(LastPlayed)";
+
+char sql_players_get_cheater[] = 
+"SELECT Cheater "
+..."FROM Players "
+..."WHERE SteamID32=%d";
+
+char sql_players_set_cheater[] = 
+"UPDATE Players "
+..."SET Cheater=%d "
+..."WHERE SteamID32=%d";
 
 
 
@@ -67,6 +89,7 @@ char sqlite_options_create[] =
 ..."TimerText INTEGER NOT NULL DEFAULT '1', "
 ..."SpeedText INTEGER NOT NULL DEFAULT '1', "
 ..."JumpBeam INTEGER NOT NULL DEFAULT '0', "
+..."HelpAndTips INTEGER NOT NULL DEFAULT '1', "
 ..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
 
@@ -85,13 +108,24 @@ char mysql_options_create[] =
 ..."Pistol TINYINT UNSIGNED NOT NULL DEFAULT '0', "
 ..."CheckpointMessages TINYINT UNSIGNED NOT NULL DEFAULT '0', "
 ..."CheckpointSounds TINYINT UNSIGNED NOT NULL DEFAULT '1', "
-..."TeleportSounds TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."TeleportSounds TINYINT UNSIGNED NOT NULL DEFAULT '0', "
 ..."ErrorSounds TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."TimerText TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."SpeedText TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."JumpBeam TINYINT UNSIGNED NOT NULL DEFAULT '0', "
+..."HelpAndTips TINYINT UNSIGNED NOT NULL DEFAULT '1', "
 ..."CONSTRAINT PK_Options PRIMARY KEY (SteamID32), "
 ..."CONSTRAINT FK_Options_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+// 1.0.0 - Added HelpAndTips column
+char sqlite_options_alter1[] = 
+"ALTER TABLE Options "
+..."ADD HelpAndTips INTEGER NOT NULL DEFAULT '1'";
+
+// 1.0.0 - Added HelpAndTips column
+char mysql_options_alter1[] = 
+"ALTER TABLE Options "
+..."ADD HelpAndTips TINYINT UNSIGNED NOT NULL DEFAULT '1'";
 
 char sql_options_insert[] = 
 "INSERT INTO Options (SteamID32) "
@@ -99,12 +133,50 @@ char sql_options_insert[] =
 
 char sql_options_update[] = 
 "UPDATE Options "
-..."SET Mode=%d, Style=%d, ShowingTeleportMenu=%d, ShowingInfoPanel=%d, ShowingKeys=%d, ShowingPlayers=%d, ShowingWeapon=%d, AutoRestart=%d, SlayOnEnd=%d, Pistol=%d, CheckpointMessages=%d, CheckpointSounds=%d, TeleportSounds=%d, ErrorSounds=%d, TimerText=%d, SpeedText=%d, JumpBeam=%d "
+..."SET Mode=%d, Style=%d, ShowingTeleportMenu=%d, ShowingInfoPanel=%d, ShowingKeys=%d, ShowingPlayers=%d, ShowingWeapon=%d, AutoRestart=%d, SlayOnEnd=%d, Pistol=%d, CheckpointMessages=%d, CheckpointSounds=%d, TeleportSounds=%d, ErrorSounds=%d, TimerText=%d, SpeedText=%d, JumpBeam=%d, HelpAndTips=%d "
 ..."WHERE SteamID32=%d";
 
 char sql_options_get[] = 
-"SELECT Mode, Style, ShowingTeleportMenu, ShowingInfoPanel, ShowingKeys, ShowingPlayers, ShowingWeapon, AutoRestart, SlayOnEnd, Pistol, CheckpointMessages, CheckpointSounds, TeleportSounds, ErrorSounds, TimerText, SpeedText, JumpBeam "
+"SELECT Mode, Style, ShowingTeleportMenu, ShowingInfoPanel, ShowingKeys, ShowingPlayers, ShowingWeapon, AutoRestart, SlayOnEnd, Pistol, CheckpointMessages, CheckpointSounds, TeleportSounds, ErrorSounds, TimerText, SpeedText, JumpBeam, HelpAndTips "
 ..."FROM Options "
+..."WHERE SteamID32=%d";
+
+
+
+// =========================  JUMPSTATS OPTIONS  ========================= //
+
+char sqlite_jsoptions_create[] = 
+"CREATE TABLE IF NOT EXISTS JumpstatsOptions ("
+..."SteamID32 INTEGER NOT NULL, "
+..."MasterSwitch INTEGER NOT NULL DEFAULT '1', "
+..."ChatTier INTEGER NOT NULL DEFAULT '1', "
+..."ConsoleTier INTEGER NOT NULL DEFAULT '1', "
+..."SoundTier INTEGER NOT NULL DEFAULT '2', "
+..."CONSTRAINT PK_JSOptions PRIMARY KEY (SteamID32), "
+..."CONSTRAINT FK_JSOptions_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char mysql_jsoptions_create[] = 
+"CREATE TABLE IF NOT EXISTS JumpstatsOptions ("
+..."SteamID32 INTEGER UNSIGNED NOT NULL, "
+..."MasterSwitch TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."ChatTier TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."ConsoleTier TINYINT UNSIGNED NOT NULL DEFAULT '1', "
+..."SoundTier TINYINT UNSIGNED NOT NULL DEFAULT '2', "
+..."CONSTRAINT PK_JSOptions PRIMARY KEY (SteamID32), "
+..."CONSTRAINT FK_JSOptions_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char sql_jsoptions_insert[] = 
+"INSERT INTO JumpstatsOptions (SteamID32) "
+..."VALUES (%d)";
+
+char sql_jsoptions_update[] = 
+"UPDATE JumpstatsOptions "
+..."SET MasterSwitch=%d, ChatTier=%d, ConsoleTier=%d, SoundTier=%d "
+..."WHERE SteamID32=%d";
+
+char sql_jsoptions_get[] = 
+"SELECT MasterSwitch, ChatTier, ConsoleTier, SoundTier "
+..."FROM JumpstatsOptions "
 ..."WHERE SteamID32=%d";
 
 

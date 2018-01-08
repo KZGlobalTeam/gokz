@@ -55,6 +55,7 @@ enum Option
 	Option_TimerText, 
 	Option_SpeedText, 
 	Option_JumpBeam, 
+	Option_HelpAndTips, 
 	OPTION_COUNT
 };
 
@@ -193,6 +194,13 @@ enum
 
 enum
 {
+	HelpAndTips_Disabled = 0, 
+	HelpAndTips_Enabled, 
+	HELPANDTIPS_COUNT
+};
+
+enum
+{
 	ModeCVar_Accelerate = 0, 
 	ModeCVar_Friction, 
 	ModeCVar_AirAccelerate, 
@@ -254,6 +262,10 @@ stock char gC_PistolNames[PISTOL_COUNT][] =
 	"Tec-9"
 };
 
+
+
+// =========================  OTHER  ========================= //
+
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
 {
 	"sv_accelerate", 
@@ -273,6 +285,29 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_timebetweenducks", 
 	"sv_accelerate_use_weapon_speed", 
 	"sv_jump_impulse"
+};
+
+// Used and recommended for key value files
+stock char gC_KeysOptions[OPTION_COUNT][] = 
+{
+	"mode", 
+	"style", 
+	"tpmenu", 
+	"infopanel", 
+	"showkeys", 
+	"showplayers", 
+	"showweapon", 
+	"autorestart", 
+	"slayonend", 
+	"pistol", 
+	"checkpointmessages", 
+	"checkpointsounds", 
+	"teleportsounds", 
+	"errorsounds", 
+	"timertext", 
+	"speedtext", 
+	"jumpbeam", 
+	"helpandtips"
 };
 
 
@@ -524,6 +559,14 @@ forward void GOKZ_OnJumpInvalidated(int client);
 forward void GOKZ_OnJoinTeam(int client, int team);
 
 /**
+ * Called the first time the player spawns in on a team.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnFirstSpawn(int client);
+
+/**
  * Called when a mode has been loaded.
  *
  * @param mode			Mode loaded.
@@ -558,18 +601,27 @@ forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
  * Gets whether a mode is loaded.
  *
  * @param mode			Mode.
- * @return				Whether mode is enabled.
+ * @return				Whether mode is loaded.
  */
 native bool GOKZ_GetModeLoaded(int mode);
+
+/**
+ * Gets the version number of a loaded mode.
+ *
+ * @param mode			Mode.
+ * @return				Version number of the mode, or -1 if not loaded.
+ */
+native int GOKZ_GetModeVersion(int mode);
 
 /**
  * Sets whether a mode is loaded. To be used by mode plugins.
  *
  * @param mode			Mode.
- * @param enabled		Whether mode is enabled.
+ * @param loaded		Whether mode is loaded.
+ * @param version		Version number of the mode.
  * @noreturn
  */
-native void GOKZ_SetModeLoaded(int mode, bool enabled);
+native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
 
 /**
  * Gets the total number of loaded modes.
@@ -577,13 +629,6 @@ native void GOKZ_SetModeLoaded(int mode, bool enabled);
  * @return				Number of loaded modes.
  */
 native int GOKZ_GetLoadedModeCount();
-
-/**
- * Gets the default movement mode as set by convar gokz_default_mode.
- *
- * @return				Default movement mode.
- */
-native int GOKZ_GetDefaultMode();
 
 /**
  * Prints a message to a client's chat, formatting colours and optionally 
@@ -800,6 +845,14 @@ native void GOKZ_TogglePause(int client);
  * @noreturn
  */
 native void GOKZ_PlayErrorSound(int client);
+
+/**
+ * Gets the default option value as set by a config file.
+ *
+ * @param option		GOKZ option.
+ * @return				Default option value.
+ */
+native int GOKZ_GetDefaultOption(Option option);
 
 /**
  * Gets the current value of a player's option.
@@ -1243,6 +1296,15 @@ methodmap KZPlayer __nullable__ < MovementAPIPlayer {
 		}
 	}
 	
+	property int helpAndTips {
+		public get() {
+			return this.GetOption(Option_HelpAndTips);
+		}
+		public set(int value) {
+			this.SetOption(Option_HelpAndTips, value);
+		}
+	}
+	
 	
 	// =========================  MISC  ========================= //
 	
@@ -1332,9 +1394,9 @@ public SharedPlugin __pl_gokz_core =
 public void __pl_gokz_core_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_GetModeLoaded");
+	MarkNativeAsOptional("GOKZ_GetModeVersion");
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
-	MarkNativeAsOptional("GOKZ_GetDefaultMode");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
 	
 	MarkNativeAsOptional("GOKZ_StartTimer");
@@ -1362,6 +1424,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_SetTeleportCount");
+	MarkNativeAsOptional("GOKZ_GetDefaultOption");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");
