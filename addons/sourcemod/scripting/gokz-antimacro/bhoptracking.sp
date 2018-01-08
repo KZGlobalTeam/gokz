@@ -21,7 +21,7 @@ void PrintBhopCheckToChat(int client, int target)
 	GOKZ_PrintToChat(client, false, 
 		" {grey}%t - %s", 
 		"Pattern", 
-		GenerateBhopPatternReport(target, 20));
+		GenerateScrollPattern(target, 20));
 }
 
 void PrintBhopCheckToConsole(int client, int target)
@@ -34,11 +34,11 @@ void PrintBhopCheckToConsole(int client, int target)
 		GOKZ_AM_GetAverageJumpInputs(target, 20), 
 		"Average", 
 		"Pattern", 
-		GenerateBhopPatternReport(target, 20, false));
+		GenerateScrollPattern(target, 20, false));
 }
 
-// Generate 'scroll pattern' report
-char[] GenerateBhopPatternReport(int client, int sampleSize = BHOP_SAMPLES, bool colours = true)
+// Generate 'scroll pattern'
+char[] GenerateScrollPattern(int client, int sampleSize = BHOP_SAMPLES, bool colours = true)
 {
 	char report[512];
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
@@ -63,6 +63,34 @@ char[] GenerateBhopPatternReport(int client, int sampleSize = BHOP_SAMPLES, bool
 				jumpInputs[i], 
 				perfs[i] ? "*" : "");
 		}
+	}
+	
+	TrimString(report);
+	
+	return report;
+}
+
+// Generate 'scroll pattern' report showing pre and post inputs instead
+char[] GenerateScrollPatternEx(int client, int sampleSize = BHOP_SAMPLES)
+{
+	char report[512];
+	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
+	bool[] perfs = new bool[sampleSize];
+	GOKZ_AM_GetHitPerf(client, perfs, sampleSize);
+	int[] jumpInputs = new int[sampleSize];
+	GOKZ_AM_GetJumpInputs(client, jumpInputs, sampleSize);
+	int[] preJumpInputs = new int[sampleSize];
+	GOKZ_AM_GetPreJumpInputs(client, preJumpInputs, sampleSize);
+	int[] postJumpInputs = new int[sampleSize];
+	GOKZ_AM_GetPostJumpInputs(client, postJumpInputs, sampleSize);
+	
+	for (int i = 0; i < maxIndex; i++)
+	{
+		Format(report, sizeof(report), "%s(%d%s%d)", 
+			report, 
+			preJumpInputs[i], 
+			perfs[i] ? "*" : " ", 
+			postJumpInputs[i]);
 	}
 	
 	TrimString(report);
@@ -146,7 +174,7 @@ static void CheckForBhopMacro(int client)
 		FormatEx(stats, sizeof(stats), 
 			"Perfs: %d/20, Scroll pattern: %s", 
 			perfsOutOf20, 
-			GenerateBhopPatternReport(client, 20, false));
+			GenerateScrollPatternEx(client, 20));
 		SuspectPlayer(client, AMReason_BhopHack, "High perf ratio", stats);
 		return;
 	}
@@ -158,7 +186,7 @@ static void CheckForBhopMacro(int client)
 		FormatEx(stats, sizeof(stats), 
 			"Perfs: %d/20, Scroll pattern: %s", 
 			perfsOutOf20, 
-			GenerateBhopPatternReport(client, 20, false));
+			GenerateScrollPatternEx(client, 20));
 		SuspectPlayer(client, AMReason_BhopHack, "1's or 2's scroll pattern", stats);
 		return;
 	}
@@ -170,7 +198,7 @@ static void CheckForBhopMacro(int client)
 		FormatEx(stats, sizeof(stats), 
 			"Perfs: %d/20, Scroll pattern: %s", 
 			perfsOutOf20, 
-			GenerateBhopPatternReport(client, 20, false));
+			GenerateScrollPatternEx(client, 20));
 		SuspectPlayer(client, AMReason_BhopMacro, "High scroll pattern", stats);
 		return;
 	}
@@ -182,7 +210,7 @@ static void CheckForBhopMacro(int client)
 		FormatEx(stats, sizeof(stats), 
 			"Perfs: %d/30, Scroll pattern: %s", 
 			perfsOutOf30, 
-			GenerateBhopPatternReport(client, 30, false));
+			GenerateScrollPatternEx(client, 30));
 		SuspectPlayer(client, AMReason_BhopMacro, "Repeating scroll pattern", stats);
 		return;
 	}
