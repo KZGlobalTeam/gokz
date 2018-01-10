@@ -41,6 +41,7 @@ bool gB_InValidRun[MAXPLAYERS + 1];
 bool gB_GloballyVerified[MAXPLAYERS + 1];
 
 #include "gokz-globals/api.sp"
+#include "gokz-globals/ban_player.sp"
 #include "gokz-globals/commands.sp"
 #include "gokz-globals/convars.sp"
 #include "gokz-globals/print_records.sp"
@@ -121,11 +122,13 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 
 public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats)
 {
-	switch (reason)
+	if (!gB_GloballyVerified[client])
 	{
-		case AMReason_BhopHack:GlobalAPI_BanPlayer(client, "bhop_hack", notes, stats);
-		case AMReason_BhopMacro:GlobalAPI_BanPlayer(client, "bhop_macro", notes, stats);
+		return;
 	}
+	
+	GlobalBanPlayer(client, reason, notes, stats);
+	gB_GloballyVerified[client] = false;
 }
 
 public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
