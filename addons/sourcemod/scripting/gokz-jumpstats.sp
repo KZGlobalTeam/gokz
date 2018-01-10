@@ -165,7 +165,7 @@ public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float of
 
 public void OnMapStart()
 {
+	PrecacheJumpstatSounds();
 	OnMapStart_DistanceTiers();
-	OnMapStart_JumpReporting();
 	OnMapStart_Options();
 } 

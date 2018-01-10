@@ -264,5 +264,5 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 public void OnMapStart()
 {
-	OnMapStart_Announcements();
+	PrecacheAnnouncementSounds();
 } 

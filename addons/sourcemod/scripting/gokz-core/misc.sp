@@ -241,7 +241,7 @@ void UpdatePlayerModelAlpha(int client)
 	SetEntityRenderColor(client, _, _, _, gCV_gokz_player_models_alpha.IntValue);
 }
 
-void OnMapStart_PlayerModel()
+void PrecachePlayerModels()
 {
 	gCV_sv_disable_immunity_alpha.IntValue = 1; // Ensures player transparency works	
 	
@@ -577,7 +577,7 @@ void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 
 static int jumpBeam;
 
-void OnMapStart_JumpBeam()
+void PrecacheJumpBeamModels()
 {
 	jumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
 }

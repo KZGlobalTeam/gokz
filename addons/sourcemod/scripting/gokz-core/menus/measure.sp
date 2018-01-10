@@ -39,7 +39,7 @@ void DisplayMeasureMenu(int client, bool reset = true)
 
 // =========================  LISTENERS  ========================= //
 
-void OnMapStart_Measure()
+void PrecacheMeasureModels()
 {
 	glowSprite = PrecacheModel("materials/sprites/bluelaser1.vmt", true);
 }

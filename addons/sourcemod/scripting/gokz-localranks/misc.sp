@@ -26,7 +26,7 @@ void CompletionMVPStarsUpdateAll()
 
 // =========================  ANNOUNCEMENTS  ========================= //
 
-void OnMapStart_Announcements()
+void PrecacheAnnouncementSounds()
 {
 	if (!LoadSounds())
 	{
