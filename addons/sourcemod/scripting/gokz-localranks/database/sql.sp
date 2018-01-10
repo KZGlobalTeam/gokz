@@ -99,7 +99,7 @@ char sql_getmaptop[] =
 ..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."WHERE Players.Cheater=0 AND MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d "
-..."GROUP BY MapCourses.MapID, MapCourses.Course, Times.Mode, Times.SteamID32 "
+..."GROUP BY Times.SteamID32, Players.Alias, Times.Teleports "
 ..."ORDER BY PBTime "
 ..."LIMIT %d";
 
@@ -109,7 +109,7 @@ char sql_getmaptoppro[] =
 ..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
 ..."WHERE Players.Cheater=0 AND MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d AND Times.Teleports=0 "
-..."GROUP BY MapCourses.MapID, MapCourses.Course, Times.Mode, Times.SteamID32 "
+..."GROUP BY Times.SteamID32, Players.Alias "
 ..."ORDER BY PBTime "
 ..."LIMIT %d";
 
@@ -238,7 +238,7 @@ char sql_gettopplayers[] =
 ..."GROUP BY Times.MapCourseID) Records "
 ..."ON Times.MapCourseID=Records.MapCourseID AND Times.RunTime=Records.RecordTime "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
-..."GROUP BY Players.SteamID32 "
+..."GROUP BY Players.SteamID32, Players.Alias "
 ..."ORDER BY RecordCount DESC "
 ..."LIMIT %d";
 
@@ -255,7 +255,7 @@ char sql_gettopplayerspro[] =
 ..."GROUP BY Times.MapCourseID) Records "
 ..."ON Times.MapCourseID=Records.MapCourseID AND Times.RunTime=Records.RecordTime "
 ..."INNER JOIN Players ON Players.SteamID32=Times.SteamID32 "
-..."GROUP BY Players.SteamID32 "
+..."GROUP BY Players.SteamID32, Players.Alias "
 ..."ORDER BY RecordCount DESC "
 ..."LIMIT %d";
 
