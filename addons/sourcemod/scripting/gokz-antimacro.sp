@@ -150,12 +150,13 @@ void SuspectPlayer(int client, AMReason reason, const char[] notes, const char[]
 {
 	Call_OnPlayerSuspected(client, reason, notes, stats);
 	
+	if (gB_GOKZLocalDB)
+	{
+		GOKZ_DB_SetCheater(client, true);
+	}
+	
 	if (gCV_gokz_autoban.BoolValue)
 	{
-		if (gB_GOKZLocalDB)
-		{
-			GOKZ_DB_SetCheater(client, true);
-		}
 		BanSuspect(client, reason);
 	}
 }
