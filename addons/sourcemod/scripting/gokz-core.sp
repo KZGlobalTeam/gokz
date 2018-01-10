@@ -353,11 +353,9 @@ public void GOKZ_OnModeUnloaded(int mode)
 
 public void OnMapStart()
 {
-	OnMapStart_Measure();
-	OnMapStart_PlayerModel();
+	PrecacheModels();
 	OnMapStart_KZConfig();
 	OnMapStart_Prefix();
-	OnMapStart_JumpBeam();
 	OnMapStart_Options();
 }
 
@@ -438,4 +436,11 @@ static void UpdateOldVariables(int client, int buttons)
 		gB_OldDucking[client] = Movement_GetDucking(client);
 	}
 	gI_OldButtons[client] = buttons;
+}
+
+static void PrecacheModels()
+{
+	PrecacheJumpBeamModels();
+	PrecachePlayerModels();
+	PrecacheMeasureModels();
 } 

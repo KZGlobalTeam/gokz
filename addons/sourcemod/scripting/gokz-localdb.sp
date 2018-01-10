@@ -133,6 +133,16 @@ public void OnLibraryRemoved(const char[] name)
 
 // =========================  OTHER  ========================= //
 
+public void OnConfigsExecuted()
+{
+	DB_SetupMap();
+}
+
+public void GOKZ_DB_OnMapSetup(int mapID)
+{
+	DB_SetupMapCourses();
+}
+
 public void GOKZ_OnClientSetup(int client)
 {
 	if (IsFakeClient(client) || gH_DB == null)
@@ -143,11 +153,6 @@ public void GOKZ_OnClientSetup(int client)
 	DB_SetupClient(client);
 	DB_LoadOptions(client);
 	DB_LoadJSOptions(client);
-}
-
-public void GOKZ_DB_OnMapSetup(int mapID)
-{
-	DB_SetupMapCourses();
 }
 
 public void OnClientDisconnect(int client)
@@ -161,11 +166,6 @@ public void OnClientDisconnect(int client)
 	DB_SaveJSOptions(client);
 	
 	gB_ClientSetUp[client] = false;
-}
-
-public void OnMapStart()
-{
-	DB_SetupMap();
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)

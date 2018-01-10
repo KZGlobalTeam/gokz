@@ -35,14 +35,6 @@ void OnLanding_JumpReporting(int client, int jumpType, float distance, float off
 	}
 }
 
-void OnMapStart_JumpReporting()
-{
-	if (!LoadSounds())
-	{
-		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
-	}
-}
-
 
 
 // =========================  PRIVATE  ========================= //
@@ -170,15 +162,12 @@ static char[] GetSyncString(int client, float sync)
 
 // SOUNDS
 
-void PlayJumpstatSound(int client, int tier)
+void PrecacheJumpstatSounds()
 {
-	int soundOption = GOKZ_JS_GetOption(client, JSOption_MinSoundTier);
-	if (tier <= DistanceTier_Meh || soundOption == DistanceTier_None || soundOption > tier)
+	if (!LoadSounds())
 	{
-		return;
+		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
 	}
-	
-	EmitSoundToClientAny(client, sounds[tier]);
 }
 
 static bool LoadSounds()
@@ -200,4 +189,15 @@ static bool LoadSounds()
 	
 	kv.Close();
 	return true;
+}
+
+void PlayJumpstatSound(int client, int tier)
+{
+	int soundOption = GOKZ_JS_GetOption(client, JSOption_MinSoundTier);
+	if (tier <= DistanceTier_Meh || soundOption == DistanceTier_None || soundOption > tier)
+	{
+		return;
+	}
+	
+	EmitSoundToClientAny(client, sounds[tier]);
 } 

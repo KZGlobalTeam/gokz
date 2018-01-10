@@ -144,8 +144,12 @@ public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
 
 public void OnMapStart()
 {
-	SetupAPI();
 	PrecacheSounds();
+}
+
+public void OnConfigsExecuted()
+{
+	SetupAPI();
 }
 
 public void GlobalAPI_OnAPIKeyReloaded()
