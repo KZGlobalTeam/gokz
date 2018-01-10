@@ -59,7 +59,7 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 
 void OnClientPutInServer_Playback(int client)
 {
-	if (!IsFakeClient(client))
+	if (!IsFakeClient(client) || IsClientSourceTV(client))
 	{
 		return;
 	}
