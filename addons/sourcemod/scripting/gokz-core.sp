@@ -39,6 +39,7 @@ Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
+bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 
 #include "gokz-core/commands.sp"
@@ -434,6 +435,7 @@ static void UpdateOldVariables(int client, int buttons)
 	{
 		Movement_GetOrigin(client, gF_OldOrigin[client]);
 		gB_OldDucking[client] = Movement_GetDucking(client);
+		gB_OldOnGround[client] = Movement_GetOnGround(client);
 	}
 	gI_OldButtons[client] = buttons;
 }
