@@ -260,22 +260,22 @@ char sql_gettopplayerspro[] =
 ..."LIMIT %d";
 
 char sql_getaverage[] = 
-"SELECT AVG(PBTime) "
+"SELECT AVG(PBTime), COUNT(*) "
 ..."FROM "
 ..."(SELECT MIN(Times.RunTime) AS PBTime "
 ..."FROM Times "
-..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
-..."INNER JOIN Players ON a.SteamID32=Players.SteamID32 "
+..."INNER JOIN MapCourses ON Times.MapCourseID=MapCourses.MapCourseID "
+..."INNER JOIN Players ON Times.SteamID32=Players.SteamID32 "
 ..."WHERE Players.Cheater=0 AND MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d "
 ..."GROUP BY Times.SteamID32) AS PBTimes";
 
 char sql_getaverage_pro[] = 
-"SELECT AVG(PBTime) "
+"SELECT AVG(PBTime), COUNT(*) "
 ..."FROM "
 ..."(SELECT MIN(Times.RunTime) AS PBTime "
 ..."FROM Times "
-..."INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID "
-..."INNER JOIN Players ON a.SteamID32=Players.SteamID32 "
+..."INNER JOIN MapCourses ON Times.MapCourseID=MapCourses.MapCourseID "
+..."INNER JOIN Players ON Times.SteamID32=Players.SteamID32 "
 ..."WHERE Players.Cheater=0 AND MapCourses.MapID=%d AND MapCourses.Course=%d AND Times.Mode=%d AND Times.Teleports=0 "
 ..."GROUP BY Times.SteamID32) AS PBTimes";
 
