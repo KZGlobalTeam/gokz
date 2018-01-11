@@ -36,6 +36,7 @@ public Plugin myinfo =
 #define PRE_VELMOD_INCREMENT 0.0014 // Per tick when prestrafing
 #define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
 #define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
+#define PRE_GRACE_TICKS 3 // Number of ticks you're allowed to fail prestrafe checks when prestrafing - Helps players with low fps
 
 float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.0, 0.0, 301.993377 };
 
@@ -44,6 +45,7 @@ ConVar gCV_ModeCVar[MODECVAR_COUNT];
 float gF_PreVelMod[MAXPLAYERS + 1];
 float gF_PreVelModLanding[MAXPLAYERS + 1];
 bool gB_PreTurningLeft[MAXPLAYERS + 1];
+int gI_PreTicksSinceIncrement[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
@@ -327,7 +329,7 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 		gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT_MIDAIR;
 	}
 	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier
-	else if (FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE && ValidPrestrafeButtons(player))
+	else if (ValidPrestrafeTurning(player, angles) && ValidPrestrafeButtons(player))
 	{
 		// If player changes their prestrafe direction, reset it
 		if (player.turningLeft && !gB_PreTurningLeft[player.id] || player.turningRight && gB_PreTurningLeft[player.id])
@@ -335,11 +337,25 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 			gF_PreVelMod[player.id] = 1.0;
 		}
 		gB_PreTurningLeft[player.id] = player.turningLeft;
-		gF_PreVelMod[player.id] += PRE_VELMOD_INCREMENT;
+		
+		// If missed a few ticks, then forgive and multiply increment amount by the number of ticks
+		if (gI_PreTicksSinceIncrement[player.id] <= PRE_GRACE_TICKS)
+		{
+			gF_PreVelMod[player.id] += PRE_VELMOD_INCREMENT * gI_PreTicksSinceIncrement[player.id];
+		}
+		else
+		{
+			gF_PreVelMod[player.id] += PRE_VELMOD_INCREMENT;
+		}
+		gI_PreTicksSinceIncrement[player.id] = 1;
 	}
 	else
 	{
-		gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT;
+		gI_PreTicksSinceIncrement[player.id]++;
+		if (gI_PreTicksSinceIncrement[player.id] > PRE_GRACE_TICKS)
+		{
+			gF_PreVelMod[player.id] -= PRE_VELMOD_DECREMENT;
+		}
 	}
 	
 	// Keep prestrafe velocity modifier within range
@@ -353,6 +369,17 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	}
 	
 	return gF_PreVelMod[player.id];
+}
+
+static bool ValidPrestrafeTurning(KZPlayer player, const float angles[3])
+{
+	// If missed a few ticks, then forgive but multiply required angle change
+	if (gI_PreTicksSinceIncrement[player.id] <= PRE_GRACE_TICKS)
+	{
+		return FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE * gI_PreTicksSinceIncrement[player.id];
+	}
+	// else
+	return FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE;
 }
 
 static bool ValidPrestrafeButtons(KZPlayer player)
