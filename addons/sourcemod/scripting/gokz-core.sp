@@ -359,9 +359,9 @@ public void OnMapStart()
 	OnMapStart_Options();
 }
 
-public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
+public void OnConfigsExecuted()
 {
-	return Plugin_Handled; // Stop round from ever ending
+	OnConfigsExecuted_TimeLimit();	
 }
 
 public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char[] soundEntry, int &seed)
