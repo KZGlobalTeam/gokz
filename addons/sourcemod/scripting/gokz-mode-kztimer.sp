@@ -299,13 +299,15 @@ static float CalcPrestrafeVelMod(KZPlayer player)
 		return gF_PreVelMod[player.id];
 	}
 	
+	bool changed = false;
+	
 	// KZTimer prestrafe (not exactly the same, and is only for 128 tick)
 	if (!player.turning)
 	{
 		if (GetEngineTime() - gF_PreVelModLastChange[player.id] > 0.2)
 		{
 			gF_PreVelMod[player.id] = 1.0;
-			gF_PreVelModLastChange[player.id] = GetEngineTime();
+			changed = true;
 		}
 	}
 	else if ((player.buttons & IN_MOVELEFT || player.buttons & IN_MOVERIGHT) && player.speed > 248.9)
@@ -338,10 +340,13 @@ static float CalcPrestrafeVelMod(KZPlayer player)
 			gF_PreVelMod[player.id] -= 0.0045;
 			gI_PreTickCounter[player.id] -= 2;
 		}
+		
+		changed = true;
 	}
 	else
 	{
 		gF_PreVelMod[player.id] -= 0.04;
+		changed = true;
 	}
 	
 	// Keep prestrafe velocity modifier within range
@@ -353,6 +358,11 @@ static float CalcPrestrafeVelMod(KZPlayer player)
 	else if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX)
 	{
 		gF_PreVelMod[player.id] = PRE_VELMOD_MAX;
+	}
+	
+	if (changed)
+	{
+		gF_PreVelModLastChange[player.id] = GetEngineTime();
 	}
 	
 	return gF_PreVelMod[player.id];

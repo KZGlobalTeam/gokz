@@ -23,16 +23,8 @@ void DB_PrintAverage(int client, int mapID, int course, int mode)
 	// Check for existence of map course with that MapID and Course
 	FormatEx(query, sizeof(query), sql_mapcourses_findid, mapID, course);
 	txn.AddQuery(query);
-	
-	// Get Number of Players with Times
-	FormatEx(query, sizeof(query), sql_getlowestmaprank, mapID, course, mode);
-	txn.AddQuery(query);
 	// Get Average PB Time
 	FormatEx(query, sizeof(query), sql_getaverage, mapID, course, mode);
-	txn.AddQuery(query);
-	
-	// Get Number of Players with PRO Times
-	FormatEx(query, sizeof(query), sql_getlowestmaprankpro, mapID, course, mode);
 	txn.AddQuery(query);
 	// Get Average PRO PB Time
 	FormatEx(query, sizeof(query), sql_getaverage_pro, mapID, course, mode);
@@ -79,21 +71,21 @@ public void DB_TxnSuccess_PrintAverage(Handle db, DataPack data, int numQueries,
 	// Get number of completions and average time
 	if (SQL_FetchRow(results[2]))
 	{
-		mapCompletions = SQL_FetchInt(results[2], 0);
-	}
-	if (mapCompletions > 0 && SQL_FetchRow(results[3]))
-	{
-		averageTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[3], 0));
+		mapCompletions = SQL_FetchInt(results[2], 1);
+		if (mapCompletions > 0)
+		{
+			averageTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 0));
+		}
 	}
 	
 	// Get number of completions and average time (PRO)
-	if (SQL_FetchRow(results[4]))
+	if (SQL_FetchRow(results[3]))
 	{
-		mapCompletionsPro = SQL_FetchInt(results[4], 0);
-	}
-	if (mapCompletions > 0 && SQL_FetchRow(results[5]))
-	{
-		averageTimePro = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[5], 0));
+		mapCompletionsPro = SQL_FetchInt(results[3], 1);
+		if (mapCompletions > 0)
+		{
+			averageTimePro = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[3], 0));
+		}
 	}
 	
 	// Print average time header to chat

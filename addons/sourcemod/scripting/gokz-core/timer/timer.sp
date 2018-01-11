@@ -62,7 +62,7 @@ int GetCurrentTimeType(int client)
 void TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
-		 || (!Movement_GetOnGround(client) || GetGameTickCount() - Movement_GetLandingTick(client) <= TIMER_START_MIN_TICKS_ON_GROUND) && !allowOffGround
+		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= TIMER_START_MIN_TICKS_ON_GROUND) && !allowOffGround
 		 || (Movement_GetMoveType(client) != MOVETYPE_WALK && Movement_GetMoveType(client) != MOVETYPE_NONE)
 		 || timerRunning[client] && currentTime[client] < 0.05)
 	{

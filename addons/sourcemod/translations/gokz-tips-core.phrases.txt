@@ -50,7 +50,7 @@
     }
     "Custom Start Position"
     {
-        "en"        "{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to create and remove custom start teleport locations."
+        "en"        "{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to control your start teleport position."
     }
     "!tips"
     {

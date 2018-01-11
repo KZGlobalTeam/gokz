@@ -13,7 +13,7 @@
 
 // =========================  DEFINITIONS  ========================= //
 
-#define GOKZ_VERSION "1.0.1"
+#define GOKZ_VERSION "1.0.2"
 #define TICKRATE 128.0
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0

@@ -722,6 +722,8 @@ void OnOptionChanged_ClanTag(int client, Option option)
 	}
 }
 
+
+
 // =========================  FIRST SPAWN  ========================= //
 
 static bool firstSpawn[MAXPLAYERS + 1];
@@ -739,4 +741,37 @@ void OnPlayerSpawn_FirstSpawn(int client)
 		Call_GOKZ_OnFirstSpawn(client);
 	}
 	firstSpawn[client] = false;
+}
+
+
+
+// =========================  TIME LIMIT  ========================= //
+
+void OnConfigsExecuted_TimeLimit()
+{
+	CreateTimer(1.0, Timer_TimeLimit, _, TIMER_REPEAT);
+}
+
+public Action Timer_TimeLimit(Handle timer)
+{
+	int timelimit;
+	if (!GetMapTimeLimit(timelimit) || timelimit == 0)
+	{
+		return Plugin_Continue;
+	}
+	
+	int timeleft;
+	// Check for less than -1 in case we miss 0 - ignore -1 because that means infinite time limit
+	if (GetMapTimeLeft(timeleft) && (timeleft == 0 || timeleft < -1))
+	{
+		CreateTimer(5.0, Timer_EndRound); // End the round after a delay or it won't end the map
+		return Plugin_Stop;
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action Timer_EndRound(Handle timer)
+{
+	CS_TerminateRound(1.0, CSRoundEnd_Draw, true);
 } 
