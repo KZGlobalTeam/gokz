@@ -1,7 +1,8 @@
 "Phrases"
-{	
-    "!replay"
-    {
-        "en"        "{grey}Type {default}!replay {grey}to watch the server's fastest runs."
-    }
+{
+	"!replay"
+	{
+		"en"		"{grey}Type {default}!replay {grey}to watch the server's fastest runs."
+		"chi"		"{grey}在聊天框中输入 {default}!replay {grey}以观察最快纪录视角."
+	}
 }

@@ -15,7 +15,7 @@ char sqlite_players_create[] =
 ..."Country TEXT, "
 ..."IP TEXT, "
 ..."Cheater INTEGER NOT NULL DEFAULT '0', "
-..."LastPlayed TIMESTAMP, "
+..."LastPlayed TIMESTAMP NULL DEFAULT NULL, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
 
@@ -26,7 +26,7 @@ char mysql_players_create[] =
 ..."Country VARCHAR(45), "
 ..."IP VARCHAR(15), "
 ..."Cheater TINYINT UNSIGNED NOT NULL DEFAULT '0', "
-..."LastPlayed TIMESTAMP, "
+..."LastPlayed TIMESTAMP NULL DEFAULT NULL, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
 
@@ -187,7 +187,7 @@ char sqlite_maps_create[] =
 "CREATE TABLE IF NOT EXISTS Maps ("
 ..."MapID INTEGER NOT NULL, "
 ..."Name VARCHAR(32) NOT NULL UNIQUE, "
-..."LastPlayed TIMESTAMP, "
+..."LastPlayed TIMESTAMP NULL DEFAULT NULL, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Maps PRIMARY KEY (MapID))";
 
@@ -195,7 +195,7 @@ char mysql_maps_create[] =
 "CREATE TABLE IF NOT EXISTS Maps ("
 ..."MapID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT, "
 ..."Name VARCHAR(32) NOT NULL UNIQUE, "
-..."LastPlayed TIMESTAMP, "
+..."LastPlayed TIMESTAMP NULL DEFAULT NULL, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Maps PRIMARY KEY (MapID))";
 

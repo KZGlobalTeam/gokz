@@ -61,6 +61,14 @@ int GetDefaultOption(JSOption option)
 	return defaultOptions[option];
 }
 
+bool GetJumpstatsDisabled(int client)
+{
+	return GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled
+	 || (GOKZ_JS_GetOption(client, JSOption_MinChatTier) == DistanceTier_None
+		 && GOKZ_JS_GetOption(client, JSOption_MinConsoleTier) == DistanceTier_None
+		 && GOKZ_JS_GetOption(client, JSOption_MinSoundTier) == DistanceTier_None);
+}
+
 
 
 // =========================  LISTENERS  ========================= //

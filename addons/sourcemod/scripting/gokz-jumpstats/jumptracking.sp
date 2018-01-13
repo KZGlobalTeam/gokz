@@ -271,7 +271,7 @@ static bool ValidWeirdJumpDropDistance(int client)
 	if (offset < -1 * WEIRDJUMP_MAX_FALL_OFFSET)
 	{
 		// Don't bother telling them if they fell a very far distance
-		if (offset >= -2 * WEIRDJUMP_MAX_FALL_OFFSET)
+		if (!GetJumpstatsDisabled(client) && offset >= -2 * WEIRDJUMP_MAX_FALL_OFFSET)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Dropped Too Far (Weird Jump)", -1 * offset, WEIRDJUMP_MAX_FALL_OFFSET);
 		}
