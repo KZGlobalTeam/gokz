@@ -1,7 +1,8 @@
 "Phrases"
-{	
-    "!jumpstats"
-    {
-        "en"        "{grey}Want to filter out some of the jumpstats spam? Type {default}!jumpstats{grey}/{default}!js {grey}to change your jumpstats options!"
-    }
+{
+	"!jumpstats"
+	{
+		"en"		"{grey}Want to filter out some of the jumpstats spam? Type {default}!jumpstats{grey}/{default}!js {grey}to change your jumpstats options!"
+		"chi"		"{grey}在聊天框中输入 {default}!jumpstats{grey}/{default}!js {grey}查看起跳数据!"
+	}
 }
