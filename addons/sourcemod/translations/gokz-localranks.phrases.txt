@@ -323,8 +323,8 @@
 	{
 		// You missed your best NUB/PRO time (01:23.45).
 		"#format"	"{1:s}"
-		"en"		"{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({lightred}{1}{grey})." 
-		"chi"		"{grey}你比个人最佳{yellow}读点{grey}/{blue}裸跳记录{grey}慢了(个人记录:{lightred}{1}{grey})." 
+		"en"		"{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({lightred}{1}{grey})."
+		"chi"		"{grey}你比个人最佳{yellow}读点{grey}/{blue}裸跳记录{grey}慢了(个人记录:{lightred}{1}{grey})."
 	}
 
 
@@ -356,14 +356,14 @@
 		// Top 20 PRO
 		"#format"	"{1:s}"
 		"en"		"Top 20 {1}"
-		"chi"		" {1} 前20"
+		"chi"		"{1} 前20"
 	}
 	"Map Top Menu - Global Top"
 	{
 		// Global Top PRO
 		"#format"	"{1:s}"
 		"en"		"Global Top {1}"
-		"chi"		" {1} 世界前20"
+		"chi"		"{1} 世界前20"
 	}
 	"Map Top Submenu - Title"
 	{

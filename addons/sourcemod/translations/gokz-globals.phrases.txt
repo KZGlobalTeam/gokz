@@ -86,7 +86,7 @@
 		// GLOBAL NUB RECORD: 01:23.45 by linus
 		"#format"	"{1:s},{2:s}"
 		"en"		"{red}GLOBAL NUB RECORD{grey}: {default}{1}{grey} by {lime}{2}"
-		"chi"		"{red}存点世界纪录{grey}: {default}{1}{grey} ,纪录保持者:{lime}{2}" 
+		"chi"		"{red}存点世界纪录{grey}: {default}{1}{grey} ,纪录保持者:{lime}{2}"
 	}
 	"GWR Time - PRO"
 	{
@@ -158,7 +158,7 @@
 		//
 		"#format"	"{1:s},{2:s}"
 		"en"		"Global Map Top\n \nMap - {1}\nMode - {2}\n "
-		"chi"	"地图世界纪录\n \n地图 - {1}\n模式 - {2}\n " 
+		"chi"	"地图世界纪录\n \n地图 - {1}\n模式 - {2}\n "
 	}
 	"Global Map Top Menu - Title (Bonus)"
 	{

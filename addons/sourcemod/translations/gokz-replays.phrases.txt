@@ -41,6 +41,6 @@
 		// Select a Mode
 		"#format"	"{1:s}"
 		"en"		"Load a Replay\n \nMap - {1}\n \nSelect a Mode"
-		"chi"		"加载录像\n \nMap - {1}\n选择模式\n "
+		"chi"		"加载录像\n \nMap - {1}\n \n选择模式"
 	}
 }

@@ -38,7 +38,7 @@
 	"Hide Clutter"
 	{
 		"en"		"{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 1 {grey}in console to clean it all up."
-		"chi"		"{grey}被刷屏了?请在控制台中输入{default}cl_draw_only_deathnotices 1 {grey}."
+		"chi"		"{grey}被刷屏了?请在控制台中输入{default}cl_draw_only_deathnotices 1{grey}."
 	}
 	"!stopsound"
 	{
@@ -74,11 +74,6 @@
 	{
 		"en"		"{grey}Tired of pressing E? Enable the {default}!autorestart {grey}option!"
 		"chi"		"{grey}不想对着起点按E? 聊天框中输入{default}!autorestart {grey}即可!"
-	}
-	"Not a Tip"
-	{
-		"en"		"{grey}This isn't a tip. I just wanted to let you know that you're doing great! Keep it up, future record holder!"
-		"chi"		"{grey}This isn't a tip. I just wanted to let you know that you're doing great! Keep it up, future record holder!"
 	}
 	"!panel"
 	{

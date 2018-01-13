@@ -28,6 +28,6 @@
 	"MVP Stars"
 	{
 		"en"		"{grey}Your MVP stars represent the percentage of maps and bonuses you've {blue}PRO{grey}'d on the server's default mode."
-		"chi"		"{grey}Tips:MVP星星数量是普通模式下以 {blue}裸跳{grey}完成地图的数量以及总地图数量的比例."
+		"chi"		"{grey}MVP星星数量是普通模式下以 {blue}裸跳{grey}完成地图的数量以及总地图数量的比例."
 	}
 }
