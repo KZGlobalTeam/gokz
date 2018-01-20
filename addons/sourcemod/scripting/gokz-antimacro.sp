@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.global/gokz-antimacro.txt"
 
-#define BUTTON_SAMPLES 50
+#define BUTTON_SAMPLES 40
 #define BHOP_GROUND_TICKS 4
 #define BHOP_SAMPLES 30
 #define LOG_PATH "logs/gokz-antimacro.log"
@@ -44,10 +44,12 @@ int gI_OldButtons[MAXPLAYERS + 1];
 
 int gI_BhopCount[MAXPLAYERS + 1];
 int gI_BhopIndex[MAXPLAYERS + 1];
-int gI_BhopLastCmdnum[MAXPLAYERS + 1];
+int gI_BhopLastTakeoffCmdnum[MAXPLAYERS + 1];
+int gI_BhopLastRecordedBhopCmdnum[MAXPLAYERS + 1];
 bool gB_BhopHitPerf[MAXPLAYERS + 1][BHOP_SAMPLES];
 int gI_BhopPreJumpInputs[MAXPLAYERS + 1][BHOP_SAMPLES];
 int gI_BhopPostJumpInputs[MAXPLAYERS + 1][BHOP_SAMPLES];
+bool gB_BhopPostJumpInputsPending[MAXPLAYERS + 1];
 
 #include "gokz-antimacro/api.sp"
 #include "gokz-antimacro/bhoptracking.sp"
@@ -85,7 +87,7 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
-	gB_SourceBans = LibraryExists("sourcebans++");
+	gB_SourceBans = LibraryExists("sourcebans");
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -185,7 +187,7 @@ static void BanSuspect(int client, AMReason reason)
 		{
 			if (gB_SourceBans)
 			{
-				SourceBans_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
+				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
 			}
 			else
 			{
@@ -196,7 +198,7 @@ static void BanSuspect(int client, AMReason reason)
 		{
 			if (gB_SourceBans)
 			{
-				SourceBans_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
+				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
 			}
 			else
 			{

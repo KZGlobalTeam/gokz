@@ -6,20 +6,6 @@
 
 
 
-static char pistolNames[PISTOL_COUNT][] = 
-{
-	"P2000 / USP-S", 
-	"Glock-18", 
-	"P250", 
-	"Dual Berettas", 
-	"Deagle", 
-	"CZ75-Auto", 
-	"Five-SeveN", 
-	"Tec-9"
-};
-
-
-
 // =========================  PUBLIC  ========================= //
 
 void DisplayPistolMenu(int client, int atItem = 0)
@@ -64,7 +50,7 @@ static void PistolMenuAddItems(int client, Menu menu)
 	
 	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)
 	{
-		FormatEx(display, sizeof(display), "%s", pistolNames[pistol]);
+		FormatEx(display, sizeof(display), "%s", gC_PistolNames[pistol]);
 		// Add asterisk to selected pistol
 		if (pistol == selectedPistol)
 		{

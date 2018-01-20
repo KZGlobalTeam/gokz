@@ -61,7 +61,7 @@ public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2
 {
 	if (action == MenuAction_Select)
 	{
-		char info[4];
+		char info[16];
 		menu.GetItem(param2, info, sizeof(info));
 		int target = GetClientOfUserId(StringToInt(info));
 		
