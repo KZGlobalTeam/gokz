@@ -126,7 +126,7 @@ static bool CheckGravity(int client)
 {
 	float gravity = Movement_GetGravity(client);
 	// Allow 1.0 and 0.0 gravity as both values appear during normal gameplay
-	if (gravity != 1.0 && gravity != 0.0)
+	if (FloatAbs(gravity - 1.0) > EPSILON && FloatAbs(gravity) > EPSILON)
 	{
 		return false;
 	}
@@ -137,7 +137,7 @@ static bool CheckBaseVelocity(int client)
 {
 	float baseVelocity[3];
 	Movement_GetBaseVelocity(client, baseVelocity);
-	if (baseVelocity[0] != 0.0 || baseVelocity[1] != 0.0 || baseVelocity[2] != 0.0)
+	if (FloatAbs(baseVelocity[0]) > EPSILON || FloatAbs(baseVelocity[1]) > EPSILON || FloatAbs(baseVelocity[2]) > EPSILON)
 	{
 		return false;
 	}
