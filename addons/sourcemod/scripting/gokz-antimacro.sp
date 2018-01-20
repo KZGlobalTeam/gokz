@@ -187,7 +187,7 @@ static void BanSuspect(int client, AMReason reason)
 		{
 			if (gB_SourceBans)
 			{
-				SourceBans_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
+				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
 			}
 			else
 			{
@@ -198,7 +198,7 @@ static void BanSuspect(int client, AMReason reason)
 		{
 			if (gB_SourceBans)
 			{
-				SourceBans_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
+				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
 			}
 			else
 			{
