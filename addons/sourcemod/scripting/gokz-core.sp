@@ -82,6 +82,10 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin is only for CS:GO.");
 	}
+	if (RoundFloat(1 / GetTickInterval()) != 128)
+	{
+		SetFailState("This plugin is only for 128 tickrate.");
+	}
 	
 	g_ThisPlugin = myself;
 	CreateNatives();
@@ -362,7 +366,7 @@ public void OnMapStart()
 
 public void OnConfigsExecuted()
 {
-	OnConfigsExecuted_TimeLimit();	
+	OnConfigsExecuted_TimeLimit();
 }
 
 public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char[] soundEntry, int &seed)
