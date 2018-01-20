@@ -12,7 +12,7 @@
 void PrintBhopCheckToChat(int client, int target)
 {
 	GOKZ_PrintToChat(client, true, 
-		"{lime}%N {grey}[{lime}%d%%%% {grey}%t | {lime}%.1f {grey}%t]", 
+		"{lime}%N {grey}[{lime}%d%%%% {grey}%t | {lime}%.2f {grey}%t]", 
 		target, 
 		RoundFloat(GOKZ_AM_GetPerfRatio(target, 20) * 100.0), 
 		"Perfs", 
@@ -27,7 +27,7 @@ void PrintBhopCheckToChat(int client, int target)
 void PrintBhopCheckToConsole(int client, int target)
 {
 	PrintToConsole(client, 
-		"%N [%d%% %t | %.1f %t]\n %t - %s", 
+		"%N [%d%% %t | %.2f %t]\n %t - %s", 
 		target, 
 		RoundFloat(GOKZ_AM_GetPerfRatio(target, 20) * 100.0), 
 		"Perfs", 
@@ -116,39 +116,35 @@ void OnPlayerRunCmd_BhopTracking(int client, int cmdnum)
 	
 	int nextIndex = NextIndex(gI_BhopIndex[client], BHOP_SAMPLES);
 	
-	// If bhop was last tick, then record the stats
-	if (HitBhop(client, cmdnum))
+	// If bhop was last tick, then record the pre bhop inputs.
+	// Require two times the button sample size since the last
+	// takeoff to avoid pre and post bhop input overlap.
+	if (HitBhop(client, cmdnum) && cmdnum >= gI_BhopLastTakeoffCmdnum[client] + BUTTON_SAMPLES * 2)
 	{
-		if (cmdnum <= gI_BhopLastCmdnum[client] + BUTTON_SAMPLES)
-		{
-			// Record post bhop buttons since haven't for previous bhop
-			gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client, cmdnum - gI_BhopLastCmdnum[client]);
-			gI_BhopIndex[client] = nextIndex;
-			gI_BhopCount[client]++;
-			
-			// Records stats of the bhop
-			gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
-			gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client, cmdnum - gI_BhopLastCmdnum[client]);
-		}
-		else
-		{
-			// Records stats of the bhop
-			gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
-			gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client);
-		}
-		
-		CheckForBhopMacro(client);
-		gI_BhopLastCmdnum[client] = cmdnum;
-	}
-	else if (cmdnum == gI_BhopLastCmdnum[client] + BUTTON_SAMPLES)
-	{
-		gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client);
-		gI_BhopIndex[client] = nextIndex;
-		gI_BhopCount[client]++;
+		gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
+		gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client);
+		gI_BhopLastRecordedBhopCmdnum[client] = cmdnum;
+		gB_BhopPostJumpInputsPending[client] = true;
 	}
 	
-	// Records buttons every tick (after checking if b-hop occurred)
+	// Record post bhop inputs once enough ticks have passed
+	if (gB_BhopPostJumpInputsPending[client] && cmdnum == gI_BhopLastRecordedBhopCmdnum[client] + BUTTON_SAMPLES)
+	{
+		gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client);
+		gB_BhopPostJumpInputsPending[client] = false;
+		gI_BhopIndex[client] = nextIndex;
+		gI_BhopCount[client]++;
+		CheckForBhopMacro(client);
+	}
+	
+	// Record buttons AFTER checking for bhop
 	RecordButtons(client, gI_OldButtons[client]);
+	
+	// Record last jump takeoff time
+	if (JustJumped(client, cmdnum))
+	{
+		gI_BhopLastTakeoffCmdnum[client] = cmdnum;
+	}
 }
 
 
@@ -157,63 +153,40 @@ void OnPlayerRunCmd_BhopTracking(int client, int cmdnum)
 
 static void CheckForBhopMacro(int client)
 {
-	// Make sure there are enough samples
-	if (gI_BhopCount[client] < 20)
+	if (GOKZ_AM_GetPerfCount(client, 19) == 19)
 	{
-		return;
+		SuspectPlayer(client, AMReason_BhopHack, "High perf ratio", GenerateBhopBanStats(client, 19));
 	}
-	
-	int perfsOutOf20 = GOKZ_AM_GetPerfCount(client, 20);
-	float averageJumpInputsOutOf20 = GOKZ_AM_GetAverageJumpInputs(client, 20);
-	int perfsOutOf30 = GOKZ_AM_GetPerfCount(client, 30);
-	
-	// Check #1
-	if (perfsOutOf20 >= 19)
+	else if (GOKZ_AM_GetPerfCount(client, 30) >= 28)
 	{
-		char stats[256];
-		FormatEx(stats, sizeof(stats), 
-			"Perfs: %d/20, Scroll pattern: %s", 
-			perfsOutOf20, 
-			GenerateScrollPatternEx(client, 20));
-		SuspectPlayer(client, AMReason_BhopHack, "High perf ratio", stats);
-		return;
+		SuspectPlayer(client, AMReason_BhopHack, "High perf ratio", GenerateBhopBanStats(client, 30));
 	}
-	
-	// Check #2
-	if (perfsOutOf20 >= 16 && averageJumpInputsOutOf20 <= 2.0 + EPSILON)
+	else if (GOKZ_AM_GetPerfCount(client, 20) >= 16 && GOKZ_AM_GetAverageJumpInputs(client, 20) <= 2.0 + EPSILON)
 	{
-		char stats[256];
-		FormatEx(stats, sizeof(stats), 
-			"Perfs: %d/20, Scroll pattern: %s", 
-			perfsOutOf20, 
-			GenerateScrollPatternEx(client, 20));
-		SuspectPlayer(client, AMReason_BhopHack, "1's or 2's scroll pattern", stats);
-		return;
+		SuspectPlayer(client, AMReason_BhopHack, "1's or 2's scroll pattern", GenerateBhopBanStats(client, 20));
 	}
-	
-	// Check #3
-	if (perfsOutOf20 >= 8 && averageJumpInputsOutOf20 >= 20.0 - EPSILON)
+	else if (gI_BhopCount[client] >= 20 && 
+		GOKZ_AM_GetPerfCount(client, 20) >= 8 && GOKZ_AM_GetAverageJumpInputs(client, 20) >= 19.0 - EPSILON)
 	{
-		char stats[256];
-		FormatEx(stats, sizeof(stats), 
-			"Perfs: %d/20, Scroll pattern: %s", 
-			perfsOutOf20, 
-			GenerateScrollPatternEx(client, 20));
-		SuspectPlayer(client, AMReason_BhopMacro, "High scroll pattern", stats);
-		return;
+		SuspectPlayer(client, AMReason_BhopMacro, "High scroll pattern", GenerateBhopBanStats(client, 20));
 	}
-	
-	// Check #4
-	if (perfsOutOf30 >= 10 && CheckForRepeatingJumpInputsCount(client, 0.85, 30) >= 14)
+	else if (gI_BhopCount[client] >= 30 && 
+		GOKZ_AM_GetPerfCount(client, 30) >= 10 && CheckForRepeatingJumpInputsCount(client, 25, 30) >= 14)
 	{
-		char stats[256];
-		FormatEx(stats, sizeof(stats), 
-			"Perfs: %d/30, Scroll pattern: %s", 
-			perfsOutOf30, 
-			GenerateScrollPatternEx(client, 30));
-		SuspectPlayer(client, AMReason_BhopMacro, "Repeating scroll pattern", stats);
-		return;
+		SuspectPlayer(client, AMReason_BhopMacro, "Repeating scroll pattern", GenerateBhopBanStats(client, 30));
 	}
+}
+
+static char[] GenerateBhopBanStats(int client, int sampleSize)
+{
+	char stats[512];
+	FormatEx(stats, sizeof(stats), 
+		"Perfs: %d/%d, Average: %.2f, Scroll pattern: %s", 
+		GOKZ_AM_GetPerfCount(client, sampleSize), 
+		IntMin(gI_BhopCount[client], sampleSize), 
+		GOKZ_AM_GetAverageJumpInputs(client, sampleSize), 
+		GenerateScrollPatternEx(client, sampleSize));
+	return stats;
 }
 
 /**
@@ -221,11 +194,11 @@ static void CheckForBhopMacro(int client)
  * an input count that repeats for more than the provided ratio.
  *
  * @param client		Client index.
- * @param ratio			Minimum ratio to be considered 'repeating'.
+ * @param threshold		Minimum frequency to be considered 'repeating'.
  * @param sampleSize	Maximum recent bhop samples to include in calculation.
  * @return				The repeating input, or else -1.
  */
-static int CheckForRepeatingJumpInputsCount(int client, float ratio = 0.5, int sampleSize = BHOP_SAMPLES)
+static int CheckForRepeatingJumpInputsCount(int client, int threshold, int sampleSize = BHOP_SAMPLES)
 {
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
 	int[] jumpInputs = new int[sampleSize];
@@ -239,8 +212,7 @@ static int CheckForRepeatingJumpInputsCount(int client, float ratio = 0.5, int s
 		jumpInputsFrequency[jumpInputs[i]]++;
 	}
 	
-	// Returns i if the given ratio of the sample size has the same jump input count
-	int threshold = RoundFloat(float(sampleSize) * ratio);
+	// Returns i if the given number of the sample size has the same jump input count
 	for (int i = 1; i < maxJumpInputs; i++)
 	{
 		if (jumpInputsFrequency[i] >= threshold)
@@ -260,15 +232,20 @@ static void ResetBhopStats(int client)
 	gI_OldButtons[client] = 0;
 	gI_BhopCount[client] = 0;
 	gI_BhopIndex[client] = 0;
-	gI_BhopLastCmdnum[client] = 0;
+	gI_BhopLastTakeoffCmdnum[client] = 0;
+	gI_BhopLastRecordedBhopCmdnum[client] = 0;
+	gB_BhopPostJumpInputsPending[client] = false;
 }
 
 // Returns true if ther was a jump last tick and was within a number of ticks after landing
 static bool HitBhop(int client, int cmdnum)
 {
-	return Movement_GetJumped(client)
-	 && Movement_GetTakeoffCmdNum(client) == cmdnum - 1
-	 && Movement_GetTakeoffCmdNum(client) - Movement_GetLandingCmdNum(client) <= BHOP_GROUND_TICKS;
+	return JustJumped(client, cmdnum) && Movement_GetTakeoffCmdNum(client) - Movement_GetLandingCmdNum(client) <= BHOP_GROUND_TICKS;
+}
+
+static bool JustJumped(int client, int cmdnum)
+{
+	return Movement_GetJumped(client) && Movement_GetTakeoffCmdNum(client) == cmdnum - 1;
 }
 
 // Records current button inputs
