@@ -1,4 +1,4 @@
- // *************************************************************************
+// *************************************************************************
 //  This file is part of SourceBans++.
 //
 //  Copyright (C) 2014-2016 SourceBans++ Dev Team <https://github.com/sbpp>
@@ -29,10 +29,10 @@
 #endif
 #define _sourcebans_included
 
-public SharedPlugin:__pl_sourcebans = 
+public SharedPlugin:__pl_sourcebans =
 {
-	name = "sourcebans++", 
-	file = "sbpp_main.smx", 
+	name = "sourcebans", 
+	file = "sourcebans.smx",
 	#if defined REQUIRE_PLUGIN
 	required = 1
 	#else
@@ -44,7 +44,6 @@ public SharedPlugin:__pl_sourcebans =
 public __pl_sourcebans_SetNTVOptional()
 {
 	MarkNativeAsOptional("SBBanPlayer");
-	MarkNativeAsOptional("SourceBans_BanPlayer");
 }
 #endif
 

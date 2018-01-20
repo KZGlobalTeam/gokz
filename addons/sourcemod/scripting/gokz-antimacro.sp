@@ -87,7 +87,7 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
-	gB_SourceBans = LibraryExists("sourcebans++");
+	gB_SourceBans = LibraryExists("sourcebans");
 }
 
 public void OnLibraryAdded(const char[] name)
