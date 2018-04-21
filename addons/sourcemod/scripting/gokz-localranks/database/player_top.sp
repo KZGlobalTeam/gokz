@@ -140,6 +140,10 @@ public int MenuHandler_PlayerTop(Menu menu, MenuAction action, int param1, int p
 	{
 		DB_OpenPlayerTop20(param1, param2, playerTopMode[param1]);
 	}
+	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayPlayerTopModeMenu(param1);
+	}
 	else if (action == MenuAction_End)
 	{
 		delete menu;

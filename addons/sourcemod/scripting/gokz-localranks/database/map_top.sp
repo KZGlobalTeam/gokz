@@ -188,7 +188,7 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "No Times Found");
 			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "No Times Found (PRO)");
 		}
-		DisplayMapTopMenu(client);
+		DisplayMapTopMenu(client, mode);
 		return;
 	}
 	
@@ -254,18 +254,18 @@ static void MapTopModeMenuSetTitle(int client, Menu menu)
 {
 	if (mapTopCourse[client] == 0)
 	{
-		menu.SetTitle("%T", "Map Top Mode Menu - Title", client, 
-			mapTopMap[client]);
+		menu.SetTitle("%T", "Map Top Mode Menu - Title", client, mapTopMap[client]);
 	}
 	else
 	{
-		menu.SetTitle("%T", "Map Top Mode Menu - Title (Bonus)", client, 
-			mapTopMap[client], mapTopCourse[client]);
+		menu.SetTitle("%T", "Map Top Mode Menu - Title (Bonus)", client, mapTopMap[client], mapTopCourse[client]);
 	}
 }
 
-void DisplayMapTopMenu(int client)
+void DisplayMapTopMenu(int client, int mode)
 {
+	mapTopMode[client] = mode;
+	
 	Menu menu = new Menu(MenuHandler_MapTop);
 	if (mapTopCourse[client] == 0)
 	{
@@ -299,6 +299,11 @@ static void MapTopMenuAddItems(int client, Menu menu)
 	}
 }
 
+void ReopenMapTopMenu(int client)
+{
+	DisplayMapTopMenu(client, mapTopMode[client]);
+}
+
 
 
 // =========================  MENU HANDLERS  ========================= //
@@ -307,8 +312,7 @@ public int MenuHandler_MapTopMode(Menu menu, MenuAction action, int param1, int 
 {
 	if (action == MenuAction_Select)
 	{
-		mapTopMode[param1] = param2;
-		DisplayMapTopMenu(param1);
+		DisplayMapTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -337,6 +341,10 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 			DB_OpenMapTop20(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
 		}
 	}
+	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayMapTopModeMenu(param1);
+	}
 	else if (action == MenuAction_End)
 	{
 		delete menu;
@@ -348,7 +356,7 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 	// TODO Menu item info is player's SteamID32, but is currently not used
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
-		DisplayMapTopMenu(param1);
+		ReopenMapTopMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{
