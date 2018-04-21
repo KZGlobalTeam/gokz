@@ -329,6 +329,26 @@
 
 
 	// Map Top Menu ////////////////////////////////////////////////////////////
+	"Map Top Mode Menu - Title"
+	{
+		// Map Top
+		//
+		// Map - kz_map
+		//
+		// Select a Mode
+		"#format"	"{1:s}"
+		"en"		"Map Top\n \nMap - {1}\n \nSelect a Mode"
+	}
+	"Map Top Mode Menu - Title (Bonus)"
+	{
+		// Bonus Top
+		//
+		// Map - kz_map (Bonus 1)
+		//
+		// Select a Mode
+		"#format"	"{1:s},{2:d}"
+		"en"		"Bonus Top\n \nMap - {1} (Bonus {2})\n \nSelect a Mode"
+	}
 	"Map Top Menu - Title"
 	{
 		// Map Top
