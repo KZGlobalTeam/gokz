@@ -39,8 +39,7 @@ public Action CommandTop(int client, int args)
 		return Plugin_Handled;
 	}
 	
-	// Open player top for the player's selected mode
-	DisplayPlayerTopMenu(client, GOKZ_GetOption(client, Option_Mode));
+	DisplayPlayerTopModeMenu(client);
 	return Plugin_Handled;
 }
 
