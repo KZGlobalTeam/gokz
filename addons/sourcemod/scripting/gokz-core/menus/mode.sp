@@ -12,7 +12,7 @@ void DisplayModeMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_Mode);
 	menu.SetTitle("%T", "Mode Menu - Title", client);
-	ModeMenuAddItems(client, menu);
+	GOKZ_MenuAddModeItems(client, menu, true);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -38,34 +38,5 @@ public int MenuHandler_Mode(Menu menu, MenuAction action, int param1, int param2
 	else if (action == MenuAction_End)
 	{
 		delete menu;
-	}
-}
-
-
-
-// =========================  PRIVATE  ========================= //
-
-static void ModeMenuAddItems(int client, Menu menu)
-{
-	int selectedMode = GOKZ_GetOption(client, Option_Mode);
-	char display[32];
-	
-	for (int mode = 0; mode < MODE_COUNT; mode++)
-	{
-		FormatEx(display, sizeof(display), "%s", gC_ModeNames[mode]);
-		// Add asterisk to selected mode
-		if (mode == selectedMode)
-		{
-			Format(display, sizeof(display), "%s*", display);
-		}
-		
-		if (GOKZ_GetModeLoaded(mode))
-		{
-			menu.AddItem("", display, ITEMDRAW_DEFAULT);
-		}
-		else
-		{
-			menu.AddItem("", display, ITEMDRAW_DISABLED);
-		}
 	}
 } 

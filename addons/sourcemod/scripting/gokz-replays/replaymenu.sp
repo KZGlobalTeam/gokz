@@ -23,7 +23,7 @@ void DisplayReplayModeMenu(int client)
 	
 	Menu menu = new Menu(MenuHandler_ReplayMode);
 	menu.SetTitle("%T", "Replay Menu (Mode) - Title", client, gC_CurrentMap);
-	ReplayModeMenuAddItems(menu);
+	GOKZ_MenuAddModeItems(client, menu, false);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -97,24 +97,6 @@ public Action Timer_SpectateBot(Handle timer, DataPack data)
 
 
 // =========================  PRIVATE  ========================= //
-
-static void ReplayModeMenuAddItems(Menu menu)
-{
-	char temp[32];
-	menu.RemoveAllItems();
-	for (int mode = 0; mode < MODE_COUNT; mode++)
-	{
-		FormatEx(temp, sizeof(temp), "%s", gC_ModeNames[mode]);
-		if (GOKZ_GetModeLoaded(mode))
-		{
-			menu.AddItem("", temp, ITEMDRAW_DEFAULT);
-		}
-		else
-		{
-			menu.AddItem("", temp, ITEMDRAW_DISABLED);
-		}
-	}
-}
 
 static void DisplayReplayMenu(int client)
 {

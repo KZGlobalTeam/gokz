@@ -21,15 +21,8 @@ void DisplayMapTopModeMenu(int client, const char[] map, int course)
 	mapTopCourse[client] = course;
 	
 	Menu menu = new Menu(MenuHandler_MapTopModeMenu);
-	if (course == 0)
-	{
-		menu.SetTitle("%T", "Global Map Top Mode Menu - Title", client, map);
-	}
-	else
-	{
-		menu.SetTitle("%T", "Global Map Top Mode Menu - Title (Bonus)", client, map, course);
-	}
-	MapTopModeMenuAddItems(client, menu);
+	MapTopModeMenuSetTitle(client, menu);
+	GOKZ_MenuAddModeItems(client, menu, false);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -40,14 +33,7 @@ void DisplayMapTopMenu(int client, const char[] map, int course, int mode)
 	mapTopMode[client] = mode;
 	
 	Menu menu = new Menu(MenuHandler_MapTopMenu);
-	if (course == 0)
-	{
-		menu.SetTitle("%T", "Global Map Top Menu - Title", client, map, gC_ModeNames[mode]);
-	}
-	else
-	{
-		menu.SetTitle("%T", "Global Map Top Menu - Title (Bonus)", client, map, course, gC_ModeNames[mode]);
-	}
+	MapTopMenuSetTitle(client, menu);
 	MapTopMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -128,20 +114,27 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 
 // =========================  PRIVATE  ========================= //
 
-static void MapTopModeMenuAddItems(int client, Menu menu)
+static void MapTopModeMenuSetTitle(int client, Menu menu)
 {
-	int selectedMode = GOKZ_GetOption(client, Option_Mode);
-	char display[32];
-	for (int mode = 0; mode < MODE_COUNT; mode++)
+	if (mapTopCourse[client] == 0)
 	{
-		FormatEx(display, sizeof(display), "%s", gC_ModeNames[mode]);
-		// Add asterisk to selected mode
-		if (mode == selectedMode)
-		{
-			Format(display, sizeof(display), "%s*", display);
-		}
-		
-		menu.AddItem(IntToStringEx(mode), display);
+		menu.SetTitle("%T", "Global Map Top Mode Menu - Title", client, mapTopMap[client]);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Global Map Top Mode Menu - Title (Bonus)", client, mapTopMap[client], mapTopCourse[client]);
+	}
+}
+
+static void MapTopMenuSetTitle(int client, Menu menu)
+{
+	if (mapTopCourse[client] == 0)
+	{
+		menu.SetTitle("%T", "Global Map Top Menu - Title", client, mapTopMap[client], gC_ModeNames[mapTopMode[client]]);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Global Map Top Menu - Title (Bonus)", client, mapTopMap[client], mapTopCourse[client], gC_ModeNames[mapTopMode[client]]);
 	}
 }
 

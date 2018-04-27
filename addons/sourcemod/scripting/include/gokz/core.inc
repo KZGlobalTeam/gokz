@@ -1008,6 +1008,43 @@ stock int GOKZ_GetCurrentTimeType(int client)
 	return GOKZ_GetTimeType(GOKZ_GetTeleportCount(client));
 }
 
+/**
+ * Clears and populates a menu with an item for each mode
+ * in order of the mode enumeration. Highlights the client's
+ * selected mode with an asterisk.
+ *
+ * @param client				Client index to check selected mode.
+ * @param menu					Menu to populate items with.
+ * @param disableUnloadedModes	Draw items for unloaded modes as disabled.
+ * @noreturn
+ */
+stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedModes)
+{
+	int selectedMode = GOKZ_GetOption(client, Option_Mode);
+	char display[32];
+	
+	menu.RemoveAllItems();
+	
+	for (int mode = 0; mode < MODE_COUNT; mode++)
+	{
+		FormatEx(display, sizeof(display), "%s", gC_ModeNames[mode]);
+		// Add asterisk to selected mode
+		if (mode == selectedMode)
+		{
+			Format(display, sizeof(display), "%s*", display);
+		}
+		
+		if (GOKZ_GetModeLoaded(mode))
+		{
+			menu.AddItem("", display, ITEMDRAW_DEFAULT);
+		}
+		else
+		{
+			menu.AddItem("", display, ITEMDRAW_DISABLED);
+		}
+	}
+}
+
 
 
 // =========================  METHODMAP  ========================= //
