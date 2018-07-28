@@ -166,6 +166,9 @@ void SetupClientTimer(int client)
 	hasStartedTimerThisMap[client] = false;
 	hasEndedTimerThisMap[client] = false;
 	currentTime[client] = 0.0;
+
+	SetHasVirtualStartPosition(client, false);
+	SetHasVirtualEndPosition(client, false);
 }
 
 void OnPlayerRunCmd_Timer(int client)
