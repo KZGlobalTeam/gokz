@@ -30,16 +30,6 @@ bool GetHasVirtualEndPosition(int client)
 	return hasVirtualEndPosition[client];
 }
 
-bool SetHasVirtualStartPosition(int client, bool value)
-{
-	hasVirtualStartPosition[client] = value;
-}
-
-bool SetHasVirtualEndPosition(int client, bool value)
-{
-	hasVirtualEndPosition[client] = value;
-}
-
 // =========================  LISTENERS  ========================= //
 
 void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
@@ -71,7 +61,13 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	hasVirtualEndPosition[client] = true;
 }
 
+// =========================  LISTENERS  ========================= //
 
+void SetupClientVirtualButtons(int client)
+{
+	hasVirtualEndPosition[client] = false;
+	hasVirtualStartPosition[client] = false;
+}
 
 // =========================  PRIVATE  ========================= //
 

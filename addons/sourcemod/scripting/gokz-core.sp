@@ -159,6 +159,7 @@ public void OnClientPutInServer(int client)
 	SetupClientTeleports(client);
 	SetupClientJoinTeam(client);
 	SetupClientFirstSpawn(client);
+	SetupClientVirtualButtons(client);
 	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
