@@ -84,11 +84,11 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 	int colour[4]; // RGBA
 	if (targetPlayer.gokzHitPerf && !targetPlayer.onGround && !targetPlayer.onLadder && !targetPlayer.noclipping)
 	{
-		colour =  { 3, 204, 0, 0 };
+		colour =  { 64, 255, 64, 0 };
 	}
 	else
 	{
-		colour =  { 235, 235, 235, 0 };
+		colour =  { 255, 255, 255, 0 };
 	}
 	
 	switch (player.speedText)
