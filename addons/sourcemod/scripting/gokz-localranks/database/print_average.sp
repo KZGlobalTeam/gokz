@@ -100,17 +100,17 @@ public void DB_TxnSuccess_PrintAverage(Handle db, DataPack data, int numQueries,
 	
 	if (mapCompletions == 0)
 	{
-		CPrintToChat(client, "  %t", "No Times Found");
+		CPrintToChat(client, "%t", "No Times Found");
 	}
 	else if (mapCompletionsPro == 0)
 	{
-		CPrintToChat(client, "  %t, %t", 
+		CPrintToChat(client, "%t, %t", 
 			"Average Time - NUB", GOKZ_FormatTime(averageTime), mapCompletions, 
 			"Average Time - No PRO Time");
 	}
 	else
 	{
-		CPrintToChat(client, "  %t, %t", 
+		CPrintToChat(client, "%t, %t", 
 			"Average Time - NUB", GOKZ_FormatTime(averageTime), mapCompletions, 
 			"Average Time - PRO", GOKZ_FormatTime(averageTimePro), mapCompletionsPro);
 	}
