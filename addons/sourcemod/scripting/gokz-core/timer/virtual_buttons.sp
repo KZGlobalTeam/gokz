@@ -32,6 +32,12 @@ bool GetHasVirtualEndPosition(int client)
 
 // =========================  LISTENERS  ========================= //
 
+void SetupClientVirtualButtons(int client)
+{
+	hasVirtualEndPosition[client] = false;
+	hasVirtualStartPosition[client] = false;
+}
+
 void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
 {
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
@@ -59,14 +65,6 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	Movement_GetOrigin(client, virtualEndOrigin[client]);
 	virtualEndCourse[client] = course;
 	hasVirtualEndPosition[client] = true;
-}
-
-// =========================  LISTENERS  ========================= //
-
-void SetupClientVirtualButtons(int client)
-{
-	hasVirtualEndPosition[client] = false;
-	hasVirtualStartPosition[client] = false;
 }
 
 // =========================  PRIVATE  ========================= //
