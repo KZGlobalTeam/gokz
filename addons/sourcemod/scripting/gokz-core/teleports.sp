@@ -561,6 +561,19 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	Movement_SetGravity(client, 1.0);
 	CreateTimer(0.1, Timer_RemoveBoosts, GetClientUserId(client)); // Prevent booster exploits
 	
+	Handle trace = TR_TraceHullFilterEx(destOrigin,
+		destOrigin,
+		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
+		view_as<float>( { 16.0, 16.0, 72.0 } ),
+		MASK_PLAYERSOLID,
+		TraceEntityFilterPlayers,
+		client);
+	if(TR_DidHit(trace))
+	{
+		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
+	}
+	delete trace;
+	
 	undoOrigin[client] = oldOrigin;
 	undoAngles[client] = oldAngles;
 	
