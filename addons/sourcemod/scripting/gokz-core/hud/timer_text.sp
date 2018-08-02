@@ -98,8 +98,8 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 	int colour[4]; // RGBA
 	switch (GetCurrentTimeType(targetPlayer.id))
 	{
-		case TimeType_Nub:colour =  { 255, 221, 153, 0 };
-		case TimeType_Pro:colour =  { 160, 205, 255, 0 };
+		case TimeType_Nub:colour =  { 234, 209, 138, 0 };
+		case TimeType_Pro:colour =  { 181, 212, 238, 0 };
 	}
 	
 	switch (player.timerText)
