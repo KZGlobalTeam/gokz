@@ -90,6 +90,14 @@ public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueri
 
 // =========================  MENUS  ========================= //
 
+void DisplayPlayerTopModeMenu(int client)
+{
+	Menu menu = new Menu(MenuHandler_PlayerTopMode);
+	menu.SetTitle("%T", "Player Top Mode Menu - Title", client);
+	GOKZ_MenuAddModeItems(client, menu, false);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
 void DisplayPlayerTopMenu(int client, int mode)
 {
 	playerTopMode[client] = mode;
@@ -114,11 +122,27 @@ static void PlayerTopMenuAddItems(int client, Menu menu)
 
 // =========================  MENU HANLDERS  ========================= //
 
+public int MenuHandler_PlayerTopMode(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		DB_OpenPlayerTop20(param1, param2, playerTopMode[param1]);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
 public int MenuHandler_PlayerTop(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
 		DB_OpenPlayerTop20(param1, param2, playerTopMode[param1]);
+	}
+	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayPlayerTopModeMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{

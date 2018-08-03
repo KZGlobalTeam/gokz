@@ -42,10 +42,10 @@ char[] GenerateScrollPattern(int client, int sampleSize = BHOP_SAMPLES, bool col
 {
 	char report[512];
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
-	bool[] perfs = new bool[sampleSize];
-	GOKZ_AM_GetHitPerf(client, perfs, sampleSize);
-	int[] jumpInputs = new int[sampleSize];
-	GOKZ_AM_GetJumpInputs(client, jumpInputs, sampleSize);
+	bool[] perfs = new bool[maxIndex];
+	GOKZ_AM_GetHitPerf(client, perfs, maxIndex);
+	int[] jumpInputs = new int[maxIndex];
+	GOKZ_AM_GetJumpInputs(client, jumpInputs, maxIndex);
 	
 	for (int i = 0; i < maxIndex; i++)
 	{
@@ -75,14 +75,14 @@ char[] GenerateScrollPatternEx(int client, int sampleSize = BHOP_SAMPLES)
 {
 	char report[512];
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
-	bool[] perfs = new bool[sampleSize];
-	GOKZ_AM_GetHitPerf(client, perfs, sampleSize);
-	int[] jumpInputs = new int[sampleSize];
-	GOKZ_AM_GetJumpInputs(client, jumpInputs, sampleSize);
-	int[] preJumpInputs = new int[sampleSize];
-	GOKZ_AM_GetPreJumpInputs(client, preJumpInputs, sampleSize);
-	int[] postJumpInputs = new int[sampleSize];
-	GOKZ_AM_GetPostJumpInputs(client, postJumpInputs, sampleSize);
+	bool[] perfs = new bool[maxIndex];
+	GOKZ_AM_GetHitPerf(client, perfs, maxIndex);
+	int[] jumpInputs = new int[maxIndex];
+	GOKZ_AM_GetJumpInputs(client, jumpInputs, maxIndex);
+	int[] preJumpInputs = new int[maxIndex];
+	GOKZ_AM_GetPreJumpInputs(client, preJumpInputs, maxIndex);
+	int[] postJumpInputs = new int[maxIndex];
+	GOKZ_AM_GetPostJumpInputs(client, postJumpInputs, maxIndex);
 	
 	for (int i = 0; i < maxIndex; i++)
 	{
@@ -165,13 +165,12 @@ static void CheckForBhopMacro(int client)
 	{
 		SuspectPlayer(client, AMReason_BhopHack, "1's or 2's scroll pattern", GenerateBhopBanStats(client, 20));
 	}
-	else if (gI_BhopCount[client] >= 20 && 
-		GOKZ_AM_GetPerfCount(client, 20) >= 8 && GOKZ_AM_GetAverageJumpInputs(client, 20) >= 19.0 - EPSILON)
+	else if (gI_BhopCount[client] >= 20 && GOKZ_AM_GetPerfCount(client, 20) >= 8
+		 && GOKZ_AM_GetAverageJumpInputs(client, 20) >= 19.0 - EPSILON)
 	{
 		SuspectPlayer(client, AMReason_BhopMacro, "High scroll pattern", GenerateBhopBanStats(client, 20));
 	}
-	else if (gI_BhopCount[client] >= 30 && 
-		GOKZ_AM_GetPerfCount(client, 30) >= 10 && CheckForRepeatingJumpInputsCount(client, 25, 30) >= 14)
+	else if (GOKZ_AM_GetPerfCount(client, 30) >= 10 && CheckForRepeatingJumpInputsCount(client, 25, 30) >= 14)
 	{
 		SuspectPlayer(client, AMReason_BhopMacro, "Repeating scroll pattern", GenerateBhopBanStats(client, 30));
 	}
@@ -201,8 +200,8 @@ static char[] GenerateBhopBanStats(int client, int sampleSize)
 static int CheckForRepeatingJumpInputsCount(int client, int threshold, int sampleSize = BHOP_SAMPLES)
 {
 	int maxIndex = IntMin(gI_BhopCount[client], sampleSize);
-	int[] jumpInputs = new int[sampleSize];
-	GOKZ_AM_GetJumpInputs(client, jumpInputs, sampleSize);
+	int[] jumpInputs = new int[maxIndex];
+	GOKZ_AM_GetJumpInputs(client, jumpInputs, maxIndex);
 	int maxJumpInputs = BUTTON_SAMPLES + 1;
 	int[] jumpInputsFrequency = new int[maxJumpInputs];
 	

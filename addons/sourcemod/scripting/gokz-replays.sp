@@ -212,9 +212,13 @@ public void OnClientDisconnect(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	OnPlayerRunCmd_Recording(client, buttons);
 	OnPlayerRunCmd_Playback(client, buttons);
 	return Plugin_Continue;
+}
+
+public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
+{
+	OnPlayerRunCmd_Recording(client, buttons);
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)

@@ -113,21 +113,21 @@ public void DB_TxnSuccess_PrintRecords(Handle db, DataPack data, int numQueries,
 	// Print WR times to chat
 	if (!mapHasRecord)
 	{
-		CPrintToChat(client, "  %t", "No Times Found");
+		CPrintToChat(client, "%t", "No Times Found");
 	}
 	else if (!mapHasRecordPro)
 	{
-		CPrintToChat(client, "  %t", "WR Time - NUB", GOKZ_FormatTime(runTime), teleportsUsed, recordHolder);
-		CPrintToChat(client, "  %t", "WR Time - No PRO Time");
+		CPrintToChat(client, "%t", "WR Time - NUB", GOKZ_FormatTime(runTime), teleportsUsed, recordHolder);
+		CPrintToChat(client, "%t", "WR Time - No PRO Time");
 	}
 	else if (teleportsUsed == 0)
 	{
-		CPrintToChat(client, "  %t", "WR Time - NUB and PRO", GOKZ_FormatTime(runTimePro), recordHolderPro);
+		CPrintToChat(client, "%t", "WR Time - NUB and PRO", GOKZ_FormatTime(runTimePro), recordHolderPro);
 	}
 	else
 	{
-		CPrintToChat(client, "  %t", "WR Time - NUB", GOKZ_FormatTime(runTime), teleportsUsed, recordHolder);
-		CPrintToChat(client, "  %t", "WR Time - PRO", GOKZ_FormatTime(runTimePro), recordHolderPro);
+		CPrintToChat(client, "%t", "WR Time - NUB", GOKZ_FormatTime(runTime), teleportsUsed, recordHolder);
+		CPrintToChat(client, "%t", "WR Time - PRO", GOKZ_FormatTime(runTimePro), recordHolderPro);
 	}
 }
 

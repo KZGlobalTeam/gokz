@@ -63,7 +63,7 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
 		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= TIMER_START_MIN_TICKS_ON_GROUND) && !allowOffGround
-		 || (Movement_GetMoveType(client) != MOVETYPE_WALK && Movement_GetMoveType(client) != MOVETYPE_NONE)
+		 || !IsValidMoveType(Movement_GetMoveType(client))
 		 || timerRunning[client] && currentTime[client] < 0.05)
 	{
 		return;
@@ -178,9 +178,7 @@ void OnPlayerRunCmd_Timer(int client)
 
 void OnChangeMoveType_Timer(int client, MoveType newMoveType)
 {
-	if (newMoveType != MOVETYPE_WALK
-		 && newMoveType != MOVETYPE_LADDER
-		 && newMoveType != MOVETYPE_NONE)
+	if (!IsValidMoveType(newMoveType))
 	{
 		if (TimerStop(client))
 		{
@@ -231,6 +229,11 @@ void OnRoundStart_Timer()
 
 
 // =========================  PRIVATE  ========================= //
+
+static bool IsValidMoveType(MoveType moveType)
+{
+	return moveType == MOVETYPE_WALK || moveType == MOVETYPE_LADDER || moveType == MOVETYPE_NONE;
+}
 
 static void PlayTimerStartSound(int client)
 {

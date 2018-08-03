@@ -122,21 +122,21 @@ static void PrintRecordsFinally(int client)
 	// Print GWR times to chat
 	if (!printRecordsTimeExists[client][TimeType_Nub])
 	{
-		GOKZ_PrintToChat(client, false, "  %t", "No Global Times Found");
+		GOKZ_PrintToChat(client, false, "%t", "No Global Times Found");
 	}
 	else if (!printRecordsTimeExists[client][TimeType_Pro])
 	{
-		GOKZ_PrintToChat(client, false, "  %t", "GWR Time - NUB", 
+		GOKZ_PrintToChat(client, false, "%t", "GWR Time - NUB", 
 			GOKZ_FormatTime(printRecordsTimes[client][TimeType_Nub]), 
 			printRecordsPlayerNames[client][TimeType_Nub]);
-		GOKZ_PrintToChat(client, false, "  %t", "GWR Time - No PRO Time");
+		GOKZ_PrintToChat(client, false, "%t", "GWR Time - No PRO Time");
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, false, "  %t", "GWR Time - NUB", 
+		GOKZ_PrintToChat(client, false, "%t", "GWR Time - NUB", 
 			GOKZ_FormatTime(printRecordsTimes[client][TimeType_Nub]), 
 			printRecordsPlayerNames[client][TimeType_Nub]);
-		GOKZ_PrintToChat(client, false, "  %t", "GWR Time - PRO", 
+		GOKZ_PrintToChat(client, false, "%t", "GWR Time - PRO", 
 			GOKZ_FormatTime(printRecordsTimes[client][TimeType_Pro]), 
 			printRecordsPlayerNames[client][TimeType_Pro]);
 	}

@@ -19,7 +19,7 @@ static int mapTopMode[MAXPLAYERS + 1];
 
 // =========================  MAP TOP  ========================= //
 
-void DB_OpenMapTop(int client, int mapID, int course, int mode)
+void DB_OpenMapTopModeMenu(int client, int mapID, int course)
 {
 	char query[1024];
 	
@@ -27,7 +27,6 @@ void DB_OpenMapTop(int client, int mapID, int course, int mode)
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(mapID);
 	data.WriteCell(course);
-	data.WriteCell(mode);
 	
 	Transaction txn = SQL_CreateTransaction();
 	
@@ -38,16 +37,15 @@ void DB_OpenMapTop(int client, int mapID, int course, int mode)
 	FormatEx(query, sizeof(query), sql_mapcourses_findid, mapID, course);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTopMenu, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTopModeMenu, DB_TxnFailure_Generic, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_OpenMapTopMenu(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_OpenMapTopModeMenu(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int mapID = data.ReadCell();
 	int course = data.ReadCell();
-	int mode = data.ReadCell();
 	data.Close();
 	
 	if (!IsValidClient(client))
@@ -76,29 +74,26 @@ public void DB_TxnSuccess_OpenMapTopMenu(Handle db, DataPack data, int numQuerie
 	
 	mapTopMapID[client] = mapID;
 	mapTopCourse[client] = course;
-	mapTopMode[client] = mode;
-	DisplayMapTopMenu(client);
+	DisplayMapTopModeMenu(client);
 }
 
-void DB_OpenMapTop_FindMap(int client, const char[] mapSearch, int course, int mode)
+void DB_OpenMapTopModeMenu_FindMap(int client, const char[] mapSearch, int course)
 {
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteString(mapSearch);
 	data.WriteCell(course);
-	data.WriteCell(mode);
 	
-	DB_FindMap(mapSearch, DB_TxnSuccess_OpenMapTopMenu_FindMap, data, DBPrio_Low);
+	DB_FindMap(mapSearch, DB_TxnSuccess_OpenMapTopModeMenu_FindMap, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_OpenMapTopMenu_FindMap(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_OpenMapTopModeMenu_FindMap(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	char mapSearch[33];
 	data.ReadString(mapSearch, sizeof(mapSearch));
 	int course = data.ReadCell();
-	int mode = data.ReadCell();
 	data.Close();
 	
 	if (!IsValidClient(client))
@@ -113,7 +108,7 @@ public void DB_TxnSuccess_OpenMapTopMenu_FindMap(Handle db, DataPack data, int n
 	}
 	else if (SQL_FetchRow(results[0]))
 	{  // Result is the MapID
-		DB_OpenMapTop(client, SQL_FetchInt(results[0], 0), course, mode);
+		DB_OpenMapTopModeMenu(client, SQL_FetchInt(results[0], 0), course);
 	}
 }
 
@@ -193,7 +188,7 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 			case TimeType_Nub:GOKZ_PrintToChat(client, true, "%t", "No Times Found");
 			case TimeType_Pro:GOKZ_PrintToChat(client, true, "%t", "No Times Found (PRO)");
 		}
-		DisplayMapTopMenu(client);
+		DisplayMapTopMenu(client, mode);
 		return;
 	}
 	
@@ -247,8 +242,30 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 
 // =========================  MENUS  ========================= //
 
-void DisplayMapTopMenu(int client)
+void DisplayMapTopModeMenu(int client)
 {
+	Menu menu = new Menu(MenuHandler_MapTopMode);
+	MapTopModeMenuSetTitle(client, menu);
+	GOKZ_MenuAddModeItems(client, menu, false);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+static void MapTopModeMenuSetTitle(int client, Menu menu)
+{
+	if (mapTopCourse[client] == 0)
+	{
+		menu.SetTitle("%T", "Map Top Mode Menu - Title", client, mapTopMap[client]);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Map Top Mode Menu - Title (Bonus)", client, mapTopMap[client], mapTopCourse[client]);
+	}
+}
+
+void DisplayMapTopMenu(int client, int mode)
+{
+	mapTopMode[client] = mode;
+	
 	Menu menu = new Menu(MenuHandler_MapTop);
 	if (mapTopCourse[client] == 0)
 	{
@@ -282,9 +299,26 @@ static void MapTopMenuAddItems(int client, Menu menu)
 	}
 }
 
+void ReopenMapTopMenu(int client)
+{
+	DisplayMapTopMenu(client, mapTopMode[client]);
+}
+
 
 
 // =========================  MENU HANDLERS  ========================= //
+
+public int MenuHandler_MapTopMode(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		DisplayMapTopMenu(param1, param2);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
 
 public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -307,6 +341,10 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 			DB_OpenMapTop20(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
 		}
 	}
+	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayMapTopModeMenu(param1);
+	}
 	else if (action == MenuAction_End)
 	{
 		delete menu;
@@ -318,7 +356,7 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 	// TODO Menu item info is player's SteamID32, but is currently not used
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
-		DisplayMapTopMenu(param1);
+		ReopenMapTopMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{

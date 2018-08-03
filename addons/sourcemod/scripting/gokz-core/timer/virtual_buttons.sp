@@ -11,22 +11,46 @@
 
 static float virtualStartOrigin[MAXPLAYERS + 1][3];
 static float virtualEndOrigin[MAXPLAYERS + 1][3];
+
+static bool hasVirtualStartPosition[MAXPLAYERS + 1];
+static bool hasVirtualEndPosition[MAXPLAYERS + 1];
+
 static int virtualStartCourse[MAXPLAYERS + 1];
 static int virtualEndCourse[MAXPLAYERS + 1];
 
 
 
+// =========================  PUBLIC  ========================= //
+
+bool GetHasVirtualStartPosition(int client)
+{
+	return hasVirtualStartPosition[client];
+}
+
+bool GetHasVirtualEndPosition(int client)
+{
+	return hasVirtualEndPosition[client];
+}
+
+
+
 // =========================  LISTENERS  ========================= //
+
+void SetupClientVirtualButtons(int client)
+{
+	hasVirtualEndPosition[client] = false;
+	hasVirtualStartPosition[client] = false;
+}
 
 void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
 {
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
-		if (GetHasStartedTimerThisMap(client) && InRangeOfStartButton(client))
+		if (GetHasVirtualStartPosition(client) && InRangeOfStartButton(client))
 		{
 			TimerStart(client, virtualStartCourse[client]);
 		}
-		else if (GetHasStartedTimerThisMap(client) && InRangeOfEndButton(client))
+		else if (GetHasVirtualEndPosition(client) && InRangeOfEndButton(client))
 		{
 			TimerEnd(client, virtualEndCourse[client]);
 		}
@@ -37,12 +61,14 @@ void OnStartButtonPress_VirtualButtons(int client, int course)
 {
 	Movement_GetOrigin(client, virtualStartOrigin[client]);
 	virtualStartCourse[client] = course;
+	hasVirtualStartPosition[client] = true;
 }
 
 void OnEndButtonPress_VirtualButtons(int client, int course)
 {
 	Movement_GetOrigin(client, virtualEndOrigin[client]);
 	virtualEndCourse[client] = course;
+	hasVirtualEndPosition[client] = true;
 }
 
 

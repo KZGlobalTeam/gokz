@@ -98,19 +98,19 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 	int colour[4]; // RGBA
 	switch (GetCurrentTimeType(targetPlayer.id))
 	{
-		case TimeType_Nub:colour =  { 255, 221, 153, 0 };
-		case TimeType_Pro:colour =  { 160, 205, 255, 0 };
+		case TimeType_Nub:colour =  { 234, 209, 138, 0 };
+		case TimeType_Pro:colour =  { 181, 212, 238, 0 };
 	}
 	
 	switch (player.timerText)
 	{
 		case TimerText_Top:
 		{
-			SetHudTextParams(-1.0, 0.013, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.07, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 		}
 		case TimerText_Bottom:
 		{
-			SetHudTextParams(-1.0, 0.957, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+			SetHudTextParams(-1.0, 0.9, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 		}
 	}
 	

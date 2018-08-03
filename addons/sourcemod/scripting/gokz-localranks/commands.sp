@@ -39,8 +39,7 @@ public Action CommandTop(int client, int args)
 		return Plugin_Handled;
 	}
 	
-	// Open player top for the player's selected mode
-	DisplayPlayerTopMenu(client, GOKZ_GetOption(client, Option_Mode));
+	DisplayPlayerTopModeMenu(client);
 	return Plugin_Handled;
 }
 
@@ -52,14 +51,14 @@ public Action CommandMapTop(int client, int args)
 	}
 	
 	if (args == 0)
-	{  // Open map top for current map and their current mode
-		DB_OpenMapTop(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetOption(client, Option_Mode));
+	{  // Open map top for current map
+		DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), 0);
 	}
 	else if (args >= 1)
-	{  // Open map top for specified map and their current mode
+	{  // Open map top for specified map
 		char specifiedMap[33];
 		GetCmdArg(1, specifiedMap, sizeof(specifiedMap));
-		DB_OpenMapTop_FindMap(client, specifiedMap, 0, GOKZ_GetOption(client, Option_Mode));
+		DB_OpenMapTopModeMenu_FindMap(client, specifiedMap, 0);
 	}
 	return Plugin_Handled;
 }
@@ -72,17 +71,17 @@ public Action CommandBMapTop(int client, int args)
 	}
 	
 	if (args == 0)
-	{  // Open Bonus 1 top for current map and their current mode		
-		DB_OpenMapTop(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetOption(client, Option_Mode));
+	{  // Open Bonus 1 top for current map	
+		DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), 1);
 	}
 	else if (args == 1)
-	{  // Open specified Bonus # top for current map and their current mode
+	{  // Open specified Bonus # top for current map
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
 		if (bonus > 0)
 		{
-			DB_OpenMapTop(client, GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetOption(client, Option_Mode));
+			DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), bonus);
 		}
 		else
 		{
@@ -90,14 +89,14 @@ public Action CommandBMapTop(int client, int args)
 		}
 	}
 	else if (args >= 2)
-	{  // Open specified bonus top for specified map and their current mode
+	{  // Open specified bonus top for specified map
 		char argBonus[4], argMap[33];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
 		if (bonus > 0)
 		{
-			DB_OpenMapTop_FindMap(client, argMap, bonus, GOKZ_GetOption(client, Option_Mode));
+			DB_OpenMapTopModeMenu_FindMap(client, argMap, bonus);
 		}
 		else
 		{
