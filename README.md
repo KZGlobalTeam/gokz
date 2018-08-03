@@ -1,5 +1,7 @@
 # GOKZ SourceMod Plugin Package (CS:GO)
 
+GOKZ is a package of [SourceMod](https://www.sourcemod.net/about.php) plugins that implements a movement and speedrunning focused game mode commonly referred to as Kreedz, or KZ for short.
+
 ## Features
 
  * **Timer** - Times runs by automatically detecting the use of start and end buttons in KZ maps.
@@ -14,8 +16,8 @@
 
 ### Server Requirements
 
- * SourceMod 1.8+
- * 128 Tick
+ * [SourceMod 1.9+](https://www.sourcemod.net/downloads.php?branch=stable)
+ * 128 Tick (`-tickrate 128`)
  * [MovementAPI Plugin](https://github.com/danzayau/MovementAPI)
  * [DHooks Extension](https://forums.alliedmods.net/showthread.php?t=180114)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-global module)
