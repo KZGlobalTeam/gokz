@@ -308,11 +308,11 @@ public Action CommandSpecs(int client, int args)
 		GOKZ_PrintToChat(client, true, "%t", "Spectator List", specs, specNames);
 		if (targetSpecs == 0)
 		{
-			GOKZ_PrintToChat(client, false, "  %t", "Target Spectator List (None)", target);
+			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List (None)", target);
 		}
 		else
 		{
-			GOKZ_PrintToChat(client, false, "  %t", "Target Spectator List", target, targetSpecs, targetSpecNames);
+			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List", target, targetSpecs, targetSpecNames);
 		}
 	}
 }

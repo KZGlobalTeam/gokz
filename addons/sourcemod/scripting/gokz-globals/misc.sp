@@ -21,7 +21,7 @@ bool MapCheck()
 void PrintGlobalCheck(int client)
 {
 	GOKZ_PrintToChat(client, true, "%t", "Global Check Header");
-	GOKZ_PrintToChat(client, false, "  %t", "Global Check", 
+	GOKZ_PrintToChat(client, false, "%t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
 		gCV_gokz_settings_enforcer.BoolValue ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X", 
@@ -33,7 +33,7 @@ void PrintGlobalCheck(int client)
 	{
 		FormatEx(modeCheck, sizeof(modeCheck), "%s {grey}| {purple}%s %s", modeCheck, gC_ModeNames[i], gB_ModeCheck[i] ? "{green}✓" : "{darkred}X");
 	}
-	GOKZ_PrintToChat(client, false, "  %s", modeCheck);
+	GOKZ_PrintToChat(client, false, "%s", modeCheck);
 }
 
 void InvalidateRun(int client)

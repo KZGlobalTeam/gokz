@@ -84,11 +84,11 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 	int colour[4]; // RGBA
 	if (targetPlayer.gokzHitPerf && !targetPlayer.onGround && !targetPlayer.onLadder && !targetPlayer.noclipping)
 	{
-		colour =  { 3, 204, 0, 0 };
+		colour =  { 64, 255, 64, 0 };
 	}
 	else
 	{
-		colour =  { 235, 235, 235, 0 };
+		colour =  { 255, 255, 255, 0 };
 	}
 	
 	switch (player.speedText)
@@ -96,17 +96,13 @@ static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
 		case SpeedText_Bottom:
 		{
 			// Set params based on the available screen space at max scaling HUD
-			if (IsPlayerAlive(player.id))
+			if (!IsDrawingInfoPanel(player.id))
 			{
-				SetHudTextParams(-1.0, 0.749, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
-			}
-			else if (!IsDrawingInfoPanel(player.id))
-			{
-				SetHudTextParams(-1.0, 0.638, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.75, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 			else
 			{
-				SetHudTextParams(-1.0, 0.597, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.65, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 		}
 	}
