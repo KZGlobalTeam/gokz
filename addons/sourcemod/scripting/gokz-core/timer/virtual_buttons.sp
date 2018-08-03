@@ -18,6 +18,8 @@ static bool hasVirtualEndPosition[MAXPLAYERS + 1];
 static int virtualStartCourse[MAXPLAYERS + 1];
 static int virtualEndCourse[MAXPLAYERS + 1];
 
+
+
 // =========================  PUBLIC  ========================= //
 
 bool GetHasVirtualStartPosition(int client)
@@ -29,6 +31,8 @@ bool GetHasVirtualEndPosition(int client)
 {
 	return hasVirtualEndPosition[client];
 }
+
+
 
 // =========================  LISTENERS  ========================= //
 
@@ -66,6 +70,8 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	virtualEndCourse[client] = course;
 	hasVirtualEndPosition[client] = true;
 }
+
+
 
 // =========================  PRIVATE  ========================= //
 
