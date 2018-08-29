@@ -15,26 +15,29 @@ void DB_SetupMapCourses()
 	
 	while ((entity = FindEntityByClassname(entity, "func_button")) != -1)
 	{
-		GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-		if (StrEqual("climb_startbutton", tempString, false))
+		if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
 		{
-			switch (g_DBType)
+			if (StrEqual("climb_startbutton", tempString, false))
 			{
-				case DatabaseType_SQLite:FormatEx(query, sizeof(query), sqlite_mapcourses_insert, gI_DBCurrentMapID, 0);
-				case DatabaseType_MySQL:FormatEx(query, sizeof(query), mysql_mapcourses_insert, gI_DBCurrentMapID, 0);
+				switch (g_DBType)
+				{
+					case DatabaseType_SQLite:FormatEx(query, sizeof(query), sqlite_mapcourses_insert, gI_DBCurrentMapID, 0);
+					case DatabaseType_MySQL:FormatEx(query, sizeof(query), mysql_mapcourses_insert, gI_DBCurrentMapID, 0);
+				}
+				txn.AddQuery(query);
 			}
-			txn.AddQuery(query);
-		}
-		else if (MatchRegex(gRE_BonusStartButton, tempString) > 0)
-		{
-			GetRegexSubString(gRE_BonusStartButton, 1, tempString, sizeof(tempString));
-			int bonus = StringToInt(tempString);
-			switch (g_DBType)
+		
+			else if (MatchRegex(gRE_BonusStartButton, tempString) > 0)
 			{
-				case DatabaseType_SQLite:FormatEx(query, sizeof(query), sqlite_mapcourses_insert, gI_DBCurrentMapID, bonus);
-				case DatabaseType_MySQL:FormatEx(query, sizeof(query), mysql_mapcourses_insert, gI_DBCurrentMapID, bonus);
+				GetRegexSubString(gRE_BonusStartButton, 1, tempString, sizeof(tempString));
+				int bonus = StringToInt(tempString);
+				switch (g_DBType)
+				{
+					case DatabaseType_SQLite:FormatEx(query, sizeof(query), sqlite_mapcourses_insert, gI_DBCurrentMapID, bonus);
+					case DatabaseType_MySQL:FormatEx(query, sizeof(query), mysql_mapcourses_insert, gI_DBCurrentMapID, bonus);
+				}
+				txn.AddQuery(query);
 			}
-			txn.AddQuery(query);
 		}
 	}
 	
