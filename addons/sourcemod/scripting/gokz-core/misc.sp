@@ -726,21 +726,21 @@ void OnOptionChanged_ClanTag(int client, Option option)
 
 // =========================  FIRST SPAWN  ========================= //
 
-static bool firstSpawn[MAXPLAYERS + 1];
+static bool hasSpawned[MAXPLAYERS + 1];
 
 void SetupClientFirstSpawn(int client)
 {
-	firstSpawn[client] = true;
+	hasSpawned[client] = false;
 }
 
 void OnPlayerSpawn_FirstSpawn(int client)
 {
 	int team = GetClientTeam(client);
-	if (firstSpawn[client] && (team == CS_TEAM_CT || team == CS_TEAM_T))
+	if (!hasSpawned[client] && (team == CS_TEAM_CT || team == CS_TEAM_T))
 	{
+		hasSpawned[client] = true;
 		Call_GOKZ_OnFirstSpawn(client);
 	}
-	firstSpawn[client] = false;
 }
 
 
