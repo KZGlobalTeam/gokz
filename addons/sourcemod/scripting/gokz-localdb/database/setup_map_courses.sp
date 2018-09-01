@@ -26,7 +26,6 @@ void DB_SetupMapCourses()
 				}
 				txn.AddQuery(query);
 			}
-		
 			else if (MatchRegex(gRE_BonusStartButton, tempString) > 0)
 			{
 				GetRegexSubString(gRE_BonusStartButton, 1, tempString, sizeof(tempString));
