@@ -26,7 +26,9 @@
 	When the player has jumped in the tick after landing and keeps their speed.
     
     Jumpbug
-    When the player is never seen as 'on ground' when bunnyhopping. This is achievable by uncrouching and jumping at the same time. A jumpbug results in unusual behaviour such as maintaining horizontal speed and not receiving fall damage.
+    When the player is never seen as 'on ground' when bunnyhopping. This is achievable by 
+    uncrouching and jumping at the same time. A jumpbug results in unusual behaviour such
+    as maintaining horizontal speed and not receiving fall damage.
 */
 
 
@@ -223,6 +225,15 @@ native bool Movement_GetTurningLeft(int client);
  */
 native bool Movement_GetTurningRight(int client);
 
+/**
+ * Gets result of CCSPlayer::GetPlayerMaxSpeed(client), which
+ * is the player's max speed as limited by their weapon.
+ *
+ * @param client	Client index.
+ * @return			Player's max speed as limited by their weapon.
+ */
+native float Movement_GetMaxSpeed(int client);
+
 
 
 // =========================  METHODMAP  ========================= //
@@ -318,6 +329,12 @@ methodmap MovementAPIPlayer __nullable__ < MovementPlayer {
 	property bool turningRight {
 		public get() {
 			return Movement_GetTurningRight(this.id);
+		}
+	}
+	
+	property float maxSpeed {
+		public get() {
+			return Movement_GetMaxSpeed(this.id);
 		}
 	}
 }

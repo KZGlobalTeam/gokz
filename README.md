@@ -18,7 +18,7 @@ GOKZ is a package of [SourceMod](https://www.sourcemod.net/about.php) plugins th
 
  * [SourceMod 1.9+](https://www.sourcemod.net/downloads.php?branch=stable)
  * 128 Tick (`-tickrate 128`)
- * [MovementAPI Plugin](https://github.com/danzayau/MovementAPI)
+ * [MovementAPI Plugin 1.1.0+](https://github.com/danzayau/MovementAPI)
  * [DHooks Extension](https://forums.alliedmods.net/showthread.php?t=180114)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-global module)
  * Optional - [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (prevent "Datatable warning" server console spam)
