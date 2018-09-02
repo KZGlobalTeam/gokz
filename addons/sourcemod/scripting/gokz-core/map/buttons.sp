@@ -33,22 +33,24 @@ void OnEntitySpawned_MapButtons(int entity)
 		return;
 	}
 	
-	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	if (StrEqual("climb_startbutton", tempString, false))
+	if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
 	{
-		HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
-	}
-	else if (StrEqual("climb_endbutton", tempString, false))
-	{
-		HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
-	}
-	else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
-	{
-		HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
-	}
-	else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
-	{
-		HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
+		if (StrEqual("climb_startbutton", tempString, false))
+		{
+			HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
+		}
+		else if (StrEqual("climb_endbutton", tempString, false))
+		{
+			HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
+		}
+		else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
+		{
+			HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
+		}
+		else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
+		{
+			HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
+		}
 	}
 }
 
