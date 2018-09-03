@@ -262,7 +262,8 @@ static char pistolEntityNames[PISTOL_COUNT][] =
 	"weapon_deagle", 
 	"weapon_cz75a", 
 	"weapon_fiveseven", 
-	"weapon_tec9"
+	"weapon_tec9", 
+	"weapon_revolver"
 };
 
 static int pistolTeams[PISTOL_COUNT] = 

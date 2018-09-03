@@ -134,6 +134,7 @@ enum
 	Pistol_CZ75A, 
 	Pistol_FiveSeveN, 
 	Pistol_Tec9, 
+	Pistol_R8Revolver, 
 	PISTOL_COUNT
 };
 
@@ -259,7 +260,8 @@ stock char gC_PistolNames[PISTOL_COUNT][] =
 	"Deagle", 
 	"CZ75-Auto", 
 	"Five-SeveN", 
-	"Tec-9"
+	"Tec-9", 
+	"R8 Revolver"
 };
 
 
