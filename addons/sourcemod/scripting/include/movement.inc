@@ -1,11 +1,11 @@
-/* 	
+/*
 	Movement Function Stock Library
 
-	Website: https://github.com/danzayau/MovementAPI	
+	Website: https://github.com/danzayau/MovementAPI
 */
 
 #if defined _movement_included_
-#endinput
+ #endinput
 #endif
 #define _movement_included_
 
@@ -16,9 +16,9 @@
 /**
  * Calculates the horizontal distance between two vectors.
  *
- * @param vec1		First vector.
- * @param vec2		Second vector.
- * @return			Vector horizontal distance.
+ * @param vec1			First vector.
+ * @param vec2			Second vector.
+ * @return				Vector horizontal distance.
  */
 stock float GetVectorHorizontalDistance(const float vec1[3], const float vec2[3])
 {
@@ -41,7 +41,6 @@ stock float GetVectorHorizontalLength(const float vec[3])
  *
  * @param vec			Vector.
  * @param length		New horizontal length.
- * @noreturn
  */
 stock void SetVectorHorizontalLength(float vec[3], float length)
 {
@@ -70,7 +69,6 @@ stock int Movement_GetButtons(int client)
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 stock void Movement_GetOrigin(int client, float result[3])
 {
@@ -83,9 +81,8 @@ stock void Movement_GetOrigin(int client, float result[3])
  * exact height of the ground the player is standing on. This is thus
  * more accurate than Movement_GetOrigin when player is on ground.
  *
- * @param client        Client index.
- * @param result        Resultant vector.
- * @noreturn
+ * @param client		Client index.
+ * @param result		Resultant vector.
  */
 stock void Movement_GetOriginEx(int client, float result[3])
 {
@@ -131,7 +128,6 @@ public bool TraceEntityFilterPlayers(int entity, int contentsMask)
  *
  * @param client		Client index.
  * @param origin		New origin.
- * @noreturn
  */
 stock void Movement_SetOrigin(int client, const float origin[3])
 {
@@ -143,7 +139,6 @@ stock void Movement_SetOrigin(int client, const float origin[3])
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 stock void Movement_GetVelocity(int client, float result[3])
 {
@@ -155,7 +150,6 @@ stock void Movement_GetVelocity(int client, float result[3])
  *
  * @param client		Client index.
  * @param velocity		New velocity.
- * @noreturn
  */
 stock void Movement_SetVelocity(int client, const float velocity[3])
 {
@@ -165,8 +159,8 @@ stock void Movement_SetVelocity(int client, const float velocity[3])
 /**
  * Gets the player's horizontal speed.
  *
- * @param client    	Client index.
- * @return        		Player's horizontal speed.
+ * @param client		Client index.
+ * @return				Player's horizontal speed.
  */
 stock float Movement_GetSpeed(int client)
 {
@@ -178,10 +172,9 @@ stock float Movement_GetSpeed(int client)
 /**
  * Sets the player's horizontal speed.
  *
- * @param client    	Client index.
+ * @param client		Client index.
  * @param value			New horizontal speed.
  * @param applyBaseVel	Whether to apply base velocity as well.
- * @noreturn
  */
 stock void Movement_SetSpeed(int client, float value, bool applyBaseVel = false)
 {
@@ -201,7 +194,7 @@ stock void Movement_SetSpeed(int client, float value, bool applyBaseVel = false)
  * Gets the player's vertical velocity.
  *
  * @param client		Client index.
- * @return        		Player's vertical velocity.
+ * @return				Player's vertical velocity.
  */
 stock float Movement_GetVerticalVelocity(int client)
 {
@@ -215,7 +208,6 @@ stock float Movement_GetVerticalVelocity(int client)
  *
  * @param client		Client index.
  * @param value			New vertical velocity.
- * @noreturn
  */
 stock void Movement_SetVerticalVelocity(int client, float value)
 {
@@ -230,7 +222,6 @@ stock void Movement_SetVerticalVelocity(int client, float value)
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 stock void Movement_GetBaseVelocity(int client, float result[3])
 {
@@ -242,7 +233,6 @@ stock void Movement_GetBaseVelocity(int client, float result[3])
  *
  * @param client		Client index.
  * @param baseVelocity	New base velocity.
- * @noreturn
  */
 stock void Movement_SetBaseVelocity(int client, const float baseVelocity[3])
 {
@@ -254,7 +244,6 @@ stock void Movement_SetBaseVelocity(int client, const float baseVelocity[3])
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 stock void Movement_GetEyeAngles(int client, float result[3])
 {
@@ -266,7 +255,6 @@ stock void Movement_GetEyeAngles(int client, float result[3])
  *
  * @param client		Client index.
  * @param eyeAngles		New eye angles.
- * @noreturn
  */
 stock void Movement_SetEyeAngles(int client, const float eyeAngles[3])
 {
@@ -276,8 +264,8 @@ stock void Movement_SetEyeAngles(int client, const float eyeAngles[3])
 /**
  * Gets whether player is on the ground.
  *
- * @param client    	Client index.
- * @return        		Whether player is on the ground.
+ * @param client		Client index.
+ * @return				Whether player is on the ground.
  */
 stock bool Movement_GetOnGround(int client)
 {
@@ -287,8 +275,8 @@ stock bool Movement_GetOnGround(int client)
 /**
  * Gets whether player is ducking or ducked.
  *
- * @param client    	Client index.
- * @return        		Whether player is ducking or ducked.
+ * @param client		Client index.
+ * @return				Whether player is ducking or ducked.
  */
 stock bool Movement_GetDucking(int client)
 {
@@ -298,8 +286,8 @@ stock bool Movement_GetDucking(int client)
 /**
  * Gets the player's "m_flDuckSpeed" value.
  *
- * @param client    		Client index.
- * @return        			Value of "m_flDuckSpeed".
+ * @param client			Client index.
+ * @return					Value of "m_flDuckSpeed".
  */
 stock float Movement_GetDuckSpeed(int client)
 {
@@ -309,9 +297,8 @@ stock float Movement_GetDuckSpeed(int client)
 /**
  * Sets the player's "m_flDuckSpeed" value.
  *
- * @param client    		Client index.
+ * @param client			Client index.
  * @param value				New "m_flDuckSpeed" value.
- * @noreturn
  */
 stock void Movement_SetDuckSpeed(int client, float value)
 {
@@ -321,8 +308,8 @@ stock void Movement_SetDuckSpeed(int client, float value)
 /**
  * Gets the player's "m_flVelocityModifier" value.
  *
- * @param client    	Client index.
- * @return        		Value of "m_flVelocityModifier".
+ * @param client		Client index.
+ * @return				Value of "m_flVelocityModifier".
  */
 stock float Movement_GetVelocityModifier(int client)
 {
@@ -332,9 +319,8 @@ stock float Movement_GetVelocityModifier(int client)
 /**
  * Sets the player's "m_flVelocityModifier" value.
  *
- * @param client    	Client index.
+ * @param client		Client index.
  * @param value			New "m_flVelocityModifier" value.
- * @noreturn
  */
 stock void Movement_SetVelocityModifier(int client, float value)
 {
@@ -344,8 +330,8 @@ stock void Movement_SetVelocityModifier(int client, float value)
 /**
  * Gets the player's gravity scale factor.
  *
- * @param client    		Client index.
- * @return        			Gravity scale factor.
+ * @param client			Client index.
+ * @return					Gravity scale factor.
  */
 stock float Movement_GetGravity(int client)
 {
@@ -355,9 +341,8 @@ stock float Movement_GetGravity(int client)
 /**
  * Sets the player's gravity scale factor.
  *
- * @param client    		Client index.
+ * @param client			Client index.
  * @param value				Desired gravity scale factor.
- * @noreturn
  */
 stock void Movement_SetGravity(int client, float value)
 {
@@ -367,8 +352,8 @@ stock void Movement_SetGravity(int client, float value)
 /**
  * Gets the player's move type.
  *
- * @param client    	Client index.
- * @return        		Player's move type.
+ * @param client		Client index.
+ * @return				Player's move type.
  */
 stock MoveType Movement_GetMoveType(int client)
 {
@@ -378,9 +363,8 @@ stock MoveType Movement_GetMoveType(int client)
 /**
  * Sets the player's move type.
  *
- * @param client    	Client index.
+ * @param client		Client index.
  * @param moveType 		New move type.
- * @noreturn
  */
 stock void Movement_SetMoveType(int client, MoveType moveType)
 {
@@ -390,8 +374,8 @@ stock void Movement_SetMoveType(int client, MoveType moveType)
 /**
  * Gets whether player is on a ladder.
  *
- * @param client    	Client index.
- * @return        		Whether player is on a ladder.
+ * @param client		Client index.
+ * @return				Whether player is on a ladder.
  */
 stock bool Movement_GetOnLadder(int client)
 {
@@ -401,8 +385,8 @@ stock bool Movement_GetOnLadder(int client)
 /**
  * Gets whether player is noclipping.
  *
- * @param client    	Client index.
- * @return        		Whether player is noclipping.
+ * @param client		Client index.
+ * @return				Whether player is noclipping.
  */
 stock bool Movement_GetNoclipping(int client)
 {
@@ -415,8 +399,8 @@ stock bool Movement_GetNoclipping(int client)
 
 methodmap MovementPlayer __nullable__ {
 	
-	public MovementPlayer(int id) {
-		return view_as<MovementPlayer>(id);
+	public MovementPlayer(int client) {
+		return view_as<MovementPlayer>(client);
 	}
 	
 	property int id {

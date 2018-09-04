@@ -1,11 +1,11 @@
-/* 	
+/*
 	MovementAPI Plugin Include
 
-	Website: https://github.com/danzayau/MovementAPI	
+	Website: https://github.com/danzayau/MovementAPI
 */
 
 #if defined _movementapi_included_
-#endinput
+ #endinput
 #endif
 #define _movementapi_included_
 
@@ -18,17 +18,17 @@
 
 	Takeoff
 	Becoming airborne, including jumping, falling, getting off a ladder and leaving noclip.
-	
+
 	Landing
 	Leaving the air, including landing on the ground, grabbing a ladder and entering noclip.
-	
+
 	Perfect Bunnyhop (Perf)
 	When the player has jumped in the tick after landing and keeps their speed.
-    
-    Jumpbug
-    When the player is never seen as 'on ground' when bunnyhopping. This is achievable by 
-    uncrouching and jumping at the same time. A jumpbug results in unusual behaviour such
-    as maintaining horizontal speed and not receiving fall damage.
+
+	Jumpbug
+	When the player is never seen as 'on ground' when bunnyhopping. This is achievable by 
+	uncrouching and jumping at the same time. A jumpbug results in unusual behaviour such
+	as maintaining horizontal speed and not receiving fall damage.
 */
 
 
@@ -39,7 +39,6 @@
  * Called when a player starts ducking.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void Movement_OnStartDucking(int client);
 
@@ -47,7 +46,6 @@ forward void Movement_OnStartDucking(int client);
  * Called when a player stops ducking.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void Movement_OnStopDucking(int client);
 
@@ -55,7 +53,6 @@ forward void Movement_OnStopDucking(int client);
  * Called when a player touches the ground.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void Movement_OnStartTouchGround(int client);
 
@@ -64,7 +61,6 @@ forward void Movement_OnStartTouchGround(int client);
  *
  * @param client		Client index.
  * @param jumped		Whether player jumped to leave ground.
- * @noreturn
  */
 forward void Movement_OnStopTouchGround(int client, bool jumped);
 
@@ -74,7 +70,6 @@ forward void Movement_OnStopTouchGround(int client, bool jumped);
  * @param client		Client index.
  * @param oldMoveType	Player's old move type.
  * @param newMoveType	Player's new move type.
- * @noreturn
  */
 forward void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType);
 
@@ -87,7 +82,6 @@ forward void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveTyp
  *
  * @param client		Client index.
  * @param jumpbug		Whether the player 'jumpbugged'.
- * @noreturn
  */
 forward void Movement_OnPlayerJump(int client, bool jumpbug);
 
@@ -98,16 +92,16 @@ forward void Movement_OnPlayerJump(int client, bool jumpbug);
 /**
  * Gets whether player's last takeoff was a jump.
  *
- * @param client    	Client index.
- * @return        		Whether player's last takeoff was a jump.
+ * @param client		Client index.
+ * @return				Whether player's last takeoff was a jump.
  */
 native bool Movement_GetJumped(int client);
 
 /**
  * Gets whether player's last takeoff was a perfect bunnyhop.
  *
- * @param client    	Client index.
- * @return        		Whether player's last takeoff was a perfect bunnyhop.
+ * @param client		Client index.
+ * @return				Whether player's last takeoff was a perfect bunnyhop.
  */
 native bool Movement_GetHitPerf(int client);
 
@@ -116,7 +110,6 @@ native bool Movement_GetHitPerf(int client);
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 native void Movement_GetTakeoffOrigin(int client, float result[3]);
 
@@ -128,7 +121,6 @@ native void Movement_GetTakeoffOrigin(int client, float result[3]);
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 native void Movement_GetTakeoffVelocity(int client, float result[3]);
 
@@ -138,24 +130,24 @@ native void Movement_GetTakeoffVelocity(int client, float result[3]);
  * If sv_enablebunnyhopping is 0, CS:GO may adjust the player's 
  * velocity after the takeoff velocity has already been measured.
  *
- * @param client    	Client index.
- * @return        		Player's last takeoff speed.
+ * @param client		Client index.
+ * @return				Player's last takeoff speed.
  */
 native float Movement_GetTakeoffSpeed(int client);
 
 /**
  * Gets player's 'tickcount' at the time of their last takeoff.
  *
- * @param client    	Client index.
- * @return        		Player's last takeoff 'tickcount'.
+ * @param client		Client index.
+ * @return				Player's last takeoff 'tickcount'.
  */
 native int Movement_GetTakeoffTick(int client);
 
 /**
  * Gets player's 'cmdnum' at the time of their last takeoff.
  *
- * @param client    	Client index.
- * @return        		Player's last takeoff 'cmdnum'.
+ * @param client		Client index.
+ * @return				Player's last takeoff 'cmdnum'.
  */
 native int Movement_GetTakeoffCmdNum(int client);
 
@@ -164,7 +156,6 @@ native int Movement_GetTakeoffCmdNum(int client);
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 native void Movement_GetLandingOrigin(int client, float result[3]);
 
@@ -173,55 +164,54 @@ native void Movement_GetLandingOrigin(int client, float result[3]);
  *
  * @param client		Client index.
  * @param result		Resultant vector.
- * @noreturn
  */
 native void Movement_GetLandingVelocity(int client, float result[3]);
 
 /**
  * Gets the player's horizontal speed at the time of their last landing.
  *
- * @param client    	Client index.
- * @return        		Last landing speed of the player (horizontal).
+ * @param client		Client index.
+ * @return				Last landing speed of the player (horizontal).
  */
 native float Movement_GetLandingSpeed(int client);
 
 /**
  * Gets player's 'tickcount' at the time of their last landing.
  *
- * @param client    	Client index.
- * @return        		Player's last landing 'tickcount'.
+ * @param client		Client index.
+ * @return				Player's last landing 'tickcount'.
  */
 native int Movement_GetLandingTick(int client);
 
 /**
  * Gets player's 'cmdnum' at the time of their last landing.
  *
- * @param client    	Client index.
- * @return        		Player's last landing 'cmdnum'.
+ * @param client		Client index.
+ * @return				Player's last landing 'cmdnum'.
  */
 native int Movement_GetLandingCmdNum(int client);
 
 /**
  * Gets whether player is turning their aim horizontally.
  *
- * @param client    	Client index.
- * @return        		Whether player is turning their aim horizontally.
+ * @param client		Client index.
+ * @return				Whether player is turning their aim horizontally.
  */
 native bool Movement_GetTurning(int client);
 
 /**
  * Gets whether player is turning their aim left.
  *
- * @param client    	Client index.
- * @return        		Whether player is turning their aim left.
+ * @param client		Client index.
+ * @return				Whether player is turning their aim left.
  */
 native bool Movement_GetTurningLeft(int client);
 
 /**
  * Gets whether player is turning their aim right.
  *
- * @param client    		Client index.
- * @return        			Whether player is turning their aim right.
+ * @param client		Client index.
+ * @return				Whether player is turning their aim right.
  */
 native bool Movement_GetTurningRight(int client);
 
@@ -229,8 +219,8 @@ native bool Movement_GetTurningRight(int client);
  * Gets result of CCSPlayer::GetPlayerMaxSpeed(client), which
  * is the player's max speed as limited by their weapon.
  *
- * @param client	Client index.
- * @return			Player's max speed as limited by their weapon.
+ * @param client		Client index.
+ * @return				Player's max speed as limited by their weapon.
  */
 native float Movement_GetMaxSpeed(int client);
 
@@ -238,16 +228,10 @@ native float Movement_GetMaxSpeed(int client);
 
 // =========================  METHODMAP  ========================= //
 
-methodmap MovementAPIPlayer __nullable__ < MovementPlayer {
+methodmap MovementAPIPlayer < MovementPlayer {
 	
-	public MovementAPIPlayer(int id) {
-		return view_as<MovementAPIPlayer>(id);
-	}
-	
-	property int id {
-		public get() {
-			return view_as<int>(this);
-		}
+	public MovementAPIPlayer(int client) {
+		return view_as<MovementAPIPlayer>(new MovementPlayer(client));
 	}
 	
 	property bool jumped {
@@ -372,5 +356,6 @@ public void __pl_movementapi_SetNTVOptional()
 	MarkNativeAsOptional("Movement_GetTurning");
 	MarkNativeAsOptional("Movement_GetTurningLeft");
 	MarkNativeAsOptional("Movement_GetTurningRight");
+	MarkNativeAsOptional("Movement_GetMaxSpeed");
 }
 #endif
