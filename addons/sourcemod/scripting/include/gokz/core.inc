@@ -1051,16 +1051,10 @@ stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedMode
 
 // =========================  METHODMAP  ========================= //
 
-methodmap KZPlayer __nullable__ < MovementAPIPlayer {
+methodmap KZPlayer < MovementAPIPlayer {
 	
-	public KZPlayer(int id) {
-		return view_as<KZPlayer>(id);
-	}
-	
-	property int id {
-		public get() {
-			return view_as<int>(this);
-		}
+	public KZPlayer(int client) {
+		return view_as<KZPlayer>(new MovementAPIPlayer(client));
 	}
 	
 	
