@@ -10,7 +10,7 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
-#include <sourcebans>
+#include <sourcebanspp>
 #include <updater>
 
 #pragma newdecls required
@@ -87,7 +87,7 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
-	gB_SourceBans = LibraryExists("sourcebans");
+	gB_SourceBans = LibraryExists("sourcebans++");
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -186,7 +186,7 @@ static void BanSuspect(int client, AMReason reason)
 		{
 			if (gB_SourceBans)
 			{
-				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
+				SBPP_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
 			}
 			else
 			{
@@ -197,7 +197,7 @@ static void BanSuspect(int client, AMReason reason)
 		{
 			if (gB_SourceBans)
 			{
-				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
+				SBPP_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
 			}
 			else
 			{
