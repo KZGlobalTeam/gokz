@@ -47,7 +47,7 @@ static bool LoadSounds()
 	kv.GetString("beatrecord", gC_BeatRecordSound, sizeof(gC_BeatRecordSound));
 	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", gC_BeatRecordSound);
 	AddFileToDownloadsTable(downloadPath);
-	PrecacheSoundAny(gC_BeatRecordSound);
+	PrecacheSound(gC_BeatRecordSound);
 	
 	kv.Close();
 	return true;
@@ -55,7 +55,7 @@ static bool LoadSounds()
 
 static void PlayBeatRecordSound()
 {
-	EmitSoundToAllAny(gC_BeatRecordSound);
+	EmitSoundToAll(gC_BeatRecordSound);
 }
 
 void AnnounceNewTime(

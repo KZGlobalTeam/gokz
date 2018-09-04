@@ -133,5 +133,5 @@ void AnnounceNewTopTime(int client, int course, int mode, int timeType, int rank
 
 void PlayBeatRecordSound()
 {
-	EmitSoundToAllAny(RECORD_SOUND_PATH);
+	EmitSoundToAll(RECORD_SOUND_PATH);
 } 
