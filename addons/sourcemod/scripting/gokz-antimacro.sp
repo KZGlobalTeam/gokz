@@ -35,6 +35,7 @@ public Plugin myinfo =
 #define LOG_PATH "logs/gokz-antimacro.log"
 
 bool gB_GOKZLocalDB;
+bool gB_SourceBans;
 bool gB_SourceBansPP;
 
 int gI_ButtonCount[MAXPLAYERS + 1];
@@ -100,6 +101,10 @@ public void OnLibraryAdded(const char[] name)
 	{
 		gB_GOKZLocalDB = true;
 	}
+	else if (StrEqual(name, "sourcebans"))
+	{
+		gB_SourceBans = true;
+	}
 	else if (StrEqual(name, "sourcebans++"))
 	{
 		gB_SourceBansPP = true;
@@ -111,6 +116,10 @@ public void OnLibraryRemoved(const char[] name)
 	if (StrEqual(name, "gokz-localdb"))
 	{
 		gB_GOKZLocalDB = false;
+	}
+	else if (StrEqual(name, "sourcebans"))
+	{
+		gB_SourceBans = false;
 	}
 	else if (StrEqual(name, "sourcebans++"))
 	{
@@ -184,7 +193,11 @@ static void BanSuspect(int client, AMReason reason)
 	{
 		case AMReason_BhopHack:
 		{
-			if (gB_SourceBansPP)
+			if (gB_SourceBans)
+			{
+				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
+			}
+			else if (gB_SourceBansPP)
 			{
 				SBPP_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
 			}
@@ -195,7 +208,11 @@ static void BanSuspect(int client, AMReason reason)
 		}
 		case AMReason_BhopMacro:
 		{
-			if (gB_SourceBansPP)
+			if (gB_SourceBans)
+			{
+				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
+			}
+			else if (gB_SourceBansPP)
 			{
 				SBPP_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
 			}
