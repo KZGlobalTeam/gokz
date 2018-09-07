@@ -1,49 +1,50 @@
-image: ubuntu:16.04
+image: i386/alpine:3.8
+
+definitions:
+  step: &compile
+    name: Compile Plugins
+    artifacts:
+      - addons/sourcemod/plugins/gokz-*.smx
+    script:
+      - apk update
+      - apk add wget libc6-compat libstdc++
+      - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar x -vzf -
+      - cd ./addons/sourcemod/scripting
+      - for file in gokz-*.sp; do ./spcomp $file; done;
+      - cd ../../../
+      - mv addons/sourcemod/scripting/*.smx addons/sourcemod/plugins
 
 pipelines:
+  custom:
+    compile:
+      - step: *compile
+
+  branches:
+    '{master,dev}':
+      - step: *compile
+
   tags:
     '*':
-      - step:
-          name: Compile Plugins
-          artifacts:
-            - addons/sourcemod/scripting/*.smx
-          script:
-            - apt-get update
-            - apt-get -y install wget lib32stdc++6
-            - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar xvz
-            - cd ./addons/sourcemod/scripting
-            - for file in gokz-*.sp; do ./spcomp $file -i includes; done;
+      - step: *compile
       - step: 
           name: Build Releases
           trigger: manual
           artifacts:
             - builds/*
           script:
-            - apt-get update
-            - apt-get -y install zip
+            - apk update
+            - apk add zip
             - mkdir builds
-            - mkdir addons/sourcemod/plugins
-            - mv addons/sourcemod/scripting/*.smx addons/sourcemod/plugins/
             - zip -r builds/GOKZ-latest.zip . -x builds\* *.git* bitbucket-pipelines.yml
             - zip -r builds/GOKZ-v${BITBUCKET_TAG}.zip . -x builds\* *.git* bitbucket-pipelines.yml
             - zip -r builds/GOKZ-latest-upgrade.zip . -x builds\* cfg\* *.git* bitbucket-pipelines.yml
             - zip -r builds/GOKZ-v${BITBUCKET_TAG}-upgrade.zip . -x builds\* cfg\* *.git* bitbucket-pipelines.yml
       - step:
-            name: Deploy Releases
-            script:
-              - apt-get update
-              - apt-get -y install curl
-              - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-v${BITBUCKET_TAG}.zip"
-              - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-v${BITBUCKET_TAG}-upgrade.zip"
-              - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-latest.zip"
-              - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-latest-upgrade.zip"
-  custom:
-    compile:
-        - step:
-            name: Compile Plugins
-            script:
-              - apt-get update
-              - apt-get -y install wget lib32stdc++6
-              - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar xvz
-              - cd ./addons/sourcemod/scripting
-              - for file in gokz-*.sp; do ./spcomp $file -i includes; done;
+          name: Deploy Releases
+          script:
+            - apk update
+            - apk add curl
+            - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-v${BITBUCKET_TAG}.zip"
+            - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-v${BITBUCKET_TAG}-upgrade.zip"
+            - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-latest.zip"
+            - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"builds/GOKZ-latest-upgrade.zip"
