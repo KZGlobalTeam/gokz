@@ -32,7 +32,7 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
 ### Installing
 
  * Ensure your server is up to date and meets the above requirements.
- * Download and extract `GOKZ-latest.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo/`.
+ * Download and extract `GOKZ-latest.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
  * Add a MySQL or SQLite database called `gokz` to `csgo/addons/sourcemod/configs/databases.cfg`.
 
 When the plugins first load, various configuration files will be auto-generated and can be found in `csgo/cfg/sourcemod/gokz`.
@@ -41,7 +41,7 @@ Use the `!updatemappool` or `sm_updatemappool` in console to populate the ranked
 
 ### Updating
 
- * Download and extract `GOKZ-latest-upgrade.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo/`.
+ * Download and extract `GOKZ-latest-upgrade.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
 
 ### Commands
 
@@ -56,7 +56,7 @@ To add a timer button to a map, use a `func_button` with a specific name.
  * Bonus start buttons are named `climb_bonusX_startbutton` where X is the bonus number.
  * Bonus end buttons are named `climb_bonusX_endbutton` where X is the bonus number.
 
-Enable both the `Don't move` and `Toggle` flags to avoid any usability issues.
+**TIP** - Enable both the `Don't move` and `Toggle` flags to easily avoid any usability issues.
 
 ## Contributing
 
