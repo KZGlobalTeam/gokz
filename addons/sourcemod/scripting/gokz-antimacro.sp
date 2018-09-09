@@ -10,7 +10,7 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
-#include <sourcebans>
+#include <sourcebanspp>
 #include <updater>
 
 #pragma newdecls required
@@ -35,6 +35,7 @@ public Plugin myinfo =
 #define LOG_PATH "logs/gokz-antimacro.log"
 
 bool gB_GOKZLocalDB;
+bool gB_SourceBansPP;
 bool gB_SourceBans;
 
 int gI_ButtonCount[MAXPLAYERS + 1];
@@ -87,6 +88,7 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
+	gB_SourceBansPP = LibraryExists("sourcebans++");
 	gB_SourceBans = LibraryExists("sourcebans");
 }
 
@@ -102,6 +104,10 @@ public void OnLibraryAdded(const char[] name)
 	}
 	else if (StrEqual(name, "sourcebans++"))
 	{
+		gB_SourceBansPP = true;
+	}
+	else if (StrEqual(name, "sourcebans"))
+	{
 		gB_SourceBans = true;
 	}
 }
@@ -113,6 +119,10 @@ public void OnLibraryRemoved(const char[] name)
 		gB_GOKZLocalDB = false;
 	}
 	else if (StrEqual(name, "sourcebans++"))
+	{
+		gB_SourceBansPP = false;
+	}
+	else if (StrEqual(name, "sourcebans"))
 	{
 		gB_SourceBans = false;
 	}
@@ -184,25 +194,27 @@ static void BanSuspect(int client, AMReason reason)
 	{
 		case AMReason_BhopHack:
 		{
-			if (gB_SourceBans)
-			{
-				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop hacking");
-			}
-			else
-			{
-				BanClient(client, gCV_gokz_autoban_duration.IntValue, BANFLAG_AUTO, "gokz-antimacro - Bhop hacking", "You have been banned for using a bhop hack", "gokz-antimacro");
-			}
+			AutoBanClient(client, "gokz-antimacro - Bhop hacking", "You have been banned for using a bhop hack");
 		}
 		case AMReason_BhopMacro:
 		{
-			if (gB_SourceBans)
-			{
-				SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, "gokz-antimacro - Bhop macroing");
-			}
-			else
-			{
-				BanClient(client, gCV_gokz_autoban_duration.IntValue, BANFLAG_AUTO, "gokz-antimacro - Bhop macroing", "You have been banned for using a bhop macro", "gokz-antimacro");
-			}
+			AutoBanClient(client, "gokz-antimacro - Bhop macroing", "You have been banned for using a bhop macro");
 		}
+	}
+}
+
+static void AutoBanClient(int client, const char[] reason, const char[] kickMessage)
+{
+	if (gB_SourceBansPP)
+	{
+		SBPP_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, reason);
+	}
+	else if (gB_SourceBans)
+	{
+		SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, reason);
+	}
+	else
+	{
+		BanClient(client, gCV_gokz_autoban_duration.IntValue, BANFLAG_AUTO, reason, kickMessage, "gokz-antimacro", 0);
 	}
 } 

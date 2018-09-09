@@ -1,6 +1,7 @@
 #include <sourcemod>
 
-#include <emitsoundany>
+#include <sdktools>
+
 #include <gokz>
 
 #include <GlobalAPI-Core>
@@ -147,7 +148,7 @@ public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
 
 public void OnMapStart()
 {
-	PrecacheSounds();
+	LoadSounds();
 }
 
 public void OnConfigsExecuted()
@@ -229,10 +230,10 @@ public int OnModeInfoCallback(bool failure, const char[] name, int latest_versio
 	}
 }
 
-static void PrecacheSounds()
+static void LoadSounds()
 {
 	char downloadPath[PLATFORM_MAX_PATH];
 	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", RECORD_SOUND_PATH);
 	AddFileToDownloadsTable(downloadPath);
-	PrecacheSoundAny(RECORD_SOUND_PATH);
+	PrecacheSound(RECORD_SOUND_PATH);
 } 

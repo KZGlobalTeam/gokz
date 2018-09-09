@@ -191,13 +191,13 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
 	OnPlayerRunCmd_Timer(client); // This should be first!
+	OnPlayerRunCmd_VirtualButtons(client, buttons);
 	OnPlayerRunCmd_TPMenu(client);
 	OnPlayerRunCmd_InfoPanel(client, cmdnum);
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_ValidJump(client, cmdnum);
 	OnPlayerRunCmd_JumpBeam(client);
-	OnPlayerRunCmd_VirtualButtons(client, buttons);
 	UpdateOldVariables(client, buttons); // This should be last!
 }
 

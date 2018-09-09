@@ -1,7 +1,7 @@
 /*	
 	Virtual Buttons
 	
-	Lets players press buttons without looking.
+	Lets players press 'virtual' start and end buttons without looking.
 */
 
 
@@ -9,11 +9,11 @@
 #define SIMPLEKZ_VIRTUAL_BUTTON_RADIUS 32.0 
 #define KZTIMER_VIRTUAL_BUTTON_RADIUS 70.0
 
+static bool hasVirtualStartButton[MAXPLAYERS + 1];
+static bool hasVirtualEndButton[MAXPLAYERS + 1];
+
 static float virtualStartOrigin[MAXPLAYERS + 1][3];
 static float virtualEndOrigin[MAXPLAYERS + 1][3];
-
-static bool hasVirtualStartPosition[MAXPLAYERS + 1];
-static bool hasVirtualEndPosition[MAXPLAYERS + 1];
 
 static int virtualStartCourse[MAXPLAYERS + 1];
 static int virtualEndCourse[MAXPLAYERS + 1];
@@ -22,14 +22,14 @@ static int virtualEndCourse[MAXPLAYERS + 1];
 
 // =========================  PUBLIC  ========================= //
 
-bool GetHasVirtualStartPosition(int client)
+bool GetHasVirtualStartButton(int client)
 {
-	return hasVirtualStartPosition[client];
+	return hasVirtualStartButton[client];
 }
 
-bool GetHasVirtualEndPosition(int client)
+bool GetHasVirtualEndButton(int client)
 {
-	return hasVirtualEndPosition[client];
+	return hasVirtualEndButton[client];
 }
 
 
@@ -38,48 +38,58 @@ bool GetHasVirtualEndPosition(int client)
 
 void SetupClientVirtualButtons(int client)
 {
-	hasVirtualEndPosition[client] = false;
-	hasVirtualStartPosition[client] = false;
-}
-
-void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
-{
-	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
-	{
-		if (GetHasVirtualStartPosition(client) && InRangeOfStartButton(client))
-		{
-			TimerStart(client, virtualStartCourse[client]);
-		}
-		else if (GetHasVirtualEndPosition(client) && InRangeOfEndButton(client))
-		{
-			TimerEnd(client, virtualEndCourse[client]);
-		}
-	}
+	hasVirtualEndButton[client] = false;
+	hasVirtualStartButton[client] = false;
 }
 
 void OnStartButtonPress_VirtualButtons(int client, int course)
 {
 	Movement_GetOrigin(client, virtualStartOrigin[client]);
 	virtualStartCourse[client] = course;
-	hasVirtualStartPosition[client] = true;
+	hasVirtualStartButton[client] = true;
 }
 
 void OnEndButtonPress_VirtualButtons(int client, int course)
 {
 	Movement_GetOrigin(client, virtualEndOrigin[client]);
 	virtualEndCourse[client] = course;
-	hasVirtualEndPosition[client] = true;
+	hasVirtualEndButton[client] = true;
+}
+
+void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
+{
+	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
+	{
+		if (GetHasVirtualStartButton(client) && InRangeOfVirtualStart(client) && CanReachVirtualStart(client))
+		{
+			TimerStart(client, virtualStartCourse[client]);
+		}
+		else if (GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
+		{
+			TimerEnd(client, virtualEndCourse[client]);
+		}
+	}
 }
 
 
 
 // =========================  PRIVATE  ========================= //
 
-static bool InRangeOfStartButton(int client)
+static bool InRangeOfVirtualStart(int client)
+{
+	return InRangeOfButton(client, virtualStartOrigin[client]);
+}
+
+static bool InRangeOfVirtualEnd(int client)
+{
+	return InRangeOfButton(client, virtualEndOrigin[client]);
+}
+
+static bool InRangeOfButton(int client, const float buttonOrigin[3])
 {
 	float origin[3];
 	Movement_GetOrigin(client, origin);
-	float distanceToButton = GetVectorDistance(origin, virtualStartOrigin[client]);
+	float distanceToButton = GetVectorDistance(origin, buttonOrigin);
 	
 	switch (GetOption(client, Option_Mode))
 	{
@@ -89,16 +99,22 @@ static bool InRangeOfStartButton(int client)
 	return false;
 }
 
-static bool InRangeOfEndButton(int client)
+static bool CanReachVirtualStart(int client)
+{
+	return CanReachButton(client, virtualStartOrigin[client]);
+}
+
+static bool CanReachVirtualEnd(int client)
+{
+	return CanReachButton(client, virtualEndOrigin[client]);
+}
+
+static bool CanReachButton(int client, const float buttonOrigin[3])
 {
 	float origin[3];
 	Movement_GetOrigin(client, origin);
-	float distanceToButton = GetVectorDistance(origin, virtualEndOrigin[client]);
-	
-	switch (GetOption(client, Option_Mode))
-	{
-		case Mode_SimpleKZ:return distanceToButton <= SIMPLEKZ_VIRTUAL_BUTTON_RADIUS;
-		case Mode_KZTimer:return distanceToButton <= KZTIMER_VIRTUAL_BUTTON_RADIUS;
-	}
-	return false;
+	Handle trace = TR_TraceRayFilterEx(origin, buttonOrigin, MASK_PLAYERSOLID, RayType_EndPoint, TraceEntityFilterPlayers);
+	bool didHit = TR_DidHit(trace);
+	delete trace;
+	return !didHit;
 } 

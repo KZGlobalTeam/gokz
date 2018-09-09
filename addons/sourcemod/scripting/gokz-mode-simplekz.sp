@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.global/gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 2
+#define MODE_VERSION 3
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
@@ -391,26 +391,7 @@ static bool ValidPrestrafeButtons(KZPlayer player)
 
 static float CalcWeaponVelMod(KZPlayer player)
 {
-	int weaponEnt = GetEntPropEnt(player.id, Prop_Data, "m_hActiveWeapon");
-	if (!IsValidEntity(weaponEnt))
-	{
-		return SPEED_NORMAL / SPEED_NO_WEAPON; // Weapon entity not found, so no weapon
-	}
-	
-	char weaponName[64];
-	GetEntityClassname(weaponEnt, weaponName, sizeof(weaponName)); // Weapon the client is holding
-	
-	// Get weapon speed and work out how much to scale the modifier
-	int weaponCount = sizeof(gC_WeaponNames);
-	for (int weaponID = 0; weaponID < weaponCount; weaponID++)
-	{
-		if (StrEqual(weaponName, gC_WeaponNames[weaponID]))
-		{
-			return SPEED_NORMAL / gI_WeaponRunSpeeds[weaponID];
-		}
-	}
-	
-	return 1.0; // If weapon isn't found (new weapon?)
+	return SPEED_NORMAL / player.maxSpeed;
 }
 
 

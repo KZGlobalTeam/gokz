@@ -4,7 +4,6 @@
 #include <sdktools>
 
 #include <colorvariables>
-#include <emitsoundany>
 #include <gokz>
 
 #include <gokz/core>

@@ -184,7 +184,7 @@ static bool LoadSounds()
 		kv.GetString(gC_KeysDistanceTier[tier], sounds[tier], sizeof(sounds[]));
 		FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", sounds[tier]);
 		AddFileToDownloadsTable(downloadPath);
-		PrecacheSoundAny(sounds[tier]);
+		PrecacheSound(sounds[tier]);
 	}
 	
 	kv.Close();
@@ -199,5 +199,5 @@ void PlayJumpstatSound(int client, int tier)
 		return;
 	}
 	
-	EmitSoundToClientAny(client, sounds[tier]);
+	EmitSoundToClient(client, sounds[tier]);
 } 
