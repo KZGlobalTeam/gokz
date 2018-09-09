@@ -1,8 +1,8 @@
 #include <sourcemod>
 
 #include <sdkhooks>
+#include <sdktools>
 
-#include <emitsoundany>
 #include <gokz>
 
 #include <movementapi>
