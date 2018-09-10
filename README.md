@@ -1,6 +1,6 @@
 # GOKZ SourceMod Plugins (CS:GO)
 
-GOKZ a set of [SourceMod](https://www.sourcemod.net/about.php) plugins exclusively for Counter-Strike: Global Offensive servers. It implements the KZ (KreedZ) game mode, which involves [speedrunning](https://en.wikipedia.org/wiki/Speedrun) through custom maps.
+GOKZ a set of [SourceMod](https://www.sourcemod.net/about.php) plugins exclusively for Counter-Strike: Global Offensive servers. It implements the KZ (Kreedz) game mode, which involves [speedrunning](https://en.wikipedia.org/wiki/Speedrun) through custom maps.
 
 ## Features
 
