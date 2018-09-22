@@ -7,19 +7,36 @@
 
 
 #define TIMER_START_MIN_TICKS_ON_GROUND 4
-#define MODE_VANILLA_SOUND_START "buttons/button9.wav"
-#define MODE_VANILLA_SOUND_END "buttons/bell1.wav"
-#define MODE_SIMPLEKZ_SOUND_START "buttons/button9.wav"
-#define MODE_SIMPLEKZ_SOUND_END "buttons/bell1.wav"
-#define MODE_KZTIMER_SOUND_START "buttons/button3.wav"
-#define MODE_KZTIMER_SOUND_END "buttons/button3.wav"
-#define SOUND_TIMER_STOP "buttons/button18.wav"
+
+static const char startSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/button9.wav", 
+	"buttons/button3.wav"
+};
+
+static const char endSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/bell1.wav", 
+	"buttons/button3.wav"
+};
+
+static const char falseEndSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/button11.wav", 
+	"buttons/button2.wav"
+};
+
+static const char stopSound[] = "buttons/button18.wav";
 
 static bool timerRunning[MAXPLAYERS + 1];
 static float currentTime[MAXPLAYERS + 1];
 static int currentCourse[MAXPLAYERS + 1];
 static bool hasStartedTimerThisMap[MAXPLAYERS + 1];
 static bool hasEndedTimerThisMap[MAXPLAYERS + 1];
+static float lastTryEndTimerTime[MAXPLAYERS + 1];
 
 
 
@@ -50,6 +67,11 @@ bool GetHasStartedTimerThisMap(int client)
 	return hasStartedTimerThisMap[client];
 }
 
+bool GetHasEndedTimerThisMap(int client)
+{
+	return hasEndedTimerThisMap[client];
+}
+
 int GetCurrentTimeType(int client)
 {
 	if (GetTeleportCount(client) == 0)
@@ -63,8 +85,8 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
 		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= TIMER_START_MIN_TICKS_ON_GROUND) && !allowOffGround
-		 || !IsValidMoveType(Movement_GetMoveType(client))
-		 || timerRunning[client] && currentTime[client] < 0.05)
+		 || !IsPlayerValidMoveType(client)
+		 || JustStartedTimer(client))
 	{
 		return;
 	}
@@ -90,10 +112,16 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 
 void TimerEnd(int client, int course)
 {
-	if (!IsPlayerAlive(client)
-		 || !timerRunning[client]
-		 || course != currentCourse[client])
+	if (!IsPlayerAlive(client) || JustTriedEndingTimer(client))
 	{
+		return;
+	}
+	
+	lastTryEndTimerTime[client] = GetGameTime();
+	
+	if (!timerRunning[client] || course != currentCourse[client])
+	{
+		PlayTimerFalseEndSound(client);
 		return;
 	}
 	
@@ -170,7 +198,7 @@ void SetupClientTimer(int client)
 
 void OnPlayerRunCmd_Timer(int client)
 {
-	if (IsPlayerAlive(client) && timerRunning[client] && !GetPaused(client))
+	if (IsPlayerAlive(client) && GetTimerRunning(client) && !GetPaused(client))
 	{
 		currentTime[client] += GetTickInterval();
 	}
@@ -194,9 +222,9 @@ void OnTeleportToStart_Timer(int client, bool customPos)
 		TimerStop(client, false);
 	}
 	if (GetOption(client, Option_AutoRestart) == AutoRestart_Enabled
-		 && !customPos && hasStartedTimerThisMap[client])
+		 && !customPos && GetHasStartedTimerThisMap(client))
 	{
-		TimerStart(client, currentCourse[client], true);
+		TimerStart(client, GetCurrentCourse(client), true);
 	}
 }
 
@@ -230,59 +258,48 @@ void OnRoundStart_Timer()
 
 // =========================  PRIVATE  ========================= //
 
+static bool IsPlayerValidMoveType(int client)
+{
+	return IsValidMoveType(Movement_GetMoveType(client));
+}
+
 static bool IsValidMoveType(MoveType moveType)
 {
 	return moveType == MOVETYPE_WALK || moveType == MOVETYPE_LADDER || moveType == MOVETYPE_NONE;
 }
 
+static bool JustStartedTimer(int client)
+{
+	return timerRunning[client] && GetCurrentTime(client) < 0.05;
+}
+
+static bool JustTriedEndingTimer(int client)
+{
+	return GetHasEndedTimerThisMap(client) && (GetGameTime() - lastTryEndTimerTime[client]) < 0.05;
+}
+
 static void PlayTimerStartSound(int client)
 {
-	switch (GetOption(client, Option_Mode))
-	{
-		case Mode_Vanilla:
-		{
-			EmitSoundToClient(client, MODE_VANILLA_SOUND_START);
-			EmitSoundToClientSpectators(client, MODE_VANILLA_SOUND_START);
-		}
-		case Mode_SimpleKZ:
-		{
-			EmitSoundToClient(client, MODE_SIMPLEKZ_SOUND_START);
-			EmitSoundToClientSpectators(client, MODE_SIMPLEKZ_SOUND_START);
-		}
-		case Mode_KZTimer:
-		{
-			EmitSoundToClient(client, MODE_KZTIMER_SOUND_START);
-			EmitSoundToClientSpectators(client, MODE_KZTIMER_SOUND_START);
-		}
-	}
+	EmitSoundToClient(client, startSounds[GetOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, startSounds[GetOption(client, Option_Mode)]);
 }
 
 static void PlayTimerEndSound(int client)
 {
-	switch (GetOption(client, Option_Mode))
-	{
-		case Mode_Vanilla:
-		{
-			EmitSoundToClient(client, MODE_VANILLA_SOUND_END);
-			EmitSoundToClientSpectators(client, MODE_VANILLA_SOUND_END);
-		}
-		case Mode_SimpleKZ:
-		{
-			EmitSoundToClient(client, MODE_SIMPLEKZ_SOUND_END);
-			EmitSoundToClientSpectators(client, MODE_SIMPLEKZ_SOUND_END);
-		}
-		case Mode_KZTimer:
-		{
-			EmitSoundToClient(client, MODE_KZTIMER_SOUND_END);
-			EmitSoundToClientSpectators(client, MODE_KZTIMER_SOUND_END);
-		}
-	}
+	EmitSoundToClient(client, endSounds[GetOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, endSounds[GetOption(client, Option_Mode)]);
+}
+
+static void PlayTimerFalseEndSound(int client)
+{
+	EmitSoundToClient(client, falseEndSounds[GetOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, falseEndSounds[GetOption(client, Option_Mode)]);
 }
 
 static void PlayTimerStopSound(int client)
 {
-	EmitSoundToClient(client, SOUND_TIMER_STOP);
-	EmitSoundToClientSpectators(client, SOUND_TIMER_STOP);
+	EmitSoundToClient(client, stopSound);
+	EmitSoundToClientSpectators(client, stopSound);
 }
 
 static void PrintEndTimeString(int client)
