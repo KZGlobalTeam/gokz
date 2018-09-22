@@ -263,7 +263,8 @@ static char pistolEntityNames[PISTOL_COUNT][] =
 	"weapon_cz75a", 
 	"weapon_fiveseven", 
 	"weapon_tec9", 
-	"weapon_revolver"
+	"weapon_revolver", 
+	"DISABLED" // Disabled option
 };
 
 static int pistolTeams[PISTOL_COUNT] = 
@@ -275,7 +276,9 @@ static int pistolTeams[PISTOL_COUNT] =
 	CS_TEAM_NONE, 
 	CS_TEAM_NONE, 
 	CS_TEAM_CT, 
-	CS_TEAM_T
+	CS_TEAM_T, 
+	CS_TEAM_NONE, 
+	CS_TEAM_NONE // Disabled option
 };
 
 void UpdatePistol(int client)
@@ -314,13 +317,26 @@ static void GivePistol(int client, int pistol)
 		switchedTeams = true;
 	}
 	
-	// Give the player this pistol
+	// Give the player this pistol (or remove it)
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
 	if (currentPistol != -1)
 	{
 		RemovePlayerItem(client, currentPistol);
 	}
-	GivePlayerItem(client, pistolEntityNames[pistol]);
+	
+	if (pistol == Pistol_Disabled)
+	{
+		// Force switch to knife to avoid weird behaviour
+		int knife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
+		if (knife != -1)
+		{
+			EquipPlayerWeapon(client, knife);
+		}
+	}
+	else
+	{
+		GivePlayerItem(client, pistolEntityNames[pistol]);
+	}
 	
 	// Go back to original team
 	if (switchedTeams)

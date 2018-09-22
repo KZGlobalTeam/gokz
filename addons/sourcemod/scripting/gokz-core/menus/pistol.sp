@@ -25,7 +25,6 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 	if (action == MenuAction_Select)
 	{
 		SetOption(param1, Option_Pistol, param2);
-		UpdatePistol(param1);
 		DisplayPistolMenu(param1, param2 / 6 * 6); // Re-display menu at same spot
 	}
 	else if (action == MenuAction_Cancel && GetCameFromOptionsMenu(param1))
@@ -50,7 +49,15 @@ static void PistolMenuAddItems(int client, Menu menu)
 	
 	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)
 	{
-		FormatEx(display, sizeof(display), "%s", gC_PistolNames[pistol]);
+		if (pistol == Pistol_Disabled)
+		{
+			FormatEx(display, sizeof(display), "%T", "Options Menu - Disabled", client);
+		}
+		else
+		{
+			FormatEx(display, sizeof(display), "%s", gC_PistolNames[pistol]);
+		}
+		
 		// Add asterisk to selected pistol
 		if (pistol == selectedPistol)
 		{
