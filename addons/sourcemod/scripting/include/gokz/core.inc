@@ -135,6 +135,7 @@ enum
 	Pistol_FiveSeveN, 
 	Pistol_Tec9, 
 	Pistol_R8Revolver, 
+	Pistol_Disabled, 
 	PISTOL_COUNT
 };
 
@@ -257,11 +258,12 @@ stock char gC_PistolNames[PISTOL_COUNT][] =
 	"Glock-18", 
 	"P250", 
 	"Dual Berettas", 
-	"Deagle", 
+	"Desert Eagle", 
 	"CZ75-Auto", 
 	"Five-SeveN", 
 	"Tec-9", 
-	"R8 Revolver"
+	"R8 Revolver", 
+	"DISABLED" // Disabled option
 };
 
 

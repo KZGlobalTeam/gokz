@@ -161,8 +161,17 @@ static void OptionsMenuAddMode(int client, Menu menu)
 static void OptionsMenuAddPistol(int client, Menu menu)
 {
 	char display[32];
-	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Pistol", 
-		client, gC_PistolNames[GetOption(client, Option_Pistol)]);
+	int pistol = GetOption(client, Option_Pistol);
+	if (pistol == Pistol_Disabled)
+	{
+		FormatEx(display, sizeof(display), "%T - %T", "Options Menu - Pistol", 
+			client, "Options Menu - Disabled", client);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Pistol", 
+			client, gC_PistolNames[pistol]);
+	}
 	menu.AddItem(IntToStringEx(view_as<int>(Option_Pistol)), display);
 }
 
