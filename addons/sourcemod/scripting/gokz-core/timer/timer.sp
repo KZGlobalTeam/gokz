@@ -36,7 +36,8 @@ static float currentTime[MAXPLAYERS + 1];
 static int currentCourse[MAXPLAYERS + 1];
 static bool hasStartedTimerThisMap[MAXPLAYERS + 1];
 static bool hasEndedTimerThisMap[MAXPLAYERS + 1];
-static float lastTryEndTimerTime[MAXPLAYERS + 1];
+static float lastTimerEndTime[MAXPLAYERS + 1];
+static float lastTimerFalseEndSoundTime[MAXPLAYERS + 1];
 
 
 
@@ -112,16 +113,16 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 
 void TimerEnd(int client, int course)
 {
-	if (!IsPlayerAlive(client) || JustTriedEndingTimer(client))
+	if (!IsPlayerAlive(client))
 	{
 		return;
 	}
 	
-	lastTryEndTimerTime[client] = GetGameTime();
-	
 	if (!timerRunning[client] || course != currentCourse[client])
 	{
-		PlayTimerFalseEndSound(client);
+		if (!JustEndedTimer(client) && !JustPlayedTimerFalseEndSound(client)) {
+			PlayTimerFalseEndSound(client);
+		}
 		return;
 	}
 	
@@ -139,6 +140,7 @@ void TimerEnd(int client, int course)
 	// End Timer
 	timerRunning[client] = false;
 	hasEndedTimerThisMap[client] = true;
+	lastTimerEndTime[client] = GetGameTime();
 	PlayTimerEndSound(client);
 	
 	if (!IsFakeClient(client))
@@ -194,6 +196,8 @@ void SetupClientTimer(int client)
 	hasStartedTimerThisMap[client] = false;
 	hasEndedTimerThisMap[client] = false;
 	currentTime[client] = 0.0;
+	lastTimerEndTime[client] = 0.0;
+	lastTimerFalseEndSoundTime[client] = 0.0;
 }
 
 void OnPlayerRunCmd_Timer(int client)
@@ -273,9 +277,14 @@ static bool JustStartedTimer(int client)
 	return timerRunning[client] && GetCurrentTime(client) < 0.05;
 }
 
-static bool JustTriedEndingTimer(int client)
+static bool JustEndedTimer(int client)
 {
-	return GetHasEndedTimerThisMap(client) && (GetGameTime() - lastTryEndTimerTime[client]) < 0.05;
+	return GetHasEndedTimerThisMap(client) && (GetGameTime() - lastTimerEndTime[client]) < 1.0;
+}
+
+static bool JustPlayedTimerFalseEndSound(int client)
+{
+	return (GetGameTime() - lastTimerFalseEndSoundTime[client]) < 0.05;
 }
 
 static void PlayTimerStartSound(int client)
@@ -294,6 +303,7 @@ static void PlayTimerFalseEndSound(int client)
 {
 	EmitSoundToClient(client, falseEndSounds[GetOption(client, Option_Mode)]);
 	EmitSoundToClientSpectators(client, falseEndSounds[GetOption(client, Option_Mode)]);
+	lastTimerFalseEndSoundTime[client] = GetGameTime();
 }
 
 static void PlayTimerStopSound(int client)
