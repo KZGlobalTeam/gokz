@@ -29,7 +29,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.global/gokz-replays.txt"
+#define UPDATE_URL "http://updater.gokz.org/gokz-replays.txt"
 
 #define MAX_BOTS 2
 #define TICK_DATA_BLOCKSIZE 7

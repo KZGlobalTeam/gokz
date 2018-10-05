@@ -26,7 +26,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.global/gokz-mode-vanilla.txt"
+#define UPDATE_URL "http://updater.gokz.org/gokz-mode-vanilla.txt"
 
 #define MODE_VERSION 1
 

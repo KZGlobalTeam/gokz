@@ -28,7 +28,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.global/gokz-localdb.txt"
+#define UPDATE_URL "http://updater.gokz.org/gokz-localdb.txt"
 
 bool gB_GOKZJumpstats;
 Regex gRE_BonusStartButton;

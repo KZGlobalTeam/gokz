@@ -29,7 +29,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.global/gokz-localranks.txt"
+#define UPDATE_URL "http://updater.gokz.org/gokz-localranks.txt"
 
 #define COMMAND_COOLDOWN 2.5
 #define MAP_POOL_CFG_PATH "cfg/sourcemod/gokz/mappool.cfg"
