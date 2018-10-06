@@ -126,7 +126,7 @@ public int MenuHandler_PlayerTopMode(Menu menu, MenuAction action, int param1, i
 {
 	if (action == MenuAction_Select)
 	{
-		DB_OpenPlayerTop20(param1, param2, playerTopMode[param1]);
+		DisplayPlayerTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)
 	{
