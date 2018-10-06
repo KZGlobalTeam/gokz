@@ -410,6 +410,13 @@
 
 
 	// Player Top Menu ////////////////////////////////////////////////////////////
+	"Player Top Mode Menu - Title"
+	{
+		// Top Record Holders
+		//
+		// Select a Mode
+		"en"		"Top Record Holders\n \nSelect a Mode"
+	}
 	"Player Top Menu - Title"
 	{
 		// Top Record Holders
