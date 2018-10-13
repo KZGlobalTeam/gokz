@@ -14,7 +14,6 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <basecomm>
 #include <updater>
 
 #pragma newdecls required
@@ -34,7 +33,6 @@ public Plugin myinfo =
 #define UPDATE_URL "http://updater.gokz.org/gokz-core.txt"
 
 Handle g_ThisPlugin;
-bool gB_BaseComm;
 Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
@@ -112,7 +110,6 @@ public void OnPluginStart()
 public void OnAllPluginsLoaded()
 {
 	OnAllPluginsLoaded_Modes();
-	gB_BaseComm = LibraryExists("basecomm");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -134,16 +131,10 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
-}
-
-public void OnLibraryRemoved(const char[] name)
-{
-	gB_BaseComm = gB_BaseComm && !StrEqual(name, "basecomm");
 }
 
 
@@ -176,16 +167,6 @@ public void OnClientDisconnect(int client)
 	OnClientDisconnect_Timer(client);
 	OnClientDisconnect_ValidJump(client);
 	gB_ClientIsSetUp[client] = false;
-}
-
-public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
-{
-	if (client != 0 && gCV_gokz_chat_processing.BoolValue)
-	{
-		OnClientSayCommand_ChatProcessing(client, command, sArgs);
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
