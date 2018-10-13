@@ -40,9 +40,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
 	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
 	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
-	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
-	RegConsoleCmd("sm_specs", CommandSpecs, "[KZ] List currently spectating players in chat.");
-	RegConsoleCmd("sm_speclist", CommandSpecs, "[KZ] List currently spectating players in chat.");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
@@ -230,91 +227,6 @@ public Action CommandGoto(int client, int args)
 		}
 	}
 	return Plugin_Handled;
-}
-
-public Action CommandSpec(int client, int args)
-{
-	// If no arguments, display the spec menu
-	if (args < 1)
-	{
-		if (DisplaySpecMenu(client) == 0)
-		{
-			// No targets, so just join spec
-			if (GetClientTeam(client) != CS_TEAM_SPECTATOR)
-			{
-				JoinTeam(client, CS_TEAM_SPECTATOR);
-			}
-		}
-	}
-	// Otherwise try to spectate the player
-	else
-	{
-		char specifiedPlayer[MAX_NAME_LENGTH];
-		GetCmdArg(1, specifiedPlayer, sizeof(specifiedPlayer));
-		
-		int target = FindTarget(client, specifiedPlayer, false, false);
-		if (target != -1)
-		{
-			SpectatePlayer(client, target);
-		}
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandSpecs(int client, int args)
-{
-	int specs = 0;
-	char specNames[1024];
-	
-	int target = IsPlayerAlive(client) ? client : GetObserverTarget(client);
-	int targetSpecs = 0;
-	char targetSpecNames[1024];
-	
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (IsClientInGame(i) && !IsFakeClient(i) && GetClientTeam(i) == CS_TEAM_SPECTATOR)
-		{
-			specs++;
-			if (specs == 1)
-			{
-				FormatEx(specNames, sizeof(specNames), "{lime}%N", i);
-			}
-			else
-			{
-				Format(specNames, sizeof(specNames), "%s{grey}, {lime}%N", specNames, i);
-			}
-			
-			if (target != -1 && GetObserverTarget(i) == target)
-			{
-				targetSpecs++;
-				if (targetSpecs == 1)
-				{
-					FormatEx(targetSpecNames, sizeof(targetSpecNames), "{lime}%N", i);
-				}
-				else
-				{
-					Format(targetSpecNames, sizeof(targetSpecNames), "%s{grey}, {lime}%N", targetSpecNames, i);
-				}
-			}
-		}
-	}
-	
-	if (specs == 0)
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Spectator List (None)");
-	}
-	else
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Spectator List", specs, specNames);
-		if (targetSpecs == 0)
-		{
-			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List (None)", target);
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List", target, targetSpecs, targetSpecNames);
-		}
-	}
 }
 
 public Action CommandOptions(int client, int args)
