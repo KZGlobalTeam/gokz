@@ -38,6 +38,8 @@ static Handle H_OnFirstSpawn;
 static Handle H_OnModeLoaded;
 static Handle H_OnModeUnloaded;
 static Handle H_OnTimerNativeCalledExternally;
+static Handle H_OnCustomStartPositionSet_Post;
+static Handle H_OnCustomStartPositionCleared_Post;
 
 
 
@@ -75,6 +77,8 @@ void CreateGlobalForwards()
 	H_OnModeLoaded = CreateGlobalForward("GOKZ_OnModeLoaded", ET_Ignore, Param_Cell);
 	H_OnModeUnloaded = CreateGlobalForward("GOKZ_OnModeUnloaded", ET_Ignore, Param_Cell);
 	H_OnTimerNativeCalledExternally = CreateGlobalForward("GOKZ_OnTimerNativeCalledExternally", ET_Event, Param_Cell);
+	H_OnCustomStartPositionSet_Post = CreateGlobalForward("GOKZ_OnCustomStartPositionSet_Post", ET_Ignore, Param_Cell, Param_Array, Param_Array);
+	H_OnCustomStartPositionCleared_Post = CreateGlobalForward("GOKZ_OnCustomStartPositionCleared_Post", ET_Ignore, Param_Cell);
 }
 
 void Call_GOKZ_OnClientSetup(int client)
@@ -317,4 +321,20 @@ void Call_GOKZ_OnTimerNativeCalledExternally(Handle plugin, Action &result)
 	Call_StartForward(H_OnTimerNativeCalledExternally);
 	Call_PushCell(plugin);
 	Call_Finish(result);
+}
+
+void Call_GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3], const float angles[3])
+{
+	Call_StartForward(H_OnCustomStartPositionSet_Post);
+	Call_PushCell(client);
+	Call_PushArray(origin, 3);
+	Call_PushArray(angles, 3);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnCustomStartPositionCleared_Post(int client)
+{
+	Call_StartForward(H_OnCustomStartPositionCleared_Post);
+	Call_PushCell(client);
+	Call_Finish();
 } 

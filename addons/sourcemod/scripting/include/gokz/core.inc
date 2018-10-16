@@ -597,6 +597,24 @@ forward void GOKZ_OnModeUnloaded(int mode);
  */
 forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
 
+/**
+ * Called when a player's custom start position is set.
+ *
+ * @param client		Client index.
+ * @param origin		New custom start position origin.
+ * @param angles		New custom start position eye angles.
+ * @noreturn
+ */
+forward void GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3], const float angles[3]);
+
+/**
+ * Called when a player's custom start position is cleared.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+forward void GOKZ_OnCustomStartPositionCleared_Post(int client);
+
 
 
 // =========================  NATIVES  ========================= //
