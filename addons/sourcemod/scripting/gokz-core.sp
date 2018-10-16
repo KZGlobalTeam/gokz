@@ -52,7 +52,6 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/map/prefix.sp"
 
 #include "gokz-core/menus/goto.sp"
-#include "gokz-core/menus/measure.sp"
 #include "gokz-core/menus/mode.sp"
 #include "gokz-core/menus/options.sp"
 #include "gokz-core/menus/pistol.sp"
@@ -386,5 +385,4 @@ static void UpdateOldVariables(int client, int buttons)
 static void PrecacheModels()
 {
 	PrecachePlayerModels();
-	PrecacheMeasureModels();
 } 

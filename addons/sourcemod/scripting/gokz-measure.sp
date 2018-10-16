@@ -1,3 +1,91 @@
+#include <sourcemod>
+
+#include <sdktools>
+
+#include <gokz/core>
+
+#undef REQUIRE_EXTENSIONS
+#undef REQUIRE_PLUGIN
+#include <updater>
+
+
+
+public Plugin myinfo = 
+{
+	name = "GOKZ Measure", 
+	author = "DanZay", 
+	description = "GOKZ Measure Module", 
+	version = GOKZ_VERSION, 
+	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+};
+
+#define UPDATE_URL "http://updater.gokz.org/gokz-measure.txt"
+
+
+
+// =========================  PLUGIN  ========================= //
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	if (GetEngineVersion() != Engine_CSGO)
+	{
+		SetFailState("This plugin is only for CS:GO.");
+	}
+	RegPluginLibrary("gokz-measure");
+	return APLRes_Success;
+}
+
+public void OnPluginStart()
+{
+	LoadTranslations("gokz-measure.phrases");
+	
+	CreateCommands();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+
+
+// =========================  OTHER  ========================= //
+
+public void OnMapStart()
+{
+	PrecacheMeasureModels();
+}
+
+
+
+// =========================  COMMANDS  ========================= //
+
+void CreateCommands()
+{
+	RegConsoleCmd("sm_measure", CommandMeasureMenu, "[KZ] Open the measurement menu.");
+}
+
+public Action CommandMeasureMenu(int client, int args)
+{
+	DisplayMeasureMenu(client);
+	return Plugin_Handled;
+}
+
+
+
+// =========================  MEASURE MENU  ========================= //
+
 /*
 	Measure Menu
 	
@@ -77,7 +165,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 			else
 			{
 				GOKZ_PrintToChat(param1, true, "%t", "Measure Failure (Points Not Set)");
-				PlayErrorSound(param1);
+				GOKZ_PlayErrorSound(param1);
 			}
 		}
 		
@@ -123,7 +211,7 @@ static void MeasureGetPos(int client, int arg)
 	{
 		CloseHandle(trace);
 		GOKZ_PrintToChat(client, true, "%t", "Measure Failure (Not Aiming at Solid)");
-		PlayErrorSound(client);
+		GOKZ_PlayErrorSound(client);
 		return;
 	}
 	

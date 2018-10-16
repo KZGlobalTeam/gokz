@@ -47,7 +47,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 	RegConsoleCmd("sm_tips", CommandToggleHelpAndTips, "[KZ] Toggle seeing help and tips.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
-	RegConsoleCmd("sm_measure", CommandMeasureMenu, "[KZ] Open the measurement menu.");
 	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
@@ -315,12 +314,6 @@ public Action CommandToggleAutoRestart(int client, int args)
 	{
 		GOKZ_SetOption(client, Option_AutoRestart, AutoRestart_Disabled, true);
 	}
-	return Plugin_Handled;
-}
-
-public Action CommandMeasureMenu(int client, int args)
-{
-	DisplayMeasureMenu(client);
 	return Plugin_Handled;
 }
 
