@@ -19,11 +19,16 @@ void CreateNatives()
 	CreateNative("GOKZ_StopTimer", Native_StopTimer);
 	CreateNative("GOKZ_StopTimerAll", Native_StopTimerAll);
 	CreateNative("GOKZ_TeleportToStart", Native_TeleportToStart);
+	CreateNative("GOKZ_GetHasStartPosition", Native_GetHasStartPosition);
 	CreateNative("GOKZ_MakeCheckpoint", Native_MakeCheckpoint);
 	CreateNative("GOKZ_TeleportToCheckpoint", Native_TeleportToCheckpoint);
+	CreateNative("GOKZ_GetCanTeleportToCheckpoint", Native_GetCanTeleportToCheckpoint);
 	CreateNative("GOKZ_PrevCheckpoint", Native_PrevCheckpoint);
+	CreateNative("GOKZ_GetCanPrevCheckpoint", Native_GetCanPrevCheckpoint);
 	CreateNative("GOKZ_NextCheckpoint", Native_NextCheckpoint);
+	CreateNative("GOKZ_GetCanNextCheckpoint", Native_GetCanNextCheckpoint);
 	CreateNative("GOKZ_UndoTeleport", Native_UndoTeleport);
+	CreateNative("GOKZ_GetCanUndoTeleport", Native_GetCanUndoTeleport);
 	CreateNative("GOKZ_Pause", Native_Pause);
 	CreateNative("GOKZ_Resume", Native_Resume);
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
@@ -124,6 +129,11 @@ public int Native_TeleportToStart(Handle plugin, int numParams)
 	TeleportToStart(GetNativeCell(1));
 }
 
+public int Native_GetHasStartPosition(Handle plugin, int numParams)
+{
+	return GetHasStartPosition(GetNativeCell(1));
+}
+
 public int Native_MakeCheckpoint(Handle plugin, int numParams)
 {
 	MakeCheckpoint(GetNativeCell(1));
@@ -134,9 +144,19 @@ public int Native_TeleportToCheckpoint(Handle plugin, int numParams)
 	TeleportToCheckpoint(GetNativeCell(1));
 }
 
+public int Native_GetCanTeleportToCheckpoint(Handle plugin, int numParams)
+{
+	return CanTeleportToCheckpoint(GetNativeCell(1));
+}
+
 public int Native_PrevCheckpoint(Handle plugin, int numParams)
 {
 	PrevCheckpoint(GetNativeCell(1));
+}
+
+public int Native_GetCanPrevCheckpoint(Handle plugin, int numParams)
+{
+	return CanPrevCheckpoint(GetNativeCell(1));
 }
 
 public int Native_NextCheckpoint(Handle plugin, int numParams)
@@ -144,9 +164,19 @@ public int Native_NextCheckpoint(Handle plugin, int numParams)
 	NextCheckpoint(GetNativeCell(1));
 }
 
+public int Native_GetCanNextCheckpoint(Handle plugin, int numParams)
+{
+	return CanNextCheckpoint(GetNativeCell(1));
+}
+
 public int Native_UndoTeleport(Handle plugin, int numParams)
 {
 	UndoTeleport(GetNativeCell(1));
+}
+
+public int Native_GetCanUndoTeleport(Handle plugin, int numParams)
+{
+	return CanUndoTeleport(GetNativeCell(1));
 }
 
 public int Native_Pause(Handle plugin, int numParams)

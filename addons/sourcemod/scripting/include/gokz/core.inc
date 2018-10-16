@@ -797,6 +797,16 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
 native void GOKZ_TeleportToStart(int client);
 
 /**
+ * Gets whether player has a start position they can
+ * teleport to, whether it is custom or not.
+ * 
+ *
+ * @param client    	Client index.
+ * @return				Whether player has a start position.
+ */
+native bool GOKZ_GetHasStartPosition(int client);
+
+/**
  * Set a new checkpoint at the player's current position.
  *
  * @param client    	Client index.
@@ -813,12 +823,30 @@ native void GOKZ_MakeCheckpoint(int client);
 native void GOKZ_TeleportToCheckpoint(int client);
 
 /**
+ * Gets whether the player can teleport to their checkpoint
+ * e.g. will return false if player has no checkpoints.
+ *
+ * @param client		Client index.
+ * @return				Whether player can teleport to checkpoint.
+ */
+native bool GOKZ_GetCanTeleportToCheckpoint(int client);
+
+/**
  * Teleport the player back to a previous checkpoint.
  *
  * @param client    	Client index.
  * @noreturn
  */
 native void GOKZ_PrevCheckpoint(int client);
+
+/**
+ * Gets whether the player can go to their previous checkpoint
+ * e.g. will return false if player has no checkpoints.
+ *
+ * @param client		Client index.
+ * @return				Whether player can go to previous checkpoint.
+ */
+native bool GOKZ_GetCanPrevCheckpoint(int client);
 
 /**
  * Teleport the player to a more recent checkpoint.
@@ -829,12 +857,30 @@ native void GOKZ_PrevCheckpoint(int client);
 native void GOKZ_NextCheckpoint(int client);
 
 /**
+ * Gets whether the player can go to their next checkpoint
+ * e.g. will return false if player has no checkpoints.
+ *
+ * @param client		Client index.
+ * @return				Whether player can go to next checkpoint.
+ */
+native bool GOKZ_GetCanNextCheckpoint(int client);
+
+/**
  * Teleport the player to where they last teleported from.
  *
  * @param client    	Client index.
  * @noreturn
  */
 native void GOKZ_UndoTeleport(int client);
+
+/**
+ * Gets whether the player can undo their teleport
+ * e.g. will return false if teleport was from midair.
+ *
+ * @param client		Client index.
+ * @return				Whether player can undo teleport.
+ */
+native bool GOKZ_GetCanUndoTeleport(int client);
 
 /**
  * Pause the player's timer and freeze them.
@@ -1096,6 +1142,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_TeleportToStart(this.id);
 	}
 	
+	property bool hasStartPosition {
+		public get() {
+			return GOKZ_GetHasStartPosition(this.id);
+		}
+	}
+	
 	public void MakeCheckpoint() {
 		GOKZ_MakeCheckpoint(this.id);
 	}
@@ -1104,16 +1156,40 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_TeleportToCheckpoint(this.id);
 	}
 	
+	property bool canTeleportToCheckpoint {
+		public get() {
+			return GOKZ_GetCanTeleportToCheckpoint(this.id);
+		}
+	}
+	
 	public void PrevCheckpoint() {
 		GOKZ_PrevCheckpoint(this.id);
+	}
+	
+	property bool canPrevCheckpoint {
+		public get() {
+			return GOKZ_GetCanPrevCheckpoint(this.id);
+		}
 	}
 	
 	public void NextCheckpoint() {
 		GOKZ_NextCheckpoint(this.id);
 	}
 	
+	property bool canNextCheckpoint {
+		public get() {
+			return GOKZ_GetCanNextCheckpoint(this.id);
+		}
+	}
+	
 	public void UndoTeleport() {
 		GOKZ_UndoTeleport(this.id);
+	}
+	
+	property bool canUndoTeleport {
+		public get() {
+			return GOKZ_GetCanUndoTeleport(this.id);
+		}
 	}
 	
 	public void Pause() {
@@ -1457,11 +1533,16 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_StopTimer");
 	MarkNativeAsOptional("GOKZ_StopTimerAll");
 	MarkNativeAsOptional("GOKZ_TeleportToStart");
+	MarkNativeAsOptional("GOKZ_GetHasStartPosition");
 	MarkNativeAsOptional("GOKZ_MakeCheckpoint");
-	MarkNativeAsOptional("GOKZ_PrevCheckpoint");
-	MarkNativeAsOptional("GOKZ_NextCheckpoint");
 	MarkNativeAsOptional("GOKZ_TeleportToCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanTeleportToCheckpoint");
+	MarkNativeAsOptional("GOKZ_PrevCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanPrevCheckpoint");
+	MarkNativeAsOptional("GOKZ_NextCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanNextCheckpoint");
 	MarkNativeAsOptional("GOKZ_UndoTeleport");
+	MarkNativeAsOptional("GOKZ_GetCanUndoTeleport");
 	MarkNativeAsOptional("GOKZ_Pause");
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");

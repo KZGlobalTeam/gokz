@@ -351,6 +351,11 @@ void TeleportToStart(int client)
 	Call_GOKZ_OnTeleportToStart_Post(client, hasCustomStartPosition[client]);
 }
 
+bool GetHasStartPosition(int client)
+{
+	return GetHasStartedTimerThisMap(client) || GetHasCustomStartPosition(client);
+}
+
 bool GetHasCustomStartPosition(int client)
 {
 	return hasCustomStartPosition[client];
