@@ -97,7 +97,7 @@ void OnPlayerRunCmd_TPMenu(int client)
 	}
 	
 	// Checks option and that no other menu is open instead of rudely interrupting it
-	if (GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled
+	if (GOKZ_GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled
 		 && GetClientMenu(client) == MenuSource_None)
 	{
 		DisplayTPMenu(client);
@@ -117,6 +117,16 @@ void OnTimerStart_TPMenu(int client)
 	UpdateTPMenu(client);
 }
 
+void OnPause_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnResume_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
 void OnMakeCheckpoint_TPMenu(int client)
 {
 	UpdateTPMenu(client);
@@ -128,6 +138,16 @@ void OnCountedTeleport_TPMenu(int client)
 }
 
 void OnJoinTeam_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnCustomStartPositionSet_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnCustomStartPositionCleared_TPMenu(int client)
 {
 	UpdateTPMenu(client);
 }
@@ -182,7 +202,7 @@ static void TPMenuAddItemTeleport(int client, Menu menu)
 {
 	char display[16];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Teleport", client);
-	if (CanTeleportToCheckpoint(client))
+	if (GOKZ_GetCanTeleportToCheckpoint(client))
 	{
 		menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DEFAULT);
 	}
@@ -196,7 +216,7 @@ static void TPMenuAddItemPrevCheckpoint(int client, Menu menu)
 {
 	char display[16];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", client);
-	if (CanPrevCheckpoint(client))
+	if (GOKZ_GetCanPrevCheckpoint(client))
 	{
 		menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DEFAULT);
 	}
@@ -210,7 +230,7 @@ static void TPMenuAddItemNextCheckpoint(int client, Menu menu)
 {
 	char display[16];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Next CP", client);
-	if (CanNextCheckpoint(client))
+	if (GOKZ_GetCanNextCheckpoint(client))
 	{
 		menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DEFAULT);
 	}
@@ -224,7 +244,7 @@ static void TPMenuAddItemUndo(int client, Menu menu)
 {
 	char display[16];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Undo TP", client);
-	if (CanUndoTeleport(client))
+	if (GOKZ_GetCanUndoTeleport(client))
 	{
 		menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DEFAULT);
 	}
@@ -237,7 +257,7 @@ static void TPMenuAddItemUndo(int client, Menu menu)
 static void TPMenuAddItemPause(int client, Menu menu)
 {
 	char display[16];
-	if (GetPaused(client))
+	if (GOKZ_GetPaused(client))
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", client);
 		menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
@@ -251,7 +271,7 @@ static void TPMenuAddItemPause(int client, Menu menu)
 
 static void TPMenuAddItemStart(int client, Menu menu) {
 	char display[16];
-	if (GetHasStartedTimerThisMap(client) || GetHasCustomStartPosition(client))
+	if (GOKZ_GetHasStartPosition(client))
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Restart", client);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);

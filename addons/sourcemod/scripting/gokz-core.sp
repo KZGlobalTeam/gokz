@@ -47,11 +47,6 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/options.sp"
 #include "gokz-core/teleports.sp"
 
-#include "gokz-core/hud/hide_csgo_hud.sp"
-#include "gokz-core/hud/info_panel.sp"
-#include "gokz-core/hud/speed_text.sp"
-#include "gokz-core/hud/timer_text.sp"
-
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/bhop_triggers.sp"
 #include "gokz-core/map/prefix.sp"
@@ -61,7 +56,6 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/menus/mode.sp"
 #include "gokz-core/menus/options.sp"
 #include "gokz-core/menus/pistol.sp"
-#include "gokz-core/menus/tp.sp"
 
 #include "gokz-core/timer/pause.sp"
 #include "gokz-core/timer/timer.sp"
@@ -99,7 +93,6 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateCommands();
 	CreateCommandListeners();
-	CreateHudSynchronizers();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 }
@@ -170,10 +163,6 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 {
 	OnPlayerRunCmd_Timer(client); // This should be first!
 	OnPlayerRunCmd_VirtualButtons(client, buttons);
-	OnPlayerRunCmd_TPMenu(client);
-	OnPlayerRunCmd_InfoPanel(client, cmdnum);
-	OnPlayerRunCmd_SpeedText(client, cmdnum);
-	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_ValidJump(client, cmdnum);
 	UpdateOldVariables(client, buttons); // This should be last!
 }
@@ -209,13 +198,11 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		OnPlayerSpawn_Pause(client);
 		OnPlayerSpawn_ValidJump(client);
 		OnPlayerSpawn_FirstSpawn(client);
-		UpdateCSGOHUD(client);
 		UpdateHideWeapon(client);
 		UpdatePistol(client);
 		UpdatePlayerModel(client);
 		UpdateGodMode(client);
 		UpdatePlayerCollision(client);
-		UpdateTPMenu(client);
 	}
 }
 
@@ -276,29 +263,11 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_JoinTeam(client);
 	OnTimerStart_Pause(client);
 	OnTimerStart_Teleports(client);
-	OnTimerStart_TimerText(client);
-	OnTimerStart_TPMenu(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	OnTimerEnd_SlayOnEnd(client);
-	OnTimerEnd_TimerText(client);
-}
-
-public void GOKZ_OnTimerStopped(int client)
-{
-	OnTimerStopped_TimerText(client);
-}
-
-public void GOKZ_OnMakeCheckpoint_Post(int client)
-{
-	OnMakeCheckpoint_TPMenu(client);
-}
-
-public void GOKZ_OnCountedTeleport_Post(int client)
-{
-	OnCountedTeleport_TPMenu(client);
 }
 
 public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
@@ -310,18 +279,14 @@ public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
 {
 	OnOptionChanged_Timer(client, option);
 	OnOptionChanged_Mode(client, option);
-	OnOptionChanged_TPMenu(client, option);
 	OnOptionChanged_HideWeapon(client, option);
 	OnOptionChanged_Pistol(client, option);
 	OnOptionChanged_ClanTag(client, option);
-	OnOptionChanged_SpeedText(client, option);
-	OnOptionChanged_TimerText(client, option);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)
 {
 	OnJoinTeam_Pause(client, team);
-	OnJoinTeam_TPMenu(client);
 }
 
 public void GOKZ_OnModeUnloaded(int mode)
@@ -407,12 +372,6 @@ static void CreateHooks()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
 	gameData.Close();
-}
-
-static void CreateHudSynchronizers()
-{
-	CreateHudSynchronizerSpeedText();
-	CreateHudSynchronizerTimerText();
 }
 
 static void UpdateOldVariables(int client, int buttons)

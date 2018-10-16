@@ -378,7 +378,7 @@ void SetCustomStartPosition(int client)
 	{
 		EmitSoundToClient(client, SOUND_CHECKPOINT);
 	}
-	UpdateTPMenu(client);
+	
 	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
 }
 
@@ -386,7 +386,7 @@ void ClearCustomStartPosition(int client)
 {
 	hasCustomStartPosition[client] = false;
 	GOKZ_PrintToChat(client, true, "%t", "Cleared Custom Start Position");
-	UpdateTPMenu(client);
+	
 	Call_GOKZ_OnCustomStartPositionCleared_Post(client);
 }
 

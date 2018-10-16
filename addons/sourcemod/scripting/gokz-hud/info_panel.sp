@@ -86,7 +86,7 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 	}
 	else if (targetPlayer.timerRunning)
 	{
-		switch (GetCurrentTimeType(targetPlayer.id))
+		switch (GOKZ_GetCurrentTimeType(targetPlayer.id))
 		{
 			case TimeType_Nub:
 			{

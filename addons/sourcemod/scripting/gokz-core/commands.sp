@@ -120,56 +120,48 @@ public Action CommandToggleAdvancedMenu(int client, int args)
 public Action CommandMakeCheckpoint(int client, int args)
 {
 	GOKZ_MakeCheckpoint(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandTeleportToCheckpoint(int client, int args)
 {
 	GOKZ_TeleportToCheckpoint(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandPrevCheckpoint(int client, int args)
 {
 	GOKZ_PrevCheckpoint(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandNextCheckpoint(int client, int args)
 {
 	GOKZ_NextCheckpoint(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandUndoTeleport(int client, int args)
 {
 	GOKZ_UndoTeleport(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandTeleportToStart(int client, int args)
 {
 	GOKZ_TeleportToStart(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandSetStartPos(int client, int args)
 {
 	SetCustomStartPosition(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
 public Action CommandClearStartPos(int client, int args)
 {
 	ClearCustomStartPosition(client);
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
@@ -183,7 +175,6 @@ public Action CommandTogglePause(int client, int args)
 	{
 		TogglePause(client);
 	}
-	UpdateTPMenu(client);
 	return Plugin_Handled;
 }
 
