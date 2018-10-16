@@ -35,8 +35,6 @@ public Plugin myinfo =
 Handle g_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
-float gF_OldOrigin[MAXPLAYERS + 1][3];
-bool gB_OldDucking[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 
@@ -177,7 +175,6 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmd_SpeedText(client, cmdnum);
 	OnPlayerRunCmd_TimerText(client, cmdnum);
 	OnPlayerRunCmd_ValidJump(client, cmdnum);
-	OnPlayerRunCmd_JumpBeam(client);
 	UpdateOldVariables(client, buttons); // This should be last!
 }
 
@@ -422,8 +419,6 @@ static void UpdateOldVariables(int client, int buttons)
 {
 	if (IsPlayerAlive(client))
 	{
-		Movement_GetOrigin(client, gF_OldOrigin[client]);
-		gB_OldDucking[client] = Movement_GetDucking(client);
 		gB_OldOnGround[client] = Movement_GetOnGround(client);
 	}
 	gI_OldButtons[client] = buttons;
@@ -431,7 +426,6 @@ static void UpdateOldVariables(int client, int buttons)
 
 static void PrecacheModels()
 {
-	PrecacheJumpBeamModels();
 	PrecachePlayerModels();
 	PrecacheMeasureModels();
 } 
