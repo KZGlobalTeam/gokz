@@ -43,8 +43,7 @@ public void OnPluginStart()
 {
 	LoadTranslations("gokz-hud.phrases");
 	
-	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
-	
+	CreateHooks();
 	CreateHudSynchronizers();
 }
 
@@ -84,6 +83,11 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		UpdateCSGOHUD(client);
 		UpdateTPMenu(client);
 	}
+}
+
+public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
+{
+	event.BroadcastDisabled = true; // Block death notices
 }
 
 
@@ -151,6 +155,12 @@ public void GOKZ_OnCustomStartPositionCleared_Post(int client)
 
 
 // =========================  PRIVATE  ========================= //
+
+static void CreateHooks()
+{
+	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
+	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
+}
 
 static void CreateHudSynchronizers()
 {
