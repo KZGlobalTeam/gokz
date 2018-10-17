@@ -140,7 +140,6 @@ public void OnClientPutInServer(int client)
 	SetupClientJoinTeam(client);
 	SetupClientFirstSpawn(client);
 	SetupClientVirtualButtons(client);
-	PrintConnectMessage(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
 
@@ -177,17 +176,6 @@ public Action OnClientCommandKeyValues(int client, KeyValues kv)
 	return Plugin_Continue;
 }
 
-public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect pre hook
-{
-	event.BroadcastDisabled = true; // Block disconnection messages
-	int client = GetClientOfUserId(event.GetInt("userid"));
-	if (IsValidClient(client))
-	{
-		PrintDisconnectMessage(client, event);
-	}
-	return Plugin_Continue;
-}
-
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
@@ -214,12 +202,6 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 		OnPlayerDeath_Timer(client);
 		OnPlayerDeath_ValidJump(client);
 	}
-	return Plugin_Continue;
-}
-
-public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team pre hook
-{
-	event.BroadcastDisabled = true; // Block join team messages
 	return Plugin_Continue;
 }
 
@@ -352,10 +334,8 @@ static void CreateRegexes()
 
 static void CreateHooks()
 {
-	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
-	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	

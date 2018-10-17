@@ -106,32 +106,6 @@ void OnOptionChanged_HideWeapon(int client, Option option)
 
 
 
-// =========================  CONNECTION MESSAGES  ========================= //
-
-void PrintConnectMessage(int client)
-{
-	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
-	{
-		return;
-	}
-	
-	GOKZ_PrintToChatAll(false, "%t", "Client Connection Message", client);
-}
-
-void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconnect event
-{
-	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
-	{
-		return;
-	}
-	
-	char reason[128];
-	event.GetString("reason", reason, sizeof(reason));
-	GOKZ_PrintToChatAll(false, "%t", "Client Disconnection Message", client, reason);
-}
-
-
-
 // =========================  FORCE SV_FULL_ALLTALK 1  ========================= //
 
 void OnRoundStart_ForceAllTalk()

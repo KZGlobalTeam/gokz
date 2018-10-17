@@ -25,8 +25,11 @@ public Plugin myinfo =
 
 bool gB_BaseComm;
 ConVar gCV_gokz_chat_processing;
+ConVar gCV_gokz_connection_messages;
 
 
+
+// =========================  PLUGIN  ========================= //
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -40,7 +43,10 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-chat.phrases");
+	
 	CreateConVars();
+	CreateHooks();
 }
 
 public void OnAllPluginsLoaded()
@@ -66,6 +72,10 @@ public void OnLibraryRemoved(const char[] name)
 	gB_BaseComm = gB_BaseComm && !StrEqual(name, "basecomm");
 }
 
+
+
+// =========================  CLIENT  ========================= //
+
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
 {
 	if (client != 0 && gCV_gokz_chat_processing.BoolValue)
@@ -76,6 +86,28 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	return Plugin_Continue;
 }
 
+public void OnClientPutInServer(int client)
+{
+	PrintConnectMessage(client);
+}
+
+public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast) // player_disconnect pre hook
+{
+	event.BroadcastDisabled = true; // Block disconnection messages
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	if (IsValidClient(client))
+	{
+		PrintDisconnectMessage(client, event);
+	}
+	return Plugin_Continue;
+}
+
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team pre hook
+{
+	event.BroadcastDisabled = true; // Block join team messages
+	return Plugin_Continue;
+}
+
 
 
 // =========================  PRIVATE  ========================= //
@@ -83,6 +115,13 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 static void CreateConVars()
 {
 	gCV_gokz_chat_processing = CreateConVar("gokz_chat_processing", "1", "Whether GOKZ processes player chat messages.", _, true, 0.0, true, 1.0);
+	gCV_gokz_connection_messages = CreateConVar("gokz_connection_messages", "1", "Whether GOKZ handles connection and disconnection messages.", _, true, 0.0, true, 1.0);
+}
+
+static void CreateHooks()
+{
+	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 }
 
 
@@ -156,4 +195,30 @@ static void SanitiseChatInput(char[] message, int maxlength)
 	CRemoveColors(message, maxlength);
 	// Chat gets double formatted, so replace '%' with '%%%%' to end up with '%'
 	ReplaceString(message, maxlength, "%", "%%%%");
+}
+
+
+
+// =========================  CONNECTION MESSAGES  ========================= //
+
+void PrintConnectMessage(int client)
+{
+	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
+	{
+		return;
+	}
+	
+	GOKZ_PrintToChatAll(false, "%t", "Client Connection Message", client);
+}
+
+void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconnect event
+{
+	if (!gCV_gokz_connection_messages.BoolValue || IsFakeClient(client))
+	{
+		return;
+	}
+	
+	char reason[128];
+	event.GetString("reason", reason, sizeof(reason));
+	GOKZ_PrintToChatAll(false, "%t", "Client Disconnection Message", client, reason);
 } 
