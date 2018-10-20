@@ -187,7 +187,6 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		OnPlayerSpawn_FirstSpawn(client);
 		UpdateHideWeapon(client);
 		UpdatePistol(client);
-		UpdatePlayerModel(client);
 		UpdateGodMode(client);
 		UpdatePlayerCollision(client);
 	}
@@ -280,7 +279,6 @@ public void GOKZ_OnModeUnloaded(int mode)
 
 public void OnMapStart()
 {
-	PrecacheModels();
 	OnMapStart_KZConfig();
 	OnMapStart_Prefix();
 	OnMapStart_Options();
@@ -359,9 +357,4 @@ static void UpdateOldVariables(int client, int buttons)
 		gB_OldOnGround[client] = Movement_GetOnGround(client);
 	}
 	gI_OldButtons[client] = buttons;
-}
-
-static void PrecacheModels()
-{
-	PrecachePlayerModels();
 } 

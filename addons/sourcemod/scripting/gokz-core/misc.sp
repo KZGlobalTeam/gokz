@@ -172,59 +172,6 @@ Action OnNormalSound_StopSounds(int entity)
 
 
 
-// =========================  PLAYER MODELS  ========================= //
-
-#define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
-#define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
-
-void UpdatePlayerModel(int client)
-{
-	if (gCV_gokz_player_models.BoolValue)
-	{
-		// Do this after a delay so that gloves apply correctly after spawning
-		CreateTimer(0.1, Timer_UpdatePlayerModel, GetClientUserId(client));
-	}
-}
-
-public Action Timer_UpdatePlayerModel(Handle timer, int userid)
-{
-	int client = GetClientOfUserId(userid);
-	if (!IsValidClient(client) || !IsPlayerAlive(client))
-	{
-		return;
-	}
-	
-	switch (GetClientTeam(client))
-	{
-		case CS_TEAM_T:
-		{
-			SetEntityModel(client, PLAYER_MODEL_T);
-		}
-		case CS_TEAM_CT:
-		{
-			SetEntityModel(client, PLAYER_MODEL_CT);
-		}
-	}
-	
-	UpdatePlayerModelAlpha(client);
-}
-
-void UpdatePlayerModelAlpha(int client)
-{
-	SetEntityRenderMode(client, RENDER_TRANSCOLOR);
-	SetEntityRenderColor(client, _, _, _, gCV_gokz_player_models_alpha.IntValue);
-}
-
-void PrecachePlayerModels()
-{
-	gCV_sv_disable_immunity_alpha.IntValue = 1; // Ensures player transparency works	
-	
-	PrecacheModel(PLAYER_MODEL_T, true);
-	PrecacheModel(PLAYER_MODEL_CT, true);
-}
-
-
-
 // =========================  PISTOL  ========================= //
 
 static char pistolEntityNames[PISTOL_COUNT][] = 
