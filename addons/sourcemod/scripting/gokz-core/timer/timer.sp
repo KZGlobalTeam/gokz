@@ -227,7 +227,7 @@ void OnTeleportToStart_Timer(int client, bool customPos)
 	{
 		TimerStop(client, false);
 	}
-	if (GetOption(client, Option_AutoRestart) == AutoRestart_Enabled
+	if (GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Enabled
 		 && !customPos && GetHasStartedTimerThisMap(client))
 	{
 		TimerStart(client, GetCurrentCourse(client), true);
@@ -291,20 +291,20 @@ static bool JustFalseEndedTimer(int client)
 
 static void PlayTimerStartSound(int client)
 {
-	EmitSoundToClient(client, startSounds[GetOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, startSounds[GetOption(client, Option_Mode)]);
+	EmitSoundToClient(client, startSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, startSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 }
 
 static void PlayTimerEndSound(int client)
 {
-	EmitSoundToClient(client, endSounds[GetOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, endSounds[GetOption(client, Option_Mode)]);
+	EmitSoundToClient(client, endSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, endSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 }
 
 static void PlayTimerFalseEndSound(int client)
 {
-	EmitSoundToClient(client, falseEndSounds[GetOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, falseEndSounds[GetOption(client, Option_Mode)]);
+	EmitSoundToClient(client, falseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, falseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 }
 
 static void PlayTimerStopSound(int client)
@@ -324,14 +324,14 @@ static void PrintEndTimeString(int client)
 				GOKZ_PrintToChatAll(true, "%t", "Beat Map (NUB)", 
 					client, 
 					GOKZ_FormatTime(currentTime[client]), 
-					gC_ModeNamesShort[GetOption(client, Option_Mode)]);
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 			case TimeType_Pro:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "Beat Map (PRO)", 
 					client, 
 					GOKZ_FormatTime(currentTime[client]), 
-					gC_ModeNamesShort[GetOption(client, Option_Mode)]);
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 		}
 	}
@@ -345,7 +345,7 @@ static void PrintEndTimeString(int client)
 					client, 
 					currentCourse[client], 
 					GOKZ_FormatTime(currentTime[client]), 
-					gC_ModeNamesShort[GetOption(client, Option_Mode)]);
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 			case TimeType_Pro:
 			{
@@ -353,7 +353,7 @@ static void PrintEndTimeString(int client)
 					client, 
 					currentCourse[client], 
 					GOKZ_FormatTime(currentTime[client]), 
-					gC_ModeNamesShort[GetOption(client, Option_Mode)]);
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 		}
 	}

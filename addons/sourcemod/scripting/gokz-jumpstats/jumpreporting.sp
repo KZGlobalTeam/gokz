@@ -17,7 +17,7 @@ static char sounds[DISTANCETIER_COUNT][256];
 
 void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
-	int tier = GetDistanceTier(jumpType, GOKZ_GetOption(client, Option_Mode), distance, offset);
+	int tier = GetDistanceTier(jumpType, GOKZ_GetCoreOption(client, Option_Mode), distance, offset);
 	if (tier == DistanceTier_None)
 	{
 		return;
@@ -67,7 +67,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 		jumper, 
 		distance, 
 		gC_JumpTypes[jumpType], 
-		gC_ModeNames[GOKZ_GetOption(jumper, Option_Mode)], 
+		gC_ModeNames[GOKZ_GetCoreOption(jumper, Option_Mode)], 
 		offset, "Offset", 
 		height, "Height", 
 		RoundFloat(preSpeed), "Pre", 

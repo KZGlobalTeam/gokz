@@ -36,9 +36,26 @@ enum
 	MAPPREFIX_COUNT
 };
 
+enum OptionProp
+{
+	OptionProp_Cookie = 0, 
+	OptionProp_Type, 
+	OptionProp_DefaultValue, 
+	OptionProp_MinValue, 
+	OptionProp_MaxValue, 
+	OPTIONPROP_COUNT
+};
+
+enum OptionType
+{
+	OptionType_Int = 0, 
+	OptionType_Float
+};
+
 enum Option
 {
-	Option_Mode = 0, 
+	OPTION_INVALID = -1, 
+	Option_Mode, 
 	Option_Style, 
 	Option_ShowingTPMenu, 
 	Option_ShowingInfoPanel, 
@@ -270,29 +287,7 @@ stock char gC_PistolNames[PISTOL_COUNT][] =
 
 // =========================  OTHER  ========================= //
 
-stock char gC_ModeCVars[MODECVAR_COUNT][] = 
-{
-	"sv_accelerate", 
-	"sv_friction", 
-	"sv_airaccelerate", 
-	"sv_ladder_scale_speed", 
-	"sv_maxvelocity", 
-	"sv_gravity", 
-	"sv_enablebunnyhopping", 
-	"sv_autobunnyhopping", 
-	"sv_staminamax", 
-	"sv_staminalandcost", 
-	"sv_staminajumpcost", 
-	"sv_staminarecoveryrate", 
-	"sv_maxspeed", 
-	"sv_wateraccelerate", 
-	"sv_timebetweenducks", 
-	"sv_accelerate_use_weapon_speed", 
-	"sv_jump_impulse"
-};
-
-// Used and recommended for key value files
-stock char gC_KeysOptions[OPTION_COUNT][] = 
+stock const char gC_CoreOptionNames[OPTION_COUNT][] = 
 {
 	"mode", 
 	"style", 
@@ -314,6 +309,27 @@ stock char gC_KeysOptions[OPTION_COUNT][] =
 	"helpandtips"
 };
 
+stock char gC_ModeCVars[MODECVAR_COUNT][] = 
+{
+	"sv_accelerate", 
+	"sv_friction", 
+	"sv_airaccelerate", 
+	"sv_ladder_scale_speed", 
+	"sv_maxvelocity", 
+	"sv_gravity", 
+	"sv_enablebunnyhopping", 
+	"sv_autobunnyhopping", 
+	"sv_staminamax", 
+	"sv_staminalandcost", 
+	"sv_staminajumpcost", 
+	"sv_staminarecoveryrate", 
+	"sv_maxspeed", 
+	"sv_wateraccelerate", 
+	"sv_timebetweenducks", 
+	"sv_accelerate_use_weapon_speed", 
+	"sv_jump_impulse"
+};
+
 
 
 // =========================  FORWARDS  ========================= //
@@ -327,14 +343,15 @@ stock char gC_KeysOptions[OPTION_COUNT][] =
 forward void GOKZ_OnClientSetup(int client);
 
 /**
- * Called when a player changes an option.
+ * Called when a player's option's value is changed.
+ * Only called if client is in game.
  *
  * @param client		Client index.
- * @param option		Option that was changed.
+ * @param option		Option name.
  * @param newValue		New value of the option.
  * @noreturn
  */
-forward void GOKZ_OnOptionChanged(int client, Option option, int newValue);
+forward void GOKZ_OnOptionChanged(int client, const char[] option, any newValue);
 
 /**
  * Called when a player starts their timer.
@@ -915,32 +932,61 @@ native void GOKZ_TogglePause(int client);
 native void GOKZ_PlayErrorSound(int client);
 
 /**
- * Gets the default option value as set by a config file.
+ * Registers an option with gokz-core, which uses clientprefs to
+ * keep track of the option's value and to save it to a database.
+ * This also effectively provides natives and forwards for other 
+ * plugins to access any options that have been registered.
  *
- * @param option		GOKZ option.
- * @return				Default option value.
+ * @param name			Option name.
+ * @param description	Option description.
+ * @param type			Type to treat the option value as.
+ * @param defaultValue	Default value of option.
+ * @param minValue		Minimum value of option.
+ * @param maxValue		Maximum value of option.
+ * @return				Whether registration was successful.
  */
-native int GOKZ_GetDefaultOption(Option option);
+native bool GOKZ_RegisterOption(const char[] name, const char[] description, OptionType type, any defaultValue, any minValue, any maxValue);
+
+/**
+ * Gets a property of a registered option. If used outside of
+ * gokz-core to get the cookie, a clone of its Handle is returned.
+ *
+ * @param option		Option name.
+ * @param prop			Option property to get.
+ * @return				Value of property, or -1 (int) if option isn't registered.
+ */
+native any GOKZ_GetOptionProp(const char[] option, OptionProp prop);
+
+/**
+ * Sets a property of a registered option. For safety and simplicity,
+ * the cookie property is read-only and will fail to be set.
+ *
+ * @param option		Option name.
+ * @param prop			Option property to set.
+ * @param value			Value to set the property to.
+ * @return				Whether option property was successfully set.
+ */
+native bool GOKZ_SetOptionProp(const char[] option, OptionProp prop, any value);
 
 /**
  * Gets the current value of a player's option.
  *
  * @param client		Client index.
- * @param option		GOKZ option.
- * @return				Current value of option.
+ * @param option		Option name.
+ * @return				Current value of option, or -1 (int) if option isn't registered.
  */
-native int GOKZ_GetOption(int client, Option option);
+native any GOKZ_GetOption(int client, const char[] option);
 
 /**
- * Sets the player's option value.
+ * Sets the player's option's value. Fails if option doesn't exist,
+ * or if desired value is outside the registered value range.
  *
  * @param client		Client index.
- * @param option		GOKZ option.
- * @param optionValue	New option value.
- * @param printMessage	Whether to print option change messages.
- * @noreturn
+ * @param option		Option name.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
  */
-native void GOKZ_SetOption(int client, Option option, int optionValue, bool printMessage = false);
+native bool GOKZ_SetOption(int client, const char[] option, any value);
 
 /**
  * Gets whether player's last takeoff was a perfect bunnyhop as adjusted by GOKZ.
@@ -1088,7 +1134,7 @@ stock int GOKZ_GetCurrentTimeType(int client)
  */
 stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedModes)
 {
-	int selectedMode = GOKZ_GetOption(client, Option_Mode);
+	int selectedMode = GOKZ_GetCoreOption(client, Option_Mode);
 	char display[32];
 	
 	menu.RemoveAllItems();
@@ -1111,6 +1157,100 @@ stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedMode
 			menu.AddItem("", display, ITEMDRAW_DISABLED);
 		}
 	}
+}
+
+/**
+ * Increment an (integer-type) option's value.
+ * Loops back to min. value if max. value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		Option name.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_CycleOption(int client, const char[] option)
+{
+	int maxValue = GOKZ_GetOptionProp(option, OptionProp_MaxValue);
+	if (maxValue == -1)
+	{
+		return false;
+	}
+	
+	int newValue = GOKZ_GetOption(client, option) + 1;
+	if (newValue > GOKZ_GetOptionProp(option, OptionProp_MaxValue))
+	{
+		newValue = GOKZ_GetOptionProp(option, OptionProp_MinValue);
+	}
+	return GOKZ_SetOption(client, option, newValue);
+}
+
+/**
+ * Returns whether an option is a gokz-core option.
+ *
+ * @param option		Option name.
+ * @param optionEnum	Variable to store enumerated gokz-core option (if it is one).
+ * @return				Whether option is a gokz-core option.
+ */
+stock bool GOKZ_IsCoreOption(const char[] option, Option &optionEnum = OPTION_INVALID)
+{
+	for (Option i; i < OPTION_COUNT; i++)
+	{
+		if (StrEqual(option, gC_CoreOptionNames[i]))
+		{
+			optionEnum = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Gets a property of a gokz-core option.
+ *
+ * @param coreOption	gokz-core option.
+ * @param prop			Option property to get.
+ * @return				Value of property, or -1 if option isn't registered.
+ */
+stock any GOKZ_GetCoreOptionProp(Option option, OptionProp prop)
+{
+	return GOKZ_GetOptionProp(gC_CoreOptionNames[option], prop);
+}
+
+/**
+ * Gets the current value of a player's gokz-core option.
+ *
+ * @param client		Client index.
+ * @param option		gokz-core option.
+ * @return				Current value of option.
+ */
+stock any GOKZ_GetCoreOption(int client, Option option)
+{
+	return GOKZ_GetOption(client, gC_CoreOptionNames[option]);
+}
+
+/**
+ * Sets the player's gokz-core option's value.
+ *
+ * @param client		Client index.
+ * @param option		gokz-core option.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_SetCoreOption(int client, Option option, any value)
+{
+	return GOKZ_SetOption(client, gC_CoreOptionNames[option], value);
+}
+
+/**
+ * Increment an integer-type gokz-core option's value.
+ * Loops back to '0' if max value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		gokz-core option.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_CycleCoreOption(int client, Option option)
+{
+	return GOKZ_CycleOption(client, gC_CoreOptionNames[option]);
 }
 
 
@@ -1264,173 +1404,189 @@ methodmap KZPlayer < MovementAPIPlayer {
 	
 	// =========================  OPTIONS  ========================= //
 	
-	public int GetOption(Option option) {
+	public any GetOption(const char[] option) {
 		return GOKZ_GetOption(this.id, option);
 	}
 	
-	public void SetOption(Option option, int optionValue, bool printMessage = false) {
-		GOKZ_SetOption(this.id, option, optionValue, printMessage);
+	public bool SetOption(const char[] option, any value) {
+		return GOKZ_SetOption(this.id, option, value);
+	}
+	
+	public bool CycleOption(const char[] option) {
+		return GOKZ_CycleOption(this.id, option);
+	}
+	
+	public any GetCoreOption(Option option) {
+		return GOKZ_GetCoreOption(this.id, option);
+	}
+	
+	public bool SetCoreOption(Option option, int value) {
+		return GOKZ_SetCoreOption(this.id, option, value);
+	}
+	
+	public bool CycleCoreOption(Option option) {
+		return GOKZ_CycleCoreOption(this.id, option);
 	}
 	
 	property int mode {
 		public get() {
-			return this.GetOption(Option_Mode);
+			return this.GetCoreOption(Option_Mode);
 		}
 		public set(int value) {
-			this.SetOption(Option_Mode, value);
+			this.SetCoreOption(Option_Mode, value);
 		}
 	}
 	
 	property int style {
 		public get() {
-			return this.GetOption(Option_Style);
+			return this.GetCoreOption(Option_Style);
 		}
 		public set(int value) {
-			this.SetOption(Option_Style, value);
+			this.SetCoreOption(Option_Style, value);
 		}
 	}
 	
 	property int showingTPMenu {
 		public get() {
-			return this.GetOption(Option_ShowingTPMenu);
+			return this.GetCoreOption(Option_ShowingTPMenu);
 		}
 		public set(int value) {
-			this.SetOption(Option_ShowingTPMenu, value);
+			this.SetCoreOption(Option_ShowingTPMenu, value);
 		}
 	}
 	
 	property int showingInfoPanel {
 		public get() {
-			return this.GetOption(Option_ShowingInfoPanel);
+			return this.GetCoreOption(Option_ShowingInfoPanel);
 		}
 		public set(int value) {
-			this.SetOption(Option_ShowingInfoPanel, value);
+			this.SetCoreOption(Option_ShowingInfoPanel, value);
 		}
 	}
 	
 	property int showingKeys {
 		public get() {
-			return this.GetOption(Option_ShowingKeys);
+			return this.GetCoreOption(Option_ShowingKeys);
 		}
 		public set(int value) {
-			this.SetOption(Option_ShowingKeys, value);
+			this.SetCoreOption(Option_ShowingKeys, value);
 		}
 	}
 	
 	property int showingPlayers {
 		public get() {
-			return this.GetOption(Option_ShowingPlayers);
+			return this.GetCoreOption(Option_ShowingPlayers);
 		}
 		public set(int value) {
-			this.SetOption(Option_ShowingPlayers, value);
+			this.SetCoreOption(Option_ShowingPlayers, value);
 		}
 	}
 	
 	property int showingWeapon {
 		public get() {
-			return this.GetOption(Option_ShowingWeapon);
+			return this.GetCoreOption(Option_ShowingWeapon);
 		}
 		public set(int value) {
-			this.SetOption(Option_ShowingWeapon, value);
+			this.SetCoreOption(Option_ShowingWeapon, value);
 		}
 	}
 	
 	property int autoRestart {
 		public get() {
-			return this.GetOption(Option_AutoRestart);
+			return this.GetCoreOption(Option_AutoRestart);
 		}
 		public set(int value) {
-			this.SetOption(Option_AutoRestart, value);
+			this.SetCoreOption(Option_AutoRestart, value);
 		}
 	}
 	
 	property int slayOnEnd {
 		public get() {
-			return this.GetOption(Option_SlayOnEnd);
+			return this.GetCoreOption(Option_SlayOnEnd);
 		}
 		public set(int value) {
-			this.SetOption(Option_SlayOnEnd, value);
+			this.SetCoreOption(Option_SlayOnEnd, value);
 		}
 	}
 	
 	property int pistol {
 		public get() {
-			return this.GetOption(Option_Pistol);
+			return this.GetCoreOption(Option_Pistol);
 		}
 		public set(int value) {
-			this.SetOption(Option_Pistol, value);
+			this.SetCoreOption(Option_Pistol, value);
 		}
 	}
 	
 	property int checkpointMessages {
 		public get() {
-			return this.GetOption(Option_CheckpointMessages);
+			return this.GetCoreOption(Option_CheckpointMessages);
 		}
 		public set(int value) {
-			this.SetOption(Option_CheckpointMessages, value);
+			this.SetCoreOption(Option_CheckpointMessages, value);
 		}
 	}
 	
 	property int checkpointSounds {
 		public get() {
-			return this.GetOption(Option_CheckpointSounds);
+			return this.GetCoreOption(Option_CheckpointSounds);
 		}
 		public set(int value) {
-			this.SetOption(Option_CheckpointSounds, value);
+			this.SetCoreOption(Option_CheckpointSounds, value);
 		}
 	}
 	
 	property int teleportSounds {
 		public get() {
-			return this.GetOption(Option_TeleportSounds);
+			return this.GetCoreOption(Option_TeleportSounds);
 		}
 		public set(int value) {
-			this.SetOption(Option_TeleportSounds, value);
+			this.SetCoreOption(Option_TeleportSounds, value);
 		}
 	}
 	
 	property int errorSounds {
 		public get() {
-			return this.GetOption(Option_ErrorSounds);
+			return this.GetCoreOption(Option_ErrorSounds);
 		}
 		public set(int value) {
-			this.SetOption(Option_ErrorSounds, value);
+			this.SetCoreOption(Option_ErrorSounds, value);
 		}
 	}
 	
 	property int timerText {
 		public get() {
-			return this.GetOption(Option_TimerText);
+			return this.GetCoreOption(Option_TimerText);
 		}
 		public set(int value) {
-			this.SetOption(Option_TimerText, value);
+			this.SetCoreOption(Option_TimerText, value);
 		}
 	}
 	
 	property int speedText {
 		public get() {
-			return this.GetOption(Option_SpeedText);
+			return this.GetCoreOption(Option_SpeedText);
 		}
 		public set(int value) {
-			this.SetOption(Option_SpeedText, value);
+			this.SetCoreOption(Option_SpeedText, value);
 		}
 	}
 	
 	property int jumpBeam {
 		public get() {
-			return this.GetOption(Option_JumpBeam);
+			return this.GetCoreOption(Option_JumpBeam);
 		}
 		public set(int value) {
-			this.SetOption(Option_JumpBeam, value);
+			this.SetCoreOption(Option_JumpBeam, value);
 		}
 	}
 	
 	property int helpAndTips {
 		public get() {
-			return this.GetOption(Option_HelpAndTips);
+			return this.GetCoreOption(Option_HelpAndTips);
 		}
 		public set(int value) {
-			this.SetOption(Option_HelpAndTips, value);
+			this.SetCoreOption(Option_HelpAndTips, value);
 		}
 	}
 	
@@ -1558,7 +1714,9 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_SetTeleportCount");
-	MarkNativeAsOptional("GOKZ_GetDefaultOption");
+	MarkNativeAsOptional("GOKZ_RegisterOption");
+	MarkNativeAsOptional("GOKZ_GetOptionProp");
+	MarkNativeAsOptional("GOKZ_SetOptionProp");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

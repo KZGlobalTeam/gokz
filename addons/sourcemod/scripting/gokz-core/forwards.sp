@@ -46,7 +46,7 @@ static Handle H_OnCustomStartPositionCleared_Post;
 void CreateGlobalForwards()
 {
 	H_OnClientSetup = CreateGlobalForward("GOKZ_OnClientSetup", ET_Ignore, Param_Cell);
-	H_OnOptionChanged = CreateGlobalForward("GOKZ_OnOptionChanged", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+	H_OnOptionChanged = CreateGlobalForward("GOKZ_OnOptionChanged", ET_Ignore, Param_Cell, Param_String, Param_Cell);
 	H_OnTimerStart = CreateGlobalForward("GOKZ_OnTimerStart", ET_Hook, Param_Cell, Param_Cell);
 	H_OnTimerStart_Post = CreateGlobalForward("GOKZ_OnTimerStart_Post", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnTimerEnd = CreateGlobalForward("GOKZ_OnTimerEnd", ET_Hook, Param_Cell, Param_Cell, Param_Float, Param_Cell);
@@ -88,11 +88,11 @@ void Call_GOKZ_OnClientSetup(int client)
 	Call_Finish();
 }
 
-void Call_GOKZ_OnOptionChanged(int client, Option option, int optionValue)
+void Call_GOKZ_OnOptionChanged(int client, const char[] option, int optionValue)
 {
 	Call_StartForward(H_OnOptionChanged);
 	Call_PushCell(client);
-	Call_PushCell(option);
+	Call_PushString(option);
 	Call_PushCell(optionValue);
 	Call_Finish();
 }

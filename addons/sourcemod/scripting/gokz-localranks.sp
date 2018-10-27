@@ -222,7 +222,7 @@ public void GOKZ_LR_OnTimeProcessed(
 	
 	AnnounceNewTime(client, course, mode, runTime, teleportsUsed, firstTime, pbDiff, rank, maxRank, firstTimePro, pbDiffPro, rankPro, maxRankPro);
 	
-	if (mode == GOKZ_GetDefaultOption(Option_Mode) && firstTimePro)
+	if (mode == GetDefaultMode() && firstTimePro)
 	{
 		CompletionMVPStarsUpdate(client);
 	}
@@ -264,4 +264,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public void OnMapStart()
 {
 	PrecacheAnnouncementSounds();
+}
+
+int GetDefaultMode()
+{
+	return GOKZ_GetCoreOptionProp(Option_Mode, OptionProp_DefaultValue);
 } 

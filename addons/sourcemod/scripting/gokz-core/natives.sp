@@ -44,7 +44,9 @@ void CreateNatives()
 	CreateNative("GOKZ_SetCheckpointCount", Native_SetCheckpointCount);
 	CreateNative("GOKZ_GetTeleportCount", Native_GetTeleportCount);
 	CreateNative("GOKZ_SetTeleportCount", Native_SetTeleportCount);
-	CreateNative("GOKZ_GetDefaultOption", Native_GetDefaultOption);
+	CreateNative("GOKZ_RegisterOption", Native_RegisterOption);
+	CreateNative("GOKZ_GetOptionProp", Native_GetOptionProp);
+	CreateNative("GOKZ_SetOptionProp", Native_SetOptionProp);
 	CreateNative("GOKZ_GetOption", Native_GetOption);
 	CreateNative("GOKZ_SetOption", Native_SetOption);
 	CreateNative("GOKZ_GetHitPerf", Native_GetHitPerf);
@@ -267,19 +269,51 @@ public int Native_SetTeleportCount(Handle plugin, int numParams)
 	return view_as<int>(true);
 }
 
-public int Native_GetDefaultOption(Handle plugin, int numParams)
+public int Native_RegisterOption(Handle plugin, int numParams)
 {
-	return GetDefaultOption(GetNativeCell(1));
+	char name[30];
+	GetNativeString(1, name, sizeof(name));
+	char description[255];
+	GetNativeString(2, description, sizeof(description));
+	return view_as<int>(RegisterOption(name, description, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5), GetNativeCell(6)));
+}
+
+public int Native_GetOptionProp(Handle plugin, int numParams)
+{
+	char option[30];
+	GetNativeString(1, option, sizeof(option));
+	OptionProp prop = GetNativeCell(2);
+	any value = GetOptionProp(option, prop);
+	
+	// Return clone of Handle if called by another plugin
+	if (prop == OptionProp_Cookie && plugin != g_ThisPlugin)
+	{
+		value = CloneHandle(value, plugin);
+	}
+	
+	return value;
+}
+
+public int Native_SetOptionProp(Handle plugin, int numParams)
+{
+	char option[30];
+	GetNativeString(1, option, sizeof(option));
+	OptionProp prop = GetNativeCell(2);
+	return SetOptionProp(option, prop, GetNativeCell(3));
 }
 
 public int Native_GetOption(Handle plugin, int numParams)
 {
-	return GetOption(GetNativeCell(1), GetNativeCell(2));
+	char option[30];
+	GetNativeString(2, option, sizeof(option));
+	return view_as<int>(GetOption(GetNativeCell(1), option));
 }
 
 public int Native_SetOption(Handle plugin, int numParams)
 {
-	SetOption(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3), GetNativeCell(4));
+	char option[30];
+	GetNativeString(2, option, sizeof(option));
+	return view_as<int>(SetOption(GetNativeCell(1), option, GetNativeCell(3)));
 }
 
 public int Native_GetHitPerf(Handle plugin, int numParams)

@@ -92,26 +92,26 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 
 public Action CommandMenu(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled)
+	if (GOKZ_GetCoreOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled)
 	{
-		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Disabled);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple, true);
+		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
 	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleAdvancedMenu(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Advanced)
+	if (GOKZ_GetCoreOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Advanced)
 	{
-		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Advanced, true);
+		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Advanced);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple, true);
+		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
 	}
 	return Plugin_Handled;
 }
@@ -227,92 +227,92 @@ public Action CommandOptions(int client, int args)
 
 public Action CommandToggleShowPlayers(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled)
+	if (GOKZ_GetCoreOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled)
 	{
-		GOKZ_SetOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled);
 	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleInfoPanel(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_ShowingInfoPanel) == ShowingInfoPanel_Disabled)
+	if (GOKZ_GetCoreOption(client, Option_ShowingInfoPanel) == ShowingInfoPanel_Disabled)
 	{
-		GOKZ_SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Disabled);
 	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleSpeed(int client, int args)
 {
-	int speedText = GOKZ_GetOption(client, Option_SpeedText);
-	int infoPanel = GOKZ_GetOption(client, Option_ShowingInfoPanel);
+	int speedText = GOKZ_GetCoreOption(client, Option_SpeedText);
+	int infoPanel = GOKZ_GetCoreOption(client, Option_ShowingInfoPanel);
 	
 	if (speedText == SpeedText_Disabled)
 	{
 		if (infoPanel == ShowingInfoPanel_Enabled)
 		{
-			GOKZ_SetOption(client, Option_SpeedText, SpeedText_InfoPanel, true);
+			GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_InfoPanel);
 		}
 		else
 		{
-			GOKZ_SetOption(client, Option_SpeedText, SpeedText_Bottom, true);
+			GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_Bottom);
 		}
 	}
 	else if (infoPanel == ShowingInfoPanel_Disabled && speedText == SpeedText_InfoPanel)
 	{
-		GOKZ_SetOption(client, Option_SpeedText, SpeedText_Bottom, true);
+		GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_Bottom);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_SpeedText, SpeedText_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_Disabled);
 	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleShowWeapon(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Disabled)
+	if (GOKZ_GetCoreOption(client, Option_ShowingWeapon) == ShowingWeapon_Disabled)
 	{
-		GOKZ_SetOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_ShowingWeapon, ShowingWeapon_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_ShowingWeapon, ShowingWeapon_Disabled);
 	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleHelpAndTips(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_HelpAndTips) == HelpAndTips_Disabled)
+	if (GOKZ_GetCoreOption(client, Option_HelpAndTips) == HelpAndTips_Disabled)
 	{
-		GOKZ_SetOption(client, Option_HelpAndTips, HelpAndTips_Enabled, true);
+		GOKZ_SetCoreOption(client, Option_HelpAndTips, HelpAndTips_Enabled);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_HelpAndTips, HelpAndTips_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_HelpAndTips, HelpAndTips_Disabled);
 	}
 	return Plugin_Handled;
 }
 
 public Action CommandToggleAutoRestart(int client, int args)
 {
-	if (GOKZ_GetOption(client, Option_AutoRestart) == AutoRestart_Disabled)
+	if (GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Disabled)
 	{
-		GOKZ_SetOption(client, Option_AutoRestart, AutoRestart_Enabled, true);
+		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Enabled);
 	}
 	else
 	{
-		GOKZ_SetOption(client, Option_AutoRestart, AutoRestart_Disabled, true);
+		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Disabled);
 	}
 	return Plugin_Handled;
 }
@@ -383,6 +383,6 @@ static void SwitchToModeIfAvailable(int client, int mode)
 	}
 	else
 	{
-		SetOption(client, Option_Mode, mode, true);
+		GOKZ_SetCoreOption(client, Option_Mode, mode);
 	}
 } 

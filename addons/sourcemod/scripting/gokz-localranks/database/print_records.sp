@@ -169,7 +169,7 @@ public void DB_TxnSuccess_PrintRecords_FindMap(Handle db, DataPack data, int num
 		{
 			char map[33];
 			SQL_FetchString(results[0], 1, map, sizeof(map));
-			GOKZ_GL_PrintRecords(client, map, course, GOKZ_GetOption(client, Option_Mode));
+			GOKZ_GL_PrintRecords(client, map, course, GOKZ_GetCoreOption(client, Option_Mode));
 		}
 	}
 } 

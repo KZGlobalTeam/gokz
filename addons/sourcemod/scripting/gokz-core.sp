@@ -1,5 +1,6 @@
 #include <sourcemod>
 
+#include <clientprefs>
 #include <dhooks>
 #include <sdktools>
 #include <sdkhooks>
@@ -92,6 +93,7 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateCommands();
 	CreateCommandListeners();
+	CreateOptions();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 }
@@ -115,6 +117,11 @@ public void OnAllPluginsLoaded()
 				OnClientPostAdminCheck(client);
 			}
 		}
+		
+		if (AreClientCookiesCached(client))
+		{
+			OnClientCookiesCached(client);
+		}
 	}
 }
 
@@ -132,7 +139,6 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnClientPutInServer(int client)
 {
-	SetupClientOptions(client);
 	SetupClientTimer(client);
 	SetupClientPause(client);
 	SetupClientHidePlayers(client);
@@ -140,6 +146,7 @@ public void OnClientPutInServer(int client)
 	SetupClientJoinTeam(client);
 	SetupClientFirstSpawn(client);
 	SetupClientVirtualButtons(client);
+	OnClientPutInServer_Options(client);
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
 
@@ -174,6 +181,11 @@ public Action OnClientCommandKeyValues(int client, KeyValues kv)
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public void OnClientCookiesCached(int client)
+{
+	OnClientCookiesCached_Options(client);
 }
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
@@ -254,13 +266,20 @@ public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 	OnTeleportToStart_Timer(client, customPos);
 }
 
-public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
-	OnOptionChanged_Timer(client, option);
-	OnOptionChanged_Mode(client, option);
-	OnOptionChanged_HideWeapon(client, option);
-	OnOptionChanged_Pistol(client, option);
-	OnOptionChanged_ClanTag(client, option);
+	Option coreOption;
+	if (!GOKZ_IsCoreOption(option, coreOption))
+	{
+		return;
+	}
+	
+	OnOptionChanged_Options(client, coreOption, newValue);
+	OnOptionChanged_Timer(client, coreOption);
+	OnOptionChanged_Mode(client, coreOption);
+	OnOptionChanged_HideWeapon(client, coreOption);
+	OnOptionChanged_Pistol(client, coreOption);
+	OnOptionChanged_ClanTag(client, coreOption);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)

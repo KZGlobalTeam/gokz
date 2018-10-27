@@ -89,9 +89,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 				cameFromOptionsMenu[param1] = true;
 				DisplayPistolMenu(param1);
 			}
-			case Option_AutoRestart:CycleOption(param1, Option_AutoRestart, true);
-			case Option_SlayOnEnd:CycleOption(param1, Option_SlayOnEnd, true);
-			default:CycleOption(param1, option, false);
+			default:GOKZ_CycleCoreOption(param1, option);
 		}
 		if (option != Option_Mode && option != Option_Pistol)
 		{
@@ -132,7 +130,7 @@ static void OptionsMenuAddItems(int client, Menu menu)
 
 static void OptionsMenuAddToggle(int client, Menu menu, Option option, const char[] optionPhrase)
 {
-	int optionValue = GetOption(client, option);
+	int optionValue = GOKZ_GetCoreOption(client, option);
 	char display[32];
 	
 	if (optionValue == 0)
@@ -154,14 +152,14 @@ static void OptionsMenuAddMode(int client, Menu menu)
 {
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Mode", 
-		client, gC_ModeNames[GetOption(client, Option_Mode)]);
+		client, gC_ModeNames[GOKZ_GetCoreOption(client, Option_Mode)]);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_Mode)), display);
 }
 
 static void OptionsMenuAddPistol(int client, Menu menu)
 {
 	char display[32];
-	int pistol = GetOption(client, Option_Pistol);
+	int pistol = GOKZ_GetCoreOption(client, Option_Pistol);
 	if (pistol == Pistol_Disabled)
 	{
 		FormatEx(display, sizeof(display), "%T - %T", "Options Menu - Pistol", 
@@ -180,7 +178,7 @@ static void OptionsMenuAddTPMenu(int client, Menu menu)
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Teleport Menu", client, 
-		phrasesTPMenu[GetOption(client, Option_ShowingTPMenu)], client);
+		phrasesTPMenu[GOKZ_GetCoreOption(client, Option_ShowingTPMenu)], client);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_ShowingTPMenu)), display);
 }
 
@@ -189,7 +187,7 @@ static void OptionsMenuAddShowingKeys(int client, Menu menu)
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Show Keys", client, 
-		phrasesShowingKeys[GetOption(client, Option_ShowingKeys)], client);
+		phrasesShowingKeys[GOKZ_GetCoreOption(client, Option_ShowingKeys)], client);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_ShowingKeys)), display);
 }
 
@@ -198,7 +196,7 @@ static void OptionsMenuAddTimerText(int client, Menu menu)
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Timer Text", client, 
-		phrasesTimerText[GetOption(client, Option_TimerText)], client);
+		phrasesTimerText[GOKZ_GetCoreOption(client, Option_TimerText)], client);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_TimerText)), display);
 }
 
@@ -207,7 +205,7 @@ static void OptionsMenuAddSpeedText(int client, Menu menu)
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Speed Text", client, 
-		phrasesSpeedText[GetOption(client, Option_SpeedText)], client);
+		phrasesSpeedText[GOKZ_GetCoreOption(client, Option_SpeedText)], client);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_SpeedText)), display);
 }
 
@@ -216,6 +214,6 @@ static void OptionsMenuAddJumpBeam(int client, Menu menu)
 	char display[32];
 	FormatEx(display, sizeof(display), "%T - %T", 
 		"Options Menu - Jump Beam", client, 
-		phrasesJumpBeam[GetOption(client, Option_JumpBeam)], client);
+		phrasesJumpBeam[GOKZ_GetCoreOption(client, Option_JumpBeam)], client);
 	menu.AddItem(IntToStringEx(view_as<int>(Option_JumpBeam)), display);
 } 

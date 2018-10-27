@@ -46,9 +46,7 @@ int gI_DBCurrentMapID;
 #include "gokz-localdb/database/sql.sp"
 #include "gokz-localdb/database/create_tables.sp"
 #include "gokz-localdb/database/load_jsoptions.sp"
-#include "gokz-localdb/database/load_options.sp"
 #include "gokz-localdb/database/save_jsoptions.sp"
-#include "gokz-localdb/database/save_options.sp"
 #include "gokz-localdb/database/save_time.sp"
 #include "gokz-localdb/database/setup_client.sp"
 #include "gokz-localdb/database/setup_database.sp"
@@ -151,7 +149,6 @@ public void GOKZ_OnClientSetup(int client)
 	}
 	
 	DB_SetupClient(client);
-	DB_LoadOptions(client);
 	DB_LoadJSOptions(client);
 }
 
@@ -162,7 +159,6 @@ public void OnClientDisconnect(int client)
 		return;
 	}
 	
-	DB_SaveOptions(client);
 	DB_SaveJSOptions(client);
 	
 	gB_ClientSetUp[client] = false;
@@ -175,8 +171,8 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 		return;
 	}
 	
-	int mode = GOKZ_GetOption(client, Option_Mode);
-	int style = GOKZ_GetOption(client, Option_Style);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
 }
 

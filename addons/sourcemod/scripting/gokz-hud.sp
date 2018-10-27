@@ -130,11 +130,17 @@ public void GOKZ_OnCountedTeleport_Post(int client)
 	OnCountedTeleport_TPMenu(client);
 }
 
-public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
-	OnOptionChanged_TPMenu(client, option);
-	OnOptionChanged_SpeedText(client, option);
-	OnOptionChanged_TimerText(client, option);
+	Option coreOption;
+	if (!GOKZ_IsCoreOption(option, coreOption))
+	{
+		return;
+	}
+	
+	OnOptionChanged_TPMenu(client, coreOption);
+	OnOptionChanged_SpeedText(client, coreOption);
+	OnOptionChanged_TimerText(client, coreOption);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)

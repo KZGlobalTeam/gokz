@@ -97,7 +97,7 @@ void OnPlayerRunCmd_TPMenu(int client)
 	}
 	
 	// Checks option and that no other menu is open instead of rudely interrupting it
-	if (GOKZ_GetOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled
+	if (GOKZ_GetCoreOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled
 		 && GetClientMenu(client) == MenuSource_None)
 	{
 		DisplayTPMenu(client);
@@ -169,7 +169,7 @@ static void DisplayTPMenu(int client)
 
 static void TPMenuAddItems(int client, Menu menu)
 {
-	switch (GOKZ_GetOption(client, Option_ShowingTPMenu))
+	switch (GOKZ_GetCoreOption(client, Option_ShowingTPMenu))
 	{
 		case ShowingTPMenu_Simple:
 		{

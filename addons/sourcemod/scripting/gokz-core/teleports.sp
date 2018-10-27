@@ -87,11 +87,11 @@ void MakeCheckpoint(int client)
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
 	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
-	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_CHECKPOINT);
 	}
-	if (GetOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Make Checkpoint");
 	}
@@ -374,7 +374,7 @@ void SetCustomStartPosition(int client)
 	Movement_GetEyeAngles(client, customStartAngles[client]);
 	hasCustomStartPosition[client] = true;
 	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
-	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_CHECKPOINT);
 	}
@@ -585,7 +585,7 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	undoOrigin[client] = oldOrigin;
 	undoAngles[client] = oldAngles;
 	
-	if (GetOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_TELEPORT);
 	}

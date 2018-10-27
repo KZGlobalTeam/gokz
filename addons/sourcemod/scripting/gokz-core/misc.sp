@@ -77,7 +77,7 @@ void SetupClientHidePlayers(int client)
 
 public Action OnSetTransmitClient(int entity, int client)
 {
-	if (GOKZ_GetOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
+	if (GOKZ_GetCoreOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
 		 && entity != client
 		 && entity != GetObserverTarget(client))
 	{
@@ -93,7 +93,7 @@ public Action OnSetTransmitClient(int entity, int client)
 void UpdateHideWeapon(int client)
 {
 	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", 
-		GOKZ_GetOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
+		GOKZ_GetCoreOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
 }
 
 void OnOptionChanged_HideWeapon(int client, Option option)
@@ -119,7 +119,7 @@ void OnRoundStart_ForceAllTalk()
 
 void OnTimerEnd_SlayOnEnd(int client)
 {
-	if (GOKZ_GetOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
 	{
 		CreateTimer(3.0, Timer_SlayPlayer, GetClientUserId(client));
 	}
@@ -143,7 +143,7 @@ public Action Timer_SlayPlayer(Handle timer, int userid)
 
 void PlayErrorSound(int client)
 {
-	if (GOKZ_GetOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
 	{
 		EmitSoundToClient(client, SOUND_ERROR);
 	}
@@ -204,7 +204,7 @@ static int pistolTeams[PISTOL_COUNT] =
 
 void UpdatePistol(int client)
 {
-	GivePistol(client, GOKZ_GetOption(client, Option_Pistol));
+	GivePistol(client, GOKZ_GetCoreOption(client, Option_Pistol));
 }
 
 void OnOptionChanged_Pistol(int client, Option option)
@@ -442,7 +442,7 @@ void UpdateClanTag(int client)
 {
 	if (!IsFakeClient(client))
 	{
-		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetOption(client, Option_Mode)]);
+		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 	}
 }
 

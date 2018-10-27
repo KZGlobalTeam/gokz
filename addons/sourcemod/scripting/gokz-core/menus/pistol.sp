@@ -24,7 +24,7 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 {
 	if (action == MenuAction_Select)
 	{
-		SetOption(param1, Option_Pistol, param2);
+		GOKZ_SetCoreOption(param1, Option_Pistol, param2);
 		DisplayPistolMenu(param1, param2 / 6 * 6); // Re-display menu at same spot
 	}
 	else if (action == MenuAction_Cancel && GetCameFromOptionsMenu(param1))
@@ -44,7 +44,7 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 
 static void PistolMenuAddItems(int client, Menu menu)
 {
-	int selectedPistol = GOKZ_GetOption(client, Option_Pistol);
+	int selectedPistol = GOKZ_GetCoreOption(client, Option_Pistol);
 	char display[32];
 	
 	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)

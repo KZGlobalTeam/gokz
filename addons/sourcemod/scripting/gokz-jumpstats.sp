@@ -148,9 +148,15 @@ public void GOKZ_OnJumpInvalidated(int client)
 	OnJumpInvalidated_JumpTracking(client);
 }
 
-public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
-	OnOptionChanged_JumpTracking(client, option);
+	Option coreOption;
+	if (!GOKZ_IsCoreOption(option, coreOption))
+	{
+		return;
+	}
+	
+	OnOptionChanged_JumpTracking(client, coreOption);
 }
 
 public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)

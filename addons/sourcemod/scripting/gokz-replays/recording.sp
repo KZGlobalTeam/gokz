@@ -41,8 +41,8 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	}
 	
 	// Prepare data
-	int mode = GOKZ_GetOption(client, Option_Mode);
-	int style = GOKZ_GetOption(client, Option_Style);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
 	int timeType = GOKZ_GetCurrentTimeType(client);
 	
 	// Setup file path and file
@@ -119,8 +119,8 @@ bool SaveRecordingCheater(int client)
 	}
 	
 	// Prepare data
-	int mode = GOKZ_GetOption(client, Option_Mode);
-	int style = GOKZ_GetOption(client, Option_Style);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
 	
 	// Setup file path and file
 	int replayNumber = 0;

@@ -8,7 +8,7 @@
 
 void CompletionMVPStarsUpdate(int client)
 {
-	DB_GetCompletion(client, GetSteamAccountID(client), GOKZ_GetDefaultOption(Option_Mode), false);
+	DB_GetCompletion(client, GetSteamAccountID(client), GetDefaultMode(), false);
 }
 
 void CompletionMVPStarsUpdateAll()
@@ -221,7 +221,7 @@ void UpdateRecordMissed(int client)
 	}
 	
 	int course = GOKZ_GetCurrentCourse(client);
-	int mode = GOKZ_GetOption(client, Option_Mode);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	float currentTime = GOKZ_GetCurrentTime(client);
 	
 	bool nubRecordExists = gB_RecordExistsCache[course][mode][TimeType_Nub];
@@ -275,7 +275,7 @@ void UpdatePBMissed(int client)
 	}
 	
 	int course = GOKZ_GetCurrentCourse(client);
-	int mode = GOKZ_GetOption(client, Option_Mode);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	float currentTime = GOKZ_GetCurrentTime(client);
 	
 	bool nubPBExists = gB_PBExistsCache[client][course][mode][TimeType_Nub];

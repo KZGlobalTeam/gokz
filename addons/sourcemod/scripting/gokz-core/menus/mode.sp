@@ -24,7 +24,7 @@ public int MenuHandler_Mode(Menu menu, MenuAction action, int param1, int param2
 {
 	if (action == MenuAction_Select)
 	{
-		GOKZ_SetOption(param1, Option_Mode, param2);
+		GOKZ_SetCoreOption(param1, Option_Mode, param2);
 		if (GetCameFromOptionsMenu(param1))
 		{
 			DisplayOptionsMenu(param1, 0);

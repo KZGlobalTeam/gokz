@@ -330,8 +330,8 @@ static void SetBotStuff(int bot)
 	int client = botClient[bot];
 	
 	// Set it's movement options just in case it could negatively affect the playback
-	GOKZ_SetOption(client, Option_Mode, botMode[bot]);
-	GOKZ_SetOption(client, Option_Style, botStyle[bot]);
+	GOKZ_SetCoreOption(client, Option_Mode, botMode[bot]);
+	GOKZ_SetCoreOption(client, Option_Style, botStyle[bot]);
 	
 	// Set bot clan tag
 	char tag[MAX_NAME_LENGTH];

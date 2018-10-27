@@ -91,7 +91,7 @@ static bool InRangeOfButton(int client, const float buttonOrigin[3])
 	Movement_GetOrigin(client, origin);
 	float distanceToButton = GetVectorDistance(origin, buttonOrigin);
 	
-	switch (GetOption(client, Option_Mode))
+	switch (GOKZ_GetCoreOption(client, Option_Mode))
 	{
 		case Mode_SimpleKZ:return distanceToButton <= SIMPLEKZ_VIRTUAL_BUTTON_RADIUS;
 		case Mode_KZTimer:return distanceToButton <= KZTIMER_VIRTUAL_BUTTON_RADIUS;
