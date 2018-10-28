@@ -19,10 +19,6 @@ void DB_CreateTables()
 			SQL_FastQuery(gH_DB, sqlite_maps_create);
 			SQL_FastQuery(gH_DB, sqlite_mapcourses_create);
 			SQL_FastQuery(gH_DB, sqlite_times_create);
-			if (gB_GOKZJumpstats)
-			{
-				SQL_FastQuery(gH_DB, sqlite_jsoptions_create);
-			}
 		}
 		case DatabaseType_MySQL:
 		{
@@ -31,10 +27,6 @@ void DB_CreateTables()
 			SQL_FastQuery(gH_DB, mysql_maps_create);
 			SQL_FastQuery(gH_DB, mysql_mapcourses_create);
 			SQL_FastQuery(gH_DB, mysql_times_create);
-			if (gB_GOKZJumpstats)
-			{
-				SQL_FastQuery(gH_DB, mysql_jsoptions_create);
-			}
 		}
 	}
 	

@@ -30,7 +30,6 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-localdb.txt"
 
-bool gB_GOKZJumpstats;
 Regex gRE_BonusStartButton;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
@@ -45,8 +44,6 @@ int gI_DBCurrentMapID;
 
 #include "gokz-localdb/database/sql.sp"
 #include "gokz-localdb/database/create_tables.sp"
-#include "gokz-localdb/database/load_jsoptions.sp"
-#include "gokz-localdb/database/save_jsoptions.sp"
 #include "gokz-localdb/database/save_time.sp"
 #include "gokz-localdb/database/setup_client.sp"
 #include "gokz-localdb/database/setup_database.sp"
@@ -79,7 +76,6 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	gB_GOKZJumpstats = LibraryExists("gokz-jumpstats");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
@@ -98,33 +94,10 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "gokz-jumpstats"))
-	{
-		gB_GOKZJumpstats = true;
-		
-		// Late-loading gokz-jumpstats options
-		if (gH_DB == null)
-		{
-			return;
-		}
-		
-		for (int client = 1; client <= MaxClients; client++)
-		{
-			if (GOKZ_IsClientSetUp(client) && !IsFakeClient(client))
-			{
-				DB_LoadJSOptions(client);
-			}
-		}
-	}
-	else if (StrEqual(name, "updater"))
+if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
-}
-
-public void OnLibraryRemoved(const char[] name)
-{
-	gB_GOKZJumpstats = gB_GOKZJumpstats && !StrEqual(name, "gokz-replays");
 }
 
 
@@ -149,7 +122,6 @@ public void GOKZ_OnClientSetup(int client)
 	}
 	
 	DB_SetupClient(client);
-	DB_LoadJSOptions(client);
 }
 
 public void OnClientDisconnect(int client)
@@ -158,8 +130,6 @@ public void OnClientDisconnect(int client)
 	{
 		return;
 	}
-	
-	DB_SaveJSOptions(client);
 	
 	gB_ClientSetUp[client] = false;
 }

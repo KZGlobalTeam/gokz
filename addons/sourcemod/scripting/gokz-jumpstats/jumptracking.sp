@@ -62,9 +62,9 @@ void OnJumpInvalidated_JumpTracking(int client)
 	InvalidateJumpstat(client);
 }
 
-void OnOptionChanged_JumpTracking(int client, Option option)
+void OnOptionChanged_JumpTracking(int client, const char[] option)
 {
-	if (option == Option_Mode)
+	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]))
 	{
 		InvalidateJumpstat(client);
 	}

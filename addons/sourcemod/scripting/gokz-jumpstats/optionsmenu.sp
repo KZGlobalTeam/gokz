@@ -29,7 +29,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 		menu.GetItem(param2, info, sizeof(info));
 		JSOption option = view_as<JSOption>(StringToInt(info));
 		
-		CycleOption(param1, option);
+		GOKZ_JS_CycleOption(param1, option);
 		DisplayOptionsMenu(param1, param2 / 6 * 6);
 	}
 	else if (action == MenuAction_End)
@@ -52,7 +52,7 @@ static void OptionsMenuAddItems(int client, Menu menu)
 
 static void OptionsMenuAddToggle(int client, Menu menu, JSOption option, const char[] optionPhrase)
 {
-	int optionValue = GetOption(client, option);
+	int optionValue = GOKZ_JS_GetOption(client, option);
 	char display[32];
 	
 	if (optionValue == 0)
@@ -68,7 +68,7 @@ static void OptionsMenuAddToggle(int client, Menu menu, JSOption option, const c
 			"Options Menu - Enabled", client);
 	}
 	
-	if (option != JSOption_JumpstatsMaster && GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
+	if (option != JSOption_JumpstatsMaster && GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
 	{
 		menu.AddItem(IntToStringEx(view_as<int>(option)), display, ITEMDRAW_DISABLED);
 	}
@@ -80,7 +80,7 @@ static void OptionsMenuAddToggle(int client, Menu menu, JSOption option, const c
 
 static void OptionsMenuAddDistanceTier(int client, Menu menu, JSOption option, const char[] optionPhrase)
 {
-	int optionValue = GetOption(client, option);
+	int optionValue = GOKZ_JS_GetOption(client, option);
 	char display[32];
 	if (optionValue == DistanceTier_None) // Disabled
 	{
@@ -101,7 +101,7 @@ static void OptionsMenuAddDistanceTier(int client, Menu menu, JSOption option, c
 		}
 	}
 	
-	if (option != JSOption_JumpstatsMaster && GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
+	if (option != JSOption_JumpstatsMaster && GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
 	{
 		menu.AddItem(IntToStringEx(view_as<int>(option)), display, ITEMDRAW_DISABLED);
 	}

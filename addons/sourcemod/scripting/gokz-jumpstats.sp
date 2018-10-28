@@ -66,6 +66,7 @@ public void OnPluginStart()
 	
 	CreateGlobalForwards();
 	CreateCommands();
+	InitialiseOptions();
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -150,13 +151,8 @@ public void GOKZ_OnJumpInvalidated(int client)
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
-	Option coreOption;
-	if (!GOKZ_IsCoreOption(option, coreOption))
-	{
-		return;
-	}
-	
-	OnOptionChanged_JumpTracking(client, coreOption);
+	OnOptionChanged_JumpTracking(client, option);
+	OnOptionChanged_Options(client, option, newValue);
 }
 
 public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)

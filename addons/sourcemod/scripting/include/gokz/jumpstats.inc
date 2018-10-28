@@ -47,7 +47,8 @@ enum
 
 enum JSOption
 {
-	JSOption_JumpstatsMaster = 0, 
+	JSOPTION_INVALID = -1, 
+	JSOption_JumpstatsMaster, 
 	JSOption_MinChatTier, 
 	JSOption_MinConsoleTier, 
 	JSOption_MinSoundTier, 
@@ -107,21 +108,11 @@ stock char gC_DistanceTiers[DISTANCETIER_COUNT][] =
 stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "ladderhop" };
 stock char gC_KeysMode[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
 stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =  { "none", "meh", "impressive", "perfect", "godlike", "ownage" };
-stock char gC_KeysJSOptions[JSOPTION_COUNT][] =  { "masterswitch", "chatreport", "consolereport", "sounds" };
+stock char gC_JSOptionNames[JSOPTION_COUNT][] =  { "masterswitch", "chatreport", "consolereport", "sounds" };
 
 
 
 // =========================  FORWARDS  ========================= //
-
-/**
- * Called when a player changes a jumpstats option.
- *
- * @param client		Client index.
- * @param option		Option that was changed.
- * @param newValue		New value of the option.
- * @noreturn
- */
-forward void GOKZ_JS_OnOptionChanged(int client, JSOption option, int newValue);
 
 /**
  * Called when a player begins their jump.
@@ -170,32 +161,74 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
 native int GOKZ_JS_GetDefaultOption(JSOption option);
 
 /**
- * Gets the current value of a player's jumpstats option.
- *
- * @param client		Client index.
- * @param option		GOKZ Jumpstats option.
- * @return				Current value of option.
- */
-native int GOKZ_JS_GetOption(int client, JSOption option);
-
-/**
- * Sets the player's jumpstats option value.
- *
- * @param client		Client index.
- * @param option		GOKZ Jumpstats option.
- * @param optionValue	New option value.
- * @param printMessage	Whether to print option change messages.
- * @noreturn
- */
-native void GOKZ_JS_SetOption(int client, JSOption option, int optionValue, bool printMessage = false);
-
-/**
  * Declare the player's current jump an invalid jumpstat.
  *
  * @param client    	Client index.
  * @noreturn
  */
 native void GOKZ_JS_InvalidateJump(int client);
+
+
+
+// =========================  STOCKS  ========================= //
+
+/**
+ * Returns whether an option is a gokz-jumpstats option.
+ *
+ * @param option		Option name.
+ * @param optionEnum	Variable to store enumerated gokz-jumpstats option (if it is one).
+ * @return				Whether option is a gokz-jumpstats option.
+ */
+stock bool GOKZ_JS_IsJSOption(const char[] option, JSOption &optionEnum = JSOPTION_INVALID)
+{
+	for (JSOption i; i < JSOPTION_COUNT; i++)
+	{
+		if (StrEqual(option, gC_JSOptionNames[i]))
+		{
+			optionEnum = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Gets the current value of a player's gokz-jumpstats option.
+ *
+ * @param client		Client index.
+ * @param option		gokz-jumpstats option.
+ * @return				Current value of option.
+ */
+stock any GOKZ_JS_GetOption(int client, JSOption option)
+{
+	return GOKZ_GetOption(client, gC_JSOptionNames[option]);
+}
+
+/**
+ * Sets the player's gokz-jumpstats option's value.
+ *
+ * @param client		Client index.
+ * @param option		gokz-jumpstats option.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_JS_SetOption(int client, JSOption option, any value)
+{
+	return GOKZ_SetOption(client, gC_JSOptionNames[option], value);
+}
+
+/**
+ * Increment an integer-type gokz-jumpstats option's value.
+ * Loops back to '0' if max value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		gokz-jumpstats option.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_JS_CycleOption(int client, JSOption option)
+{
+	return GOKZ_CycleOption(client, gC_JSOptionNames[option]);
+}
 
 
 
@@ -215,9 +248,6 @@ public SharedPlugin __pl_gokz_jumpstats =
 #if !defined REQUIRE_PLUGIN
 public void __pl_gokz_jumpstats_SetNTVOptional()
 {
-	MarkNativeAsOptional("GOKZ_JS_GetDefaultOptions");
-	MarkNativeAsOptional("GOKZ_JS_GetOption");
-	MarkNativeAsOptional("GOKZ_JS_SetOption");
 	MarkNativeAsOptional("GOKZ_JS_InvalidateJump");
 }
 #endif
