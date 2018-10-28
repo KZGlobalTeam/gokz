@@ -40,6 +40,8 @@ static Handle H_OnModeUnloaded;
 static Handle H_OnTimerNativeCalledExternally;
 static Handle H_OnCustomStartPositionSet_Post;
 static Handle H_OnCustomStartPositionCleared_Post;
+static Handle H_OnOptionsMenuCreated;
+static Handle H_OnOptionsMenuReady;
 
 
 
@@ -79,6 +81,8 @@ void CreateGlobalForwards()
 	H_OnTimerNativeCalledExternally = CreateGlobalForward("GOKZ_OnTimerNativeCalledExternally", ET_Event, Param_Cell);
 	H_OnCustomStartPositionSet_Post = CreateGlobalForward("GOKZ_OnCustomStartPositionSet_Post", ET_Ignore, Param_Cell, Param_Array, Param_Array);
 	H_OnCustomStartPositionCleared_Post = CreateGlobalForward("GOKZ_OnCustomStartPositionCleared_Post", ET_Ignore, Param_Cell);
+	H_OnOptionsMenuCreated = CreateGlobalForward("GOKZ_OnOptionsMenuCreated", ET_Ignore, Param_Cell);
+	H_OnOptionsMenuReady = CreateGlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
 }
 
 void Call_GOKZ_OnClientSetup(int client)
@@ -336,5 +340,19 @@ void Call_GOKZ_OnCustomStartPositionCleared_Post(int client)
 {
 	Call_StartForward(H_OnCustomStartPositionCleared_Post);
 	Call_PushCell(client);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+{
+	Call_StartForward(H_OnOptionsMenuCreated);
+	Call_PushCell(topMenu);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	Call_StartForward(H_OnOptionsMenuReady);
+	Call_PushCell(topMenu);
 	Call_Finish();
 } 

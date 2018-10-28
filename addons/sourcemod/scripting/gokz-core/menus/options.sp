@@ -1,12 +1,37 @@
 /*
-	Options Menu
+	Options Top Menu
 	
-	Lets players view and set options.
+	Top menu for presenting option categories.
 */
 
 
 
+static TopMenu optionsMenu;
+static TopMenuObject catGeneral;
+static TopMenuObject itemsGeneral[OPTION_COUNT];
 static bool cameFromOptionsMenu[MAXPLAYERS + 1];
+
+static char optionDisplayPhrases[OPTION_COUNT][] = 
+{
+	"Options Menu - Mode", 
+	"Options Menu - Style", 
+	"Options Menu - Teleport Menu", 
+	"Options Menu - Info Panel", 
+	"Options Menu - Show Keys", 
+	"Options Menu - Show Players", 
+	"Options Menu - Show Weapon", 
+	"Options Menu - Auto Restart", 
+	"Options Menu - Slay On End", 
+	"Options Menu - Pistol", 
+	"Options Menu - Checkpoint Messages", 
+	"Options Menu - Checkpoint Sounds", 
+	"Options Menu - Teleport Sounds", 
+	"Options Menu - Error Sounds", 
+	"Options Menu - Timer Text", 
+	"Options Menu - Speed Text", 
+	"Options Menu - Jump Beam", 
+	"Options Menu - Help and Tips"
+};
 
 static char phrasesTPMenu[TPMENU_COUNT][] = 
 {
@@ -50,14 +75,15 @@ static char phrasesJumpBeam[JUMPBEAM_COUNT][] =
 
 // =========================  PUBLIC  ========================= //
 
-void DisplayOptionsMenu(int client, int atItem = 0)
+void DisplayOptionsMenu(int client, TopMenuPosition position = TopMenuPosition_Start)
 {
-	Menu menu = new Menu(MenuHandler_Options);
-	menu.Pagination = 6;
-	menu.SetTitle("%T", "Options Menu - Title", client);
-	OptionsMenuAddItems(client, menu);
-	menu.DisplayAt(client, atItem, MENU_TIME_FOREVER);
+	optionsMenu.Display(client, position);
 	cameFromOptionsMenu[client] = false;
+}
+
+TopMenu GetOptionsTopMenu()
+{
+	return optionsMenu;
 }
 
 bool GetCameFromOptionsMenu(int client)
@@ -67,39 +93,142 @@ bool GetCameFromOptionsMenu(int client)
 
 
 
+// =========================  LISTENERS  ========================= //
+
+void OnAllPluginsLoaded_OptionsMenu()
+{
+	optionsMenu = new TopMenu(TopMenuHandler_Options);
+	
+	// Add general options category and items
+	catGeneral = optionsMenu.AddCategory(OPTIONS_MENU_CAT_GENERAL, TopMenuHandler_Options);
+	for (int option = 0; option < view_as<int>(OPTION_COUNT); option++)
+	{
+		if (option == view_as<int>(Option_Style))
+		{
+			continue; // TODO Currently hard-coded to skip style
+		}
+		itemsGeneral[option] = optionsMenu.AddItem(gC_CoreOptionNames[option], TopMenuHandler_General, catGeneral);
+	}
+	
+	Call_GOKZ_OnOptionsMenuCreated(optionsMenu);
+	Call_GOKZ_OnOptionsMenuReady(optionsMenu);
+}
+
+
+
 // =========================  HANDLER  ========================= //
 
-public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int param2)
+public void TopMenuHandler_Options(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
 {
-	if (action == MenuAction_Select)
+	if (action == TopMenuAction_DisplayOption || action == TopMenuAction_DisplayTitle)
 	{
-		char info[16];
-		menu.GetItem(param2, info, sizeof(info));
-		Option option = view_as<Option>(StringToInt(info));
-		
+		if (topobj_id == INVALID_TOPMENUOBJECT)
+		{
+			Format(buffer, maxlength, "%T", "Options Menu - Title", param);
+		}
+		else if (topobj_id == catGeneral)
+		{
+			Format(buffer, maxlength, "%T", "Options Menu - General", param);
+		}
+	}
+}
+
+public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
+{
+	Option option = OPTION_INVALID;
+	for (int i = 0; i < view_as<int>(OPTION_COUNT); i++)
+	{
+		if (topobj_id == itemsGeneral[i])
+		{
+			option = view_as<Option>(i);
+			break;
+		}
+	}
+	
+	if (option == OPTION_INVALID)
+	{
+		return;
+	}
+	
+	if (action == TopMenuAction_DisplayOption)
+	{
 		switch (option)
 		{
 			case Option_Mode:
 			{
-				cameFromOptionsMenu[param1] = true;
-				DisplayModeMenu(param1);
+				FormatEx(buffer, maxlength, "%T - %s", 
+					optionDisplayPhrases[option], param, 
+					gC_ModeNames[GOKZ_GetCoreOption(param, Option_Mode)]);
+			}
+			case Option_ShowingTPMenu:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					optionDisplayPhrases[option], param, 
+					phrasesTPMenu[GOKZ_GetCoreOption(param, Option_ShowingTPMenu)], param);
+			}
+			case Option_ShowingKeys:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					optionDisplayPhrases[option], param, 
+					phrasesShowingKeys[GOKZ_GetCoreOption(param, Option_ShowingKeys)], param);
 			}
 			case Option_Pistol:
 			{
-				cameFromOptionsMenu[param1] = true;
-				DisplayPistolMenu(param1);
+				int pistol = GOKZ_GetCoreOption(param, Option_Pistol);
+				if (pistol == Pistol_Disabled)
+				{
+					FormatEx(buffer, maxlength, "%T - %T", 
+						optionDisplayPhrases[option], param, 
+						"Options Menu - Disabled", param);
+				}
+				else
+				{
+					FormatEx(buffer, maxlength, "%T - %s", 
+						optionDisplayPhrases[option], param, 
+						gC_PistolNames[pistol]);
+				}
 			}
-			default:GOKZ_CycleCoreOption(param1, option);
-		}
-		if (option != Option_Mode && option != Option_Pistol)
-		{
-			// Reopen the menu at the same place
-			DisplayOptionsMenu(param1, param2 / 6 * 6);
+			case Option_TimerText:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					optionDisplayPhrases[option], param, 
+					phrasesTimerText[GOKZ_GetCoreOption(param, Option_TimerText)], param);
+			}
+			case Option_SpeedText:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					optionDisplayPhrases[option], param, 
+					phrasesSpeedText[GOKZ_GetCoreOption(param, Option_SpeedText)], param);
+			}
+			case Option_JumpBeam:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					optionDisplayPhrases[option], param, 
+					phrasesJumpBeam[GOKZ_GetCoreOption(param, Option_JumpBeam)], param);
+			}
+			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}
 	}
-	else if (action == MenuAction_End)
+	else if (action == TopMenuAction_SelectOption)
 	{
-		delete menu;
+		switch (option)
+		{
+			case Option_Mode:
+			{
+				cameFromOptionsMenu[param] = true;
+				DisplayModeMenu(param);
+			}
+			case Option_Pistol:
+			{
+				cameFromOptionsMenu[param] = true;
+				DisplayPistolMenu(param);
+			}
+			default:
+			{
+				GOKZ_CycleCoreOption(param, option);
+				optionsMenu.Display(param, TopMenuPosition_LastCategory);
+			}
+		}
 	}
 }
 
@@ -107,113 +236,18 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 
 // =========================  PRIVATE  ========================= //
 
-static void OptionsMenuAddItems(int client, Menu menu)
+static void FormatToggleableOptionDisplay(int client, Option option, char[] buffer, int maxlength)
 {
-	OptionsMenuAddMode(client, menu);
-	OptionsMenuAddTPMenu(client, menu);
-	OptionsMenuAddToggle(client, menu, Option_ShowingInfoPanel, "Options Menu - Info Panel");
-	OptionsMenuAddTimerText(client, menu);
-	OptionsMenuAddSpeedText(client, menu);
-	OptionsMenuAddShowingKeys(client, menu);
-	OptionsMenuAddToggle(client, menu, Option_CheckpointMessages, "Options Menu - Checkpoint Messages");
-	OptionsMenuAddToggle(client, menu, Option_CheckpointSounds, "Options Menu - Checkpoint Sounds");
-	OptionsMenuAddToggle(client, menu, Option_TeleportSounds, "Options Menu - Teleport Sounds");
-	OptionsMenuAddToggle(client, menu, Option_ErrorSounds, "Options Menu - Error Sounds");
-	OptionsMenuAddToggle(client, menu, Option_ShowingWeapon, "Options Menu - Show Weapon");
-	OptionsMenuAddToggle(client, menu, Option_ShowingPlayers, "Options Menu - Show Players");
-	OptionsMenuAddPistol(client, menu);
-	OptionsMenuAddToggle(client, menu, Option_AutoRestart, "Options Menu - Auto Restart");
-	OptionsMenuAddToggle(client, menu, Option_SlayOnEnd, "Options Menu - Slay On End");
-	OptionsMenuAddJumpBeam(client, menu);
-	OptionsMenuAddToggle(client, menu, Option_HelpAndTips, "Options Menu - Help and Tips");
-}
-
-static void OptionsMenuAddToggle(int client, Menu menu, Option option, const char[] optionPhrase)
-{
-	int optionValue = GOKZ_GetCoreOption(client, option);
-	char display[32];
-	
-	if (optionValue == 0)
+	if (GOKZ_GetCoreOption(client, option) == 0)
 	{
-		FormatEx(display, sizeof(display), "%T - %T", 
-			optionPhrase, client, 
+		FormatEx(buffer, maxlength, "%T - %T", 
+			optionDisplayPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
 	{
-		FormatEx(display, sizeof(display), "%T - %T", 
-			optionPhrase, client, 
+		FormatEx(buffer, maxlength, "%T - %T", 
+			optionDisplayPhrases[option], client, 
 			"Options Menu - Enabled", client);
 	}
-	menu.AddItem(IntToStringEx(view_as<int>(option)), display);
-}
-
-static void OptionsMenuAddMode(int client, Menu menu)
-{
-	char display[32];
-	FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Mode", 
-		client, gC_ModeNames[GOKZ_GetCoreOption(client, Option_Mode)]);
-	menu.AddItem(IntToStringEx(view_as<int>(Option_Mode)), display);
-}
-
-static void OptionsMenuAddPistol(int client, Menu menu)
-{
-	char display[32];
-	int pistol = GOKZ_GetCoreOption(client, Option_Pistol);
-	if (pistol == Pistol_Disabled)
-	{
-		FormatEx(display, sizeof(display), "%T - %T", "Options Menu - Pistol", 
-			client, "Options Menu - Disabled", client);
-	}
-	else
-	{
-		FormatEx(display, sizeof(display), "%T - %s", "Options Menu - Pistol", 
-			client, gC_PistolNames[pistol]);
-	}
-	menu.AddItem(IntToStringEx(view_as<int>(Option_Pistol)), display);
-}
-
-static void OptionsMenuAddTPMenu(int client, Menu menu)
-{
-	char display[32];
-	FormatEx(display, sizeof(display), "%T - %T", 
-		"Options Menu - Teleport Menu", client, 
-		phrasesTPMenu[GOKZ_GetCoreOption(client, Option_ShowingTPMenu)], client);
-	menu.AddItem(IntToStringEx(view_as<int>(Option_ShowingTPMenu)), display);
-}
-
-static void OptionsMenuAddShowingKeys(int client, Menu menu)
-{
-	char display[32];
-	FormatEx(display, sizeof(display), "%T - %T", 
-		"Options Menu - Show Keys", client, 
-		phrasesShowingKeys[GOKZ_GetCoreOption(client, Option_ShowingKeys)], client);
-	menu.AddItem(IntToStringEx(view_as<int>(Option_ShowingKeys)), display);
-}
-
-static void OptionsMenuAddTimerText(int client, Menu menu)
-{
-	char display[32];
-	FormatEx(display, sizeof(display), "%T - %T", 
-		"Options Menu - Timer Text", client, 
-		phrasesTimerText[GOKZ_GetCoreOption(client, Option_TimerText)], client);
-	menu.AddItem(IntToStringEx(view_as<int>(Option_TimerText)), display);
-}
-
-static void OptionsMenuAddSpeedText(int client, Menu menu)
-{
-	char display[32];
-	FormatEx(display, sizeof(display), "%T - %T", 
-		"Options Menu - Speed Text", client, 
-		phrasesSpeedText[GOKZ_GetCoreOption(client, Option_SpeedText)], client);
-	menu.AddItem(IntToStringEx(view_as<int>(Option_SpeedText)), display);
-}
-
-static void OptionsMenuAddJumpBeam(int client, Menu menu)
-{
-	char display[32];
-	FormatEx(display, sizeof(display), "%T - %T", 
-		"Options Menu - Jump Beam", client, 
-		phrasesJumpBeam[GOKZ_GetCoreOption(client, Option_JumpBeam)], client);
-	menu.AddItem(IntToStringEx(view_as<int>(Option_JumpBeam)), display);
 } 

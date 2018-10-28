@@ -312,6 +312,10 @@
 		"en"		"Options"
 		"chi"		"选项"
 	}
+	"Options Menu - General"
+	{
+		"en"		"General"
+	}
 	"Options Menu - Enabled"
 	{
 		"en"		"Enabled"
@@ -381,6 +385,10 @@
 	{
 		"en"		"Mode"
 		"chi"		"模式"
+	}
+	"Options Menu - Style"
+	{
+		"en"		"Style"
 	}
 	"Options Menu - Teleport Menu"
 	{

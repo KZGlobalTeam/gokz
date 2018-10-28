@@ -13,6 +13,7 @@ void CreateNatives()
 	CreateNative("GOKZ_SetModeLoaded", Native_SetModeLoaded);
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
+	CreateNative("GOKZ_GetOptionsTopMenu", Native_GetOptionsTopMenu);
 	
 	CreateNative("GOKZ_StartTimer", Native_StartTimer);
 	CreateNative("GOKZ_EndTimer", Native_EndTimer);
@@ -92,6 +93,11 @@ public int Native_PrintToChat(Handle plugin, int numParams)
 		Format(buffer, sizeof(buffer), "%s%s", prefix, buffer);
 	}
 	CPrintToChat(client, "%s", buffer);
+}
+
+public int Native_GetOptionsTopMenu(Handle plugin, int numParams)
+{
+	return view_as<int>(GetOptionsTopMenu());
 }
 
 public int Native_StartTimer(Handle plugin, int numParams)

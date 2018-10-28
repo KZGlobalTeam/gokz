@@ -25,12 +25,11 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 	if (action == MenuAction_Select)
 	{
 		GOKZ_SetCoreOption(param1, Option_Pistol, param2);
-		DisplayPistolMenu(param1, param2 / 6 * 6); // Re-display menu at same spot
+		DisplayOptionsMenu(param1, TopMenuPosition_LastCategory);
 	}
 	else if (action == MenuAction_Cancel && GetCameFromOptionsMenu(param1))
 	{
-		// Reopen the options menu at the page this option is on
-		DisplayOptionsMenu(param1, 12);
+		DisplayOptionsMenu(param1, TopMenuPosition_LastCategory);
 	}
 	else if (action == MenuAction_End)
 	{

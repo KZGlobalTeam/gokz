@@ -123,6 +123,8 @@ public void OnAllPluginsLoaded()
 			OnClientCookiesCached(client);
 		}
 	}
+	
+	OnAllPluginsLoaded_OptionsMenu();
 }
 
 public void OnLibraryAdded(const char[] name)

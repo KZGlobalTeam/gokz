@@ -9,6 +9,8 @@
 #endif
 #define _gokz_core_included_
 
+#include <topmenus>
+
 #include <gokz>
 #include <movementapi>
 
@@ -17,6 +19,7 @@
 // =========================  DEFINITIONS  ========================= //
 
 #define MAX_COURSES 256
+#define OPTIONS_MENU_CAT_GENERAL "general"
 
 
 
@@ -632,6 +635,23 @@ forward void GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3
  */
 forward void GOKZ_OnCustomStartPositionCleared_Post(int client);
 
+/**
+ * Called when the options menu has been created and 3rd 
+ * party plugins can grab the handle or add categories.
+ *
+ * @param topMenu		Options top menu handle.
+ * @noreturn
+ */
+forward void GOKZ_OnOptionsMenuCreated(TopMenu topMenu);
+
+/**
+ * Called when the options menu is ready to have items added.
+ *
+ * @param topMenu		Options top menu handle.
+ * @noreturn
+ */
+forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
+
 
 
 // =========================  NATIVES  ========================= //
@@ -668,6 +688,14 @@ native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
  * @return				Number of loaded modes.
  */
 native int GOKZ_GetLoadedModeCount();
+
+/**
+ * Gets the Handle to the options top menu.
+ *
+ * @return				Handle to the options top menu, 
+ *						or INVALID_HANDLE if not created yet.
+ */
+native TopMenu GOKZ_GetOptionsTopMenu();
 
 /**
  * Prints a message to a client's chat, formatting colours and optionally 
@@ -1683,6 +1711,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
+	MarkNativeAsOptional("GOKZ_GetOptionsTopMenu");
 	
 	MarkNativeAsOptional("GOKZ_StartTimer");
 	MarkNativeAsOptional("GOKZ_EndTimer");

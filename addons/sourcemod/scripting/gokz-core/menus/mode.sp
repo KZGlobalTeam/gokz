@@ -27,13 +27,12 @@ public int MenuHandler_Mode(Menu menu, MenuAction action, int param1, int param2
 		GOKZ_SetCoreOption(param1, Option_Mode, param2);
 		if (GetCameFromOptionsMenu(param1))
 		{
-			DisplayOptionsMenu(param1, 0);
+			DisplayOptionsMenu(param1, TopMenuPosition_LastCategory);
 		}
 	}
 	else if (action == MenuAction_Cancel && GetCameFromOptionsMenu(param1))
 	{
-		// Reopen the options menu at the page this option is on
-		DisplayOptionsMenu(param1, 0);
+		DisplayOptionsMenu(param1, TopMenuPosition_LastCategory);
 	}
 	else if (action == MenuAction_End)
 	{
