@@ -17,6 +17,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#include <gokz/methodmap>
+
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -85,6 +87,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
 	LoadTranslations("common.phrases");
+	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-core.phrases");
 	
 	CreateGlobalForwards();

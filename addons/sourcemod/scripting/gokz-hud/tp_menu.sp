@@ -97,16 +97,16 @@ void OnPlayerRunCmd_TPMenu(int client)
 	}
 	
 	// Checks option and that no other menu is open instead of rudely interrupting it
-	if (GOKZ_GetCoreOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled
+	if (GOKZ_HUD_GetOption(client, HUDOption_TPMenu) != TPMenu_Disabled
 		 && GetClientMenu(client) == MenuSource_None)
 	{
 		DisplayTPMenu(client);
 	}
 }
 
-void OnOptionChanged_TPMenu(int client, Option option)
+void OnOptionChanged_TPMenu(int client, HUDOption option)
 {
-	if (option == Option_ShowingTPMenu)
+	if (option == HUDOption_TPMenu)
 	{
 		UpdateTPMenu(client);
 	}
@@ -169,16 +169,16 @@ static void DisplayTPMenu(int client)
 
 static void TPMenuAddItems(int client, Menu menu)
 {
-	switch (GOKZ_GetCoreOption(client, Option_ShowingTPMenu))
+	switch (GOKZ_HUD_GetOption(client, HUDOption_TPMenu))
 	{
-		case ShowingTPMenu_Simple:
+		case TPMenu_Simple:
 		{
 			TPMenuAddItemCheckpoint(client, menu);
 			TPMenuAddItemTeleport(client, menu);
 			TPMenuAddItemPause(client, menu);
 			TPMenuAddItemStart(client, menu);
 		}
-		case ShowingTPMenu_Advanced:
+		case TPMenu_Advanced:
 		{
 			TPMenuAddItemCheckpoint(client, menu);
 			TPMenuAddItemTeleport(client, menu);

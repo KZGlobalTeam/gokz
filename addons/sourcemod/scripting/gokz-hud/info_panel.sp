@@ -14,7 +14,7 @@
 bool IsDrawingInfoPanel(int client)
 {
 	KZPlayer player = new KZPlayer(client);
-	return player.showingInfoPanel != ShowingInfoPanel_Disabled
+	return player.infoPanel != InfoPanel_Disabled
 	 && !NothingEnabledInInfoPanel(player);
 }
 
@@ -61,8 +61,8 @@ static bool NothingEnabledInInfoPanel(KZPlayer player)
 {
 	bool noTimerText = player.timerText != TimerText_InfoPanel;
 	bool noSpeedText = player.speedText != SpeedText_InfoPanel || player.paused;
-	bool noKeys = player.showingKeys == ShowingKeys_Disabled
-	 || player.showingKeys == ShowingKeys_Spectating && player.alive;
+	bool noKeys = player.showKeys == ShowKeys_Disabled
+	 || player.showKeys == ShowKeys_Spectating && player.alive;
 	return noTimerText && noSpeedText && noKeys;
 }
 
@@ -182,11 +182,11 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 static char[] GetKeysString(KZPlayer player, KZPlayer targetPlayer)
 {
 	char keysString[64];
-	if (player.showingKeys == ShowingKeys_Disabled)
+	if (player.showKeys == ShowKeys_Disabled)
 	{
 		keysString = "";
 	}
-	else if (player.showingKeys == ShowingKeys_Spectating && player.alive)
+	else if (player.showKeys == ShowKeys_Spectating && player.alive)
 	{
 		keysString = "";
 	}

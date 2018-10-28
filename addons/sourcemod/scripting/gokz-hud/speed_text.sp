@@ -32,9 +32,9 @@ void OnPlayerRunCmd_SpeedText(int client, int cmdnum)
 	}
 }
 
-void OnOptionChanged_SpeedText(int client, Option option)
+void OnOptionChanged_SpeedText(int client, HUDOption option)
 {
-	if (option == Option_SpeedText)
+	if (option == HUDOption_SpeedText)
 	{
 		ClearSpeedText(client);
 		UpdateSpeedText(client);

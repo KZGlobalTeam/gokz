@@ -205,21 +205,6 @@
 
 
 	// Option Change Chat Messages ////////////////////////////////////////////////////////////
-	"Option - Teleport Menu - Disable"
-	{
-		"en"		"{grey}The teleport menu has been disabled."
-		"chi"		"{grey}存点菜单已关闭."
-	}
-	"Option - Teleport Menu - Enable (Simple)"
-	{
-		"en"		"{grey}The simple teleport menu has been enabled."
-		"chi"		"{grey}简易存点菜单已开启."
-	}
-	"Option - Teleport Menu - Enable (Advanced)"
-	{
-		"en"		"{grey}The advanced teleport menu has been enabled."
-		"chi"		"{grey}高级存点菜单已开启."
-	}
 	"Option - Show Players - Enable"
 	{
 		"en"		"{grey}You are now showing other players."
@@ -229,16 +214,6 @@
 	{
 		"en"		"{grey}You are now hiding other players."
 		"chi"		"{grey}已屏蔽其他玩家模型."
-	}
-	"Option - Info Panel - Enable"
-	{
-		"en"		"{grey}Your centre information panel has been enabled."
-		"chi"		"{grey}你的中心面板已打开."
-	}
-	"Option - Info Panel - Disable"
-	{
-		"en"		"{grey}Your centre information panel has been disabled."
-		"chi"		"{grey}你的中心面板已关闭."
 	}
 	"Option - Show Weapon - Enable"
 	{
@@ -316,41 +291,6 @@
 	{
 		"en"		"General"
 	}
-	"Options Menu - Enabled"
-	{
-		"en"		"Enabled"
-		"chi"		"开启"
-	}
-	"Options Menu - Disabled"
-	{
-		"en"		"Disabled"
-		"chi"		"关闭"
-	}
-	"Options Menu - Top"
-	{
-		"en"		"Top"
-		"chi"		"最顶"
-	}
-	"Options Menu - Bottom"
-	{
-		"en"		"Bottom"
-		"chi"		"最底"
-	}
-	"Options Menu - Bottom"
-	{
-		"en"		"Bottom"
-		"chi"		"最底"
-	}
-	"Options Menu - Always"
-	{
-		"en"		"Always"
-		"chi"		"总是"
-	}
-	"Options Menu - Spectating"
-	{
-		"en"		"Spectating"
-		"chi"		"观察"
-	}
 	"Options Menu - Feet"
 	{
 		"en"		"Feet"
@@ -371,16 +311,6 @@
 		"en"		"Ground"
 		"chi"		"地面"
 	}
-	"Options Menu - Simple"
-	{
-		"en"		"Simple"
-		"chi"		"简易"
-	}
-	"Options Menu - Advanced"
-	{
-		"en"		"Advanced"
-		"chi"		"高级"
-	}
 	"Options Menu - Mode"
 	{
 		"en"		"Mode"
@@ -389,16 +319,6 @@
 	"Options Menu - Style"
 	{
 		"en"		"Style"
-	}
-	"Options Menu - Teleport Menu"
-	{
-		"en"		"Teleport menu"
-		"chi"		"存点菜单"
-	}
-	"Options Menu - Info Panel"
-	{
-		"en"		"Centre panel"
-		"chi"		"中心面板"
 	}
 	"Options Menu - Show Players"
 	{
@@ -409,11 +329,6 @@
 	{
 		"en"		"Show weapon"
 		"chi"		"屏蔽武器显示"
-	}
-	"Options Menu - Show Keys"
-	{
-		"en"		"Show key presses"
-		"chi"		"显示按键"
 	}
 	"Options Menu - Auto Restart"
 	{
@@ -449,16 +364,6 @@
 	{
 		"en"		"Error sounds"
 		"chi"		"报错音效"
-	}
-	"Options Menu - Timer Text"
-	{
-		"en"		"Timer text"
-		"chi"		"计时器音效"
-	}
-	"Options Menu - Speed Text"
-	{
-		"en"		"Speed text"
-		"chi"		"空速文字"
 	}
 	"Options Menu - Jump Beam"
 	{

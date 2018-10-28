@@ -31,9 +31,9 @@ void OnPlayerRunCmd_TimerText(int client, int cmdnum)
 	}
 }
 
-void OnOptionChanged_TimerText(int client, Option option)
+void OnOptionChanged_TimerText(int client, HUDOption option)
 {
-	if (option == Option_TimerText)
+	if (option == HUDOption_TimerText)
 	{
 		ClearTimerText(client);
 		UpdateTimerText(client);

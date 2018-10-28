@@ -13,6 +13,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#include <gokz/methodmap>
+
 #pragma newdecls required
 #pragma semicolon 1
 

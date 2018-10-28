@@ -1,10 +1,13 @@
 #include <sourcemod>
 
 #include <gokz/core>
+#include <gokz/hud>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
+
+#include <gokz/methodmap>
 
 
 
@@ -19,8 +22,11 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-hud.txt"
 
+#include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_csgo_hud.sp"
 #include "gokz-hud/info_panel.sp"
+#include "gokz-hud/options.sp"
+#include "gokz-hud/options_menu.sp"
 #include "gokz-hud/speed_text.sp"
 #include "gokz-hud/timer_text.sp"
 #include "gokz-hud/tp_menu.sp"
@@ -41,10 +47,12 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-hud.phrases");
 	
 	CreateHooks();
 	CreateHudSynchronizers();
+	CreateCommands();
 }
 
 public void OnAllPluginsLoaded()
@@ -53,6 +61,8 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	OnAllPluginsLoaded_Options();
+	OnAllPluginsLoaded_OptionsMenu();
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -94,6 +104,16 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 
 // =========================  GOKZ  ========================= //
 
+public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+{
+	OnOptionsMenuCreated_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	OnTimerStart_TimerText(client);
@@ -132,15 +152,14 @@ public void GOKZ_OnCountedTeleport_Post(int client)
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
-	Option coreOption;
-	if (!GOKZ_IsCoreOption(option, coreOption))
+	any hudOption;
+	if (GOKZ_HUD_IsHUDOption(option, hudOption))
 	{
-		return;
+		OnOptionChanged_TPMenu(client, hudOption);
+		OnOptionChanged_SpeedText(client, hudOption);
+		OnOptionChanged_TimerText(client, hudOption);
+		OnOptionChanged_Options(client, hudOption, newValue);
 	}
-	
-	OnOptionChanged_TPMenu(client, coreOption);
-	OnOptionChanged_SpeedText(client, coreOption);
-	OnOptionChanged_TimerText(client, coreOption);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)
@@ -156,6 +175,15 @@ public void GOKZ_OnCustomStartPositionSet_Post(int client, const float position[
 public void GOKZ_OnCustomStartPositionCleared_Post(int client)
 {
 	OnCustomStartPositionCleared_TPMenu(client);
+}
+
+
+
+// =========================  OTHER  ========================= //
+
+public void OnMapStart()
+{
+	OnMapStart_Options();
 }
 
 

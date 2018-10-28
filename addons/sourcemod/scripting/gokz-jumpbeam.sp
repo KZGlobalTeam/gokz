@@ -8,6 +8,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#include <gokz/methodmap>
+
 
 
 public Plugin myinfo = 

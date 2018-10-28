@@ -15,6 +15,8 @@
 #include <gokz/localdb>
 #include <gokz/localranks>
 
+#include <gokz/methodmap>
+
 #pragma newdecls required
 #pragma semicolon 1
 

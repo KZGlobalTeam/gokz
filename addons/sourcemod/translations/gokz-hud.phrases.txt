@@ -1,5 +1,33 @@
 "Phrases"
 {
+	// Option Change Chat Messages ////////////////////////////////////////////////////////////
+	"Option - Teleport Menu - Disable"
+	{
+		"en"		"{grey}The teleport menu has been disabled."
+		"chi"		"{grey}存点菜单已关闭."
+	}
+	"Option - Teleport Menu - Enable (Simple)"
+	{
+		"en"		"{grey}The simple teleport menu has been enabled."
+		"chi"		"{grey}简易存点菜单已开启."
+	}
+	"Option - Teleport Menu - Enable (Advanced)"
+	{
+		"en"		"{grey}The advanced teleport menu has been enabled."
+		"chi"		"{grey}高级存点菜单已开启."
+	}
+	"Option - Info Panel - Enable"
+	{
+		"en"		"{grey}Your centre information panel has been enabled."
+		"chi"		"{grey}你的中心面板已打开."
+	}
+	"Option - Info Panel - Disable"
+	{
+		"en"		"{grey}Your centre information panel has been disabled."
+		"chi"		"{grey}你的中心面板已关闭."
+	}
+
+
 	// Info Panel Text ////////////////////////////////////////////////////////////
 	"Info Panel Text - Time"
 	{
@@ -73,5 +101,37 @@
 	{
 		"en"		"Respawn"
 		"chi"		"重生"
+	}
+
+
+	// Options Menu ////////////////////////////////////////////////////////////
+	"Options Menu - HUD"
+	{
+		"en"		"HUD"
+	}
+	"Options Menu - Teleport Menu"
+	{
+		"en"		"Teleport menu"
+		"chi"		"存点菜单"
+	}
+	"Options Menu - Info Panel"
+	{
+		"en"		"Centre panel"
+		"chi"		"中心面板"
+	}
+	"Options Menu - Show Keys"
+	{
+		"en"		"Show key presses"
+		"chi"		"显示按键"
+	}
+	"Options Menu - Timer Text"
+	{
+		"en"		"Timer text"
+		"chi"		"计时器音效"
+	}
+	"Options Menu - Speed Text"
+	{
+		"en"		"Speed text"
+		"chi"		"空速文字"
 	}
 }

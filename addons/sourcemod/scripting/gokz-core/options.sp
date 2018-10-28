@@ -15,9 +15,6 @@ static const int defaultDefaultValues[OPTION_COUNT] =
 {
 	Mode_SimpleKZ, 
 	Style_Normal, 
-	ShowingTPMenu_Simple, 
-	ShowingInfoPanel_Enabled, 
-	ShowingKeys_Spectating, 
 	ShowingPlayers_Enabled, 
 	ShowingWeapon_Enabled, 
 	AutoRestart_Disabled, 
@@ -27,8 +24,6 @@ static const int defaultDefaultValues[OPTION_COUNT] =
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 
 	ErrorSounds_Enabled, 
-	TimerText_InfoPanel, 
-	SpeedText_InfoPanel, 
 	JumpBeam_Disabled, 
 	HelpAndTips_Enabled
 };
@@ -37,9 +32,6 @@ static const int optionCounts[OPTION_COUNT] =
 {
 	MODE_COUNT, 
 	STYLE_COUNT, 
-	TPMENU_COUNT, 
-	SHOWINGINFOPANEL_COUNT, 
-	SHOWINGKEYS_COUNT, 
 	SHOWINGPLAYERS_COUNT, 
 	SHOWINGWEAPON_COUNT, 
 	AUTORESTART_COUNT, 
@@ -49,8 +41,6 @@ static const int optionCounts[OPTION_COUNT] =
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
-	TIMERTEXT_COUNT, 
-	SPEEDTEXT_COUNT, 
 	JUMPBEAM_COUNT, 
 	HELPANDTIPS_COUNT
 };
@@ -59,9 +49,6 @@ static const char optionDescription[OPTION_COUNT][] =
 {
 	"Movement mode", 
 	"Movement style", 
-	"Teleport menu", 
-	"Info panel", 
-	"Keys display", 
 	"Other player visibility", 
 	"Viewmodel visibility", 
 	"Automatic timer restart upon teleport to start", 
@@ -71,8 +58,6 @@ static const char optionDescription[OPTION_COUNT][] =
 	"Checkpoint sounds", 
 	"Teleport sounds", 
 	"Error sounds", 
-	"Timer text", 
-	"Speed text", 
 	"Jump beam", 
 	"Tips"
 };
@@ -396,38 +381,6 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 		case Option_Mode:
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Switched Mode", gC_ModeNames[newValue]);
-		}
-		case Option_ShowingTPMenu:
-		{
-			switch (newValue)
-			{
-				case ShowingTPMenu_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Disable");
-				}
-				case ShowingTPMenu_Simple:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable (Simple)");
-				}
-				case ShowingTPMenu_Advanced:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable (Advanced)");
-				}
-			}
-		}
-		case Option_ShowingInfoPanel:
-		{
-			switch (newValue)
-			{
-				case ShowingInfoPanel_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Info Panel - Disable");
-				}
-				case ShowingInfoPanel_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Info Panel - Enable");
-				}
-			}
 		}
 		case Option_ShowingPlayers:
 		{

@@ -1,0 +1,44 @@
+"Phrases"
+{
+	// Options Menu ////////////////////////////////////////////////////////////
+	"Options Menu - Enabled"
+	{
+		"en"		"Enabled"
+		"chi"		"开启"
+	}
+	"Options Menu - Disabled"
+	{
+		"en"		"Disabled"
+		"chi"		"关闭"
+	}
+	"Options Menu - Top"
+	{
+		"en"		"Top"
+		"chi"		"最顶"
+	}
+	"Options Menu - Bottom"
+	{
+		"en"		"Bottom"
+		"chi"		"最底"
+	}
+	"Options Menu - Always"
+	{
+		"en"		"Always"
+		"chi"		"总是"
+	}
+	"Options Menu - Spectating"
+	{
+		"en"		"Spectating"
+		"chi"		"观察"
+	}
+	"Options Menu - Simple"
+	{
+		"en"		"Simple"
+		"chi"		"简易"
+	}
+	"Options Menu - Advanced"
+	{
+		"en"		"Advanced"
+		"chi"		"高级"
+	}
+}

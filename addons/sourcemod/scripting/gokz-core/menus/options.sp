@@ -15,9 +15,6 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 {
 	"Options Menu - Mode", 
 	"Options Menu - Style", 
-	"Options Menu - Teleport Menu", 
-	"Options Menu - Info Panel", 
-	"Options Menu - Show Keys", 
 	"Options Menu - Show Players", 
 	"Options Menu - Show Weapon", 
 	"Options Menu - Auto Restart", 
@@ -27,39 +24,8 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
 	"Options Menu - Error Sounds", 
-	"Options Menu - Timer Text", 
-	"Options Menu - Speed Text", 
 	"Options Menu - Jump Beam", 
 	"Options Menu - Help and Tips"
-};
-
-static char phrasesTPMenu[TPMENU_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Simple", 
-	"Options Menu - Advanced"
-};
-
-static char phrasesShowingKeys[SHOWINGKEYS_COUNT][] = 
-{
-	"Options Menu - Spectating", 
-	"Options Menu - Always", 
-	"Options Menu - Disabled"
-};
-
-static char phrasesTimerText[TIMERTEXT_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Info Panel", 
-	"Options Menu - Bottom", 
-	"Options Menu - Top"
-};
-
-static char phrasesSpeedText[SPEEDTEXT_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Info Panel", 
-	"Options Menu - Bottom"
 };
 
 static char phrasesJumpBeam[JUMPBEAM_COUNT][] = 
@@ -158,19 +124,7 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 			{
 				FormatEx(buffer, maxlength, "%T - %s", 
 					optionDisplayPhrases[option], param, 
-					gC_ModeNames[GOKZ_GetCoreOption(param, Option_Mode)]);
-			}
-			case Option_ShowingTPMenu:
-			{
-				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesTPMenu[GOKZ_GetCoreOption(param, Option_ShowingTPMenu)], param);
-			}
-			case Option_ShowingKeys:
-			{
-				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesShowingKeys[GOKZ_GetCoreOption(param, Option_ShowingKeys)], param);
+					gC_ModeNames[GOKZ_GetCoreOption(param, option)]);
 			}
 			case Option_Pistol:
 			{
@@ -188,23 +142,11 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 						gC_PistolNames[pistol]);
 				}
 			}
-			case Option_TimerText:
-			{
-				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesTimerText[GOKZ_GetCoreOption(param, Option_TimerText)], param);
-			}
-			case Option_SpeedText:
-			{
-				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesSpeedText[GOKZ_GetCoreOption(param, Option_SpeedText)], param);
-			}
 			case Option_JumpBeam:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 
 					optionDisplayPhrases[option], param, 
-					phrasesJumpBeam[GOKZ_GetCoreOption(param, Option_JumpBeam)], param);
+					phrasesJumpBeam[GOKZ_GetCoreOption(param, option)], param);
 			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}

@@ -20,9 +20,6 @@ static char radioCommands[][] =
 
 void CreateCommands()
 {
-	RegConsoleCmd("sm_menu", CommandMenu, "[KZ] Toggle the simple teleport menu.");
-	RegConsoleCmd("sm_cpmenu", CommandMenu, "[KZ] Toggle the simple teleport menu.");
-	RegConsoleCmd("sm_adv", CommandToggleAdvancedMenu, "[KZ] Toggle the advanced teleport menu.");
 	RegConsoleCmd("sm_checkpoint", CommandMakeCheckpoint, "[KZ] Set a checkpoint.");
 	RegConsoleCmd("sm_gocheck", CommandTeleportToCheckpoint, "[KZ] Teleport to your current checkpoint.");
 	RegConsoleCmd("sm_prev", CommandPrevCheckpoint, "[KZ] Go back a checkpoint.");
@@ -42,8 +39,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
-	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
-	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 	RegConsoleCmd("sm_tips", CommandToggleHelpAndTips, "[KZ] Toggle seeing help and tips.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
@@ -87,32 +82,6 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	GetCmdArgString(teamString, sizeof(teamString));
 	int team = StringToInt(teamString);
 	JoinTeam(client, team);
-	return Plugin_Handled;
-}
-
-public Action CommandMenu(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Disabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleAdvancedMenu(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_ShowingTPMenu) != ShowingTPMenu_Advanced)
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Advanced);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingTPMenu, ShowingTPMenu_Simple);
-	}
 	return Plugin_Handled;
 }
 
@@ -234,46 +203,6 @@ public Action CommandToggleShowPlayers(int client, int args)
 	else
 	{
 		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled);
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleInfoPanel(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_ShowingInfoPanel) == ShowingInfoPanel_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Enabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingInfoPanel, ShowingInfoPanel_Disabled);
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleSpeed(int client, int args)
-{
-	int speedText = GOKZ_GetCoreOption(client, Option_SpeedText);
-	int infoPanel = GOKZ_GetCoreOption(client, Option_ShowingInfoPanel);
-	
-	if (speedText == SpeedText_Disabled)
-	{
-		if (infoPanel == ShowingInfoPanel_Enabled)
-		{
-			GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_InfoPanel);
-		}
-		else
-		{
-			GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_Bottom);
-		}
-	}
-	else if (infoPanel == ShowingInfoPanel_Disabled && speedText == SpeedText_InfoPanel)
-	{
-		GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_Bottom);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_SpeedText, SpeedText_Disabled);
 	}
 	return Plugin_Handled;
 }
