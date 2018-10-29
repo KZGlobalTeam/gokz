@@ -37,19 +37,6 @@ static const char optionDescription[JSOPTION_COUNT][] =
 
 // =========================  PUBLIC  ========================= //
 
-void InitialiseOptions()
-{
-	for (JSOption option; option < JSOPTION_COUNT; option++)
-	{
-		char prefixedDescription[255];
-		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			OPTION_DESCRIPTION_PREFIX, 
-			optionDescription[option]);
-		GOKZ_RegisterOption(gC_JSOptionNames[option], prefixedDescription, 
-			OptionType_Int, defaultDefaultValues[option], 0, optionCounts[option] - 1);
-	}
-}
-
 bool GetJumpstatsDisabled(int client)
 {
 	return GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled
@@ -61,6 +48,19 @@ bool GetJumpstatsDisabled(int client)
 
 
 // =========================  LISTENERS  ========================= //
+
+void OnAllPluginsLoaded_Options()
+{
+	for (JSOption option; option < JSOPTION_COUNT; option++)
+	{
+		char prefixedDescription[255];
+		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
+			OPTION_DESCRIPTION_PREFIX, 
+			optionDescription[option]);
+		GOKZ_RegisterOption(gC_JSOptionNames[option], prefixedDescription, 
+			OptionType_Int, defaultDefaultValues[option], 0, optionCounts[option] - 1);
+	}
+}
 
 void OnClientPutInServer_Options(int client)
 {

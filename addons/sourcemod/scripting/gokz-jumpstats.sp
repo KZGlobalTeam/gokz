@@ -38,7 +38,6 @@ public Plugin myinfo =
 int gI_TouchingEntities[MAXPLAYERS + 1];
 
 #include "gokz-jumpstats/api.sp"
-#include "gokz-jumpstats/commands.sp"
 #include "gokz-jumpstats/distancetiers.sp"
 #include "gokz-jumpstats/jumpreporting.sp"
 #include "gokz-jumpstats/jumptracking.sp"
@@ -63,12 +62,10 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	LoadTranslations("gokz-core.phrases");
+	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-jumpstats.phrases");
 	
 	CreateGlobalForwards();
-	CreateCommands();
-	InitialiseOptions();
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -85,6 +82,8 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	OnAllPluginsLoaded_Options();
+	OnAllPluginsLoaded_OptionsMenu();
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -140,6 +139,16 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 
 
 // =========================  GOKZ  ========================= //
+
+public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+{
+	OnOptionsMenuCreated_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
 
 public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
 {

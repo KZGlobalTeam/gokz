@@ -100,27 +100,26 @@
 
 
 	// Jumpstats Options Menu ////////////////////////////////////////////////////////////
-	"Jumpstats Options Menu - Title"
+	"Options Menu - Jumpstats"
 	{
-		"en"		"Jumpstats Options"
-		"chi"		"起跳数据选项"
+		"en"		"Jumpstats"
 	}
-	"Jumpstats Options Menu - Master Switch"
+	"Options Menu - Jumpstats Master Switch"
 	{
 		"en"		"Jumpstats"
 		"chi"		"起跳数据显示"
 	}
-	"Jumpstats Options Menu - Chat Report"
+	"Options Menu - Jumpstats Chat Report"
 	{
 		"en"		"Chat report"
 		"chi"		"聊天框显示"
 	}
-	"Jumpstats Options Menu - Console Report"
+	"Options Menu - Jumpstats Console Report"
 	{
 		"en"		"Console report"
 		"chi"		"控制台输出显示"
 	}
-	"Jumpstats Options Menu - Sounds"
+	"Options Menu - Jumpstats Sounds"
 	{
 		"en"		"Sounds"
 		"chi"		"音效"

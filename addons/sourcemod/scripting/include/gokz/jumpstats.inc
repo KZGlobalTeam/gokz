@@ -11,6 +11,12 @@
 
 
 
+// =========================  DEFINITIONS  ========================= //
+
+#define OPTIONS_MENU_CAT_JUMPSTATS "jumpstats"
+
+
+
 // =========================  ENUMERATIONS  ========================= //
 
 enum

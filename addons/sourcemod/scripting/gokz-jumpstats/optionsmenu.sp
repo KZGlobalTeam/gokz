@@ -1,40 +1,113 @@
 /*
 	Options Menu
 	
-	Lets players view and set options.
+	Lets player set their gokz-jumpstats options.
 */
 
 
 
-// =========================  PUBLIC  ========================= //
+TopMenu optionsTopMenu;
+TopMenuObject catJumpstats;
+TopMenuObject itemsJumpstats[JSOPTION_COUNT];
 
-void DisplayOptionsMenu(int client, int atItem = 0)
+static char optionDisplayPhrases[JSOPTION_COUNT][] = 
 {
-	Menu menu = new Menu(MenuHandler_Options);
-	menu.Pagination = 6;
-	menu.SetTitle("%T", "Jumpstats Options Menu - Title", client);
-	OptionsMenuAddItems(client, menu);
-	menu.DisplayAt(client, atItem, MENU_TIME_FOREVER);
+	"Options Menu - Jumpstats Master Switch", 
+	"Options Menu - Jumpstats Chat Report", 
+	"Options Menu - Jumpstats Console Report", 
+	"Options Menu - Jumpstats Sounds", 
+};
+
+
+
+// =========================  LISTENERS  ========================= //
+
+void OnAllPluginsLoaded_OptionsMenu()
+{
+	// Handle late loading
+	TopMenu topMenu;
+	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
+	{
+		GOKZ_OnOptionsMenuReady(topMenu);
+	}
+}
+
+void OnOptionsMenuCreated_OptionsMenu(TopMenu topMenu)
+{
+	if (optionsTopMenu == topMenu && catJumpstats != INVALID_TOPMENUOBJECT)
+	{
+		return;
+	}
+	
+	catJumpstats = topMenu.AddCategory(OPTIONS_MENU_CAT_JUMPSTATS, TopMenuHandler_Categories);
+}
+
+void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
+{
+	// Make sure category exists
+	if (catJumpstats == INVALID_TOPMENUOBJECT)
+	{
+		GOKZ_OnOptionsMenuCreated(topMenu);
+	}
+	
+	if (optionsTopMenu == topMenu)
+	{
+		return;
+	}
+	
+	optionsTopMenu = topMenu;
+	
+	// Add HUD option items	
+	for (int option = 0; option < view_as<int>(JSOPTION_COUNT); option++)
+	{
+		itemsJumpstats[option] = optionsTopMenu.AddItem(gC_JSOptionNames[option], TopMenuHandler_HUD, catJumpstats);
+	}
 }
 
 
 
 // =========================  HANDLER  ========================= //
 
-public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int param2)
+public void TopMenuHandler_Categories(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
 {
-	if (action == MenuAction_Select)
+	if (action == TopMenuAction_DisplayOption || action == TopMenuAction_DisplayTitle)
 	{
-		char info[16];
-		menu.GetItem(param2, info, sizeof(info));
-		JSOption option = view_as<JSOption>(StringToInt(info));
-		
-		GOKZ_JS_CycleOption(param1, option);
-		DisplayOptionsMenu(param1, param2 / 6 * 6);
+		if (topobj_id == catJumpstats)
+		{
+			Format(buffer, maxlength, "%T", "Options Menu - Jumpstats", param);
+		}
 	}
-	else if (action == MenuAction_End)
+}
+
+public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
+{
+	JSOption option = JSOPTION_INVALID;
+	for (int i = 0; i < view_as<int>(JSOPTION_COUNT); i++)
 	{
-		delete menu;
+		if (topobj_id == itemsJumpstats[i])
+		{
+			option = view_as<JSOption>(i);
+			break;
+		}
+	}
+	
+	if (option == JSOPTION_INVALID)
+	{
+		return;
+	}
+	
+	if (action == TopMenuAction_DisplayOption)
+	{
+		switch (option)
+		{
+			case JSOption_JumpstatsMaster:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+			default:FormatDistanceTierOptionDisplay(param, option, buffer, maxlength);
+		}
+	}
+	else if (action == TopMenuAction_SelectOption)
+	{
+		GOKZ_JS_CycleOption(param, option);
+		optionsTopMenu.Display(param, TopMenuPosition_LastCategory);
 	}
 }
 
@@ -42,50 +115,29 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int param1, int par
 
 // =========================  PRIVATE  ========================= //
 
-static void OptionsMenuAddItems(int client, Menu menu)
+static void FormatToggleableOptionDisplay(int client, JSOption option, char[] buffer, int maxlength)
 {
-	OptionsMenuAddToggle(client, menu, JSOption_JumpstatsMaster, "Jumpstats Options Menu - Master Switch");
-	OptionsMenuAddDistanceTier(client, menu, JSOption_MinChatTier, "Jumpstats Options Menu - Chat Report");
-	OptionsMenuAddDistanceTier(client, menu, JSOption_MinConsoleTier, "Jumpstats Options Menu - Console Report");
-	OptionsMenuAddDistanceTier(client, menu, JSOption_MinSoundTier, "Jumpstats Options Menu - Sounds");
-}
-
-static void OptionsMenuAddToggle(int client, Menu menu, JSOption option, const char[] optionPhrase)
-{
-	int optionValue = GOKZ_JS_GetOption(client, option);
-	char display[32];
-	
-	if (optionValue == 0)
+	if (GOKZ_JS_GetOption(client, option) == 0)
 	{
-		FormatEx(display, sizeof(display), "%T - %T", 
-			optionPhrase, client, 
+		FormatEx(buffer, maxlength, "%T - %T", 
+			optionDisplayPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
 	{
-		FormatEx(display, sizeof(display), "%T - %T", 
-			optionPhrase, client, 
+		FormatEx(buffer, maxlength, "%T - %T", 
+			optionDisplayPhrases[option], client, 
 			"Options Menu - Enabled", client);
-	}
-	
-	if (option != JSOption_JumpstatsMaster && GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
-	{
-		menu.AddItem(IntToStringEx(view_as<int>(option)), display, ITEMDRAW_DISABLED);
-	}
-	else
-	{
-		menu.AddItem(IntToStringEx(view_as<int>(option)), display, ITEMDRAW_DEFAULT);
 	}
 }
 
-static void OptionsMenuAddDistanceTier(int client, Menu menu, JSOption option, const char[] optionPhrase)
+static void FormatDistanceTierOptionDisplay(int client, JSOption option, char[] buffer, int maxlength)
 {
 	int optionValue = GOKZ_JS_GetOption(client, option);
-	char display[32];
 	if (optionValue == DistanceTier_None) // Disabled
 	{
-		FormatEx(display, sizeof(display), "%T - %T", 
-			optionPhrase, client, 
+		FormatEx(buffer, maxlength, "%T - %T", 
+			optionDisplayPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
@@ -93,20 +145,15 @@ static void OptionsMenuAddDistanceTier(int client, Menu menu, JSOption option, c
 		// Add a plus sign to anything below the highest tier
 		if (optionValue < DISTANCETIER_COUNT - 1)
 		{
-			FormatEx(display, sizeof(display), "%T - %s+", optionPhrase, client, gC_DistanceTiers[optionValue]);
+			FormatEx(buffer, maxlength, "%T - %s+", 
+				optionDisplayPhrases[option], client, 
+				gC_DistanceTiers[optionValue]);
 		}
 		else
 		{
-			FormatEx(display, sizeof(display), "%T - %s", optionPhrase, client, gC_DistanceTiers[optionValue]);
+			FormatEx(buffer, maxlength, "%T - %s", 
+				optionDisplayPhrases[option], client, 
+				gC_DistanceTiers[optionValue]);
 		}
-	}
-	
-	if (option != JSOption_JumpstatsMaster && GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
-	{
-		menu.AddItem(IntToStringEx(view_as<int>(option)), display, ITEMDRAW_DISABLED);
-	}
-	else
-	{
-		menu.AddItem(IntToStringEx(view_as<int>(option)), display, ITEMDRAW_DEFAULT);
 	}
 } 
