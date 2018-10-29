@@ -18,7 +18,6 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 	"Options Menu - Show Players", 
 	"Options Menu - Auto Restart", 
 	"Options Menu - Slay On End", 
-	"Options Menu - Pistol", 
 	"Options Menu - Checkpoint Messages", 
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
@@ -125,22 +124,6 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 					optionDisplayPhrases[option], param, 
 					gC_ModeNames[GOKZ_GetCoreOption(param, option)]);
 			}
-			case Option_Pistol:
-			{
-				int pistol = GOKZ_GetCoreOption(param, Option_Pistol);
-				if (pistol == Pistol_Disabled)
-				{
-					FormatEx(buffer, maxlength, "%T - %T", 
-						optionDisplayPhrases[option], param, 
-						"Options Menu - Disabled", param);
-				}
-				else
-				{
-					FormatEx(buffer, maxlength, "%T - %s", 
-						optionDisplayPhrases[option], param, 
-						gC_PistolNames[pistol]);
-				}
-			}
 			case Option_JumpBeam:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 
@@ -158,11 +141,6 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 			{
 				cameFromOptionsMenu[param] = true;
 				DisplayModeMenu(param);
-			}
-			case Option_Pistol:
-			{
-				cameFromOptionsMenu[param] = true;
-				DisplayPistolMenu(param);
 			}
 			default:
 			{

@@ -57,7 +57,6 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/menus/goto.sp"
 #include "gokz-core/menus/mode.sp"
 #include "gokz-core/menus/options.sp"
-#include "gokz-core/menus/pistol.sp"
 
 #include "gokz-core/timer/pause.sp"
 #include "gokz-core/timer/timer.sp"
@@ -202,7 +201,6 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		OnPlayerSpawn_Pause(client);
 		OnPlayerSpawn_ValidJump(client);
 		OnPlayerSpawn_FirstSpawn(client);
-		UpdatePistol(client);
 		UpdateGodMode(client);
 		UpdatePlayerCollision(client);
 	}
@@ -281,7 +279,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	OnOptionChanged_Options(client, coreOption, newValue);
 	OnOptionChanged_Timer(client, coreOption);
 	OnOptionChanged_Mode(client, coreOption);
-	OnOptionChanged_Pistol(client, coreOption);
 	OnOptionChanged_ClanTag(client, coreOption);
 }
 

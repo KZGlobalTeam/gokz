@@ -63,7 +63,6 @@ enum Option
 	Option_ShowingPlayers, 
 	Option_AutoRestart, 
 	Option_SlayOnEnd, 
-	Option_Pistol, 
 	Option_CheckpointMessages, 
 	Option_CheckpointSounds, 
 	Option_TeleportSounds, 
@@ -106,21 +105,6 @@ enum
 	SlayOnEnd_Disabled = 0, 
 	SlayOnEnd_Enabled, 
 	SLAYONEND_COUNT
-};
-
-enum
-{
-	Pistol_USP = 0, 
-	Pistol_Glock, 
-	Pistol_P250, 
-	Pistol_Dualies, 
-	Pistol_Deagle, 
-	Pistol_CZ75A, 
-	Pistol_FiveSeveN, 
-	Pistol_Tec9, 
-	Pistol_R8Revolver, 
-	Pistol_Disabled, 
-	PISTOL_COUNT
 };
 
 enum
@@ -219,20 +203,6 @@ stock char gC_TimeTypeNames[TIMETYPE_COUNT][] =
 	"PRO"
 };
 
-stock char gC_PistolNames[PISTOL_COUNT][] = 
-{
-	"P2000 / USP-S", 
-	"Glock-18", 
-	"P250", 
-	"Dual Berettas", 
-	"Desert Eagle", 
-	"CZ75-Auto", 
-	"Five-SeveN", 
-	"Tec-9", 
-	"R8 Revolver", 
-	"DISABLED" // Disabled option
-};
-
 
 
 // =========================  OTHER  ========================= //
@@ -244,7 +214,6 @@ stock const char gC_CoreOptionNames[OPTION_COUNT][] =
 	"showplayers", 
 	"autorestart", 
 	"slayonend", 
-	"pistol", 
 	"checkpointmessages", 
 	"checkpointsounds", 
 	"teleportsounds", 

@@ -41,7 +41,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 	RegConsoleCmd("sm_tips", CommandToggleHelpAndTips, "[KZ] Toggle seeing help and tips.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
-	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
@@ -229,12 +228,6 @@ public Action CommandToggleAutoRestart(int client, int args)
 	{
 		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Disabled);
 	}
-	return Plugin_Handled;
-}
-
-public Action CommandPistolMenu(int client, int args)
-{
-	DisplayPistolMenu(client);
 	return Plugin_Handled;
 }
 

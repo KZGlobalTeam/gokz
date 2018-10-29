@@ -299,15 +299,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int pistol {
-		public get() {
-			return this.GetCoreOption(Option_Pistol);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_Pistol, value);
-		}
-	}
-	
 	property int checkpointMessages {
 		public get() {
 			return this.GetCoreOption(Option_CheckpointMessages);
@@ -437,4 +428,18 @@ methodmap KZPlayer < MovementAPIPlayer {
 	}
 	#endif
 	// =========================  END HUD  ========================= //
+	
+	
+	#if defined _gokz_pistol_included_
+	// =========================  PISTOL  ========================= //
+	property int pistol {
+		public get() {
+			return this.GetOption(PISTOL_OPTION_NAME);
+		}
+		public set(int value) {
+			this.SetOption(PISTOL_OPTION_NAME, value);
+		}
+	}
+	#endif
+	// =========================  END PISTOL  ========================= //
 } 

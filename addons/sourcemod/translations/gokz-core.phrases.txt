@@ -263,14 +263,6 @@
 	}
 
 
-	// Pistol Menu ////////////////////////////////////////////////////////////
-	"Pistol Menu - Title"
-	{
-		"en"		"Pick a Pistol"
-		"chi"		"选择一把手枪"
-	}
-
-
 	// Options Menu ////////////////////////////////////////////////////////////
 	"Options Menu - Title"
 	{
@@ -324,11 +316,6 @@
 	{
 		"en"		"End timer slay"
 		"chi"		"完成地图强制复活"
-	}
-	"Options Menu - Pistol"
-	{
-		"en"		"Pistol"
-		"chi"		"手枪"
 	}
 	"Options Menu - Checkpoint Messages"
 	{
