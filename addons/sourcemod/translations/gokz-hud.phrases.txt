@@ -26,6 +26,16 @@
 		"en"		"{grey}Your centre information panel has been disabled."
 		"chi"		"{grey}你的中心面板已关闭."
 	}
+	"Option - Show Weapon - Enable"
+	{
+		"en"		"{grey}You are now showing your weapon."
+		"chi"		"{grey}你现在能看到你的武器了."
+	}
+	"Option - Show Weapon - Disable"
+	{
+		"en"		"{grey}You are now hiding your weapon."
+		"chi"		"{grey}你现在屏蔽了你的武器显示."
+	}
 
 
 	// Info Panel Text ////////////////////////////////////////////////////////////
@@ -133,5 +143,10 @@
 	{
 		"en"		"Speed text"
 		"chi"		"空速文字"
+	}
+	"Options Menu - Show Weapon"
+	{
+		"en"		"Show weapon"
+		"chi"		"屏蔽武器显示"
 	}
 }

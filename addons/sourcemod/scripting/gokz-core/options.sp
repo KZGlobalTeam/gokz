@@ -16,7 +16,6 @@ static const int defaultDefaultValues[OPTION_COUNT] =
 	Mode_SimpleKZ, 
 	Style_Normal, 
 	ShowingPlayers_Enabled, 
-	ShowingWeapon_Enabled, 
 	AutoRestart_Disabled, 
 	SlayOnEnd_Disabled, 
 	Pistol_USP, 
@@ -33,7 +32,6 @@ static const int optionCounts[OPTION_COUNT] =
 	MODE_COUNT, 
 	STYLE_COUNT, 
 	SHOWINGPLAYERS_COUNT, 
-	SHOWINGWEAPON_COUNT, 
 	AUTORESTART_COUNT, 
 	SLAYONEND_COUNT, 
 	PISTOL_COUNT, 
@@ -50,7 +48,6 @@ static const char optionDescription[OPTION_COUNT][] =
 	"Movement mode", 
 	"Movement style", 
 	"Other player visibility", 
-	"Viewmodel visibility", 
 	"Automatic timer restart upon teleport to start", 
 	"Automatic slay upon end", 
 	"Pistol", 
@@ -393,20 +390,6 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 				case ShowingPlayers_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Show Players - Enable");
-				}
-			}
-		}
-		case Option_ShowingWeapon:
-		{
-			switch (newValue)
-			{
-				case ShowingWeapon_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Weapon - Disable");
-				}
-				case ShowingWeapon_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Weapon - Enable");
 				}
 			}
 		}

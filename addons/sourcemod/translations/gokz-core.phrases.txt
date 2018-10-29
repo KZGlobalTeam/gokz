@@ -215,16 +215,6 @@
 		"en"		"{grey}You are now hiding other players."
 		"chi"		"{grey}已屏蔽其他玩家模型."
 	}
-	"Option - Show Weapon - Enable"
-	{
-		"en"		"{grey}You are now showing your weapon."
-		"chi"		"{grey}你现在能看到你的武器了."
-	}
-	"Option - Show Weapon - Disable"
-	{
-		"en"		"{grey}You are now hiding your weapon."
-		"chi"		"{grey}你现在屏蔽了你的武器显示."
-	}
 	"Option - Auto Restart - Enable"
 	{
 		"en"		"{grey}Your timer will now restart upon teleporting to start."
@@ -324,11 +314,6 @@
 	{
 		"en"		"Show players"
 		"chi"		"屏蔽其他玩家"
-	}
-	"Options Menu - Show Weapon"
-	{
-		"en"		"Show weapon"
-		"chi"		"屏蔽武器显示"
 	}
 	"Options Menu - Auto Restart"
 	{

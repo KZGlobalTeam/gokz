@@ -61,7 +61,6 @@ enum Option
 	Option_Mode, 
 	Option_Style, 
 	Option_ShowingPlayers, 
-	Option_ShowingWeapon, 
 	Option_AutoRestart, 
 	Option_SlayOnEnd, 
 	Option_Pistol, 
@@ -93,13 +92,6 @@ enum
 	ShowingPlayers_Disabled = 0, 
 	ShowingPlayers_Enabled, 
 	SHOWINGPLAYERS_COUNT
-};
-
-enum
-{
-	ShowingWeapon_Disabled = 0, 
-	ShowingWeapon_Enabled, 
-	SHOWINGWEAPON_COUNT
 };
 
 enum
@@ -250,7 +242,6 @@ stock const char gC_CoreOptionNames[OPTION_COUNT][] =
 	"mode", 
 	"style", 
 	"showplayers", 
-	"showweapon", 
 	"autorestart", 
 	"slayonend", 
 	"pistol", 

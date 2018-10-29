@@ -39,7 +39,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
-	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 	RegConsoleCmd("sm_tips", CommandToggleHelpAndTips, "[KZ] Toggle seeing help and tips.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
@@ -203,19 +202,6 @@ public Action CommandToggleShowPlayers(int client, int args)
 	else
 	{
 		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled);
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleShowWeapon(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_ShowingWeapon) == ShowingWeapon_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingWeapon, ShowingWeapon_Enabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingWeapon, ShowingWeapon_Disabled);
 	}
 	return Plugin_Handled;
 }

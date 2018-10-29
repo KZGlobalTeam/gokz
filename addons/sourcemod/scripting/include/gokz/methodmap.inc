@@ -281,15 +281,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int showingWeapon {
-		public get() {
-			return this.GetCoreOption(Option_ShowingWeapon);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_ShowingWeapon, value);
-		}
-	}
-	
 	property int autoRestart {
 		public get() {
 			return this.GetCoreOption(Option_AutoRestart);
@@ -433,6 +424,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 		public set(int value) {
 			this.SetHUDOption(HUDOption_SpeedText, value);
+		}
+	}
+	
+	property int showWeapon {
+		public get() {
+			return this.GetHUDOption(HUDOption_ShowWeapon);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_ShowWeapon, value);
 		}
 	}
 	#endif

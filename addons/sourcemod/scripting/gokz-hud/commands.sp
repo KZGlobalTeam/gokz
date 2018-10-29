@@ -15,6 +15,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_adv", CommandToggleAdvancedMenu, "[KZ] Toggle the advanced teleport menu.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
 	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
+	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 }
 
 
@@ -83,6 +84,19 @@ public Action CommandToggleSpeed(int client, int args)
 	else
 	{
 		GOKZ_HUD_SetOption(client, HUDOption_SpeedText, SpeedText_Disabled);
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandToggleShowWeapon(int client, int args)
+{
+	if (GOKZ_HUD_GetOption(client, HUDOption_ShowWeapon) == ShowWeapon_Disabled)
+	{
+		GOKZ_HUD_SetOption(client, HUDOption_ShowWeapon, ShowWeapon_Enabled);
+	}
+	else
+	{
+		GOKZ_HUD_SetOption(client, HUDOption_ShowWeapon, ShowWeapon_Disabled);
 	}
 	return Plugin_Handled;
 } 

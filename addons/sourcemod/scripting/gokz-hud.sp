@@ -24,6 +24,7 @@ public Plugin myinfo =
 
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_csgo_hud.sp"
+#include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
 #include "gokz-hud/options.sp"
 #include "gokz-hud/options_menu.sp"
@@ -92,6 +93,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	{
 		UpdateCSGOHUD(client);
 		UpdateTPMenu(client);
+		UpdateHideWeapon(client);
 	}
 }
 
@@ -158,6 +160,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 		OnOptionChanged_TPMenu(client, hudOption);
 		OnOptionChanged_SpeedText(client, hudOption);
 		OnOptionChanged_TimerText(client, hudOption);
+		OnOptionChanged_HideWeapon(client, hudOption);
 		OnOptionChanged_Options(client, hudOption, newValue);
 	}
 }

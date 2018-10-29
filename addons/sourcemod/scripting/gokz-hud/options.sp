@@ -15,7 +15,8 @@ static const int defaultDefaultValues[HUDOPTION_COUNT] =
 	InfoPanel_Enabled, 
 	ShowKeys_Spectating, 
 	TimerText_InfoPanel, 
-	SpeedText_InfoPanel
+	SpeedText_InfoPanel, 
+	ShowWeapon_Enabled
 };
 
 static const int optionCounts[HUDOPTION_COUNT] = 
@@ -24,7 +25,8 @@ static const int optionCounts[HUDOPTION_COUNT] =
 	INFOPANEL_COUNT, 
 	SHOWKEYS_COUNT, 
 	TIMERTEXT_COUNT, 
-	SPEEDTEXT_COUNT
+	SPEEDTEXT_COUNT, 
+	SHOWWEAPON_COUNT
 };
 
 static const char optionDescription[HUDOPTION_COUNT][] = 
@@ -34,6 +36,7 @@ static const char optionDescription[HUDOPTION_COUNT][] =
 	"Show keys", 
 	"Timer text", 
 	"Speed text", 
+	"Show weapon"
 };
 
 
@@ -117,6 +120,20 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				case InfoPanel_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Info Panel - Enable");
+				}
+			}
+		}
+		case HUDOption_ShowWeapon:
+		{
+			switch (newValue)
+			{
+				case ShowWeapon_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Weapon - Disable");
+				}
+				case ShowWeapon_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Weapon - Enable");
 				}
 			}
 		}

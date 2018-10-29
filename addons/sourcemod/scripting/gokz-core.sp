@@ -202,7 +202,6 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		OnPlayerSpawn_Pause(client);
 		OnPlayerSpawn_ValidJump(client);
 		OnPlayerSpawn_FirstSpawn(client);
-		UpdateHideWeapon(client);
 		UpdatePistol(client);
 		UpdateGodMode(client);
 		UpdatePlayerCollision(client);
@@ -282,7 +281,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	OnOptionChanged_Options(client, coreOption, newValue);
 	OnOptionChanged_Timer(client, coreOption);
 	OnOptionChanged_Mode(client, coreOption);
-	OnOptionChanged_HideWeapon(client, coreOption);
 	OnOptionChanged_Pistol(client, coreOption);
 	OnOptionChanged_ClanTag(client, coreOption);
 }

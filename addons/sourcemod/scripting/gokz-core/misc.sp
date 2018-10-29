@@ -88,24 +88,6 @@ public Action OnSetTransmitClient(int entity, int client)
 
 
 
-// =========================  HIDE WEAPON  ========================= //
-
-void UpdateHideWeapon(int client)
-{
-	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", 
-		GOKZ_GetCoreOption(client, Option_ShowingWeapon) == ShowingWeapon_Enabled);
-}
-
-void OnOptionChanged_HideWeapon(int client, Option option)
-{
-	if (option == Option_ShowingWeapon)
-	{
-		UpdateHideWeapon(client);
-	}
-}
-
-
-
 // =========================  FORCE SV_FULL_ALLTALK 1  ========================= //
 
 void OnRoundStart_ForceAllTalk()

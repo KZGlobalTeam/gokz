@@ -27,6 +27,7 @@ enum HUDOption
 	HUDOption_ShowKeys, 
 	HUDOption_TimerText, 
 	HUDOption_SpeedText, 
+	HUDOption_ShowWeapon,
 	HUDOPTION_COUNT
 };
 
@@ -71,11 +72,18 @@ enum
 	SPEEDTEXT_COUNT
 };
 
+enum
+{
+	ShowWeapon_Disabled = 0, 
+	ShowWeapon_Enabled, 
+	SHOWWEAPON_COUNT
+};
+
 
 
 // =========================  OTHER  ========================= //
 
-stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =  { "tpmenu", "infopanel", "showkeys", "timertext", "speedtext" };
+stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =  { "tpmenu", "infopanel", "showkeys", "timertext", "speedtext", "showweapon" };
 
 
 

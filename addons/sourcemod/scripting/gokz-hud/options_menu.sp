@@ -16,7 +16,8 @@ static char optionDisplayPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Info Panel", 
 	"Options Menu - Show Keys", 
 	"Options Menu - Timer Text", 
-	"Options Menu - Speed Text"
+	"Options Menu - Speed Text", 
+	"Options Menu - Show Weapon"
 };
 
 static char phrasesTPMenu[TPMENU_COUNT][] = 
