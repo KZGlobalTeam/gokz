@@ -3,6 +3,7 @@
 #include <sdktools>
 
 #include <gokz/core>
+#include <gokz/jumpbeam>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -25,6 +26,10 @@ public Plugin myinfo =
 
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
+int gI_JumpBeam;
+TopMenu gTM_Options;
+TopMenuObject gTMO_CatGeneral;
+TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
 
 
 
@@ -40,12 +45,20 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	return APLRes_Success;
 }
 
+public void OnPluginStart()
+{
+	LoadTranslations("gokz-common.phrases");
+	LoadTranslations("gokz-jumpbeam.phrases");
+}
+
 public void OnAllPluginsLoaded()
 {
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	OnAllPluginsLoaded_Options();
+	OnAllPluginsLoaded_OptionsMenu();
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -66,7 +79,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	UpdateOldVariables(client);
 }
 
-static void UpdateOldVariables(int client)
+void UpdateOldVariables(int client)
 {
 	if (IsPlayerAlive(client))
 	{
@@ -79,23 +92,19 @@ static void UpdateOldVariables(int client)
 
 // =========================  OTHER  ========================= //
 
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
 public void OnMapStart()
 {
-	PrecacheJumpBeamModels();
+	gI_JumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
 }
 
 
 
 // =========================  JUMP BEAM  ========================= //
-
-#define JUMP_BEAM_LIFETIME 4.0
-
-static int jumpBeam;
-
-void PrecacheJumpBeamModels()
-{
-	jumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
-}
 
 void OnPlayerRunCmd_JumpBeam(int targetClient)
 {
@@ -124,27 +133,27 @@ void OnPlayerRunCmd_JumpBeam(int targetClient)
 	}
 }
 
-static void SendJumpBeam(KZPlayer player, KZPlayer targetPlayer)
+void SendJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
-	if (player.jumpBeam == JumpBeam_Disabled)
+	if (player.jbType == JBType_Disabled)
 	{
 		return;
 	}
 	
-	switch (player.jumpBeam)
+	switch (player.jbType)
 	{
-		case JumpBeam_Feet:SendFeetJumpBeam(player, targetPlayer);
-		case JumpBeam_Head:SendHeadJumpBeam(player, targetPlayer);
-		case JumpBeam_FeetAndHead:
+		case JBType_Feet:SendFeetJumpBeam(player, targetPlayer);
+		case JBType_Head:SendHeadJumpBeam(player, targetPlayer);
+		case JBType_FeetAndHead:
 		{
 			SendFeetJumpBeam(player, targetPlayer);
 			SendHeadJumpBeam(player, targetPlayer);
 		}
-		case JumpBeam_Ground:SendGroundJumpBeam(player, targetPlayer);
+		case JBType_Ground:SendGroundJumpBeam(player, targetPlayer);
 	}
 }
 
-static void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
+void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
 	float origin[3], beamStart[3], beamEnd[3];
 	int beamColour[4];
@@ -154,11 +163,11 @@ static void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	beamEnd = origin;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_JumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
-static void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
+void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
 	float origin[3], beamStart[3], beamEnd[3];
 	int beamColour[4];
@@ -184,11 +193,11 @@ static void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	}
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_JumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
-static void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
+void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 {
 	float origin[3], takeoffOrigin[3], beamStart[3], beamEnd[3];
 	int beamColour[4];
@@ -201,11 +210,11 @@ static void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	beamEnd[2] = takeoffOrigin[2] + 0.1;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, jumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_JumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
-static void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
+void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 {
 	if (targetPlayer.ducking)
 	{
@@ -214,5 +223,94 @@ static void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 	else
 	{
 		colour =  { 0, 255, 0, 110 }; // Green
+	}
+}
+
+
+
+// =========================  OPTIONS  ========================= //
+
+void OnAllPluginsLoaded_Options()
+{
+	for (JBOption option; option < JBOPTION_COUNT; option++)
+	{
+		char prefixedDescription[255];
+		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
+			JBOPTION_DESCRIPTION_PREFIX, 
+			gC_JBOptionDescriptions[option]);
+		GOKZ_RegisterOption(gC_JBOptionNames[option], prefixedDescription, 
+			OptionType_Int, gI_JBOptionDefaultValues[option], 0, gI_JBOptionCounts[option] - 1);
+	}
+}
+
+
+
+// =========================  OPTIONS MENU  ========================= //
+
+void OnAllPluginsLoaded_OptionsMenu()
+{
+	// Handle late loading
+	TopMenu topMenu;
+	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
+	{
+		GOKZ_OnOptionsMenuReady(topMenu);
+	}
+}
+
+void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
+{
+	if (gTM_Options == topMenu)
+	{
+		return;
+	}
+	
+	gTM_Options = topMenu;
+	gTMO_CatGeneral = gTM_Options.FindCategory(OPTIONS_MENU_CAT_GENERAL);
+	
+	for (int option = 0; option < view_as<int>(JBOPTION_COUNT); option++)
+	{
+		gTMO_ItemsJB[option] = gTM_Options.AddItem(gC_JBOptionNames[option], TopMenuHandler_General, gTMO_CatGeneral);
+	}
+}
+
+public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
+{
+	JBOption option = JBOPTION_INVALID;
+	for (int i = 0; i < view_as<int>(JBOPTION_COUNT); i++)
+	{
+		if (topobj_id == gTMO_ItemsJB[i])
+		{
+			option = view_as<JBOption>(i);
+			break;
+		}
+	}
+	
+	if (option == JBOPTION_INVALID)
+	{
+		return;
+	}
+	
+	if (action == TopMenuAction_DisplayOption)
+	{
+		switch (option)
+		{
+			case JBOption_Type:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					gC_JBOptionPhrases[option], param, 
+					gC_JBTypePhrases[GOKZ_JB_GetOption(param, option)], param);
+			}
+		}
+	}
+	else if (action == TopMenuAction_SelectOption)
+	{
+		switch (option)
+		{
+			default:
+			{
+				GOKZ_JB_CycleOption(param, option);
+				gTM_Options.Display(param, TopMenuPosition_LastCategory);
+			}
+		}
 	}
 } 

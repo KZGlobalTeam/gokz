@@ -22,17 +22,7 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
 	"Options Menu - Error Sounds", 
-	"Options Menu - Jump Beam", 
 	"Options Menu - Help and Tips"
-};
-
-static char phrasesJumpBeam[JUMPBEAM_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Feet", 
-	"Options Menu - Head", 
-	"Options Menu - Feet and Head", 
-	"Options Menu - Ground"
 };
 
 
@@ -123,12 +113,6 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 				FormatEx(buffer, maxlength, "%T - %s", 
 					optionDisplayPhrases[option], param, 
 					gC_ModeNames[GOKZ_GetCoreOption(param, option)]);
-			}
-			case Option_JumpBeam:
-			{
-				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesJumpBeam[GOKZ_GetCoreOption(param, option)], param);
 			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}

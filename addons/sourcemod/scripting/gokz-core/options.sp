@@ -22,7 +22,6 @@ static const int defaultDefaultValues[OPTION_COUNT] =
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 
 	ErrorSounds_Enabled, 
-	JumpBeam_Disabled, 
 	HelpAndTips_Enabled
 };
 
@@ -37,7 +36,6 @@ static const int optionCounts[OPTION_COUNT] =
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
-	JUMPBEAM_COUNT, 
 	HELPANDTIPS_COUNT
 };
 
@@ -52,7 +50,6 @@ static const char optionDescription[OPTION_COUNT][] =
 	"Checkpoint sounds", 
 	"Teleport sounds", 
 	"Error sounds", 
-	"Jump beam", 
 	"Tips"
 };
 

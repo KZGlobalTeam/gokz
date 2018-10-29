@@ -335,15 +335,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int jumpBeam {
-		public get() {
-			return this.GetCoreOption(Option_JumpBeam);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_JumpBeam, value);
-		}
-	}
-	
 	property int helpAndTips {
 		public get() {
 			return this.GetCoreOption(Option_HelpAndTips);
@@ -442,4 +433,30 @@ methodmap KZPlayer < MovementAPIPlayer {
 	}
 	#endif
 	// =========================  END PISTOL  ========================= //
+	
+	
+	#if defined _gokz_jumpbeam_included_
+	// =========================  JUMP BEAM  ========================= //
+	public any GetJBOption(JBOption option) {
+		return GOKZ_JB_GetOption(this.id, option);
+	}
+	
+	public bool SetJBOption(JBOption option, any value) {
+		return GOKZ_JB_SetOption(this.id, option, value);
+	}
+	
+	public bool CycleJBOption(JBOption option) {
+		return GOKZ_JB_CycleOption(this.id, option);
+	}
+	
+	property int jbType {
+		public get() {
+			return this.GetJBOption(JBOption_Type);
+		}
+		public set(int value) {
+			this.SetJBOption(JBOption_Type, value);
+		}
+	}
+	#endif
+	// =========================  END JUMP BEAM  ========================= //
 } 

@@ -67,7 +67,6 @@ enum Option
 	Option_CheckpointSounds, 
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
-	Option_JumpBeam, 
 	Option_HelpAndTips, 
 	OPTION_COUNT
 };
@@ -133,16 +132,6 @@ enum
 	ErrorSounds_Disabled = 0, 
 	ErrorSounds_Enabled, 
 	ERRORSOUNDS_COUNT
-};
-
-enum
-{
-	JumpBeam_Disabled = 0, 
-	JumpBeam_Feet, 
-	JumpBeam_Head, 
-	JumpBeam_FeetAndHead, 
-	JumpBeam_Ground, 
-	JUMPBEAM_COUNT
 };
 
 enum
@@ -218,7 +207,6 @@ stock const char gC_CoreOptionNames[OPTION_COUNT][] =
 	"checkpointsounds", 
 	"teleportsounds", 
 	"errorsounds", 
-	"jumpbeam", 
 	"helpandtips"
 };
 
