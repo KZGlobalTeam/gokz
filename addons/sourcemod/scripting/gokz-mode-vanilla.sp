@@ -133,7 +133,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore)
 	{
 		player.gokzHitPerf = Movement_GetHitPerf(client);
@@ -148,7 +148,7 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore && newMoveType == MOVETYPE_WALK)
 	{
 		player.gokzHitPerf = false;
@@ -163,7 +163,7 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (jumpbug)
 	{
 		player.gokzHitPerf = true;

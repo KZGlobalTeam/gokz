@@ -132,7 +132,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		return Plugin_Continue;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player);
 	if (gB_Jumpbugged[player.id])
@@ -170,7 +170,7 @@ public void Movement_OnStartTouchGround(int client)
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	ReduceDuckSlowdown(player);
 }
 
@@ -181,7 +181,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (jumped)
 	{
 		TweakJump(player);
@@ -213,7 +213,7 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore && newMoveType == MOVETYPE_WALK)
 	{
 		player.gokzHitPerf = false;

@@ -61,7 +61,7 @@ void OnTimerStopped_TimerText(int client)
 
 static void UpdateTimerText(int client)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	
 	if (player.fake
 		 || player.timerText != TimerText_Bottom && player.timerText != TimerText_Top)
@@ -75,7 +75,7 @@ static void UpdateTimerText(int client)
 	}
 	else
 	{
-		KZPlayer targetPlayer = new KZPlayer(player.observerTarget);
+		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
 		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
 			TimerTextShow(player, targetPlayer);

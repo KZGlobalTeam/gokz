@@ -112,7 +112,7 @@ void OnPlayerRunCmd_JumpBeam(int targetClient)
 	// client's OnPlayerRunCmd call, otherwise the jump 
 	// beam will be all broken up.
 	
-	KZPlayer targetPlayer = new KZPlayer(targetClient);
+	KZPlayer targetPlayer = KZPlayer(targetClient);
 	
 	if (targetPlayer.fake || !targetPlayer.alive || targetPlayer.onGround || !targetPlayer.validJump)
 	{
@@ -125,7 +125,7 @@ void OnPlayerRunCmd_JumpBeam(int targetClient)
 	// Send to spectators
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		KZPlayer player = new KZPlayer(client);
+		KZPlayer player = KZPlayer(client);
 		if (player.inGame && !player.alive && player.observerTarget == targetClient)
 		{
 			SendJumpBeam(player, targetPlayer);

@@ -110,7 +110,7 @@ public void OnClientPutInServer(int client)
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	int mode = player.mode;
 	gB_InValidRun[client] = GlobalsEnabled(mode);
 }

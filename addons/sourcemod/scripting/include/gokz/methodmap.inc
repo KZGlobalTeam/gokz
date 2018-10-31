@@ -16,7 +16,7 @@
 methodmap KZPlayer < MovementAPIPlayer {
 	
 	public KZPlayer(int client) {
-		return view_as<KZPlayer>(new MovementAPIPlayer(client));
+		return view_as<KZPlayer>(MovementAPIPlayer(client));
 	}
 	
 	

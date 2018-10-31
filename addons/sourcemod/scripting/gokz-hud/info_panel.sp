@@ -13,7 +13,7 @@
 
 bool IsDrawingInfoPanel(int client)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	return player.infoPanel != InfoPanel_Disabled
 	 && !NothingEnabledInInfoPanel(player);
 }
@@ -36,7 +36,7 @@ void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
 
 static void UpdateInfoPanel(int client)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	
 	if (player.fake || !IsDrawingInfoPanel(player.id))
 	{
@@ -49,7 +49,7 @@ static void UpdateInfoPanel(int client)
 	}
 	else
 	{
-		KZPlayer targetPlayer = new KZPlayer(player.observerTarget);
+		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
 		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
 			PrintHintText(player.id, "%s", GetInfoPanel(player, targetPlayer));

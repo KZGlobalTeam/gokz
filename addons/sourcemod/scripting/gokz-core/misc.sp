@@ -168,7 +168,7 @@ void SetupClientJoinTeam(int client)
 
 void JoinTeam(int client, int newTeam)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	int currentTeam = GetClientTeam(client);
 	
 	if (newTeam == CS_TEAM_SPECTATOR && currentTeam != CS_TEAM_SPECTATOR)

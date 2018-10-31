@@ -488,7 +488,7 @@ static void EndStrafes(int client)
 
 static void UpdateStrafes(int client)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (player.turningLeft && strafesDirection[player.id] != StrafeDirection_Left)
 	{
 		strafesDirection[player.id] = StrafeDirection_Left;

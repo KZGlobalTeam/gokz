@@ -47,7 +47,7 @@ public Action CommandTier(int client, int args)
 
 public Action CommandPrintRecords(int client, int args)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	int mode = player.mode;
 	
 	if (args == 0)
@@ -65,7 +65,7 @@ public Action CommandPrintRecords(int client, int args)
 
 public Action CommandPrintBonusRecords(int client, int args)
 {
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	int mode = player.mode;
 	
 	if (args == 0)

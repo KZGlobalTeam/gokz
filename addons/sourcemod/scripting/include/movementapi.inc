@@ -231,7 +231,7 @@ native float Movement_GetMaxSpeed(int client);
 methodmap MovementAPIPlayer < MovementPlayer {
 	
 	public MovementAPIPlayer(int client) {
-		return view_as<MovementAPIPlayer>(new MovementPlayer(client));
+		return view_as<MovementAPIPlayer>(MovementPlayer(client));
 	}
 	
 	property bool jumped {
