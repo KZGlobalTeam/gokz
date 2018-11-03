@@ -125,7 +125,6 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =  { "masterswitch", "chatreport",
  *
  * @param client		Client index.
  * @param jumpType		Type of jump.
- * @noreturn
  */
 forward void GOKZ_JS_OnTakeoff(int client, int jumpType);
 
@@ -142,7 +141,6 @@ forward void GOKZ_JS_OnTakeoff(int client, int jumpType);
  * @param strafes		Number of strafes.
  * @param sync			Percentage of time that speed was gained.
  * @param duration		Duration of the jump in seconds.
- * @noreturn
  */
 forward void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration);
 
@@ -150,7 +148,6 @@ forward void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float o
  * Called when player's current jump has been declared an invalid jumpstat.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_JS_OnJumpInvalidated(int client);
 
@@ -170,7 +167,6 @@ native int GOKZ_JS_GetDefaultOption(JSOption option);
  * Declare the player's current jump an invalid jumpstat.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_JS_InvalidateJump(int client);
 

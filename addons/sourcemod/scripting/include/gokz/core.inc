@@ -221,7 +221,6 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
  * Called when a player has been set up e.g. options, timer etc.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnClientSetup(int client);
 
@@ -232,7 +231,6 @@ forward void GOKZ_OnClientSetup(int client);
  * @param client		Client index.
  * @param option		Option name.
  * @param newValue		New value of the option.
- * @noreturn
  */
 forward void GOKZ_OnOptionChanged(int client, const char[] option, any newValue);
 
@@ -250,7 +248,6 @@ forward Action GOKZ_OnTimerStart(int client, int course);
  *
  * @param client		Client index.
  * @param course    	Course number.
- * @noreturn
  */
 forward void GOKZ_OnTimerStart_Post(int client, int course);
 
@@ -272,7 +269,6 @@ forward Action GOKZ_OnTimerEnd(int client, int course, float time, int teleports
  * @param course    		Course number.
  * @param time				Player's end time.
  * @param teleportsUsed		Number of teleports used by player.
- * @noreturn
  */
 forward void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed);
 
@@ -291,7 +287,6 @@ forward Action GOKZ_OnTimerEndMessage(int client, int course, float time, int te
  * Called when a player's timer has been forcefully stopped.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnTimerStopped(int client);
 
@@ -307,7 +302,6 @@ forward Action GOKZ_OnPause(int client);
  * Called when a player has paused.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnPause_Post(int client);
 
@@ -323,7 +317,6 @@ forward Action GOKZ_OnResume(int client);
  * Called when a player has resumed.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnResume_Post(int client);
 
@@ -339,7 +332,6 @@ forward Action GOKZ_OnMakeCheckpoint(int client);
  * Called when a player has made a checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnMakeCheckpoint_Post(int client);
 
@@ -355,7 +347,6 @@ forward Action GOKZ_OnTeleportToCheckpoint(int client);
  * Called when a player has teleported to their checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnTeleportToCheckpoint_Post(int client);
 
@@ -371,7 +362,6 @@ forward Action GOKZ_OnPrevCheckpoint(int client);
  * Called when a player has gone to a previous checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnPrevCheckpoint_Post(int client);
 
@@ -387,7 +377,6 @@ forward Action GOKZ_OnNextCheckpoint(int client);
  * Called when a player has gone to a next checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnNextCheckpoint_Post(int client);
 
@@ -405,7 +394,6 @@ forward Action GOKZ_OnTeleportToStart(int client, bool customPos);
  *
  * @param client		Client index.
  * @param customPos		Whether a custom start position is in use.
- * @noreturn
  */
 forward void GOKZ_OnTeleportToStart_Post(int client, bool customPos);
 
@@ -421,7 +409,6 @@ forward Action GOKZ_OnUndoTeleport(int client);
  * Called when a player has undone a teleport.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnUndoTeleport_Post(int client);
 
@@ -430,7 +417,6 @@ forward void GOKZ_OnUndoTeleport_Post(int client);
  * i.e. a catch-all for teleport to checkpoint, teleport to start, undo teleport etc.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnCountedTeleport_Post(int client);
 
@@ -441,7 +427,6 @@ forward void GOKZ_OnCountedTeleport_Post(int client);
  * @param client		Client index.
  * @param jumped		Whether player jumped.
  * @param ladderJump	Whether it was a ladder jump.
- * @noreturn
  */
 forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
 
@@ -450,7 +435,6 @@ forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
  * A jump is deemed invalid if the player is teleported.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnJumpInvalidated(int client);
 
@@ -458,7 +442,6 @@ forward void GOKZ_OnJumpInvalidated(int client);
  * Called when a player has been switched to a team.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnJoinTeam(int client, int team);
 
@@ -466,7 +449,6 @@ forward void GOKZ_OnJoinTeam(int client, int team);
  * Called the first time the player spawns in on a team.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnFirstSpawn(int client);
 
@@ -474,7 +456,6 @@ forward void GOKZ_OnFirstSpawn(int client);
  * Called when a mode has been loaded.
  *
  * @param mode			Mode loaded.
- * @noreturn
  */
 forward void GOKZ_OnModeLoaded(int mode);
 
@@ -482,7 +463,6 @@ forward void GOKZ_OnModeLoaded(int mode);
  * Called when a mode has been unloaded.
  *
  * @param mode			Mode unloaded.
- * @noreturn
  */
 forward void GOKZ_OnModeUnloaded(int mode);
 
@@ -503,7 +483,6 @@ forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
  * @param client		Client index.
  * @param origin		New custom start position origin.
  * @param angles		New custom start position eye angles.
- * @noreturn
  */
 forward void GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3], const float angles[3]);
 
@@ -511,7 +490,6 @@ forward void GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3
  * Called when a player's custom start position is cleared.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnCustomStartPositionCleared_Post(int client);
 
@@ -520,7 +498,6 @@ forward void GOKZ_OnCustomStartPositionCleared_Post(int client);
  * party plugins can grab the handle or add categories.
  *
  * @param topMenu		Options top menu handle.
- * @noreturn
  */
 forward void GOKZ_OnOptionsMenuCreated(TopMenu topMenu);
 
@@ -528,7 +505,6 @@ forward void GOKZ_OnOptionsMenuCreated(TopMenu topMenu);
  * Called when the options menu is ready to have items added.
  *
  * @param topMenu		Options top menu handle.
- * @noreturn
  */
 forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
 
@@ -558,7 +534,6 @@ native int GOKZ_GetModeVersion(int mode);
  * @param mode			Mode.
  * @param loaded		Whether mode is loaded.
  * @param version		Version number of the mode.
- * @noreturn
  */
 native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
 
@@ -586,7 +561,6 @@ native TopMenu GOKZ_GetOptionsTopMenu();
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
- * @noreturn
  */
 native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, any...);
 
@@ -623,7 +597,6 @@ native bool GOKZ_StopTimer(int client, bool playSound = true);
  * Forces all players' timers to stop. Intended for run invalidation.
  *
  * @param playSound		Whether to play the timer stop sound.
- * @noreturn
  */
 native void GOKZ_StopTimerAll(bool playSound = true);
 
@@ -717,7 +690,6 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
  * Teleports the player to start, or respawns them.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_TeleportToStart(int client);
 
@@ -735,7 +707,6 @@ native bool GOKZ_GetHasStartPosition(int client);
  * Set a new checkpoint at the player's current position.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_MakeCheckpoint(int client);
 
@@ -743,7 +714,6 @@ native void GOKZ_MakeCheckpoint(int client);
  * Teleports the player to their last checkpoint.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_TeleportToCheckpoint(int client);
 
@@ -760,7 +730,6 @@ native bool GOKZ_GetCanTeleportToCheckpoint(int client);
  * Teleport the player back to a previous checkpoint.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_PrevCheckpoint(int client);
 
@@ -777,7 +746,6 @@ native bool GOKZ_GetCanPrevCheckpoint(int client);
  * Teleport the player to a more recent checkpoint.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_NextCheckpoint(int client);
 
@@ -794,7 +762,6 @@ native bool GOKZ_GetCanNextCheckpoint(int client);
  * Teleport the player to where they last teleported from.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_UndoTeleport(int client);
 
@@ -811,7 +778,6 @@ native bool GOKZ_GetCanUndoTeleport(int client);
  * Pause the player's timer and freeze them.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_Pause(int client);
 
@@ -819,7 +785,6 @@ native void GOKZ_Pause(int client);
  * Resumes the player's timer and unfreezes them.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_Resume(int client);
 
@@ -827,7 +792,6 @@ native void GOKZ_Resume(int client);
  * Toggles the paused state of the player.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_TogglePause(int client);
 
@@ -835,7 +799,6 @@ native void GOKZ_TogglePause(int client);
  * Plays the error sound to the client if they have the option enabled.
  *
  * @param client		Client index.
- * @noreturn
  */
 native void GOKZ_PlayErrorSound(int client);
 
@@ -946,7 +909,6 @@ native bool GOKZ_GetValidJump(int client);
  *
  * @param client		Client index.
  * @param team			Which team to switch to.
- * @noreturn
  */
 native void GOKZ_JoinTeam(int client, int team);
 
@@ -963,7 +925,6 @@ native void GOKZ_JoinTeam(int client, int team);
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
- * @noreturn
  */
 stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 {
@@ -988,7 +949,6 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
- * @noreturn
  */
 stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] format, any...)
 {
@@ -1038,7 +998,6 @@ stock int GOKZ_GetCurrentTimeType(int client)
  * @param client				Client index to check selected mode.
  * @param menu					Menu to populate items with.
  * @param disableUnloadedModes	Draw items for unloaded modes as disabled.
- * @noreturn
  */
 stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedModes)
 {

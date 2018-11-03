@@ -29,7 +29,6 @@ enum DatabaseType
  * Use GOKZ_DB_GetDatabase to get a clone of the database handle.
  *
  * @param DBType		Database type.
- * @noreturn
  */
 forward void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType);
 
@@ -40,7 +39,6 @@ forward void GOKZ_DB_OnDatabaseConnect(DatabaseType DBType);
  * @param client		Client index.
  * @param steamID		SteamID32 of the player (from GetSteamAccountID()).
  * @param cheater		Whether player is marked as a cheater in the database.
- * @noreturn
  */
 forward void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater);
 
@@ -49,7 +47,6 @@ forward void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater);
  * At this point, the map is present and updated in the "Maps" table.
  *
  * @param mapID			MapID from the "Maps" table.
- * @noreturn
  */
 forward void GOKZ_DB_OnMapSetup(int mapID);
 
@@ -64,7 +61,6 @@ forward void GOKZ_DB_OnMapSetup(int mapID);
  * @param style				Player's movement style.
  * @param runTimeMS			Player's end time in milliseconds.
  * @param teleportsUsed		Number of teleports used by player.
- * @noreturn
  */
 forward void GOKZ_DB_OnTimeInserted(
 	int client, 
@@ -84,7 +80,6 @@ forward void GOKZ_DB_OnTimeInserted(
  * Gets a clone of the GOKZ local database handle.
  *
  * @param database		Database handle (INVALID_HANDLE if connection hasn't been made).
- * @noreturn
  */
 native Database GOKZ_DB_GetDatabase();
 
@@ -130,7 +125,6 @@ native bool GOKZ_DB_IsCheater(int client);
  *
  * @param client		Client index.
  * @param cheater		Whether to mark the player as a cheater.
- * @noreturn
  */
 native void GOKZ_DB_SetCheater(int client, bool cheater);
 

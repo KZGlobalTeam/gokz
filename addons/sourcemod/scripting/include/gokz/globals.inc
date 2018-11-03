@@ -47,7 +47,6 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
  * @param timeType		Time type i.e. NUB or PRO.
  * @param rank			Ranking within the same time type.
  * @param rankOverall	Overall (NUB and PRO) ranking (0 if not ranked high enough).
- * @noreturn
  */
 forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall);
 
@@ -62,7 +61,6 @@ forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType
  * @param map	    	Map name or "" for current map.
  * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode			GOKZ mode.
- * @noreturn
  */
 native void GOKZ_GL_PrintRecords(int client, const char[] map = "", int course, int mode);
 
@@ -74,7 +72,6 @@ native void GOKZ_GL_PrintRecords(int client, const char[] map = "", int course, 
  * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode			GOKZ mode.
  * @param timeType		Type of time i.e. NUB or PRO.
- * @noreturn
  */
 native void GOKZ_GL_DisplayMapTopMenu(int client, const char[] map = "", int course, int mode, int timeType);
 

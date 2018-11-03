@@ -165,7 +165,6 @@ stock int IntMin(int value1, int value2)
  * @param input			Input string.
  * @param output		Output buffer.
  * @param size			Maximum size of output.
- * @noreturn
  */
 stock void String_ToLower(const char[] input, char[] output, int size)
 {
@@ -211,7 +210,6 @@ stock int GetObserverTarget(int client)
  *
  * @param client		Client being spectated.
  * @param sound			Sound to play.
- * @noreturn
  */
 stock void EmitSoundToClientSpectators(int client, const char[] sound)
 {
@@ -254,7 +252,6 @@ stock float CalcDeltaAngle(float startAngle, float endAngle)
  * @param input				Input String.
  * @param output			Output String.
  * @param size				Max Size of the Output string
- * @noreturn
  */
 stock void Color_StripFromChatText(const char[] input, char[] output, int size)
 {
@@ -328,7 +325,6 @@ stock int NextIndex(int index, int max)
  * @param buffer		Output buffer.
  * @param bufferSize	Size of buffer.
  * @param index			Index of current/most recent value of input array.
- * @noreturn
  */
 stock void SortByRecent(const int[] input, int inputSize, int[] buffer, int bufferSize, int index)
 {

@@ -44,7 +44,6 @@ enum
  * @param pbDiffPro		Difference between new time and PRO PB in seconds (-'ve means beat PB).
  * @param rankPro		New rank of the player's PB PRO time.
  * @param maxRankPro	New total number of players with PRO times.
- * @noreturn
  */
 forward void GOKZ_LR_OnTimeProcessed(
 	int client, 
@@ -74,7 +73,6 @@ forward void GOKZ_LR_OnTimeProcessed(
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
  * @param recordType		Type of record.
- * @noreturn
  */
 forward void GOKZ_LR_OnNewRecord(
 	int client, 
@@ -95,7 +93,6 @@ forward void GOKZ_LR_OnNewRecord(
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
  * @param recordType		Type of record.
- * @noreturn
  */
 forward void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int mode, int style, int recordType);
 
@@ -109,7 +106,6 @@ forward void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, in
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
  * @param recordType		Type of record.
- * @noreturn
  */
 forward void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, int style, int recordType);
 
@@ -140,7 +136,6 @@ native bool GOKZ_LR_GetPBMissed(int client, int timeType);
  * Don't use if the client hasn't opened the map top menu before.
  *
  * @param client		Client index.
- * @noreturn
  */
 native void GOKZ_LR_ReopenMapTopMenu(int client);
 
