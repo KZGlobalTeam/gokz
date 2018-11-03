@@ -1,0 +1,120 @@
+/* 	
+	GOKZ Quiet Include File
+	
+	Website: https://bitbucket.org/kztimerglobalteam/gokz
+*/
+
+#if defined _gokz_quiet_included_
+#endinput
+#endif
+#define _gokz_quiet_included_
+
+
+
+// =========================  ENUMERATIONS  ========================= //
+
+enum QTOption
+{
+	QTOPTION_INVALID = -1, 
+	QTOption_ShowPlayers, 
+	QTOPTION_COUNT
+};
+
+enum
+{
+	ShowPlayers_Disabled = 0, 
+	ShowPlayers_Enabled, 
+	SHOWPLAYERS_COUNT
+};
+
+
+
+// =========================  OTHER  ========================= //
+
+stock const char gC_QTOptionNames[QTOPTION_COUNT][] = 
+{
+	"showplayers"
+};
+
+stock const char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
+{
+	"Other player visibility"
+};
+
+
+stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 
+{
+	ShowPlayers_Disabled
+};
+
+stock int gI_QTOptionCounts[QTOPTION_COUNT] = 
+{
+	SHOWPLAYERS_COUNT
+};
+
+stock char gC_QTOptionPhrases[QTOPTION_COUNT][] = 
+{
+	"Options Menu - Show Players"
+};
+
+
+
+// =========================  STOCKS  ========================= //
+
+/**
+ * Returns whether an option is a gokz-quiet option.
+ *
+ * @param option		Option name.
+ * @param optionEnum	Variable to store enumerated gokz-quiet option (if it is one).
+ * @return				Whether option is a gokz-quiet option.
+ */
+stock bool GOKZ_QT_IsQTOption(const char[] option, QTOption &optionEnum = QTOPTION_INVALID)
+{
+	for (QTOption i; i < QTOPTION_COUNT; i++)
+	{
+		if (StrEqual(option, gC_QTOptionNames[i]))
+		{
+			optionEnum = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Gets the current value of a player's gokz-quiet option.
+ *
+ * @param client		Client index.
+ * @param option		gokz-quiet option.
+ * @return				Current value of option.
+ */
+stock any GOKZ_QT_GetOption(int client, QTOption option)
+{
+	return GOKZ_GetOption(client, gC_QTOptionNames[option]);
+}
+
+/**
+ * Sets the player's gokz-quiet option's value.
+ *
+ * @param client		Client index.
+ * @param option		gokz-quiet option.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_QT_SetOption(int client, QTOption option, any value)
+{
+	return GOKZ_SetOption(client, gC_QTOptionNames[option], value);
+}
+
+/**
+ * Increment an integer-type gokz-quiet option's value.
+ * Loops back to '0' if max value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		gokz-quiet option.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_QT_CycleOption(int client, QTOption option)
+{
+	return GOKZ_CycleOption(client, gC_QTOptionNames[option]);
+} 

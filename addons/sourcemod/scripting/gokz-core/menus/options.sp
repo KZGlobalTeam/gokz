@@ -15,7 +15,6 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 {
 	"Options Menu - Mode", 
 	"Options Menu - Style", 
-	"Options Menu - Show Players", 
 	"Options Menu - Auto Restart", 
 	"Options Menu - Slay On End", 
 	"Options Menu - Checkpoint Messages", 

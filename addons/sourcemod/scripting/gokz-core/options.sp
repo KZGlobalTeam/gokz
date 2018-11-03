@@ -15,7 +15,6 @@ static const int defaultDefaultValues[OPTION_COUNT] =
 {
 	Mode_SimpleKZ, 
 	Style_Normal, 
-	ShowingPlayers_Enabled, 
 	AutoRestart_Disabled, 
 	SlayOnEnd_Disabled, 
 	CheckpointMessages_Disabled, 
@@ -28,7 +27,6 @@ static const int optionCounts[OPTION_COUNT] =
 {
 	MODE_COUNT, 
 	STYLE_COUNT, 
-	SHOWINGPLAYERS_COUNT, 
 	AUTORESTART_COUNT, 
 	SLAYONEND_COUNT, 
 	CHECKPOINTMESSAGES_COUNT, 
@@ -41,7 +39,6 @@ static const char optionDescription[OPTION_COUNT][] =
 {
 	"Movement mode", 
 	"Movement style", 
-	"Other player visibility", 
 	"Automatic timer restart upon teleport to start", 
 	"Automatic slay upon end", 
 	"Checkpoint messages", 
@@ -369,20 +366,6 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 		case Option_Mode:
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Switched Mode", gC_ModeNames[newValue]);
-		}
-		case Option_ShowingPlayers:
-		{
-			switch (newValue)
-			{
-				case ShowingPlayers_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Players - Disable");
-				}
-				case ShowingPlayers_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Players - Enable");
-				}
-			}
 		}
 		case Option_AutoRestart:
 		{

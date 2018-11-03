@@ -272,15 +272,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int showingPlayers {
-		public get() {
-			return this.GetCoreOption(Option_ShowingPlayers);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_ShowingPlayers, value);
-		}
-	}
-	
 	property int autoRestart {
 		public get() {
 			return this.GetCoreOption(Option_AutoRestart);
@@ -464,4 +455,18 @@ methodmap KZPlayer < MovementAPIPlayer {
 	}
 	#endif
 	// =========================  END TIPS  ========================= //
+	
+	
+	#if defined _gokz_quiet_included_
+	// =========================  QUIET  ========================= //
+	property int showPlayers {
+		public get() {
+			return this.GetOption(gC_QTOptionNames[QTOption_ShowPlayers]);
+		}
+		public set(int value) {
+			this.SetOption(gC_QTOptionNames[QTOption_ShowPlayers], value);
+		}
+	}
+	#endif
+	// =========================  END QUIET  ========================= //
 } 

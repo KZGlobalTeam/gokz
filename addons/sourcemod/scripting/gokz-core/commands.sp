@@ -38,7 +38,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
 	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
-	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
@@ -188,19 +187,6 @@ public Action CommandGoto(int client, int args)
 public Action CommandOptions(int client, int args)
 {
 	DisplayOptionsMenu(client);
-	return Plugin_Handled;
-}
-
-public Action CommandToggleShowPlayers(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Enabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled);
-	}
 	return Plugin_Handled;
 }
 

@@ -60,7 +60,6 @@ enum Option
 	OPTION_INVALID = -1, 
 	Option_Mode, 
 	Option_Style, 
-	Option_ShowingPlayers, 
 	Option_AutoRestart, 
 	Option_SlayOnEnd, 
 	Option_CheckpointMessages, 
@@ -82,13 +81,6 @@ enum
 {
 	Style_Normal = 0, 
 	STYLE_COUNT
-};
-
-enum
-{
-	ShowingPlayers_Disabled = 0, 
-	ShowingPlayers_Enabled, 
-	SHOWINGPLAYERS_COUNT
 };
 
 enum
@@ -192,7 +184,6 @@ stock const char gC_CoreOptionNames[OPTION_COUNT][] =
 {
 	"mode", 
 	"style", 
-	"showplayers", 
 	"autorestart", 
 	"slayonend", 
 	"checkpointmessages", 

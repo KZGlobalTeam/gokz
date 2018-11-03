@@ -1,0 +1,22 @@
+Phrases
+{
+	// Option Change Chat Messages ////////////////////////////////////////////////////////////
+	"Option - Show Players - Enable"
+	{
+		"en"		"{grey}You are now showing other players."
+		"chi"		"{grey}已取消屏蔽其他玩家."
+	}
+	"Option - Show Players - Disable"
+	{
+		"en"		"{grey}You are now hiding other players."
+		"chi"		"{grey}已屏蔽其他玩家模型."
+	}
+
+
+	// Options Menu ////////////////////////////////////////////////////////////
+	"Options Menu - Show Players"
+	{
+		"en"		"Show players"
+		"chi"		"屏蔽其他玩家"
+	}
+}

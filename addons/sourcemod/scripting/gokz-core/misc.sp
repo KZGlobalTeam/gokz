@@ -68,26 +68,6 @@ void UpdatePlayerCollision(int client)
 
 
 
-// =========================  HIDE PLAYERS  ========================= //
-
-void SetupClientHidePlayers(int client)
-{
-	SDKHook(client, SDKHook_SetTransmit, OnSetTransmitClient);
-}
-
-public Action OnSetTransmitClient(int entity, int client)
-{
-	if (GOKZ_GetCoreOption(client, Option_ShowingPlayers) == ShowingPlayers_Disabled
-		 && entity != client
-		 && entity != GetObserverTarget(client))
-	{
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
-
-
 // =========================  FORCE SV_FULL_ALLTALK 1  ========================= //
 
 void OnRoundStart_ForceAllTalk()
