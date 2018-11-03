@@ -39,7 +39,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
-	RegConsoleCmd("sm_tips", CommandToggleHelpAndTips, "[KZ] Toggle seeing help and tips.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
@@ -201,19 +200,6 @@ public Action CommandToggleShowPlayers(int client, int args)
 	else
 	{
 		GOKZ_SetCoreOption(client, Option_ShowingPlayers, ShowingPlayers_Disabled);
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleHelpAndTips(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_HelpAndTips) == HelpAndTips_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_HelpAndTips, HelpAndTips_Enabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_HelpAndTips, HelpAndTips_Disabled);
 	}
 	return Plugin_Handled;
 }

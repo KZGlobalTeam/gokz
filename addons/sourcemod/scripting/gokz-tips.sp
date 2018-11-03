@@ -1,6 +1,7 @@
 #include <sourcemod>
 
 #include <gokz/core>
+#include <gokz/tips>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -33,6 +34,9 @@ ConVar gCV_gokz_tips_interval;
 ArrayList g_TipPhrases;
 int gI_CurrentTip;
 Handle gH_TipTimer;
+TopMenu gTM_Options;
+TopMenuObject gTMO_CatGeneral;
+TopMenuObject gTMO_ItemTips;
 
 
 
@@ -49,12 +53,15 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-common.phrases");
+	LoadTranslations("gokz-tips.phrases");
 	LoadTranslations(TIPS_CORE);
 	LoadTranslations(TIPS_LOCALRANKS);
 	LoadTranslations(TIPS_REPLAYS);
 	LoadTranslations(TIPS_JUMPSTATS);
 	
 	CreateConVars();
+	CreateCommands();
 	
 	AutoExecConfig(true, "gokz-tips", "sourcemod/gokz");
 	
@@ -70,6 +77,9 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	
+	OnAllPluginsLoaded_Options();
+	OnAllPluginsLoaded_OptionsMenu();
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -92,11 +102,21 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  GENERAL  ========================= //
+// =========================  OTHER  ========================= //
 
 public void OnMapStart()
 {
 	LoadTipPhrases();
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
+{
+	OnOptionChanged_Options(client, option, newValue);
 }
 
 
@@ -120,13 +140,118 @@ public Action Timer_PrintTip(Handle timer)
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		KZPlayer player = KZPlayer(client);
-		if (player.inGame && player.helpAndTips != HelpAndTips_Disabled)
+		if (player.inGame && player.tips != Tips_Disabled)
 		{
 			GOKZ_PrintToChat(client, true, "%t", tip);
 		}
 	}
 	
 	gI_CurrentTip = NextIndex(gI_CurrentTip, g_TipPhrases.Length);
+}
+
+
+
+// =========================  OPTIONS  ========================= //
+
+void OnAllPluginsLoaded_Options()
+{
+	GOKZ_RegisterOption(TIPS_OPTION_NAME, TIPS_OPTION_DESCRIPTION, 
+		OptionType_Int, Tips_Enabled, 0, TIPS_COUNT - 1);
+}
+
+void OnOptionChanged_Options(int client, const char[] option, any newValue)
+{
+	if (StrEqual(option, TIPS_OPTION_NAME))
+	{
+		switch (newValue)
+		{
+			case Tips_Disabled:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Option - Tips - Disable");
+			}
+			case Tips_Enabled:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Option - Tips - Enable");
+			}
+		}
+	}
+}
+
+
+
+// =========================  OPTIONS MENU  ========================= //
+
+void OnAllPluginsLoaded_OptionsMenu()
+{
+	// Handle late loading
+	TopMenu topMenu;
+	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
+	{
+		GOKZ_OnOptionsMenuReady(topMenu);
+	}
+}
+
+void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
+{
+	if (gTM_Options == topMenu)
+	{
+		return;
+	}
+	
+	gTM_Options = topMenu;
+	gTMO_CatGeneral = gTM_Options.FindCategory(OPTIONS_MENU_CAT_GENERAL);
+	gTMO_ItemTips = gTM_Options.AddItem(TIPS_OPTION_NAME, TopMenuHandler_Tips, gTMO_CatGeneral);
+}
+
+public void TopMenuHandler_Tips(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
+{
+	if (topobj_id != gTMO_ItemTips)
+	{
+		return;
+	}
+	
+	if (action == TopMenuAction_DisplayOption)
+	{
+		if (GOKZ_GetOption(param, TIPS_OPTION_NAME) == Tips_Disabled)
+		{
+			FormatEx(buffer, maxlength, "%T - %T", 
+				"Options Menu - Tips", param, 
+				"Options Menu - Disabled", param);
+		}
+		else
+		{
+			FormatEx(buffer, maxlength, "%T - %T", 
+				"Options Menu - Tips", param, 
+				"Options Menu - Enabled", param);
+		}
+	}
+	else if (action == TopMenuAction_SelectOption)
+	{
+		GOKZ_CycleOption(param, TIPS_OPTION_NAME);
+		gTM_Options.Display(param, TopMenuPosition_LastCategory);
+	}
+}
+
+
+
+// =========================  COMMANDS  ========================= //
+
+void CreateCommands()
+{
+	RegConsoleCmd("sm_tips", CommandToggleTips, "[KZ] Toggle seeing help and tips.");
+}
+
+public Action CommandToggleTips(int client, int args)
+{
+	if (GOKZ_GetOption(client, TIPS_OPTION_NAME) == Tips_Disabled)
+	{
+		GOKZ_SetOption(client, TIPS_OPTION_NAME, Tips_Enabled);
+	}
+	else
+	{
+		GOKZ_SetOption(client, TIPS_OPTION_NAME, Tips_Disabled);
+	}
+	return Plugin_Handled;
 }
 
 

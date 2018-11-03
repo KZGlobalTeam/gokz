@@ -67,7 +67,6 @@ enum Option
 	Option_CheckpointSounds, 
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
-	Option_HelpAndTips, 
 	OPTION_COUNT
 };
 
@@ -136,13 +135,6 @@ enum
 
 enum
 {
-	HelpAndTips_Disabled = 0, 
-	HelpAndTips_Enabled, 
-	HELPANDTIPS_COUNT
-};
-
-enum
-{
 	ModeCVar_Accelerate = 0, 
 	ModeCVar_Friction, 
 	ModeCVar_AirAccelerate, 
@@ -206,8 +198,7 @@ stock const char gC_CoreOptionNames[OPTION_COUNT][] =
 	"checkpointmessages", 
 	"checkpointsounds", 
 	"teleportsounds", 
-	"errorsounds", 
-	"helpandtips"
+	"errorsounds"
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 

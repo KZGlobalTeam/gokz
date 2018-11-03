@@ -334,15 +334,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetCoreOption(Option_ErrorSounds, value);
 		}
 	}
-	
-	property int helpAndTips {
-		public get() {
-			return this.GetCoreOption(Option_HelpAndTips);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_HelpAndTips, value);
-		}
-	}
 	#endif
 	// =========================  END CORE  ========================= //
 	
@@ -459,4 +450,18 @@ methodmap KZPlayer < MovementAPIPlayer {
 	}
 	#endif
 	// =========================  END JUMP BEAM  ========================= //
+	
+	
+	#if defined _gokz_tips_included_
+	// =========================  TIPS  ========================= //
+	property int tips {
+		public get() {
+			return this.GetOption(TIPS_OPTION_NAME);
+		}
+		public set(int value) {
+			this.SetOption(TIPS_OPTION_NAME, value);
+		}
+	}
+	#endif
+	// =========================  END TIPS  ========================= //
 } 

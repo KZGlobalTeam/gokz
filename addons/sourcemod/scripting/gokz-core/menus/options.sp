@@ -21,8 +21,7 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 	"Options Menu - Checkpoint Messages", 
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
-	"Options Menu - Error Sounds", 
-	"Options Menu - Help and Tips"
+	"Options Menu - Error Sounds"
 };
 
 

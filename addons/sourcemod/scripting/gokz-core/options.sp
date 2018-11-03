@@ -21,8 +21,7 @@ static const int defaultDefaultValues[OPTION_COUNT] =
 	CheckpointMessages_Disabled, 
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 
-	ErrorSounds_Enabled, 
-	HelpAndTips_Enabled
+	ErrorSounds_Enabled
 };
 
 static const int optionCounts[OPTION_COUNT] = 
@@ -35,8 +34,7 @@ static const int optionCounts[OPTION_COUNT] =
 	CHECKPOINTMESSAGES_COUNT, 
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
-	ERRORSOUNDS_COUNT, 
-	HELPANDTIPS_COUNT
+	ERRORSOUNDS_COUNT
 };
 
 static const char optionDescription[OPTION_COUNT][] = 
@@ -49,8 +47,7 @@ static const char optionDescription[OPTION_COUNT][] =
 	"Checkpoint messages", 
 	"Checkpoint sounds", 
 	"Teleport sounds", 
-	"Error sounds", 
-	"Tips"
+	"Error sounds"
 };
 
 
@@ -412,20 +409,6 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 				case SlayOnEnd_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Enable");
-				}
-			}
-		}
-		case Option_HelpAndTips:
-		{
-			switch (newValue)
-			{
-				case HelpAndTips_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Disable");
-				}
-				case HelpAndTips_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Enable");
 				}
 			}
 		}

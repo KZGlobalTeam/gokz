@@ -235,16 +235,6 @@
 		"en"		"{grey}You will no longer be slain after completing a course."
 		"chi"		"{grey}完成地图后不再强制复活."
 	}
-	"Option - Help And Tips - Enable"
-	{
-		"en"		"{grey}You will now see help and tips."
-		"chi"		"{grey}现在你可以看到帮助以及提示."
-	}
-	"Option - Help And Tips - Disable"
-	{
-		"en"		"{grey}You will no longer see help and tips."
-		"chi"		"{grey}现在帮助以及提示已隐藏."
-	}
 
 
 	// Mode Menu ////////////////////////////////////////////////////////////
@@ -316,10 +306,5 @@
 	{
 		"en"		"Error sounds"
 		"chi"		"报错音效"
-	}
-	"Options Menu - Help and Tips"
-	{
-		"en"		"Help and tips"
-		"chi"		"帮助及提示"
 	}
 }
