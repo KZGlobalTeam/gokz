@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 // Adds a replay to the cache
 void AddToReplayInfoCache(int course, int mode, int style, int timeType)
@@ -27,7 +27,7 @@ void SortReplayInfoCache()
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnMapStart_ReplayCache()
 {
@@ -95,7 +95,7 @@ void OnMapStart_ReplayCache()
 
 
 
-// =========================  SORT FUNCTION  ========================= //
+// =====[ SORT FUNCTION ]=====
 
 public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle hndl)
 {
@@ -141,7 +141,7 @@ public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static int GetModeIDFromString(const char[] mode)
 {

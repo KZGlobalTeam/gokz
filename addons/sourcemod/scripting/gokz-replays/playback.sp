@@ -28,7 +28,7 @@ static char botAlias[MAX_BOTS][MAX_NAME_LENGTH];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
 int LoadReplayBot(int course, int mode, int style, int timeType)
@@ -55,7 +55,7 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnClientPutInServer_Playback(int client)
 {
@@ -190,7 +190,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 // Returns false if there was a problem loading the playback e.g. doesn't exist
 static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)

@@ -13,7 +13,7 @@ static Handle speedHudSynchronizer;
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateHudSynchronizerSpeedText()
 {
@@ -22,7 +22,7 @@ void CreateHudSynchronizerSpeedText()
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnPlayerRunCmd_SpeedText(int client, int cmdnum)
 {
@@ -43,7 +43,7 @@ void OnOptionChanged_SpeedText(int client, HUDOption option)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void UpdateSpeedText(int client)
 {

@@ -17,7 +17,7 @@ static int mapTopMode[MAXPLAYERS + 1];
 
 
 
-// =========================  MAP TOP  ========================= //
+// =====[ MAP TOP ]=====
 
 void DB_OpenMapTopModeMenu(int client, int mapID, int course)
 {
@@ -114,7 +114,7 @@ public void DB_TxnSuccess_OpenMapTopModeMenu_FindMap(Handle db, DataPack data, i
 
 
 
-// =========================  MAP TOP 20  ========================= //
+// =====[ MAP TOP 20 ]=====
 
 void DB_OpenMapTop20(int client, int mapID, int course, int mode, int timeType)
 {
@@ -240,7 +240,7 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 
 
 
-// =========================  MENUS  ========================= //
+// =====[ MENUS ]=====
 
 void DisplayMapTopModeMenu(int client)
 {
@@ -306,7 +306,7 @@ void ReopenMapTopMenu(int client)
 
 
 
-// =========================  MENU HANDLERS  ========================= //
+// =====[ MENU HANDLERS ]=====
 
 public int MenuHandler_MapTopMode(Menu menu, MenuAction action, int param1, int param2)
 {

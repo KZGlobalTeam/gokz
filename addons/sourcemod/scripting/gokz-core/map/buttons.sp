@@ -11,7 +11,7 @@ static Regex RE_BonusEndButton;
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateRegexesMapButtons()
 {
@@ -21,7 +21,7 @@ void CreateRegexesMapButtons()
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnEntitySpawned_MapButtons(int entity)
 {
@@ -56,7 +56,7 @@ void OnEntitySpawned_MapButtons(int entity)
 
 
 
-// =========================  HANDLERS  ========================= //
+// =====[ HANDLERS ]=====
 
 public void OnStartButtonPress(const char[] name, int caller, int activator, float delay)
 {

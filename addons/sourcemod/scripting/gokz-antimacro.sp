@@ -61,7 +61,7 @@ bool gB_BhopPostJumpInputsPending[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -132,7 +132,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -157,7 +157,7 @@ public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] 
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void SuspectPlayer(int client, AMReason reason, const char[] notes, const char[] stats)
 {
@@ -176,7 +176,7 @@ void SuspectPlayer(int client, AMReason reason, const char[] notes, const char[]
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void LogSuspicion(int client, AMReason reason, const char[] notes, const char[] stats)
 {

@@ -13,7 +13,7 @@ static char sounds[DISTANCETIER_COUNT][256];
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
@@ -37,7 +37,7 @@ void OnLanding_JumpReporting(int client, int jumpType, float distance, float off
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {

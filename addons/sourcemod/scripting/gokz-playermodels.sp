@@ -28,7 +28,7 @@ ConVar gCV_sv_disable_immunity_alpha;
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -64,7 +64,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
@@ -77,7 +77,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
@@ -86,7 +86,7 @@ public void OnMapStart()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateConVars()
 {
@@ -123,7 +123,7 @@ static void PrecacheModels()
 
 
 
-// =========================  PLAYER MODELS  ========================= //
+// =====[ PLAYER MODELS ]=====
 
 #define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
 #define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"

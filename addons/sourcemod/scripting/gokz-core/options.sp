@@ -49,7 +49,7 @@ static const char optionDescription[OPTION_COUNT][] =
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateOptions()
 {
@@ -242,7 +242,7 @@ bool IsRegisteredOption(const char[] option)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnClientCookiesCached_Options(int client)
 {
@@ -295,7 +295,7 @@ void OnMapStart_Options()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool IsValueInRange(OptionType type, any value, any minValue, any maxValue)
 {

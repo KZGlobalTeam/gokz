@@ -17,7 +17,7 @@ static float lastTouchLadderTime[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool BhopTriggersJustTouched(int client)
 {
@@ -35,7 +35,7 @@ bool BhopTriggersJustTouched(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnEntitySpawned_MapBhopTriggers(int entity)
 {

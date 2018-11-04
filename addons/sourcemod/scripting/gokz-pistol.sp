@@ -72,7 +72,7 @@ bool gB_CameFromOptionsMenu[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -112,7 +112,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
 {
@@ -133,7 +133,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
@@ -142,7 +142,7 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 
 
 
-// =========================  PISTOL  ========================= //
+// =====[ PISTOL ]=====
 
 void UpdatePistol(int client)
 {
@@ -202,7 +202,7 @@ void GivePistol(int client, int pistol)
 
 
 
-// =========================  OPTIONS  ========================= //
+// =====[ OPTIONS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -212,7 +212,7 @@ void OnAllPluginsLoaded_Options()
 
 
 
-// =========================  OPTIONS MENU  ========================= //
+// =====[ OPTIONS MENU ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -267,7 +267,7 @@ public void TopMenuHandler_Pistol(TopMenu topmenu, TopMenuAction action, TopMenu
 
 
 
-// =========================  PISTOL MENU  ========================= //
+// =====[ PISTOL MENU ]=====
 
 void DisplayPistolMenu(int client, int atItem = 0, bool fromOptionsMenu = false)
 {
@@ -324,7 +324,7 @@ void PistolMenuAddItems(int client, Menu menu)
 
 
 
-// =========================  COMMANDS  ========================= //
+// =====[ COMMANDS ]=====
 
 void CreateCommands()
 {

@@ -94,7 +94,7 @@ public void DB_TxnSuccess_OpenRecentRecords(Handle db, DataPack data, int numQue
 
 
 
-// =========================  MENUS  ========================= //
+// =====[ MENUS ]=====
 
 void DisplayRecentRecordsMenu(int client, int mode)
 {
@@ -118,7 +118,7 @@ static void RecentRecordsMenuAddItems(int client, Menu menu)
 
 
 
-// =========================  MENU HANDLERS  ========================= //
+// =====[ MENU HANDLERS ]=====
 
 public int MenuHandler_RecentRecords(Menu menu, MenuAction action, int param1, int param2)
 {

@@ -34,7 +34,7 @@ public Plugin myinfo =
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -76,7 +76,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
@@ -104,7 +104,7 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 
 
 
-// =========================  GOKZ  ========================= //
+// =====[ GOKZ EVENTS ]=====
 
 public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
 {
@@ -182,7 +182,7 @@ public void GOKZ_OnCustomStartPositionCleared_Post(int client)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
@@ -191,7 +191,7 @@ public void OnMapStart()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateHooks()
 {

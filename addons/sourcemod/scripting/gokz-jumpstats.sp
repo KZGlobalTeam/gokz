@@ -46,7 +46,7 @@ int gI_TouchingEntities[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -96,7 +96,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
@@ -124,7 +124,7 @@ public void SDKHook_EndTouch_Callback(int client, int touched)
 
 
 
-// =========================  MOVEMENTAPI  ========================= //
+// =====[ MOVEMENTAPI EVENTS ]=====
 
 public void Movement_OnStartTouchGround(int client)
 {
@@ -138,7 +138,7 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 
 
 
-// =========================  GOKZ  ========================= //
+// =====[ GOKZ EVENTS ]=====
 
 public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
 {
@@ -173,7 +173,7 @@ public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float of
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {

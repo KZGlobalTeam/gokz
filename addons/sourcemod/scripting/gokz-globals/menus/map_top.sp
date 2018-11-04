@@ -13,7 +13,7 @@ static int mapTopMode[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void DisplayMapTopModeMenu(int client, const char[] map, int course)
 {
@@ -55,7 +55,7 @@ void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, in
 
 
 
-// =========================  HANDLERS  ========================= //
+// =====[ HANDLERS ]=====
 
 public int MenuHandler_MapTopModeMenu(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -112,7 +112,7 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void MapTopModeMenuSetTitle(int client, Menu menu)
 {

@@ -41,7 +41,7 @@ static float lastFalseEndTime[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool GetTimerRunning(int client)
 {
@@ -190,7 +190,7 @@ void TimerStopAll(bool playSound = true)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void SetupClientTimer(int client)
 {
@@ -262,7 +262,7 @@ void OnRoundStart_Timer()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool IsPlayerValidMoveType(int client)
 {

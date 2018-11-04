@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateCommands()
 {
@@ -23,7 +23,7 @@ void CreateCommands()
 
 
 
-// =========================  COMMAND HANDLERS  ========================= //
+// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandGlobalCheck(int client, int args)
 {

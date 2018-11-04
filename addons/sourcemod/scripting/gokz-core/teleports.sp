@@ -30,7 +30,7 @@ static float undoAngles[MAXPLAYERS + 1][3];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 int GetCheckpointCount(int client)
 {
@@ -513,7 +513,7 @@ bool GotoPlayer(int client, int target, bool printMessage = true)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnTimerStart_Teleports(int client)
 {
@@ -527,7 +527,7 @@ void OnTimerStart_Teleports(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static int NextIndex(int current, int maximum)
 {

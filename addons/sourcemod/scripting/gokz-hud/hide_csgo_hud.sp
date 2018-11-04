@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void UpdateCSGOHUD(int client)
 {
@@ -20,7 +20,7 @@ void UpdateCSGOHUD(int client)
 
 
 
-// =========================  CALLBACKS  ========================= //
+// =====[ CALLBACKS ]=====
 
 public Action CleanHUD(Handle timer, int userid)
 {

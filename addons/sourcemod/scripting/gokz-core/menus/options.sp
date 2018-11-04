@@ -25,7 +25,7 @@ static char optionDisplayPhrases[OPTION_COUNT][] =
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void DisplayOptionsMenu(int client, TopMenuPosition position = TopMenuPosition_Start)
 {
@@ -45,7 +45,7 @@ bool GetCameFromOptionsMenu(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -68,7 +68,7 @@ void OnAllPluginsLoaded_OptionsMenu()
 
 
 
-// =========================  HANDLER  ========================= //
+// =====[ HANDLER ]=====
 
 public void TopMenuHandler_Options(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
 {
@@ -135,7 +135,7 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void FormatToggleableOptionDisplay(int client, Option option, char[] buffer, int maxlength)
 {

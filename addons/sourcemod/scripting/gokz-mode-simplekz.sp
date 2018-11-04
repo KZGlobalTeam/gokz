@@ -56,7 +56,7 @@ bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -124,7 +124,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  GENERAL  ========================= //
+// =====[ GENERAL ]=====
 
 public void OnGameFrame()
 {
@@ -147,7 +147,7 @@ public void OnGameFrame()
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -269,7 +269,7 @@ public void GOKZ_OnClientSetup(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool IsUsingMode(int client)
 {

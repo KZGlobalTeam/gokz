@@ -29,7 +29,7 @@ ConVar gCV_gokz_connection_messages;
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -74,7 +74,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
 {
@@ -110,7 +110,7 @@ public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcas
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateConVars()
 {
@@ -126,7 +126,7 @@ static void CreateHooks()
 
 
 
-// =========================  CHAT PROCESSING  ========================= //
+// =====[ CHAT PROCESSING ]=====
 
 void OnClientSayCommand_ChatProcessing(int client, const char[] command, const char[] message)
 {
@@ -199,7 +199,7 @@ static void SanitiseChatInput(char[] message, int maxlength)
 
 
 
-// =========================  CONNECTION MESSAGES  ========================= //
+// =====[ CONNECTION MESSAGES ]=====
 
 void PrintConnectMessage(int client)
 {

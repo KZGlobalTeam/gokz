@@ -9,7 +9,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool IsDrawingInfoPanel(int client)
 {
@@ -20,7 +20,7 @@ bool IsDrawingInfoPanel(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
 {
@@ -32,7 +32,7 @@ void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void UpdateInfoPanel(int client)
 {

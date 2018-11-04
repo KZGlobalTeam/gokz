@@ -37,7 +37,7 @@ ConVar gCV_ModeCVar[MODECVAR_COUNT];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -105,7 +105,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -189,7 +189,7 @@ public void GOKZ_OnClientSetup(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool IsUsingMode(int client)
 {

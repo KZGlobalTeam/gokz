@@ -29,7 +29,7 @@ TopMenuObject gTMO_ItemsQuiet[QTOPTION_COUNT];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -77,7 +77,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -86,7 +86,7 @@ public void OnClientPutInServer(int client)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
@@ -104,7 +104,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 
 
-// =========================  HIDE PLAYERS  ========================= //
+// =====[ HIDE PLAYERS ]=====
 
 void SetupClientHidePlayers(int client)
 {
@@ -124,7 +124,7 @@ public Action OnSetTransmitClient(int entity, int client)
 
 
 
-// =========================  OPTIONS  ========================= //
+// =====[ OPTIONS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -167,7 +167,7 @@ void PrintOptionChangeMessage(int client, QTOption option, any newValue)
 
 
 
-// =========================  OPTIONS MENU  ========================= //
+// =====[ OPTIONS MENU ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -250,7 +250,7 @@ static void FormatToggleableOptionDisplay(int client, QTOption option, char[] bu
 
 
 
-// =========================  COMMANDS  ========================= //
+// =====[ COMMANDS ]=====
 
 void CreateCommands()
 {

@@ -23,7 +23,7 @@ public Plugin myinfo =
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -64,7 +64,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  SPEC MENU  ========================= //
+// =====[ SPEC MENU ]=====
 
 int DisplaySpecMenu(int client)
 {
@@ -167,7 +167,7 @@ static int SpecMenuAddItems(int client, Menu menu)
 
 
 
-// =========================  COMMAND HANDLERS  ========================= //
+// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandSpec(int client, int args)
 {

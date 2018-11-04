@@ -64,7 +64,7 @@ int gI_OldButtons[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -139,7 +139,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -226,7 +226,7 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 
 
 
-// =========================  MOVEMENTAPI  ========================= //
+// =====[ MOVEMENTAPI EVENTS ]=====
 
 public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
 {
@@ -248,7 +248,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 
 
 
-// =========================  GOKZ  ========================= //
+// =====[ GOKZ EVENTS ]=====
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
@@ -293,7 +293,7 @@ public void GOKZ_OnModeUnloaded(int mode)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
@@ -340,7 +340,7 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateRegexes()
 {

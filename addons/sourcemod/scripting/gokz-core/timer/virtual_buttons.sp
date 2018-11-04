@@ -20,7 +20,7 @@ static int virtualEndCourse[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool GetHasVirtualStartButton(int client)
 {
@@ -34,7 +34,7 @@ bool GetHasVirtualEndButton(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void SetupClientVirtualButtons(int client)
 {
@@ -73,7 +73,7 @@ void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool InRangeOfVirtualStart(int client)
 {

@@ -10,7 +10,7 @@ static int selectedReplayMode[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void DisplayReplayModeMenu(int client)
 {
@@ -29,7 +29,7 @@ void DisplayReplayModeMenu(int client)
 
 
 
-// =========================  HANDLERS  ========================= //
+// =====[ HANDLERS ]=====
 
 public int MenuHandler_ReplayMode(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -96,7 +96,7 @@ public Action Timer_SpectateBot(Handle timer, DataPack data)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void DisplayReplayMenu(int client)
 {

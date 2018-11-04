@@ -17,7 +17,7 @@ static char printRecordsPlayerNames[MAXPLAYERS + 1][TIMETYPE_COUNT][MAX_NAME_LEN
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void PrintRecords(int client, const char[] map, int course, int mode)
 {
@@ -92,7 +92,7 @@ public int PrintRecordsCallback(bool failure, const char[] top, DataPack dp)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 void OnClientPutInServer_PrintRecords(int client)
 {
@@ -100,7 +100,7 @@ void OnClientPutInServer_PrintRecords(int client)
 }
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void PrintRecordsFinally(int client)
 {

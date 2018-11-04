@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateCommands()
 {
@@ -20,7 +20,7 @@ void CreateCommands()
 
 
 
-// =========================  COMMAND HANDLERS  ========================= //
+// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandMenu(int client, int args)
 {

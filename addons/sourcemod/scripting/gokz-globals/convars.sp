@@ -12,7 +12,7 @@ float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =  { 0.0, 0.0, 0.0 };
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateConVars()
 {

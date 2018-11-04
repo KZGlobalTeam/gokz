@@ -6,7 +6,7 @@
 
 
 
-// =========================  GOKZ.CFG  ========================= //
+// =====[ GOKZ.CFG ]=====
 
 #define GOKZ_CFG_PATH "sourcemod/gokz/gokz.cfg"
 
@@ -27,7 +27,7 @@ void OnMapStart_KZConfig()
 
 
 
-// =========================  GODMODE  ========================= //
+// =====[ GODMODE ]=====
 
 void UpdateGodMode(int client)
 {
@@ -37,7 +37,7 @@ void UpdateGodMode(int client)
 
 
 
-// =========================  NOCLIP  ========================= //
+// =====[ NOCLIP ]=====
 
 void ToggleNoclip(int client)
 {
@@ -58,7 +58,7 @@ void ToggleNoclip(int client)
 
 
 
-// =========================  PLAYER COLLISION  ========================= //
+// =====[ PLAYER COLLISION ]=====
 
 void UpdatePlayerCollision(int client)
 {
@@ -68,7 +68,7 @@ void UpdatePlayerCollision(int client)
 
 
 
-// =========================  FORCE SV_FULL_ALLTALK 1  ========================= //
+// =====[ FORCE SV_FULL_ALLTALK 1 ]=====
 
 void OnRoundStart_ForceAllTalk()
 {
@@ -77,7 +77,7 @@ void OnRoundStart_ForceAllTalk()
 
 
 
-// =========================  SLAY ON END  ========================= //
+// =====[ SLAY ON END ]=====
 
 void OnTimerEnd_SlayOnEnd(int client)
 {
@@ -99,7 +99,7 @@ public Action Timer_SlayPlayer(Handle timer, int userid)
 
 
 
-// =========================  ERROR SOUNDS  ========================= //
+// =====[ ERROR SOUNDS ]=====
 
 #define SOUND_ERROR "buttons/button10.wav"
 
@@ -113,7 +113,7 @@ void PlayErrorSound(int client)
 
 
 
-// =========================  STOP SOUNDS  ========================= //
+// =====[ STOP SOUNDS ]=====
 
 void StopSounds(int client)
 {
@@ -134,7 +134,7 @@ Action OnNormalSound_StopSounds(int entity)
 
 
 
-// =========================  JOIN TEAM HANDLING  ========================= //
+// =====[ JOIN TEAM HANDLING ]=====
 
 static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
@@ -191,7 +191,7 @@ void OnTimerStart_JoinTeam(int client)
 
 
 
-// =========================  VALID JUMP TRACKING  ========================= //
+// =====[ VALID JUMP TRACKING ]=====
 
 /*
 	Valid jump tracking is intended to detect when the player
@@ -302,7 +302,7 @@ void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 
 
 
-// =========================  CLAN TAG  ========================= //
+// =====[ CLAN TAG ]=====
 
 void UpdateClanTag(int client)
 {
@@ -322,7 +322,7 @@ void OnOptionChanged_ClanTag(int client, Option option)
 
 
 
-// =========================  FIRST SPAWN  ========================= //
+// =====[ FIRST SPAWN ]=====
 
 static bool hasSpawned[MAXPLAYERS + 1];
 
@@ -343,7 +343,7 @@ void OnPlayerSpawn_FirstSpawn(int client)
 
 
 
-// =========================  TIME LIMIT  ========================= //
+// =====[ TIME LIMIT ]=====
 
 void OnConfigsExecuted_TimeLimit()
 {

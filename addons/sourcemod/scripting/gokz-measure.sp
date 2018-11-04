@@ -23,7 +23,7 @@ public Plugin myinfo =
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -60,7 +60,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
@@ -69,7 +69,7 @@ public void OnMapStart()
 
 
 
-// =========================  COMMANDS  ========================= //
+// =====[ COMMANDS ]=====
 
 void CreateCommands()
 {
@@ -84,7 +84,7 @@ public Action CommandMeasureMenu(int client, int args)
 
 
 
-// =========================  MEASURE MENU  ========================= //
+// =====[ MEASURE MENU ]=====
 
 /*
 	Measure Menu
@@ -108,7 +108,7 @@ static Handle P2PGreen[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void DisplayMeasureMenu(int client, bool reset = true)
 {
@@ -125,7 +125,7 @@ void DisplayMeasureMenu(int client, bool reset = true)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void PrecacheMeasureModels()
 {
@@ -134,7 +134,7 @@ void PrecacheMeasureModels()
 
 
 
-// =========================  HANDLER  ========================= //
+// =====[ HANDLER ]=====
 
 public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -183,7 +183,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void MeasureMenuAddItems(int client, Menu menu)
 {

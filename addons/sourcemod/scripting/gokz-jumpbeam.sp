@@ -33,7 +33,7 @@ TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -71,7 +71,7 @@ public void OnLibraryAdded(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
@@ -90,7 +90,7 @@ void UpdateOldVariables(int client)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
@@ -104,7 +104,7 @@ public void OnMapStart()
 
 
 
-// =========================  JUMP BEAM  ========================= //
+// =====[ JUMP BEAM ]=====
 
 void OnPlayerRunCmd_JumpBeam(int targetClient)
 {
@@ -228,7 +228,7 @@ void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 
 
 
-// =========================  OPTIONS  ========================= //
+// =====[ OPTIONS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -245,7 +245,7 @@ void OnAllPluginsLoaded_Options()
 
 
 
-// =========================  OPTIONS MENU  ========================= //
+// =====[ OPTIONS MENU ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {

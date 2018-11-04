@@ -14,7 +14,7 @@ static float distanceTiers[JUMPTYPE_COUNT - 2][MODE_COUNT][DISTANCETIER_COUNT];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 int GetDistanceTier(int jumpType, int mode, float distance, float offset)
 {
@@ -45,7 +45,7 @@ float GetDistanceTierDistance(int jumpType, int mode, int tier)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnMapStart_DistanceTiers()
 {
@@ -57,7 +57,7 @@ void OnMapStart_DistanceTiers()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool LoadDistanceTiers()
 {

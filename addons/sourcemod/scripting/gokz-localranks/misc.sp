@@ -24,7 +24,7 @@ void CompletionMVPStarsUpdateAll()
 
 
 
-// =========================  ANNOUNCEMENTS  ========================= //
+// =====[ ANNOUNCEMENTS ]=====
 
 void PrecacheAnnouncementSounds()
 {
@@ -203,7 +203,7 @@ void AnnounceNewRecord(int client, int course, int mode, int recordType)
 
 
 
-// =========================  MISSED RECORD TRACKING  ========================= //
+// =====[ MISSED RECORD TRACKING ]=====
 
 void ResetRecordMissed(int client)
 {
@@ -255,7 +255,7 @@ void UpdateRecordMissed(int client)
 
 
 
-// =========================  MISSED PB TRACKING  ========================= //
+// =====[ MISSED PB TRACKING ]=====
 
 #define MISSED_PB_SOUND "buttons/button18.wav"
 

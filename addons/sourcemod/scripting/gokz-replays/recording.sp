@@ -19,7 +19,7 @@ static ArrayList recordedTickData[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void StartRecording(int client)
 {
@@ -210,7 +210,7 @@ void ResumeRecording(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnClientPutInServer_Recording(int client)
 {

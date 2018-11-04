@@ -10,7 +10,7 @@ static Handle H_OnNewTopTime;
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
@@ -31,7 +31,7 @@ void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank,
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 void CreateNatives()
 {

@@ -10,7 +10,7 @@ static Handle H_OnPlayerSuspected;
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
@@ -29,7 +29,7 @@ void Call_OnPlayerSuspected(int client, AMReason reason, const char[] notes, con
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 void CreateNatives()
 {

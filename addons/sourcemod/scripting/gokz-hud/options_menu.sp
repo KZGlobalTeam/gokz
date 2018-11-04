@@ -51,7 +51,7 @@ static char phrasesSpeedText[SPEEDTEXT_COUNT][] =
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -97,7 +97,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 
 
 
-// =========================  HANDLER  ========================= //
+// =====[ HANDLER ]=====
 
 public void TopMenuHandler_Categories(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
 {
@@ -167,7 +167,7 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void FormatToggleableOptionDisplay(int client, HUDOption option, char[] buffer, int maxlength)
 {

@@ -11,7 +11,7 @@ ConVar gCV_sv_full_alltalk;
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateConVars()
 {

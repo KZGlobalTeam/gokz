@@ -88,7 +88,7 @@ public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueri
 
 
 
-// =========================  MENUS  ========================= //
+// =====[ MENUS ]=====
 
 void DisplayPlayerTopModeMenu(int client)
 {
@@ -120,7 +120,7 @@ static void PlayerTopMenuAddItems(int client, Menu menu)
 
 
 
-// =========================  MENU HANLDERS  ========================= //
+// =====[ MENU HANLDERS ]=====
 
 public int MenuHandler_PlayerTopMode(Menu menu, MenuAction action, int param1, int param2)
 {

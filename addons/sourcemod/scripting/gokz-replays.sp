@@ -52,7 +52,7 @@ ConVar gCV_bot_quota;
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -113,7 +113,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  GENERAL  ========================= //
+// =====[ GENERAL ]=====
 
 public void OnMapStart()
 {
@@ -197,7 +197,7 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] i
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -263,7 +263,7 @@ public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateConVars()
 {

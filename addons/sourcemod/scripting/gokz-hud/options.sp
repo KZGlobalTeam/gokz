@@ -41,7 +41,7 @@ static const char optionDescription[HUDOPTION_COUNT][] =
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -68,7 +68,7 @@ void OnMapStart_Options()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void LoadDefaultOptions()
 {

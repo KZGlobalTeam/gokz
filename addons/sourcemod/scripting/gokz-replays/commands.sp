@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateCommands()
 {
@@ -15,7 +15,7 @@ void CreateCommands()
 
 
 
-// =========================  COMMAND HANDLERS  ========================= //
+// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandReplay(int client, int args)
 {

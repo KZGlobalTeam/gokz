@@ -16,7 +16,7 @@ static char radioCommands[][] =
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateCommands()
 {
@@ -65,7 +65,7 @@ void CreateCommandListeners()
 
 
 
-// =========================  COMMAND HANDLERS  ========================= //
+// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandBlock(int client, const char[] command, int argc)
 {
@@ -253,7 +253,7 @@ public Action CommandKZTimer(int client, int args)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void SwitchToModeIfAvailable(int client, int mode)
 {

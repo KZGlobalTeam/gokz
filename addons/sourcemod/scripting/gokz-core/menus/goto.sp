@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 int DisplayGotoMenu(int client)
 {
@@ -26,7 +26,7 @@ int DisplayGotoMenu(int client)
 
 
 
-// =========================  HANDLER  ========================= //
+// =====[ HANDLER ]=====
 
 public int MenuHandler_Goto(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -55,7 +55,7 @@ public int MenuHandler_Goto(Menu menu, MenuAction action, int param1, int param2
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 // Returns number of items added to the menu
 static int GotoMenuAddItems(int client, Menu menu)

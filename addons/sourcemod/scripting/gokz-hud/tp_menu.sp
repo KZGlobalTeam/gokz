@@ -21,7 +21,7 @@ static bool TPMenuIsShowing[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 // Update the TP menu i.e. item text, item disabled/enabled
 void UpdateTPMenu(int client)
@@ -35,7 +35,7 @@ void UpdateTPMenu(int client)
 
 
 
-// =========================  HANDLER  ========================= //
+// =====[ HANDLER ]=====
 
 public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -87,7 +87,7 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 }
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnPlayerRunCmd_TPMenu(int client)
 {
@@ -154,7 +154,7 @@ void OnCustomStartPositionCleared_TPMenu(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void DisplayTPMenu(int client)
 {

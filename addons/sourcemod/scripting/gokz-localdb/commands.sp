@@ -14,7 +14,7 @@ void CreateCommands()
 
 
 
-// =========================  ADMIN COMMAND HANDLERS  ========================= //
+// =====[ ADMIN COMMAND HANDLERS ]=====
 
 public Action CommandSetCheater(int client, int args)
 {

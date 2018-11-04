@@ -11,7 +11,7 @@ ConVar gCV_gokz_autoban_duration;
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateConVars()
 {

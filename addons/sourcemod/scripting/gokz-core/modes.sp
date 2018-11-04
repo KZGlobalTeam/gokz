@@ -13,7 +13,7 @@ static float GOKZTakeoffSpeed[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool GetModeLoaded(int mode)
 {
@@ -91,7 +91,7 @@ void SetGOKZTakeoffSpeed(int client, float takeoffSpeed)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnAllPluginsLoaded_Modes()
 {

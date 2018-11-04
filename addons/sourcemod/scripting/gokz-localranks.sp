@@ -67,7 +67,7 @@ char gC_BeatRecordSound[256];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -136,7 +136,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  GOKZ  ========================= //
+// =====[ GOKZ EVENTS ]=====
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
@@ -252,7 +252,7 @@ public void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, i
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {

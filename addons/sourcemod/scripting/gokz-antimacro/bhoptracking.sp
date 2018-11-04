@@ -7,7 +7,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void PrintBhopCheckToChat(int client, int target)
 {
@@ -100,7 +100,7 @@ char[] GenerateScrollPatternEx(int client, int sampleSize = BHOP_SAMPLES)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnClientPutInServer_BhopTracking(int client)
 {
@@ -149,7 +149,7 @@ void OnPlayerRunCmd_BhopTracking(int client, int cmdnum)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CheckForBhopMacro(int client)
 {

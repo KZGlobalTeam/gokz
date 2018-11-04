@@ -54,7 +54,7 @@ bool gB_GloballyVerified[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -101,7 +101,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
@@ -146,7 +146,7 @@ public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
@@ -184,7 +184,7 @@ public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType,
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void SetupAPI()
 {

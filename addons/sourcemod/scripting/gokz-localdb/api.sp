@@ -13,7 +13,7 @@ static Handle H_OnTimeInserted;
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
@@ -62,7 +62,7 @@ void Call_OnTimeInserted(int client, int steamID, int mapID, int course, int mod
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 void CreateNatives()
 {

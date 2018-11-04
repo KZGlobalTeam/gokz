@@ -17,7 +17,7 @@ static bool hasResumedInThisRun[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool GetPaused(int client)
 {
@@ -130,7 +130,7 @@ void TogglePause(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void SetupClientPause(int client)
 {

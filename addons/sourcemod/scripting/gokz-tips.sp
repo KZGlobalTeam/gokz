@@ -40,7 +40,7 @@ TopMenuObject gTMO_ItemTips;
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -102,7 +102,7 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
@@ -121,7 +121,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 
 
-// =========================  TIPS TIMER  ========================= //
+// =====[ TIPS TIMER ]=====
 
 static void CreateTipsTimer()
 {
@@ -151,7 +151,7 @@ public Action Timer_PrintTip(Handle timer)
 
 
 
-// =========================  OPTIONS  ========================= //
+// =====[ OPTIONS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -179,7 +179,7 @@ void OnOptionChanged_Options(int client, const char[] option, any newValue)
 
 
 
-// =========================  OPTIONS MENU  ========================= //
+// =====[ OPTIONS MENU ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -234,7 +234,7 @@ public void TopMenuHandler_Tips(TopMenu topmenu, TopMenuAction action, TopMenuOb
 
 
 
-// =========================  COMMANDS  ========================= //
+// =====[ COMMANDS ]=====
 
 void CreateCommands()
 {
@@ -256,7 +256,7 @@ public Action CommandToggleTips(int client, int args)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateConVars()
 {

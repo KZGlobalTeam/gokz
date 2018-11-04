@@ -53,7 +53,7 @@ int gI_DBCurrentMapID;
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
@@ -102,7 +102,7 @@ if (StrEqual(name, "updater"))
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnConfigsExecuted()
 {
@@ -148,7 +148,7 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateRegexes()
 {

@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void DisplayModeMenu(int client)
 {
@@ -18,7 +18,7 @@ void DisplayModeMenu(int client)
 
 
 
-// =========================  HANDLER  ========================= //
+// =====[ HANDLER ]=====
 
 public int MenuHandler_Mode(Menu menu, MenuAction action, int param1, int param2)
 {

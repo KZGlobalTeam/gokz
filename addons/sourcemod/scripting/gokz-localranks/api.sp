@@ -13,7 +13,7 @@ static Handle H_OnPBMissed;
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
@@ -100,7 +100,7 @@ void Call_OnPBMissed(int client, float pbTime, int course, int mode, int style, 
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateNatives()
 {

@@ -35,7 +35,7 @@ static const char optionDescription[JSOPTION_COUNT][] =
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool GetJumpstatsDisabled(int client)
 {
@@ -47,7 +47,7 @@ bool GetJumpstatsDisabled(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -93,7 +93,7 @@ void OnMapStart_Options()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void LoadDefaultOptions()
 {

@@ -354,7 +354,7 @@ public int Native_JoinTeam(Handle plugin, int numParams)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool BlockedExternallyCalledTimerNative(Handle plugin)
 {

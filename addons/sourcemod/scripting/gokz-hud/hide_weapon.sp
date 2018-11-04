@@ -6,7 +6,7 @@
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void UpdateHideWeapon(int client)
 {
@@ -16,7 +16,7 @@ void UpdateHideWeapon(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnOptionChanged_HideWeapon(int client, HUDOption option)
 {

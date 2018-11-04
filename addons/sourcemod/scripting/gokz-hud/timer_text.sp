@@ -12,7 +12,7 @@ static Handle timerHudSynchronizer;
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 void CreateHudSynchronizerTimerText()
 {
@@ -21,7 +21,7 @@ void CreateHudSynchronizerTimerText()
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnPlayerRunCmd_TimerText(int client, int cmdnum)
 {
@@ -57,7 +57,7 @@ void OnTimerStopped_TimerText(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void UpdateTimerText(int client)
 {

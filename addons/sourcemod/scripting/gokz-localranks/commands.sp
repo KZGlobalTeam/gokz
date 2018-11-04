@@ -30,7 +30,7 @@ void CreateCommands()
 
 
 
-// =========================  COMMAND HANDLERS  ========================= //
+// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandTop(int client, int args)
 {
@@ -364,7 +364,7 @@ public Action CommandRecentRecords(int client, int args)
 
 
 
-// =========================  ADMIN COMMAND HANDLERS  ========================= //
+// =====[ ADMIN COMMAND HANDLERS ]=====
 
 public Action CommandUpdateMapPool(int client, int args)
 {
@@ -373,7 +373,7 @@ public Action CommandUpdateMapPool(int client, int args)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 bool IsSpammingCommands(int client, bool printMessage = true)
 {

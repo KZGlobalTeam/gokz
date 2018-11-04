@@ -120,7 +120,7 @@ static void UpdateJumpstat(int client)
 
 
 
-// =========================  CHECKS  ========================= //
+// =====[ CHECKS ]=====
 
 static bool CheckGravity(int client)
 {
@@ -152,7 +152,7 @@ static bool CheckInWater(int client)
 
 
 
-// =========================  TYPE  ========================= //
+// =====[ TYPE ]=====
 
 /*
 	Jump type is determined at the beginning of a takeoff.
@@ -282,7 +282,7 @@ static bool ValidWeirdJumpDropDistance(int client)
 
 
 
-// =========================  DISTANCE  ========================= //
+// =====[ DISTANCE ]=====
 
 /*
 	Jump distance is the horizontal distance of the jump.
@@ -320,7 +320,7 @@ static float CalcDistance(int client)
 
 
 
-// =========================  OFFSET  ========================= //
+// =====[ OFFSET ]=====
 
 static float offsetLast[MAXPLAYERS + 1];
 
@@ -339,7 +339,7 @@ static void EndOffset(int client)
 
 
 
-// =========================  DURATION  ========================= //
+// =====[ DURATION ]=====
 
 static int durationTicksLast[MAXPLAYERS + 1];
 static int durationTicksCurrent[MAXPLAYERS + 1];
@@ -376,7 +376,7 @@ static void UpdateDuration(int client)
 
 
 
-// =========================  HEIGHT  ========================= //
+// =====[ HEIGHT ]=====
 
 static float heightLast[MAXPLAYERS + 1];
 static float heightCurrent[MAXPLAYERS + 1];
@@ -406,7 +406,7 @@ static float UpdateHeight(int client)
 
 
 
-// =========================  MAX SPEED  ========================= //
+// =====[ MAX SPEED ]=====
 
 static float maxSpeedLast[MAXPLAYERS + 1];
 static float maxSpeedCurrent[MAXPLAYERS + 1];
@@ -433,7 +433,7 @@ static void UpdateMaxSpeed(int client)
 
 
 
-// =========================  STRAFES  ========================= //
+// =====[ STRAFES ]=====
 
 static int strafesLast[MAXPLAYERS + 1];
 static int strafesCurrent[MAXPLAYERS + 1];
@@ -517,7 +517,7 @@ static void UpdateStrafes(int client)
 
 
 
-// =========================  SYNC  ========================= //
+// =====[ SYNC ]=====
 
 /*	
 	Sync is calculated as the percentage of time spent gaining

@@ -12,7 +12,7 @@ static Handle H_OnJumpInvalidated;
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
@@ -54,7 +54,7 @@ void Call_OnJumpInvalidated(int client)
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 void CreateNatives()
 {
