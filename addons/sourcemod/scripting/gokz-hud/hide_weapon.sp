@@ -1,22 +1,15 @@
 /*
-	Hide Weapon
-	
 	Hides weapon view model.
 */
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-void UpdateHideWeapon(int client)
+void OnPlayerSpawn_HideWeapon(int client)
 {
-	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", 
-		GOKZ_HUD_GetOption(client, HUDOption_ShowWeapon) == ShowWeapon_Enabled);
+	UpdateHideWeapon(client);
 }
-
-
-
-// =====[ LISTENERS ]=====
 
 void OnOptionChanged_HideWeapon(int client, HUDOption option)
 {
@@ -24,4 +17,14 @@ void OnOptionChanged_HideWeapon(int client, HUDOption option)
 	{
 		UpdateHideWeapon(client);
 	}
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void UpdateHideWeapon(int client)
+{
+	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", 
+		GOKZ_HUD_GetOption(client, HUDOption_ShowWeapon) == ShowWeapon_Enabled);
 } 

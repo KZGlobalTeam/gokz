@@ -1,6 +1,4 @@
 /*
-	Teleport Menu
-	
 	Lets players easily use teleport functionality.
 	
 	This menu is displayed whenever the player is alive and there is
@@ -21,75 +19,14 @@ static bool TPMenuIsShowing[MAXPLAYERS + 1];
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-// Update the TP menu i.e. item text, item disabled/enabled
-void UpdateTPMenu(int client)
+void OnPlayerSpawn_TPMenu(client)
 {
-	// Only cancel the menu if we know it's the TP menu
-	if (TPMenuIsShowing[client])
-	{
-		CancelClientMenu(client);
-	}
+	UpdateTPMenu(client);
 }
 
-
-
-// =====[ HANDLER ]=====
-
-public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		char info[16];
-		menu.GetItem(param2, info, sizeof(info));
-		
-		if (StrEqual(info, ITEM_INFO_CHECKPOINT, false))
-		{
-			GOKZ_MakeCheckpoint(param1);
-		}
-		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
-		{
-			GOKZ_TeleportToCheckpoint(param1);
-		}
-		else if (StrEqual(info, ITEM_INFO_PREV, false))
-		{
-			GOKZ_PrevCheckpoint(param1);
-		}
-		else if (StrEqual(info, ITEM_INFO_NEXT, false))
-		{
-			GOKZ_NextCheckpoint(param1);
-		}
-		else if (StrEqual(info, ITEM_INFO_UNDO, false))
-		{
-			GOKZ_UndoTeleport(param1);
-		}
-		else if (StrEqual(info, ITEM_INFO_PAUSE, false))
-		{
-			GOKZ_TogglePause(param1);
-		}
-		else if (StrEqual(info, ITEM_INFO_START, false))
-		{
-			GOKZ_TeleportToStart(param1);
-		}
-		
-		// Menu closes when player selects something, so...
-		TPMenuIsShowing[param1] = false;
-	}
-	else if (action == MenuAction_Cancel)
-	{
-		TPMenuIsShowing[param1] = false;
-	}
-	else if (action == MenuAction_End)
-	{
-		delete menu;
-	}
-}
-
-
-// =====[ LISTENERS ]=====
-
-void OnPlayerRunCmd_TPMenu(int client)
+void OnPlayerRunCmdPost_TPMenu(int client)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -152,9 +89,68 @@ void OnCustomStartPositionCleared_TPMenu(int client)
 	UpdateTPMenu(client);
 }
 
+public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char info[16];
+		menu.GetItem(param2, info, sizeof(info));
+		
+		if (StrEqual(info, ITEM_INFO_CHECKPOINT, false))
+		{
+			GOKZ_MakeCheckpoint(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
+		{
+			GOKZ_TeleportToCheckpoint(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_PREV, false))
+		{
+			GOKZ_PrevCheckpoint(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_NEXT, false))
+		{
+			GOKZ_NextCheckpoint(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_UNDO, false))
+		{
+			GOKZ_UndoTeleport(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_PAUSE, false))
+		{
+			GOKZ_TogglePause(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_START, false))
+		{
+			GOKZ_TeleportToStart(param1);
+		}
+		
+		// Menu closes when player selects something, so...
+		TPMenuIsShowing[param1] = false;
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		TPMenuIsShowing[param1] = false;
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
 
 
 // =====[ PRIVATE ]=====
+
+// Update the TP menu i.e. item text, item disabled/enabled
+static void UpdateTPMenu(int client)
+{
+	// Only cancel the menu if we know it's the TP menu
+	if (TPMenuIsShowing[client])
+	{
+		CancelClientMenu(client);
+	}
+}
 
 static void DisplayTPMenu(int client)
 {

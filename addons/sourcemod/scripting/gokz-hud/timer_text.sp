@@ -12,18 +12,14 @@ static Handle timerHudSynchronizer;
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-void CreateHudSynchronizerTimerText()
+void OnPluginStart_TimerText()
 {
 	timerHudSynchronizer = CreateHudSynchronizer();
 }
 
-
-
-// =====[ LISTENERS ]=====
-
-void OnPlayerRunCmd_TimerText(int client, int cmdnum)
+void OnPlayerRunCmdPost_TimerText(int client, int cmdnum)
 {
 	if (cmdnum % 32 == 0)
 	{

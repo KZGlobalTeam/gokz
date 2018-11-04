@@ -1,57 +1,10 @@
-/*
-	Options Menu
-	
-	Lets player set their gokz-hud options.
-*/
+static TopMenu optionsTopMenu;
+static TopMenuObject catHUD;
+static TopMenuObject itemsHUD[HUDOPTION_COUNT];
 
 
 
-TopMenu optionsTopMenu;
-TopMenuObject catHUD;
-TopMenuObject itemsHUD[HUDOPTION_COUNT];
-
-static char optionDisplayPhrases[HUDOPTION_COUNT][] = 
-{
-	"Options Menu - Teleport Menu", 
-	"Options Menu - Info Panel", 
-	"Options Menu - Show Keys", 
-	"Options Menu - Timer Text", 
-	"Options Menu - Speed Text", 
-	"Options Menu - Show Weapon"
-};
-
-static char phrasesTPMenu[TPMENU_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Simple", 
-	"Options Menu - Advanced"
-};
-
-static char phrasesShowKeys[SHOWKEYS_COUNT][] = 
-{
-	"Options Menu - Spectating", 
-	"Options Menu - Always", 
-	"Options Menu - Disabled"
-};
-
-static char phrasesTimerText[TIMERTEXT_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Info Panel", 
-	"Options Menu - Bottom", 
-	"Options Menu - Top"
-};
-
-static char phrasesSpeedText[SPEEDTEXT_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Info Panel", 
-	"Options Menu - Bottom"
-};
-
-
-
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -70,7 +23,7 @@ void OnOptionsMenuCreated_OptionsMenu(TopMenu topMenu)
 		return;
 	}
 	
-	catHUD = topMenu.AddCategory(OPTIONS_MENU_CAT_HUD, TopMenuHandler_Categories);
+	catHUD = topMenu.AddCategory(HUD_OPTION_CATEGORY, TopMenuHandler_Categories);
 }
 
 void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
@@ -94,10 +47,6 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 		itemsHUD[option] = optionsTopMenu.AddItem(gC_HUDOptionNames[option], TopMenuHandler_HUD, catHUD);
 	}
 }
-
-
-
-// =====[ HANDLER ]=====
 
 public void TopMenuHandler_Categories(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
 {
@@ -134,26 +83,26 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 			case HUDOption_TPMenu:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesTPMenu[GOKZ_HUD_GetOption(param, option)], param);
+					gC_HUDOptionPhrases[option], param, 
+					gC_TPMenuPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			case HUDOption_ShowKeys:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesShowKeys[GOKZ_HUD_GetOption(param, option)], param);
+					gC_HUDOptionPhrases[option], param, 
+					gC_ShowKeysPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			case HUDOption_TimerText:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesTimerText[GOKZ_HUD_GetOption(param, option)], param);
+					gC_HUDOptionPhrases[option], param, 
+					gC_TimerTextPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			case HUDOption_SpeedText:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 
-					optionDisplayPhrases[option], param, 
-					phrasesSpeedText[GOKZ_HUD_GetOption(param, option)], param);
+					gC_HUDOptionPhrases[option], param, 
+					gC_SpeedTextPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}
@@ -174,13 +123,13 @@ static void FormatToggleableOptionDisplay(int client, HUDOption option, char[] b
 	if (GOKZ_HUD_GetOption(client, option) == 0)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gC_HUDOptionPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gC_HUDOptionPhrases[option], client, 
 			"Options Menu - Enabled", client);
 	}
 } 

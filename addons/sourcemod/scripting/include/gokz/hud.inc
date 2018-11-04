@@ -76,16 +76,87 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define OPTIONS_MENU_CAT_HUD "hud"
+#define HUD_CFG_OPTIONS "cfg/sourcemod/gokz/gokz-hud-options.cfg"
+#define HUD_OPTION_CATEGORY "hud"
+#define HUD_OPTION_DESC_PREFIX "HUD - "
 
 stock char gC_HUDOptionNames[HUDOPTION_COUNT][] = 
 {
-	"tpmenu", 
-	"infopanel", 
-	"showkeys", 
-	"timertext", 
-	"speedtext", 
-	"showweapon"
+	"gokz-tpmenu", 
+	"gokz-infopanel", 
+	"gokz-showkeys", 
+	"gokz-timertext", 
+	"gokz-speedtext", 
+	"gokz-showweapon"
+};
+
+stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
+{
+	"Teleport menu", 
+	"Info panel", 
+	"Show keys", 
+	"Timer text", 
+	"Speed text", 
+	"Show weapon"
+};
+
+stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
+{
+	"Options Menu - Teleport Menu", 
+	"Options Menu - Info Panel", 
+	"Options Menu - Show Keys", 
+	"Options Menu - Timer Text", 
+	"Options Menu - Speed Text", 
+	"Options Menu - Show Weapon"
+};
+
+stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
+{
+	TPMENU_COUNT, 
+	INFOPANEL_COUNT, 
+	SHOWKEYS_COUNT, 
+	TIMERTEXT_COUNT, 
+	SPEEDTEXT_COUNT, 
+	SHOWWEAPON_COUNT
+};
+
+stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
+{
+	TPMenu_Simple, 
+	InfoPanel_Enabled, 
+	ShowKeys_Spectating, 
+	TimerText_InfoPanel, 
+	SpeedText_InfoPanel, 
+	ShowWeapon_Enabled
+};
+
+stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
+{
+	"Options Menu - Disabled", 
+	"Options Menu - Simple", 
+	"Options Menu - Advanced"
+};
+
+stock char gC_ShowKeysPhrases[SHOWKEYS_COUNT][] = 
+{
+	"Options Menu - Spectating", 
+	"Options Menu - Always", 
+	"Options Menu - Disabled"
+};
+
+stock char gC_TimerTextPhrases[TIMERTEXT_COUNT][] = 
+{
+	"Options Menu - Disabled", 
+	"Options Menu - Info Panel", 
+	"Options Menu - Bottom", 
+	"Options Menu - Top"
+};
+
+stock char gC_SpeedTextPhrases[SPEEDTEXT_COUNT][] = 
+{
+	"Options Menu - Disabled", 
+	"Options Menu - Info Panel", 
+	"Options Menu - Bottom"
 };
 
 

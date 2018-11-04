@@ -1,14 +1,21 @@
 /*
-	Hide CS:GO HUD
-	
 	Hides elements of the CS:GO HUD.
 */
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-void UpdateCSGOHUD(int client)
+void OnPlayerSpawn_HideHUD(int client)
+{
+	UpdateCSGOHUD(client);
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void UpdateCSGOHUD(int client)
 {
 	if (IsFakeClient(client))
 	{
@@ -17,10 +24,6 @@ void UpdateCSGOHUD(int client)
 	
 	CreateTimer(0.1, CleanHUD, GetClientUserId(client));
 }
-
-
-
-// =====[ CALLBACKS ]=====
 
 public Action CleanHUD(Handle timer, int userid)
 {

@@ -1,58 +1,21 @@
 /*
-	Options
-	
-	Player options to customise their experience.
+	Options for controlling appearance and behaviour of HUD and UI.
 */
 
 
 
-#define OPTION_DESCRIPTION_PREFIX "HUD - "
-#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-hud-options.cfg"
-
-static const int defaultDefaultValues[HUDOPTION_COUNT] = 
-{
-	TPMenu_Simple, 
-	InfoPanel_Enabled, 
-	ShowKeys_Spectating, 
-	TimerText_InfoPanel, 
-	SpeedText_InfoPanel, 
-	ShowWeapon_Enabled
-};
-
-static const int optionCounts[HUDOPTION_COUNT] = 
-{
-	TPMENU_COUNT, 
-	INFOPANEL_COUNT, 
-	SHOWKEYS_COUNT, 
-	TIMERTEXT_COUNT, 
-	SPEEDTEXT_COUNT, 
-	SHOWWEAPON_COUNT
-};
-
-static const char optionDescription[HUDOPTION_COUNT][] = 
-{
-	"Teleport menu", 
-	"Info panel", 
-	"Show keys", 
-	"Timer text", 
-	"Speed text", 
-	"Show weapon"
-};
-
-
-
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
+	char prefixedDescription[255];
 	for (HUDOption option; option < HUDOPTION_COUNT; option++)
 	{
-		char prefixedDescription[255];
 		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			OPTION_DESCRIPTION_PREFIX, 
-			optionDescription[option]);
+			HUD_OPTION_DESC_PREFIX, 
+			gC_HUDOptionDescriptions[option]);
 		GOKZ_RegisterOption(gC_HUDOptionNames[option], prefixedDescription, 
-			OptionType_Int, defaultDefaultValues[option], 0, optionCounts[option] - 1);
+			OptionType_Int, gI_HUDOptionDefaults[option], 0, gI_HUDOptionCounts[option] - 1);
 	}
 }
 
@@ -74,9 +37,9 @@ static void LoadDefaultOptions()
 {
 	KeyValues kv = new KeyValues("options");
 	
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	if (!kv.ImportFromFile(HUD_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
+		LogError("Could not read default options config file: %s", HUD_CFG_OPTIONS);
 		return;
 	}
 	

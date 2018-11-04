@@ -1,6 +1,4 @@
 /*
-	Information Panel
-	
 	Centre information panel (hint text).
 	
 	This is updated every ~0.1s and whenever player has taken off 
@@ -20,9 +18,9 @@ bool IsDrawingInfoPanel(int client)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
-void OnPlayerRunCmd_InfoPanel(int client, int cmdnum)
+void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum)
 {
 	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum - 1)
 	{

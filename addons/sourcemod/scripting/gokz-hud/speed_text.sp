@@ -13,18 +13,14 @@ static Handle speedHudSynchronizer;
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-void CreateHudSynchronizerSpeedText()
+void OnPluginStart_SpeedText()
 {
 	speedHudSynchronizer = CreateHudSynchronizer();
 }
 
-
-
-// =====[ LISTENERS ]=====
-
-void OnPlayerRunCmd_SpeedText(int client, int cmdnum)
+void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum)
 {
 	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum - 1)
 	{

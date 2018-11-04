@@ -1,14 +1,4 @@
-/*
-	Commands
-	
-	Commands for player and admin use.
-*/
-
-
-
-// =====[ PUBLIC ]=====
-
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_menu", CommandMenu, "[KZ] Toggle the simple teleport menu.");
 	RegConsoleCmd("sm_cpmenu", CommandMenu, "[KZ] Toggle the simple teleport menu.");
@@ -17,10 +7,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 }
-
-
-
-// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandMenu(int client, int args)
 {

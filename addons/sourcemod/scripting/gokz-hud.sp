@@ -15,7 +15,7 @@ public Plugin myinfo =
 {
 	name = "GOKZ HUD", 
 	author = "DanZay", 
-	description = "GOKZ HUD Module", 
+	description = "Provides HUD and UI features", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
@@ -23,7 +23,7 @@ public Plugin myinfo =
 #define UPDATE_URL "http://updater.gokz.org/gokz-hud.txt"
 
 #include "gokz-hud/commands.sp"
-#include "gokz-hud/hide_csgo_hud.sp"
+#include "gokz-hud/hide_hud.sp"
 #include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
 #include "gokz-hud/options.sp"
@@ -38,10 +38,6 @@ public Plugin myinfo =
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-hud");
 	return APLRes_Success;
 }
@@ -51,9 +47,11 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-hud.phrases");
 	
-	CreateHooks();
-	CreateHudSynchronizers();
-	CreateCommands();
+	HookEvents();
+	RegisterCommands();
+	
+	OnPluginStart_SpeedText();
+	OnPluginStart_TimerText();
 }
 
 public void OnAllPluginsLoaded()
@@ -62,6 +60,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	
 	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
@@ -80,10 +79,10 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmd_TPMenu(client);
-	OnPlayerRunCmd_InfoPanel(client, cmdnum);
-	OnPlayerRunCmd_SpeedText(client, cmdnum);
-	OnPlayerRunCmd_TimerText(client, cmdnum);
+	OnPlayerRunCmdPost_InfoPanel(client, cmdnum);
+	OnPlayerRunCmdPost_SpeedText(client, cmdnum);
+	OnPlayerRunCmdPost_TimerText(client, cmdnum);
+	OnPlayerRunCmdPost_TPMenu(client);
 }
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
@@ -91,9 +90,9 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (IsValidClient(client))
 	{
-		UpdateCSGOHUD(client);
-		UpdateTPMenu(client);
-		UpdateHideWeapon(client);
+		OnPlayerSpawn_HideHUD(client);
+		OnPlayerSpawn_HideWeapon(client);
+		OnPlayerSpawn_TPMenu(client);
 	}
 }
 
@@ -102,18 +101,9 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 	event.BroadcastDisabled = true; // Block death notices
 }
 
-
-
-// =====[ GOKZ EVENTS ]=====
-
-public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+public void GOKZ_OnJoinTeam(int client, int team)
 {
-	OnOptionsMenuCreated_OptionsMenu(topMenu);
-}
-
-public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
-{
-	OnOptionsMenuReady_OptionsMenu(topMenu);
+	OnJoinTeam_TPMenu(client);
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
@@ -152,24 +142,6 @@ public void GOKZ_OnCountedTeleport_Post(int client)
 	OnCountedTeleport_TPMenu(client);
 }
 
-public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
-{
-	any hudOption;
-	if (GOKZ_HUD_IsHUDOption(option, hudOption))
-	{
-		OnOptionChanged_TPMenu(client, hudOption);
-		OnOptionChanged_SpeedText(client, hudOption);
-		OnOptionChanged_TimerText(client, hudOption);
-		OnOptionChanged_HideWeapon(client, hudOption);
-		OnOptionChanged_Options(client, hudOption, newValue);
-	}
-}
-
-public void GOKZ_OnJoinTeam(int client, int team)
-{
-	OnJoinTeam_TPMenu(client);
-}
-
 public void GOKZ_OnCustomStartPositionSet_Post(int client, const float position[3], const float angles[3])
 {
 	OnCustomStartPositionSet_TPMenu(client);
@@ -178,6 +150,19 @@ public void GOKZ_OnCustomStartPositionSet_Post(int client, const float position[
 public void GOKZ_OnCustomStartPositionCleared_Post(int client)
 {
 	OnCustomStartPositionCleared_TPMenu(client);
+}
+
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
+{
+	any hudOption;
+	if (GOKZ_HUD_IsHUDOption(option, hudOption))
+	{
+		OnOptionChanged_SpeedText(client, hudOption);
+		OnOptionChanged_TimerText(client, hudOption);
+		OnOptionChanged_TPMenu(client, hudOption);
+		OnOptionChanged_HideWeapon(client, hudOption);
+		OnOptionChanged_Options(client, hudOption, newValue);
+	}
 }
 
 
@@ -189,18 +174,22 @@ public void OnMapStart()
 	OnMapStart_Options();
 }
 
+public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+{
+	OnOptionsMenuCreated_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
 
 
 // =====[ PRIVATE ]=====
 
-static void CreateHooks()
+static void HookEvents()
 {
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
-}
-
-static void CreateHudSynchronizers()
-{
-	CreateHudSynchronizerSpeedText();
-	CreateHudSynchronizerTimerText();
 } 
