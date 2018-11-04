@@ -1,6 +1,4 @@
 /*
-	Database - Print Records
-	
 	Prints the record times on a map course and given mode.
 */
 

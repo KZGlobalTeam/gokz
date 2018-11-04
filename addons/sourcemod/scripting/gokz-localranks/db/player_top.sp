@@ -1,18 +1,14 @@
 /*
-	Database - Player Top
-	
-	Opens the menu with top 20 record holders for the time type and given mode.
+	Opens a menu with top record holders of a time type and mode.
 */
 
 
-
-#define PLAYER_TOP_SIZE 20
 
 static int playerTopMode[MAXPLAYERS + 1];
 
 
 
-void DB_OpenPlayerTop20(int client, int timeType, int mode)
+void DB_OpenPlayerTop(int client, int timeType, int mode)
 {
 	char query[1024];
 	
@@ -23,24 +19,25 @@ void DB_OpenPlayerTop20(int client, int timeType, int mode)
 	
 	Transaction txn = SQL_CreateTransaction();
 	
-	// Get top 20 players
-	switch (timeType) {
+	// Get top players
+	switch (timeType)
+	{
 		case TimeType_Nub:
 		{
-			FormatEx(query, sizeof(query), sql_gettopplayers, mode, PLAYER_TOP_SIZE);
+			FormatEx(query, sizeof(query), sql_gettopplayers, mode, LR_PLAYER_TOP_CUTOFF);
 			txn.AddQuery(query);
 		}
 		case TimeType_Pro:
 		{
-			FormatEx(query, sizeof(query), sql_gettopplayerspro, mode, PLAYER_TOP_SIZE);
+			FormatEx(query, sizeof(query), sql_gettopplayerspro, mode, LR_PLAYER_TOP_CUTOFF);
 			txn.AddQuery(query);
 		}
 	}
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenPlayerTop20, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenPlayerTop, DB_TxnFailure_Generic, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_OpenPlayerTop(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
@@ -69,7 +66,7 @@ public void DB_TxnSuccess_OpenPlayerTop20(Handle db, DataPack data, int numQueri
 	
 	// Set submenu title
 	menu.SetTitle("%T", "Player Top Submenu - Title", client, 
-		gC_TimeTypeNames[timeType], gC_ModeNames[mode]);
+		LR_PLAYER_TOP_CUTOFF, gC_TimeTypeNames[timeType], gC_ModeNames[mode]);
 	
 	// Add submenu items
 	char display[256];
@@ -113,7 +110,8 @@ static void PlayerTopMenuAddItems(int client, Menu menu)
 	char display[32];
 	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
 	{
-		FormatEx(display, sizeof(display), "%T", "Player Top Menu - Top 20", client, gC_TimeTypeNames[timeType]);
+		FormatEx(display, sizeof(display), "%T", "Player Top Menu - Top", client, 
+			LR_PLAYER_TOP_CUTOFF, gC_TimeTypeNames[timeType]);
 		menu.AddItem("", display, ITEMDRAW_DEFAULT);
 	}
 }
@@ -138,7 +136,7 @@ public int MenuHandler_PlayerTop(Menu menu, MenuAction action, int param1, int p
 {
 	if (action == MenuAction_Select)
 	{
-		DB_OpenPlayerTop20(param1, param2, playerTopMode[param1]);
+		DB_OpenPlayerTop(param1, param2, playerTopMode[param1]);
 	}
 	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{

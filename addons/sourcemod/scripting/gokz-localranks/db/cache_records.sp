@@ -1,6 +1,4 @@
 /*
-	Database - Cache Records
-	
 	Caches the record times on the map.
 */
 

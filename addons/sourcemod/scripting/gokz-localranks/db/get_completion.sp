@@ -1,6 +1,4 @@
 /*
-	Database - Get Completion
-	
 	Gets the number and percentage of maps completed.
 */
 
@@ -115,7 +113,7 @@ public void DB_TxnSuccess_GetCompletion(Handle db, DataPack data, int numQueries
 	}
 	
 	// Set scoreboard MVP stars to percentage PRO completion of server's default mode
-	if (totalMainCourses + totalBonuses != 0 && targetSteamID == GetSteamAccountID(client) && mode == GetDefaultMode())
+	if (totalMainCourses + totalBonuses != 0 && targetSteamID == GetSteamAccountID(client) && mode == GOKZ_GetDefaultMode())
 	{
 		CS_SetMVPCount(client, RoundToFloor(float(completionsPro + bonusCompletionsPro) / float(totalMainCourses + totalBonuses) * 100.0));
 	}

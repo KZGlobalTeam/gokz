@@ -1,6 +1,4 @@
 /*
-	Database - Process New Time
-	
 	Processes a newly submitted time, determining if the player beat their
 	personal best and if they beat the map course and mode's record time.
 */

@@ -1,6 +1,4 @@
-/*	
-	SQL
-	
+/*
 	SQL query templates.
 */
 

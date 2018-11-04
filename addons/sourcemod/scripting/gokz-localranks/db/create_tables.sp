@@ -1,6 +1,4 @@
 /*
-	Database - Create Tables
-	
 	Table creation and alteration.
 */
 

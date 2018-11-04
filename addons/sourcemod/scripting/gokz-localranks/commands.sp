@@ -1,16 +1,8 @@
-/*
-	Commands
-	
-	Commands for player and admin use.
-*/
-
-
-
 static float lastCommandTime[MAXPLAYERS + 1];
 
 
 
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_top", CommandTop, "[KZ] Opens a menu showing the top record holders.");
 	RegConsoleCmd("sm_maptop", CommandMapTop, "[KZ] Opens a menu showing the top times of a map. Usage: !maptop <map>");
@@ -27,10 +19,6 @@ void CreateCommands()
 	
 	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Updates the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
 }
-
-
-
-// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandTop(int client, int args)
 {
@@ -362,10 +350,6 @@ public Action CommandRecentRecords(int client, int args)
 	return Plugin_Handled;
 }
 
-
-
-// =====[ ADMIN COMMAND HANDLERS ]=====
-
 public Action CommandUpdateMapPool(int client, int args)
 {
 	DB_UpdateRankedMapPool(client);
@@ -379,11 +363,11 @@ bool IsSpammingCommands(int client, bool printMessage = true)
 {
 	float currentTime = GetEngineTime();
 	float timeSinceLastCommand = currentTime - lastCommandTime[client];
-	if (timeSinceLastCommand < COMMAND_COOLDOWN)
+	if (timeSinceLastCommand < LR_COMMAND_COOLDOWN)
 	{
 		if (printMessage)
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Please Wait Before Using Command", COMMAND_COOLDOWN - timeSinceLastCommand + 0.1);
+			GOKZ_PrintToChat(client, true, "%t", "Please Wait Before Using Command", LR_COMMAND_COOLDOWN - timeSinceLastCommand + 0.1);
 		}
 		return true;
 	}

@@ -1,14 +1,14 @@
 /*
-	Miscellaneous
-	
 	Miscellaneous functions.
 */
 
 
 
+// =====[ COMPLETION MVP STARS ]=====
+
 void CompletionMVPStarsUpdate(int client)
 {
-	DB_GetCompletion(client, GetSteamAccountID(client), GetDefaultMode(), false);
+	DB_GetCompletion(client, GetSteamAccountID(client), GOKZ_GetDefaultMode(), false);
 }
 
 void CompletionMVPStarsUpdateAll()
@@ -30,14 +30,14 @@ void PrecacheAnnouncementSounds()
 {
 	if (!LoadSounds())
 	{
-		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
+		SetFailState("Invalid or missing %s", LR_CFG_SOUNDS);
 	}
 }
 
 static bool LoadSounds()
 {
 	KeyValues kv = new KeyValues("sounds");
-	if (!kv.ImportFromFile(SOUNDS_CFG_PATH))
+	if (!kv.ImportFromFile(LR_CFG_SOUNDS))
 	{
 		return false;
 	}

@@ -1,6 +1,4 @@
 /*
-	Database - Cache PBs
-	
 	Caches the player's personal best times on the map.
 */
 

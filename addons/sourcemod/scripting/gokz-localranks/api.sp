@@ -1,11 +1,3 @@
-/*
-	API
-	
-	GOKZ Local Ranks API.
-*/
-
-
-
 static Handle H_OnTimeProcessed;
 static Handle H_OnNewRecord;
 static Handle H_OnRecordMissed;
@@ -100,7 +92,7 @@ void Call_OnPBMissed(int client, float pbTime, int course, int mode, int style, 
 
 
 
-// =====[ FORWARDS ]=====
+// =====[ NATIVES ]=====
 
 void CreateNatives()
 {

@@ -1119,6 +1119,16 @@ stock bool GOKZ_CycleCoreOption(int client, Option option)
 	return GOKZ_CycleOption(client, gC_CoreOptionNames[option]);
 }
 
+/**
+ * Gets the current default mode.
+ *
+ * @return				Default mode.
+ */
+stock int GOKZ_GetDefaultMode()
+{
+	return GOKZ_GetCoreOptionProp(Option_Mode, OptionProp_DefaultValue);
+}
+
 
 
 // =====[ DEPENDENCY ]=====

@@ -1,6 +1,4 @@
 /*
-	Database - Average
-	
 	Gets the average personal best time of a course.
 */
 

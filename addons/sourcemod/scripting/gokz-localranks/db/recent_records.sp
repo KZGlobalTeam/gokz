@@ -1,6 +1,4 @@
 /*
-	Database - Recent Records
-	
 	Opens the menu with a list of recently broken records for the given mode 
 	and time type.
 */
@@ -24,8 +22,8 @@ void DB_OpenRecentRecords(int client, int mode, int timeType)
 	
 	switch (timeType)
 	{
-		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getrecentrecords, mode, 20);
-		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getrecentrecords_pro, mode, 20);
+		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getrecentrecords, mode, LR_PLAYER_TOP_CUTOFF);
+		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getrecentrecords_pro, mode, LR_PLAYER_TOP_CUTOFF);
 	}
 	txn.AddQuery(query);
 	

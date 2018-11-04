@@ -1,12 +1,9 @@
 /*
-	Database - Map Top
-	
-	Opens the menu with the top 20 times for the map course and given mode.
+	Opens a menu with the top times for a map course and mode.
 */
 
 
 
-#define MAP_TOP_SIZE 20
 #define ITEM_INFO_GLOBAL_TOP_NUB "gn"
 #define ITEM_INFO_GLOBAL_TOP_PRO "gp"
 
@@ -17,7 +14,7 @@ static int mapTopMode[MAXPLAYERS + 1];
 
 
 
-// =====[ MAP TOP ]=====
+// =====[ MAP TOP MODE ]=====
 
 void DB_OpenMapTopModeMenu(int client, int mapID, int course)
 {
@@ -114,9 +111,9 @@ public void DB_TxnSuccess_OpenMapTopModeMenu_FindMap(Handle db, DataPack data, i
 
 
 
-// =====[ MAP TOP 20 ]=====
+// =====[ MAP TOP ]=====
 
-void DB_OpenMapTop20(int client, int mapID, int course, int mode, int timeType)
+void DB_OpenMapTop(int client, int mapID, int course, int mode, int timeType)
 {
 	char query[1024];
 	
@@ -135,18 +132,18 @@ void DB_OpenMapTop20(int client, int mapID, int course, int mode, int timeType)
 	FormatEx(query, sizeof(query), sql_mapcourses_findid, mapID, course);
 	txn.AddQuery(query);
 	
-	// Get top 20 times for each time type
+	// Get top times for each time type
 	switch (timeType)
 	{
-		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getmaptop, mapID, course, mode, MAP_TOP_SIZE);
-		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getmaptoppro, mapID, course, mode, MAP_TOP_SIZE);
+		case TimeType_Nub:FormatEx(query, sizeof(query), sql_getmaptop, mapID, course, mode, LR_MAP_TOP_CUTOFF);
+		case TimeType_Pro:FormatEx(query, sizeof(query), sql_getmaptoppro, mapID, course, mode, LR_MAP_TOP_CUTOFF);
 	}
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTop20, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTop, DB_TxnFailure_Generic, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
@@ -199,12 +196,12 @@ public void DB_TxnSuccess_OpenMapTop20(Handle db, DataPack data, int numQueries,
 	if (course == 0)
 	{
 		menu.SetTitle("%T", "Map Top Submenu - Title", client, 
-			gC_TimeTypeNames[timeType], mapName, gC_ModeNames[mode]);
+			LR_MAP_TOP_CUTOFF, gC_TimeTypeNames[timeType], mapName, gC_ModeNames[mode]);
 	}
 	else
 	{
 		menu.SetTitle("%T", "Map Top Submenu - Title (Bonus)", client, 
-			gC_TimeTypeNames[timeType], mapName, course, gC_ModeNames[mode]);
+			LR_MAP_TOP_CUTOFF, gC_TimeTypeNames[timeType], mapName, course, gC_ModeNames[mode]);
 	}
 	
 	// Add submenu items
@@ -286,7 +283,7 @@ static void MapTopMenuAddItems(int client, Menu menu)
 	char display[32];
 	for (int i = 0; i < TIMETYPE_COUNT; i++)
 	{
-		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top 20", client, gC_TimeTypeNames[i]);
+		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top", client, LR_MAP_TOP_CUTOFF, gC_TimeTypeNames[i]);
 		menu.AddItem(IntToStringEx(i), display);
 	}
 	if (gB_GOKZGlobal)
@@ -338,7 +335,7 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 		else
 		{
 			int timeType = StringToInt(info);
-			DB_OpenMapTop20(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
+			DB_OpenMapTop(param1, mapTopMapID[param1], mapTopCourse[param1], mapTopMode[param1], timeType);
 		}
 	}
 	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)

@@ -1,6 +1,4 @@
 /*
-	Database - Update Ranked Map Pool
-	
 	Inserts a list of maps read from a file into the Maps table,
 	and updates them to be part of the ranked map pool.
 */
@@ -9,14 +7,14 @@
 
 void DB_UpdateRankedMapPool(int client)
 {
-	Handle file = OpenFile(MAP_POOL_CFG_PATH, "r");
+	Handle file = OpenFile(LR_CFG_MAP_POOL, "r");
 	if (file == null)
 	{
-		LogError("There was a problem opening file '%s'.", MAP_POOL_CFG_PATH);
+		LogError("There was a problem opening file '%s'.", LR_CFG_MAP_POOL);
 		if (IsValidClient(client))
 		{
 			// TODO Translation phrases?
-			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file '%s'.", MAP_POOL_CFG_PATH);
+			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file '%s'.", LR_CFG_MAP_POOL);
 		}
 		return;
 	}
@@ -41,12 +39,12 @@ void DB_UpdateRankedMapPool(int client)
 	{
 		if (client == 0)
 		{
-			PrintToServer("No maps found in file '%s'.", MAP_POOL_CFG_PATH);
+			PrintToServer("No maps found in file '%s'.", LR_CFG_MAP_POOL);
 		}
 		else
 		{
 			// TODO Translation phrases?
-			GOKZ_PrintToChat(client, true, "{darkred}No maps found in file '%s'.", MAP_POOL_CFG_PATH);
+			GOKZ_PrintToChat(client, true, "{darkred}No maps found in file '%s'.", LR_CFG_MAP_POOL);
 			GOKZ_PlayErrorSound(client);
 		}
 		return;

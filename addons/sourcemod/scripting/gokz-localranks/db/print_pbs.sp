@@ -1,6 +1,4 @@
 /*
-	Database - Print Personal Bests
-	
 	Prints the player's personal times on a map course and given mode.
 */
 
