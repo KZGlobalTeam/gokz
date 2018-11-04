@@ -202,7 +202,7 @@ public Action CommandWR(int client, int args)
 	if (args == 0)
 	{  // Print record times for current map and their current mode
 		DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetCoreOption(client, Option_Mode));
-		if (gB_GOKZGlobals)
+		if (gB_GOKZGlobal)
 		{
 			GOKZ_GL_PrintRecords(client, "", 0, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -226,7 +226,7 @@ public Action CommandBWR(int client, int args)
 	if (args == 0)
 	{  // Print Bonus 1 record times for current map and their current mode
 		DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetCoreOption(client, Option_Mode));
-		if (gB_GOKZGlobals)
+		if (gB_GOKZGlobal)
 		{
 			GOKZ_GL_PrintRecords(client, "", 1, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -239,7 +239,7 @@ public Action CommandBWR(int client, int args)
 		if (bonus > 0)
 		{
 			DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetCoreOption(client, Option_Mode));
-			if (gB_GOKZGlobals)
+			if (gB_GOKZGlobal)
 			{
 				GOKZ_GL_PrintRecords(client, "", bonus, GOKZ_GetCoreOption(client, Option_Mode));
 			}

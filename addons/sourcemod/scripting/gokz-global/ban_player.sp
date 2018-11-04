@@ -1,10 +1,10 @@
 /*
-	Ban Players
-	
-	Globally ban players when they are suspected by gokz-antimacro.
+	Globally ban players when they are suspected by gokz-anticheat.
 */
 
 
+
+// =====[ PUBLIC ]=====
 
 void GlobalBanPlayer(int client, ACReason reason, const char[] notes, const char[] stats)
 {

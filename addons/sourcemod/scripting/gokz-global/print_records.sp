@@ -1,9 +1,6 @@
 /*
-	Print Records
-	
-	Prints the record times on a map course and given mode.
+	Prints the global record times for a map course and mode.
 */
-
 
 
 static bool inProgress[MAXPLAYERS + 1];
@@ -92,12 +89,13 @@ public int PrintRecordsCallback(bool failure, const char[] top, DataPack dp)
 
 
 
-// =====[ PRIVATE ]=====
+// =====[ EVENTS ]=====
 
 void OnClientPutInServer_PrintRecords(int client)
 {
 	inProgress[client] = false;
 }
+
 
 
 // =====[ PRIVATE ]=====

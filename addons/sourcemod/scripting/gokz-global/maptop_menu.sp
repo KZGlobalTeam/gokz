@@ -1,10 +1,6 @@
 /*
-	Map Top
-	
-	Opens a menu with the top global times for the map course and given mode.
+	Menu with the top global times for a map course and mode.
 */
-
-
 
 static bool cameFromLocalRanks[MAXPLAYERS + 1];
 static char mapTopMap[MAXPLAYERS + 1][64];
@@ -55,7 +51,7 @@ void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, in
 
 
 
-// =====[ HANDLERS ]=====
+// =====[ EVENTS ]=====
 
 public int MenuHandler_MapTopModeMenu(Menu menu, MenuAction action, int param1, int param2)
 {

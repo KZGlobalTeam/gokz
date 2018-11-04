@@ -1,13 +1,13 @@
 /*
-	gokz-globals Plugin Include
+	gokz-global Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
 
-#if defined _gokz_globals_included_
+#if defined _gokz_global_included_
 #endinput
 #endif
-#define _gokz_globals_included_
+#define _gokz_global_included_
 
 #include <GlobalAPI-Core>
 
@@ -27,11 +27,20 @@ enum
 
 // =====[ CONSTANTS ]=====
 
+#define GL_SOUND_NEW_RECORD "gokz/holyshit.mp3"
+
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {
 	"sv_cheats", 
 	"sv_clamp_unsafe_velocities", 
 	"mp_drop_knife_enable"
+};
+
+stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
+{
+	0.0, 
+	0.0, 
+	0.0
 };
 
 
@@ -100,10 +109,10 @@ stock GlobalMode GOKZ_GL_GetGlobalMode(int mode)
 
 // =====[ DEPENDENCY ]=====
 
-public SharedPlugin __pl_gokz_globals = 
+public SharedPlugin __pl_gokz_global = 
 {
-	name = "gokz-globals", 
-	file = "gokz-globals.smx", 
+	name = "gokz-global", 
+	file = "gokz-global.smx", 
 	#if defined REQUIRE_PLUGIN
 	required = 1, 
 	#else
@@ -112,7 +121,7 @@ public SharedPlugin __pl_gokz_globals =
 };
 
 #if !defined REQUIRE_PLUGIN
-public void __pl_gokz_globals_SetNTVOptional()
+public void __pl_gokz_global_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_GL_PrintRecords");
 	MarkNativeAsOptional("GOKZ_GL_DisplayMapTopMenu");

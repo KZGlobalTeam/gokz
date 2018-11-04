@@ -1,11 +1,10 @@
 /*
-	Send Time
-	
-	Sends a time to the global API, and announces if they got a top global 
-	time for the map course and mode.
+	Sends a time to the global API.
 */
 
 
+
+// =====[ PUBLIC ]=====
 
 void SendTime(int client, int course, float time, int teleportsUsed)
 {

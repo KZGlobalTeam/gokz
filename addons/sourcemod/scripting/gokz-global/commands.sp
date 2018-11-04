@@ -1,14 +1,4 @@
-/*
-	Commands
-	
-	Commands for player use.
-*/
-
-
-
-// =====[ PUBLIC ]=====
-
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_globalcheck", CommandGlobalCheck, "[KZ] Prints whether global records are currently enabled.");
 	RegConsoleCmd("sm_gc", CommandGlobalCheck, "[KZ] Prints whether global records are currently enabled.");
@@ -21,13 +11,9 @@ void CreateCommands()
 	RegConsoleCmd("sm_gbmaptop", CommandBonusMapTop, "[KZ] Opens a menu showing the top global bonus times of a map. Usage: !gbmaptop <#bonus> <map>");
 }
 
-
-
-// =====[ COMMAND HANDLERS ]=====
-
 public Action CommandGlobalCheck(int client, int args)
 {
-	PrintGlobalCheck(client);
+	PrintGlobalCheckToChat(client);
 	return Plugin_Handled;
 }
 

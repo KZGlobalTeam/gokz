@@ -289,7 +289,7 @@ static void MapTopMenuAddItems(int client, Menu menu)
 		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Top 20", client, gC_TimeTypeNames[i]);
 		menu.AddItem(IntToStringEx(i), display);
 	}
-	if (gB_GOKZGlobals)
+	if (gB_GOKZGlobal)
 	{
 		FormatEx(display, sizeof(display), "%T", "Map Top Menu - Global Top", client, gC_TimeTypeNames[TimeType_Nub]);
 		menu.AddItem(ITEM_INFO_GLOBAL_TOP_NUB, display);
@@ -327,11 +327,11 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 		char info[8];
 		menu.GetItem(param2, info, sizeof(info));
 		
-		if (gB_GOKZGlobals && StrEqual(info, ITEM_INFO_GLOBAL_TOP_NUB))
+		if (gB_GOKZGlobal && StrEqual(info, ITEM_INFO_GLOBAL_TOP_NUB))
 		{
 			GOKZ_GL_DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], TimeType_Nub);
 		}
-		else if (gB_GOKZGlobals && StrEqual(info, ITEM_INFO_GLOBAL_TOP_PRO))
+		else if (gB_GOKZGlobal && StrEqual(info, ITEM_INFO_GLOBAL_TOP_PRO))
 		{
 			GOKZ_GL_DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mapTopMode[param1], TimeType_Pro);
 		}

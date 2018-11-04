@@ -165,7 +165,7 @@ public void DB_TxnSuccess_PrintRecords_FindMap(Handle db, DataPack data, int num
 	else if (SQL_FetchRow(results[0]))
 	{  // Result is the MapID
 		DB_PrintRecords(client, SQL_FetchInt(results[0], 0), course, mode);
-		if (gB_GOKZGlobals)
+		if (gB_GOKZGlobal)
 		{
 			char map[33];
 			SQL_FetchString(results[0], 1, map, sizeof(map));

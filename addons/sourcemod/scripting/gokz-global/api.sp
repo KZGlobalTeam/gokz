@@ -1,11 +1,3 @@
-/*
-	API
-	
-	GOKZ Globals API.
-*/
-
-
-
 static Handle H_OnNewTopTime;
 
 
