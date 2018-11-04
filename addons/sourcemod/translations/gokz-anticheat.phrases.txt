@@ -19,7 +19,7 @@
 	
 	
 	// Chat Messages ////////////////////////////////////////////////////////////
-	"Antimacro Warning"
+	"Anti-Cheat Warning"
 	{
 		"en"		"{darkred}WARNING! The use of software, macros, hyperscroll, or any other external assistance to aid character movement is strictly not allowed and may result in an automatic ban."
 		"chi"		"{darkred}警告!一经发现任何作弊行为,将立即封禁,毫不留情!"

@@ -6,7 +6,7 @@
 
 
 
-void GlobalBanPlayer(int client, AMReason reason, const char[] notes, const char[] stats)
+void GlobalBanPlayer(int client, ACReason reason, const char[] notes, const char[] stats)
 {
 	char playerName[MAX_NAME_LENGTH], steamid[32];
 	GetClientName(client, playerName, sizeof(playerName));
@@ -18,8 +18,8 @@ void GlobalBanPlayer(int client, AMReason reason, const char[] notes, const char
 	
 	switch (reason)
 	{
-		case AMReason_BhopHack:GlobalAPI_BanPlayer(client, "bhop_hack", notes, stats, BanPlayerCallback, dp);
-		case AMReason_BhopMacro:GlobalAPI_BanPlayer(client, "bhop_macro", notes, stats, BanPlayerCallback, dp);
+		case ACReason_BhopHack:GlobalAPI_BanPlayer(client, "bhop_hack", notes, stats, BanPlayerCallback, dp);
+		case ACReason_BhopMacro:GlobalAPI_BanPlayer(client, "bhop_macro", notes, stats, BanPlayerCallback, dp);
 	}
 }
 

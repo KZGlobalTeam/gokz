@@ -1,27 +1,13 @@
-/*
-	Commands
-	
-	Commands for player and admin use.
-*/
-
-
-
-// =====[ PUBLIC ]=====
-
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_bhopcheck", CommandBhopCheck, "[KZ] Shows bunnyhop stats report including perf ratio and scroll pattern.");
 }
-
-
-
-// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandBhopCheck(int client, int args)
 {
 	if (args == 0)
 	{
-		if (GOKZ_AM_GetSampleSize(client) == 0)
+		if (GOKZ_AC_GetSampleSize(client) == 0)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Not Enough Bhops (Self)");
 		}
@@ -57,7 +43,7 @@ public Action CommandBhopCheck(int client, int args)
 		GOKZ_PrintToChat(client, true, "%t", "See Console");
 		for (int i = 0; i < targetCount; i++)
 		{
-			if (GOKZ_AM_GetSampleSize(targetList[i]) == 0)
+			if (GOKZ_AC_GetSampleSize(targetList[i]) == 0)
 			{
 				PrintToConsole(client, "%t", "Not Enough Bhops (Console)", targetList[i]);
 			}
@@ -69,7 +55,7 @@ public Action CommandBhopCheck(int client, int args)
 	}
 	else
 	{
-		if (GOKZ_AM_GetSampleSize(targetList[0]) == 0)
+		if (GOKZ_AC_GetSampleSize(targetList[0]) == 0)
 		{
 			if (targetList[0] == client)
 			{

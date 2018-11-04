@@ -6,7 +6,7 @@
 
 #include <GlobalAPI-Core>
 #include <gokz/core>
-#include <gokz/antimacro>
+#include <gokz/anticheat>
 #include <gokz/replays>
 #include <gokz/globals>
 
@@ -123,7 +123,7 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	}
 }
 
-public void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[] notes, const char[] stats)
+public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] notes, const char[] stats)
 {
 	if (!gB_GloballyVerified[client])
 	{
