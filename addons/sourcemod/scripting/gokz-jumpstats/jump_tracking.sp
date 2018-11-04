@@ -1,15 +1,16 @@
 /*
-	Jump Tracking
-	
-	Jumpstat tracking.
+	Tracking of jump type, speed, strafes and more.
 */
 
 
 
 static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded horizontal speed
 static int lastPlayerJumpTick[MAXPLAYERS + 1];
+static int entityTouchCount[MAXPLAYERS + 1];
 
 
+
+// =====[ EVENTS ]=====
 
 void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump)
 {
@@ -21,7 +22,7 @@ void OnStartTouchGround_JumpTracking(int client)
 	EndJumpstat(client);
 }
 
-void OnPlayerRunCmd_JumpTracking(int client, int cmdnum)
+void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -42,10 +43,16 @@ void OnPlayerRunCmd_JumpTracking(int client, int cmdnum)
 
 void OnStartTouch_JumpTracking(int client)
 {
+	entityTouchCount[client]++;
 	if (!Movement_GetOnGround(client))
 	{
 		InvalidateJumpstat(client);
 	}
+}
+
+void OnEndTouch_JumpTracking(int client)
+{
+	entityTouchCount[client]--;
 }
 
 void OnPlayerJump_JumpTracking(int client, bool jumpbug)
@@ -69,6 +76,15 @@ void OnOptionChanged_JumpTracking(int client, const char[] option)
 		InvalidateJumpstat(client);
 	}
 }
+
+void OnClientPutInServer_JumpTracking(int client)
+{
+	entityTouchCount[client] = 0;
+}
+
+
+
+// =====[ GENERAL ]=====
 
 static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 {
@@ -216,13 +232,13 @@ static void EndType(int client)
 
 static int DetermineType(int client, bool jumped, bool ladderJump)
 {
-	if (gI_TouchingEntities[client] > 0)
+	if (entityTouchCount[client] > 0)
 	{
 		return JumpType_Invalid;
 	}
 	else if (ladderJump)
 	{
-		if (GetGameTickCount() - lastPlayerJumpTick[client] <= BHOP_ON_GROUND_TICKS)
+		if (GetGameTickCount() - lastPlayerJumpTick[client] <= JS_MAX_BHOP_GROUND_TICKS)
 		{
 			return JumpType_Ladderhop;
 		}
@@ -262,18 +278,18 @@ static int DetermineType(int client, bool jumped, bool ladderJump)
 
 static bool HitBhop(int client)
 {
-	return Movement_GetTakeoffCmdNum(client) - Movement_GetLandingCmdNum(client) <= BHOP_ON_GROUND_TICKS;
+	return Movement_GetTakeoffCmdNum(client) - Movement_GetLandingCmdNum(client) <= JS_MAX_BHOP_GROUND_TICKS;
 }
 
 static bool ValidWeirdJumpDropDistance(int client)
 {
 	float offset = GetOffset(client);
-	if (offset < -1 * WEIRDJUMP_MAX_FALL_OFFSET)
+	if (offset < -1 * JS_MAX_WEIRDJUMP_FALL_OFFSET)
 	{
 		// Don't bother telling them if they fell a very far distance
-		if (!GetJumpstatsDisabled(client) && offset >= -2 * WEIRDJUMP_MAX_FALL_OFFSET)
+		if (!GetJumpstatsDisabled(client) && offset >= -2 * JS_MAX_WEIRDJUMP_FALL_OFFSET)
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Dropped Too Far (Weird Jump)", -1 * offset, WEIRDJUMP_MAX_FALL_OFFSET);
+			GOKZ_PrintToChat(client, true, "%t", "Dropped Too Far (Weird Jump)", -1 * offset, JS_MAX_WEIRDJUMP_FALL_OFFSET);
 		}
 		return false;
 	}
@@ -438,10 +454,10 @@ static void UpdateMaxSpeed(int client)
 static int strafesLast[MAXPLAYERS + 1];
 static int strafesCurrent[MAXPLAYERS + 1];
 static int strafesDirection[MAXPLAYERS + 1];
-static int strafesTicks[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
-static int strafesGainTicks[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
-static float strafesGain[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
-static float strafesLoss[MAXPLAYERS + 1][MAX_TRACKED_STRAFES];
+static int strafesTicks[MAXPLAYERS + 1][JS_MAX_TRACKED_STRAFES];
+static int strafesGainTicks[MAXPLAYERS + 1][JS_MAX_TRACKED_STRAFES];
+static float strafesGain[MAXPLAYERS + 1][JS_MAX_TRACKED_STRAFES];
+static float strafesLoss[MAXPLAYERS + 1][JS_MAX_TRACKED_STRAFES];
 
 int GetStrafes(int client)
 {
@@ -472,7 +488,7 @@ static void BeginStrafes(int client)
 {
 	strafesCurrent[client] = 0;
 	strafesDirection[client] = StrafeDirection_None;
-	for (int strafe = 0; strafe < MAX_TRACKED_STRAFES; strafe++)
+	for (int strafe = 0; strafe < JS_MAX_TRACKED_STRAFES; strafe++)
 	{
 		strafesTicks[client][strafe] = 0;
 		strafesGainTicks[client][strafe] = 0;
@@ -500,7 +516,7 @@ static void UpdateStrafes(int client)
 		strafesCurrent[player.id]++;
 	}
 	
-	if (strafesCurrent[client] < MAX_TRACKED_STRAFES)
+	if (strafesCurrent[client] < JS_MAX_TRACKED_STRAFES)
 	{
 		strafesTicks[client][strafesCurrent[client]]++;
 		if (player.speed > lastTickSpeed[client])

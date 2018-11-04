@@ -1,26 +1,10 @@
-/*
-	Options Menu
-	
-	Lets player set their gokz-jumpstats options.
-*/
+static TopMenu optionsTopMenu;
+static TopMenuObject catJumpstats;
+static TopMenuObject itemsJumpstats[JSOPTION_COUNT];
 
 
 
-TopMenu optionsTopMenu;
-TopMenuObject catJumpstats;
-TopMenuObject itemsJumpstats[JSOPTION_COUNT];
-
-static char optionDisplayPhrases[JSOPTION_COUNT][] = 
-{
-	"Options Menu - Jumpstats Master Switch", 
-	"Options Menu - Jumpstats Chat Report", 
-	"Options Menu - Jumpstats Console Report", 
-	"Options Menu - Jumpstats Sounds", 
-};
-
-
-
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()
 {
@@ -39,7 +23,7 @@ void OnOptionsMenuCreated_OptionsMenu(TopMenu topMenu)
 		return;
 	}
 	
-	catJumpstats = topMenu.AddCategory(OPTIONS_MENU_CAT_JUMPSTATS, TopMenuHandler_Categories);
+	catJumpstats = topMenu.AddCategory(JS_OPTION_CATEGORY, TopMenuHandler_Categories);
 }
 
 void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
@@ -63,10 +47,6 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 		itemsJumpstats[option] = optionsTopMenu.AddItem(gC_JSOptionNames[option], TopMenuHandler_HUD, catJumpstats);
 	}
 }
-
-
-
-// =====[ HANDLER ]=====
 
 public void TopMenuHandler_Categories(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
 {
@@ -120,13 +100,13 @@ static void FormatToggleableOptionDisplay(int client, JSOption option, char[] bu
 	if (GOKZ_JS_GetOption(client, option) == 0)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gI_JSOptionPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gI_JSOptionPhrases[option], client, 
 			"Options Menu - Enabled", client);
 	}
 }
@@ -137,7 +117,7 @@ static void FormatDistanceTierOptionDisplay(int client, JSOption option, char[] 
 	if (optionValue == DistanceTier_None) // Disabled
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gI_JSOptionPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
@@ -146,13 +126,13 @@ static void FormatDistanceTierOptionDisplay(int client, JSOption option, char[] 
 		if (optionValue < DISTANCETIER_COUNT - 1)
 		{
 			FormatEx(buffer, maxlength, "%T - %s+", 
-				optionDisplayPhrases[option], client, 
+				gI_JSOptionPhrases[option], client, 
 				gC_DistanceTiers[optionValue]);
 		}
 		else
 		{
 			FormatEx(buffer, maxlength, "%T - %s", 
-				optionDisplayPhrases[option], client, 
+				gI_JSOptionPhrases[option], client, 
 				gC_DistanceTiers[optionValue]);
 		}
 	}

@@ -1,19 +1,37 @@
 /*
-	Jump Reporting
-	
-	Jumpstat chat and console reports.
+	Chat and console reports for jumpstats.
 */
 
 
 
-#define SOUNDS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-sounds.cfg"
-
-static char tierColours[DISTANCETIER_COUNT][] =  { "{grey}", "{grey}", "{blue}", "{green}", "{darkred}", "{gold}" };
 static char sounds[DISTANCETIER_COUNT][256];
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ PUBLIC ]=====
+
+void PlayJumpstatSound(int client, int tier)
+{
+	int soundOption = GOKZ_JS_GetOption(client, JSOption_MinSoundTier);
+	if (tier <= DistanceTier_Meh || soundOption == DistanceTier_None || soundOption > tier)
+	{
+		return;
+	}
+	
+	EmitSoundToClient(client, sounds[tier]);
+}
+
+
+
+// =====[ EVENTS ]=====
+
+void OnMapStart_JumpReporting()
+{
+	if (!LoadSounds())
+	{
+		SetFailState("Invalid or missing %s", JS_CFG_SOUNDS);
+	}
+}
 
 void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
 {
@@ -80,7 +98,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 	{
 		PrintToConsole(client, "  0. -           -           -           %3d%%", RoundFloat(GetStrafeAirtime(jumper, 0)));
 	}
-	for (int strafe = 1; strafe <= strafes && strafe < MAX_TRACKED_STRAFES; strafe++)
+	for (int strafe = 1; strafe <= strafes && strafe < JS_MAX_TRACKED_STRAFES; strafe++)
 	{
 		PrintToConsole(client, 
 			" %2d. %3.0f%%        %-11.3f %-11.3f %3d%%", 
@@ -107,9 +125,9 @@ static void DoChatReport(int client, int jumper, int jumpType, int tier, float d
 	
 	GOKZ_PrintToChat(client, true, 
 		"%s%s{grey}: %s%.1f {grey}[%s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
-		tierColours[tier], 
+		gC_DistanceTierChatColours[tier], 
 		gC_JumpTypesShort[jumpType], 
-		tierColours[tier], 
+		gC_DistanceTierChatColours[tier], 
 		distance, 
 		GetStrafesString(client, strafes), 
 		GetPreSpeedString(client, jumper, preSpeed), 
@@ -162,18 +180,10 @@ static char[] GetSyncString(int client, float sync)
 
 // SOUNDS
 
-void PrecacheJumpstatSounds()
-{
-	if (!LoadSounds())
-	{
-		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
-	}
-}
-
 static bool LoadSounds()
 {
 	KeyValues kv = new KeyValues("sounds");
-	if (!kv.ImportFromFile(SOUNDS_CFG_PATH))
+	if (!kv.ImportFromFile(JS_CFG_SOUNDS))
 	{
 		return false;
 	}
@@ -181,7 +191,7 @@ static bool LoadSounds()
 	char downloadPath[256];
 	for (int tier = DistanceTier_Impressive; tier < DISTANCETIER_COUNT; tier++)
 	{
-		kv.GetString(gC_KeysDistanceTier[tier], sounds[tier], sizeof(sounds[]));
+		kv.GetString(gC_DistanceTierKeys[tier], sounds[tier], sizeof(sounds[]));
 		FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", sounds[tier]);
 		AddFileToDownloadsTable(downloadPath);
 		PrecacheSound(sounds[tier]);
@@ -189,15 +199,4 @@ static bool LoadSounds()
 	
 	kv.Close();
 	return true;
-}
-
-void PlayJumpstatSound(int client, int tier)
-{
-	int soundOption = GOKZ_JS_GetOption(client, JSOption_MinSoundTier);
-	if (tier <= DistanceTier_Meh || soundOption == DistanceTier_None || soundOption > tier)
-	{
-		return;
-	}
-	
-	EmitSoundToClient(client, sounds[tier]);
 } 

@@ -161,6 +161,13 @@ stock char gC_ModeNamesShort[MODE_COUNT][] =
 	"KZT"
 };
 
+stock char gC_ModeKeys[MODE_COUNT][] = 
+{
+	"vanilla", 
+	"simplekz", 
+	"kztimer"
+};
+
 stock char gC_StyleNamesShort[STYLE_COUNT][] = 
 {
 	"NRM"

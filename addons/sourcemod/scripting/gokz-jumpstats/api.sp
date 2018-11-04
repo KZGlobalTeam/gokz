@@ -1,11 +1,3 @@
-/*
-	API
-	
-	GOKZ Jumpstats API.
-*/
-
-
-
 static Handle H_OnTakeoff;
 static Handle H_OnLanding;
 static Handle H_OnJumpInvalidated;

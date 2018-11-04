@@ -1,37 +1,6 @@
 /*
-	Options
-	
-	Player options to customise their experience.
+	Options for jumpstats, including an option to disable it completely.
 */
-
-
-
-#define OPTION_DESCRIPTION_PREFIX "Jumpstats - "
-#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-options.cfg"
-
-static const int defaultDefaultValues[JSOPTION_COUNT] = 
-{
-	JumpstatsMaster_Enabled, 
-	DistanceTier_Meh, 
-	DistanceTier_Meh, 
-	DistanceTier_Impressive
-};
-
-static int optionCounts[JSOPTION_COUNT] = 
-{
-	JUMPSTATSMASTER_COUNT, 
-	DISTANCETIER_COUNT, 
-	DISTANCETIER_COUNT, 
-	DISTANCETIER_COUNT
-};
-
-static const char optionDescription[JSOPTION_COUNT][] = 
-{
-	"Master switch", 
-	"Chat report", 
-	"Console report", 
-	"Sounds"
-};
 
 
 
@@ -47,7 +16,7 @@ bool GetJumpstatsDisabled(int client)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnAllPluginsLoaded_Options()
 {
@@ -55,10 +24,10 @@ void OnAllPluginsLoaded_Options()
 	{
 		char prefixedDescription[255];
 		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			OPTION_DESCRIPTION_PREFIX, 
-			optionDescription[option]);
+			JS_OPTION_DESC_PREFIX, 
+			gC_JSOptionDescriptions[option]);
 		GOKZ_RegisterOption(gC_JSOptionNames[option], prefixedDescription, 
-			OptionType_Int, defaultDefaultValues[option], 0, optionCounts[option] - 1);
+			OptionType_Int, gI_JSOptionDefaults[option], 0, gI_JSOptionCounts[option] - 1);
 	}
 }
 
@@ -99,9 +68,9 @@ static void LoadDefaultOptions()
 {
 	KeyValues kv = new KeyValues("options");
 	
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	if (!kv.ImportFromFile(JS_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
+		LogError("Could not read default options config file: %s", JS_CFG_OPTIONS);
 		return;
 	}
 	

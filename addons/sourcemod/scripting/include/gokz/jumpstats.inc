@@ -66,7 +66,15 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define OPTIONS_MENU_CAT_JUMPSTATS "jumpstats"
+#define JS_CFG_TIERS "cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"
+#define JS_CFG_SOUNDS "cfg/sourcemod/gokz/gokz-jumpstats-sounds.cfg"
+#define JS_CFG_OPTIONS "cfg/sourcemod/gokz/gokz-jumpstats-options.cfg"
+#define JS_OPTION_CATEGORY "js"
+#define JS_OPTION_DESC_PREFIX "Jumpstats - "
+#define JS_MAX_LADDERJUMP_OFFSET 2.0
+#define JS_MAX_BHOP_GROUND_TICKS 5
+#define JS_MAX_WEIRDJUMP_FALL_OFFSET 64.0
+#define JS_MAX_TRACKED_STRAFES 32
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
@@ -92,6 +100,16 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"??"
 };
 
+stock char gC_JumpTypeKeys[JUMPTYPE_COUNT - 2][] = 
+{
+	"longjump", 
+	"bhop", 
+	"multibhop", 
+	"weirdjump", 
+	"ladderjump", 
+	"ladderhop"
+};
+
 stock char gC_DistanceTiers[DISTANCETIER_COUNT][] = 
 {
 	"None", 
@@ -102,24 +120,7 @@ stock char gC_DistanceTiers[DISTANCETIER_COUNT][] =
 	"Ownage"
 };
 
-stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] = 
-{
-	"longjump", 
-	"bhop", 
-	"multibhop", 
-	"weirdjump", 
-	"ladderjump", 
-	"ladderhop"
-};
-
-stock char gC_KeysMode[MODE_COUNT][] = 
-{
-	"vanilla", 
-	"simplekz", 
-	"kztimer"
-};
-
-stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] = 
+stock char gC_DistanceTierKeys[DISTANCETIER_COUNT][] = 
 {
 	"none", 
 	"meh", 
@@ -129,12 +130,54 @@ stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =
 	"ownage"
 };
 
+stock char gC_DistanceTierChatColours[DISTANCETIER_COUNT][] = 
+{
+	"{grey}", 
+	"{grey}", 
+	"{blue}", 
+	"{green}", 
+	"{darkred}", 
+	"{gold}"
+};
+
 stock char gC_JSOptionNames[JSOPTION_COUNT][] = 
 {
 	"masterswitch", 
 	"chatreport", 
 	"consolereport", 
 	"sounds"
+};
+
+stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 
+{
+	"Master switch", 
+	"Chat report", 
+	"Console report", 
+	"Sounds"
+};
+
+stock char gI_JSOptionPhrases[JSOPTION_COUNT][] = 
+{
+	"Options Menu - Jumpstats Master Switch", 
+	"Options Menu - Jumpstats Chat Report", 
+	"Options Menu - Jumpstats Console Report", 
+	"Options Menu - Jumpstats Sounds", 
+};
+
+stock int gI_JSOptionDefaults[JSOPTION_COUNT] = 
+{
+	JumpstatsMaster_Enabled, 
+	DistanceTier_Meh, 
+	DistanceTier_Meh, 
+	DistanceTier_Impressive
+};
+
+stock int gI_JSOptionCounts[JSOPTION_COUNT] = 
+{
+	JUMPSTATSMASTER_COUNT, 
+	DISTANCETIER_COUNT, 
+	DISTANCETIER_COUNT, 
+	DISTANCETIER_COUNT
 };
 
 
