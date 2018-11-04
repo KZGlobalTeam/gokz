@@ -11,7 +11,6 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <gokz/jumpstats>
 #include <updater>
 
 #pragma newdecls required
@@ -23,33 +22,33 @@ public Plugin myinfo =
 {
 	name = "GOKZ Local DB", 
 	author = "DanZay", 
-	description = "GOKZ Local Database Module", 
+	description = "Provides database for players, maps, courses and times", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-localdb.txt"
 
-Regex gRE_BonusStartButton;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
+Regex gRE_BonusStartButton;
 
 #include "gokz-localdb/api.sp"
 #include "gokz-localdb/commands.sp"
-#include "gokz-localdb/database.sp"
 
-#include "gokz-localdb/database/sql.sp"
-#include "gokz-localdb/database/create_tables.sp"
-#include "gokz-localdb/database/save_time.sp"
-#include "gokz-localdb/database/setup_client.sp"
-#include "gokz-localdb/database/setup_database.sp"
-#include "gokz-localdb/database/setup_map.sp"
-#include "gokz-localdb/database/setup_map_courses.sp"
-#include "gokz-localdb/database/set_cheater.sp"
+#include "gokz-localdb/db/sql.sp"
+#include "gokz-localdb/db/helpers.sp"
+#include "gokz-localdb/db/create_tables.sp"
+#include "gokz-localdb/db/save_time.sp"
+#include "gokz-localdb/db/set_cheater.sp"
+#include "gokz-localdb/db/setup_client.sp"
+#include "gokz-localdb/db/setup_database.sp"
+#include "gokz-localdb/db/setup_map.sp"
+#include "gokz-localdb/db/setup_map_courses.sp"
 
 
 
@@ -57,11 +56,6 @@ int gI_DBCurrentMapID;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateNatives();
 	RegPluginLibrary("gokz-localdb");
 	return APLRes_Success;
@@ -69,9 +63,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	CreateGlobalForwards();
 	CreateRegexes();
-	CreateCommands();
+	CreateGlobalForwards();
+	RegisterCommands();
 }
 
 public void OnAllPluginsLoaded()
@@ -83,11 +77,12 @@ public void OnAllPluginsLoaded()
 	
 	DB_SetupDatabase();
 	
+	char auth[32];
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (GOKZ_IsClientSetUp(client))
+		if (IsClientAuthorized(client) && GetClientAuthId(client, AuthId_Engine, auth, sizeof(auth)))
 		{
-			GOKZ_OnClientSetup(client);
+			OnClientAuthorized(client, auth);
 		}
 	}
 }
@@ -114,7 +109,7 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 	DB_SetupMapCourses();
 }
 
-public void GOKZ_OnClientSetup(int client)
+public void OnClientAuthorized(int client, const char[] auth)
 {
 	if (IsFakeClient(client) || gH_DB == null)
 	{

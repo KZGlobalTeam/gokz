@@ -1,6 +1,4 @@
 /*
-	Database - Setup Client
-	
 	Inserts the player into the database, or else updates their information.
 */
 

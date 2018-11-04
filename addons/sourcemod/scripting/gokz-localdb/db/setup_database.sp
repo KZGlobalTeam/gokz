@@ -1,6 +1,4 @@
 /*
-	Database - Setup Database
-	
 	Set up the connection to the local database.
 */
 

@@ -1,6 +1,4 @@
 /*
-	Database - Setup Map
-	
 	Inserts the map information into the database.
 	Retrieves the MapID of the map and stores it in a global variable.
 */

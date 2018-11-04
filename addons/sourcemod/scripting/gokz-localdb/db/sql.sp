@@ -1,6 +1,4 @@
-/*	
-	SQL
-	
+/*
 	SQL query templates.
 */
 
@@ -29,16 +27,6 @@ char mysql_players_create[] =
 ..."LastPlayed TIMESTAMP NULL DEFAULT NULL, "
 ..."Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 ..."CONSTRAINT PK_Player PRIMARY KEY (SteamID32))";
-
-// 1.0.0 - Added Cheater column
-char sqlite_players_alter1[] = 
-"ALTER TABLE Players "
-..."ADD Cheater INTEGER NOT NULL DEFAULT '0'";
-
-// 1.0.0 - Added Cheater column
-char mysql_players_alter1[] = 
-"ALTER TABLE Players "
-..."ADD Cheater TINYINT UNSIGNED NOT NULL DEFAULT '0'";
 
 char sqlite_players_insert[] = 
 "INSERT OR IGNORE INTO Players (Alias, Country, IP, SteamID32, LastPlayed) "

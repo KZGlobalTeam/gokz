@@ -1,6 +1,4 @@
 /*
-	Database - Set Cheater
-	
 	Sets whether player is a cheater in the database.
 */
 

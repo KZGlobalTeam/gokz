@@ -1,6 +1,4 @@
 /*
-	Database - Setup Map Courses
-	
 	Inserts the map's courses into the database.
 */
 

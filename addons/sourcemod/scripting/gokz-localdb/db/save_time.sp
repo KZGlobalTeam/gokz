@@ -1,6 +1,4 @@
 /*
-	Database - Save Time
-	
 	Inserts the player's time into the database.
 */
 

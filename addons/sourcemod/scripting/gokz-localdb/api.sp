@@ -1,11 +1,3 @@
-/*
-	API
-	
-	GOKZ Local DB API.
-*/
-
-
-
 static Handle H_OnDatabaseConnect;
 static Handle H_OnClientSetup;
 static Handle H_OnMapSetup;
