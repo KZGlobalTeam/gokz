@@ -17,7 +17,7 @@ public Plugin myinfo =
 {
 	name = "GOKZ Jump Beam", 
 	author = "DanZay", 
-	description = "GOKZ Jump Beam Module", 
+	description = "Provides option to leave behind a trail when in midair", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
@@ -26,7 +26,7 @@ public Plugin myinfo =
 
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
-int gI_JumpBeam;
+int gI_BeamModel;
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
 TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
@@ -37,10 +37,6 @@ TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-jumpbeam");
 	return APLRes_Success;
 }
@@ -57,6 +53,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	
 	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
@@ -75,9 +72,27 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmd_JumpBeam(client);
+	OnPlayerRunCmdPost_JumpBeam(client);
 	UpdateOldVariables(client);
 }
+
+
+
+// =====[ OTHER EVENTS ]=====
+
+public void OnMapStart()
+{
+	gI_BeamModel = PrecacheModel("materials/sprites/laser.vmt", true);
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+
+
+// =====[ GENERAL ]=====
 
 void UpdateOldVariables(int client)
 {
@@ -90,23 +105,9 @@ void UpdateOldVariables(int client)
 
 
 
-// =====[ OTHER EVENTS ]=====
-
-public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
-{
-	OnOptionsMenuReady_OptionsMenu(topMenu);
-}
-
-public void OnMapStart()
-{
-	gI_JumpBeam = PrecacheModel("materials/sprites/laser.vmt", true);
-}
-
-
-
 // =====[ JUMP BEAM ]=====
 
-void OnPlayerRunCmd_JumpBeam(int targetClient)
+void OnPlayerRunCmdPost_JumpBeam(int targetClient)
 {
 	// In this case, spectators are handled from the target 
 	// client's OnPlayerRunCmd call, otherwise the jump 
@@ -163,7 +164,7 @@ void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	beamEnd = origin;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, gI_JumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
@@ -193,7 +194,7 @@ void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	}
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, gI_JumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
@@ -210,7 +211,7 @@ void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	beamEnd[2] = takeoffOrigin[2] + 0.1;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, gI_JumpBeam, 0, 0, 0, JUMP_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.id);
 }
 
@@ -236,7 +237,7 @@ void OnAllPluginsLoaded_Options()
 	{
 		char prefixedDescription[255];
 		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			JBOPTION_DESCRIPTION_PREFIX, 
+			JB_OPTION_DESC_PREFIX, 
 			gC_JBOptionDescriptions[option]);
 		GOKZ_RegisterOption(gC_JBOptionNames[option], prefixedDescription, 
 			OptionType_Int, gI_JBOptionDefaultValues[option], 0, gI_JBOptionCounts[option] - 1);

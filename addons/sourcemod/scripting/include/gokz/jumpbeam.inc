@@ -34,8 +34,8 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define JUMP_BEAM_LIFETIME 4.0
-#define JBOPTION_DESCRIPTION_PREFIX "Jump Beam - "
+#define JB_BEAM_LIFETIME 4.0
+#define JB_OPTION_DESC_PREFIX "Jump Beam - "
 
 stock char gC_JBOptionNames[JBOPTION_COUNT][] = 
 {
