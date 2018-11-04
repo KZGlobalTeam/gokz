@@ -16,7 +16,7 @@ public Plugin myinfo =
 {
 	name = "GOKZ Chat", 
 	author = "DanZay", 
-	description = "GOKZ Chat Module", 
+	description = "Handles client-triggered chat messages", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
@@ -24,6 +24,7 @@ public Plugin myinfo =
 #define UPDATE_URL "http://updater.gokz.org/gokz-chat.txt"
 
 bool gB_BaseComm;
+
 ConVar gCV_gokz_chat_processing;
 ConVar gCV_gokz_connection_messages;
 
@@ -33,10 +34,6 @@ ConVar gCV_gokz_connection_messages;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-chat");
 	return APLRes_Success;
 }
@@ -46,25 +43,25 @@ public void OnPluginStart()
 	LoadTranslations("gokz-chat.phrases");
 	
 	CreateConVars();
-	CreateHooks();
+	HookEvents();
 }
 
 public void OnAllPluginsLoaded()
 {
-	gB_BaseComm = LibraryExists("basecomm");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	gB_BaseComm = LibraryExists("basecomm");
 }
 
 public void OnLibraryAdded(const char[] name)
 {
-	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	gB_BaseComm = gB_BaseComm || StrEqual(name, "basecomm");
 }
 
 public void OnLibraryRemoved(const char[] name)
@@ -110,15 +107,15 @@ public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcas
 
 
 
-// =====[ PRIVATE ]=====
+// =====[ GENERAL ]=====
 
-static void CreateConVars()
+void CreateConVars()
 {
 	gCV_gokz_chat_processing = CreateConVar("gokz_chat_processing", "1", "Whether GOKZ processes player chat messages.", _, true, 0.0, true, 1.0);
 	gCV_gokz_connection_messages = CreateConVar("gokz_connection_messages", "1", "Whether GOKZ handles connection and disconnection messages.", _, true, 0.0, true, 1.0);
 }
 
-static void CreateHooks()
+void HookEvents()
 {
 	HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
@@ -169,7 +166,7 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 	}
 }
 
-static bool UsedBaseChat(int client, const char[] command, const char[] message)
+bool UsedBaseChat(int client, const char[] command, const char[] message)
 {
 	// Assuming base chat is in use, check if message will get processed by basechat
 	if (message[0] != '@')
@@ -189,7 +186,7 @@ static bool UsedBaseChat(int client, const char[] command, const char[] message)
 	return false;
 }
 
-static void SanitiseChatInput(char[] message, int maxlength)
+void SanitiseChatInput(char[] message, int maxlength)
 {
 	Color_StripFromChatText(message, message, maxlength);
 	CRemoveColors(message, maxlength);
