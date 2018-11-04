@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Jump Beam Include File
+/*
+	gokz-jumpbeam Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,14 +11,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define JUMP_BEAM_LIFETIME 4.0
-#define JBOPTION_DESCRIPTION_PREFIX "Jump Beam - "
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum JBOption
 {
@@ -39,7 +32,10 @@ enum
 
 
 
-// =========================  CONSTANTS  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define JUMP_BEAM_LIFETIME 4.0
+#define JBOPTION_DESCRIPTION_PREFIX "Jump Beam - "
 
 stock char gC_JBOptionNames[JBOPTION_COUNT][] = 
 {
@@ -77,7 +73,7 @@ stock char gC_JBTypePhrases[JBTYPE_COUNT][] =
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Returns whether an option is a gokz-jumpbeam option.
@@ -135,4 +131,19 @@ stock bool GOKZ_JB_SetOption(int client, JBOption option, any value)
 stock bool GOKZ_JB_CycleOption(int client, JBOption option)
 {
 	return GOKZ_CycleOption(client, gC_JBOptionNames[option]);
-} 
+}
+
+
+
+// =====[ DEPENDENCY ]=====
+
+public SharedPlugin __pl_gokz_jumpbeam = 
+{
+	name = "gokz-jumpbeam", 
+	file = "gokz-jumpbeam.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
+}; 

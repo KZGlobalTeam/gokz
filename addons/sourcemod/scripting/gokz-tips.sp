@@ -7,7 +7,7 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#include <gokz/methodmap>
+#include <gokz/kzplayer>
 
 
 

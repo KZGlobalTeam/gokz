@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Jumpstats Include File
+/*
+	gokz-jumpstats Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,13 +11,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define OPTIONS_MENU_CAT_JUMPSTATS "jumpstats"
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -70,7 +64,9 @@ enum
 
 
 
-// =========================  PHRASES  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define OPTIONS_MENU_CAT_JUMPSTATS "jumpstats"
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
@@ -106,19 +102,44 @@ stock char gC_DistanceTiers[DISTANCETIER_COUNT][] =
 	"Ownage"
 };
 
+stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] = 
+{
+	"longjump", 
+	"bhop", 
+	"multibhop", 
+	"weirdjump", 
+	"ladderjump", 
+	"ladderhop"
+};
+
+stock char gC_KeysMode[MODE_COUNT][] = 
+{
+	"vanilla", 
+	"simplekz", 
+	"kztimer"
+};
+
+stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] = 
+{
+	"none", 
+	"meh", 
+	"impressive", 
+	"perfect", 
+	"godlike", 
+	"ownage"
+};
+
+stock char gC_JSOptionNames[JSOPTION_COUNT][] = 
+{
+	"masterswitch", 
+	"chatreport", 
+	"consolereport", 
+	"sounds"
+};
 
 
-// =========================  OTHER  ========================= //
 
-// Used and recommended for key value files
-stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "ladderhop" };
-stock char gC_KeysMode[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
-stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =  { "none", "meh", "impressive", "perfect", "godlike", "ownage" };
-stock char gC_JSOptionNames[JSOPTION_COUNT][] =  { "masterswitch", "chatreport", "consolereport", "sounds" };
-
-
-
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player begins their jump.
@@ -153,7 +174,7 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets the default jumpstats option value as set by a config file.
@@ -172,7 +193,7 @@ native void GOKZ_JS_InvalidateJump(int client);
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Returns whether an option is a gokz-jumpstats option.
@@ -234,7 +255,7 @@ stock bool GOKZ_JS_CycleOption(int client, JSOption option)
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_jumpstats = 
 {

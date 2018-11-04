@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Replays Include File
+/*
+	gokz-replays Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
+// =====[ CONSTANTS ]=====
 
 #define REPLAY_DIRECTORY "data/gokz-replays" // In Path_SM
 #define REPLAY_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters"
@@ -21,7 +21,7 @@
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_replays = 
 {

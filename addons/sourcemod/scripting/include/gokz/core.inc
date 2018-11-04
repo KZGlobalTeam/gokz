@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Core Include File
+/*
+	gokz-core Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -16,14 +16,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define MAX_COURSES 256
-#define OPTIONS_MENU_CAT_GENERAL "general"
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -149,7 +142,10 @@ enum
 
 
 
-// =========================  PHRASES  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define MAX_COURSES 256
+#define OPTIONS_MENU_CAT_GENERAL "general"
 
 stock char gC_ModeNames[MODE_COUNT][] = 
 {
@@ -176,11 +172,7 @@ stock char gC_TimeTypeNames[TIMETYPE_COUNT][] =
 	"PRO"
 };
 
-
-
-// =========================  OTHER  ========================= //
-
-stock const char gC_CoreOptionNames[OPTION_COUNT][] = 
+stock char gC_CoreOptionNames[OPTION_COUNT][] = 
 {
 	"mode", 
 	"style", 
@@ -215,7 +207,7 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player has been set up e.g. options, timer etc.
@@ -510,7 +502,7 @@ forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets whether a mode is loaded.
@@ -914,7 +906,7 @@ native void GOKZ_JoinTeam(int client, int team);
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Prints a message to all clients' chat, formatting colours and optionally 
@@ -1122,7 +1114,7 @@ stock bool GOKZ_CycleCoreOption(int client, Option option)
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_core = 
 {

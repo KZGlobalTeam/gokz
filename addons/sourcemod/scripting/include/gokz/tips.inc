@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Tips Include File
+/*
+	gokz-tips Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,18 +11,33 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define TIPS_OPTION_NAME "tips"
-#define TIPS_OPTION_DESCRIPTION "Tips"
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
 	Tips_Disabled = 0, 
 	Tips_Enabled, 
 	TIPS_COUNT
+};
+
+
+
+// =====[ CONSTANTS ]=====
+
+#define TIPS_OPTION_NAME "tips"
+#define TIPS_OPTION_DESCRIPTION "Tips"
+
+
+
+// =====[ DEPENDENCY ]=====
+
+public SharedPlugin __pl_gokz_tips = 
+{
+	name = "gokz-tips", 
+	file = "gokz-tips.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
 }; 

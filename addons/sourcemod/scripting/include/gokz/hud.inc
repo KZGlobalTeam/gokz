@@ -1,5 +1,5 @@
-/* 	
-	GOKZ HUD Include File
+/*
+	gokz-hud Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,13 +11,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define OPTIONS_MENU_CAT_HUD "hud"
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum HUDOption
 {
@@ -27,10 +21,9 @@ enum HUDOption
 	HUDOption_ShowKeys, 
 	HUDOption_TimerText, 
 	HUDOption_SpeedText, 
-	HUDOption_ShowWeapon,
+	HUDOption_ShowWeapon, 
 	HUDOPTION_COUNT
 };
-
 
 enum
 {
@@ -81,13 +74,23 @@ enum
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ CONSTANTS ]=====
 
-stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =  { "tpmenu", "infopanel", "showkeys", "timertext", "speedtext", "showweapon" };
+#define OPTIONS_MENU_CAT_HUD "hud"
+
+stock char gC_HUDOptionNames[HUDOPTION_COUNT][] = 
+{
+	"tpmenu", 
+	"infopanel", 
+	"showkeys", 
+	"timertext", 
+	"speedtext", 
+	"showweapon"
+};
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Returns whether an option is a gokz-hud option.
@@ -145,4 +148,19 @@ stock bool GOKZ_HUD_SetOption(int client, HUDOption option, any value)
 stock bool GOKZ_HUD_CycleOption(int client, HUDOption option)
 {
 	return GOKZ_CycleOption(client, gC_HUDOptionNames[option]);
-} 
+}
+
+
+
+// =====[ DEPENDENCY ]=====
+
+public SharedPlugin __pl_gokz_hud = 
+{
+	name = "gokz-hud", 
+	file = "gokz-hud.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
+}; 

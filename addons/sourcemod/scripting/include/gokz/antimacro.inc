@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Antimacro Include File
+/*
+	gokz-antimacro Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum AMReason
 {
@@ -21,7 +21,7 @@ enum AMReason
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when gokz-antimacro suspects a player of cheating.
@@ -35,7 +35,7 @@ forward void GOKZ_AM_OnPlayerSuspected(int client, AMReason reason, const char[]
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets the number of recent bhop samples available for the player.
@@ -123,7 +123,7 @@ native int GOKZ_AM_GetPostJumpInputs(int client, int[] buffer, int sampleSize);
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_antimacro = 
 {

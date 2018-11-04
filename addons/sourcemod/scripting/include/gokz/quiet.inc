@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Quiet Include File
+/*
+	gokz-quiet Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum QTOption
 {
@@ -29,18 +29,17 @@ enum
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ CONSTANTS ]=====
 
-stock const char gC_QTOptionNames[QTOPTION_COUNT][] = 
+stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
 	"showplayers"
 };
 
-stock const char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
+stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
 {
 	"Other player visibility"
 };
-
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 
 {
@@ -59,7 +58,7 @@ stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Returns whether an option is a gokz-quiet option.
@@ -117,4 +116,19 @@ stock bool GOKZ_QT_SetOption(int client, QTOption option, any value)
 stock bool GOKZ_QT_CycleOption(int client, QTOption option)
 {
 	return GOKZ_CycleOption(client, gC_QTOptionNames[option]);
-} 
+}
+
+
+
+// =====[ DEPENDENCY ]=====
+
+public SharedPlugin __pl_gokz_quiet = 
+{
+	name = "gokz-quiet", 
+	file = "gokz-quiet.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
+}; 

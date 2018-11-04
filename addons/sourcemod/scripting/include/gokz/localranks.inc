@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Local Ranks Include File
+/*
+	gokz-localranks Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -23,7 +23,7 @@ enum
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player's time has been processed by GOKZ Local Ranks.
@@ -111,7 +111,7 @@ forward void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, 
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets whether player has missed the server record time.
@@ -141,7 +141,7 @@ native void GOKZ_LR_ReopenMapTopMenu(int client);
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_localranks = 
 {

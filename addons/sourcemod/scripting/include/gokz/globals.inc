@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Globals Include File
+/*
+	gokz-globals Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -13,7 +13,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -25,7 +25,7 @@ enum
 
 
 
-// =========================  OTHER  ========================= //
+// =====[ CONSTANTS ]=====
 
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {
@@ -36,7 +36,7 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player sets a new global top time.
@@ -52,7 +52,7 @@ forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Prints to chat the global records for a map, course and mode.
@@ -77,7 +77,7 @@ native void GOKZ_GL_DisplayMapTopMenu(int client, const char[] map = "", int cou
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Gets the global mode enumeration equivalent for the GOKZ mode.
@@ -98,7 +98,7 @@ stock GlobalMode GOKZ_GL_GetGlobalMode(int mode)
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_globals = 
 {

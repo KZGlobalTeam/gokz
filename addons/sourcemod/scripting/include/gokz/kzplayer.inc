@@ -1,17 +1,18 @@
-/* 	
-	GOKZ Methodmap Include File
+/*
+	GOKZ KZPlayer Methodmap Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
 
-#if defined _gokz_methodmap_included_
+#if defined _gokz_kzplayer_included_
 #endinput
 #endif
-#define _gokz_methodmap_included_
+#define _gokz_kzplayer_included_
+
+#include <gokz>
+#include <movementapi>
 
 
-
-// =========================  METHODMAP  ========================= //
 
 methodmap KZPlayer < MovementAPIPlayer {
 	
@@ -20,7 +21,8 @@ methodmap KZPlayer < MovementAPIPlayer {
 	}
 	
 	
-	// =========================  GENERAL  ========================= //
+	
+	// =====[ GENERAL ]=====
 	
 	property bool valid {
 		public get() {
@@ -65,8 +67,9 @@ methodmap KZPlayer < MovementAPIPlayer {
 	}
 	
 	
+	
+	// =====[ CORE ]=====
 	#if defined _gokz_core_included_
-	// =========================  CORE  ========================= //
 	
 	public void StartTimer(int course) {
 		GOKZ_StartTimer(this.id, course);
@@ -227,9 +230,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	
-	// =========================  CORE OPTIONS  ========================= //
-	
 	public any GetOption(const char[] option) {
 		return GOKZ_GetOption(this.id, option);
 	}
@@ -325,14 +325,14 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetCoreOption(Option_ErrorSounds, value);
 		}
 	}
+	
 	#endif
-	// =========================  END CORE  ========================= //
+	// =====[ END CORE ]=====
 	
 	
+	
+	// =====[ HUD ]=====
 	#if defined _gokz_hud_included_
-	// =========================  HUD  ========================= //
-	
-	// =========================  HUD OPTIONS  ========================= //
 	
 	public any GetHUDOption(HUDOption option) {
 		return GOKZ_HUD_GetOption(this.id, option);
@@ -399,12 +399,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetHUDOption(HUDOption_ShowWeapon, value);
 		}
 	}
+	
 	#endif
-	// =========================  END HUD  ========================= //
+	// =====[ END HUD ]=====
 	
 	
+	
+	// =====[ PISTOL ]=====
 	#if defined _gokz_pistol_included_
-	// =========================  PISTOL  ========================= //
+	
 	property int pistol {
 		public get() {
 			return this.GetOption(PISTOL_OPTION_NAME);
@@ -413,12 +416,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetOption(PISTOL_OPTION_NAME, value);
 		}
 	}
+	
 	#endif
-	// =========================  END PISTOL  ========================= //
+	// =====[ END PISTOL ]=====
 	
 	
+	
+	// =====[ JUMP BEAM ]=====
 	#if defined _gokz_jumpbeam_included_
-	// =========================  JUMP BEAM  ========================= //
+	
 	public any GetJBOption(JBOption option) {
 		return GOKZ_JB_GetOption(this.id, option);
 	}
@@ -439,12 +445,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetJBOption(JBOption_Type, value);
 		}
 	}
+	
 	#endif
-	// =========================  END JUMP BEAM  ========================= //
+	// =====[ END JUMP BEAM ]=====
 	
 	
+	
+	// =====[ TIPS ]=====
 	#if defined _gokz_tips_included_
-	// =========================  TIPS  ========================= //
+	
 	property int tips {
 		public get() {
 			return this.GetOption(TIPS_OPTION_NAME);
@@ -453,12 +462,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetOption(TIPS_OPTION_NAME, value);
 		}
 	}
+	
 	#endif
-	// =========================  END TIPS  ========================= //
+	// =====[ END TIPS ]=====
 	
 	
+	
+	// =====[ QUIET ]=====
 	#if defined _gokz_quiet_included_
-	// =========================  QUIET  ========================= //
+	
 	property int showPlayers {
 		public get() {
 			return this.GetOption(gC_QTOptionNames[QTOption_ShowPlayers]);
@@ -467,6 +479,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetOption(gC_QTOptionNames[QTOption_ShowPlayers], value);
 		}
 	}
+	
 	#endif
-	// =========================  END QUIET  ========================= //
+	// =====[ END QUIET ]=====
 } 

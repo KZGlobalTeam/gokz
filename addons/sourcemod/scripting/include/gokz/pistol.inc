@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Pistol Include File
+/*
+	gokz-pistol Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,14 +11,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define PISTOL_OPTION_NAME "pistol"
-#define PISTOL_OPTION_DESCRIPTION "Pistol"
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -33,4 +26,26 @@ enum
 	Pistol_R8Revolver, 
 	Pistol_Disabled, 
 	PISTOL_COUNT
+};
+
+
+
+// =====[ CONSTANTS ]=====
+
+#define PISTOL_OPTION_NAME "pistol"
+#define PISTOL_OPTION_DESCRIPTION "Pistol"
+
+
+
+// =====[ DEPENDENCY ]=====
+
+public SharedPlugin __pl_gokz_pistol = 
+{
+	name = "gokz-pistol", 
+	file = "gokz-pistol.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
 }; 

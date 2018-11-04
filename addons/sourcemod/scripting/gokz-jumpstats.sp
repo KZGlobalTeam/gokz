@@ -13,7 +13,7 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#include <gokz/methodmap>
+#include <gokz/kzplayer>
 
 #pragma newdecls required
 #pragma semicolon 1

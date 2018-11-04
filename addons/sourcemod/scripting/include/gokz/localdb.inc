@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Local DB Include File
+/*
+	gokz-localdb Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum DatabaseType
 {
@@ -22,7 +22,7 @@ enum DatabaseType
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when gokz-localdb has connected to the database.
@@ -74,7 +74,7 @@ forward void GOKZ_DB_OnTimeInserted(
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets a clone of the GOKZ local database handle.
@@ -130,7 +130,7 @@ native void GOKZ_DB_SetCheater(int client, bool cheater);
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Converts a time float (seconds) to an integer (milliseconds).
@@ -156,7 +156,7 @@ stock float GOKZ_DB_TimeIntToFloat(int time)
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_localdb = 
 {

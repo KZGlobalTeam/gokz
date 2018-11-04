@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Stocks
+/*
+	GOKZ General Include
 
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,17 +11,7 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define GOKZ_VERSION "2.0.0-dev"
-#define TICKRATE 128.0
-#define EPSILON 0.000001
-#define SPEED_NORMAL 250.0
-#define SPEED_NO_WEAPON 260.0
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum ObsMode
 {
@@ -36,7 +26,17 @@ enum ObsMode
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define GOKZ_VERSION "2.0.0-dev"
+#define TICKRATE 128.0
+#define EPSILON 0.000001
+#define SPEED_NORMAL 250.0
+#define SPEED_NO_WEAPON 260.0
+
+
+
+// =====[ STOCKS ]=====
 
 /**
  * Represents a time float as a string e.g. 01:23.45.

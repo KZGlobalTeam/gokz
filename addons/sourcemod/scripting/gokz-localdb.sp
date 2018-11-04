@@ -94,7 +94,7 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-if (StrEqual(name, "updater"))
+	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
