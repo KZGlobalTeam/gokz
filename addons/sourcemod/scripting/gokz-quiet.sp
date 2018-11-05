@@ -15,13 +15,12 @@ public Plugin myinfo =
 {
 	name = "GOKZ Quiet", 
 	author = "DanZay", 
-	description = "GOKZ Quiet Module", 
+	description = "Provides options for a quieter KZ experience", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-quiet.txt"
-#define OPTION_DESCRIPTION_PREFIX "Quiet - "
 
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
@@ -33,10 +32,6 @@ TopMenuObject gTMO_ItemsQuiet[QTOPTION_COUNT];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-quiet");
 	return APLRes_Success;
 }
@@ -46,15 +41,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
 	
-	CreateCommands();
-	
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		if (IsClientInGame(client))
-		{
-			OnClientPutInServer(client);
-		}
-	}
+	RegisterCommands();
 }
 
 public void OnAllPluginsLoaded()
@@ -65,6 +52,14 @@ public void OnAllPluginsLoaded()
 	}
 	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
+	
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client))
+		{
+			OnClientPutInServer(client);
+		}
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -132,7 +127,7 @@ void OnAllPluginsLoaded_Options()
 	for (QTOption option; option < QTOPTION_COUNT; option++)
 	{
 		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			OPTION_DESCRIPTION_PREFIX, 
+			QT_OPTION_DESC_PREFIX, 
 			gC_QTOptionDescriptions[option]);
 		GOKZ_RegisterOption(gC_QTOptionNames[option], prefixedDescription, 
 			OptionType_Int, gI_QTOptionDefaultValues[option], 0, gI_QTOptionCounts[option] - 1);
@@ -232,7 +227,7 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 	}
 }
 
-static void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, int maxlength)
+void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, int maxlength)
 {
 	if (GOKZ_GetOption(client, gC_QTOptionNames[option]) == 0)
 	{
@@ -252,7 +247,7 @@ static void FormatToggleableOptionDisplay(int client, QTOption option, char[] bu
 
 // =====[ COMMANDS ]=====
 
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
 }

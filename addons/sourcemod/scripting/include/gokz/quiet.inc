@@ -31,6 +31,8 @@ enum
 
 // =====[ CONSTANTS ]=====
 
+#define QT_OPTION_DESC_PREFIX "Quiet - "
+
 stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
 	"showplayers"
