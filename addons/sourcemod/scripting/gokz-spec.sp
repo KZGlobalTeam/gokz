@@ -14,7 +14,7 @@ public Plugin myinfo =
 {
 	name = "GOKZ Spectate Menu", 
 	author = "DanZay", 
-	description = "GOKZ Spectate Menu Module", 
+	description = "Provides easy ways to spectate players", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
@@ -27,10 +27,6 @@ public Plugin myinfo =
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-spec");
 	return APLRes_Success;
 }
@@ -41,9 +37,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-core.phrases");
 	LoadTranslations("gokz-spec.phrases");
 	
-	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
-	RegConsoleCmd("sm_specs", CommandSpecs, "[KZ] List currently spectating players in chat.");
-	RegConsoleCmd("sm_speclist", CommandSpecs, "[KZ] List currently spectating players in chat.");
+	RegisterCommands();
 }
 
 public void OnAllPluginsLoaded()
@@ -137,7 +131,7 @@ public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2
 }
 
 // Returns number of items added to the menu
-static int SpecMenuAddItems(int client, Menu menu)
+int SpecMenuAddItems(int client, Menu menu)
 {
 	char display[MAX_NAME_LENGTH + 4];
 	int targetCount = 0;
@@ -167,7 +161,14 @@ static int SpecMenuAddItems(int client, Menu menu)
 
 
 
-// =====[ COMMAND HANDLERS ]=====
+// =====[ COMMANDS ]=====
+
+void RegisterCommands()
+{
+	RegConsoleCmd("sm_spec", CommandSpec, "[KZ] Spectate another player. Usage: !spec <player>");
+	RegConsoleCmd("sm_specs", CommandSpecs, "[KZ] List currently spectating players in chat.");
+	RegConsoleCmd("sm_speclist", CommandSpecs, "[KZ] List currently spectating players in chat.");
+}
 
 public Action CommandSpec(int client, int args)
 {
