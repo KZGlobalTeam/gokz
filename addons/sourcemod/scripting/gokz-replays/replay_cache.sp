@@ -1,6 +1,4 @@
 /*
-	Replay Cache
-	
 	Cached info about the map's available replay bots stored in an ArrayList.
 */
 
@@ -25,82 +23,10 @@ void SortReplayInfoCache()
 	SortADTArrayCustom(g_ReplayInfoCache, SortFunc_ReplayInfoCache);
 }
 
-
-
-// =====[ LISTENERS ]=====
-
-void OnMapStart_ReplayCache()
-{
-	if (g_ReplayInfoCache == INVALID_HANDLE)
-	{
-		g_ReplayInfoCache = new ArrayList(REPLAY_CACHE_BLOCKSIZE, 0);
-	}
-	else
-	{
-		g_ReplayInfoCache.Clear();
-	}
-	
-	char path[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, path, sizeof(path), "%s/%s", REPLAY_DIRECTORY, gC_CurrentMap);
-	DirectoryListing dir = OpenDirectory(path);
-	
-	// We want to find files that look like "0_KZT_NRM_PRO.rec"
-	char file[PLATFORM_MAX_PATH], pieces[4][16];
-	int length, dotpos, course, mode, style, timeType;
-	
-	while (dir.GetNext(file, sizeof(file)))
-	{
-		// Some credit to Influx Timer - https://github.com/TotallyMehis/Influx-Timer
-		
-		// Check file extension
-		length = strlen(file);
-		dotpos = 0;
-		for (int i = 0; i < length; i++)
-		{
-			if (file[i] == '.')
-			{
-				dotpos = i;
-			}
-		}
-		if (!StrEqual(file[dotpos + 1], REPLAY_FILE_EXTENSION, false))
-		{
-			continue;
-		}
-		
-		// Remove file extension
-		Format(file, dotpos + 1, file);
-		
-		// Break down file name into pieces
-		if (ExplodeString(file, "_", pieces, sizeof(pieces), sizeof(pieces[])) != sizeof(pieces))
-		{
-			continue;
-		}
-		
-		// Extract info from the pieces
-		course = StringToInt(pieces[0]);
-		mode = GetModeIDFromString(pieces[1]);
-		style = GetStyleIDFromString(pieces[2]);
-		timeType = GetTimeTypeIDFromString(pieces[3]);
-		if (course < 0 || course > MAX_COURSES || mode == -1 || style == -1 || timeType == -1)
-		{
-			continue;
-		}
-		
-		// Add it to the cache
-		AddToReplayInfoCache(course, mode, style, timeType);
-	}
-	
-	SortReplayInfoCache();
-}
-
-
-
-// =====[ SORT FUNCTION ]=====
-
 public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle hndl)
 {
 	// Do not expect any indexes to be 'equal'	
-	int replayInfo1[REPLAY_CACHE_BLOCKSIZE], replayInfo2[REPLAY_CACHE_BLOCKSIZE];
+	int replayInfo1[RP_CACHE_BLOCKSIZE], replayInfo2[RP_CACHE_BLOCKSIZE];
 	g_ReplayInfoCache.GetArray(index1, replayInfo1);
 	g_ReplayInfoCache.GetArray(index2, replayInfo2);
 	
@@ -137,6 +63,74 @@ public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle
 		return 1;
 	}
 	return -1;
+}
+
+
+
+// =====[ EVENTS ]=====
+
+void OnMapStart_ReplayCache()
+{
+	if (g_ReplayInfoCache == INVALID_HANDLE)
+	{
+		g_ReplayInfoCache = new ArrayList(RP_CACHE_BLOCKSIZE, 0);
+	}
+	else
+	{
+		g_ReplayInfoCache.Clear();
+	}
+	
+	char path[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY, gC_CurrentMap);
+	DirectoryListing dir = OpenDirectory(path);
+	
+	// We want to find files that look like "0_KZT_NRM_PRO.rec"
+	char file[PLATFORM_MAX_PATH], pieces[4][16];
+	int length, dotpos, course, mode, style, timeType;
+	
+	while (dir.GetNext(file, sizeof(file)))
+	{
+		// Some credit to Influx Timer - https://github.com/TotallyMehis/Influx-Timer
+		
+		// Check file extension
+		length = strlen(file);
+		dotpos = 0;
+		for (int i = 0; i < length; i++)
+		{
+			if (file[i] == '.')
+			{
+				dotpos = i;
+			}
+		}
+		if (!StrEqual(file[dotpos + 1], RP_FILE_EXTENSION, false))
+		{
+			continue;
+		}
+		
+		// Remove file extension
+		Format(file, dotpos + 1, file);
+		
+		// Break down file name into pieces
+		if (ExplodeString(file, "_", pieces, sizeof(pieces), sizeof(pieces[])) != sizeof(pieces))
+		{
+			continue;
+		}
+		
+		// Extract info from the pieces
+		course = StringToInt(pieces[0]);
+		mode = GetModeIDFromString(pieces[1]);
+		style = GetStyleIDFromString(pieces[2]);
+		timeType = GetTimeTypeIDFromString(pieces[3]);
+		if (course < 0 || course > MAX_COURSES || mode == -1 || style == -1 || timeType == -1)
+		{
+			continue;
+		}
+		
+		// Add it to the cache
+		AddToReplayInfoCache(course, mode, style, timeType);
+	}
+	
+	SortReplayInfoCache();
 }
 
 

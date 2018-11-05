@@ -13,11 +13,16 @@
 
 // =====[ CONSTANTS ]=====
 
-#define REPLAY_DIRECTORY "data/gokz-replays" // In Path_SM
-#define REPLAY_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters"
-#define REPLAY_FILE_EXTENSION "replay"
-#define REPLAY_MAGIC_NUMBER 0x676F6B7A
-#define REPLAY_FORMAT_VERSION 0x01
+#define RP_DIRECTORY "data/gokz-replays" // In Path_SM
+#define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
+#define RP_FILE_EXTENSION "replay"
+#define RP_MAGIC_NUMBER 0x676F6B7A
+#define RP_FORMAT_VERSION 0x01
+#define RP_NAV_FILE "maps/gokz-replays.nav"
+#define RP_TICK_DATA_BLOCKSIZE 7
+#define RP_CACHE_BLOCKSIZE 4
+#define RP_MAX_BOTS 2
+#define RP_PLAYBACK_BREATHER_TIME 2.0
 
 
 

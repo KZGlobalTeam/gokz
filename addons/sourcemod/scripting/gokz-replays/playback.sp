@@ -1,6 +1,4 @@
 /*
-	Playback
-	
 	Bot replay playback logic and processes.
 	
 	The recorded files are read and their information and tick data
@@ -10,21 +8,21 @@
 
 
 
-static int playbackTick[MAX_BOTS];
-static ArrayList playbackTickData[MAX_BOTS];
-static bool inBreather[MAX_BOTS];
-static float breatherStartTime[MAX_BOTS];
+static int playbackTick[RP_MAX_BOTS];
+static ArrayList playbackTickData[RP_MAX_BOTS];
+static bool inBreather[RP_MAX_BOTS];
+static float breatherStartTime[RP_MAX_BOTS];
 
-static bool botInGame[MAX_BOTS];
-static int botClient[MAX_BOTS];
-static bool botDataLoaded[MAX_BOTS];
-static int botSteamAccountID[MAX_BOTS];
-static int botCourse[MAX_BOTS];
-static int botMode[MAX_BOTS];
-static int botStyle[MAX_BOTS];
-static float botTime[MAX_BOTS];
-static int botTeleportsUsed[MAX_BOTS];
-static char botAlias[MAX_BOTS][MAX_NAME_LENGTH];
+static bool botInGame[RP_MAX_BOTS];
+static int botClient[RP_MAX_BOTS];
+static bool botDataLoaded[RP_MAX_BOTS];
+static int botSteamAccountID[RP_MAX_BOTS];
+static int botCourse[RP_MAX_BOTS];
+static int botMode[RP_MAX_BOTS];
+static int botStyle[RP_MAX_BOTS];
+static float botTime[RP_MAX_BOTS];
+static int botTeleportsUsed[RP_MAX_BOTS];
+static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
 
 
 
@@ -34,7 +32,7 @@ static char botAlias[MAX_BOTS][MAX_NAME_LENGTH];
 int LoadReplayBot(int course, int mode, int style, int timeType)
 {
 	int bot;
-	if (GetBotsInUse() < MAX_BOTS)
+	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
 		bot = GetUnusedBot();
 	}
@@ -55,7 +53,7 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnClientPutInServer_Playback(int client)
 {
@@ -65,7 +63,7 @@ void OnClientPutInServer_Playback(int client)
 	}
 	
 	// Check if an unassigned bot has joined, and assign it
-	for (int bot; bot < MAX_BOTS; bot++)
+	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
 		if (!botInGame[bot])
 		{
@@ -79,7 +77,7 @@ void OnClientPutInServer_Playback(int client)
 
 void OnClientDisconnect_Playback(int client)
 {
-	for (int bot; bot < MAX_BOTS; bot++)
+	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
 		if (botClient[bot] != client)
 		{
@@ -102,7 +100,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 		return;
 	}
 	
-	for (int bot; bot < MAX_BOTS; bot++)
+	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
 		// Check if not the bot we're looking for
 		if (!botInGame[bot] || botClient[bot] != client || !botDataLoaded[bot])
@@ -131,7 +129,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 				inBreather[bot] = true;
 				breatherStartTime[bot] = GetEngineTime();
 			}
-			else if (GetEngineTime() > breatherStartTime[bot] + PLAYBACK_BREATHER_TIME)
+			else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
 			{
 				// End the breather period
 				inBreather[bot] = false;
@@ -199,7 +197,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	char path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), 
 		"%s/%s/%d_%s_%s_%s.%s", 
-		REPLAY_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], REPLAY_FILE_EXTENSION);
+		RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
 	if (!FileExists(path))
 	{
 		LogError("Could not find replay file: %s", path);
@@ -212,7 +210,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	// Check magic number in header
 	int magicNumber;
 	file.ReadInt32(magicNumber);
-	if (magicNumber != REPLAY_MAGIC_NUMBER)
+	if (magicNumber != RP_MAGIC_NUMBER)
 	{
 		LogError("Tried to load invalid replay file: %s", path);
 		return false;
@@ -221,7 +219,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	// Check replay format version
 	int formatVersion;
 	file.ReadInt8(formatVersion);
-	if (formatVersion != REPLAY_FORMAT_VERSION)
+	if (formatVersion != RP_FORMAT_VERSION)
 	{
 		LogError("Tried to load replay file with unsupported format version: %s", path);
 		return false;
@@ -276,7 +274,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == INVALID_HANDLE)
 	{
-		playbackTickData[bot] = new ArrayList(TICK_DATA_BLOCKSIZE, length);
+		playbackTickData[bot] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, length);
 	}
 	else
 	{  // Make sure it's all clear and the correct size
@@ -284,10 +282,10 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 		playbackTickData[bot].Resize(length);
 	}
 	
-	any tickData[TICK_DATA_BLOCKSIZE];
+	any tickData[RP_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < length; i++)
 	{
-		file.Read(tickData, TICK_DATA_BLOCKSIZE, 4);
+		file.Read(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 		playbackTickData[bot].Set(i, view_as<float>(tickData[0]), 0); // origin[0]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[1]), 1); // origin[1]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[2]), 2); // origin[2]
@@ -375,7 +373,7 @@ static void SetBotStuff(int bot)
 static int GetBotsInUse()
 {
 	int botsInUse = 0;
-	for (int bot; bot < MAX_BOTS; bot++)
+	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
 		if (botInGame[bot] && botDataLoaded[bot])
 		{
@@ -388,7 +386,7 @@ static int GetBotsInUse()
 // Returns a bot that isn't currently replaying, or -1 if unused bots found
 static int GetUnusedBot()
 {
-	for (int bot; bot < MAX_BOTS; bot++)
+	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
 		if (botInGame[bot] && !botDataLoaded[bot])
 		{

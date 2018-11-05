@@ -1,7 +1,5 @@
 /*
-	Replay Menu
-	
-	Provides players a way to load a replay bot.
+	Lets player select a replay bot to play back.
 */
 
 
@@ -29,7 +27,7 @@ void DisplayReplayModeMenu(int client)
 
 
 
-// =====[ HANDLERS ]=====
+// =====[ EVENTS ]=====
 
 public int MenuHandler_ReplayMode(Menu menu, MenuAction action, int param1, int param2)
 {
@@ -51,7 +49,7 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 		char info[4];
 		menu.GetItem(param2, info, sizeof(info));
 		int replayIndex = StringToInt(info);
-		int replayInfo[REPLAY_CACHE_BLOCKSIZE];
+		int replayInfo[RP_CACHE_BLOCKSIZE];
 		g_ReplayInfoCache.GetArray(replayIndex, replayInfo);
 		int botClient = LoadReplayBot(replayInfo[0], replayInfo[1], replayInfo[2], replayInfo[3]);
 		if (botClient != -1)
@@ -119,7 +117,7 @@ static int ReplayMenuAddItems(int client, Menu menu)
 {
 	int replaysAdded = 0;
 	int replayCount = g_ReplayInfoCache.Length;
-	int replayInfo[REPLAY_CACHE_BLOCKSIZE];
+	int replayInfo[RP_CACHE_BLOCKSIZE];
 	char temp[32], indexString[4];
 	
 	menu.RemoveAllItems();

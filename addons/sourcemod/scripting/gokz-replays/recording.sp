@@ -1,14 +1,12 @@
 /*
-	Recording
-	
 	Bot replay recording logic and processes.
 	
-	Records data every time OnPlayerRunCmd is called.
+	Records data every time OnPlayerRunCmdPost is called.
 	If the player misses the server record, then the recording will 
 	immediately stop and be discarded. Upon beating the server record, 
-	a binary file will be written 	with a 'header' containing 
+	a binary file will be written with a 'header' containing 
 	information	about the run, followed by the recorded tick data 
-	from OnPlayerRunCmd.
+	from OnPlayerRunCmdPost.
 */
 
 
@@ -49,7 +47,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	char path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), 
 		"%s/%s/%d_%s_%s_%s.%s", 
-		REPLAY_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], REPLAY_FILE_EXTENSION);
+		RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
 	if (FileExists(path))
 	{
 		DeleteFile(path);
@@ -75,8 +73,8 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	int tickCount = recordedTickData[client].Length;
 	
 	// Write header
-	file.WriteInt32(REPLAY_MAGIC_NUMBER);
-	file.WriteInt8(REPLAY_FORMAT_VERSION);
+	file.WriteInt32(RP_MAGIC_NUMBER);
+	file.WriteInt8(RP_FORMAT_VERSION);
 	file.WriteInt8(strlen(GOKZ_VERSION));
 	file.WriteString(GOKZ_VERSION, false);
 	file.WriteInt8(strlen(gC_CurrentMap));
@@ -96,11 +94,11 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	file.WriteInt32(tickCount);
 	
 	// Write tick data
-	any tickData[TICK_DATA_BLOCKSIZE];
+	any tickData[RP_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < tickCount; i++)
 	{
-		recordedTickData[client].GetArray(i, tickData, TICK_DATA_BLOCKSIZE);
-		file.Write(tickData, TICK_DATA_BLOCKSIZE, 4);
+		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 	}
 	file.Close();
 	
@@ -129,7 +127,7 @@ bool SaveRecordingCheater(int client)
 	{
 		BuildPath(Path_SM, path, sizeof(path), 
 			"%s/%d_%d.%s", 
-			REPLAY_DIRECTORY_CHEATERS, GetSteamAccountID(client), replayNumber, REPLAY_FILE_EXTENSION);
+			RP_DIRECTORY_CHEATERS, GetSteamAccountID(client), replayNumber, RP_FILE_EXTENSION);
 		replayNumber++;
 	}
 	while (FileExists(path));
@@ -149,8 +147,8 @@ bool SaveRecordingCheater(int client)
 	int tickCount = recordedTickData[client].Length;
 	
 	// Write header
-	file.WriteInt32(REPLAY_MAGIC_NUMBER);
-	file.WriteInt8(REPLAY_FORMAT_VERSION);
+	file.WriteInt32(RP_MAGIC_NUMBER);
+	file.WriteInt8(RP_FORMAT_VERSION);
 	file.WriteInt8(strlen(GOKZ_VERSION));
 	file.WriteString(GOKZ_VERSION, false);
 	file.WriteInt8(strlen(gC_CurrentMap));
@@ -170,11 +168,11 @@ bool SaveRecordingCheater(int client)
 	file.WriteInt32(tickCount);
 	
 	// Write tick data
-	any tickData[TICK_DATA_BLOCKSIZE];
+	any tickData[RP_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < tickCount; i++)
 	{
-		recordedTickData[client].GetArray(i, tickData, TICK_DATA_BLOCKSIZE);
-		file.Write(tickData, TICK_DATA_BLOCKSIZE, 4);
+		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 	}
 	file.Close();
 	
@@ -210,13 +208,18 @@ void ResumeRecording(int client)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
+
+void OnMapStart_Recording()
+{
+	CreateReplaysDirectory(gC_CurrentMap);
+}
 
 void OnClientPutInServer_Recording(int client)
 {
 	if (recordedTickData[client] == INVALID_HANDLE)
 	{
-		recordedTickData[client] = new ArrayList(TICK_DATA_BLOCKSIZE, 0);
+		recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
 	}
 	else
 	{  // Just in case it isn't cleared when the client disconnects via GOKZ_OnTimerStopped
@@ -224,7 +227,7 @@ void OnClientPutInServer_Recording(int client)
 	}
 }
 
-void OnPlayerRunCmd_Recording(int client, int buttons)
+void OnPlayerRunCmdPost_Recording(int client, int buttons)
 {
 	if (IsFakeClient(client))
 	{
@@ -307,5 +310,35 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 		{
 			DiscardRecording(client);
 		}
+	}
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void CreateReplaysDirectory(const char[] map)
+{
+	char path[PLATFORM_MAX_PATH];
+	
+	// Create parent replay directory
+	BuildPath(Path_SM, path, sizeof(path), RP_DIRECTORY);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+	
+	// Create map's replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY, map);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+	
+	// Create cheaters replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_CHEATERS);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
 	}
 } 
