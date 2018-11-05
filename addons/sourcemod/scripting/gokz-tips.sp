@@ -15,17 +15,12 @@ public Plugin myinfo =
 {
 	name = "GOKZ Tips", 
 	author = "DanZay", 
-	description = "GOKZ Tips Module", 
+	description = "Prints tips to chat periodically based on loaded plugins", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-tips.txt"
-
-#define TIPS_CORE "gokz-tips-core.phrases.txt"
-#define TIPS_LOCALRANKS "gokz-tips-localranks.phrases.txt"
-#define TIPS_REPLAYS "gokz-tips-replays.phrases.txt"
-#define TIPS_JUMPSTATS "gokz-tips-jumpstats.phrases.txt"
 
 bool gB_GOKZLocalRanks;
 bool gB_GOKZReplays;
@@ -44,10 +39,7 @@ TopMenuObject gTMO_ItemTips;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
+	RegPluginLibrary("gokz-tips");
 	return APLRes_Success;
 }
 
@@ -61,11 +53,10 @@ public void OnPluginStart()
 	LoadTranslations(TIPS_JUMPSTATS);
 	
 	CreateConVars();
-	CreateCommands();
+	RegisterCommands();
+	CreateTipsTimer();
 	
 	AutoExecConfig(true, "gokz-tips", "sourcemod/gokz");
-	
-	CreateTipsTimer();
 }
 
 public void OnAllPluginsLoaded()
@@ -121,9 +112,95 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 
 
-// =====[ TIPS TIMER ]=====
+// =====[ CONVARS ]=====
 
-static void CreateTipsTimer()
+void CreateConVars()
+{
+	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 5.0, false);
+	gCV_gokz_tips_interval.AddChangeHook(OnConVarChanged);
+}
+
+public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if (convar == gCV_gokz_tips_interval)
+	{
+		CreateTipsTimer();
+	}
+}
+
+
+
+// =====[ TIPS ]=====
+
+void LoadTipPhrases()
+{
+	if (g_TipPhrases == null)
+	{
+		g_TipPhrases = new ArrayList(64, 0);
+	}
+	else
+	{
+		g_TipPhrases.Clear();
+	}
+	
+	char tipsPath[PLATFORM_MAX_PATH];
+	
+	BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_CORE);
+	LoadTipPhrasesFromFile(tipsPath);
+	
+	if (gB_GOKZLocalRanks)
+	{
+		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_LOCALRANKS);
+		LoadTipPhrasesFromFile(tipsPath);
+	}
+	
+	if (gB_GOKZReplays)
+	{
+		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_REPLAYS);
+		LoadTipPhrasesFromFile(tipsPath);
+	}
+	
+	if (gB_GOKZJumpstats)
+	{
+		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_JUMPSTATS);
+		LoadTipPhrasesFromFile(tipsPath);
+	}
+	
+	ShuffleTipPhrases();
+}
+
+void LoadTipPhrasesFromFile(const char[] filePath)
+{
+	KeyValues kv = new KeyValues("Phrases");
+	if (!kv.ImportFromFile(filePath))
+	{
+		SetFailState("Couldn't load file: %s", filePath);
+	}
+	
+	char phraseName[64];
+	kv.GotoFirstSubKey(true);
+	do
+	{
+		kv.GetSectionName(phraseName, sizeof(phraseName));
+		g_TipPhrases.PushString(phraseName);
+	} while (kv.GotoNextKey(true));
+}
+
+void ShuffleTipPhrases()
+{
+	for (int i = g_TipPhrases.Length - 1; i >= 1; i--)
+	{
+		int j = GetRandomInt(0, i);
+		char tempStringI[64];
+		g_TipPhrases.GetString(i, tempStringI, sizeof(tempStringI));
+		char tempStringJ[64];
+		g_TipPhrases.GetString(j, tempStringJ, sizeof(tempStringJ));
+		g_TipPhrases.SetString(i, tempStringJ);
+		g_TipPhrases.SetString(j, tempStringI);
+	}
+}
+
+void CreateTipsTimer()
 {
 	if (gH_TipTimer != null)
 	{
@@ -236,7 +313,7 @@ public void TopMenuHandler_Tips(TopMenu topmenu, TopMenuAction action, TopMenuOb
 
 // =====[ COMMANDS ]=====
 
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_tips", CommandToggleTips, "[KZ] Toggle seeing help and tips.");
 }
@@ -252,90 +329,4 @@ public Action CommandToggleTips(int client, int args)
 		GOKZ_SetOption(client, TIPS_OPTION_NAME, Tips_Disabled);
 	}
 	return Plugin_Handled;
-}
-
-
-
-// =====[ PRIVATE ]=====
-
-static void CreateConVars()
-{
-	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 5.0, false);
-	gCV_gokz_tips_interval.AddChangeHook(OnConVarChanged);
-}
-
-public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
-{
-	if (convar == gCV_gokz_tips_interval)
-	{
-		CreateTipsTimer();
-	}
-}
-
-static void LoadTipPhrases()
-{
-	if (g_TipPhrases == null)
-	{
-		g_TipPhrases = new ArrayList(64, 0);
-	}
-	else
-	{
-		g_TipPhrases.Clear();
-	}
-	
-	char tipsPath[PLATFORM_MAX_PATH];
-	
-	BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_CORE);
-	LoadTipPhrasesFromFile(tipsPath);
-	
-	if (gB_GOKZLocalRanks)
-	{
-		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_LOCALRANKS);
-		LoadTipPhrasesFromFile(tipsPath);
-	}
-	
-	if (gB_GOKZReplays)
-	{
-		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_REPLAYS);
-		LoadTipPhrasesFromFile(tipsPath);
-	}
-	
-	if (gB_GOKZJumpstats)
-	{
-		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_JUMPSTATS);
-		LoadTipPhrasesFromFile(tipsPath);
-	}
-	
-	ShuffleTipPhrases();
-}
-
-static void LoadTipPhrasesFromFile(const char[] filePath)
-{
-	KeyValues kv = new KeyValues("Phrases");
-	if (!kv.ImportFromFile(filePath))
-	{
-		SetFailState("Couldn't load file: %s", filePath);
-	}
-	
-	char phraseName[64];
-	kv.GotoFirstSubKey(true);
-	do
-	{
-		kv.GetSectionName(phraseName, sizeof(phraseName));
-		g_TipPhrases.PushString(phraseName);
-	} while (kv.GotoNextKey(true));
-}
-
-static void ShuffleTipPhrases()
-{
-	for (int i = g_TipPhrases.Length - 1; i >= 1; i--)
-	{
-		int j = GetRandomInt(0, i);
-		char tempStringI[64];
-		g_TipPhrases.GetString(i, tempStringI, sizeof(tempStringI));
-		char tempStringJ[64];
-		g_TipPhrases.GetString(j, tempStringJ, sizeof(tempStringJ));
-		g_TipPhrases.SetString(i, tempStringJ);
-		g_TipPhrases.SetString(j, tempStringI);
-	}
 } 
