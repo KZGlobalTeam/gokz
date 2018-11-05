@@ -365,7 +365,7 @@ static void CreateHooks()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
-	gameData.Close();
+	delete gameData;
 }
 
 static void UpdateOldVariables(int client, int buttons)

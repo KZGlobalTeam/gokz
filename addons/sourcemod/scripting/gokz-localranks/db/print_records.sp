@@ -38,7 +38,7 @@ public void DB_TxnSuccess_PrintRecords(Handle db, DataPack data, int numQueries,
 	int client = GetClientOfUserId(data.ReadCell());
 	int course = data.ReadCell();
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
@@ -148,7 +148,7 @@ public void DB_TxnSuccess_PrintRecords_FindMap(Handle db, DataPack data, int num
 	data.ReadString(mapSearch, sizeof(mapSearch));
 	int course = data.ReadCell();
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

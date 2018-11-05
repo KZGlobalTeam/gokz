@@ -43,7 +43,7 @@ public void DB_TxnSuccess_OpenPlayerTop(Handle db, DataPack data, int numQueries
 	int client = GetClientOfUserId(data.ReadCell());
 	int timeType = data.ReadCell();
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

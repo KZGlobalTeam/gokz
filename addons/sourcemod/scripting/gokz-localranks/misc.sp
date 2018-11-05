@@ -49,7 +49,7 @@ static bool LoadSounds()
 	AddFileToDownloadsTable(downloadPath);
 	PrecacheSound(gC_BeatRecordSound);
 	
-	kv.Close();
+	delete kv;
 	return true;
 }
 

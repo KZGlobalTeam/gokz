@@ -69,7 +69,7 @@ public void DB_TxnSuccess_SetupClient(Handle db, DataPack data, int numQueries, 
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int steamID = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

@@ -204,7 +204,7 @@ void CreateTipsTimer()
 {
 	if (gH_TipTimer != null)
 	{
-		gH_TipTimer.Close();
+		delete gH_TipTimer;
 	}
 	gH_TipTimer = CreateTimer(gCV_gokz_tips_interval.FloatValue, Timer_PrintTip, _, TIMER_REPEAT);
 }

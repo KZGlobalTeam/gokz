@@ -197,6 +197,6 @@ static bool LoadSounds()
 		PrecacheSound(sounds[tier]);
 	}
 	
-	kv.Close();
+	delete kv;
 	return true;
 } 

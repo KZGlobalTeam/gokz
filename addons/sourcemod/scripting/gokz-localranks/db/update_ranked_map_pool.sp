@@ -33,7 +33,7 @@ void DB_UpdateRankedMapPool(int client)
 		String_ToLower(map, map, sizeof(map));
 		maps.PushString(map);
 	}
-	file.Close();
+	delete file;
 	
 	if (maps.Length == 0)
 	{

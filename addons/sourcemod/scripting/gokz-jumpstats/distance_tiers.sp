@@ -82,6 +82,6 @@ static bool LoadDistanceTiers()
 		}
 		kv.GoBack();
 	}
-	kv.Close();
+	delete kv;
 	return true;
 } 

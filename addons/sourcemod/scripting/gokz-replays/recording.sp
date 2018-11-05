@@ -100,7 +100,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
 		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 	}
-	file.Close();
+	delete file;
 	
 	// Discard recorded data
 	recordedTickData[client].Clear();
@@ -174,7 +174,7 @@ bool SaveRecordingCheater(int client)
 		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
 		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 	}
-	file.Close();
+	delete file;
 	
 	// Discard recorded data
 	recordedTickData[client].Clear();

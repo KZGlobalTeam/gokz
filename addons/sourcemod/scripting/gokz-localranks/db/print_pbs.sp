@@ -54,7 +54,7 @@ public void DB_TxnSuccess_PrintPBs(Handle db, DataPack data, int numQueries, Han
 	int client = GetClientOfUserId(data.ReadCell());
 	int course = data.ReadCell();
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
@@ -186,7 +186,7 @@ public void DB_TxnSuccess_PrintPBs_FindMap(Handle db, DataPack data, int numQuer
 	data.ReadString(mapSearch, sizeof(mapSearch));
 	int course = data.ReadCell();
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
@@ -227,7 +227,7 @@ public void DB_TxnSuccess_PrintPBs_FindPlayerAndMap(Handle db, DataPack data, in
 	data.ReadString(mapSearch, sizeof(mapSearch));
 	int course = data.ReadCell();
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

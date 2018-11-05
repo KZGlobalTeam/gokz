@@ -81,7 +81,7 @@ public Action Timer_SpectateBot(Handle timer, DataPack data)
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int botClient = GetClientOfUserId(data.ReadCell());
-	data.Close();
+	delete data;
 	
 	if (IsValidClient(client) && IsValidClient(botClient))
 	{

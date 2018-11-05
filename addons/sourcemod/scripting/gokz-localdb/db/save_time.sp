@@ -41,7 +41,7 @@ public void DB_TxnSuccess_SaveTime(Handle db, DataPack data, int numQueries, Han
 	int style = data.ReadCell();
 	int runTimeMS = data.ReadCell();
 	int teleportsUsed = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

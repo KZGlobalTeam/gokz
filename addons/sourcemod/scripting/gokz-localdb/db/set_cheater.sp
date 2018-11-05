@@ -51,7 +51,7 @@ public void DB_TxnSuccess_SetCheater(Handle db, DataPack data, int numQueries, H
 	int client = GetClientOfUserId(data.ReadCell());
 	int steamID = data.ReadCell();
 	bool cheater = view_as<bool>(data.ReadCell());
-	data.Close();
+	delete data;
 	
 	// TODO Translation phrases?
 	if (IsValidClient(client))

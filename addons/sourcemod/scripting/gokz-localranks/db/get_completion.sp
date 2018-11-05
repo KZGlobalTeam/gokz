@@ -47,7 +47,7 @@ public void DB_TxnSuccess_GetCompletion(Handle db, DataPack data, int numQueries
 	int targetSteamID = data.ReadCell();
 	int mode = data.ReadCell();
 	bool print = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
@@ -136,7 +136,7 @@ public void DB_TxnSuccess_GetCompletion_FindPlayer(Handle db, DataPack data, int
 	char playerSearch[33];
 	data.ReadString(playerSearch, sizeof(playerSearch));
 	int mode = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

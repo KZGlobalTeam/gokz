@@ -298,7 +298,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	playbackTick[bot] = 0;
 	botDataLoaded[bot] = true;
 	
-	file.Close();
+	delete file;
 	
 	return true;
 }

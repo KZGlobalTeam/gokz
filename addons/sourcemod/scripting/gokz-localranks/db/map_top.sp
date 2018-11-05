@@ -43,7 +43,7 @@ public void DB_TxnSuccess_OpenMapTopModeMenu(Handle db, DataPack data, int numQu
 	int client = GetClientOfUserId(data.ReadCell());
 	int mapID = data.ReadCell();
 	int course = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
@@ -91,7 +91,7 @@ public void DB_TxnSuccess_OpenMapTopModeMenu_FindMap(Handle db, DataPack data, i
 	char mapSearch[33];
 	data.ReadString(mapSearch, sizeof(mapSearch));
 	int course = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
@@ -150,7 +150,7 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 	int course = data.ReadCell();
 	int mode = data.ReadCell();
 	int timeType = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{

@@ -36,7 +36,7 @@ public void DB_TxnSuccess_OpenRecentRecords(Handle db, DataPack data, int numQue
 	int client = GetClientOfUserId(data.ReadCell());
 	int mode = data.ReadCell();
 	int timeType = data.ReadCell();
-	data.Close();
+	delete data;
 	
 	if (!IsValidClient(client))
 	{
