@@ -194,22 +194,22 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
 {
 	"sv_accelerate", 
-	"sv_friction", 
-	"sv_airaccelerate", 
-	"sv_ladder_scale_speed", 
-	"sv_maxvelocity", 
-	"sv_gravity", 
-	"sv_enablebunnyhopping", 
-	"sv_autobunnyhopping", 
-	"sv_staminamax", 
-	"sv_staminalandcost", 
-	"sv_staminajumpcost", 
-	"sv_staminarecoveryrate", 
-	"sv_maxspeed", 
-	"sv_wateraccelerate", 
-	"sv_timebetweenducks", 
 	"sv_accelerate_use_weapon_speed", 
-	"sv_jump_impulse"
+	"sv_airaccelerate", 
+	"sv_autobunnyhopping", 
+	"sv_enablebunnyhopping", 
+	"sv_friction", 
+	"sv_gravity", 
+	"sv_jump_impulse", 
+	"sv_ladder_scale_speed", 
+	"sv_maxspeed", 
+	"sv_maxvelocity", 
+	"sv_staminajumpcost", 
+	"sv_staminalandcost", 
+	"sv_staminamax", 
+	"sv_staminarecoveryrate", 
+	"sv_timebetweenducks", 
+	"sv_wateraccelerate"
 };
 
 

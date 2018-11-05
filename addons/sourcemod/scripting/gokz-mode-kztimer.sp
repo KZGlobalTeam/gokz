@@ -23,7 +23,7 @@ public Plugin myinfo =
 {
 	name = "GOKZ Mode - KZTimer", 
 	author = "DanZay", 
-	description = "GOKZ Mode Module - KZTimer", 
+	description = "KZTimer mode for GOKZ", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
@@ -35,7 +35,26 @@ public Plugin myinfo =
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
 
-float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.0, 100.0, 1.0, 2000.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.0, 0.0, 301.993377 };
+float gF_ModeCVarValues[MODECVAR_COUNT] = 
+{
+	6.5,  // sv_accelerate
+	0.0,  // sv_accelerate_use_weapon_speed
+	100.0,  // sv_airaccelerate
+	0.0,  // sv_autobunnyhopping
+	1.0,  // sv_enablebunnyhopping
+	5.0,  // sv_friction
+	800.0,  // sv_gravity
+	301.993377,  // sv_jump_impulse
+	1.0,  // sv_ladder_scale_speed
+	320.0,  // sv_maxspeed
+	2000.0,  // sv_maxvelocity
+	0.0,  // sv_staminajumpcost
+	0.0,  // sv_staminalandcost
+	0.0,  // sv_staminamax
+	0.0,  // sv_staminarecoveryrate
+	0.0,  // sv_timebetweenducks
+	10.0,  // sv_wateraccelerate
+};
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
@@ -52,18 +71,22 @@ bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 // =====[ PLUGIN EVENTS ]=====
 
-public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
-{
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	return APLRes_Success;
-}
-
 public void OnPluginStart()
 {
 	CreateConVars();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_KZTimer, true, MODE_VERSION);
+	}
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -82,38 +105,22 @@ public void OnPluginEnd()
 	}
 }
 
-public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("gokz-core"))
-	{
-		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_KZTimer, true, MODE_VERSION);
-	}
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	else if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_KZTimer, true, MODE_VERSION);
-	}
-	else if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
-	{
-		gB_GOKZCore = false;
-	}
+	gB_GOKZCore = gB_GOKZCore && !StrEqual(name, "gokz-core");
 }
 
 
@@ -239,9 +246,9 @@ public void GOKZ_OnClientSetup(int client)
 
 
 
-// =====[ PRIVATE ]=====
+// =====[ GENERAL ]=====
 
-static bool IsUsingMode(int client)
+bool IsUsingMode(int client)
 {
 	// If GOKZ core isn't loaded, then apply mode at all times
 	return !gB_GOKZCore || GOKZ_GetCoreOption(client, Option_Mode) == Mode_KZTimer;
@@ -249,9 +256,9 @@ static bool IsUsingMode(int client)
 
 
 
-// CONVARS
+// =====[ CONVARS ]=====
 
-static void CreateConVars()
+void CreateConVars()
 {
 	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
 	{
@@ -259,7 +266,7 @@ static void CreateConVars()
 	}
 }
 
-static void TweakConVars()
+void TweakConVars()
 {
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
@@ -267,7 +274,7 @@ static void TweakConVars()
 	}
 }
 
-static void ReplicateConVars(int client)
+void ReplicateConVars(int client)
 {
 	// Replicate convars only when player changes mode in GOKZ
 	// so that lagg isn't caused by other players using other
@@ -286,14 +293,14 @@ static void ReplicateConVars(int client)
 
 
 
-// VELOCITY MODIFIER
+// =====[ VELOCITY MODIFIER ]=====
 
-static void TweakVelMod(KZPlayer player)
+void TweakVelMod(KZPlayer player)
 {
 	player.velocityModifier = CalcPrestrafeVelMod(player) * CalcWeaponVelMod(player);
 }
 
-static float CalcPrestrafeVelMod(KZPlayer player)
+float CalcPrestrafeVelMod(KZPlayer player)
 {
 	// No changes to prestrafe velocity modifier in midair
 	if (!player.onGround)
@@ -370,16 +377,16 @@ static float CalcPrestrafeVelMod(KZPlayer player)
 	return gF_PreVelMod[player.id];
 }
 
-static float CalcWeaponVelMod(KZPlayer player)
+float CalcWeaponVelMod(KZPlayer player)
 {
 	return SPEED_NORMAL / player.maxSpeed;
 }
 
 
 
-// JUMPING
+// =====[ JUMPING ]=====
 
-static void TweakJump(KZPlayer player)
+void TweakJump(KZPlayer player)
 {
 	if (player.hitPerf)
 	{
@@ -413,7 +420,7 @@ static void TweakJump(KZPlayer player)
 	}
 }
 
-static void TweakJumpbug(KZPlayer player)
+void TweakJumpbug(KZPlayer player)
 {
 	if (player.speed > PERF_SPEED_CAP)
 	{
@@ -428,9 +435,9 @@ static void TweakJumpbug(KZPlayer player)
 
 
 
-// OTHER
+// =====[ OTHER ]=====
 
-static void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
+void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 {
 	if (player.onGround && buttons & IN_JUMP && !(gI_OldButtons[player.id] & IN_JUMP) && !(gI_OldButtons[player.id] & IN_DUCK))
 	{
@@ -438,7 +445,7 @@ static void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 	}
 }
 
-static void ReduceDuckSlowdown(KZPlayer player)
+void ReduceDuckSlowdown(KZPlayer player)
 {
 	if (player.duckSpeed < DUCK_SPEED_MINIMUM)
 	{

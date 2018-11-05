@@ -23,7 +23,7 @@ public Plugin myinfo =
 {
 	name = "GOKZ Mode - Vanilla", 
 	author = "DanZay", 
-	description = "GOKZ Mode Module - Vanilla", 
+	description = "Vanilla mode for GOKZ", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
@@ -39,18 +39,22 @@ ConVar gCV_ModeCVar[MODECVAR_COUNT];
 
 // =====[ PLUGIN EVENTS ]=====
 
-public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
-{
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	return APLRes_Success;
-}
-
 public void OnPluginStart()
 {
 	CreateConVars();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
+	}
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -69,38 +73,22 @@ public void OnPluginEnd()
 	}
 }
 
-public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("gokz-core"))
-	{
-		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
-	}
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+	else if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_Vanilla, true, MODE_VERSION);
-	}
-	else if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
-	{
-		gB_GOKZCore = false;
-	}
+	gB_GOKZCore = gB_GOKZCore && !StrEqual(name, "gokz-core");
 }
 
 
@@ -189,9 +177,9 @@ public void GOKZ_OnClientSetup(int client)
 
 
 
-// =====[ PRIVATE ]=====
+// =====[ GENERAL ]=====
 
-static bool IsUsingMode(int client)
+bool IsUsingMode(int client)
 {
 	// If GOKZ core isn't loaded, then apply mode at all times
 	return !gB_GOKZCore || GOKZ_GetCoreOption(client, Option_Mode) == Mode_Vanilla;
@@ -199,9 +187,9 @@ static bool IsUsingMode(int client)
 
 
 
-// CONVARS
+// =====[ CONVARS ]=====
 
-static void CreateConVars()
+void CreateConVars()
 {
 	for (int cvar = 0; cvar < MODECVAR_COUNT; cvar++)
 	{
@@ -209,7 +197,7 @@ static void CreateConVars()
 	}
 }
 
-static void TweakConVars()
+void TweakConVars()
 {
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
@@ -217,7 +205,7 @@ static void TweakConVars()
 	}
 }
 
-static void ReplicateConVars(int client)
+void ReplicateConVars(int client)
 {
 	// Replicate convars only when player changes mode in GOKZ
 	// so that lagg isn't caused by other players using other
