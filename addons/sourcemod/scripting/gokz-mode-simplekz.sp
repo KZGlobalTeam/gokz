@@ -128,7 +128,7 @@ public void OnLibraryRemoved(const char[] name)
 
 public void OnGameFrame()
 {
-	/* 
+	/*
 		Why are we using OnGameFrame() for slope boost fix?
 		
 		MovementAPI measures landing speed, calls forwards etc. during 

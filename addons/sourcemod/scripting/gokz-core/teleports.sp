@@ -1,4 +1,4 @@
-/*	
+/*
 	Teleports
 	
 	Checkpoints and teleporting functionality.

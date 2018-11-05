@@ -258,13 +258,15 @@ stock void Color_StripFromChatText(const char[] input, char[] output, int size)
 	int x = 0;
 	for (int i = 0; input[i] != '\0'; i++) {
 		
-		if (x + 1 == size) {
+		if (x + 1 == size)
+		{
 			break;
 		}
 		
 		int character = input[i];
 		
-		if (character > 0x08) {
+		if (character > 0x08)
+		{
 			output[x++] = character;
 		}
 	}

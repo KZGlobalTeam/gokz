@@ -535,7 +535,7 @@ static void UpdateStrafes(int client)
 
 // =====[ SYNC ]=====
 
-/*	
+/*
 	Sync is calculated as the percentage of time spent gaining
 	speed during the jump. Maintaining current speed negatively
 	affects sync.

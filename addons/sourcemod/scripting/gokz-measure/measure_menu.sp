@@ -1,4 +1,4 @@
-/*	
+/*
 	Lets players measure the distance between two points.
 	Credits to DaFox (https://forums.alliedmods.net/showthread.php?t=88830?t=88830)
 */

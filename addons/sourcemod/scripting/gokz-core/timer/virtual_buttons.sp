@@ -1,4 +1,4 @@
-/*	
+/*
 	Virtual Buttons
 	
 	Lets players press 'virtual' start and end buttons without looking.

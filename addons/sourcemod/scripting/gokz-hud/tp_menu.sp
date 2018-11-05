@@ -265,7 +265,8 @@ static void TPMenuAddItemPause(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddItemStart(int client, Menu menu) {
+static void TPMenuAddItemStart(int client, Menu menu)
+{
 	char display[16];
 	if (GOKZ_GetHasStartPosition(client))
 	{

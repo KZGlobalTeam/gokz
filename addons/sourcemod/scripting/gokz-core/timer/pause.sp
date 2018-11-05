@@ -1,4 +1,4 @@
-/*	
+/*
 	Pause
 	
 	Pausing and resuming functionality.
