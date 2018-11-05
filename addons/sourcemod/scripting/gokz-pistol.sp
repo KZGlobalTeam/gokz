@@ -16,54 +16,12 @@ public Plugin myinfo =
 {
 	name = "GOKZ Pistol", 
 	author = "DanZay", 
-	description = "GOKZ Pistol Module", 
+	description = "Allows players to pick a pistol to KZ with", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-pistols.txt"
-
-char gC_PistolNames[PISTOL_COUNT][] = 
-{
-	"P2000 / USP-S", 
-	"Glock-18", 
-	"P250", 
-	"Dual Berettas", 
-	"Desert Eagle", 
-	"CZ75-Auto", 
-	"Five-SeveN", 
-	"Tec-9", 
-	"R8 Revolver", 
-	"" // Disabled
-};
-
-char gC_PistolEntityNames[PISTOL_COUNT][] = 
-{
-	"weapon_hkp2000", 
-	"weapon_glock", 
-	"weapon_p250", 
-	"weapon_elite", 
-	"weapon_deagle", 
-	"weapon_cz75a", 
-	"weapon_fiveseven", 
-	"weapon_tec9", 
-	"weapon_revolver", 
-	"" // Disabled
-};
-
-int gI_PistolTeams[PISTOL_COUNT] = 
-{
-	CS_TEAM_CT, 
-	CS_TEAM_T, 
-	CS_TEAM_NONE, 
-	CS_TEAM_NONE, 
-	CS_TEAM_NONE, 
-	CS_TEAM_NONE, 
-	CS_TEAM_CT, 
-	CS_TEAM_T, 
-	CS_TEAM_NONE, 
-	CS_TEAM_NONE // Disabled option
-};
 
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
@@ -76,10 +34,6 @@ bool gB_CameFromOptionsMenu[MAXPLAYERS + 1];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-pistol");
 	return APLRes_Success;
 }
@@ -89,7 +43,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-pistol.phrases");
 	
-	CreateCommands();
+	RegisterCommands();
 }
 
 public void OnAllPluginsLoaded()
@@ -98,6 +52,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	
 	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
@@ -190,13 +145,70 @@ void GivePistol(int client, int pistol)
 	}
 	else
 	{
-		GivePlayerItem(client, gC_PistolEntityNames[pistol]);
+		GivePlayerItem(client, gC_PistolClassNames[pistol]);
 	}
 	
 	// Go back to original team
 	if (switchedTeams)
 	{
 		CS_SwitchTeam(client, playerTeam);
+	}
+}
+
+
+
+// =====[ PISTOL MENU ]=====
+
+void DisplayPistolMenu(int client, int atItem = 0, bool fromOptionsMenu = false)
+{
+	Menu menu = new Menu(MenuHandler_Pistol);
+	menu.SetTitle("%T", "Pistol Menu - Title", client);
+	PistolMenuAddItems(client, menu);
+	menu.DisplayAt(client, atItem, MENU_TIME_FOREVER);
+	
+	gB_CameFromOptionsMenu[client] = fromOptionsMenu;
+}
+
+public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		GOKZ_SetOption(param1, PISTOL_OPTION_NAME, param2);
+		DisplayPistolMenu(param1, param2 / 6 * 6, gB_CameFromOptionsMenu[param1]); // Re-display menu at same spot
+	}
+	else if (action == MenuAction_Cancel && gB_CameFromOptionsMenu[param1])
+	{
+		gTM_Options.Display(param1, TopMenuPosition_LastCategory);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+void PistolMenuAddItems(int client, Menu menu)
+{
+	int selectedPistol = GOKZ_GetOption(client, PISTOL_OPTION_NAME);
+	char display[32];
+	
+	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)
+	{
+		if (pistol == Pistol_Disabled)
+		{
+			FormatEx(display, sizeof(display), "%T", "Options Menu - Disabled", client);
+		}
+		else
+		{
+			FormatEx(display, sizeof(display), "%s", gC_PistolNames[pistol]);
+		}
+		
+		// Add asterisk to selected pistol
+		if (pistol == selectedPistol)
+		{
+			Format(display, sizeof(display), "%s*", display);
+		}
+		
+		menu.AddItem("", display, ITEMDRAW_DEFAULT);
 	}
 }
 
@@ -267,66 +279,9 @@ public void TopMenuHandler_Pistol(TopMenu topmenu, TopMenuAction action, TopMenu
 
 
 
-// =====[ PISTOL MENU ]=====
-
-void DisplayPistolMenu(int client, int atItem = 0, bool fromOptionsMenu = false)
-{
-	Menu menu = new Menu(MenuHandler_Pistol);
-	menu.SetTitle("%T", "Pistol Menu - Title", client);
-	PistolMenuAddItems(client, menu);
-	menu.DisplayAt(client, atItem, MENU_TIME_FOREVER);
-	
-	gB_CameFromOptionsMenu[client] = fromOptionsMenu;
-}
-
-public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		GOKZ_SetOption(param1, PISTOL_OPTION_NAME, param2);
-		DisplayPistolMenu(param1, param2 / 6 * 6, gB_CameFromOptionsMenu[param1]); // Re-display menu at same spot
-	}
-	else if (action == MenuAction_Cancel && gB_CameFromOptionsMenu[param1])
-	{
-		gTM_Options.Display(param1, TopMenuPosition_LastCategory);
-	}
-	else if (action == MenuAction_End)
-	{
-		delete menu;
-	}
-}
-
-void PistolMenuAddItems(int client, Menu menu)
-{
-	int selectedPistol = GOKZ_GetOption(client, PISTOL_OPTION_NAME);
-	char display[32];
-	
-	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)
-	{
-		if (pistol == Pistol_Disabled)
-		{
-			FormatEx(display, sizeof(display), "%T", "Options Menu - Disabled", client);
-		}
-		else
-		{
-			FormatEx(display, sizeof(display), "%s", gC_PistolNames[pistol]);
-		}
-		
-		// Add asterisk to selected pistol
-		if (pistol == selectedPistol)
-		{
-			Format(display, sizeof(display), "%s*", display);
-		}
-		
-		menu.AddItem("", display, ITEMDRAW_DEFAULT);
-	}
-}
-
-
-
 // =====[ COMMANDS ]=====
 
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_pistol", CommandPistolMenu, "[KZ] Open the pistol selection menu.");
 }

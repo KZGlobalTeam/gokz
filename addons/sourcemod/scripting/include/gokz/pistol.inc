@@ -35,6 +35,48 @@ enum
 #define PISTOL_OPTION_NAME "pistol"
 #define PISTOL_OPTION_DESCRIPTION "Pistol"
 
+stock char gC_PistolNames[PISTOL_COUNT][] = 
+{
+	"P2000 / USP-S", 
+	"Glock-18", 
+	"P250", 
+	"Dual Berettas", 
+	"Desert Eagle", 
+	"CZ75-Auto", 
+	"Five-SeveN", 
+	"Tec-9", 
+	"R8 Revolver", 
+	"" // Disabled
+};
+
+stock char gC_PistolClassNames[PISTOL_COUNT][] = 
+{
+	"weapon_hkp2000", 
+	"weapon_glock", 
+	"weapon_p250", 
+	"weapon_elite", 
+	"weapon_deagle", 
+	"weapon_cz75a", 
+	"weapon_fiveseven", 
+	"weapon_tec9", 
+	"weapon_revolver", 
+	"" // Disabled
+};
+
+stock int gI_PistolTeams[PISTOL_COUNT] = 
+{
+	CS_TEAM_CT, 
+	CS_TEAM_T, 
+	CS_TEAM_NONE, 
+	CS_TEAM_NONE, 
+	CS_TEAM_NONE, 
+	CS_TEAM_NONE, 
+	CS_TEAM_CT, 
+	CS_TEAM_T, 
+	CS_TEAM_NONE, 
+	CS_TEAM_NONE // Disabled
+};
+
 
 
 // =====[ DEPENDENCY ]=====
