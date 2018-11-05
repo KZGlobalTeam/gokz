@@ -39,11 +39,6 @@
 		"en"		"{darkred}Your timer has stopped because you noclipped."
 		"chi"		"{darkred}你启用了穿墙模式,计时已中止."
 	}
-	"Time Stopped (Goto)"
-	{
-		"en"		"{darkred}Your timer has stopped because you used !goto."
-		"chi"		"{darkred}你使用了!goto功能,计时已中止."
-	}
 	"Time Stopped (Changed Mode)"
 	{
 		"en"		"{darkred}Your timer has stopped because you switched mode."
@@ -53,11 +48,6 @@
 	{
 		"en"		"{grey}See console for command output."
 		"chi"		"{grey}请移步至控制台(~键)查看输出信息."
-	}
-	"No Players Found"
-	{
-		"en"		"{darkred}No players were found."
-		"chi"		"{darkred}查无此人."
 	}
 
 
@@ -137,23 +127,6 @@
 		"en"		"{grey}You have stopped all sounds."
 		"chi"		"{grey}你屏蔽了所有音效."
 	}
-	"Goto Success"
-	{
-		// You have teleported to Bill.
-		"#format"	"{1:N}"
-		"en"		"{grey}You have teleported to {lime}{1}{grey}."
-		"chi"		"{grey}你传送到了玩家{lime}{1}{grey}身边."
-	}
-	"Goto Failure (Not Yourself)"
-	{
-		"en"		"{darkred}You can't teleport to yourself."
-		"chi"		"{darkred}你不能传送到你自己脸上."
-	}
-	"Goto Failure (Dead)"
-	{
-		"en"		"{darkred}The player you specified is not alive."
-		"chi"		"{darkred}你传送的玩家不再是存活状态."
-	}
 	"Switched Mode"
 	{
 		// You have switched to the Vanilla mode.
@@ -232,14 +205,6 @@
 	{
 		"en"		"Switch Modes"
 		"chi"		"切换模式"
-	}
-
-
-	// Goto Menu ////////////////////////////////////////////////////////////
-	"Goto Menu - Title"
-	{
-		"en"		"Go to Player"
-		"chi"		"传送到玩家"
 	}
 
 

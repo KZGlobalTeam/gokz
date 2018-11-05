@@ -9,6 +9,8 @@
 #endif
 #define _gokz_included_
 
+#include <movement>
+
 
 
 // =====[ ENUMS ]=====
@@ -366,4 +368,49 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
 	}
 	
 	return IDNumberPart1 + (IDNumberPart2 << 1);
+}
+
+/**
+ * Teleports a player and removes their velocity and base velocity
+ * immediately and also after a 0.1 second delay. Automatically
+ * makes the player crouch if there is a ceiling above them.
+ *
+ * @param client		Client index.
+ * @param origin		Origin to teleport to.
+ * @param angles		Eye angles to set.
+ */
+stock void TeleportPlayer(int client, const float origin[3], const float angles[3])
+{
+	Movement_SetOrigin(client, origin);
+	Movement_SetEyeAngles(client, angles);
+	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetGravity(client, 1.0);
+	CreateTimer(0.1, Timer_RemoveBoosts, GetClientUserId(client)); // Prevent booster exploits
+	
+	// Duck the player if there is something blocking them from above
+	Handle trace = TR_TraceHullFilterEx(origin, 
+		origin, 
+		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
+		view_as<float>( { 16.0, 16.0, 72.0 } ), 
+		MASK_PLAYERSOLID, 
+		TraceEntityFilterPlayers, 
+		client);
+	if (TR_DidHit(trace))
+	{
+		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
+	}
+	delete trace;
+}
+
+public Action Timer_RemoveBoosts(Handle timer, int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (IsValidClient(client))
+	{
+		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+		Movement_SetGravity(client, 1.0);
+	}
+	return Plugin_Continue;
 } 

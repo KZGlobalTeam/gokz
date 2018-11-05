@@ -54,7 +54,6 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/map/bhop_triggers.sp"
 #include "gokz-core/map/prefix.sp"
 
-#include "gokz-core/menus/goto.sp"
 #include "gokz-core/menus/mode.sp"
 #include "gokz-core/menus/options.sp"
 

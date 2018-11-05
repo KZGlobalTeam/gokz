@@ -457,61 +457,6 @@ bool CanUndoTeleport(int client, bool showError = false)
 }
 
 
-// GOTO
-
-// Returns whether teleport to target was successful
-bool GotoPlayer(int client, int target, bool printMessage = true)
-{
-	if (target == client)
-	{
-		if (printMessage)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Not Yourself)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
-	if (!IsPlayerAlive(target))
-	{
-		if (printMessage)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Dead)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
-	
-	float targetOrigin[3];
-	float targetAngles[3];
-	
-	Movement_GetOrigin(target, targetOrigin);
-	Movement_GetEyeAngles(target, targetAngles);
-	
-	// Leave spectators if necessary
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
-	{
-		CS_SwitchTeam(client, CS_TEAM_T);
-	}
-	// Respawn the player if necessary
-	if (!IsPlayerAlive(client))
-	{
-		CS_RespawnPlayer(client);
-	}
-	
-	TeleportDo(client, targetOrigin, targetAngles);
-	
-	GOKZ_PrintToChat(client, true, "%t", "Goto Success", target);
-	
-	if (GetTimerRunning(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
-		GOKZ_StopTimer(client);
-	}
-	
-	return true;
-}
-
-
 
 // =====[ LISTENERS ]=====
 
@@ -559,28 +504,8 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	lastTeleportInBhopTrigger[client] = BhopTriggersJustTouched(client);
 	lastTeleportOnGround[client] = Movement_GetOnGround(client);
 	
-	// Do Teleport
 	teleportCount[client]++;
-	Movement_SetOrigin(client, destOrigin);
-	Movement_SetEyeAngles(client, destAngles);
-	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetGravity(client, 1.0);
-	CreateTimer(0.1, Timer_RemoveBoosts, GetClientUserId(client)); // Prevent booster exploits
-	
-	// Duck the player if there is something blocking them from above
-	Handle trace = TR_TraceHullFilterEx(destOrigin, 
-		destOrigin, 
-		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
-		view_as<float>( { 16.0, 16.0, 72.0 } ), 
-		MASK_PLAYERSOLID, 
-		TraceEntityFilterPlayers, 
-		client);
-	if (TR_DidHit(trace))
-	{
-		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
-	}
-	delete trace;
+	TeleportPlayer(client, destOrigin, destAngles);
 	
 	undoOrigin[client] = oldOrigin;
 	undoAngles[client] = oldAngles;
@@ -614,16 +539,4 @@ static void CheckpointTeleportDo(int client)
 	{
 		SetPausedOnLadder(client, false);
 	}
-}
-
-public Action Timer_RemoveBoosts(Handle timer, int userid)
-{
-	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client))
-	{
-		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-		Movement_SetGravity(client, 1.0);
-	}
-	return Plugin_Continue;
 } 

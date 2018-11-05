@@ -1,5 +1,13 @@
 "Phrases"
 {
+	// Chat Messages ////////////////////////////////////////////////////////////
+	"No Players Found"
+	{
+		"en"		"{darkred}No players were found."
+		"chi"		"{darkred}查无此人."
+	}
+
+
 	// Options Menu ////////////////////////////////////////////////////////////
 	"Options Menu - Enabled"
 	{

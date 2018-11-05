@@ -36,7 +36,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
 	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
-	RegConsoleCmd("sm_goto", CommandGoto, "[KZ] Teleport to another player. Usage: !goto <player>");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
@@ -154,33 +153,6 @@ public Action CommandStopTimer(int client, int args)
 public Action CommandStopSound(int client, int args)
 {
 	StopSounds(client);
-	return Plugin_Handled;
-}
-
-public Action CommandGoto(int client, int args)
-{
-	// If no arguments, display the goto menu
-	if (args < 1)
-	{
-		if (DisplayGotoMenu(client) == 0)
-		{
-			// No targets, so show error
-			GOKZ_PrintToChat(client, true, "%t", "No Players Found");
-			GOKZ_PlayErrorSound(client);
-		}
-	}
-	// Otherwise try to teleport to the specified player
-	else
-	{
-		char specifiedPlayer[MAX_NAME_LENGTH];
-		GetCmdArg(1, specifiedPlayer, sizeof(specifiedPlayer));
-		
-		int target = FindTarget(client, specifiedPlayer, false, false);
-		if (target != -1)
-		{
-			GotoPlayer(client, target);
-		}
-	}
 	return Plugin_Handled;
 }
 
