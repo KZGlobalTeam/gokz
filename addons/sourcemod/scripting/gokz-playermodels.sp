@@ -15,12 +15,14 @@ public Plugin myinfo =
 {
 	name = "GOKZ Player Models", 
 	author = "DanZay", 
-	description = "GOKZ Player Models Module", 
+	description = "Sets player's model upon spawning", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-playermodels.txt"
+#define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
+#define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
 
 ConVar gCV_gokz_player_models;
 ConVar gCV_gokz_player_models_alpha;
@@ -32,18 +34,14 @@ ConVar gCV_sv_disable_immunity_alpha;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
 	RegPluginLibrary("gokz-playermodels");
 	return APLRes_Success;
 }
 
 public void OnPluginStart()
 {
-	CreateHooks();
 	CreateConVars();
+	HookEvents();
 }
 
 public void OnAllPluginsLoaded()
@@ -81,14 +79,23 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 
 public void OnMapStart()
 {
-	PrecacheModels();
+	PrecachePlayerModels();
 }
 
 
 
-// =====[ PRIVATE ]=====
+// =====[ GENERAL ]=====
 
-static void CreateConVars()
+void HookEvents()
+{
+	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
+}
+
+
+
+// =====[ CONVARS ]=====
+
+void CreateConVars()
 {
 	gCV_gokz_player_models = CreateConVar("gokz_player_models", "1", "Whether GOKZ sets player's models upon spawning.", _, true, 0.0, true, 1.0);
 	gCV_gokz_player_models_alpha = CreateConVar("gokz_player_models_alpha", "65", "Amount of alpha (transparency) to set player models to.", _, true, 0.0, true, 255.0);
@@ -111,22 +118,9 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] n
 	}
 }
 
-static void CreateHooks()
-{
-	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
-}
-
-static void PrecacheModels()
-{
-	PrecachePlayerModels();
-}
-
 
 
 // =====[ PLAYER MODELS ]=====
-
-#define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
-#define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
 
 void UpdatePlayerModel(int client)
 {
