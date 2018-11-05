@@ -1,6 +1,6 @@
 Phrases
 {
-	// Option Change Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Option - Show Players - Enable"
 	{
 		"en"		"{grey}You are now showing other players."
@@ -13,7 +13,7 @@ Phrases
 	}
 
 
-	// Options Menu ////////////////////////////////////////////////////////////
+	// =====[ OPTIONS MENU ]=====
 	"Options Menu - Show Players"
 	{
 		"en"		"Show players"

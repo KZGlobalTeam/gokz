@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"No Global Times Found"
 	{
 		"en"		"{grey}No global times were found!"
@@ -128,7 +128,7 @@
 	}
 
 
-	// Global Top Menu ////////////////////////////////////////////////////////////
+	// =====[ GLOBAL TOP MENU ]=====
 	"Global Map Top Mode Menu - Title"
 	{
 		// Global Map Top

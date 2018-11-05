@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Player Not Found"
 	{
 		// Your search for player 'Bill' returned with no results.
@@ -328,7 +328,7 @@
 	}
 
 
-	// Map Top Menu ////////////////////////////////////////////////////////////
+	// =====[ MAP TOP MENU ]=====
 	"Map Top Mode Menu - Title"
 	{
 		// Map Top
@@ -408,7 +408,7 @@
 	}
 
 
-	// Player Top Menu ////////////////////////////////////////////////////////////
+	// =====[ PLAYER TOP MENU ]=====
 	"Player Top Mode Menu - Title"
 	{
 		// Top Record Holders
@@ -445,7 +445,7 @@
 	}
 
 
-	// Recent Records Menu ////////////////////////////////////////////////////////////
+	// =====[ RECENT RECORDS MENU ]=====
 	"Recent Records Menu - Title"
 	{
 		// Recently Broken Records

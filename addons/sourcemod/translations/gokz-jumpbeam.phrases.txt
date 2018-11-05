@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Options Menu ////////////////////////////////////////////////////////////
+	// =====[ OPTIONS MENU ]=====
 	"Options Menu - Jump Beam"
 	{
 		"en"		"Jump beam"

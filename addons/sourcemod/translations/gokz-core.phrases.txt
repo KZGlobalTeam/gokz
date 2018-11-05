@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// General Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Beat Map (NUB)"
 	{
 		// Bill finished in NUB 01:23.45 [Mode]
@@ -29,33 +29,15 @@
 		"en"		"{lime}{1} {grey}finished {bluegrey}Bonus {2} {grey}in {blue}PRO {default}{3} {grey}[{purple}{4}{grey}]"
 		"chi"		"{lime}{1} {grey}在{bluegrey}加成{2}阶{grey}下以{yellow}裸跳{default}方式完成地图,用时{3}{grey} [{purple}{4}{grey}]"
 	}
-	"Time Stopped"
-	{
-		"en"		"{darkred}Your timer has stopped."
-		"chi"		"{darkred}计时已暂停."
-	}
-	"Time Stopped (Noclipped)"
+	"Timer Stopped (Noclipped)"
 	{
 		"en"		"{darkred}Your timer has stopped because you noclipped."
 		"chi"		"{darkred}你启用了穿墙模式,计时已中止."
 	}
-	"Time Stopped (Changed Mode)"
+	"Timer Stopped (Changed Mode)"
 	{
 		"en"		"{darkred}Your timer has stopped because you switched mode."
 		"chi"		"{darkred}你切换了模式,计时已中止."
-	}
-	"See Console"
-	{
-		"en"		"{grey}See console for command output."
-		"chi"		"{grey}请移步至控制台(~键)查看输出信息."
-	}
-
-
-	// Command Chat Messages ////////////////////////////////////////////////////////////
-	"Must Be Alive"
-	{
-		"en"		"{darkred}You must be alive to do that."
-		"chi"		"{darkred}你必须活着才能那么做."
 	}
 	"Make Checkpoint"
 	{
@@ -151,33 +133,6 @@
 		"en"		"{grey}You have cleared your custom start position."
 		"chi"		"{grey}你清除了自定义起始点."
 	}
-	"Invalid Bonus Number"
-	{
-		// 'asdf' is not a valid bonus number.
-		"#format"	"{1:s}"
-		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
-		"chi"		"{grey}字符'{default}{1}{grey}'无效,不是有效数字."
-	}
-	"Player No Longer Valid"
-	{
-		"en"		"{darkred}The player you specified is no longer valid."
-		"chi"		"{darkred}你观察过的玩家已经不存在."
-	}
-	"Please Wait Before Using Command Again"
-	{
-		"en"		"{grey}Please wait before using that command again."
-		"chi"		"{grey}请勿频繁输入指令,请稍后再试."
-	}
-	"Please Wait Before Using Command"
-	{
-		// Please wait 2.5 seconds before using that command.
-		"#format"	"{1:.1f}"
-		"en"		"{grey}Please wait {default}{1} {grey}seconds before using that command."
-		"chi"		"{grey}请在{default}{1}{grey}秒后再使用该指令."
-	}
-
-
-	// Option Change Chat Messages ////////////////////////////////////////////////////////////
 	"Option - Auto Restart - Enable"
 	{
 		"en"		"{grey}Your timer will now restart upon teleporting to start."
@@ -200,7 +155,7 @@
 	}
 
 
-	// Mode Menu ////////////////////////////////////////////////////////////
+	// =====[ MODE MENU ]=====
 	"Mode Menu - Title"
 	{
 		"en"		"Switch Modes"
@@ -208,7 +163,7 @@
 	}
 
 
-	// Options Menu ////////////////////////////////////////////////////////////
+	// =====[ OPTIONS MENU ]=====
 	"Options Menu - Title"
 	{
 		"en"		"Options"

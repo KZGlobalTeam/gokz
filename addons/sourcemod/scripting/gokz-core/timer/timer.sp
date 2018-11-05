@@ -216,7 +216,7 @@ void OnChangeMoveType_Timer(int client, MoveType newMoveType)
 	{
 		if (TimerStop(client))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Noclipped)");
+			GOKZ_PrintToChat(client, true, "%t", "Timer Stopped (Noclipped)");
 		}
 	}
 }
@@ -250,7 +250,7 @@ void OnOptionChanged_Timer(int client, Option option)
 	{
 		if (TimerStop(client))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Changed Mode)");
+			GOKZ_PrintToChat(client, true, "%t", "Timer Stopped (Changed Mode)");
 		}
 	}
 }

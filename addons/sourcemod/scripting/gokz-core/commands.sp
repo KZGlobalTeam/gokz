@@ -145,7 +145,7 @@ public Action CommandStopTimer(int client, int args)
 {
 	if (TimerStop(client))
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Time Stopped");
+		GOKZ_PrintToChat(client, true, "%t", "Timer Stopped");
 	}
 	return Plugin_Handled;
 }

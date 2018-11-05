@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Option Change Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Option - Teleport Menu - Disable"
 	{
 		"en"		"{grey}The teleport menu has been disabled."
@@ -38,7 +38,7 @@
 	}
 
 
-	// Info Panel Text ////////////////////////////////////////////////////////////
+	// =====[ INFO PANEL ]=====
 	"Info Panel Text - Time"
 	{
 		"en"		"Time"
@@ -66,7 +66,7 @@
 	}
 
 
-	// Teleport Menu ////////////////////////////////////////////////////////////
+	// =====[ TELEPORT MENU ]=====
 	"TP Menu - Checkpoint"
 	{
 		"en"		"Checkpoint"
@@ -114,7 +114,7 @@
 	}
 
 
-	// Options Menu ////////////////////////////////////////////////////////////
+	// =====[ OPTIONS MENU ]=====
 	"Options Menu - HUD"
 	{
 		"en"		"HUD"

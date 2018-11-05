@@ -1,7 +1,7 @@
 Phrases
 {
-	// Chat Messages ////////////////////////////////////////////////////////////
-	"Time Stopped (Goto)"
+	// =====[ CHAT MESSAGES ]=====
+	"Timer Stopped (Goto)"
 	{
 		"en"		"{darkred}Your timer has stopped because you used !goto."
 		"chi"		"{darkred}你使用了!goto功能,计时已中止."
@@ -25,7 +25,7 @@ Phrases
 	}
 
 
-	// Goto Menu ////////////////////////////////////////////////////////////
+	// =====[ GOTO MENU ]=====
 	"Goto Menu - Title"
 	{
 		"en"		"Go to Player"

@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// General ////////////////////////////////////////////////////////////
+	// =====[ GENERAL ]=====
 	"Offset"
 	{
 		"en"		"Offset"
@@ -48,7 +48,7 @@
 	}
 
 
-	// Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Dropped Too Far (Weird Jump)"
 	{
 		// You fell too for for a valid Weird Jump (96.0/64.0).
@@ -75,7 +75,7 @@
 	}
 
 
-	// Headers 
+	// =====[ CONSOLE MESSAGES ]===== 
 	// NOTE: For table formatting in console, these should be 12 characters long.
 	"Sync (Table)"
 	{
@@ -99,7 +99,7 @@
 	}
 
 
-	// Jumpstats Options Menu ////////////////////////////////////////////////////////////
+	// =====[ OPTIONS MENU ]=====
 	"Options Menu - Jumpstats"
 	{
 		"en"		"Jumpstats"

@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Pistol Menu ////////////////////////////////////////////////////////////
+	// =====[ PISTOL MENU ]=====
 	"Pistol Menu - Title"
 	{
 		"en"		"Pick a Pistol"
@@ -8,7 +8,7 @@
 	}
 
 
-	// Options Menu ////////////////////////////////////////////////////////////
+	// =====[ OPTIONS MENU ]=====
 	"Options Menu - Pistol"
 	{
 		"en"		"Pistol"

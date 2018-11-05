@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Command Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Measure Result"
 	{
 		// Distance - Horizontal: 123.45 (121.11), Vertical: 12.34.
@@ -20,7 +20,7 @@
 	}
 
 
-	// Measure Menu ////////////////////////////////////////////////////////////
+	// =====[ MEASURE MENU ]=====
 	"Measure Menu - Title"
 	{
 		"en"		"Measure"

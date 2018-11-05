@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// General ////////////////////////////////////////////////////////////
+	// =====[ GENERAL ]=====
 	"Perfs"
 	{
 		"en"		"Perfs"
@@ -16,9 +16,9 @@
 		"en"		"Pattern"
 		"chi"		"Pattern"
 	}
-	
-	
-	// Chat Messages ////////////////////////////////////////////////////////////
+
+
+	// =====[ CHAT MESSAGES ]=====
 	"Anti-Cheat Warning"
 	{
 		"en"		"{darkred}WARNING! The use of software, macros, hyperscroll, or any other external assistance to aid character movement is strictly not allowed and may result in an automatic ban."
@@ -36,9 +36,9 @@
 		"en"		"{grey}You have not bhopped enough for a bhop check."
 		"chi"		"{grey}你的BHOP距离未通过BHOP检查."
 	}
-	
-	
-	// Console Messages ////////////////////////////////////////////////////////////
+
+
+	// =====[ CONSOLE MESSAGES ]=====
 	"Not Enough Bhops (Console)"
 	{
 		// Bill has not bhopped enough for a bhop check. Skipping...

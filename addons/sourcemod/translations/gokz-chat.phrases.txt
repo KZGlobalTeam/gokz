@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// General Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Client Connection Message"
 	{
 		// Bill has joined the server.

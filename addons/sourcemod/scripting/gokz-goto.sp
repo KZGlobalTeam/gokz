@@ -107,7 +107,7 @@ bool GotoPlayer(int client, int target, bool printMessage = true)
 	
 	if (GOKZ_GetTimerRunning(client))
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
+		GOKZ_PrintToChat(client, true, "%t", "Timer Stopped (Goto)");
 		GOKZ_StopTimer(client);
 	}
 	
