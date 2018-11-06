@@ -164,10 +164,14 @@ enum
 #define GOKZ_BONUS_END_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_endbutton$"
 
 #define GOKZ_CFG_SERVER "sourcemod/gokz/gokz.cfg"
-#define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/gokz-core-options.cfg"
+#define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/options.cfg"
+#define GOKZ_CFG_OPTIONS_ROOT "Options"
+#define GOKZ_CFG_OPTIONS_DESCRIPTION "description"
+#define GOKZ_CFG_OPTIONS_DEFAULT "default"
 
-#define GOKZ_OPTION_DESC_PREFIX "GOKZ - "
-#define GENERAL_OPTION_CATEGORY "gen"
+#define GOKZ_OPTION_MAX_NAME_LENGTH 30
+#define GOKZ_OPTION_MAX_DESC_LENGTH 255
+#define GENERAL_OPTION_CATEGORY "General"
 
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
@@ -229,26 +233,26 @@ stock char gC_StyleNamesShort[STYLE_COUNT][] =
 
 stock char gC_CoreOptionNames[OPTION_COUNT][] = 
 {
-	"mode", 
-	"style", 
-	"autorestart", 
-	"slayonend", 
-	"checkpointmessages", 
-	"checkpointsounds", 
-	"teleportsounds", 
-	"errorsounds"
+	"General - Mode", 
+	"General - Style", 
+	"General - Auto Restart", 
+	"General - Slay On End", 
+	"General - Checkpoint Messages", 
+	"General - Checkpoint Sounds", 
+	"General - Teleport Sounds", 
+	"General - Error Sounds"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
 {
-	"Movement mode", 
-	"Movement style", 
-	"Automatic timer restart upon teleport to start", 
-	"Automatic slay upon end", 
-	"Checkpoint messages", 
-	"Checkpoint sounds", 
-	"Teleport sounds", 
-	"Error sounds"
+	"Movement Mode - 0 = Vanilla, 1 = SimpleKZ, 2 = KZTimer", 
+	"Movement Style - 0 = Normal", 
+	"Automatic Restart Upon Teleport to Start - 0 = Disabled, 1 = Enabled", 
+	"Automatic Slaying Upon Ending Timer - 0 = Disabled, 1 = Enabled", 
+	"Checkpoint Messages - 0 = Disabled, 1 = Enabled", 
+	"Checkpoint Sounds - 0 = Disabled, 1 = Enabled", 
+	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
+	"Error Sounds - 0 = Disabled, 1 = Enabled"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 

@@ -169,11 +169,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 // =====[ OTHER EVENTS ]=====
 
-public void OnMapStart()
-{
-	OnMapStart_Options();
-}
-
 public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
 {
 	OnOptionsMenuCreated_OptionsMenu(topMenu);

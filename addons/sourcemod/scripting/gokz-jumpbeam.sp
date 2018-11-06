@@ -235,11 +235,7 @@ void OnAllPluginsLoaded_Options()
 {
 	for (JBOption option; option < JBOPTION_COUNT; option++)
 	{
-		char prefixedDescription[255];
-		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			JB_OPTION_DESC_PREFIX, 
-			gC_JBOptionDescriptions[option]);
-		GOKZ_RegisterOption(gC_JBOptionNames[option], prefixedDescription, 
+		GOKZ_RegisterOption(gC_JBOptionNames[option], gC_JBOptionDescriptions[option], 
 			OptionType_Int, gI_JBOptionDefaultValues[option], 0, gI_JBOptionCounts[option] - 1);
 	}
 }

@@ -76,28 +76,26 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define HUD_CFG_OPTIONS "cfg/sourcemod/gokz/gokz-hud-options.cfg"
-#define HUD_OPTION_CATEGORY "hud"
-#define HUD_OPTION_DESC_PREFIX "HUD - "
+#define HUD_OPTION_CATEGORY "HUD"
 
 stock char gC_HUDOptionNames[HUDOPTION_COUNT][] = 
 {
-	"gokz-tpmenu", 
-	"gokz-infopanel", 
-	"gokz-showkeys", 
-	"gokz-timertext", 
-	"gokz-speedtext", 
-	"gokz-showweapon"
+	"HUD - Teleport Menu", 
+	"HUD - Centre Panel", 
+	"HUD - Show Keys", 
+	"HUD - Timer Text", 
+	"HUD - Speed Text", 
+	"HUD - Show Weapon"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
 {
-	"Teleport menu", 
-	"Info panel", 
-	"Show keys", 
-	"Timer text", 
-	"Speed text", 
-	"Show weapon"
+	"Teleport Menu - 0 = Disabled, 1 = Simple, 2 = Advanced", 
+	"Centre Information Panel - 0 = Disabled, 1 = Enabled", 
+	"Key Press Display - 0 = Spectating, 1 = Always, 2 = Disabled", 
+	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom, 3 = Top", 
+	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
+	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 

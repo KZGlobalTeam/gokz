@@ -149,7 +149,6 @@ public void OnMapStart()
 {
 	OnMapStart_JumpReporting();
 	OnMapStart_DistanceTiers();
-	OnMapStart_Options();
 }
 
 public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)

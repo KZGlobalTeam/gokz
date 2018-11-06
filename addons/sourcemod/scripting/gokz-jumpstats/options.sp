@@ -22,11 +22,7 @@ void OnAllPluginsLoaded_Options()
 {
 	for (JSOption option; option < JSOPTION_COUNT; option++)
 	{
-		char prefixedDescription[255];
-		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			JS_OPTION_DESC_PREFIX, 
-			gC_JSOptionDescriptions[option]);
-		GOKZ_RegisterOption(gC_JSOptionNames[option], prefixedDescription, 
+		GOKZ_RegisterOption(gC_JSOptionNames[option], gC_JSOptionDescriptions[option], 
 			OptionType_Int, gI_JSOptionDefaults[option], 0, gI_JSOptionCounts[option] - 1);
 	}
 }
@@ -55,30 +51,9 @@ void OnOptionChanged_Options(int client, const char[] option, any newValue)
 	}
 }
 
-void OnMapStart_Options()
-{
-	LoadDefaultOptions();
-}
-
 
 
 // =====[ PRIVATE ]=====
-
-static void LoadDefaultOptions()
-{
-	KeyValues kv = new KeyValues("options");
-	
-	if (!kv.ImportFromFile(JS_CFG_OPTIONS))
-	{
-		LogError("Failed to load file: \"%s\".", JS_CFG_OPTIONS);
-		return;
-	}
-	
-	for (JSOption option; option < JSOPTION_COUNT; option++)
-	{
-		GOKZ_SetOptionProp(gC_JSOptionNames[option], OptionProp_DefaultValue, kv.GetNum(gC_JSOptionNames[option]));
-	}
-}
 
 static void PrintOptionChangeMessage(int client, JSOption option, any newValue)
 {

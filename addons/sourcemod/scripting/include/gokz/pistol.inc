@@ -32,8 +32,8 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define PISTOL_OPTION_NAME "pistol"
-#define PISTOL_OPTION_DESCRIPTION "Pistol"
+#define PISTOL_OPTION_NAME "General - Pistol"
+#define PISTOL_OPTION_DESCRIPTION "Pistol - 0 = P2000 / USP-S, 1 = Glock-18, 2 = P250, 3 = Dual Berettas, 4 = Desert Eagle, 5 = CZ75-Auto, 6 = Five-SeveN, 7 = Tec-9, 8 = R8 Revolver, 9 - Disabled"
 
 stock char gC_PistolNames[PISTOL_COUNT][] = 
 {

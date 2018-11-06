@@ -8,13 +8,9 @@
 
 void OnAllPluginsLoaded_Options()
 {
-	char prefixedDescription[255];
 	for (HUDOption option; option < HUDOPTION_COUNT; option++)
 	{
-		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			HUD_OPTION_DESC_PREFIX, 
-			gC_HUDOptionDescriptions[option]);
-		GOKZ_RegisterOption(gC_HUDOptionNames[option], prefixedDescription, 
+		GOKZ_RegisterOption(gC_HUDOptionNames[option], gC_HUDOptionDescriptions[option], 
 			OptionType_Int, gI_HUDOptionDefaults[option], 0, gI_HUDOptionCounts[option] - 1);
 	}
 }
@@ -24,30 +20,9 @@ void OnOptionChanged_Options(int client, HUDOption option, any newValue)
 	PrintOptionChangeMessage(client, option, newValue);
 }
 
-void OnMapStart_Options()
-{
-	LoadDefaultOptions();
-}
-
 
 
 // =====[ PRIVATE ]=====
-
-static void LoadDefaultOptions()
-{
-	KeyValues kv = new KeyValues("options");
-	
-	if (!kv.ImportFromFile(HUD_CFG_OPTIONS))
-	{
-		LogError("Failed to load file: \"%s\".", HUD_CFG_OPTIONS);
-		return;
-	}
-	
-	for (HUDOption option; option < HUDOPTION_COUNT; option++)
-	{
-		GOKZ_SetOptionProp(gC_HUDOptionNames[option], OptionProp_DefaultValue, kv.GetNum(gC_HUDOptionNames[option]));
-	}
-}
 
 static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 {

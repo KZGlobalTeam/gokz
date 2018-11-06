@@ -123,13 +123,9 @@ public Action OnSetTransmitClient(int entity, int client)
 
 void OnAllPluginsLoaded_Options()
 {
-	char prefixedDescription[255];
 	for (QTOption option; option < QTOPTION_COUNT; option++)
 	{
-		FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-			QT_OPTION_DESC_PREFIX, 
-			gC_QTOptionDescriptions[option]);
-		GOKZ_RegisterOption(gC_QTOptionNames[option], prefixedDescription, 
+		GOKZ_RegisterOption(gC_QTOptionNames[option], gC_QTOptionDescriptions[option], 
 			OptionType_Int, gI_QTOptionDefaultValues[option], 0, gI_QTOptionCounts[option] - 1);
 	}
 }

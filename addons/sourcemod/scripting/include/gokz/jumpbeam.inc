@@ -35,16 +35,15 @@ enum
 // =====[ CONSTANTS ]=====
 
 #define JB_BEAM_LIFETIME 4.0
-#define JB_OPTION_DESC_PREFIX "Jump Beam - "
 
 stock char gC_JBOptionNames[JBOPTION_COUNT][] = 
 {
-	"jbtype"
+	"General - Jump Beam Type"
 };
 
 stock char gC_JBOptionDescriptions[JBOPTION_COUNT][] = 
 {
-	"Jump beam type"
+	"Jump Beam Type - 0 = Disabled, 1 = Feet, 2 = Head, 3 = Feet & Head, 4 = Ground"
 };
 
 stock int gI_JBOptionDefaultValues[JBOPTION_COUNT] = 

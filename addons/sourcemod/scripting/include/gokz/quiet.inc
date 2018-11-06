@@ -31,16 +31,14 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define QT_OPTION_DESC_PREFIX "Quiet - "
-
 stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
-	"showplayers"
+	"General - Show Players"
 };
 
 stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
 {
-	"Other player visibility"
+	"Visibility of Other Players - 0 = Disabled, 1 = Enabled"
 };
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 

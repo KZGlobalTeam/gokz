@@ -1,4 +1,5 @@
-static StringMap options;
+static StringMap optionData;
+static StringMap optionDescriptions;
 
 
 
@@ -12,13 +13,8 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 		return false;
 	}
 	
-	char prefixedDescription[255];
-	FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-		GOKZ_OPTION_DESC_PREFIX, 
-		description);
-	
 	Handle cookie = IsRegisteredOption(name) ? GetOptionProp(name, OptionProp_Cookie)
-	 : RegClientCookie(name, prefixedDescription, CookieAccess_Protected);
+	 : RegClientCookie(name, description, CookieAccess_Private);
 	
 	// I seriously couldn't work out a prettier way of using the enum values
 	ArrayList data = new ArrayList(1, view_as<int>(OPTIONPROP_COUNT));
@@ -28,10 +24,8 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 	data.Set(view_as<int>(OptionProp_MinValue), minValue);
 	data.Set(view_as<int>(OptionProp_MaxValue), maxValue);
 	
-	if (!options.SetValue(name, data, true))
-	{
-		return false;
-	}
+	optionData.SetValue(name, data, true);
+	optionDescriptions.SetString(name, description, true);
 	
 	// Support late-loading/registering
 	for (int client = 1; client <= MaxClients; client++)
@@ -48,7 +42,7 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 any GetOptionProp(const char[] option, OptionProp prop)
 {
 	ArrayList data;
-	if (!options.GetValue(option, data))
+	if (!optionData.GetValue(option, data))
 	{
 		LogError("Failed to get option property of unregistered option \"%s\".", option);
 		return -1;
@@ -60,7 +54,7 @@ any GetOptionProp(const char[] option, OptionProp prop)
 bool SetOptionProp(const char[] option, OptionProp prop, any newValue)
 {
 	ArrayList data;
-	if (!options.GetValue(option, data))
+	if (!optionData.GetValue(option, data))
 	{
 		LogError("Failed to set property of unregistered option \"%s\".", option);
 		return false;
@@ -106,7 +100,7 @@ bool SetOptionProp(const char[] option, OptionProp prop, any newValue)
 	}
 	
 	data.Set(view_as<int>(prop), newValue);
-	return options.SetValue(option, data, true);
+	return optionData.SetValue(option, data, true);
 }
 
 any GetOption(int client, const char[] option)
@@ -179,7 +173,7 @@ bool SetOption(int client, const char[] option, any newValue)
 bool IsRegisteredOption(const char[] option)
 {
 	int dummy;
-	return options.GetValue(option, dummy);
+	return optionData.GetValue(option, dummy);
 }
 
 
@@ -188,8 +182,10 @@ bool IsRegisteredOption(const char[] option)
 
 void OnPluginStart_Options()
 {
-	options = new StringMap();
+	optionData = new StringMap();
+	optionDescriptions = new StringMap();
 	
+	// Register gokz-core optionData
 	for (Option option; option < OPTION_COUNT; option++)
 	{
 		RegisterOption(gC_CoreOptionNames[option], gC_CoreOptionDescriptions[option], 
@@ -199,12 +195,12 @@ void OnPluginStart_Options()
 
 void OnClientCookiesCached_Options(int client)
 {
-	StringMapSnapshot snapshot = options.Snapshot();
-	char option[30];
+	StringMapSnapshot optionDataSnapshot = optionData.Snapshot();
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	
-	for (int i = 0; i < snapshot.Length; i++)
+	for (int i = 0; i < optionDataSnapshot.Length; i++)
 	{
-		snapshot.GetKey(i, option, sizeof(option));
+		optionDataSnapshot.GetKey(i, option, sizeof(option));
 		LoadOption(client, option);
 	}
 }
@@ -295,25 +291,84 @@ static bool LoadOption(int client, const char[] option)
 	}
 }
 
+// Load default optionData from a config file, creating one and adding optionData if necessary
 static void LoadDefaultOptions()
 {
-	KeyValues kv = new KeyValues("options");
+	KeyValues oldKV = new KeyValues(GOKZ_CFG_OPTIONS_ROOT);
 	
-	if (!kv.ImportFromFile(GOKZ_CFG_OPTIONS))
+	if (FileExists(GOKZ_CFG_OPTIONS) && !oldKV.ImportFromFile(GOKZ_CFG_OPTIONS))
 	{
 		LogError("Failed to load file: \"%s\".", GOKZ_CFG_OPTIONS);
+		delete oldKV;
 		return;
 	}
 	
-	for (Option option; option < OPTION_COUNT; option++)
+	KeyValues newKV = new KeyValues(GOKZ_CFG_OPTIONS_ROOT); // This one will be sorted by option name
+	StringMapSnapshot optionDataSnapshot = optionData.Snapshot();
+	ArrayList optionDataSnapshotArray = new ArrayList(GOKZ_OPTION_MAX_NAME_LENGTH, 0);
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
+	char optionDescription[GOKZ_OPTION_MAX_DESC_LENGTH];
+	
+	// Sort the optionData by name
+	for (int i = 0; i < optionDataSnapshot.Length; i++)
 	{
-		GOKZ_SetOptionProp(gC_CoreOptionNames[option], OptionProp_DefaultValue, kv.GetNum(gC_CoreOptionNames[option]));
+		optionDataSnapshot.GetKey(i, option, sizeof(option));
+		optionDataSnapshotArray.PushString(option);
 	}
+	SortADTArray(optionDataSnapshotArray, Sort_Ascending, Sort_String);
+	
+	// Get the values from the KeyValues, otherwise set them
+	for (int i = 0; i < optionDataSnapshotArray.Length; i++)
+	{
+		oldKV.Rewind();
+		newKV.Rewind();
+		optionDataSnapshotArray.GetString(i, option, sizeof(option));
+		optionDescriptions.GetString(option, optionDescription, sizeof(optionDescription));
+		
+		newKV.JumpToKey(option, true);
+		newKV.SetString(GOKZ_CFG_OPTIONS_DESCRIPTION, optionDescription);
+		
+		OptionType type = GetOptionProp(option, OptionProp_Type);
+		if (type == OptionType_Float)
+		{
+			if (oldKV.JumpToKey(option, false) && oldKV.JumpToKey(GOKZ_CFG_OPTIONS_DEFAULT, false))
+			{
+				oldKV.GoBack();
+				newKV.SetFloat(GOKZ_CFG_OPTIONS_DEFAULT, oldKV.GetFloat(GOKZ_CFG_OPTIONS_DEFAULT));
+				SetOptionProp(option, OptionProp_DefaultValue, oldKV.GetFloat(GOKZ_CFG_OPTIONS_DEFAULT));
+			}
+			else
+			{
+				newKV.SetFloat(GOKZ_CFG_OPTIONS_DEFAULT, GetOptionProp(option, OptionProp_DefaultValue));
+			}
+		}
+		else if (type == OptionType_Int)
+		{
+			if (oldKV.JumpToKey(option, false) && oldKV.JumpToKey(GOKZ_CFG_OPTIONS_DEFAULT, false))
+			{
+				oldKV.GoBack();
+				newKV.SetNum(GOKZ_CFG_OPTIONS_DEFAULT, oldKV.GetNum(GOKZ_CFG_OPTIONS_DEFAULT));
+				SetOptionProp(option, OptionProp_DefaultValue, oldKV.GetNum(GOKZ_CFG_OPTIONS_DEFAULT));
+			}
+			else
+			{
+				newKV.SetNum(GOKZ_CFG_OPTIONS_DEFAULT, GetOptionProp(option, OptionProp_DefaultValue));
+			}
+		}
+	}
+	
+	newKV.Rewind();
+	newKV.ExportToFile(GOKZ_CFG_OPTIONS);
+	
+	delete oldKV;
+	delete newKV;
+	delete optionDataSnapshot;
+	delete optionDataSnapshotArray;
 }
 
 static void PrintOptionChangeMessage(int client, Option option, int newValue)
 {
-	// NOTE: Not all options have a message for when they are changed.
+	// NOTE: Not all optionData have a message for when they are changed.
 	switch (option)
 	{
 		case Option_Mode:
