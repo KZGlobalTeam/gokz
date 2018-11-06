@@ -98,6 +98,10 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	if (IsUsingMode(client))
+	{
+		ReplicateConVars(client);
+	}
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -162,14 +166,6 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]) && newValue == Mode_Vanilla)
-	{
-		ReplicateConVars(client);
-	}
-}
-
-public void GOKZ_OnClientSetup(int client)
-{
-	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
 	}

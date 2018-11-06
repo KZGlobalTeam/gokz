@@ -38,7 +38,6 @@ public Plugin myinfo =
 Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
 
-bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 
@@ -157,15 +156,12 @@ public void OnClientPutInServer(int client)
 public void OnClientPostAdminCheck(int client)
 {
 	OnClientPostAdminCheck_ClanTag(client);
-	gB_ClientIsSetUp[client] = true;
-	Call_GOKZ_OnClientSetup(client);
 }
 
 public void OnClientDisconnect(int client)
 {
 	OnClientDisconnect_Timer(client);
 	OnClientDisconnect_ValidJump(client);
-	gB_ClientIsSetUp[client] = false;
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])

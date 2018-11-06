@@ -321,13 +321,6 @@ stock char gC_RadioCommands[][] =
 // =====[ FORWARDS ]=====
 
 /**
- * Called when a player has been set up e.g. options, timer etc.
- *
- * @param client		Client index.
- */
-forward void GOKZ_OnClientSetup(int client);
-
-/**
  * Called when a player's option's value is changed.
  * Only called if client is in game.
  *
@@ -702,14 +695,6 @@ native bool GOKZ_StopTimer(int client, bool playSound = true);
  * @param playSound		Whether to play the timer stop sound.
  */
 native void GOKZ_StopTimerAll(bool playSound = true);
-
-/**
- * Gets whether client has been set up by GOKZ e.g. options, timer etc.
- *
- * @param client		Client index.
- * @return				Whether client has been set up.
- */
-native bool GOKZ_IsClientSetUp(int client);
 
 /**
  * Gets whether or not the player's timer is running i.e. isn't 'stopped'.
@@ -1278,7 +1263,6 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	
-	MarkNativeAsOptional("GOKZ_IsClientSetUp");
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
 	MarkNativeAsOptional("GOKZ_GetCurrentCourse");
 	MarkNativeAsOptional("GOKZ_GetPaused");

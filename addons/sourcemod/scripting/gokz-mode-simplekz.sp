@@ -136,6 +136,10 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	if (IsUsingMode(client))
+	{
+		ReplicateConVars(client);
+	}
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -238,14 +242,6 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]) && newValue == Mode_SimpleKZ)
-	{
-		ReplicateConVars(client);
-	}
-}
-
-public void GOKZ_OnClientSetup(int client)
-{
-	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
 	}

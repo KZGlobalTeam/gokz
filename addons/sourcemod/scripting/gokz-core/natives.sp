@@ -27,7 +27,6 @@ void CreateNatives()
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
 	
-	CreateNative("GOKZ_IsClientSetUp", Native_IsClientSetUp);
 	CreateNative("GOKZ_GetTimerRunning", Native_GetTimerRunning);
 	CreateNative("GOKZ_GetCurrentCourse", Native_GetCurrentCourse);
 	CreateNative("GOKZ_GetPaused", Native_GetPaused);
@@ -197,11 +196,6 @@ public int Native_TogglePause(Handle plugin, int numParams)
 public int Native_PlayErrorSound(Handle plugin, int numParams)
 {
 	PlayErrorSound(GetNativeCell(1));
-}
-
-public int Native_IsClientSetUp(Handle plugin, int numParams)
-{
-	return view_as<int>(gB_ClientIsSetUp[GetNativeCell(1)]);
 }
 
 public int Native_GetTimerRunning(Handle plugin, int numParams)
