@@ -407,5 +407,5 @@ static void LoadSounds()
 	char downloadPath[PLATFORM_MAX_PATH];
 	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", GL_SOUND_NEW_RECORD);
 	AddFileToDownloadsTable(downloadPath);
-	PrecacheSound(GL_SOUND_NEW_RECORD);
+	PrecacheSound(GL_SOUND_NEW_RECORD, true);
 } 

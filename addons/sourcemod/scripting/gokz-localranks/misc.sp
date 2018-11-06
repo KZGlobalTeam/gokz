@@ -47,7 +47,7 @@ static bool LoadSounds()
 	kv.GetString("beatrecord", gC_BeatRecordSound, sizeof(gC_BeatRecordSound));
 	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", gC_BeatRecordSound);
 	AddFileToDownloadsTable(downloadPath);
-	PrecacheSound(gC_BeatRecordSound);
+	PrecacheSound(gC_BeatRecordSound, true);
 	
 	delete kv;
 	return true;

@@ -194,7 +194,7 @@ static bool LoadSounds()
 		kv.GetString(gC_DistanceTierKeys[tier], sounds[tier], sizeof(sounds[]));
 		FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", sounds[tier]);
 		AddFileToDownloadsTable(downloadPath);
-		PrecacheSound(sounds[tier]);
+		PrecacheSound(sounds[tier], true);
 	}
 	
 	delete kv;
