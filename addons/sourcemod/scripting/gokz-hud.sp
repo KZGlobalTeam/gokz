@@ -61,7 +61,6 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	
-	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
 
@@ -176,6 +175,7 @@ public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
+	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 

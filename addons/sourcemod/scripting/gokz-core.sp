@@ -327,6 +327,16 @@ public void GOKZ_OnModeUnloaded(int mode)
 	OnModeUnloaded_Options(mode);
 }
 
+public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+{
+	OnOptionsMenuCreated_OptionsMenu();
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_OptionsMenu();
+}
+
 
 
 // =====[ PRIVATE ]=====

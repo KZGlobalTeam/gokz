@@ -6,13 +6,9 @@
 
 // =====[ EVENTS ]=====
 
-void OnAllPluginsLoaded_Options()
+void OnOptionsMenuReady_Options()
 {
-	for (HUDOption option; option < HUDOPTION_COUNT; option++)
-	{
-		GOKZ_RegisterOption(gC_HUDOptionNames[option], gC_HUDOptionDescriptions[option], 
-			OptionType_Int, gI_HUDOptionDefaults[option], 0, gI_HUDOptionCounts[option] - 1);
-	}
+	RegisterOptions();
 }
 
 void OnOptionChanged_Options(int client, HUDOption option, any newValue)
@@ -23,6 +19,15 @@ void OnOptionChanged_Options(int client, HUDOption option, any newValue)
 
 
 // =====[ PRIVATE ]=====
+
+static void RegisterOptions()
+{
+	for (HUDOption option; option < HUDOPTION_COUNT; option++)
+	{
+		GOKZ_RegisterOption(gC_HUDOptionNames[option], gC_HUDOptionDescriptions[option], 
+			OptionType_Int, gI_HUDOptionDefaults[option], 0, gI_HUDOptionCounts[option] - 1);
+	}
+}
 
 static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 {

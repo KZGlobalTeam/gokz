@@ -13,11 +13,20 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 		return false;
 	}
 	
-	Handle cookie = IsRegisteredOption(name) ? GetOptionProp(name, OptionProp_Cookie)
-	 : RegClientCookie(name, description, CookieAccess_Private);
+	ArrayList data;
+	Handle cookie;
+	if (IsRegisteredOption(name))
+	{
+		optionData.GetValue(name, data);
+		cookie = GetOptionProp(name, OptionProp_Cookie);
+		
+	}
+	else
+	{
+		data = new ArrayList(1, view_as<int>(OPTIONPROP_COUNT));
+		cookie = RegClientCookie(name, description, CookieAccess_Private);
+	}
 	
-	// I seriously couldn't work out a prettier way of using the enum values
-	ArrayList data = new ArrayList(1, view_as<int>(OPTIONPROP_COUNT));
 	data.Set(view_as<int>(OptionProp_Cookie), cookie);
 	data.Set(view_as<int>(OptionProp_Type), type);
 	data.Set(view_as<int>(OptionProp_DefaultValue), defaultValue);
@@ -184,13 +193,7 @@ void OnPluginStart_Options()
 {
 	optionData = new StringMap();
 	optionDescriptions = new StringMap();
-	
-	// Register gokz-core optionData
-	for (Option option; option < OPTION_COUNT; option++)
-	{
-		RegisterOption(gC_CoreOptionNames[option], gC_CoreOptionDescriptions[option], 
-			OptionType_Int, gI_CoreOptionDefaults[option], 0, gI_CoreOptionCounts[option] - 1);
-	}
+	RegisterOptions();
 }
 
 void OnClientCookiesCached_Options(int client)
@@ -245,6 +248,15 @@ void OnMapStart_Options()
 
 
 // =====[ PRIVATE ]=====
+
+static void RegisterOptions()
+{
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		RegisterOption(gC_CoreOptionNames[option], gC_CoreOptionDescriptions[option], 
+			OptionType_Int, gI_CoreOptionDefaults[option], 0, gI_CoreOptionCounts[option] - 1);
+	}
+}
 
 static bool IsValueInRange(OptionType type, any value, any minValue, any maxValue)
 {

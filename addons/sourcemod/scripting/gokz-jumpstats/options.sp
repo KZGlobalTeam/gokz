@@ -18,13 +18,9 @@ bool GetJumpstatsDisabled(int client)
 
 // =====[ EVENTS ]=====
 
-void OnAllPluginsLoaded_Options()
+void OnOptionsMenuReady_Options()
 {
-	for (JSOption option; option < JSOPTION_COUNT; option++)
-	{
-		GOKZ_RegisterOption(gC_JSOptionNames[option], gC_JSOptionDescriptions[option], 
-			OptionType_Int, gI_JSOptionDefaults[option], 0, gI_JSOptionCounts[option] - 1);
-	}
+	RegisterOptions();
 }
 
 void OnClientPutInServer_Options(int client)
@@ -54,6 +50,15 @@ void OnOptionChanged_Options(int client, const char[] option, any newValue)
 
 
 // =====[ PRIVATE ]=====
+
+static void RegisterOptions()
+{
+	for (JSOption option; option < JSOPTION_COUNT; option++)
+	{
+		GOKZ_RegisterOption(gC_JSOptionNames[option], gC_JSOptionDescriptions[option], 
+			OptionType_Int, gI_JSOptionDefaults[option], 0, gI_JSOptionCounts[option] - 1);
+	}
+}
 
 static void PrintOptionChangeMessage(int client, JSOption option, any newValue)
 {

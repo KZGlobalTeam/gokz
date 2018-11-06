@@ -39,9 +39,17 @@ bool GetCameFromOptionsMenu(int client)
 void OnAllPluginsLoaded_OptionsMenu()
 {
 	optionsMenu = new TopMenu(TopMenuHandler_Options);
-	
-	// Add general options category and items
+	Call_GOKZ_OnOptionsMenuCreated(optionsMenu);
+	Call_GOKZ_OnOptionsMenuReady(optionsMenu);
+}
+
+void OnOptionsMenuCreated_OptionsMenu()
+{
 	catGeneral = optionsMenu.AddCategory(GENERAL_OPTION_CATEGORY, TopMenuHandler_Options);
+}
+
+void OnOptionsMenuReady_OptionsMenu()
+{
 	for (int option = 0; option < view_as<int>(OPTION_COUNT); option++)
 	{
 		if (option == view_as<int>(Option_Style))
@@ -50,9 +58,6 @@ void OnAllPluginsLoaded_OptionsMenu()
 		}
 		itemsGeneral[option] = optionsMenu.AddItem(gC_CoreOptionNames[option], TopMenuHandler_General, catGeneral);
 	}
-	
-	Call_GOKZ_OnOptionsMenuCreated(optionsMenu);
-	Call_GOKZ_OnOptionsMenuReady(optionsMenu);
 }
 
 

@@ -53,7 +53,6 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	
-	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
 
@@ -92,6 +91,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
+	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
@@ -216,7 +216,12 @@ void PistolMenuAddItems(int client, Menu menu)
 
 // =====[ OPTIONS ]=====
 
-void OnAllPluginsLoaded_Options()
+void OnOptionsMenuReady_Options()
+{
+	RegisterOption();
+}
+
+void RegisterOption()
 {
 	GOKZ_RegisterOption(PISTOL_OPTION_NAME, PISTOL_OPTION_DESCRIPTION, 
 		OptionType_Int, Pistol_USP, 0, PISTOL_COUNT - 1);

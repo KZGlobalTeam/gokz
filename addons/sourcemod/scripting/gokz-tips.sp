@@ -77,7 +77,6 @@ public void OnAllPluginsLoaded()
 		gC_PluginsWithTipsLoaded[i] = LibraryExists(gokzPlugin);
 	}
 	
-	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
 
@@ -117,6 +116,7 @@ public void OnMapStart()
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
+	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
@@ -242,10 +242,9 @@ public Action Timer_PrintTip(Handle timer)
 
 // =====[ OPTIONS ]=====
 
-void OnAllPluginsLoaded_Options()
+void OnOptionsMenuReady_Options()
 {
-	GOKZ_RegisterOption(TIPS_OPTION_NAME, TIPS_OPTION_DESCRIPTION, 
-		OptionType_Int, Tips_Enabled, 0, TIPS_COUNT - 1);
+	RegisterOption();
 }
 
 void OnOptionChanged_Options(int client, const char[] option, any newValue)
@@ -264,6 +263,12 @@ void OnOptionChanged_Options(int client, const char[] option, any newValue)
 			}
 		}
 	}
+}
+
+void RegisterOption()
+{
+	GOKZ_RegisterOption(TIPS_OPTION_NAME, TIPS_OPTION_DESCRIPTION, 
+		OptionType_Int, Tips_Enabled, 0, TIPS_COUNT - 1);
 }
 
 

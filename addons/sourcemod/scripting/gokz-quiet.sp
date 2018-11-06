@@ -50,7 +50,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
-	OnAllPluginsLoaded_Options();
+	
 	OnAllPluginsLoaded_OptionsMenu();
 	
 	for (int client = 1; client <= MaxClients; client++)
@@ -85,6 +85,7 @@ public void OnClientPutInServer(int client)
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
+	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
@@ -121,13 +122,9 @@ public Action OnSetTransmitClient(int entity, int client)
 
 // =====[ OPTIONS ]=====
 
-void OnAllPluginsLoaded_Options()
+void OnOptionsMenuReady_Options()
 {
-	for (QTOption option; option < QTOPTION_COUNT; option++)
-	{
-		GOKZ_RegisterOption(gC_QTOptionNames[option], gC_QTOptionDescriptions[option], 
-			OptionType_Int, gI_QTOptionDefaultValues[option], 0, gI_QTOptionCounts[option] - 1);
-	}
+	RegisterOptions();
 }
 
 void OnOptionChanged_Options(int client, QTOption option, any newValue)
@@ -153,6 +150,15 @@ void PrintOptionChangeMessage(int client, QTOption option, any newValue)
 				}
 			}
 		}
+	}
+}
+
+void RegisterOptions()
+{
+	for (QTOption option; option < QTOPTION_COUNT; option++)
+	{
+		GOKZ_RegisterOption(gC_QTOptionNames[option], gC_QTOptionDescriptions[option], 
+			OptionType_Int, gI_QTOptionDefaultValues[option], 0, gI_QTOptionCounts[option] - 1);
 	}
 }
 

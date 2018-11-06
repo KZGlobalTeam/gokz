@@ -54,7 +54,6 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	
-	OnAllPluginsLoaded_Options();
 	OnAllPluginsLoaded_OptionsMenu();
 }
 
@@ -87,6 +86,7 @@ public void OnMapStart()
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
+	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
@@ -231,7 +231,12 @@ void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 
 // =====[ OPTIONS ]=====
 
-void OnAllPluginsLoaded_Options()
+void OnOptionsMenuReady_Options()
+{
+	RegisterOptions();
+}
+
+void RegisterOptions()
 {
 	for (JBOption option; option < JBOPTION_COUNT; option++)
 	{
