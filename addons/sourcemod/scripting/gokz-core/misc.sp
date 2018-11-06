@@ -17,7 +17,7 @@ void OnMapStart_KZConfig()
 	}
 	else
 	{
-		SetFailState("Failed to load config (%s not found).", gokzCfgFullPath);
+		SetFailState("Failed to load file: \"%s\". Check that it exists.", gokzCfgFullPath);
 	}
 }
 

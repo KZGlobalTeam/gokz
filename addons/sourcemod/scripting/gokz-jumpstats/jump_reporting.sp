@@ -29,7 +29,7 @@ void OnMapStart_JumpReporting()
 {
 	if (!LoadSounds())
 	{
-		SetFailState("Invalid or missing %s", JS_CFG_SOUNDS);
+		SetFailState("Failed to load file: \"%s\".", JS_CFG_SOUNDS);
 	}
 }
 

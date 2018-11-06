@@ -174,7 +174,7 @@ void LoadTipPhrasesFromFile(const char[] filePath)
 	KeyValues kv = new KeyValues("Phrases");
 	if (!kv.ImportFromFile(filePath))
 	{
-		SetFailState("Couldn't load file: %s", filePath);
+		SetFailState("Failed to load file: \"%s\".", filePath);
 	}
 	
 	char phraseName[64];

@@ -10,7 +10,7 @@ void DB_SetupDatabase()
 	gH_DB = SQL_Connect("gokz", true, error, sizeof(error));
 	if (gH_DB == null)
 	{
-		SetFailState("Database connection failed: %s", error);
+		SetFailState("Database connection failed. Error: \"%s\".", error);
 	}
 	
 	char databaseType[8];
@@ -25,7 +25,7 @@ void DB_SetupDatabase()
 	}
 	else
 	{
-		SetFailState("Invalid database driver (use SQLite or MySQL).");
+		SetFailState("Incompatible database driver. Use SQLite or MySQL.");
 	}
 	
 	DB_CreateTables();

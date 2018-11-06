@@ -46,7 +46,7 @@ void OnMapStart_DistanceTiers()
 {
 	if (!LoadDistanceTiers())
 	{
-		SetFailState("Invalid or missing %s", JS_CFG_TIERS);
+		SetFailState("Failed to load file: \"%s\".", JS_CFG_TIERS);
 	}
 }
 

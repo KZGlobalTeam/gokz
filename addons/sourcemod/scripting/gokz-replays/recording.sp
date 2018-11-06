@@ -61,7 +61,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	File file = OpenFile(path, "wb");
 	if (file == null)
 	{
-		LogError("Couldn't create/open replay file to write to: %s", path);
+		LogError("Failed to create/open replay file to write to: \"%s\".", path);
 		return false;
 	}
 	
@@ -135,7 +135,7 @@ bool SaveRecordingCheater(int client)
 	File file = OpenFile(path, "wb");
 	if (file == null)
 	{
-		LogError("Couldn't create/open replay file to write to: %s", path);
+		LogError("Failed to create/open replay file to write to: \"%s\".", path);
 		return false;
 	}
 	

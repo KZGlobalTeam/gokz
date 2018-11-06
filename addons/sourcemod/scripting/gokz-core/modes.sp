@@ -28,10 +28,6 @@ void SetModeLoaded(int mode, bool loaded, int version = -1)
 	else if (modeLoaded[mode] && !loaded)
 	{
 		modeLoaded[mode] = false;
-		if (GetLoadedModeCount() == 0)
-		{
-			SetFailState("All modes were unloaded. At least one GOKZ mode plugin is required.");
-		}
 		Call_GOKZ_OnModeUnloaded(mode);
 	}
 }

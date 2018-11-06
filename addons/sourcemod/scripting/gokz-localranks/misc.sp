@@ -30,7 +30,7 @@ void PrecacheAnnouncementSounds()
 {
 	if (!LoadSounds())
 	{
-		SetFailState("Invalid or missing %s", LR_CFG_SOUNDS);
+		SetFailState("Failed to load file: \"%s\".", LR_CFG_SOUNDS);
 	}
 }
 

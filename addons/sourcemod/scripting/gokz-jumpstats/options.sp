@@ -70,7 +70,7 @@ static void LoadDefaultOptions()
 	
 	if (!kv.ImportFromFile(JS_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", JS_CFG_OPTIONS);
+		LogError("Failed to load file: \"%s\".", JS_CFG_OPTIONS);
 		return;
 	}
 	

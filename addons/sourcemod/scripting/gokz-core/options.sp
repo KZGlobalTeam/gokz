@@ -301,7 +301,7 @@ static void LoadDefaultOptions()
 	
 	if (!kv.ImportFromFile(GOKZ_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", GOKZ_CFG_OPTIONS);
+		LogError("Failed to load file: \"%s\".", GOKZ_CFG_OPTIONS);
 		return;
 	}
 	

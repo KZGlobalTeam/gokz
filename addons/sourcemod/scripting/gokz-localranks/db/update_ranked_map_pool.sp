@@ -10,7 +10,7 @@ void DB_UpdateRankedMapPool(int client)
 	Handle file = OpenFile(LR_CFG_MAP_POOL, "r");
 	if (file == null)
 	{
-		LogError("There was a problem opening file '%s'.", LR_CFG_MAP_POOL);
+		LogError("Failed to load file: \"%s\".", LR_CFG_MAP_POOL);
 		if (IsValidClient(client))
 		{
 			// TODO Translation phrases?

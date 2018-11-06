@@ -39,7 +39,7 @@ static void LoadDefaultOptions()
 	
 	if (!kv.ImportFromFile(HUD_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", HUD_CFG_OPTIONS);
+		LogError("Failed to load file: \"%s\".", HUD_CFG_OPTIONS);
 		return;
 	}
 	

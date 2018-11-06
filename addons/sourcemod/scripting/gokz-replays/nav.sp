@@ -46,7 +46,7 @@ static void GenerateNavFile()
 	
 	if (!FileExists(RP_NAV_FILE))
 	{
-		SetFailState("Could not generate .nav file because \"%s\" does not exist.", RP_NAV_FILE);
+		SetFailState("Failed to load file: \"%s\". Check that it exists.", RP_NAV_FILE);
 	}
 	File_Copy(RP_NAV_FILE, navFilePath);
 	ForceChangeLevel(gC_CurrentMap, "[gokz-replays] Generate .nav file.");

@@ -72,11 +72,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
 	if (GetEngineVersion() != Engine_CSGO)
 	{
-		SetFailState("This plugin is only for CS:GO servers.");
+		SetFailState("GOKZ only supports CS:GO servers.");
 	}
 	if (RoundFloat(1 / GetTickInterval()) != 128)
 	{
-		SetFailState("This plugin is only for 128 tickrate servers.");
+		SetFailState("GOKZ only supports 128 tickrate servers.");
 	}
 	
 	gH_ThisPlugin = myself;

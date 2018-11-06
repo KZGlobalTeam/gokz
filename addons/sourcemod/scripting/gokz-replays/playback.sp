@@ -200,7 +200,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 		RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
 	if (!FileExists(path))
 	{
-		LogError("Could not find replay file: %s", path);
+		LogError("Failed to load file: \"%s\".", path);
 		return false;
 	}
 	
@@ -212,7 +212,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	file.ReadInt32(magicNumber);
 	if (magicNumber != RP_MAGIC_NUMBER)
 	{
-		LogError("Tried to load invalid replay file: %s", path);
+		LogError("Failed to load invalid replay file: \"%s\".", path);
 		return false;
 	}
 	
@@ -221,7 +221,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	file.ReadInt8(formatVersion);
 	if (formatVersion != RP_FORMAT_VERSION)
 	{
-		LogError("Tried to load replay file with unsupported format version: %s", path);
+		LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
 		return false;
 	}
 	
