@@ -43,6 +43,11 @@ void OnAllPluginsLoaded_OptionsMenu()
 	Call_GOKZ_OnOptionsMenuReady(optionsMenu);
 }
 
+void OnConfigsExecuted_OptionsMenu()
+{
+	SortOptionsMenu();
+}
+
 void OnOptionsMenuCreated_OptionsMenu()
 {
 	catGeneral = optionsMenu.AddCategory(GENERAL_OPTION_CATEGORY, TopMenuHandler_Options);
@@ -130,6 +135,15 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 
 
 // =====[ PRIVATE ]=====
+
+static void SortOptionsMenu()
+{
+	char error[256];
+	if (!optionsMenu.LoadConfig(GOKZ_CFG_OPTIONS_SORTING, error, sizeof(error)))
+	{
+		LogError("Failed to load file: \"%s\". Error: %s", GOKZ_CFG_OPTIONS_SORTING, error);
+	}
+}
 
 static void FormatToggleableOptionDisplay(int client, Option option, char[] buffer, int maxlength)
 {

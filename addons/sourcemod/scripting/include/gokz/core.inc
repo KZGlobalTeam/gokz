@@ -165,6 +165,7 @@ enum
 
 #define GOKZ_CFG_SERVER "sourcemod/gokz/gokz.cfg"
 #define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/options.cfg"
+#define GOKZ_CFG_OPTIONS_SORTING "cfg/sourcemod/gokz/options_menu_sorting.cfg"
 #define GOKZ_CFG_OPTIONS_ROOT "Options"
 #define GOKZ_CFG_OPTIONS_DESCRIPTION "description"
 #define GOKZ_CFG_OPTIONS_DEFAULT "default"

@@ -289,6 +289,7 @@ public void OnMapStart()
 public void OnConfigsExecuted()
 {
 	OnConfigsExecuted_TimeLimit();
+	OnConfigsExecuted_OptionsMenu();
 }
 
 public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char[] soundEntry, int &seed)
