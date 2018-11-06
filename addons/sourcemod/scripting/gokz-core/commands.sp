@@ -1,24 +1,4 @@
-/*
-	Commands
-	
-	Commands for player and admin use.
-*/
-
-
-
-static char radioCommands[][] = 
-{
-	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
-	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
-	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
-	"enemydown", "compliment", "thanks", "cheer"
-};
-
-
-
-// =====[ PUBLIC ]=====
-
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_checkpoint", CommandMakeCheckpoint, "[KZ] Set a checkpoint.");
 	RegConsoleCmd("sm_gocheck", CommandTeleportToCheckpoint, "[KZ] Teleport to your current checkpoint.");
@@ -53,18 +33,14 @@ void CreateCommands()
 	RegConsoleCmd("sm_k", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
 }
 
-void CreateCommandListeners()
+void AddCommandsListeners()
 {
 	AddCommandListener(CommandJoinTeam, "jointeam");
-	for (int i = 0; i < sizeof(radioCommands); i++)
+	for (int i = 0; i < sizeof(gC_RadioCommands); i++)
 	{
-		AddCommandListener(CommandBlock, radioCommands[i]);
+		AddCommandListener(CommandBlock, gC_RadioCommands[i]);
 	}
 }
-
-
-
-// =====[ COMMAND HANDLERS ]=====
 
 public Action CommandBlock(int client, const char[] command, int argc)
 {

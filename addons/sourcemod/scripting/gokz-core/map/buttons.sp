@@ -1,7 +1,5 @@
 /*
-	Mapping API - Buttons
-	
-	Hooks between func_buttons and GOKZ.
+	Hooks between specifically named func_buttons and GOKZ.
 */
 
 
@@ -11,17 +9,13 @@ static Regex RE_BonusEndButton;
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-void CreateRegexesMapButtons()
+void OnPluginStart_MapButtons()
 {
-	RE_BonusStartButton = CompileRegex("^climb_bonus(\\d+)_startbutton$");
-	RE_BonusEndButton = CompileRegex("^climb_bonus(\\d+)_endbutton$");
+	RE_BonusStartButton = CompileRegex(GOKZ_BONUS_START_BUTTON_NAME_REGEX);
+	RE_BonusEndButton = CompileRegex(GOKZ_BONUS_END_BUTTON_NAME_REGEX);
 }
-
-
-
-// =====[ LISTENERS ]=====
 
 void OnEntitySpawned_MapButtons(int entity)
 {
@@ -35,11 +29,11 @@ void OnEntitySpawned_MapButtons(int entity)
 	
 	if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
 	{
-		if (StrEqual("climb_startbutton", tempString, false))
+		if (StrEqual(GOKZ_START_BUTTON_NAME, tempString, false))
 		{
 			HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
 		}
-		else if (StrEqual("climb_endbutton", tempString, false))
+		else if (StrEqual(GOKZ_END_BUTTON_NAME, tempString, false))
 		{
 			HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
 		}
@@ -53,10 +47,6 @@ void OnEntitySpawned_MapButtons(int entity)
 		}
 	}
 }
-
-
-
-// =====[ HANDLERS ]=====
 
 public void OnStartButtonPress(const char[] name, int caller, int activator, float delay)
 {
@@ -93,7 +83,7 @@ public void OnBonusStartButtonPress(const char[] name, int caller, int activator
 	{
 		GetRegexSubString(RE_BonusStartButton, 1, tempString, sizeof(tempString));
 		int course = StringToInt(tempString);
-		if (course > 0 && course < MAX_COURSES)
+		if (course > 0 && course < GOKZ_MAX_COURSES)
 		{
 			GOKZ_StartTimer(activator, course);
 			OnStartButtonPress_VirtualButtons(activator, course);
@@ -115,7 +105,7 @@ public void OnBonusEndButtonPress(const char[] name, int caller, int activator, 
 	{
 		GetRegexSubString(RE_BonusEndButton, 1, tempString, sizeof(tempString));
 		int course = StringToInt(tempString);
-		if (course > 0 && course < MAX_COURSES)
+		if (course > 0 && course < GOKZ_MAX_COURSES)
 		{
 			GOKZ_EndTimer(activator, course);
 			OnEndButtonPress_VirtualButtons(activator, course);

@@ -1,20 +1,14 @@
 /*
-	Virtual Buttons
-	
+	Most commonly referred to in the KZ community as timer tech.
 	Lets players press 'virtual' start and end buttons without looking.
 */
 
 
 
-#define SIMPLEKZ_VIRTUAL_BUTTON_RADIUS 32.0 
-#define KZTIMER_VIRTUAL_BUTTON_RADIUS 70.0
-
 static bool hasVirtualStartButton[MAXPLAYERS + 1];
 static bool hasVirtualEndButton[MAXPLAYERS + 1];
-
 static float virtualStartOrigin[MAXPLAYERS + 1][3];
 static float virtualEndOrigin[MAXPLAYERS + 1][3];
-
 static int virtualStartCourse[MAXPLAYERS + 1];
 static int virtualEndCourse[MAXPLAYERS + 1];
 
@@ -34,9 +28,9 @@ bool GetHasVirtualEndButton(int client)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
-void SetupClientVirtualButtons(int client)
+void OnClientPutInServer_VirtualButtons(int client)
 {
 	hasVirtualEndButton[client] = false;
 	hasVirtualStartButton[client] = false;
@@ -56,7 +50,7 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	hasVirtualEndButton[client] = true;
 }
 
-void OnPlayerRunCmd_VirtualButtons(int client, int buttons)
+void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 {
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
@@ -93,8 +87,8 @@ static bool InRangeOfButton(int client, const float buttonOrigin[3])
 	
 	switch (GOKZ_GetCoreOption(client, Option_Mode))
 	{
-		case Mode_SimpleKZ:return distanceToButton <= SIMPLEKZ_VIRTUAL_BUTTON_RADIUS;
-		case Mode_KZTimer:return distanceToButton <= KZTIMER_VIRTUAL_BUTTON_RADIUS;
+		case Mode_SimpleKZ:return distanceToButton <= GOKZ_SKZ_VIRTUAL_BUTTON_RADIUS;
+		case Mode_KZTimer:return distanceToButton <= GOKZ_KZT_VIRTUAL_BUTTON_RADIUS;
 	}
 	return false;
 }

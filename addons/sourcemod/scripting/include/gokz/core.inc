@@ -144,8 +144,36 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define MAX_COURSES 256
-#define OPTIONS_MENU_CAT_GENERAL "general"
+#define GOKZ_MAX_CHECKPOINTS 32
+#define GOKZ_MAX_COURSES 100
+
+#define GOKZ_SKZ_VIRTUAL_BUTTON_RADIUS 32.0
+#define GOKZ_KZT_VIRTUAL_BUTTON_RADIUS 70.0
+#define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.15
+#define GOKZ_LADDER_NO_CHECKPOINT_TIME 1.5
+#define GOKZ_PAUSE_COOLDOWN 1.0
+#define GOKZ_TIMER_START_GROUND_TICKS 4
+
+#define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
+#define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
+#define GOKZ_SOUND_TIMER_STOP "buttons/button18.wav"
+
+#define GOKZ_START_BUTTON_NAME "climb_startbutton"
+#define GOKZ_END_BUTTON_NAME "climb_endbutton"
+#define GOKZ_BONUS_START_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_startbutton$"
+#define GOKZ_BONUS_END_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_endbutton$"
+
+#define GOKZ_CFG_SERVER "sourcemod/gokz/gokz.cfg"
+#define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/gokz-core-options.cfg"
+
+#define GOKZ_OPTION_DESC_PREFIX "GOKZ - "
+#define GENERAL_OPTION_CATEGORY "gen"
+
+stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
+{
+	"NUB", 
+	"PRO"
+};
 
 stock char gC_ModeNames[MODE_COUNT][] = 
 {
@@ -168,15 +196,35 @@ stock char gC_ModeKeys[MODE_COUNT][] =
 	"kztimer"
 };
 
+stock char gC_ModeStartSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/button9.wav", 
+	"buttons/button3.wav"
+};
+
+stock char gC_ModeEndSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/bell1.wav", 
+	"buttons/button3.wav"
+};
+
+stock char gC_ModeFalseEndSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/button11.wav", 
+	"buttons/button2.wav"
+};
+
+stock char gC_StyleNames[STYLE_COUNT][] = 
+{
+	"Normal"
+};
+
 stock char gC_StyleNamesShort[STYLE_COUNT][] = 
 {
 	"NRM"
-};
-
-stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
-{
-	"NUB", 
-	"PRO"
 };
 
 stock char gC_CoreOptionNames[OPTION_COUNT][] = 
@@ -189,6 +237,54 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"checkpointsounds", 
 	"teleportsounds", 
 	"errorsounds"
+};
+
+stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
+{
+	"Movement mode", 
+	"Movement style", 
+	"Automatic timer restart upon teleport to start", 
+	"Automatic slay upon end", 
+	"Checkpoint messages", 
+	"Checkpoint sounds", 
+	"Teleport sounds", 
+	"Error sounds"
+};
+
+stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
+{
+	"Options Menu - Mode", 
+	"Options Menu - Style", 
+	"Options Menu - Auto Restart", 
+	"Options Menu - Slay On End", 
+	"Options Menu - Checkpoint Messages", 
+	"Options Menu - Checkpoint Sounds", 
+	"Options Menu - Teleport Sounds", 
+	"Options Menu - Error Sounds"
+};
+
+stock int gI_CoreOptionCounts[OPTION_COUNT] = 
+{
+	MODE_COUNT, 
+	STYLE_COUNT, 
+	AUTORESTART_COUNT, 
+	SLAYONEND_COUNT, 
+	CHECKPOINTMESSAGES_COUNT, 
+	CHECKPOINTSOUNDS_COUNT, 
+	TELEPORTSOUNDS_COUNT, 
+	ERRORSOUNDS_COUNT
+};
+
+stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
+{
+	Mode_SimpleKZ, 
+	Style_Normal, 
+	AutoRestart_Disabled, 
+	SlayOnEnd_Disabled, 
+	CheckpointMessages_Disabled, 
+	CheckpointSounds_Enabled, 
+	TeleportSounds_Disabled, 
+	ErrorSounds_Enabled
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
@@ -210,6 +306,14 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_staminarecoveryrate", 
 	"sv_timebetweenducks", 
 	"sv_wateraccelerate"
+};
+
+stock char gC_RadioCommands[][] = 
+{
+	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
+	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
+	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
+	"enemydown", "compliment", "thanks", "cheer"
 };
 
 

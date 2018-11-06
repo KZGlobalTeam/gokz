@@ -1,14 +1,9 @@
 /*
-	Teleports
-	
-	Checkpoints and teleporting functionality.
+	Checkpoints and teleporting, including ability to go back
+	to previous checkpoint, go to next checkpoint, and undo.
 */
 
 
-
-#define MAX_STORED_CHECKPOINTS 32
-#define SOUND_CHECKPOINT "buttons/blip1.wav"
-#define SOUND_TELEPORT "buttons/blip1.wav"
 
 static int checkpointCount[MAXPLAYERS + 1]; // Absolute total number of checkpoints
 static int storedCheckpointCount[MAXPLAYERS + 1]; // Current number of valid stored checkpoints
@@ -20,9 +15,9 @@ static float startAngles[MAXPLAYERS + 1][3];
 static bool hasCustomStartPosition[MAXPLAYERS + 1];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
-static float checkpointOrigin[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
-static float checkpointAngles[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
-static bool checkpointOnLadder[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS];
+static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
+static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
+static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
 static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
 static float undoOrigin[MAXPLAYERS + 1][3];
@@ -52,15 +47,6 @@ void SetTeleportCount(int client, int tpCount)
 	teleportCount[client] = tpCount;
 }
 
-void SetupClientTeleports(int client)
-{
-	checkpointCount[client] = 0;
-	storedCheckpointCount[client] = 0;
-	checkpointPrevCount[client] = 0;
-	teleportCount[client] = 0;
-	hasCustomStartPosition[client] = false;
-}
-
 
 // CHECKPOINT
 
@@ -81,15 +67,15 @@ void MakeCheckpoint(int client)
 	
 	// Make Checkpoint
 	checkpointCount[client]++;
-	storedCheckpointCount[client] = IntMin(storedCheckpointCount[client] + 1, MAX_STORED_CHECKPOINTS);
+	storedCheckpointCount[client] = IntMin(storedCheckpointCount[client] + 1, GOKZ_MAX_CHECKPOINTS);
 	checkpointPrevCount[client] = 0;
-	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
+	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
 	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_CHECKPOINT);
+		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
 	}
 	if (GOKZ_GetCoreOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
@@ -208,7 +194,7 @@ void PrevCheckpoint(int client)
 	
 	storedCheckpointCount[client]--;
 	checkpointPrevCount[client]++;
-	checkpointIndex[client] = PrevIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
+	checkpointIndex[client] = PrevIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
@@ -267,7 +253,7 @@ void NextCheckpoint(int client)
 	
 	storedCheckpointCount[client]++;
 	checkpointPrevCount[client]--;
-	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
+	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
@@ -376,7 +362,7 @@ void SetCustomStartPosition(int client)
 	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_CHECKPOINT);
+		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
 	}
 	
 	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
@@ -458,7 +444,16 @@ bool CanUndoTeleport(int client, bool showError = false)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
+
+void OnClientPutInServer_Teleports(int client)
+{
+	checkpointCount[client] = 0;
+	storedCheckpointCount[client] = 0;
+	checkpointPrevCount[client] = 0;
+	teleportCount[client] = 0;
+	hasCustomStartPosition[client] = false;
+}
 
 void OnTimerStart_Teleports(int client)
 {
@@ -512,7 +507,7 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	
 	if (GOKZ_GetCoreOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_TELEPORT);
+		EmitSoundToClient(client, GOKZ_SOUND_TELEPORT);
 	}
 	
 	// Call Post Foward

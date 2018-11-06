@@ -1,13 +1,3 @@
-/*
-	Pause
-	
-	Pausing and resuming functionality.
-*/
-
-
-
-#define PAUSE_COOLDOWN 1.0
-
 static bool paused[MAXPLAYERS + 1];
 static bool pausedOnLadder[MAXPLAYERS + 1];
 static float lastPauseTime[MAXPLAYERS + 1];
@@ -36,7 +26,7 @@ void Pause(int client)
 		return;
 	}
 	if (GetTimerRunning(client) && hasResumedInThisRun[client]
-		 && GetEngineTime() - lastResumeTime[client] < PAUSE_COOLDOWN)
+		 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
 		GOKZ_PlayErrorSound(client);
@@ -81,7 +71,7 @@ void Resume(int client)
 		return;
 	}
 	if (GetTimerRunning(client) && hasPausedInThisRun[client]
-		 && GetEngineTime() - lastPauseTime[client] < PAUSE_COOLDOWN)
+		 && GetEngineTime() - lastPauseTime[client] < GOKZ_PAUSE_COOLDOWN)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Just Paused)");
 		GOKZ_PlayErrorSound(client);
@@ -130,9 +120,9 @@ void TogglePause(int client)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
-void SetupClientPause(int client)
+void OnClientPutInServer_Pause(int client)
 {
 	paused[client] = false;
 }

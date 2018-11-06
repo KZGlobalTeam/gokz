@@ -244,7 +244,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	}
 	
 	gTM_Options = topMenu;
-	gTMO_CatGeneral = gTM_Options.FindCategory(OPTIONS_MENU_CAT_GENERAL);
+	gTMO_CatGeneral = gTM_Options.FindCategory(GENERAL_OPTION_CATEGORY);
 	gTMO_ItemPistol = gTM_Options.AddItem(PISTOL_OPTION_NAME, TopMenuHandler_Pistol, gTMO_CatGeneral);
 }
 

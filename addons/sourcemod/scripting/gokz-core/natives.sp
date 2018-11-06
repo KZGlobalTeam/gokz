@@ -1,11 +1,3 @@
-/*
-	Natives
-	
-	GOKZ Core plugin natives.
-*/
-
-
-
 void CreateNatives()
 {
 	CreateNative("GOKZ_GetModeLoaded", Native_GetModeLoaded);
@@ -292,7 +284,7 @@ public int Native_GetOptionProp(Handle plugin, int numParams)
 	any value = GetOptionProp(option, prop);
 	
 	// Return clone of Handle if called by another plugin
-	if (prop == OptionProp_Cookie && plugin != g_ThisPlugin)
+	if (prop == OptionProp_Cookie && plugin != gH_ThisPlugin)
 	{
 		value = CloneHandle(value, plugin);
 	}
@@ -358,7 +350,7 @@ public int Native_JoinTeam(Handle plugin, int numParams)
 
 static bool BlockedExternallyCalledTimerNative(Handle plugin)
 {
-	if (plugin != g_ThisPlugin)
+	if (plugin != gH_ThisPlugin)
 	{
 		Action result;
 		Call_GOKZ_OnTimerNativeCalledExternally(plugin, result);

@@ -1,6 +1,4 @@
 /*
-	Miscellaneous
-	
 	Small features that aren't worth splitting into their own file.
 */
 
@@ -8,16 +6,14 @@
 
 // =====[ GOKZ.CFG ]=====
 
-#define GOKZ_CFG_PATH "sourcemod/gokz/gokz.cfg"
-
 void OnMapStart_KZConfig()
 {
 	char gokzCfgFullPath[PLATFORM_MAX_PATH];
-	FormatEx(gokzCfgFullPath, sizeof(gokzCfgFullPath), "cfg/%s", GOKZ_CFG_PATH);
+	FormatEx(gokzCfgFullPath, sizeof(gokzCfgFullPath), "cfg/%s", GOKZ_CFG_SERVER);
 	
 	if (FileExists(gokzCfgFullPath))
 	{
-		ServerCommand("exec %s", GOKZ_CFG_PATH);
+		ServerCommand("exec %s", GOKZ_CFG_SERVER);
 	}
 	else
 	{
@@ -29,7 +25,7 @@ void OnMapStart_KZConfig()
 
 // =====[ GODMODE ]=====
 
-void UpdateGodMode(int client)
+void OnPlayerSpawn_GodMode(int client)
 {
 	// Stop players from taking damage
 	SetEntProp(client, Prop_Data, "m_takedamage", 0);
@@ -60,7 +56,7 @@ void ToggleNoclip(int client)
 
 // =====[ PLAYER COLLISION ]=====
 
-void UpdatePlayerCollision(int client)
+void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
 	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
@@ -141,7 +137,12 @@ static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 static bool savedOnLadder[MAXPLAYERS + 1];
 
-void SetupClientJoinTeam(int client)
+void OnClientPutInServer_JoinTeam(int client)
+{
+	hasSavedPosition[client] = false;
+}
+
+void OnTimerStart_JoinTeam(int client)
 {
 	hasSavedPosition[client] = false;
 }
@@ -182,11 +183,6 @@ void JoinTeam(int client, int newTeam)
 		}
 		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
-}
-
-void OnTimerStart_JoinTeam(int client)
-{
-	hasSavedPosition[client] = false;
 }
 
 
@@ -243,7 +239,7 @@ static bool IsValidStopTouchGround(int client)
 	return true;
 }
 
-void OnPlayerRunCmd_ValidJump(int client, int cmdnum)
+void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 {
 	if (velocityTeleported[client] && DidInvalidVelocityTeleport(client, cmdnum))
 	{
@@ -304,7 +300,7 @@ void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 
 // =====[ CLAN TAG ]=====
 
-void UpdateClanTag(int client)
+void OnClientPostAdminCheck_ClanTag(int client)
 {
 	if (!IsFakeClient(client))
 	{
@@ -316,7 +312,7 @@ void OnOptionChanged_ClanTag(int client, Option option)
 {
 	if (option == Option_Mode)
 	{
-		UpdateClanTag(client);
+		OnClientPostAdminCheck_ClanTag(client);
 	}
 }
 
@@ -326,7 +322,7 @@ void OnOptionChanged_ClanTag(int client, Option option)
 
 static bool hasSpawned[MAXPLAYERS + 1];
 
-void SetupClientFirstSpawn(int client)
+void OnClientPutInServer_FirstSpawn(int client)
 {
 	hasSpawned[client] = false;
 }

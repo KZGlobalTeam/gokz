@@ -1,7 +1,5 @@
 /*
-	Mode Menu
-	
-	Lets players pick their movement mode.
+	Lets players choose their mode.
 */
 
 
@@ -18,7 +16,7 @@ void DisplayModeMenu(int client)
 
 
 
-// =====[ HANDLER ]=====
+// =====[ EVENTS ]=====
 
 public int MenuHandler_Mode(Menu menu, MenuAction action, int param1, int param2)
 {

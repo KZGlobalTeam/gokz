@@ -28,21 +28,24 @@ public Plugin myinfo =
 {
 	name = "GOKZ Core", 
 	author = "DanZay", 
-	description = "GOKZ Core Plugin", 
+	description = "Core plugin of the GOKZ plugin set", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-core.txt"
 
-Handle g_ThisPlugin;
+Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
+
 bool gB_ClientIsSetUp[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 
+ConVar gCV_gokz_chat_prefix;
+ConVar gCV_sv_full_alltalk;
+
 #include "gokz-core/commands.sp"
-#include "gokz-core/convars.sp"
 #include "gokz-core/forwards.sp"
 #include "gokz-core/natives.sp"
 #include "gokz-core/modes.sp"
@@ -54,8 +57,8 @@ int gI_OldButtons[MAXPLAYERS + 1];
 #include "gokz-core/map/bhop_triggers.sp"
 #include "gokz-core/map/prefix.sp"
 
-#include "gokz-core/menus/mode.sp"
-#include "gokz-core/menus/options.sp"
+#include "gokz-core/menus/mode_menu.sp"
+#include "gokz-core/menus/options_menu.sp"
 
 #include "gokz-core/timer/pause.sp"
 #include "gokz-core/timer/timer.sp"
@@ -69,14 +72,15 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
 	if (GetEngineVersion() != Engine_CSGO)
 	{
-		SetFailState("This plugin is only for CS:GO.");
+		SetFailState("This plugin is only for CS:GO servers.");
 	}
 	if (RoundFloat(1 / GetTickInterval()) != 128)
 	{
-		SetFailState("This plugin is only for 128 tickrate.");
+		SetFailState("This plugin is only for 128 tickrate servers.");
 	}
 	
-	g_ThisPlugin = myself;
+	gH_ThisPlugin = myself;
+	
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
 	return APLRes_Success;
@@ -89,25 +93,26 @@ public void OnPluginStart()
 	LoadTranslations("gokz-core.phrases");
 	
 	CreateGlobalForwards();
-	CreateRegexes();
-	CreateHooks();
 	CreateConVars();
-	CreateCommands();
-	CreateCommandListeners();
-	CreateOptions();
+	HookEvents();
+	RegisterCommands();
+	
+	OnPluginStart_MapButtons();
+	OnPluginStart_Options();
 	
 	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 }
 
 public void OnAllPluginsLoaded()
 {
-	OnAllPluginsLoaded_Modes();
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	
-	// Handle late loading here now that all the modes have been loaded
+	OnAllPluginsLoaded_Modes();
+	OnAllPluginsLoaded_OptionsMenu();
+	
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
@@ -118,14 +123,11 @@ public void OnAllPluginsLoaded()
 				OnClientPostAdminCheck(client);
 			}
 		}
-		
 		if (AreClientCookiesCached(client))
 		{
 			OnClientCookiesCached(client);
 		}
 	}
-	
-	OnAllPluginsLoaded_OptionsMenu();
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -142,19 +144,19 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnClientPutInServer(int client)
 {
-	SetupClientTimer(client);
-	SetupClientPause(client);
-	SetupClientTeleports(client);
-	SetupClientJoinTeam(client);
-	SetupClientFirstSpawn(client);
-	SetupClientVirtualButtons(client);
+	OnClientPutInServer_Timer(client);
+	OnClientPutInServer_Pause(client);
+	OnClientPutInServer_Teleports(client);
+	OnClientPutInServer_JoinTeam(client);
+	OnClientPutInServer_FirstSpawn(client);
+	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
-	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	HookClientEvents(client);
 }
 
 public void OnClientPostAdminCheck(int client)
 {
-	UpdateClanTag(client);
+	OnClientPostAdminCheck_ClanTag(client);
 	gB_ClientIsSetUp[client] = true;
 	Call_GOKZ_OnClientSetup(client);
 }
@@ -168,9 +170,9 @@ public void OnClientDisconnect(int client)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmd_Timer(client); // This should be first!
-	OnPlayerRunCmd_VirtualButtons(client, buttons);
-	OnPlayerRunCmd_ValidJump(client, cmdnum);
+	OnPlayerRunCmdPost_Timer(client); // This should be first!
+	OnPlayerRunCmdPost_VirtualButtons(client, buttons);
+	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
 	UpdateOldVariables(client, buttons); // This should be last!
 }
 
@@ -199,8 +201,8 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 		OnPlayerSpawn_Pause(client);
 		OnPlayerSpawn_ValidJump(client);
 		OnPlayerSpawn_FirstSpawn(client);
-		UpdateGodMode(client);
-		UpdatePlayerCollision(client);
+		OnPlayerSpawn_GodMode(client);
+		OnPlayerSpawn_PlayerCollision(client);
 	}
 }
 
@@ -223,10 +225,6 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	return MRES_Ignored;
 }
 
-
-
-// =====[ MOVEMENTAPI EVENTS ]=====
-
 public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
 {
 	OnChangeMoveType_Timer(client, newMoveType);
@@ -244,10 +242,6 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 {
 	OnStopTouchGround_ValidJump(client, jumped);
 }
-
-
-
-// =====[ GOKZ EVENTS ]=====
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
@@ -283,11 +277,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 public void GOKZ_OnJoinTeam(int client, int team)
 {
 	OnJoinTeam_Pause(client, team);
-}
-
-public void GOKZ_OnModeUnloaded(int mode)
-{
-	OnModeUnloaded_Options(mode);
 }
 
 
@@ -337,17 +326,32 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 	return Plugin_Handled;
 }
 
+public void GOKZ_OnModeUnloaded(int mode)
+{
+	OnModeUnloaded_Options(mode);
+}
+
 
 
 // =====[ PRIVATE ]=====
 
-static void CreateRegexes()
+static void CreateConVars()
 {
-	CreateRegexesMapButtons();
+	gCV_gokz_chat_prefix = CreateConVar("gokz_chat_prefix", "{grey}[{green}KZ{grey}] ", "Chat prefix used for GOKZ messages.");
+	gCV_sv_full_alltalk = FindConVar("sv_full_alltalk");
+	
+	// Remove unwanted flags from constantly changed mode convars - replication is done manually in mode plugins
+	for (int i = 0; i < MODECVAR_COUNT; i++)
+	{
+		FindConVar(gC_ModeCVars[i]).Flags &= ~FCVAR_NOTIFY;
+		FindConVar(gC_ModeCVars[i]).Flags &= ~FCVAR_REPLICATED;
+	}
 }
 
-static void CreateHooks()
+static void HookEvents()
 {
+	AddCommandsListeners();
+	
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
@@ -365,6 +369,11 @@ static void CreateHooks()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
 	delete gameData;
+}
+
+static void HookClientEvents(int client)
+{
+	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
 
 static void UpdateOldVariables(int client, int buttons)

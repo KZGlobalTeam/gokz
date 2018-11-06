@@ -1,15 +1,9 @@
 /*
-	Bunnyhop Trigger Detection
-	
 	Detects when players are in bunnyhop/timed ladder triggers and
 	shouldn't be allowed to checkpoint.
 */
 
 
-
-// Times after touching trigger_multiple to block checkpoints
-#define BHOP_TRIG_DETECTION_TIME 0.15
-#define LADDER_TRIG_DETECTION_TIME 1.5
 
 static float lastTrigMultiTouchTime[MAXPLAYERS + 1];
 static float lastTouchGroundTime[MAXPLAYERS + 1];
@@ -23,19 +17,19 @@ bool BhopTriggersJustTouched(int client)
 {
 	if (Movement_GetMoveType(client) == MOVETYPE_LADDER)
 	{
-		return GetEngineTime() - lastTouchLadderTime[client] < LADDER_TRIG_DETECTION_TIME
-		 && GetEngineTime() - lastTrigMultiTouchTime[client] < LADDER_TRIG_DETECTION_TIME;
+		return GetEngineTime() - lastTouchLadderTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME
+		 && GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME;
 	}
 	else
 	{
-		return GetEngineTime() - lastTouchGroundTime[client] < BHOP_TRIG_DETECTION_TIME
-		 && GetEngineTime() - lastTrigMultiTouchTime[client] < BHOP_TRIG_DETECTION_TIME;
+		return GetEngineTime() - lastTouchGroundTime[client] < GOKZ_BHOP_NO_CHECKPOINT_TIME
+		 && GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_BHOP_NO_CHECKPOINT_TIME;
 	}
 }
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnEntitySpawned_MapBhopTriggers(int entity)
 {

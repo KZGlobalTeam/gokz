@@ -1,11 +1,3 @@
-/*
-	Forwards
-	
-	GOKZ Core plugin global forwards.
-*/
-
-
-
 static Handle H_OnClientSetup;
 static Handle H_OnOptionChanged;
 static Handle H_OnTimerStart;

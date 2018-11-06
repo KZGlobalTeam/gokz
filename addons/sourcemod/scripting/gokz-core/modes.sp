@@ -1,11 +1,3 @@
-/*
-	Modes
-	
-	Support for plugin-based movement modes.
-*/
-
-
-
 static bool modeLoaded[MODE_COUNT];
 static int modeVersion[MODE_COUNT];
 static bool GOKZHitPerf[MAXPLAYERS + 1];
@@ -91,7 +83,7 @@ void SetGOKZTakeoffSpeed(int client, float takeoffSpeed)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
 void OnAllPluginsLoaded_Modes()
 {

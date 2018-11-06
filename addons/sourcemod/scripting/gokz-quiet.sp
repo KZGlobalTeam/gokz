@@ -183,7 +183,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	}
 	
 	gTM_Options = topMenu;
-	gTMO_CatGeneral = gTM_Options.FindCategory(OPTIONS_MENU_CAT_GENERAL);
+	gTMO_CatGeneral = gTM_Options.FindCategory(GENERAL_OPTION_CATEGORY);
 	
 	// Add gokz-quiet option items	
 	for (int option = 0; option < view_as<int>(QTOPTION_COUNT); option++)

@@ -147,5 +147,5 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 
 static void CreateRegexes()
 {
-	gRE_BonusStartButton = CompileRegex("^climb_bonus(\\d+)_startbutton$");
+	gRE_BonusStartButton = CompileRegex(GOKZ_BONUS_START_BUTTON_NAME_REGEX);
 } 

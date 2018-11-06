@@ -1,36 +1,3 @@
-/*
-	Timer
-	
-	Used to record how long the player takes to complete map courses.
-*/
-
-
-
-#define TIMER_START_MIN_TICKS_ON_GROUND 4
-
-static const char startSounds[MODE_COUNT][] = 
-{
-	"common/wpn_select.wav", 
-	"buttons/button9.wav", 
-	"buttons/button3.wav"
-};
-
-static const char endSounds[MODE_COUNT][] = 
-{
-	"common/wpn_select.wav", 
-	"buttons/bell1.wav", 
-	"buttons/button3.wav"
-};
-
-static const char falseEndSounds[MODE_COUNT][] = 
-{
-	"common/wpn_select.wav", 
-	"buttons/button11.wav", 
-	"buttons/button2.wav"
-};
-
-static const char stopSound[] = "buttons/button18.wav";
-
 static bool timerRunning[MAXPLAYERS + 1];
 static float currentTime[MAXPLAYERS + 1];
 static int currentCourse[MAXPLAYERS + 1];
@@ -85,7 +52,7 @@ int GetCurrentTimeType(int client)
 void TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
-		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= TIMER_START_MIN_TICKS_ON_GROUND) && !allowOffGround
+		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS) && !allowOffGround
 		 || !IsPlayerValidMoveType(client)
 		 || JustStartedTimer(client))
 	{
@@ -190,9 +157,9 @@ void TimerStopAll(bool playSound = true)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
 
-void SetupClientTimer(int client)
+void OnClientPutInServer_Timer(int client)
 {
 	timerRunning[client] = false;
 	hasStartedTimerThisMap[client] = false;
@@ -202,7 +169,7 @@ void SetupClientTimer(int client)
 	lastFalseEndTime[client] = 0.0;
 }
 
-void OnPlayerRunCmd_Timer(int client)
+void OnPlayerRunCmdPost_Timer(int client)
 {
 	if (IsPlayerAlive(client) && GetTimerRunning(client) && !GetPaused(client))
 	{
@@ -291,26 +258,26 @@ static bool JustFalseEndedTimer(int client)
 
 static void PlayTimerStartSound(int client)
 {
-	EmitSoundToClient(client, startSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, startSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClient(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 }
 
 static void PlayTimerEndSound(int client)
 {
-	EmitSoundToClient(client, endSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, endSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClient(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 }
 
 static void PlayTimerFalseEndSound(int client)
 {
-	EmitSoundToClient(client, falseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, falseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClient(client, gC_ModeFalseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	EmitSoundToClientSpectators(client, gC_ModeFalseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 }
 
 static void PlayTimerStopSound(int client)
 {
-	EmitSoundToClient(client, stopSound);
-	EmitSoundToClientSpectators(client, stopSound);
+	EmitSoundToClient(client, GOKZ_SOUND_TIMER_STOP);
+	EmitSoundToClientSpectators(client, GOKZ_SOUND_TIMER_STOP);
 }
 
 static void PrintEndTimeString(int client)

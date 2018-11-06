@@ -1,66 +1,8 @@
-/*
-	Options
-	
-	Player options to customise their experience.
-*/
-
-
-
-#define OPTION_DESCRIPTION_PREFIX "GOKZ - "
-#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
-
 static StringMap options;
-
-static const int defaultDefaultValues[OPTION_COUNT] = 
-{
-	Mode_SimpleKZ, 
-	Style_Normal, 
-	AutoRestart_Disabled, 
-	SlayOnEnd_Disabled, 
-	CheckpointMessages_Disabled, 
-	CheckpointSounds_Enabled, 
-	TeleportSounds_Disabled, 
-	ErrorSounds_Enabled
-};
-
-static const int optionCounts[OPTION_COUNT] = 
-{
-	MODE_COUNT, 
-	STYLE_COUNT, 
-	AUTORESTART_COUNT, 
-	SLAYONEND_COUNT, 
-	CHECKPOINTMESSAGES_COUNT, 
-	CHECKPOINTSOUNDS_COUNT, 
-	TELEPORTSOUNDS_COUNT, 
-	ERRORSOUNDS_COUNT
-};
-
-static const char optionDescription[OPTION_COUNT][] = 
-{
-	"Movement mode", 
-	"Movement style", 
-	"Automatic timer restart upon teleport to start", 
-	"Automatic slay upon end", 
-	"Checkpoint messages", 
-	"Checkpoint sounds", 
-	"Teleport sounds", 
-	"Error sounds"
-};
 
 
 
 // =====[ PUBLIC ]=====
-
-void CreateOptions()
-{
-	options = new StringMap();
-	
-	for (Option option; option < OPTION_COUNT; option++)
-	{
-		RegisterOption(gC_CoreOptionNames[option], optionDescription[option], 
-			OptionType_Int, defaultDefaultValues[option], 0, optionCounts[option] - 1);
-	}
-}
 
 bool RegisterOption(const char[] name, const char[] description, OptionType type, any defaultValue, any minValue, any maxValue)
 {
@@ -72,7 +14,7 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 	
 	char prefixedDescription[255];
 	FormatEx(prefixedDescription, sizeof(prefixedDescription), "%s%s", 
-		OPTION_DESCRIPTION_PREFIX, 
+		GOKZ_OPTION_DESC_PREFIX, 
 		description);
 	
 	Handle cookie = IsRegisteredOption(name) ? GetOptionProp(name, OptionProp_Cookie)
@@ -242,7 +184,18 @@ bool IsRegisteredOption(const char[] option)
 
 
 
-// =====[ LISTENERS ]=====
+// =====[ EVENTS ]=====
+
+void OnPluginStart_Options()
+{
+	options = new StringMap();
+	
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		RegisterOption(gC_CoreOptionNames[option], gC_CoreOptionDescriptions[option], 
+			OptionType_Int, gI_CoreOptionDefaults[option], 0, gI_CoreOptionCounts[option] - 1);
+	}
+}
 
 void OnClientCookiesCached_Options(int client)
 {
@@ -346,9 +299,9 @@ static void LoadDefaultOptions()
 {
 	KeyValues kv = new KeyValues("options");
 	
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	if (!kv.ImportFromFile(GOKZ_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
+		LogError("Could not read default options config file: %s", GOKZ_CFG_OPTIONS);
 		return;
 	}
 	

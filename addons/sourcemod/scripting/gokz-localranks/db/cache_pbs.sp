@@ -11,7 +11,7 @@ void DB_CachePBs(int client, int steamID)
 	Transaction txn = SQL_CreateTransaction();
 	
 	// Reset PB exists array
-	for (int course = 0; course < MAX_COURSES; course++)
+	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
 	{
 		for (int mode = 0; mode < MODE_COUNT; mode++)
 		{

@@ -1,7 +1,8 @@
 /*
-	Options Top Menu
+	TopMenu that allows users to browse categories of options.
 	
-	Top menu for presenting option categories.
+	Adds core options to the general category where players
+	can cycle the value of each core option.
 */
 
 
@@ -10,18 +11,6 @@ static TopMenu optionsMenu;
 static TopMenuObject catGeneral;
 static TopMenuObject itemsGeneral[OPTION_COUNT];
 static bool cameFromOptionsMenu[MAXPLAYERS + 1];
-
-static char optionDisplayPhrases[OPTION_COUNT][] = 
-{
-	"Options Menu - Mode", 
-	"Options Menu - Style", 
-	"Options Menu - Auto Restart", 
-	"Options Menu - Slay On End", 
-	"Options Menu - Checkpoint Messages", 
-	"Options Menu - Checkpoint Sounds", 
-	"Options Menu - Teleport Sounds", 
-	"Options Menu - Error Sounds"
-};
 
 
 
@@ -52,7 +41,7 @@ void OnAllPluginsLoaded_OptionsMenu()
 	optionsMenu = new TopMenu(TopMenuHandler_Options);
 	
 	// Add general options category and items
-	catGeneral = optionsMenu.AddCategory(OPTIONS_MENU_CAT_GENERAL, TopMenuHandler_Options);
+	catGeneral = optionsMenu.AddCategory(GENERAL_OPTION_CATEGORY, TopMenuHandler_Options);
 	for (int option = 0; option < view_as<int>(OPTION_COUNT); option++)
 	{
 		if (option == view_as<int>(Option_Style))
@@ -109,7 +98,7 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 			case Option_Mode:
 			{
 				FormatEx(buffer, maxlength, "%T - %s", 
-					optionDisplayPhrases[option], param, 
+					gC_CoreOptionPhrases[option], param, 
 					gC_ModeNames[GOKZ_GetCoreOption(param, option)]);
 			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
@@ -142,13 +131,13 @@ static void FormatToggleableOptionDisplay(int client, Option option, char[] buff
 	if (GOKZ_GetCoreOption(client, option) == 0)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gC_CoreOptionPhrases[option], client, 
 			"Options Menu - Disabled", client);
 	}
 	else
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
-			optionDisplayPhrases[option], client, 
+			gC_CoreOptionPhrases[option], client, 
 			"Options Menu - Enabled", client);
 	}
 } 

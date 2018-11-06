@@ -266,7 +266,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	}
 	
 	gTM_Options = topMenu;
-	gTMO_CatGeneral = gTM_Options.FindCategory(OPTIONS_MENU_CAT_GENERAL);
+	gTMO_CatGeneral = gTM_Options.FindCategory(GENERAL_OPTION_CATEGORY);
 	
 	for (int option = 0; option < view_as<int>(JBOPTION_COUNT); option++)
 	{

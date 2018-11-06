@@ -15,7 +15,7 @@ void DB_SetupMapCourses()
 	{
 		if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
 		{
-			if (StrEqual("climb_startbutton", tempString, false))
+			if (StrEqual(GOKZ_START_BUTTON_NAME, tempString, false))
 			{
 				switch (g_DBType)
 				{

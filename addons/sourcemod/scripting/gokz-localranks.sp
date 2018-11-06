@@ -34,11 +34,11 @@ public Plugin myinfo =
 bool gB_GOKZGlobal;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
-bool gB_RecordExistsCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
-float gF_RecordTimesCache[MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+bool gB_RecordExistsCache[GOKZ_MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+float gF_RecordTimesCache[GOKZ_MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_RecordMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
-bool gB_PBExistsCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
-float gF_PBTimesCache[MAXPLAYERS + 1][MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+bool gB_PBExistsCache[MAXPLAYERS + 1][GOKZ_MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
+float gF_PBTimesCache[MAXPLAYERS + 1][GOKZ_MAX_COURSES][MODE_COUNT][TIMETYPE_COUNT];
 bool gB_PBMissed[MAXPLAYERS + 1][TIMETYPE_COUNT];
 char gC_BeatRecordSound[256];
 
