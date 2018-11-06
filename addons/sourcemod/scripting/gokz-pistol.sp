@@ -43,6 +43,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-pistol.phrases");
 	
+	HookEvents();
 	RegisterCommands();
 }
 
@@ -93,6 +94,15 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
 	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+
+
+// =====[ GENERAL ]=====
+
+void HookEvents()
+{
+	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 }
 
 
