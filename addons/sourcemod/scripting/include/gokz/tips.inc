@@ -24,12 +24,24 @@ enum
 
 // =====[ CONSTANTS ]=====
 
+#define TIPS_PLUGINS_COUNT 9
+#define TIPS_CORE "gokz-tips-core.phrases.txt"
+#define TIPS_TIPS "gokz-tips-tips.phrases.txt"
 #define TIPS_OPTION_NAME "tips"
 #define TIPS_OPTION_DESCRIPTION "Tips"
-#define TIPS_CORE "gokz-tips-core.phrases.txt"
-#define TIPS_LOCALRANKS "gokz-tips-localranks.phrases.txt"
-#define TIPS_REPLAYS "gokz-tips-replays.phrases.txt"
-#define TIPS_JUMPSTATS "gokz-tips-jumpstats.phrases.txt"
+
+stock char gC_PluginsWithTips[TIPS_PLUGINS_COUNT][] = 
+{
+	"goto", 
+	"hud", 
+	"jumpstats", 
+	"localranks", 
+	"measure", 
+	"pistol", 
+	"quiet", 
+	"replays", 
+	"spec"
+}
 
 
 

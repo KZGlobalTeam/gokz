@@ -22,16 +22,14 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-tips.txt"
 
-bool gB_GOKZLocalRanks;
-bool gB_GOKZReplays;
-bool gB_GOKZJumpstats;
-ConVar gCV_gokz_tips_interval;
+bool gC_PluginsWithTipsLoaded[TIPS_PLUGINS_COUNT];
 ArrayList g_TipPhrases;
 int gI_CurrentTip;
 Handle gH_TipTimer;
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
 TopMenuObject gTMO_ItemTips;
+ConVar gCV_gokz_tips_interval;
 
 
 
@@ -47,10 +45,16 @@ public void OnPluginStart()
 {
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-tips.phrases");
-	LoadTranslations(TIPS_CORE);
-	LoadTranslations(TIPS_LOCALRANKS);
-	LoadTranslations(TIPS_REPLAYS);
-	LoadTranslations(TIPS_JUMPSTATS);
+	LoadTranslations("gokz-tips-tips.phrases");
+	LoadTranslations("gokz-tips-core.phrases");
+	
+	// Load translations of tips for other GOKZ plugins
+	char translation[PLATFORM_MAX_PATH];
+	for (int i = 0; i < TIPS_PLUGINS_COUNT; i++)
+	{
+		FormatEx(translation, sizeof(translation), "gokz-tips-%s.phrases", gC_PluginsWithTips[i]);
+		LoadTranslations(translation);
+	}
 	
 	CreateConVars();
 	RegisterCommands();
@@ -61,12 +65,16 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	gB_GOKZLocalRanks = LibraryExists("gokz-localranks");
-	gB_GOKZReplays = LibraryExists("gokz-replays");
-	gB_GOKZJumpstats = LibraryExists("gokz-jumpstats");
 	if (LibraryExists("updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
+	}
+	
+	char gokzPlugin[PLATFORM_MAX_PATH];
+	for (int i = 0; i < TIPS_PLUGINS_COUNT; i++)
+	{
+		FormatEx(gokzPlugin, sizeof(gokzPlugin), "gokz-%s", gC_PluginsWithTips[i]);
+		gC_PluginsWithTipsLoaded[i] = LibraryExists(gokzPlugin);
 	}
 	
 	OnAllPluginsLoaded_Options();
@@ -75,20 +83,27 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	gB_GOKZLocalRanks = gB_GOKZLocalRanks || StrEqual(name, "gokz-localranks");
-	gB_GOKZReplays = gB_GOKZReplays || StrEqual(name, "gokz-replays");
-	gB_GOKZJumpstats = gB_GOKZJumpstats || StrEqual(name, "gokz-jumpstats");
 	if (StrEqual(name, "updater"))
 	{
 		Updater_AddPlugin(UPDATE_URL);
+	}
+	
+	char gokzPlugin[PLATFORM_MAX_PATH];
+	for (int i = 0; i < TIPS_PLUGINS_COUNT; i++)
+	{
+		FormatEx(gokzPlugin, sizeof(gokzPlugin), "gokz-%s", gC_PluginsWithTips[i]);
+		gC_PluginsWithTipsLoaded[i] = gC_PluginsWithTipsLoaded[i] || StrEqual(name, gokzPlugin);
 	}
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	gB_GOKZLocalRanks = gB_GOKZLocalRanks && !StrEqual(name, "gokz-localranks");
-	gB_GOKZReplays = gB_GOKZReplays && !StrEqual(name, "gokz-replays");
-	gB_GOKZJumpstats = gB_GOKZJumpstats && !StrEqual(name, "gokz-jumpstats");
+	char gokzPlugin[PLATFORM_MAX_PATH];
+	for (int i = 0; i < TIPS_PLUGINS_COUNT; i++)
+	{
+		FormatEx(gokzPlugin, sizeof(gokzPlugin), "gokz-%s", gC_PluginsWithTips[i]);
+		gC_PluginsWithTipsLoaded[i] = gC_PluginsWithTipsLoaded[i] && !StrEqual(name, gokzPlugin);
+	}
 }
 
 
@@ -116,7 +131,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 void CreateConVars()
 {
-	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 5.0, false);
+	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 1.0, false);
 	gCV_gokz_tips_interval.AddChangeHook(OnConVarChanged);
 }
 
@@ -145,25 +160,20 @@ void LoadTipPhrases()
 	
 	char tipsPath[PLATFORM_MAX_PATH];
 	
+	BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_TIPS);
+	LoadTipPhrasesFromFile(tipsPath);
+	
 	BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_CORE);
 	LoadTipPhrasesFromFile(tipsPath);
 	
-	if (gB_GOKZLocalRanks)
+	// Load tips for other loaded GOKZ plugins
+	for (int i = 0; i < TIPS_PLUGINS_COUNT; i++)
 	{
-		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_LOCALRANKS);
-		LoadTipPhrasesFromFile(tipsPath);
-	}
-	
-	if (gB_GOKZReplays)
-	{
-		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_REPLAYS);
-		LoadTipPhrasesFromFile(tipsPath);
-	}
-	
-	if (gB_GOKZJumpstats)
-	{
-		BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/%s", TIPS_JUMPSTATS);
-		LoadTipPhrasesFromFile(tipsPath);
+		if (gC_PluginsWithTipsLoaded[i])
+		{
+			BuildPath(Path_SM, tipsPath, sizeof(tipsPath), "translations/gokz-tips-%s.phrases.txt", gC_PluginsWithTips[i]);
+			LoadTipPhrasesFromFile(tipsPath);
+		}
 	}
 	
 	ShuffleTipPhrases();
@@ -184,6 +194,8 @@ void LoadTipPhrasesFromFile(const char[] filePath)
 		kv.GetSectionName(phraseName, sizeof(phraseName));
 		g_TipPhrases.PushString(phraseName);
 	} while (kv.GotoNextKey(true));
+	
+	delete kv;
 }
 
 void ShuffleTipPhrases()

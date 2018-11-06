@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"!stopsound"
+	{
+		"en"		"{grey}Type {default}!stopsound {grey}to stop sounds such as map music."
+	}
+}
