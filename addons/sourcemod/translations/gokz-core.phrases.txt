@@ -104,11 +104,6 @@
 		"en"		"{darkred}You can't resume because you just paused."
 		"chi"		"{darkred}你刚刚才暂停计时,无法恢复计时."
 	}
-	"Stopped Sounds"
-	{
-		"en"		"{grey}You have stopped all sounds."
-		"chi"		"{grey}你屏蔽了所有音效."
-	}
 	"Switched Mode"
 	{
 		// You have switched to the Vanilla mode.

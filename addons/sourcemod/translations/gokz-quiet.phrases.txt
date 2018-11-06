@@ -1,6 +1,11 @@
 Phrases
 {
 	// =====[ CHAT MESSAGES ]=====
+	"Stopped Sounds"
+	{
+		"en"		"{grey}You have stopped all sounds."
+		"chi"		"{grey}你屏蔽了所有音效."
+	}
 	"Option - Show Players - Enable"
 	{
 		"en"		"{grey}You are now showing other players."

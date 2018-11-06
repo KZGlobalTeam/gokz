@@ -120,6 +120,16 @@ public Action OnSetTransmitClient(int entity, int client)
 
 
 
+// =====[ STOP SOUNDS ]=====
+
+void StopSounds(int client)
+{
+	ClientCommand(client, "snd_playsounds Music.StopAllExceptMusic");
+	GOKZ_PrintToChat(client, true, "%t", "Stopped Sounds");
+}
+
+
+
 // =====[ OPTIONS ]=====
 
 void OnOptionsMenuReady_Options()
@@ -252,6 +262,7 @@ void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, i
 void RegisterCommands()
 {
 	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
+	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
 }
 
 public Action CommandToggleShowPlayers(int client, int args)
@@ -264,5 +275,11 @@ public Action CommandToggleShowPlayers(int client, int args)
 	{
 		GOKZ_SetOption(client, gC_QTOptionNames[QTOption_ShowPlayers], ShowPlayers_Disabled);
 	}
+	return Plugin_Handled;
+}
+
+public Action CommandStopSound(int client, int args)
+{
+	StopSounds(client);
 	return Plugin_Handled;
 } 

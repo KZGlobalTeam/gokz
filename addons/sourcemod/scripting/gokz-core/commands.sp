@@ -15,7 +15,6 @@ void RegisterCommands()
 	RegConsoleCmd("sm_pause", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
-	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
 	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
@@ -123,12 +122,6 @@ public Action CommandStopTimer(int client, int args)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Timer Stopped");
 	}
-	return Plugin_Handled;
-}
-
-public Action CommandStopSound(int client, int args)
-{
-	StopSounds(client);
 	return Plugin_Handled;
 }
 

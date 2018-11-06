@@ -111,12 +111,6 @@ void PlayErrorSound(int client)
 
 // =====[ STOP SOUNDS ]=====
 
-void StopSounds(int client)
-{
-	ClientCommand(client, "snd_playsounds Music.StopAllExceptMusic");
-	GOKZ_PrintToChat(client, true, "%t", "Stopped Sounds");
-}
-
 Action OnNormalSound_StopSounds(int entity)
 {
 	char className[20];
