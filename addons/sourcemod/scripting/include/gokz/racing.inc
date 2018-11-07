@@ -1,0 +1,165 @@
+/* 	
+	gokz-racing Plugin Include
+	
+	Website: https://bitbucket.org/kztimerglobalteam/gokz
+*/
+
+#if defined _gokz_racing_included_
+#endinput
+#endif
+#define _gokz_racing_included_
+
+
+
+// =====[ ENUMS ]=====
+
+enum RaceInfo
+{
+	RaceInfo_ID, 
+	RaceInfo_Status, 
+	RaceInfo_HostUserID, 
+	RaceInfo_FinishedRacerCount, 
+	RaceInfo_Type, 
+	RaceInfo_Course, 
+	RaceInfo_Mode, 
+	RaceInfo_TeleportsRule, 
+	RACEINFO_COUNT
+};
+
+enum
+{
+	RaceType_Normal, 
+	RaceType_Duel, 
+	RACETYPE_COUNT
+};
+
+enum
+{
+	RaceStatus_Pending, 
+	RaceStatus_Countdown, 
+	RaceStatus_Started, 
+	RACESTATUS_COUNT
+};
+
+enum
+{
+	RacerStatus_Available, 
+	RacerStatus_Pending, 
+	RacerStatus_Accepted, 
+	RacerStatus_Racing, 
+	RacerStatus_Finished, 
+	RacerStatus_Surrendered, 
+	RACERSTATUS_COUNT
+};
+
+enum
+{
+	TeleportsRule_None, 
+	TeleportsRule_Unlimited, 
+	TELEPORTSRULE_COUNT
+};
+
+
+
+// =====[ CONSTANTS ]=====
+
+#define RC_COUNTDOWN_TIME 10
+#define RC_REQUEST_TIMEOUT_TIME 15
+
+// Translation phrases for the teleports rules
+stock char gC_TeleportRulePhrases[TELEPORTSRULE_COUNT][] = 
+{
+	"Teleport Rule - None", 
+	"Teleport Rule - Unlimited"
+};
+
+
+
+// =====[ FORWARDS ]=====
+
+/**
+ * Called when a player has finished their race.
+ *
+ * @param client		Client index.
+ * @param raceID		ID of the race.
+ * @param place			Final placement in the race.
+ * @noreturn
+ */
+forward void GOKZ_RC_OnFinish(int client, int raceID, int place);
+
+/**
+ * Called when a player has surrendered their race.
+ *
+ * @param client		Client index.
+ * @param raceID		ID of the race.
+ * @noreturn
+ */
+forward void GOKZ_RC_OnSurrender(int client, int raceID);
+
+/**
+ * Called when a player receives a race request.
+ *
+ * @param client		Client index.
+ * @param raceID		ID of the race.
+ * @noreturn
+ */
+forward void GOKZ_RC_OnRequestReceived(int client, int raceID)
+
+/**
+ * Called when a player accepts a race request.
+ *
+ * @param client		Client index.
+ * @param raceID		ID of the race.
+ * @noreturn
+ */
+forward void GOKZ_RC_OnRequestAccepted(int client, int raceID)
+
+/**
+ * Called when a player declines a race request.
+ *
+ * @param client		Client index.
+ * @param raceID		ID of the race.
+ * @param timeout		Whether it was because the request timed out.
+ * @noreturn
+ */
+forward void GOKZ_RC_OnRequestDeclined(int client, int raceID, bool timeout)
+
+
+
+// =====[ STOCKS ]=====
+
+/**
+ * Clears and populates a menu with an item for teleport rule
+ * in order of the teleport rule enumeration.
+ *
+ * @param client				Client index for translations.
+ * @param menu					Menu to populate items with.
+ * @noreturn
+ */
+stock void GOKZ_RC_MenuAddTeleportsRuleItems(int client, Menu menu)
+{
+	char display[32];
+	
+	menu.RemoveAllItems();
+	
+	for (int i = 0; i < TELEPORTSRULE_COUNT; i++)
+	{
+		FormatEx(display, sizeof(display), "%T", gC_TeleportRulePhrases[i], client);
+		menu.AddItem("", display);
+	}
+}
+
+
+
+// =====[ DEPENDENCY ]=====
+
+public SharedPlugin __pl_gokz_racing = 
+{
+	name = "gokz-racing", 
+	file = "gokz-racing.smx", 
+	#if defined REQUIRE_PLUGIN
+	required = 1, 
+	#else
+	required = 0, 
+	#endif
+}; 
