@@ -147,11 +147,8 @@ void GivePistol(int client, int pistol)
 	if (pistol == Pistol_Disabled)
 	{
 		// Force switch to knife to avoid weird behaviour
-		int knife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
-		if (knife != -1)
-		{
-			EquipPlayerWeapon(client, knife);
-		}
+		// Doesn't use EquipPlayerWeapon because server hangs when player spawns
+		FakeClientCommand(client, "use weapon_knife");
 	}
 	else
 	{
