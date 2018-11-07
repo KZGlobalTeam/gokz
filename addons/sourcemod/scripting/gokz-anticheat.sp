@@ -1,5 +1,6 @@
 #include <sourcemod>
 
+#include <autoexecconfig>
 #include <colorvariables>
 #include <gokz>
 
@@ -76,8 +77,6 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateGlobalForwards();
 	RegisterCommands();
-	
-	AutoExecConfig(true, "gokz-anticheat", "sourcemod/gokz");
 }
 
 public void OnAllPluginsLoaded()
@@ -167,8 +166,14 @@ void SuspectPlayer(int client, ACReason reason, const char[] notes, const char[]
 
 static void CreateConVars()
 {
-	gCV_gokz_autoban = CreateConVar("gokz_autoban", "1", "Whether to autoban players when they are suspected of cheating.", _, true, 0.0, true, 1.0);
-	gCV_gokz_autoban_duration = CreateConVar("gokz_autoban_duration", "0", "Duration of anticheat autobans in minutes (0 for permanent).", _, true, 0.0);
+	AutoExecConfig_SetFile("gokz-anticheat", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
+	
+	gCV_gokz_autoban = AutoExecConfig_CreateConVar("gokz_autoban", "1", "Whether to autoban players when they are suspected of cheating.", _, true, 0.0, true, 1.0);
+	gCV_gokz_autoban_duration = AutoExecConfig_CreateConVar("gokz_autoban_duration", "0", "Duration of anticheat autobans in minutes (0 for permanent).", _, true, 0.0);
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
 }
 
 static void LogSuspicion(int client, ACReason reason, const char[] notes, const char[] stats)

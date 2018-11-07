@@ -1,5 +1,7 @@
 #include <sourcemod>
 
+#include <autoexecconfig>
+
 #include <gokz/core>
 #include <gokz/tips>
 
@@ -59,8 +61,6 @@ public void OnPluginStart()
 	CreateConVars();
 	RegisterCommands();
 	CreateTipsTimer();
-	
-	AutoExecConfig(true, "gokz-tips", "sourcemod/gokz");
 }
 
 public void OnAllPluginsLoaded()
@@ -131,8 +131,14 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 void CreateConVars()
 {
-	gCV_gokz_tips_interval = CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 1.0, false);
+	AutoExecConfig_SetFile("gokz-tips", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
+	
+	gCV_gokz_tips_interval = AutoExecConfig_CreateConVar("gokz_tips_interval", "75", "How often GOKZ tips are printed to chat in seconds.", _, true, 1.0, false);
 	gCV_gokz_tips_interval.AddChangeHook(OnConVarChanged);
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
 }
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)

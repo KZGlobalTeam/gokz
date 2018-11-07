@@ -5,6 +5,7 @@
 #include <sdktools>
 #include <sdkhooks>
 
+#include <autoexecconfig>
 #include <colorvariables>
 #include <cstrike>
 #include <gokz>
@@ -98,8 +99,6 @@ public void OnPluginStart()
 	
 	OnPluginStart_MapButtons();
 	OnPluginStart_Options();
-	
-	AutoExecConfig(true, "gokz-core", "sourcemod/gokz");
 }
 
 public void OnAllPluginsLoaded()
@@ -344,7 +343,14 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 
 static void CreateConVars()
 {
-	gCV_gokz_chat_prefix = CreateConVar("gokz_chat_prefix", "{grey}[{green}KZ{grey}] ", "Chat prefix used for GOKZ messages.");
+	AutoExecConfig_SetFile("gokz-core", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
+	
+	gCV_gokz_chat_prefix = AutoExecConfig_CreateConVar("gokz_chat_prefix", "{grey}[{green}KZ{grey}] ", "Chat prefix used for GOKZ messages.");
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
+	
 	gCV_sv_full_alltalk = FindConVar("sv_full_alltalk");
 	
 	// Remove unwanted flags from constantly changed mode convars - replication is done manually in mode plugins

@@ -1,5 +1,6 @@
 #include <sourcemod>
 
+#include <autoexecconfig>
 #include <colorvariables>
 #include <cstrike>
 
@@ -111,8 +112,14 @@ public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcas
 
 void CreateConVars()
 {
-	gCV_gokz_chat_processing = CreateConVar("gokz_chat_processing", "1", "Whether GOKZ processes player chat messages.", _, true, 0.0, true, 1.0);
-	gCV_gokz_connection_messages = CreateConVar("gokz_connection_messages", "1", "Whether GOKZ handles connection and disconnection messages.", _, true, 0.0, true, 1.0);
+	AutoExecConfig_SetFile("gokz-chat", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
+	
+	gCV_gokz_chat_processing = AutoExecConfig_CreateConVar("gokz_chat_processing", "1", "Whether GOKZ processes player chat messages.", _, true, 0.0, true, 1.0);
+	gCV_gokz_connection_messages = AutoExecConfig_CreateConVar("gokz_connection_messages", "1", "Whether GOKZ handles connection and disconnection messages.", _, true, 0.0, true, 1.0);
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
 }
 
 void HookEvents()

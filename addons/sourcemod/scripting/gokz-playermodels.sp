@@ -1,5 +1,7 @@
 #include <sourcemod>
 
+#include <autoexecconfig>
+
 #include <cstrike>
 #include <sdktools>
 
@@ -97,11 +99,17 @@ void HookEvents()
 
 void CreateConVars()
 {
-	gCV_gokz_player_models = CreateConVar("gokz_player_models", "1", "Whether GOKZ sets player's models upon spawning.", _, true, 0.0, true, 1.0);
-	gCV_gokz_player_models_alpha = CreateConVar("gokz_player_models_alpha", "65", "Amount of alpha (transparency) to set player models to.", _, true, 0.0, true, 255.0);
-	gCV_sv_disable_immunity_alpha = FindConVar("sv_disable_immunity_alpha");
+	AutoExecConfig_SetFile("gokz-playermodels", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
 	
+	gCV_gokz_player_models = AutoExecConfig_CreateConVar("gokz_player_models", "1", "Whether GOKZ sets player's models upon spawning.", _, true, 0.0, true, 1.0);
+	gCV_gokz_player_models_alpha = AutoExecConfig_CreateConVar("gokz_player_models_alpha", "65", "Amount of alpha (transparency) to set player models to.", _, true, 0.0, true, 255.0);
 	gCV_gokz_player_models_alpha.AddChangeHook(OnConVarChanged);
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
+	
+	gCV_sv_disable_immunity_alpha = FindConVar("sv_disable_immunity_alpha");
 }
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)

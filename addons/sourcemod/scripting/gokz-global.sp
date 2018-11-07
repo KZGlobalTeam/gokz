@@ -2,6 +2,7 @@
 
 #include <sdktools>
 
+#include <autoexecconfig>
 #include <gokz>
 
 #include <GlobalAPI-Core>
@@ -319,8 +320,14 @@ void PlayBeatRecordSound()
 
 static void CreateConVars()
 {
-	gCV_gokz_settings_enforcer = CreateConVar("gokz_settings_enforcer", "1", "Whether GOKZ enforces convars required for global records.", _, true, 0.0, true, 1.0);
+	AutoExecConfig_SetFile("gokz-global", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
+	
+	gCV_gokz_settings_enforcer = AutoExecConfig_CreateConVar("gokz_settings_enforcer", "1", "Whether GOKZ enforces convars required for global records.", _, true, 0.0, true, 1.0);
 	gCV_gokz_settings_enforcer.AddChangeHook(OnConVarChanged);
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
 	
 	for (int i = 0; i < ENFORCEDCVAR_COUNT; i++)
 	{
