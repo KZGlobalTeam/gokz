@@ -26,7 +26,6 @@ public Plugin myinfo =
 #define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
 #define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
 
-ConVar gCV_gokz_player_models;
 ConVar gCV_gokz_player_models_alpha;
 ConVar gCV_sv_disable_immunity_alpha;
 
@@ -102,7 +101,6 @@ void CreateConVars()
 	AutoExecConfig_SetFile("gokz-playermodels", "sourcemod/gokz");
 	AutoExecConfig_SetCreateFile(true);
 	
-	gCV_gokz_player_models = AutoExecConfig_CreateConVar("gokz_player_models", "1", "Whether GOKZ sets player's models upon spawning.", _, true, 0.0, true, 1.0);
 	gCV_gokz_player_models_alpha = AutoExecConfig_CreateConVar("gokz_player_models_alpha", "65", "Amount of alpha (transparency) to set player models to.", _, true, 0.0, true, 255.0);
 	gCV_gokz_player_models_alpha.AddChangeHook(OnConVarChanged);
 	
@@ -132,11 +130,8 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] n
 
 void UpdatePlayerModel(int client)
 {
-	if (gCV_gokz_player_models.BoolValue)
-	{
-		// Do this after a delay so that gloves apply correctly after spawning
-		CreateTimer(0.1, Timer_UpdatePlayerModel, GetClientUserId(client));
-	}
+	// Do this after a delay so that gloves apply correctly after spawning
+	CreateTimer(0.1, Timer_UpdatePlayerModel, GetClientUserId(client));
 }
 
 public Action Timer_UpdatePlayerModel(Handle timer, int userid)
