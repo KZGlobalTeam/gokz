@@ -119,7 +119,7 @@ forward void GOKZ_RC_OnRequestAccepted(int client, int raceID)
  *
  * @param client		Client index.
  * @param raceID		ID of the race.
- * @param timeout		Whether it was because the request timed out.
+ * @param timeout		Whether the client was too late to respond.
  * @noreturn
  */
 forward void GOKZ_RC_OnRequestDeclined(int client, int raceID, bool timeout)

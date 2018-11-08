@@ -52,7 +52,7 @@ void StartRacer(int client)
 	
 	if (status[client] == RacerStatus_Pending)
 	{
-		ResetRacer(client);
+		DeclineRequest(client, true);
 		return;
 	}
 	
