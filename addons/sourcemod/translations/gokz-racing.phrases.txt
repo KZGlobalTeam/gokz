@@ -80,10 +80,6 @@
 		"#format"	"{1:N}"
 		"en"		"{lime}{1} {grey}has declined."
 	}
-	"Race Request Sent"
-	{
-		"en"		"{grey}You have invited everyone to race."
-	}
 	"Race Request Received"
 	{
 		// You have been invited to a race hosted by Bob.
@@ -92,9 +88,9 @@
 	}
 	"Race Request Accepted"
 	{
-		// Alice has accepted a race hosted by Bob!
+		// Alice has accepted the race hosted by Bob!
 		"#format"	"{1:N},{2:N}"
-		"en"		"{lime}{1} {grey}has accepted a race hosted by {lime}{2}{grey}!"
+		"en"		"{lime}{1} {grey}has accepted the race hosted by {lime}{2}{grey}!"
 	}
 	"Race Request Not Accepted In Time (Host)"
 	{
@@ -106,11 +102,11 @@
 	{
 		"en"		"{grey}You did not respond to the race invitation in time."
 	}
-	"Race Started"
+	"Race Host Started Countdown"
 	{
-		// Alice has started the race!
+		// Alice has started the countdown! Get ready!
 		"#format"	"{1:N}"
-		"en"		"{lime}{1} {grey}has started the race!"
+		"en"		"{lime}{1} {grey}has started the countdown! Get ready!"
 	}
 	"Race Won"
 	{
@@ -126,13 +122,13 @@
 	}
 	"Race Lost"
 	{
-		// Alice lost the race. [#5]
+		// Alice lost the race! [#5]
 		"#format"	"{1:N},{2:d}"
-		"en"		"{lime}{1} {grey}lost the race. [#{default}{2}{grey}]"
+		"en"		"{lime}{1} {grey}lost the race! [#{default}{2}{grey}]"
 	}
 	"Race Surrendered"
 	{
-		// Alice has surrendered.
+		// Alice has surrendered!
 		"#format"	"{1:N}"
 		"en"		"{lime}{1} {grey}has surrendered!"
 	}
@@ -144,7 +140,7 @@
 	}
 	"Duel Request Received"
 	{
-		// Alice has challenged you to a duel.
+		// Alice has challenged you to a duel!
 		"#format"	"{1:N}"
 		"en"		"{lime}{1} {grey}has challenged you to a duel!"
 	}

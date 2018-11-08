@@ -103,6 +103,44 @@ int GetAcceptedRacersCount(int raceID)
 
 // =====[ ANNOUNCEMENTS ]=====
 
+/**
+ * Prints a message to chat for all clients in a race, formatting colours 
+ * and optionally adding the chat prefix. If using the chat prefix, specify
+ * a colour at the beginning of the message e.g. "{default}Hello!".
+ *
+ * @param raceID		ID of the race.
+ * @param specs			Whether to also include racer spectators.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ */
+void PrintToChatAllInRace(int raceID, bool specs, bool addPrefix, const char[] format, any...)
+{
+	char buffer[1024];
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client) && GetRaceID(client) == raceID)
+		{
+			SetGlobalTransTarget(client);
+			VFormat(buffer, sizeof(buffer), format, 5);
+			GOKZ_PrintToChat(client, addPrefix, buffer);
+			
+			if (specs)
+			{
+				for (int target = 1; target <= MaxClients; target++)
+				{
+					if (IsClientInGame(target) && GetObserverTarget(target) == client)
+					{
+						SetGlobalTransTarget(target);
+						VFormat(buffer, sizeof(buffer), format, 5);
+						GOKZ_PrintToChat(target, addPrefix, buffer);
+					}
+				}
+			}
+		}
+	}
+}
+
 void AnnounceRaceFinish(int client, int raceID, int place)
 {
 	switch (GetRaceInfo(raceID, RaceInfo_Type))
@@ -111,18 +149,18 @@ void AnnounceRaceFinish(int client, int raceID, int place)
 		{
 			if (place == 1)
 			{
-				GOKZ_PrintToChatAll(true, "%t", "Race Won", client);
+				PrintToChatAllInRace(raceID, true, true, "%t", "Race Won", client);
 			}
 			else
 			{
 				ArrayList unfinishedRacers = GetUnfinishedRacers(raceID);
 				if (unfinishedRacers.Length >= 1)
 				{
-					GOKZ_PrintToChatAll(true, "%t", "Race Placed", client, place);
+					PrintToChatAllInRace(raceID, true, true, "%t", "Race Placed", client, place);
 				}
 				else
 				{
-					GOKZ_PrintToChatAll(true, "%t", "Race Lost", client, place);
+					PrintToChatAllInRace(raceID, true, true, "%t", "Race Lost", client, place);
 				}
 				delete unfinishedRacers;
 			}
@@ -146,7 +184,7 @@ void AnnounceRaceSurrender(int client, int raceID)
 	{
 		case RaceType_Normal:
 		{
-			GOKZ_PrintToChatAll(true, "%t", "Race Surrendered", client);
+			PrintToChatAllInRace(raceID, true, true, "%t", "Race Surrendered", client);
 		}
 		case RaceType_Duel:
 		{
@@ -191,7 +229,7 @@ void AnnounceRequestAccepted(int client, int raceID)
 	{
 		case RaceType_Normal:
 		{
-			GOKZ_PrintToChatAll(true, "%t", "Race Request Accepted", client, host);
+			PrintToChatAllInRace(raceID, true, true, "%t", "Race Request Accepted", client, host);
 		}
 		case RaceType_Duel:
 		{

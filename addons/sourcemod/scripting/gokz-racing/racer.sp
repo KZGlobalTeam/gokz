@@ -28,6 +28,17 @@ static void ResetRacer(int client)
 	currentRaceID[client] = -1;
 }
 
+static void ResetRacersInRace(int raceID)
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (currentRaceID[client] == raceID)
+		{
+			ResetRacer(client);
+		}
+	}
+}
+
 
 
 // =====[ RACING ]=====
@@ -67,8 +78,7 @@ bool FinishRacer(int client)
 	
 	Call_OnFinish(client, raceID, place);
 	
-	ResetRacer(client);
-	TryFinishLastRemainingRacer(raceID);
+	CheckRaceFinished(raceID);
 	
 	return true;
 }
@@ -86,19 +96,22 @@ bool SurrenderRacer(int client)
 	
 	Call_OnSurrender(client, raceID);
 	
-	ResetRacer(client);
-	TryFinishLastRemainingRacer(raceID);
+	CheckRaceFinished(raceID);
 	
 	return true;
 }
 
-static void TryFinishLastRemainingRacer(int raceID)
+static void CheckRaceFinished(int raceID)
 {
 	ArrayList remainingRacers = GetUnfinishedRacers(raceID);
 	if (remainingRacers.Length == 1)
 	{
 		int lastRacer = remainingRacers.Get(0);
 		FinishRacer(lastRacer);
+	}
+	else if (remainingRacers.Length == 0)
+	{
+		ResetRacersInRace(raceID);
 	}
 	delete remainingRacers;
 }
@@ -170,7 +183,7 @@ bool StartHostedRace(int client)
 	{
 		if (GetRaceInfo(raceID, RaceInfo_Type) == RaceType_Normal)
 		{
-			GOKZ_PrintToChatAll(true, "%t", "Race Started", client);
+			PrintToChatAllInRace(raceID, true, true, "%t", "Race Host Started Countdown", client);
 		}
 		return true;
 	}
