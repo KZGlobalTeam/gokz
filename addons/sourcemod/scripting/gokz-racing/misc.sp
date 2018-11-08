@@ -18,7 +18,7 @@ bool InStartedRace(int client)
 
 bool InCountdown(int client)
 {
-	return InRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Countdown;
+	return GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Countdown;
 }
 
 bool InRaceMode(int client)
@@ -49,7 +49,7 @@ bool IsAllowedToTeleport(int client)
 
 bool IsRaceHost(int client)
 {
-	return InRace(client) && GetRaceHost(GetRaceID(client)) == client;
+	return GetRaceHost(GetRaceID(client)) == client;
 }
 
 int GetRaceHost(int raceID)
@@ -62,7 +62,7 @@ ArrayList GetUnfinishedRacers(int raceID)
 	ArrayList racers = new ArrayList();
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (InRace(i) && GetRaceID(i) == raceID && !IsFinished(i))
+		if (GetRaceID(i) == raceID && !IsFinished(i))
 		{
 			racers.Push(i);
 		}
@@ -83,7 +83,7 @@ ArrayList GetAcceptedRacers(int raceID)
 	ArrayList racers = new ArrayList();
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (InRace(i) && GetRaceID(i) == raceID && IsAccepted(i))
+		if (GetRaceID(i) == raceID && IsAccepted(i))
 		{
 			racers.Push(i);
 		}
