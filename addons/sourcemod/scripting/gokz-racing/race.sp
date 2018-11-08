@@ -14,6 +14,33 @@ static int lastRaceID;
 
 // =====[ GENERAL ]=====
 
+int GetRaceInfo(int raceID, RaceInfo infoIndex)
+{
+	ArrayList info;
+	if (raceInfo.GetValue(IntToStringEx(raceID), info))
+	{
+		return info.Get(view_as<int>(infoIndex));
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+static bool SetRaceInfo(int raceID, RaceInfo infoIndex, int value)
+{
+	ArrayList info;
+	if (raceInfo.GetValue(IntToStringEx(raceID), info))
+	{
+		info.Set(view_as<int>(infoIndex), value);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 bool IsValidRaceID(int raceID)
 {
 	any dummy;
@@ -25,6 +52,53 @@ int IncrementFinishedRacerCount(int raceID)
 	int finishedRacers = GetRaceInfo(raceID, RaceInfo_FinishedRacerCount) + 1;
 	SetRaceInfo(raceID, RaceInfo_FinishedRacerCount, finishedRacers);
 	return finishedRacers;
+}
+
+int GetRaceHost(int raceID)
+{
+	return GetClientOfUserId(GetRaceInfo(raceID, RaceInfo_HostUserID));
+}
+
+ArrayList GetUnfinishedRacers(int raceID)
+{
+	ArrayList racers = new ArrayList();
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (GetRaceID(i) == raceID && !IsFinished(i))
+		{
+			racers.Push(i);
+		}
+	}
+	return racers;
+}
+
+int GetUnfinishedRacersCount(int raceID)
+{
+	ArrayList racers = GetUnfinishedRacers(raceID);
+	int count = racers.Length;
+	delete racers;
+	return count;
+}
+
+ArrayList GetAcceptedRacers(int raceID)
+{
+	ArrayList racers = new ArrayList();
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (GetRaceID(i) == raceID && IsAccepted(i))
+		{
+			racers.Push(i);
+		}
+	}
+	return racers;
+}
+
+int GetAcceptedRacersCount(int raceID)
+{
+	ArrayList racers = GetAcceptedRacers(raceID);
+	int count = racers.Length;
+	delete racers;
+	return count;
 }
 
 
@@ -62,37 +136,6 @@ static void UnregisterRace(int raceID)
 
 
 
-// =====[ RACE INFO ]=====
-
-int GetRaceInfo(int raceID, RaceInfo infoIndex)
-{
-	ArrayList info;
-	if (raceInfo.GetValue(IntToStringEx(raceID), info))
-	{
-		return info.Get(view_as<int>(infoIndex));
-	}
-	else
-	{
-		return -1;
-	}
-}
-
-static bool SetRaceInfo(int raceID, RaceInfo infoIndex, int value)
-{
-	ArrayList info;
-	if (raceInfo.GetValue(IntToStringEx(raceID), info))
-	{
-		info.Set(view_as<int>(infoIndex), value);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-
-
 // =====[ START ]=====
 
 bool StartRace(int raceID)
@@ -110,6 +153,8 @@ bool StartRace(int raceID)
 	StartCountdownHUD(raceID);
 	CreateTimer(float(RC_COUNTDOWN_TIME), Timer_EndCountdown, raceID);
 	
+	Call_OnRaceStarted(raceID);
+	
 	return true;
 }
 
@@ -124,6 +169,8 @@ public Action Timer_EndCountdown(Handle timer, int raceID)
 
 bool AbortRace(int raceID)
 {
+	Call_OnRaceAborted(raceID); // Call before aborting so race is accessible
+	
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (GetRaceID(client) == raceID)
@@ -131,6 +178,7 @@ bool AbortRace(int raceID)
 			AbortRacer(client);
 		}
 	}
+	
 	UnregisterRace(raceID);
 	
 	return true;

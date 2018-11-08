@@ -3,6 +3,8 @@ static Handle H_OnSurrender;
 static Handle H_OnRequestReceived;
 static Handle H_OnRequestAccepted;
 static Handle H_OnRequestDeclined;
+static Handle H_OnRaceStarted;
+static Handle H_OnRaceAborted;
 
 
 
@@ -15,6 +17,8 @@ void CreateGlobalForwards()
 	H_OnRequestReceived = CreateGlobalForward("GOKZ_RC_OnRequestReceived", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnRequestAccepted = CreateGlobalForward("GOKZ_RC_OnRequestAccepted", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnRequestDeclined = CreateGlobalForward("GOKZ_RC_OnRequestDeclined", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+	H_OnRaceStarted = CreateGlobalForward("GOKZ_RC_OnRaceStarted", ET_Ignore, Param_Cell);
+	H_OnRaceAborted = CreateGlobalForward("GOKZ_RC_OnRaceAborted", ET_Ignore, Param_Cell);
 }
 
 void Call_OnFinish(int client, int raceID, int place)
@@ -56,5 +60,19 @@ void Call_OnRequestDeclined(int client, int raceID, bool timeout)
 	Call_PushCell(client);
 	Call_PushCell(raceID);
 	Call_PushCell(timeout);
+	Call_Finish();
+}
+
+void Call_OnRaceStarted(int raceID)
+{
+	Call_StartForward(H_OnRaceStarted);
+	Call_PushCell(raceID);
+	Call_Finish();
+}
+
+void Call_OnRaceAborted(int raceID)
+{
+	Call_StartForward(H_OnRaceAborted);
+	Call_PushCell(raceID);
 	Call_Finish();
 } 

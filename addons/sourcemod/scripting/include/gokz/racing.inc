@@ -83,7 +83,6 @@ stock char gC_TeleportRulePhrases[TELEPORTRULE_COUNT][] =
  * @param client		Client index.
  * @param raceID		ID of the race.
  * @param place			Final placement in the race.
- * @noreturn
  */
 forward void GOKZ_RC_OnFinish(int client, int raceID, int place);
 
@@ -92,7 +91,6 @@ forward void GOKZ_RC_OnFinish(int client, int raceID, int place);
  *
  * @param client		Client index.
  * @param raceID		ID of the race.
- * @noreturn
  */
 forward void GOKZ_RC_OnSurrender(int client, int raceID);
 
@@ -101,7 +99,6 @@ forward void GOKZ_RC_OnSurrender(int client, int raceID);
  *
  * @param client		Client index.
  * @param raceID		ID of the race.
- * @noreturn
  */
 forward void GOKZ_RC_OnRequestReceived(int client, int raceID)
 
@@ -110,7 +107,6 @@ forward void GOKZ_RC_OnRequestReceived(int client, int raceID)
  *
  * @param client		Client index.
  * @param raceID		ID of the race.
- * @noreturn
  */
 forward void GOKZ_RC_OnRequestAccepted(int client, int raceID)
 
@@ -120,9 +116,22 @@ forward void GOKZ_RC_OnRequestAccepted(int client, int raceID)
  * @param client		Client index.
  * @param raceID		ID of the race.
  * @param timeout		Whether the client was too late to respond.
- * @noreturn
  */
 forward void GOKZ_RC_OnRequestDeclined(int client, int raceID, bool timeout)
+
+/**
+ * Called when a race is being starting.
+ *
+ * @param raceID		ID of the race.
+ */
+forward void GOKZ_RC_OnRaceStarted(int raceID);
+
+/**
+ * Called when a race is being aborted.
+ *
+ * @param raceID		ID of the race.
+ */
+forward void GOKZ_RC_OnRaceAborted(int raceID);
 
 
 
@@ -134,7 +143,6 @@ forward void GOKZ_RC_OnRequestDeclined(int client, int raceID, bool timeout)
  *
  * @param client				Client index for translations.
  * @param menu					Menu to populate items with.
- * @noreturn
  */
 stock void GOKZ_RC_MenuAddTeleportRuleItems(int client, Menu menu)
 {

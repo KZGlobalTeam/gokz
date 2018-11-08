@@ -5,34 +5,80 @@
 
 
 
-static int status[MAXPLAYERS + 1];
-static int currentRaceID[MAXPLAYERS + 1];
+static int racerStatus[MAXPLAYERS + 1];
+static int racerRaceID[MAXPLAYERS + 1];
 
 
 
 // =====[ GENERAL ]=====
 
-int GetRacerStatus(int client)
+int GetStatus(int client)
 {
-	return status[client];
+	return racerStatus[client];
 }
 
 int GetRaceID(int client)
 {
-	return currentRaceID[client];
+	return racerRaceID[client];
+}
+
+bool InRace(int client)
+{
+	return GetStatus(client) != RacerStatus_Available;
+}
+
+bool InStartedRace(int client)
+{
+	return GetStatus(client) == RacerStatus_Racing;
+}
+
+bool InCountdown(int client)
+{
+	return GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Countdown;
+}
+
+bool InRaceMode(int client)
+{
+	return GOKZ_GetCoreOption(client, Option_Mode) == GetRaceInfo(GetRaceID(client), RaceInfo_Mode);
+}
+
+bool IsRaceCourse(int client, int course)
+{
+	return course == GetRaceInfo(GetRaceID(client), RaceInfo_Course);
+}
+
+bool IsFinished(int client)
+{
+	int status = GetStatus(client);
+	return status == RacerStatus_Finished || status == RacerStatus_Surrendered;
+}
+
+bool IsAccepted(int client)
+{
+	return GetStatus(client) == RacerStatus_Accepted;
+}
+
+bool IsAllowedToTeleport(int client)
+{
+	return !(InStartedRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_TeleportRule) == TeleportRule_None);
+}
+
+bool IsRaceHost(int client)
+{
+	return GetRaceHost(GetRaceID(client)) == client;
 }
 
 static void ResetRacer(int client)
 {
-	status[client] = RacerStatus_Available;
-	currentRaceID[client] = -1;
+	racerStatus[client] = RacerStatus_Available;
+	racerRaceID[client] = -1;
 }
 
 static void ResetRacersInRace(int raceID)
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (currentRaceID[client] == raceID)
+		if (racerRaceID[client] == raceID)
 		{
 			ResetRacer(client);
 		}
@@ -45,35 +91,35 @@ static void ResetRacersInRace(int raceID)
 
 void StartRacer(int client)
 {
-	if (!InRace(client))
-	{
-		return;
-	}
-	
-	if (status[client] == RacerStatus_Pending)
+	if (racerStatus[client] == RacerStatus_Pending)
 	{
 		DeclineRequest(client, true);
 		return;
 	}
 	
-	status[client] = RacerStatus_Racing;
+	if (racerStatus[client] != RacerStatus_Accepted)
+	{
+		return;
+	}
+	
+	racerStatus[client] = RacerStatus_Racing;
 	
 	// Prepare the racer
 	GOKZ_StopTimer(client);
-	GOKZ_SetCoreOption(client, Option_Mode, GetRaceInfo(GetRaceID(client), RaceInfo_Mode));
+	GOKZ_SetCoreOption(client, Option_Mode, GetRaceInfo(racerRaceID[client], RaceInfo_Mode));
 	GOKZ_TeleportToStart(client);
 }
 
 bool FinishRacer(int client)
 {
-	if (!InStartedRace(client))
+	if (racerStatus[client] != RacerStatus_Racing)
 	{
 		return false;
 	}
 	
-	status[client] = RacerStatus_Finished;
+	racerStatus[client] = RacerStatus_Finished;
 	
-	int raceID = GetRaceID(client);
+	int raceID = racerRaceID[client];
 	int place = IncrementFinishedRacerCount(raceID);
 	
 	Call_OnFinish(client, raceID, place);
@@ -85,14 +131,15 @@ bool FinishRacer(int client)
 
 bool SurrenderRacer(int client)
 {
-	if (!InRace(client))
+	if (racerStatus[client] == RacerStatus_Available
+		 || racerStatus[client] == RacerStatus_Surrendered)
 	{
 		return false;
 	}
 	
-	status[client] = RacerStatus_Surrendered;
+	racerStatus[client] = RacerStatus_Surrendered;
 	
-	int raceID = GetRaceID(client);
+	int raceID = racerRaceID[client];
 	
 	Call_OnSurrender(client, raceID);
 	
@@ -101,6 +148,7 @@ bool SurrenderRacer(int client)
 	return true;
 }
 
+// Auto-finish last remaining racer, and reset everyone if no one is left
 static void CheckRaceFinished(int raceID)
 {
 	ArrayList remainingRacers = GetUnfinishedRacers(raceID);
@@ -118,19 +166,11 @@ static void CheckRaceFinished(int raceID)
 
 bool AbortRacer(int client)
 {
-	if (!InRace(client))
+	if (racerStatus[client] == RacerStatus_Available)
 	{
 		return false;
 	}
 	
-	if (IsClientInGame(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Race Has Been Aborted");
-		if (status[client] == RacerStatus_Racing)
-		{
-			GOKZ_PlayErrorSound(client);
-		}
-	}
 	ResetRacer(client);
 	
 	return true;
@@ -148,8 +188,8 @@ int HostRace(int client, int type, int course, int mode, int teleportRule)
 	}
 	
 	int raceID = RegisterRace(client, type, course, mode, teleportRule);
-	currentRaceID[client] = raceID;
-	status[client] = RacerStatus_Accepted;
+	racerRaceID[client] = raceID;
+	racerStatus[client] = RacerStatus_Accepted;
 	
 	return raceID;
 }
@@ -163,7 +203,7 @@ bool StartHostedRace(int client)
 		return false;
 	}
 	
-	int raceID = GetRaceID(client);
+	int raceID = racerRaceID[client];
 	
 	if (GetRaceInfo(raceID, RaceInfo_Status) != RaceStatus_Pending)
 	{
@@ -179,18 +219,7 @@ bool StartHostedRace(int client)
 		return false;
 	}
 	
-	if (StartRace(raceID))
-	{
-		if (GetRaceInfo(raceID, RaceInfo_Type) == RaceType_Normal)
-		{
-			PrintToChatAllInRace(raceID, true, true, "%t", "Race Host Started Countdown", client);
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return StartRace(raceID);
 }
 
 bool AbortHostedRace(int client)
@@ -202,7 +231,7 @@ bool AbortHostedRace(int client)
 		return false;
 	}
 	
-	int raceID = GetRaceID(client);
+	int raceID = racerRaceID[client];
 	
 	return AbortRace(raceID);
 }
@@ -214,15 +243,15 @@ bool AbortHostedRace(int client)
 bool SendRequest(int host, int target)
 {
 	if (IsFakeClient(target) || target == host || InRace(target)
-		 || !IsRaceHost(host) || GetRaceInfo(GetRaceID(host), RaceInfo_Status) != RaceStatus_Pending)
+		 || !IsRaceHost(host) || GetRaceInfo(racerRaceID[host], RaceInfo_Status) != RaceStatus_Pending)
 	{
 		return false;
 	}
 	
-	int raceID = GetRaceID(host);
+	int raceID = racerRaceID[host];
 	
-	currentRaceID[target] = raceID;
-	status[target] = RacerStatus_Pending;
+	racerRaceID[target] = raceID;
+	racerStatus[target] = RacerStatus_Pending;
 	
 	// Host callback
 	DataPack data = new DataPack();
@@ -244,14 +273,14 @@ public Action Timer_RequestTimeout(Handle timer, DataPack data)
 	int raceID = data.ReadCell();
 	delete data;
 	
-	if (!IsValidClient(host) || GetRaceID(host) != raceID
-		 || !IsValidClient(target) || GetRaceID(target) != raceID)
+	if (!IsValidClient(host) || racerRaceID[host] != raceID
+		 || !IsValidClient(target) || racerRaceID[target] != raceID)
 	{
 		return;
 	}
 	
 	// If haven't accepted by now, auto decline the race
-	if (status[target] == RacerStatus_Pending)
+	if (racerStatus[target] == RacerStatus_Pending)
 	{
 		DeclineRequest(target, true);
 	}
@@ -273,26 +302,26 @@ int SendRequestAll(int host)
 
 bool AcceptRequest(int client)
 {
-	if (GetRacerStatus(client) != RacerStatus_Pending)
+	if (GetStatus(client) != RacerStatus_Pending)
 	{
 		return false;
 	}
 	
-	status[client] = RacerStatus_Accepted;
+	racerStatus[client] = RacerStatus_Accepted;
 	
-	Call_OnRequestAccepted(client, GetRaceID(client));
+	Call_OnRequestAccepted(client, racerRaceID[client]);
 	
 	return true;
 }
 
 bool DeclineRequest(int client, bool timeout = false)
 {
-	if (GetRacerStatus(client) != RacerStatus_Pending)
+	if (GetStatus(client) != RacerStatus_Pending)
 	{
 		return false;
 	}
 	
-	int raceID = GetRaceID(client);
+	int raceID = racerRaceID[client];
 	ResetRacer(client);
 	
 	Call_OnRequestDeclined(client, raceID, timeout);
@@ -314,9 +343,9 @@ void OnClientDisconnect_Racer(int client)
 	// Abort if player was the host of the race, else surrender
 	if (InRace(client))
 	{
-		if (IsRaceHost(client) && GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Pending)
+		if (IsRaceHost(client) && GetRaceInfo(racerRaceID[client], RaceInfo_Status) == RaceStatus_Pending)
 		{
-			AbortRace(GetRaceID(client));
+			AbortRace(racerRaceID[client]);
 		}
 		else
 		{

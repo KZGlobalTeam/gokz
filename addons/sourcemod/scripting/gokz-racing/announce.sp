@@ -1,107 +1,10 @@
 /*
-	Miscellaneous functions and features.
+	Chat messages of race and racer events.
 */
 
 
 
-// =====[ GENERAL HELPERS ]=====
-
-bool InRace(int client)
-{
-	return GetRacerStatus(client) != RacerStatus_Available;
-}
-
-bool InStartedRace(int client)
-{
-	return GetRacerStatus(client) == RacerStatus_Racing;
-}
-
-bool InCountdown(int client)
-{
-	return GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Countdown;
-}
-
-bool InRaceMode(int client)
-{
-	return GOKZ_GetCoreOption(client, Option_Mode) == GetRaceInfo(GetRaceID(client), RaceInfo_Mode);
-}
-
-bool IsRaceCourse(int client, int course)
-{
-	return course == GetRaceInfo(GetRaceID(client), RaceInfo_Course);
-}
-
-bool IsFinished(int client)
-{
-	int status = GetRacerStatus(client);
-	return status == RacerStatus_Finished || status == RacerStatus_Surrendered;
-}
-
-bool IsAccepted(int client)
-{
-	return GetRacerStatus(client) == RacerStatus_Accepted;
-}
-
-bool IsAllowedToTeleport(int client)
-{
-	return !(InStartedRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_TeleportRule) == TeleportRule_None);
-}
-
-bool IsRaceHost(int client)
-{
-	return GetRaceHost(GetRaceID(client)) == client;
-}
-
-int GetRaceHost(int raceID)
-{
-	return GetClientOfUserId(GetRaceInfo(raceID, RaceInfo_HostUserID));
-}
-
-ArrayList GetUnfinishedRacers(int raceID)
-{
-	ArrayList racers = new ArrayList();
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (GetRaceID(i) == raceID && !IsFinished(i))
-		{
-			racers.Push(i);
-		}
-	}
-	return racers;
-}
-
-int GetUnfinishedRacersCount(int raceID)
-{
-	ArrayList racers = GetUnfinishedRacers(raceID);
-	int count = racers.Length;
-	delete racers;
-	return count;
-}
-
-ArrayList GetAcceptedRacers(int raceID)
-{
-	ArrayList racers = new ArrayList();
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (GetRaceID(i) == raceID && IsAccepted(i))
-		{
-			racers.Push(i);
-		}
-	}
-	return racers;
-}
-
-int GetAcceptedRacersCount(int raceID)
-{
-	ArrayList racers = GetAcceptedRacers(raceID);
-	int count = racers.Length;
-	delete racers;
-	return count;
-}
-
-
-
-// =====[ ANNOUNCEMENTS ]=====
+// =====[ PUBLIC ]=====
 
 /**
  * Prints a message to chat for all clients in a race, formatting colours 
@@ -141,7 +44,11 @@ void PrintToChatAllInRace(int raceID, bool specs, bool addPrefix, const char[] f
 	}
 }
 
-void AnnounceRaceFinish(int client, int raceID, int place)
+
+
+// =====[ EVENTS ]=====
+
+void OnFinish_Announce(int client, int raceID, int place)
 {
 	switch (GetRaceInfo(raceID, RaceInfo_Type))
 	{
@@ -178,7 +85,7 @@ void AnnounceRaceFinish(int client, int raceID, int place)
 	}
 }
 
-void AnnounceRaceSurrender(int client, int raceID)
+void OnSurrender_Announce(int client, int raceID)
 {
 	switch (GetRaceInfo(raceID, RaceInfo_Type))
 	{
@@ -199,7 +106,7 @@ void AnnounceRaceSurrender(int client, int raceID)
 	}
 }
 
-void AnnounceRequestReceived(int client, int raceID)
+void OnRequestReceived_Announce(int client, int raceID)
 {
 	int host = GetRaceHost(raceID);
 	
@@ -221,7 +128,7 @@ void AnnounceRequestReceived(int client, int raceID)
 	GOKZ_PrintToChat(client, false, "%t", "You Have Seconds To Accept", RC_REQUEST_TIMEOUT_TIME);
 }
 
-void AnnounceRequestAccepted(int client, int raceID)
+void OnRequestAccepted_Announce(int client, int raceID)
 {
 	int host = GetRaceHost(raceID);
 	
@@ -238,7 +145,7 @@ void AnnounceRequestAccepted(int client, int raceID)
 	}
 }
 
-void AnnounceRequestDeclined(int client, int raceID, bool timeout)
+void OnRequestDeclined_Announce(int client, int raceID, bool timeout)
 {
 	int host = GetRaceHost(raceID);
 	
@@ -262,5 +169,28 @@ void AnnounceRequestDeclined(int client, int raceID, bool timeout)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "You Have Declined");
 		GOKZ_PrintToChat(host, true, "%t", "Player Has Declined", client);
+	}
+}
+
+void OnRaceStarted_Announce(int raceID)
+{
+	if (GetRaceInfo(raceID, RaceInfo_Type) == RaceType_Normal)
+	{
+		PrintToChatAllInRace(raceID, true, true, "%t", "Race Host Started Countdown", GetRaceHost(raceID));
+	}
+}
+
+void OnRaceAborted_Announce(int raceID)
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client) && GetRaceID(client) == raceID)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Race Has Been Aborted");
+			if (GetStatus(client) == RacerStatus_Racing)
+			{
+				GOKZ_PlayErrorSound(client);
+			}
+		}
 	}
 } 

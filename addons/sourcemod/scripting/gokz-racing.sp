@@ -19,11 +19,11 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
+#include "gokz-racing/announce.sp"
 #include "gokz-racing/api.sp"
 #include "gokz-racing/commands.sp"
 #include "gokz-racing/countdown_hud.sp"
 #include "gokz-racing/duel_menu.sp"
-#include "gokz-racing/misc.sp"
 #include "gokz-racing/race.sp"
 #include "gokz-racing/race_menu.sp"
 #include "gokz-racing/racer.sp"
@@ -102,28 +102,42 @@ public Action GOKZ_OnUndoTeleport(int client)
 
 public void GOKZ_RC_OnFinish(int client, int raceID, int place)
 {
-	AnnounceRaceFinish(client, raceID, place);
+	OnFinish_Announce(client, raceID, place);
 	OnFinish_Race(raceID);
 }
 
 public void GOKZ_RC_OnSurrender(int client, int raceID)
 {
-	AnnounceRaceSurrender(client, raceID);
+	OnSurrender_Announce(client, raceID);
 }
 
 public void GOKZ_RC_OnRequestReceived(int client, int raceID)
 {
-	AnnounceRequestReceived(client, raceID);
+	OnRequestReceived_Announce(client, raceID);
 }
 
 public void GOKZ_RC_OnRequestAccepted(int client, int raceID)
 {
-	AnnounceRequestAccepted(client, raceID);
+	OnRequestAccepted_Announce(client, raceID);
 	OnRequestAccepted_Race(raceID);
 }
 
 public void GOKZ_RC_OnRequestDeclined(int client, int raceID, bool timeout)
 {
-	AnnounceRequestDeclined(client, raceID, timeout);
+	OnRequestDeclined_Announce(client, raceID, timeout);
 	OnRequestDeclined_Race(raceID);
+}
+
+
+
+// =====[ OTHER EVENTS ]=====
+
+public void GOKZ_RC_OnRaceStarted(int raceID)
+{
+	OnRaceStarted_Announce(raceID);
+}
+
+public void GOKZ_RC_OnRaceAborted(int raceID)
+{
+	OnRaceAborted_Announce(raceID);
 } 
