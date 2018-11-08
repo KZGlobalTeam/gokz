@@ -62,8 +62,10 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 			{
 				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuTeleport[param1]);
 			}
-			SendRequestAll(param1);
-			GOKZ_PrintToChat(param1, true, "%t", "You Invited Everyone");
+			if (SendRequestAll(param1) > 0)
+			{
+				GOKZ_PrintToChat(param1, true, "%t", "You Invited Everyone");
+			}
 			DisplayRaceMenu(param1, false);
 		}
 		else if (StrEqual(info, ITEM_INFO_MODE, false))
@@ -87,12 +89,12 @@ void RaceMenuAddItems(int client, Menu menu)
 	
 	menu.RemoveAllItems();
 	
-	bool pending = InRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Pending;
+	bool pending = GetRaceInfo(GetRaceID(client), RaceInfo_Status) == RaceStatus_Pending;
 	FormatEx(display, sizeof(display), "%T", "Race Menu - Start Race", client);
-	menu.AddItem(ITEM_INFO_START, display, pending ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+	menu.AddItem(ITEM_INFO_START, display, (InRace(client) && pending) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	
 	FormatEx(display, sizeof(display), "%T", "Race Menu - Invite Everyone", client);
-	menu.AddItem(ITEM_INFO_INVITE, display, ITEMDRAW_DEFAULT);
+	menu.AddItem(ITEM_INFO_INVITE, display, (!InRace(client) || pending) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	
 	FormatEx(display, sizeof(display), "%T\n \n%T", "Race Menu - Abort Race", client, "Race Menu - Rules", client);
 	menu.AddItem(ITEM_INFO_ABORT, display, InRace(client) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
