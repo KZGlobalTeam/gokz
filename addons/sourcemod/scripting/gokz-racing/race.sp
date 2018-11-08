@@ -31,7 +31,7 @@ int IncrementFinishedRacerCount(int raceID)
 
 // =====[ REGISTRATION ]=====
 
-int RegisterRace(int host, int type, int course, int mode, int teleportsRule)
+int RegisterRace(int host, int type, int course, int mode, int teleportRule)
 {
 	int raceID = ++lastRaceID;
 	
@@ -43,7 +43,7 @@ int RegisterRace(int host, int type, int course, int mode, int teleportsRule)
 	info.Set(view_as<int>(RaceInfo_Type), type);
 	info.Set(view_as<int>(RaceInfo_Course), course);
 	info.Set(view_as<int>(RaceInfo_Mode), mode);
-	info.Set(view_as<int>(RaceInfo_TeleportsRule), teleportsRule);
+	info.Set(view_as<int>(RaceInfo_TeleportRule), teleportRule);
 	
 	raceInfo.SetValue(IntToStringEx(raceID), info);
 	

@@ -44,7 +44,7 @@ bool IsAccepted(int client)
 
 bool IsAllowedToTeleport(int client)
 {
-	return !(InStartedRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_TeleportsRule) == TeleportsRule_None);
+	return !(InStartedRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_TeleportRule) == TeleportRule_None);
 }
 
 bool IsRaceHost(int client)
@@ -179,7 +179,7 @@ void AnnounceRequestReceived(int client, int raceID)
 	
 	GOKZ_PrintToChat(client, false, "%t", "Race Rules", 
 		gC_ModeNames[GetRaceInfo(raceID, RaceInfo_Mode)], 
-		gC_TeleportRulePhrases[GetRaceInfo(raceID, RaceInfo_TeleportsRule)]);
+		gC_TeleportRulePhrases[GetRaceInfo(raceID, RaceInfo_TeleportRule)]);
 	GOKZ_PrintToChat(client, false, "%t", "You Have Seconds To Accept", RC_REQUEST_TIMEOUT_TIME);
 }
 

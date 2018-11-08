@@ -22,7 +22,7 @@ enum RaceInfo
 	RaceInfo_Type, 
 	RaceInfo_Course, 
 	RaceInfo_Mode, 
-	RaceInfo_TeleportsRule, 
+	RaceInfo_TeleportRule, 
 	RACEINFO_COUNT
 };
 
@@ -54,9 +54,9 @@ enum
 
 enum
 {
-	TeleportsRule_None, 
-	TeleportsRule_Unlimited, 
-	TELEPORTSRULE_COUNT
+	TeleportRule_None, 
+	TeleportRule_Unlimited, 
+	TELEPORTRULE_COUNT
 };
 
 
@@ -66,8 +66,8 @@ enum
 #define RC_COUNTDOWN_TIME 10
 #define RC_REQUEST_TIMEOUT_TIME 15
 
-// Translation phrases for the teleports rules
-stock char gC_TeleportRulePhrases[TELEPORTSRULE_COUNT][] = 
+// Translation phrases for the teleport rules
+stock char gC_TeleportRulePhrases[TELEPORTRULE_COUNT][] = 
 {
 	"Teleport Rule - None", 
 	"Teleport Rule - Unlimited"
@@ -136,13 +136,13 @@ forward void GOKZ_RC_OnRequestDeclined(int client, int raceID, bool timeout)
  * @param menu					Menu to populate items with.
  * @noreturn
  */
-stock void GOKZ_RC_MenuAddTeleportsRuleItems(int client, Menu menu)
+stock void GOKZ_RC_MenuAddTeleportRuleItems(int client, Menu menu)
 {
 	char display[32];
 	
 	menu.RemoveAllItems();
 	
-	for (int i = 0; i < TELEPORTSRULE_COUNT; i++)
+	for (int i = 0; i < TELEPORTRULE_COUNT; i++)
 	{
 		FormatEx(display, sizeof(display), "%T", gC_TeleportRulePhrases[i], client);
 		menu.AddItem("", display);

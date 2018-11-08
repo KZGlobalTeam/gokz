@@ -127,14 +127,14 @@ bool AbortRacer(int client)
 
 // =====[ HOSTING ]=====
 
-int HostRace(int client, int type, int course, int mode, int teleportsRule)
+int HostRace(int client, int type, int course, int mode, int teleportRule)
 {
 	if (InRace(client))
 	{
 		return -1;
 	}
 	
-	int raceID = RegisterRace(client, type, course, mode, teleportsRule);
+	int raceID = RegisterRace(client, type, course, mode, teleportRule);
 	currentRaceID[client] = raceID;
 	status[client] = RacerStatus_Accepted;
 	

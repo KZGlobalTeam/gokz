@@ -145,7 +145,7 @@ static void DisplayRaceTeleportMenu(int client)
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
 	menu.SetTitle("%T", "Teleport Rule Menu - Title", client);
-	GOKZ_RC_MenuAddTeleportsRuleItems(client, menu);
+	GOKZ_RC_MenuAddTeleportRuleItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
