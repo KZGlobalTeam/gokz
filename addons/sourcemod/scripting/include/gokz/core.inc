@@ -1010,11 +1010,10 @@ native void GOKZ_JoinTeam(int client, int team);
 // =====[ STOCKS ]=====
 
 /**
- * Prints a message to all clients' chat, formatting colours and optionally 
+ * Prints a message to all client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
  * the beginning of the message e.g. "{default}Hello!".
  *
- * @param client		Client index.
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
