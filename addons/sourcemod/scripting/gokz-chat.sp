@@ -164,7 +164,7 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 	
 	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
 	{
-		GOKZ_PrintToChatAll(false, "{grey}*S* {lime}%s {default}: %s", sanitisedName, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{default}* {lime}%s {default}: %s", sanitisedName, sanitisedMessage);
 	}
 	else
 	{
