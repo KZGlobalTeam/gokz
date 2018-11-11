@@ -135,8 +135,7 @@ void HookEvents()
 void OnClientSayCommand_ChatProcessing(int client, const char[] command, const char[] message)
 {
 	if (gB_BaseComm && BaseComm_IsClientGagged(client)
-		 || UsedBaseChat(client, command, message)
-		 || IsChatTrigger())
+		 || UsedBaseChat(client, command, message))
 	{
 		return;
 	}
