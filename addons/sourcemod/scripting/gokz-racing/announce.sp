@@ -32,7 +32,7 @@ void PrintToChatAllInRace(int raceID, bool specs, bool addPrefix, const char[] f
 			{
 				for (int target = 1; target <= MaxClients; target++)
 				{
-					if (IsClientInGame(target) && GetObserverTarget(target) == client)
+					if (IsClientInGame(target) && GetObserverTarget(target) == client && GetRaceID(target) != raceID)
 					{
 						SetGlobalTransTarget(target);
 						VFormat(buffer, sizeof(buffer), format, 5);
