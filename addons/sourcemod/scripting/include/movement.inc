@@ -5,7 +5,7 @@
 */
 
 #if defined _movement_included_
- #endinput
+  #endinput
 #endif
 #define _movement_included_
 
@@ -13,7 +13,7 @@
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
  * Calculates the horizontal distance between two vectors.
@@ -397,7 +397,7 @@ stock bool Movement_GetNoclipping(int client)
 
 
 
-// =========================  METHODMAP  ========================= //
+// =====[ METHODMAP ]=====
 
 methodmap MovementPlayer {
 	

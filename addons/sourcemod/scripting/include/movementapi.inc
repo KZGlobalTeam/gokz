@@ -5,7 +5,7 @@
 */
 
 #if defined _movementapi_included_
- #endinput
+  #endinput
 #endif
 #define _movementapi_included_
 
@@ -33,7 +33,7 @@
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player starts ducking.
@@ -87,7 +87,7 @@ forward void Movement_OnPlayerJump(int client, bool jumpbug);
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets whether player's last takeoff was a jump.
@@ -226,7 +226,7 @@ native float Movement_GetMaxSpeed(int client);
 
 
 
-// =========================  METHODMAP  ========================= //
+// =====[ METHODMAP ]=====
 
 methodmap MovementAPIPlayer < MovementPlayer {
 	
@@ -325,7 +325,7 @@ methodmap MovementAPIPlayer < MovementPlayer {
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_movementapi = 
 {
