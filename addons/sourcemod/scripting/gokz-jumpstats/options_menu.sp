@@ -4,6 +4,15 @@ static TopMenuObject itemsJumpstats[JSOPTION_COUNT];
 
 
 
+// =====[ PUBLIC ]=====
+
+void DisplayJumpstatsOptionsMenu(int client)
+{
+	optionsTopMenu.DisplayCategory(catJumpstats, client);
+}
+
+
+
 // =====[ EVENTS ]=====
 
 void OnAllPluginsLoaded_OptionsMenu()

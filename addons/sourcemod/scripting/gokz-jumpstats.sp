@@ -32,6 +32,7 @@ public Plugin myinfo =
 #define UPDATE_URL "http://updater.gokz.org/gokz-jumpstats.txt"
 
 #include "gokz-jumpstats/api.sp"
+#include "gokz-jumpstats/commands.sp"
 #include "gokz-jumpstats/distance_tiers.sp"
 #include "gokz-jumpstats/jump_reporting.sp"
 #include "gokz-jumpstats/jump_tracking.sp"
@@ -55,6 +56,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-jumpstats.phrases");
 	
 	CreateGlobalForwards();
+	RegisterCommands();
 }
 
 public void OnAllPluginsLoaded()
