@@ -294,19 +294,24 @@ void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
 
 // =====[ CLAN TAG ]=====
 
-void OnClientPostAdminCheck_ClanTag(int client)
+void OnClientPutInServer_ClanTag(int client)
 {
-	if (!IsFakeClient(client))
-	{
-		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
-	}
+	UpdateClanTag(client);
 }
 
 void OnOptionChanged_ClanTag(int client, Option option)
 {
 	if (option == Option_Mode)
 	{
-		OnClientPostAdminCheck_ClanTag(client);
+		UpdateClanTag(client);
+	}
+}
+
+static void UpdateClanTag(int client)
+{
+	if (!IsFakeClient(client))
+	{
+		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 	}
 }
 

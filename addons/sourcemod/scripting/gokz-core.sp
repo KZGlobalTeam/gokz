@@ -116,10 +116,6 @@ public void OnAllPluginsLoaded()
 		if (IsClientInGame(client))
 		{
 			OnClientPutInServer(client);
-			if (IsClientAuthorized(client))
-			{
-				OnClientPostAdminCheck(client);
-			}
 		}
 		if (AreClientCookiesCached(client))
 		{
@@ -149,12 +145,8 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_FirstSpawn(client);
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
+	OnClientPutInServer_ClanTag(client);
 	HookClientEvents(client);
-}
-
-public void OnClientPostAdminCheck(int client)
-{
-	OnClientPostAdminCheck_ClanTag(client);
 }
 
 public void OnClientDisconnect(int client)
