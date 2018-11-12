@@ -15,16 +15,6 @@ void DisplayJumpstatsOptionsMenu(int client)
 
 // =====[ EVENTS ]=====
 
-void OnAllPluginsLoaded_OptionsMenu()
-{
-	// Handle late loading
-	TopMenu topMenu;
-	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
-	{
-		GOKZ_OnOptionsMenuReady(topMenu);
-	}
-}
-
 void OnOptionsMenuCreated_OptionsMenu(TopMenu topMenu)
 {
 	if (optionsTopMenu == topMenu && catJumpstats != INVALID_TOPMENUOBJECT)

@@ -66,7 +66,11 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	
-	OnAllPluginsLoaded_OptionsMenu();
+	TopMenu topMenu;
+	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
+	{
+		GOKZ_OnOptionsMenuReady(topMenu);
+	}
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{

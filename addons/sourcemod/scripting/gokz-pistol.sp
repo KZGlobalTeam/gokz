@@ -54,7 +54,11 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATE_URL);
 	}
 	
-	OnAllPluginsLoaded_OptionsMenu();
+	TopMenu topMenu;
+	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
+	{
+		GOKZ_OnOptionsMenuReady(topMenu);
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -237,16 +241,6 @@ void RegisterOption()
 
 
 // =====[ OPTIONS MENU ]=====
-
-void OnAllPluginsLoaded_OptionsMenu()
-{
-	// Handle late loading
-	TopMenu topMenu;
-	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
-	{
-		GOKZ_OnOptionsMenuReady(topMenu);
-	}
-}
 
 void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 {

@@ -6,16 +6,6 @@ static TopMenuObject itemsHUD[HUDOPTION_COUNT];
 
 // =====[ EVENTS ]=====
 
-void OnAllPluginsLoaded_OptionsMenu()
-{
-	// Handle late loading
-	TopMenu topMenu;
-	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
-	{
-		GOKZ_OnOptionsMenuReady(topMenu);
-	}
-}
-
 void OnOptionsMenuCreated_OptionsMenu(TopMenu topMenu)
 {
 	if (optionsTopMenu == topMenu && catHUD != INVALID_TOPMENUOBJECT)
