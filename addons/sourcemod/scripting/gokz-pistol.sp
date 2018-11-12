@@ -235,7 +235,7 @@ void OnOptionsMenuReady_Options()
 void RegisterOption()
 {
 	GOKZ_RegisterOption(PISTOL_OPTION_NAME, PISTOL_OPTION_DESCRIPTION, 
-		OptionType_Int, Pistol_USP, 0, PISTOL_COUNT - 1);
+		OptionType_Int, Pistol_USPS, 0, PISTOL_COUNT - 1);
 }
 
 
