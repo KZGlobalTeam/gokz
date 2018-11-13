@@ -206,6 +206,8 @@ void OnClientCookiesCached_Options(int client)
 		optionDataSnapshot.GetKey(i, option, sizeof(option));
 		LoadOption(client, option);
 	}
+	
+	delete optionDataSnapshot;
 }
 
 void OnClientPutInServer_Options(int client)
