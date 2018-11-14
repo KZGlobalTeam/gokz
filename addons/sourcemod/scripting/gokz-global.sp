@@ -339,11 +339,21 @@ static void CreateConVars()
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-	if (convar == gCV_gokz_settings_enforcer && !gCV_gokz_settings_enforcer.BoolValue)
+	if (convar == gCV_gokz_settings_enforcer)
 	{
-		for (int i = 1; i <= MaxClients; i++)
+		if (gCV_gokz_settings_enforcer.BoolValue)
 		{
-			InvalidateRun(i);
+			for (int i = 0; i < ENFORCEDCVAR_COUNT; i++)
+			{
+				gCV_EnforcedCVar[i].FloatValue = gF_EnforcedCVarValues[i];
+			}
+		}
+		else
+		{
+			for (int i = 1; i <= MaxClients; i++)
+			{
+				InvalidateRun(i);
+			}
 		}
 	}
 }
