@@ -2,6 +2,8 @@
 
 #include <sdkhooks>
 
+#include <cstrike>
+
 #include <gokz/core>
 #include <gokz/quiet>
 
@@ -61,7 +63,7 @@ public void OnAllPluginsLoaded()
 	{
 		if (IsClientInGame(client))
 		{
-			OnClientPutInServer(client);
+			GOKZ_OnJoinTeam(client, GetClientTeam(client));
 		}
 	}
 }
@@ -78,9 +80,9 @@ public void OnLibraryAdded(const char[] name)
 
 // =====[ CLIENT EVENTS ]=====
 
-public void OnClientPutInServer(int client)
+public void GOKZ_OnJoinTeam(int client, int team)
 {
-	SetupClientHidePlayers(client);
+	OnJoinTeam_HidePlayers(client, team);
 }
 
 
@@ -106,9 +108,15 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 // =====[ HIDE PLAYERS ]=====
 
-void SetupClientHidePlayers(int client)
+void OnJoinTeam_HidePlayers(int client, int team)
 {
-	SDKHook(client, SDKHook_SetTransmit, OnSetTransmitClient);
+	// Make sure client is only ever hooked once
+	SDKUnhook(client, SDKHook_SetTransmit, OnSetTransmitClient);
+	
+	if (team == CS_TEAM_T || team == CS_TEAM_CT)
+	{
+		SDKHook(client, SDKHook_SetTransmit, OnSetTransmitClient);
+	}
 }
 
 public Action OnSetTransmitClient(int entity, int client)
