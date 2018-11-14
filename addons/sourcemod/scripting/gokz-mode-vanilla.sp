@@ -32,6 +32,27 @@ public Plugin myinfo =
 
 #define MODE_VERSION 1
 
+float gF_ModeCVarValues[MODECVAR_COUNT] = 
+{
+	5.5,  // sv_accelerate
+	1.0,  // sv_accelerate_use_weapon_speed
+	12.0,  // sv_airaccelerate
+	0.0,  // sv_autobunnyhopping
+	1.0,  // sv_enablebunnyhopping
+	5.2,  // sv_friction
+	800.0,  // sv_gravity
+	301.993377,  // sv_jump_impulse
+	0.78,  // sv_ladder_scale_speed
+	320.0,  // sv_maxspeed
+	3500.0,  // sv_maxvelocity
+	0.080,  // sv_staminajumpcost
+	0.050,  // sv_staminalandcost
+	80.0,  // sv_staminamax
+	60.0,  // sv_staminarecoveryrate
+	0.4,  // sv_timebetweenducks
+	10.0,  // sv_wateraccelerate
+};
+
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
 
@@ -197,7 +218,7 @@ void TweakConVars()
 {
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
-		gCV_ModeCVar[i].RestoreDefault();
+		gCV_ModeCVar[i].FloatValue = gF_ModeCVarValues[i];
 	}
 }
 
@@ -212,10 +233,8 @@ void ReplicateConVars(int client)
 		return;
 	}
 	
-	char defValue[32];
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
-		gCV_ModeCVar[i].GetDefault(defValue, sizeof(defValue));
-		gCV_ModeCVar[i].ReplicateToClient(client, defValue);
+		gCV_ModeCVar[i].ReplicateToClient(client, FloatToStringEx(gF_ModeCVarValues[i]));
 	}
 } 
