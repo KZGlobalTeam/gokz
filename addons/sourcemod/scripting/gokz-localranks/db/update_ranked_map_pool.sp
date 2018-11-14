@@ -106,6 +106,8 @@ void DB_UpdateRankedMapPool(int client)
 	}
 	
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_UpdateRankedMapPool, DB_TxnFailure_Generic, data, DBPrio_Low);
+	
+	delete maps;
 }
 
 public void DB_TxnSuccess_UpdateRankedMapPool(Handle db, int userid, int numQueries, Handle[] results, any[] queryData)
