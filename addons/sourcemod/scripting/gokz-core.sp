@@ -237,11 +237,6 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_Teleports(client);
 }
 
-public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
-{
-	OnTimerEnd_SlayOnEnd(client);
-}
-
 public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
 {
 	OnTeleportToStart_Timer(client, customPos);

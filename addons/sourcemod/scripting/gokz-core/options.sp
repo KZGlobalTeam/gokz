@@ -403,19 +403,5 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 				}
 			}
 		}
-		case Option_SlayOnEnd:
-		{
-			switch (newValue)
-			{
-				case SlayOnEnd_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Disable");
-				}
-				case SlayOnEnd_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Enable");
-				}
-			}
-		}
 	}
 } 

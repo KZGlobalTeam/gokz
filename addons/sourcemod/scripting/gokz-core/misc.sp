@@ -73,28 +73,6 @@ void OnRoundStart_ForceAllTalk()
 
 
 
-// =====[ SLAY ON END ]=====
-
-void OnTimerEnd_SlayOnEnd(int client)
-{
-	if (GOKZ_GetCoreOption(client, Option_SlayOnEnd) == SlayOnEnd_Enabled)
-	{
-		CreateTimer(3.0, Timer_SlayPlayer, GetClientUserId(client));
-	}
-}
-
-public Action Timer_SlayPlayer(Handle timer, int userid)
-{
-	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client))
-	{
-		ForcePlayerSuicide(client);
-	}
-	return Plugin_Continue;
-}
-
-
-
 // =====[ ERROR SOUNDS ]=====
 
 #define SOUND_ERROR "buttons/button10.wav"

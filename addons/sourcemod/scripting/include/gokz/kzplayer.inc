@@ -281,15 +281,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int slayOnEnd {
-		public get() {
-			return this.GetCoreOption(Option_SlayOnEnd);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_SlayOnEnd, value);
-		}
-	}
-	
 	property int checkpointMessages {
 		public get() {
 			return this.GetCoreOption(Option_CheckpointMessages);
@@ -482,4 +473,21 @@ methodmap KZPlayer < MovementAPIPlayer {
 	
 	#endif
 	// =====[ END QUIET ]=====
+	
+	
+	
+	// =====[ SLAY ON END ]=====
+	#if defined _gokz_slayonend_included_
+	
+	property int slayOnEnd {
+		public get() {
+			return this.GetOption(SLAYONEND_OPTION_NAME);
+		}
+		public set(int value) {
+			this.SetOption(SLAYONEND_OPTION_NAME, value);
+		}
+	}
+	
+	#endif
+	// =====[ END SLAY ON END ]=====
 } 
