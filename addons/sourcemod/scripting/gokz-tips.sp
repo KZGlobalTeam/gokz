@@ -111,6 +111,15 @@ public void OnLibraryRemoved(const char[] name)
 
 
 
+// =====[ CLIENT EVENTS ]=====
+
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
+{
+	OnOptionChanged_Options(client, option, newValue);
+}
+
+
+
 // =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
@@ -122,11 +131,6 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
 	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
-}
-
-public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
-{
-	OnOptionChanged_Options(client, option, newValue);
 }
 
 
@@ -257,6 +261,12 @@ void OnOptionsMenuReady_Options()
 	RegisterOption();
 }
 
+void RegisterOption()
+{
+	GOKZ_RegisterOption(TIPS_OPTION_NAME, TIPS_OPTION_DESCRIPTION, 
+		OptionType_Int, Tips_Enabled, 0, TIPS_COUNT - 1);
+}
+
 void OnOptionChanged_Options(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, TIPS_OPTION_NAME))
@@ -273,12 +283,6 @@ void OnOptionChanged_Options(int client, const char[] option, any newValue)
 			}
 		}
 	}
-}
-
-void RegisterOption()
-{
-	GOKZ_RegisterOption(TIPS_OPTION_NAME, TIPS_OPTION_DESCRIPTION, 
-		OptionType_Int, Tips_Enabled, 0, TIPS_COUNT - 1);
 }
 
 
