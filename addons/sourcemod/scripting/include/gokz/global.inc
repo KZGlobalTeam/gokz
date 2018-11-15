@@ -20,6 +20,7 @@ enum
 	EnforcedCVar_Cheats = 0, 
 	EnforcedCVar_ClampUnsafeVelocities, 
 	EnforcedCVar_DropKnifeEnable, 
+	EnforcedCVar_AutoBunnyhopping, 
 	ENFORCEDCVAR_COUNT
 };
 
@@ -33,11 +34,13 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 {
 	"sv_cheats", 
 	"sv_clamp_unsafe_velocities", 
-	"mp_drop_knife_enable"
+	"mp_drop_knife_enable", 
+	"sv_autobunnyhopping"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
 {
+	0.0, 
 	0.0, 
 	0.0, 
 	0.0

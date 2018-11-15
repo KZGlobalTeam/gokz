@@ -107,7 +107,7 @@ void OnClientPutInServer_BhopTracking(int client)
 
 void OnPlayerRunCmdPost_BhopTracking(int client, int cmdnum)
 {
-	if (!IsPlayerAlive(client) || IsFakeClient(client))
+	if (!IsPlayerAlive(client) || IsFakeClient(client) || gCV_sv_autobunnyhopping.BoolValue)
 	{
 		return;
 	}

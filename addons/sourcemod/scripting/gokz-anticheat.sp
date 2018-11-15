@@ -52,6 +52,7 @@ bool gB_BhopPostJumpInputsPending[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_autoban;
 ConVar gCV_gokz_autoban_duration;
+ConVar gCV_sv_autobunnyhopping;
 
 #include "gokz-anticheat/api.sp"
 #include "gokz-anticheat/bhop_tracking.sp"
@@ -174,6 +175,8 @@ static void CreateConVars()
 	
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
+	
+	gCV_sv_autobunnyhopping = FindConVar("sv_autobunnyhopping");
 }
 
 static void LogSuspicion(int client, ACReason reason, const char[] notes, const char[] stats)
