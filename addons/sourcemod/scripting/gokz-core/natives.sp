@@ -28,10 +28,10 @@ void CreateNatives()
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
 	
 	CreateNative("GOKZ_GetTimerRunning", Native_GetTimerRunning);
-	CreateNative("GOKZ_GetCurrentCourse", Native_GetCurrentCourse);
+	CreateNative("GOKZ_GetCourse", Native_GetCourse);
 	CreateNative("GOKZ_GetPaused", Native_GetPaused);
-	CreateNative("GOKZ_GetCurrentTime", Native_GetCurrentTime);
-	CreateNative("GOKZ_SetCurrentTime", Native_SetCurrentTime);
+	CreateNative("GOKZ_GetTime", Native_GetTime);
+	CreateNative("GOKZ_SetTime", Native_SetTime);
 	CreateNative("GOKZ_GetCheckpointCount", Native_GetCheckpointCount);
 	CreateNative("GOKZ_SetCheckpointCount", Native_SetCheckpointCount);
 	CreateNative("GOKZ_GetTeleportCount", Native_GetTeleportCount);
@@ -203,7 +203,7 @@ public int Native_GetTimerRunning(Handle plugin, int numParams)
 	return view_as<int>(GetTimerRunning(GetNativeCell(1)));
 }
 
-public int Native_GetCurrentCourse(Handle plugin, int numParams)
+public int Native_GetCourse(Handle plugin, int numParams)
 {
 	return GetCurrentCourse(GetNativeCell(1));
 }
@@ -213,12 +213,12 @@ public int Native_GetPaused(Handle plugin, int numParams)
 	return view_as<int>(GetPaused(GetNativeCell(1)));
 }
 
-public int Native_GetCurrentTime(Handle plugin, int numParams)
+public int Native_GetTime(Handle plugin, int numParams)
 {
 	return view_as<int>(GetCurrentTime(GetNativeCell(1)));
 }
 
-public int Native_SetCurrentTime(Handle plugin, int numParams)
+public int Native_SetTime(Handle plugin, int numParams)
 {
 	if (BlockedExternallyCalledTimerNative(plugin))
 	{

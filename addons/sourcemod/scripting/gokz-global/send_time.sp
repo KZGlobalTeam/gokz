@@ -17,7 +17,7 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 		dp.WriteCell(GetClientUserId(client));
 		dp.WriteCell(course);
 		dp.WriteCell(mode);
-		dp.WriteCell(GOKZ_GetTimeType(teleportsUsed));
+		dp.WriteCell(GOKZ_GetTimeTypeEx(teleportsUsed));
 		
 		GlobalAPI_SendRecord(client, GOKZ_GL_GetGlobalMode(mode), course, teleportsUsed, time, SendTimeCallback, dp);
 	}

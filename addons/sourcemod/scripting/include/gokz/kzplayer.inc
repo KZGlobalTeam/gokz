@@ -159,9 +159,9 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int currentCourse {
+	property int course {
 		public get() {
-			return GOKZ_GetCurrentCourse(this.id);
+			return GOKZ_GetCourse(this.id);
 		}
 	}
 	
@@ -179,12 +179,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property float currentTime {
+	property float time {
 		public get() {
-			return GOKZ_GetCurrentTime(this.id);
+			return GOKZ_GetTime(this.id);
 		}
 		public set(float value) {
-			GOKZ_SetCurrentTime(this.id, value);
+			GOKZ_SetTime(this.id, value);
 		}
 	}
 	
@@ -203,6 +203,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 		public set(int value) {
 			GOKZ_SetTeleportCount(this.id, value);
+		}
+	}
+	
+	property int timeType {
+		public get() {
+			return GOKZ_GetTimeType(this.id);
 		}
 	}
 	

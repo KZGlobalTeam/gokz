@@ -556,7 +556,7 @@ forward void GOKZ_OnModeUnloaded(int mode);
  * Called when a plugin other than gokz-core calls a native 
  * that may affect the player's timer or teleport count in 
  * their favour e.g. GOKZ_StartTimer, GOKZ_EndTimer,
- * GOKZ_SetCurrentTime and GOKZ_SetTeleportCount.
+ * GOKZ_SetTime and GOKZ_SetTeleportCount.
  *
  * @param plugin		Handle of the calling plugin.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
@@ -698,9 +698,9 @@ native bool GOKZ_GetTimerRunning(int client);
  * Gets the course the player is currently running.
  *
  * @param client    	Client index.
- * @param course    	Course number.
+ * @return		    	Course number.
  */
-native bool GOKZ_GetCurrentCourse(int client);
+native int GOKZ_GetCourse(int client);
 
 /**
  * Gets whether the player is paused.
@@ -716,7 +716,7 @@ native bool GOKZ_GetPaused(int client);
  * @param client    	Client index.
  * @return				Player's current run time.
  */
-native float GOKZ_GetCurrentTime(int client);
+native float GOKZ_GetTime(int client);
 
 /**
  * Gets the player's current run time.
@@ -726,7 +726,7 @@ native float GOKZ_GetCurrentTime(int client);
  * @param time			Run time to set to.
  * @return				Whether native was allowed to proceed.
  */
-native bool GOKZ_SetCurrentTime(int client, float time);
+native bool GOKZ_SetTime(int client, float time);
 
 /**
  * Gets the player's current checkpoint count.
@@ -1042,29 +1042,29 @@ stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] f
 }
 
 /**
+ * Gets the player's current time type.
+ *
+ * @param client		Client index.
+ * @return				Player's current time type.
+ */
+stock int GOKZ_GetTimeType(int client)
+{
+	return GOKZ_GetTimeTypeEx(GOKZ_GetTeleportCount(client));
+}
+
+/**
  * Gets the time type given a teleport count.
  *
  * @param teleports		Teleport count.
  * @return				Time type.
  */
-stock int GOKZ_GetTimeType(int teleportCount)
+stock int GOKZ_GetTimeTypeEx(int teleportCount)
 {
 	if (teleportCount == 0)
 	{
 		return TimeType_Pro;
 	}
 	return TimeType_Nub;
-}
-
-/**
- * Gets the player's current time type.
- *
- * @param client		Client index.
- * @return				Player's current time type.
- */
-stock int GOKZ_GetCurrentTimeType(int client)
-{
-	return GOKZ_GetTimeType(GOKZ_GetTeleportCount(client));
 }
 
 /**
@@ -1253,10 +1253,10 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
-	MarkNativeAsOptional("GOKZ_GetCurrentCourse");
+	MarkNativeAsOptional("GOKZ_GetCourse");
 	MarkNativeAsOptional("GOKZ_GetPaused");
-	MarkNativeAsOptional("GOKZ_GetCurrentTime");
-	MarkNativeAsOptional("GOKZ_SetCurrentTime");
+	MarkNativeAsOptional("GOKZ_GetTime");
+	MarkNativeAsOptional("GOKZ_SetTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");

@@ -84,14 +84,14 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 	}
 	else if (targetPlayer.timerRunning)
 	{
-		switch (GOKZ_GetCurrentTimeType(targetPlayer.id))
+		switch (targetPlayer.timeType)
 		{
 			case TimeType_Nub:
 			{
 				FormatEx(timeString, sizeof(timeString), 
 					"%T: <font color='#ead18a'>%s</font> %s\n", 
 					"Info Panel Text - Time", player.id, 
-					GOKZ_FormatTime(targetPlayer.currentTime, false), 
+					GOKZ_FormatTime(targetPlayer.time, false), 
 					GetPausedString(player, targetPlayer));
 			}
 			case TimeType_Pro:
@@ -99,7 +99,7 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 				FormatEx(timeString, sizeof(timeString), 
 					"%T: <font color='#b5d4ee'>%s</font> %s\n", 
 					"Info Panel Text - Time", player.id, 
-					GOKZ_FormatTime(targetPlayer.currentTime, false), 
+					GOKZ_FormatTime(targetPlayer.time, false), 
 					GetPausedString(player, targetPlayer));
 			}
 		}

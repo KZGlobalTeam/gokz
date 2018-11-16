@@ -92,7 +92,7 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 	}
 	
 	int colour[4]; // RGBA
-	switch (GOKZ_GetCurrentTimeType(targetPlayer.id))
+	switch (targetPlayer.timeType)
 	{
 		case TimeType_Nub:colour =  { 234, 209, 138, 0 };
 		case TimeType_Pro:colour =  { 181, 212, 238, 0 };
@@ -110,5 +110,5 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 		}
 	}
 	
-	ShowSyncHudText(player.id, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.currentTime, false));
+	ShowSyncHudText(player.id, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.time, false));
 } 

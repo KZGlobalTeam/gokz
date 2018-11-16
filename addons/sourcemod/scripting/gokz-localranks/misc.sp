@@ -220,9 +220,9 @@ void UpdateRecordMissed(int client)
 		return;
 	}
 	
-	int course = GOKZ_GetCurrentCourse(client);
+	int course = GOKZ_GetCourse(client);
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
-	float currentTime = GOKZ_GetCurrentTime(client);
+	float currentTime = GOKZ_GetTime(client);
 	
 	bool nubRecordExists = gB_RecordExistsCache[course][mode][TimeType_Nub];
 	float nubRecordTime = gF_RecordTimesCache[course][mode][TimeType_Nub];
@@ -274,9 +274,9 @@ void UpdatePBMissed(int client)
 		return;
 	}
 	
-	int course = GOKZ_GetCurrentCourse(client);
+	int course = GOKZ_GetCourse(client);
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
-	float currentTime = GOKZ_GetCurrentTime(client);
+	float currentTime = GOKZ_GetTime(client);
 	
 	bool nubPBExists = gB_PBExistsCache[client][course][mode][TimeType_Nub];
 	float nubPBTime = gF_PBTimesCache[client][course][mode][TimeType_Nub];

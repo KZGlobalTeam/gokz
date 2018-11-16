@@ -336,12 +336,12 @@ static void SetBotStuff(int bot)
 	if (botCourse[bot] == 0)
 	{  // Main course so tag "MODE NUB/PRO"
 		FormatEx(tag, sizeof(tag), "%s %s", 
-			gC_ModeNamesShort[botMode[bot]], gC_TimeTypeNames[GOKZ_GetTimeType(botTeleportsUsed[bot])]);
+			gC_ModeNamesShort[botMode[bot]], gC_TimeTypeNames[GOKZ_GetTimeTypeEx(botTeleportsUsed[bot])]);
 	}
 	else
 	{  // Bonus course so tag "MODE B# NUB/PRO"
 		FormatEx(tag, sizeof(tag), "%s B%d %s", 
-			gC_ModeNamesShort[botMode[bot]], botCourse[bot], gC_TimeTypeNames[GOKZ_GetTimeType(botTeleportsUsed[bot])]);
+			gC_ModeNamesShort[botMode[bot]], botCourse[bot], gC_TimeTypeNames[GOKZ_GetTimeTypeEx(botTeleportsUsed[bot])]);
 	}
 	CS_SetClientClanTag(client, tag);
 	
@@ -352,7 +352,7 @@ static void SetBotStuff(int bot)
 	SetClientName(client, name);
 	
 	// Set the bot's team based on if it's NUB or PRO
-	if (GOKZ_GetTimeType(botTeleportsUsed[bot]) == TimeType_Pro)
+	if (GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
 	{
 		GOKZ_JoinTeam(client, CS_TEAM_CT);
 	}
