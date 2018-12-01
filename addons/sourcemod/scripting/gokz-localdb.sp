@@ -111,31 +111,16 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 
 public void OnClientAuthorized(int client, const char[] auth)
 {
-	if (IsFakeClient(client) || gH_DB == null)
-	{
-		return;
-	}
-	
 	DB_SetupClient(client);
 }
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
 	gB_ClientSetUp[client] = false;
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);

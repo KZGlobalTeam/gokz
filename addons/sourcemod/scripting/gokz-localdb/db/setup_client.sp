@@ -71,7 +71,7 @@ public void DB_TxnSuccess_SetupClient(Handle db, DataPack data, int numQueries, 
 	int steamID = data.ReadCell();
 	delete data;
 	
-	if (!IsValidClient(client))
+	if (!IsClientAuthorized(client))
 	{
 		return;
 	}

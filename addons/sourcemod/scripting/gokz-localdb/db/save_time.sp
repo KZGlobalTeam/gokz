@@ -6,6 +6,11 @@
 
 void DB_SaveTime(int client, int course, int mode, int style, float runTime, int teleportsUsed)
 {
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
 	char query[1024];
 	int steamID = GetSteamAccountID(client);
 	int mapID = GOKZ_DB_GetCurrentMapID();
