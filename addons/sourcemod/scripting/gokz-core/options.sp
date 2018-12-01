@@ -319,7 +319,7 @@ static void LoadDefaultOptions()
 	
 	KeyValues newKV = new KeyValues(GOKZ_CFG_OPTIONS_ROOT); // This one will be sorted by option name
 	StringMapSnapshot optionDataSnapshot = optionData.Snapshot();
-	ArrayList optionDataSnapshotArray = new ArrayList(GOKZ_OPTION_MAX_NAME_LENGTH, 0);
+	ArrayList optionDataSnapshotArray = new ArrayList(ByteCountToCells(GOKZ_OPTION_MAX_NAME_LENGTH), 0);
 	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	char optionDescription[GOKZ_OPTION_MAX_DESC_LENGTH];
 	
