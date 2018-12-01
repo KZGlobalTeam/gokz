@@ -38,6 +38,7 @@ bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
 ConVar gCV_bot_quota;
 
+#include "gokz-replays/api.sp"
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
 #include "gokz-replays/playback.sp"
@@ -59,6 +60,7 @@ public void OnPluginStart()
 {
 	LoadTranslations("gokz-replays.phrases");
 	
+	CreateGlobalForwards();
 	CreateConVars();
 	HookEvents();
 	RegisterCommands();

@@ -17,9 +17,131 @@ static ArrayList recordedTickData[MAXPLAYERS + 1];
 
 
 
-// =====[ PUBLIC ]=====
+// =====[ EVENTS ]=====
 
-void StartRecording(int client)
+void OnMapStart_Recording()
+{
+	CreateReplaysDirectory(gC_CurrentMap);
+}
+
+void OnClientPutInServer_Recording(int client)
+{
+	if (recordedTickData[client] == INVALID_HANDLE)
+	{
+		recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
+	}
+	else
+	{  // Just in case it isn't cleared when the client disconnects via GOKZ_OnTimerStopped
+		recordedTickData[client].Clear();
+	}
+}
+
+void OnPlayerRunCmdPost_Recording(int client, int buttons)
+{
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	
+	if (recording[client] && !recordingPaused[client])
+	{
+		int tick = GetArraySize(recordedTickData[client]);
+		recordedTickData[client].Resize(tick + 1);
+		
+		float origin[3], angles[3];
+		Movement_GetOrigin(client, origin);
+		Movement_GetEyeAngles(client, angles);
+		int flags = GetEntityFlags(client);
+		
+		recordedTickData[client].Set(tick, origin[0], 0);
+		recordedTickData[client].Set(tick, origin[1], 1);
+		recordedTickData[client].Set(tick, origin[2], 2);
+		recordedTickData[client].Set(tick, angles[0], 3);
+		recordedTickData[client].Set(tick, angles[1], 4);
+		// Don't bother tracking eye angle roll (angles[2]) - not used
+		recordedTickData[client].Set(tick, buttons, 5);
+		recordedTickData[client].Set(tick, flags, 6);
+	}
+}
+
+void GOKZ_OnTimerStart_Recording(int client)
+{
+	StartRecording(client);
+}
+
+void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
+{
+	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
+	{
+		SaveRecordingOfCheater(client);
+		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
+	}
+	else
+	{
+		char path[PLATFORM_MAX_PATH];
+		FormatReplayPath(path, sizeof(path), 
+			course, 
+			GOKZ_GetCoreOption(client, Option_Mode), 
+			GOKZ_GetCoreOption(client, Option_Style), 
+			GOKZ_GetTimeTypeEx(teleportsUsed));
+		
+		if (SaveRecordingOfRun(path, client, course, time, teleportsUsed))
+		{
+			Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed);
+		}
+		else
+		{
+			Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
+		}
+	}
+}
+
+void GOKZ_OnPause_Recording(int client)
+{
+	PauseRecording(client);
+}
+
+void GOKZ_OnResume_Recording(int client)
+{
+	ResumeRecording(client);
+}
+
+void GOKZ_OnTimerStopped_Recording(int client)
+{
+	DiscardRecording(client);
+}
+
+void GOKZ_OnCountedTeleport_Recording(int client)
+{
+	if (gB_NubRecordMissed[client])
+	{
+		DiscardRecording(client);
+	}
+}
+
+void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
+{
+	// If missed PRO record or both records, then can no longer beat a server record
+	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
+	{
+		DiscardRecording(client);
+	}
+	// If on a NUB run and missed NUB record, then can no longer beat a server record
+	// Otherwise wait to see if they teleport before stopping the recording
+	if (recordType == RecordType_Nub)
+	{
+		if (GOKZ_GetTeleportCount(client) > 0)
+		{
+			DiscardRecording(client);
+		}
+	}
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void StartRecording(int client)
 {
 	if (IsFakeClient(client))
 	{
@@ -31,7 +153,7 @@ void StartRecording(int client)
 	ResumeRecording(client);
 }
 
-bool SaveRecording(int client, int course, float time, int teleportsUsed)
+static bool SaveRecordingOfRun(const char[] path, int client, int course, float time, int teleportsUsed)
 {
 	if (!recording[client])
 	{
@@ -41,13 +163,9 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	// Prepare data
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
-	int timeType = GOKZ_GetTimeType(client);
+	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
 	
 	// Setup file path and file
-	char path[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, path, sizeof(path), 
-		"%s/%s/%d_%s_%s_%s.%s", 
-		RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
 	if (FileExists(path))
 	{
 		DeleteFile(path);
@@ -102,6 +220,8 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	}
 	delete file;
 	
+	Call_OnReplaySaved(client, path);
+	
 	// Discard recorded data
 	recordedTickData[client].Clear();
 	recording[client] = false;
@@ -109,7 +229,7 @@ bool SaveRecording(int client, int course, float time, int teleportsUsed)
 	return true;
 }
 
-bool SaveRecordingCheater(int client)
+static bool SaveRecordingOfCheater(int client)
 {
 	if (!recording[client])
 	{
@@ -176,6 +296,8 @@ bool SaveRecordingCheater(int client)
 	}
 	delete file;
 	
+	Call_OnReplaySaved(client, path);
+	
 	// Discard recorded data
 	recordedTickData[client].Clear();
 	recording[client] = false;
@@ -183,139 +305,34 @@ bool SaveRecordingCheater(int client)
 	return true;
 }
 
-void DiscardRecording(int client)
+static void DiscardRecording(int client)
 {
+	if (!recording[client])
+	{
+		return;
+	}
+	
 	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
 	{
-		SaveRecordingCheater(client);
+		SaveRecordingOfCheater(client);
 	}
 	else
 	{
 		recording[client] = false;
 		recordedTickData[client].Clear();
+		Call_OnReplayDiscarded(client);
 	}
 }
 
-void PauseRecording(int client)
+static void PauseRecording(int client)
 {
 	recordingPaused[client] = true;
 }
 
-void ResumeRecording(int client)
+static void ResumeRecording(int client)
 {
 	recordingPaused[client] = false;
 }
-
-
-
-// =====[ EVENTS ]=====
-
-void OnMapStart_Recording()
-{
-	CreateReplaysDirectory(gC_CurrentMap);
-}
-
-void OnClientPutInServer_Recording(int client)
-{
-	if (recordedTickData[client] == INVALID_HANDLE)
-	{
-		recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
-	}
-	else
-	{  // Just in case it isn't cleared when the client disconnects via GOKZ_OnTimerStopped
-		recordedTickData[client].Clear();
-	}
-}
-
-void OnPlayerRunCmdPost_Recording(int client, int buttons)
-{
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
-	if (recording[client] && !recordingPaused[client])
-	{
-		int tick = GetArraySize(recordedTickData[client]);
-		recordedTickData[client].Resize(tick + 1);
-		
-		float origin[3], angles[3];
-		Movement_GetOrigin(client, origin);
-		Movement_GetEyeAngles(client, angles);
-		int flags = GetEntityFlags(client);
-		
-		recordedTickData[client].Set(tick, origin[0], 0);
-		recordedTickData[client].Set(tick, origin[1], 1);
-		recordedTickData[client].Set(tick, origin[2], 2);
-		recordedTickData[client].Set(tick, angles[0], 3);
-		recordedTickData[client].Set(tick, angles[1], 4);
-		// Don't bother tracking eye angle roll (angles[2]) - not used
-		recordedTickData[client].Set(tick, buttons, 5);
-		recordedTickData[client].Set(tick, flags, 6);
-	}
-}
-
-void GOKZ_OnTimerStart_Recording(int client)
-{
-	StartRecording(client);
-}
-
-void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
-{
-	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
-	{
-		SaveRecordingCheater(client);
-	}
-	else
-	{
-		SaveRecording(client, course, time, teleportsUsed);
-	}
-}
-
-void GOKZ_OnPause_Recording(int client)
-{
-	PauseRecording(client);
-}
-
-void GOKZ_OnResume_Recording(int client)
-{
-	ResumeRecording(client);
-}
-
-void GOKZ_OnTimerStopped_Recording(int client)
-{
-	DiscardRecording(client);
-}
-
-void GOKZ_OnCountedTeleport_Recording(int client)
-{
-	if (gB_NubRecordMissed[client])
-	{
-		DiscardRecording(client);
-	}
-}
-
-void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
-{
-	// If missed PRO record or both records, then can no longer beat a server record
-	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
-	{
-		DiscardRecording(client);
-	}
-	// If on a NUB run and missed NUB record, then can no longer beat a server record
-	// Otherwise wait to see if they teleport before stopping the recording
-	if (recordType == RecordType_Nub)
-	{
-		if (GOKZ_GetTeleportCount(client) > 0)
-		{
-			DiscardRecording(client);
-		}
-	}
-}
-
-
-
-// =====[ PRIVATE ]=====
 
 static void CreateReplaysDirectory(const char[] map)
 {
@@ -341,4 +358,17 @@ static void CreateReplaysDirectory(const char[] map)
 	{
 		CreateDirectory(path, 511);
 	}
+}
+
+static void FormatReplayPath(char[] buffer, int maxlength, int course, int mode, int style, int timeType)
+{
+	BuildPath(Path_SM, buffer, maxlength, 
+		"%s/%s/%d_%s_%s_%s.%s", 
+		RP_DIRECTORY, 
+		gC_CurrentMap, 
+		course, 
+		gC_ModeNamesShort[mode], 
+		gC_StyleNamesShort[style], 
+		gC_TimeTypeNames[timeType], 
+		RP_FILE_EXTENSION);
 } 
