@@ -30,7 +30,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-mode-kztimer.txt"
 
-#define MODE_VERSION 197
+#define MODE_VERSION 198
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
@@ -40,19 +40,27 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 	6.5,  // sv_accelerate
 	0.0,  // sv_accelerate_use_weapon_speed
 	100.0,  // sv_airaccelerate
+	30.0,  // sv_air_max_wishspeed
 	1.0,  // sv_enablebunnyhopping
 	5.0,  // sv_friction
 	800.0,  // sv_gravity
 	301.993377,  // sv_jump_impulse
 	1.0,  // sv_ladder_scale_speed
+	0.0,  // sv_ledge_mantle_helper
 	320.0,  // sv_maxspeed
 	2000.0,  // sv_maxvelocity
+	0.7,  // sv_standable_normal
 	0.0,  // sv_staminajumpcost
 	0.0,  // sv_staminalandcost
 	0.0,  // sv_staminamax
 	0.0,  // sv_staminarecoveryrate
 	0.0,  // sv_timebetweenducks
+	0.7,  // sv_walkable_normal
 	10.0,  // sv_wateraccelerate
+	0.8,  // sv_water_movespeed_multiplier
+	0.0,  // sv_water_swim_mode 
+	0.0,  // sv_weapon_encumbrance_per_item
+	0.0 // sv_weapon_encumbrance_scale
 };
 
 bool gB_GOKZCore;

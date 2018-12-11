@@ -30,26 +30,34 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-mode-vanilla.txt"
 
-#define MODE_VERSION 1
+#define MODE_VERSION 2
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {
 	5.5,  // sv_accelerate
 	1.0,  // sv_accelerate_use_weapon_speed
 	12.0,  // sv_airaccelerate
+	30.0,  // sv_air_max_wishspeed
 	1.0,  // sv_enablebunnyhopping
 	5.2,  // sv_friction
 	800.0,  // sv_gravity
 	301.993377,  // sv_jump_impulse
 	0.78,  // sv_ladder_scale_speed
+	1.0,  // sv_ledge_mantle_helper
 	320.0,  // sv_maxspeed
 	3500.0,  // sv_maxvelocity
 	0.080,  // sv_staminajumpcost
 	0.050,  // sv_staminalandcost
 	80.0,  // sv_staminamax
 	60.0,  // sv_staminarecoveryrate
+	0.7,  // sv_standable_normal
 	0.4,  // sv_timebetweenducks
+	0.7,  // sv_walkable_normal
 	10.0,  // sv_wateraccelerate
+	0.8,  // sv_water_movespeed_multiplier
+	0.0,  // sv_water_swim_mode 
+	0.85,  // sv_weapon_encumbrance_per_item
+	0.0 // sv_weapon_encumbrance_scale
 };
 
 bool gB_GOKZCore;
