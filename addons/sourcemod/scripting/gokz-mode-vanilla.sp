@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-mode-vanilla.txt"
 
-#define MODE_VERSION 1
+#define MODE_VERSION 2
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];

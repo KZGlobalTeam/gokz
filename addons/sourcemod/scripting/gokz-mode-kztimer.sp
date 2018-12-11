@@ -28,12 +28,12 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-mode-kztimer.txt"
 
-#define MODE_VERSION 197
+#define MODE_VERSION 198
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
 
-float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.0, 100.0, 1.0, 2000.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.0, 0.0, 301.993377 };
+float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.0, 100.0, 1.0, 2000.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.0, 0.0, 301.993377, 0.0, 0.0, 0.0, 0.8, 30.0, 0.7, 0.7, 0.0 };
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];

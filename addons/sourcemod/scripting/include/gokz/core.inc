@@ -220,6 +220,14 @@ enum
 	ModeCVar_TimeBetweenDucks, 
 	ModeCVar_AccelerateUseWeaponSpeed, 
 	ModeCVar_JumpImpulse, 
+	ModeCVar_WeaponEncumbrance, 
+	MoveCVar_WeaponEncumbrancePerItem, 
+	MoveCVar_WaterSwimMode, 
+	MoveCVar_WaterMoveSpeedMultiplier, 
+	ModeCVar_AirMaxWishSpeed, 
+	ModeCVar_StandableNormal, 
+	ModeCVar_WalkableNormal, 
+	ModeCVar_LedgeMantleHelper, 
 	MODECVAR_COUNT
 };
 
@@ -288,7 +296,15 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_wateraccelerate", 
 	"sv_timebetweenducks", 
 	"sv_accelerate_use_weapon_speed", 
-	"sv_jump_impulse"
+	"sv_jump_impulse", 
+	"sv_weapon_encumbrance_scale", 
+	"sv_weapon_encumbrance_per_item", 
+	"sv_water_swim_mode", 
+	"sv_water_movespeed_multiplier", 
+	"sv_air_max_wishspeed", 
+	"sv_standable_normal", 
+	"sv_walkable_normal", 
+	"sv_ledge_mantle_helper"
 };
 
 // Used and recommended for key value files
