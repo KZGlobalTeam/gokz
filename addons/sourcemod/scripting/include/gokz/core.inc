@@ -279,7 +279,7 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
 {
-	Mode_SimpleKZ, 
+	Mode_KZTimer, 
 	Style_Normal, 
 	AutoRestart_Disabled, 
 	CheckpointMessages_Disabled, 
