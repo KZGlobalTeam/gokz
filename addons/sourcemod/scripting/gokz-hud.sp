@@ -85,7 +85,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmdPost_InfoPanel(client, cmdnum);
 	OnPlayerRunCmdPost_SpeedText(client, cmdnum);
 	OnPlayerRunCmdPost_TimerText(client, cmdnum);
-	OnPlayerRunCmdPost_TPMenu(client);
+	OnPlayerRunCmdPost_TPMenu(client, cmdnum);
 }
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
@@ -118,11 +118,13 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	OnTimerEnd_TimerText(client);
+	OnTimerEnd_TPMenu(client);
 }
 
 public void GOKZ_OnTimerStopped(int client)
 {
 	OnTimerStopped_TimerText(client);
+	OnTimerStopped_TPMenu(client);
 }
 
 public void GOKZ_OnPause_Post(int client)

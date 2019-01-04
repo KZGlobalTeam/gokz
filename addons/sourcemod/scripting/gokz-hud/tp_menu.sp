@@ -26,7 +26,7 @@ void OnPlayerSpawn_TPMenu(client)
 	UpdateTPMenu(client);
 }
 
-void OnPlayerRunCmdPost_TPMenu(int client)
+void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -34,10 +34,14 @@ void OnPlayerRunCmdPost_TPMenu(int client)
 	}
 	
 	// Checks option and that no other menu is open instead of rudely interrupting it
-	if (GOKZ_HUD_GetOption(client, HUDOption_TPMenu) != TPMenu_Disabled
-		 && GetClientMenu(client) == MenuSource_None)
+	if (GetClientMenu(client) == MenuSource_None)
 	{
 		DisplayTPMenu(client);
+	}
+	else if (cmdnum % 6 == 0 && GOKZ_GetTimerRunning(client)
+		 && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	{
+		UpdateTPMenu(client);
 	}
 }
 
@@ -50,6 +54,16 @@ void OnOptionChanged_TPMenu(int client, HUDOption option)
 }
 
 void OnTimerStart_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnTimerEnd_TPMenu(int client)
+{
+	UpdateTPMenu(client);
+}
+
+void OnTimerStopped_TPMenu(int client)
 {
 	UpdateTPMenu(client);
 }
@@ -138,6 +152,14 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 	}
 }
 
+public int PanelHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Cancel)
+	{
+		TPMenuIsShowing[param1] = false;
+	}
+}
+
 
 
 // =====[ PRIVATE ]=====
@@ -154,13 +176,47 @@ static void UpdateTPMenu(int client)
 
 static void DisplayTPMenu(int client)
 {
-	Menu menu = new Menu(MenuHandler_TPMenu);
-	menu.OptionFlags = MENUFLAG_NO_SOUND;
-	menu.ExitButton = false;
-	menu.Pagination = MENU_NO_PAGINATION;
-	TPMenuAddItems(client, menu);
-	menu.Display(client, MENU_TIME_FOREVER);
-	TPMenuIsShowing[client] = true;
+	if (GOKZ_HUD_GetOption(client, HUDOption_TPMenu) != TPMenu_Disabled)
+	{
+		Menu menu = new Menu(MenuHandler_TPMenu);
+		menu.OptionFlags = MENUFLAG_NO_SOUND;
+		menu.ExitButton = false;
+		menu.Pagination = MENU_NO_PAGINATION;
+		TPMenuSetTitle(client, menu);
+		TPMenuAddItems(client, menu);
+		menu.Display(client, MENU_TIME_FOREVER);
+		TPMenuIsShowing[client] = true;
+	}
+	else if (GOKZ_GetTimerRunning(client) && 
+		GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	{
+		// Use a Panel if want to only show timer text as it doesn't seem
+		// to be possible to display a Menu with no items.
+		Panel panel = new Panel(null);
+		panel.SetTitle(GetTimerTextMenuTitleString(client));
+		panel.Send(client, PanelHandler_TPMenu, MENU_TIME_FOREVER);
+		delete panel;
+		TPMenuIsShowing[client] = true;
+	}
+}
+
+static void TPMenuSetTitle(int client, Menu menu)
+{
+	if (GOKZ_GetTimerRunning(client) && 
+		GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	{
+		menu.SetTitle(GetTimerTextMenuTitleString(client));
+	}
+}
+
+static char[] GetTimerTextMenuTitleString(int client)
+{
+	char timerTextString[32];
+	FormatEx(timerTextString, sizeof(timerTextString), 
+		"%s %s", 
+		gC_TimeTypeNames[GOKZ_GetTimeType(client)], 
+		GOKZ_FormatTime(GOKZ_GetTime(client)));
+	return timerTextString;
 }
 
 static void TPMenuAddItems(int client, Menu menu)

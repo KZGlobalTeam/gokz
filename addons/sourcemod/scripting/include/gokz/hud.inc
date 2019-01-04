@@ -52,6 +52,7 @@ enum
 {
 	TimerText_Disabled = 0, 
 	TimerText_InfoPanel, 
+	TimerText_TPMenu, 
 	TimerText_Bottom, 
 	TimerText_Top, 
 	TIMERTEXT_COUNT
@@ -93,7 +94,7 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Teleport Menu - 0 = Disabled, 1 = Simple, 2 = Advanced", 
 	"Centre Information Panel - 0 = Disabled, 1 = Enabled", 
 	"Key Press Display - 0 = Spectating, 1 = Always, 2 = Disabled", 
-	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom, 3 = Top", 
+	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Teleport Menu, 3 = Bottom, 4 = Top", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled"
 };
@@ -146,6 +147,7 @@ stock char gC_TimerTextPhrases[TIMERTEXT_COUNT][] =
 {
 	"Options Menu - Disabled", 
 	"Options Menu - Info Panel", 
+	"Options Menu - Teleport Menu", 
 	"Options Menu - Bottom", 
 	"Options Menu - Top"
 };
