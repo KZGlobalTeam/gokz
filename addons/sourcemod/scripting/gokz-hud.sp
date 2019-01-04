@@ -23,7 +23,6 @@ public Plugin myinfo =
 #define UPDATE_URL "http://updater.gokz.org/gokz-hud.txt"
 
 #include "gokz-hud/commands.sp"
-#include "gokz-hud/hide_hud.sp"
 #include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
 #include "gokz-hud/options.sp"
@@ -93,7 +92,6 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (IsValidClient(client))
 	{
-		OnPlayerSpawn_HideHUD(client);
 		OnPlayerSpawn_HideWeapon(client);
 		OnPlayerSpawn_TPMenu(client);
 	}
