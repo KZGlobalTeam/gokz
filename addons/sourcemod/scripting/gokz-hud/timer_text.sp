@@ -21,7 +21,7 @@ void OnPluginStart_TimerText()
 
 void OnPlayerRunCmdPost_TimerText(int client, int cmdnum)
 {
-	if (cmdnum % 32 == 0)
+	if (cmdnum % 6 == 3)
 	{
 		UpdateTimerText(client);
 	}
@@ -110,5 +110,5 @@ static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
 		}
 	}
 	
-	ShowSyncHudText(player.id, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.time, false));
+	ShowSyncHudText(player.id, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.time));
 } 
