@@ -123,10 +123,10 @@ static void MeasureGetPos(int client, int arg)
 	
 	if (arg == 0)
 	{
-		if (P2PRed[client] != INVALID_HANDLE)
+		if (P2PRed[client] != null)
 		{
 			CloseHandle(P2PRed[client]);
-			P2PRed[client] = INVALID_HANDLE;
+			P2PRed[client] = null;
 		}
 		measurePosSet[client][0] = true;
 		P2PRed[client] = CreateTimer(1.0, Timer_P2PRed, GetClientUserId(client), TIMER_REPEAT);
@@ -134,10 +134,10 @@ static void MeasureGetPos(int client, int arg)
 	}
 	else
 	{
-		if (P2PGreen[client] != INVALID_HANDLE)
+		if (P2PGreen[client] != null)
 		{
 			CloseHandle(P2PGreen[client]);
-			P2PGreen[client] = INVALID_HANDLE;
+			P2PGreen[client] = null;
 		}
 		measurePosSet[client][1] = true;
 		P2PXBeam(client, 1);
@@ -193,15 +193,15 @@ static void MeasureBeam(int client, float vecStart[3], float vecEnd[3], float li
 
 static void MeasureResetPos(int client)
 {
-	if (P2PRed[client] != INVALID_HANDLE)
+	if (P2PRed[client] != null)
 	{
 		CloseHandle(P2PRed[client]);
-		P2PRed[client] = INVALID_HANDLE;
+		P2PRed[client] = null;
 	}
-	if (P2PGreen[client] != INVALID_HANDLE)
+	if (P2PGreen[client] != null)
 	{
 		CloseHandle(P2PGreen[client]);
-		P2PGreen[client] = INVALID_HANDLE;
+		P2PGreen[client] = null;
 	}
 	measurePosSet[client][0] = false;
 	measurePosSet[client][1] = false;

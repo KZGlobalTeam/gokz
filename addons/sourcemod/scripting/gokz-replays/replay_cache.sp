@@ -71,7 +71,7 @@ public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle
 
 void OnMapStart_ReplayCache()
 {
-	if (g_ReplayInfoCache == INVALID_HANDLE)
+	if (g_ReplayInfoCache == null)
 	{
 		g_ReplayInfoCache = new ArrayList(RP_CACHE_BLOCKSIZE, 0);
 	}

@@ -91,7 +91,7 @@ public void OnAllPluginsLoaded()
 	gB_GOKZGlobal = LibraryExists("gokz-global");
 	
 	gH_DB = GOKZ_DB_GetDatabase();
-	if (gH_DB != INVALID_HANDLE)
+	if (gH_DB != null)
 	{
 		g_DBType = GOKZ_DB_GetDatabaseType();
 		DB_CreateTables();

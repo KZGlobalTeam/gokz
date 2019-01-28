@@ -85,7 +85,7 @@ void OnClientDisconnect_Playback(int client)
 		}
 		
 		botInGame[bot] = false;
-		if (playbackTickData[bot] != INVALID_HANDLE)
+		if (playbackTickData[bot] != null)
 		{
 			playbackTickData[bot].Clear(); // Clear it all out
 			botDataLoaded[bot] = false;
@@ -272,7 +272,7 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	file.ReadInt32(length);
 	
 	// Setup playback tick data array list
-	if (playbackTickData[bot] == INVALID_HANDLE)
+	if (playbackTickData[bot] == null)
 	{
 		playbackTickData[bot] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, length);
 	}

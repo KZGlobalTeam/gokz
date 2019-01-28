@@ -650,7 +650,7 @@ native int GOKZ_GetLoadedModeCount();
  * Gets the Handle to the options top menu.
  *
  * @return				Handle to the options top menu, 
- *						or INVALID_HANDLE if not created yet.
+ *						or null if not created yet.
  */
 native TopMenu GOKZ_GetOptionsTopMenu();
 

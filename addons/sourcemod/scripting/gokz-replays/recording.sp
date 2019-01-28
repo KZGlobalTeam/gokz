@@ -26,7 +26,7 @@ void OnMapStart_Recording()
 
 void OnClientPutInServer_Recording(int client)
 {
-	if (recordedTickData[client] == INVALID_HANDLE)
+	if (recordedTickData[client] == null)
 	{
 		recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
 	}
