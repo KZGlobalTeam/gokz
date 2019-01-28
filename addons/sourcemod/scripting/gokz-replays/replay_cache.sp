@@ -131,6 +131,8 @@ void OnMapStart_ReplayCache()
 	}
 	
 	SortReplayInfoCache();
+	
+	delete dir;
 }
 
 
