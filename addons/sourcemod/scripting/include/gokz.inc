@@ -31,7 +31,7 @@ enum ObsMode
 // =====[ CONSTANTS ]=====
 
 #define GOKZ_VERSION "2.0.0-dev"
-#define TICKRATE 128.0
+#define TICK_RATE 128.0
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0

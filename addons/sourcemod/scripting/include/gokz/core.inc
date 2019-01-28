@@ -143,8 +143,6 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_TICK_RATE 128
-
 #define GOKZ_MAX_CHECKPOINTS 32
 #define GOKZ_MAX_COURSES 100
 

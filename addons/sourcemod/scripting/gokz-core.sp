@@ -74,7 +74,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("GOKZ only supports CS:GO servers.");
 	}
-	if (RoundFloat(1 / GetTickInterval()) != GOKZ_TICK_RATE)
+	if (FloatAbs(1.0 / GetTickInterval() - TICK_RATE) > EPSILON)
 	{
 		SetFailState("GOKZ only supports 128 tickrate servers.");
 	}

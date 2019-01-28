@@ -158,7 +158,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			float currentOrigin[3], velocity[3];
 			Movement_GetOrigin(client, currentOrigin);
 			MakeVectorFromPoints(currentOrigin, repOrigin, velocity);
-			ScaleVector(velocity, TICKRATE);
+			ScaleVector(velocity, TICK_RATE);
 			TeleportEntity(client, NULL_VECTOR, repAngles, velocity);
 			
 			// Should the bot be ducking?!
