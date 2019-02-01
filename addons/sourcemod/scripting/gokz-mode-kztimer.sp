@@ -49,11 +49,11 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 	0.0,  // sv_ledge_mantle_helper
 	320.0,  // sv_maxspeed
 	2000.0,  // sv_maxvelocity
-	0.7,  // sv_standable_normal
 	0.0,  // sv_staminajumpcost
 	0.0,  // sv_staminalandcost
 	0.0,  // sv_staminamax
 	0.0,  // sv_staminarecoveryrate
+	0.7,  // sv_standable_normal
 	0.0,  // sv_timebetweenducks
 	0.7,  // sv_walkable_normal
 	10.0,  // sv_wateraccelerate
