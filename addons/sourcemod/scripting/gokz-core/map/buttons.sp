@@ -55,8 +55,11 @@ public void OnStartButtonPress(const char[] name, int caller, int activator, flo
 		return;
 	}
 	
-	GOKZ_StartTimer(activator, 0);
-	OnStartButtonPress_VirtualButtons(activator, 0);
+	if (GOKZ_StartTimer(activator, 0))
+	{
+		// Only called on success to prevent virtual button exploits
+		OnStartButtonPress_VirtualButtons(activator, 0);
+	}
 }
 
 public void OnEndButtonPress(const char[] name, int caller, int activator, float delay)
@@ -85,8 +88,11 @@ public void OnBonusStartButtonPress(const char[] name, int caller, int activator
 		int course = StringToInt(tempString);
 		if (course > 0 && course < GOKZ_MAX_COURSES)
 		{
-			GOKZ_StartTimer(activator, course);
-			OnStartButtonPress_VirtualButtons(activator, course);
+			if (GOKZ_StartTimer(activator, course))
+			{
+				// Only called on success to prevent virtual button exploits
+				OnStartButtonPress_VirtualButtons(activator, course);
+			}
 		}
 	}
 }
