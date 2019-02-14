@@ -672,7 +672,7 @@ native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, an
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @return				Whether native was allowed to proceed.
+ * @return				Whether player's timer was started.
  */
 native bool GOKZ_StartTimer(int client, int course);
 
@@ -682,7 +682,7 @@ native bool GOKZ_StartTimer(int client, int course);
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @return				Whether native was allowed to proceed.
+ * @return				Whether player's timer was ended.
  */
 native bool GOKZ_EndTimer(int client, int course);
 

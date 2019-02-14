@@ -98,8 +98,7 @@ public int Native_StartTimer(Handle plugin, int numParams)
 		return view_as<int>(false);
 	}
 	
-	TimerStart(GetNativeCell(1), GetNativeCell(2));
-	return view_as<int>(true);
+	return view_as<int>(TimerStart(GetNativeCell(1), GetNativeCell(2)));
 }
 
 public int Native_EndTimer(Handle plugin, int numParams)
@@ -109,8 +108,7 @@ public int Native_EndTimer(Handle plugin, int numParams)
 		return view_as<int>(false);
 	}
 	
-	TimerEnd(GetNativeCell(1), GetNativeCell(2));
-	return view_as<int>(true);
+	return view_as<int>(TimerEnd(GetNativeCell(1), GetNativeCell(2)));
 }
 
 public int Native_StopTimer(Handle plugin, int numParams)

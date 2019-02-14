@@ -49,14 +49,14 @@ int GetCurrentTimeType(int client)
 	return TimeType_Nub;
 }
 
-void TimerStart(int client, int course, bool allowOffGround = false)
+bool TimerStart(int client, int course, bool allowOffGround = false)
 {
 	if (!IsPlayerAlive(client)
 		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS) && !allowOffGround
 		 || !IsPlayerValidMoveType(client)
 		 || JustStartedTimer(client))
 	{
-		return;
+		return false;
 	}
 	
 	// Call Pre Forward
@@ -64,7 +64,7 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 	Call_GOKZ_OnTimerStart(client, course, result);
 	if (result != Plugin_Continue)
 	{
-		return;
+		return false;
 	}
 	
 	// Start Timer
@@ -76,13 +76,15 @@ void TimerStart(int client, int course, bool allowOffGround = false)
 	
 	// Call Post Forward
 	Call_GOKZ_OnTimerStart_Post(client, course);
+	
+	return true;
 }
 
-void TimerEnd(int client, int course)
+bool TimerEnd(int client, int course)
 {
 	if (!IsPlayerAlive(client))
 	{
-		return;
+		return false;
 	}
 	
 	if (!timerRunning[client] || course != currentCourse[client])
@@ -92,7 +94,7 @@ void TimerEnd(int client, int course)
 			PlayTimerFalseEndSound(client);
 		}
 		lastFalseEndTime[client] = GetGameTime();
-		return;
+		return false;
 	}
 	
 	float time = GetCurrentTime(client);
@@ -103,7 +105,7 @@ void TimerEnd(int client, int course)
 	Call_GOKZ_OnTimerEnd(client, course, time, teleportsUsed, result);
 	if (result != Plugin_Continue)
 	{
-		return;
+		return false;
 	}
 	
 	// End Timer
@@ -124,6 +126,8 @@ void TimerEnd(int client, int course)
 	
 	// Call Post Forward
 	Call_GOKZ_OnTimerEnd_Post(client, course, time, teleportsUsed);
+	
+	return true;
 }
 
 bool TimerStop(int client, bool playSound = true)
