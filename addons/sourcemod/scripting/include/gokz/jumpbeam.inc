@@ -38,7 +38,7 @@ enum
 
 stock char gC_JBOptionNames[JBOPTION_COUNT][] = 
 {
-	"General - Jump Beam Type"
+	"GOKZ JB - Jump Beam Type"
 };
 
 stock char gC_JBOptionDescriptions[JBOPTION_COUNT][] = 

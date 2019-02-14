@@ -233,13 +233,13 @@ stock char gC_StyleNamesShort[STYLE_COUNT][] =
 
 stock char gC_CoreOptionNames[OPTION_COUNT][] = 
 {
-	"General - Mode", 
-	"General - Style", 
-	"General - Auto Restart", 
-	"General - Checkpoint Messages", 
-	"General - Checkpoint Sounds", 
-	"General - Teleport Sounds", 
-	"General - Error Sounds"
+	"GOKZ - Mode", 
+	"GOKZ - Style", 
+	"GOKZ - Auto Restart", 
+	"GOKZ - Checkpoint Messages", 
+	"GOKZ - Checkpoint Sounds", 
+	"GOKZ - Teleport Sounds", 
+	"GOKZ - Error Sounds"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 

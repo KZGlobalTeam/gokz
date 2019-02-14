@@ -140,10 +140,10 @@ stock char gC_DistanceTierChatColours[DISTANCETIER_COUNT][] =
 
 stock char gC_JSOptionNames[JSOPTION_COUNT][] = 
 {
-	"Jumpstats - Master Switch", 
-	"Jumpstats - Chat Report", 
-	"Jumpstats - Console Report", 
-	"Jumpstats - Sounds"
+	"GOKZ JS - Master Switch", 
+	"GOKZ JS - Chat Report", 
+	"GOKZ JS - Console Report", 
+	"GOKZ JS - Sounds"
 };
 
 stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 

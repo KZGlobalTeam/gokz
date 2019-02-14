@@ -81,12 +81,12 @@ enum
 
 stock char gC_HUDOptionNames[HUDOPTION_COUNT][] = 
 {
-	"HUD - Teleport Menu", 
-	"HUD - Centre Panel", 
-	"HUD - Show Keys", 
-	"HUD - Timer Text", 
-	"HUD - Speed Text", 
-	"HUD - Show Weapon"
+	"GOKZ HUD - Teleport Menu", 
+	"GOKZ HUD - Centre Panel", 
+	"GOKZ HUD - Show Keys", 
+	"GOKZ HUD - Timer Text", 
+	"GOKZ HUD - Speed Text", 
+	"GOKZ HUD - Show Weapon"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 

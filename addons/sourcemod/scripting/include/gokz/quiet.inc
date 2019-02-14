@@ -33,7 +33,7 @@ enum
 
 stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
-	"General - Show Players"
+	"GOKZ QT - Show Players"
 };
 
 stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 

@@ -24,7 +24,7 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define SLAYONEND_OPTION_NAME "General - Slay On End"
+#define SLAYONEND_OPTION_NAME "GOKZ - Slay On End"
 #define SLAYONEND_OPTION_DESCRIPTION "Automatic Slaying Upon Ending Timer - 0 = Disabled, 1 = Enabled"
 
 
