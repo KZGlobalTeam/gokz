@@ -13,13 +13,24 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 		return false;
 	}
 	
+	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH - 1)
+	{
+		LogError("Failed to register option \"%s\" because its name is too long.", name);
+		return false;
+	}
+	
+	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH - 1)
+	{
+		LogError("Failed to register option \"%s\" because its description is too long.", name);
+		return false;
+	}
+	
 	ArrayList data;
 	Handle cookie;
 	if (IsRegisteredOption(name))
 	{
 		optionData.GetValue(name, data);
 		cookie = GetOptionProp(name, OptionProp_Cookie);
-		
 	}
 	else
 	{
