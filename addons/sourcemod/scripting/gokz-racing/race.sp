@@ -158,8 +158,8 @@ bool StartRace(int raceID)
 	}
 	
 	StartCountdownHUD(raceID);
-	CreateTimer(float(RC_COUNTDOWN_TIME), Timer_EndCountdown, raceID);
 	
+	CreateTimer(RC_COUNTDOWN_TIME, Timer_EndCountdown, raceID);
 	
 	return true;
 }

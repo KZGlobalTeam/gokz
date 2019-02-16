@@ -64,8 +64,8 @@ enum
 
 // =====[ CONSTANTS ]=====
 
-#define RC_COUNTDOWN_TIME 10
-#define RC_REQUEST_TIMEOUT_TIME 15
+#define RC_COUNTDOWN_TIME 10.0
+#define RC_REQUEST_TIMEOUT_TIME 15.0
 
 // Translation phrases for the teleport rules
 stock char gC_TeleportRulePhrases[TELEPORTRULE_COUNT][] = 

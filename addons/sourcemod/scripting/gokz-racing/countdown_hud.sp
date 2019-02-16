@@ -16,13 +16,13 @@ void StartCountdownHUD(int raceID)
 	{
 		if (GetRaceID(client) == raceID)
 		{
-			DisplayCountdownHUD(client, RC_COUNTDOWN_TIME);
+			DisplayCountdownHUD(client, RoundFloat(RC_COUNTDOWN_TIME));
 		}
 	}
 	
 	DataPack data = new DataPack();
 	data.WriteCell(raceID);
-	data.WriteCell(RC_COUNTDOWN_TIME);
+	data.WriteCell(RoundFloat(RC_COUNTDOWN_TIME));
 	CreateTimer(1.0, Timer_Countdown, data);
 }
 
