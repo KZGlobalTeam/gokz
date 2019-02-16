@@ -148,6 +148,7 @@ bool StartRace(int raceID)
 		if (GetRaceID(client) == raceID)
 		{
 			StartRacer(client);
+			GOKZ_PrintToChat(client, true, "%t", "Race Countdown Started");
 		}
 	}
 	
@@ -174,6 +175,8 @@ bool AbortRace(int raceID)
 		if (GetRaceID(client) == raceID)
 		{
 			AbortRacer(client);
+			GOKZ_PrintToChat(client, true, "%t", "Race Has Been Aborted");
+			GOKZ_PlayErrorSound(client);
 		}
 	}
 	

@@ -9,10 +9,6 @@
 	{
 		"en"		"Unlimited teleports"
 	}
-	"GO!"
-	{
-		"en"		"GO!"
-	}
 
 
 	// =====[ CHAT MESSAGES ]=====
@@ -36,11 +32,15 @@
 	{
 		"en"		"{grey}You have invited everyone that is ready to race."
 	}
-	"Player Already Part Of A Race"
+	"Player Already In A Race"
 	{
 		// Alice is already in a race.
 		"#format"	"{1:N}"
-		"en"		"{lime}{1} {darkred}already participating in a race."
+		"en"		"{lime}{1} {darkred}is already in a race."
+	}
+	"Race Countdown Started"
+	{
+		"en"		"{grey}The countdown has started! {default}Get ready!"
 	}
 	"Race Has Been Aborted"
 	{
@@ -101,12 +101,6 @@
 	"Race Request Not Accepted In Time (Target)"
 	{
 		"en"		"{grey}You did not respond to the race invitation in time."
-	}
-	"Race Host Started Countdown"
-	{
-		// Alice has started the countdown! Get ready!
-		"#format"	"{1:N}"
-		"en"		"{lime}{1} {grey}has started the countdown! Get ready!"
 	}
 	"Race Won"
 	{
