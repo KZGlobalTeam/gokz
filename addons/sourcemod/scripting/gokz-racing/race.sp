@@ -46,12 +46,6 @@ static bool SetRaceInfo(int raceID, RaceInfo prop, int value)
 	}
 }
 
-bool IsValidRaceID(int raceID)
-{
-	any dummy;
-	return raceInfo.GetValue(IntToStringEx(raceID), dummy);
-}
-
 int IncrementFinishedRacerCount(int raceID)
 {
 	int finishedRacers = GetRaceInfo(raceID, RaceInfo_FinishedRacerCount) + 1;
@@ -156,8 +150,6 @@ bool StartRace(int raceID)
 			StartRacer(client);
 		}
 	}
-	
-	StartCountdownHUD(raceID);
 	
 	CreateTimer(RC_COUNTDOWN_TIME, Timer_EndCountdown, raceID);
 	

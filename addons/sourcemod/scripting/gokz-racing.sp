@@ -22,7 +22,6 @@ public Plugin myinfo =
 #include "gokz-racing/announce.sp"
 #include "gokz-racing/api.sp"
 #include "gokz-racing/commands.sp"
-#include "gokz-racing/countdown_hud.sp"
 #include "gokz-racing/duel_menu.sp"
 #include "gokz-racing/race.sp"
 #include "gokz-racing/race_menu.sp"
@@ -48,7 +47,6 @@ public void OnPluginStart()
 	RegisterCommands();
 	
 	OnPluginStart_Race();
-	OnPluginStart_CountdownHUD();
 }
 
 
