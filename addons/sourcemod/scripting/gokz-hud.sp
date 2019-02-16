@@ -7,6 +7,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#include <gokz/racing>
+
 #include <gokz/kzplayer>
 
 
@@ -22,11 +24,14 @@ public Plugin myinfo =
 
 #define UPDATE_URL "http://updater.gokz.org/gokz-hud.txt"
 
+bool gB_GOKZRacing;
+
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
 #include "gokz-hud/options.sp"
 #include "gokz-hud/options_menu.sp"
+#include "gokz-hud/racing_text.sp"
 #include "gokz-hud/speed_text.sp"
 #include "gokz-hud/timer_text.sp"
 #include "gokz-hud/tp_menu.sp"
@@ -49,6 +54,7 @@ public void OnPluginStart()
 	HookEvents();
 	RegisterCommands();
 	
+	OnPluginStart_RacingText();
 	OnPluginStart_SpeedText();
 	OnPluginStart_TimerText();
 }
@@ -73,6 +79,12 @@ public void OnLibraryAdded(const char[] name)
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
+	gB_GOKZRacing = gB_GOKZRacing || StrEqual(name, "gokz-racing");
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	gB_GOKZRacing = gB_GOKZRacing && !StrEqual(name, "gokz-racing");
 }
 
 
@@ -82,6 +94,7 @@ public void OnLibraryAdded(const char[] name)
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
 	OnPlayerRunCmdPost_InfoPanel(client, cmdnum);
+	OnPlayerRunCmdPost_RacingText(client, cmdnum);
 	OnPlayerRunCmdPost_SpeedText(client, cmdnum);
 	OnPlayerRunCmdPost_TimerText(client, cmdnum);
 	OnPlayerRunCmdPost_TPMenu(client, cmdnum);
@@ -181,6 +194,11 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
 	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+public void GOKZ_RC_OnRaceInfoChanged(int raceID, RaceInfo prop, int oldValue, int newValue)
+{
+	OnRaceInfoChanged_RacingText(raceID, prop, newValue);
 }
 
 
