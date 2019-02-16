@@ -34,6 +34,7 @@ public Plugin myinfo =
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-racing");
 	return APLRes_Success;
 }
