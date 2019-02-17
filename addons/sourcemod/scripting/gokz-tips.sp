@@ -22,7 +22,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.org/gokz-tips.txt"
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-tips.txt"
 
 bool gC_PluginsWithTipsLoaded[TIPS_PLUGINS_COUNT];
 ArrayList g_TipPhrases;
@@ -67,7 +67,7 @@ public void OnAllPluginsLoaded()
 {
 	if (LibraryExists("updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 	
 	char gokzPlugin[PLATFORM_MAX_PATH];
@@ -88,7 +88,7 @@ public void OnLibraryAdded(const char[] name)
 {
 	if (StrEqual(name, "updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 	
 	char gokzPlugin[PLATFORM_MAX_PATH];

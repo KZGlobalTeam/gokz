@@ -29,7 +29,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.org/gokz-replays.txt"
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-replays.txt"
 
 bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
@@ -70,7 +70,7 @@ public void OnAllPluginsLoaded()
 {
 	if (LibraryExists("updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 	
@@ -87,7 +87,7 @@ public void OnLibraryAdded(const char[] name)
 {
 	if (StrEqual(name, "updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 	gB_GOKZLocalDB = gB_GOKZLocalDB || StrEqual(name, "gokz-localdb");
 }

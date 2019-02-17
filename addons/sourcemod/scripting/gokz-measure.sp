@@ -19,7 +19,7 @@ public Plugin myinfo =
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.org/gokz-measure.txt"
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-measure.txt"
 
 int gI_BeamModel;
 
@@ -47,7 +47,7 @@ public void OnAllPluginsLoaded()
 {
 	if (LibraryExists("updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 
@@ -55,7 +55,7 @@ public void OnLibraryAdded(const char[] name)
 {
 	if (StrEqual(name, "updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 
