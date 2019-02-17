@@ -43,7 +43,7 @@ stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] =
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 
 {
-	ShowPlayers_Disabled
+	ShowPlayers_Enabled
 };
 
 stock int gI_QTOptionCounts[QTOPTION_COUNT] = 

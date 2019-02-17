@@ -121,7 +121,7 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
 {
-	TPMenu_Simple, 
+	TPMenu_Advanced, 
 	InfoPanel_Enabled, 
 	ShowKeys_Spectating, 
 	TimerText_InfoPanel, 
