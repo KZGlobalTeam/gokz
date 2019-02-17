@@ -1,5 +1,8 @@
 /*	
 	Uses HUD text to show the race countdown and a start message.
+	
+	This is manually refreshed when a race starts to show the start message	as
+	soon as possible, improving responsiveness.
 */
 
 
@@ -49,6 +52,13 @@ void OnRaceInfoChanged_RacingText(int raceID, RaceInfo prop, int newValue)
 			{
 				ClearRacingText(client);
 			}
+		}
+	}
+	else if (newValue == RaceStatus_Started)
+	{
+		for (int client = 1; client <= MaxClients; client++)
+		{
+			UpdateRacingText(client);
 		}
 	}
 }
