@@ -68,14 +68,14 @@ static void UpdateRacingText(int client)
 	
 	if (player.alive)
 	{
-		RacingTextShow(player, player);
+		ShowRacingText(player, player);
 	}
 	else
 	{
 		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
 		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
-			RacingTextShow(player, targetPlayer);
+			ShowRacingText(player, targetPlayer);
 		}
 	}
 }
@@ -85,7 +85,7 @@ static void ClearRacingText(int client)
 	ClearSyncHud(client, racingHudSynchronizer);
 }
 
-static void RacingTextShow(KZPlayer player, KZPlayer targetPlayer)
+static void ShowRacingText(KZPlayer player, KZPlayer targetPlayer)
 {
 	if (GOKZ_RC_GetStatus(targetPlayer.id) != RacerStatus_Racing)
 	{

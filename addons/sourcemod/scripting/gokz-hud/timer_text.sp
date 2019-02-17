@@ -1,9 +1,8 @@
-/*
-	Timer Text
+/*	
+	Uses HUD text to show current run time somewhere on the screen.
 	
-	Uses ShowSyncHudText to show current run time somewhere on the screen.
-	
-	This is updated every ~0.25s and whenever timer is started, stopped etc.
+	This is manually refreshed whenever the players' timer is started, ended or
+	stopped to improve responsiveness.
 */
 
 
@@ -67,14 +66,14 @@ static void UpdateTimerText(int client)
 	
 	if (player.alive)
 	{
-		TimerTextShow(player, player);
+		ShowTimerText(player, player);
 	}
 	else
 	{
 		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
 		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
-			TimerTextShow(player, targetPlayer);
+			ShowTimerText(player, targetPlayer);
 		}
 	}
 }
@@ -84,7 +83,7 @@ static void ClearTimerText(int client)
 	ClearSyncHud(client, timerHudSynchronizer);
 }
 
-static void TimerTextShow(KZPlayer player, KZPlayer targetPlayer)
+static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 {
 	if (!targetPlayer.timerRunning)
 	{

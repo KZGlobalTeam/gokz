@@ -1,10 +1,8 @@
-/*
-	Speed Text
+/*	
+	Uses HUD text to show current speed somewhere on the screen.
 	
-	Uses ShowSyncHudText to show current speed somewhere on the screen.
-	
-	This is updated every ~0.1s and whenever player has taken off 
-	so that they get to see updated pre-speed as soon as possible.
+	This is manually refreshed whenever player has taken off so that they see
+	their pre-speed as soon as possible, improving responsiveness.
 */
 
 
@@ -53,14 +51,14 @@ static void UpdateSpeedText(int client)
 	
 	if (player.alive)
 	{
-		SpeedTextShow(player, player);
+		ShowSpeedText(player, player);
 	}
 	else
 	{
 		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
 		if (targetPlayer.id != -1 && !targetPlayer.fake)
 		{
-			SpeedTextShow(player, targetPlayer);
+			ShowSpeedText(player, targetPlayer);
 		}
 	}
 }
@@ -70,7 +68,7 @@ static void ClearSpeedText(int client)
 	ClearSyncHud(client, speedHudSynchronizer);
 }
 
-static void SpeedTextShow(KZPlayer player, KZPlayer targetPlayer)
+static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 {
 	if (targetPlayer.paused)
 	{

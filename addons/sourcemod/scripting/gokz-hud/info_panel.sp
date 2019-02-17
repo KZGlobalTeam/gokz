@@ -1,8 +1,8 @@
 /*
-	Centre information panel (hint text).
+	Displays information using hint text.
 	
-	This is updated every ~0.1s and whenever player has taken off 
-	so that they get to see updated pre-speed as soon as possible.
+	This is manually refreshed whenever player has taken off so that they see
+	their pre-speed as soon as possible, improving responsiveness.
 */
 
 
