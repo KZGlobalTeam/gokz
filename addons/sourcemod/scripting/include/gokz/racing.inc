@@ -149,13 +149,14 @@ forward void GOKZ_RC_OnRaceInfoChanged(int raceID, RaceInfo prop, int oldValue, 
  * @param prop			Info property to get.
  * @return				Value of the info property.
  */
-native int GOKZ_RC_GetRaceInfo(int client, RaceInfo prop);
+native int GOKZ_RC_GetRaceInfo(int raceID, RaceInfo prop);
 
 /**
  * Gets the player's racer status.
+ * Refer to the RacerStatus enumeration.
  *
  * @param client    	Client index.
- * @return				Whether player is paused.
+ * @return				Racer status of the client.
  */
 native int GOKZ_RC_GetStatus(int client);
 
