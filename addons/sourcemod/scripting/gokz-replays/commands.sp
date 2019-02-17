@@ -1,21 +1,7 @@
-/*
-	Commands
-	
-	Commands for player and admin use.
-*/
-
-
-
-// =========================  PUBLIC  ========================= //
-
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_replay", CommandReplay, "[KZ] Open the replay loading menu.");
 }
-
-
-
-// =========================  COMMAND HANDLERS  ========================= //
 
 public Action CommandReplay(int client, int args)
 {

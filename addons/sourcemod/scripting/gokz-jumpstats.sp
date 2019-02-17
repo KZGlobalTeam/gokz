@@ -13,6 +13,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#include <gokz/kzplayer>
+
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -22,38 +24,27 @@ public Plugin myinfo =
 {
 	name = "GOKZ Jumpstats", 
 	author = "DanZay", 
-	description = "GOKZ Jumpstats Module", 
+	description = "Tracks and outputs movement statistics", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.org/gokz-jumpstats.txt"
-
-#define BHOP_ON_GROUND_TICKS 5
-#define WEIRDJUMP_MAX_FALL_OFFSET 64.0
-#define MAX_TRACKED_STRAFES 32
-
-int gI_TouchingEntities[MAXPLAYERS + 1];
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-jumpstats.txt"
 
 #include "gokz-jumpstats/api.sp"
 #include "gokz-jumpstats/commands.sp"
-#include "gokz-jumpstats/distancetiers.sp"
-#include "gokz-jumpstats/jumpreporting.sp"
-#include "gokz-jumpstats/jumptracking.sp"
+#include "gokz-jumpstats/distance_tiers.sp"
+#include "gokz-jumpstats/jump_reporting.sp"
+#include "gokz-jumpstats/jump_tracking.sp"
 #include "gokz-jumpstats/options.sp"
-#include "gokz-jumpstats/optionsmenu.sp"
+#include "gokz-jumpstats/options_menu.sp"
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateNatives();
 	RegPluginLibrary("gokz-jumpstats");
 	return APLRes_Success;
@@ -61,11 +52,25 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	LoadTranslations("gokz-core.phrases");
+	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-jumpstats.phrases");
 	
 	CreateGlobalForwards();
-	CreateCommands();
+	RegisterCommands();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+	
+	TopMenu topMenu;
+	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
+	{
+		GOKZ_OnOptionsMenuReady(topMenu);
+	}
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -76,53 +81,29 @@ public void OnPluginStart()
 	}
 }
 
-public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
 public void OnLibraryAdded(const char[] name)
 {
 	if (StrEqual(name, "updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 
 
 
-// =========================  CLIENT  ========================= //
-
-public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
-{
-	OnPlayerRunCmd_JumpTracking(client, cmdnum);
-}
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
-	gI_TouchingEntities[client] = 0;
-	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
-	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
+	HookClientEvents(client);
 	OnClientPutInServer_Options(client);
+	OnClientPutInServer_JumpTracking(client);
 }
 
-public void SDKHook_StartTouch_Callback(int client, int touched)
+public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	gI_TouchingEntities[client]++;
-	OnStartTouch_JumpTracking(client);
+	OnPlayerRunCmdPost_JumpTracking(client, cmdnum);
 }
-
-public void SDKHook_EndTouch_Callback(int client, int touched)
-{
-	gI_TouchingEntities[client]--;
-}
-
-
-
-// =========================  MOVEMENTAPI  ========================= //
 
 public void Movement_OnStartTouchGround(int client)
 {
@@ -134,10 +115,6 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	OnPlayerJump_JumpTracking(client, jumpbug);
 }
 
-
-
-// =========================  GOKZ  ========================= //
-
 public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
 {
 	OnJumpValidated_JumpTracking(client, jumped, ladderJump);
@@ -148,9 +125,10 @@ public void GOKZ_OnJumpInvalidated(int client)
 	OnJumpInvalidated_JumpTracking(client);
 }
 
-public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	OnOptionChanged_JumpTracking(client, option);
+	OnOptionChanged_Options(client, option, newValue);
 }
 
 public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration)
@@ -158,13 +136,43 @@ public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float of
 	OnLanding_JumpReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration);
 }
 
+public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost
+{
+	OnStartTouch_JumpTracking(client);
+}
+
+public void SDKHook_EndTouch_Callback(int client, int touched) // SDKHook_EndTouchPost
+{
+	OnEndTouch_JumpTracking(client);
+}
 
 
-// =========================  OTHER  ========================= //
+
+// =====[ OTHER EVENTS ]=====
 
 public void OnMapStart()
 {
-	PrecacheJumpstatSounds();
+	OnMapStart_JumpReporting();
 	OnMapStart_DistanceTiers();
-	OnMapStart_Options();
+}
+
+public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
+{
+	OnOptionsMenuCreated_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_Options();
+	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void HookClientEvents(int client)
+{
+	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
+	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
 } 

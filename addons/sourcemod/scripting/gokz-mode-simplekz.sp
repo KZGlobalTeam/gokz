@@ -12,6 +12,8 @@
 #include <gokz/core>
 #include <updater>
 
+#include <gokz/kzplayer>
+
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -21,12 +23,12 @@ public Plugin myinfo =
 {
 	name = "GOKZ Mode - SimpleKZ", 
 	author = "DanZay", 
-	description = "GOKZ Mode Module - SimpleKZ", 
+	description = "SimpleKZ mode for GOKZ", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.org/gokz-mode-simplekz.txt"
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
 #define MODE_VERSION 4
 #define DUCK_SPEED_MINIMUM 7.0
@@ -38,7 +40,33 @@ public Plugin myinfo =
 #define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
 #define PRE_GRACE_TICKS 3 // Number of ticks you're allowed to fail prestrafe checks when prestrafing - Helps players with low fps
 
-float gF_ModeCVarValues[MODECVAR_COUNT] =  { 6.5, 5.2, 100.0, 1.0, 3500.0, 800.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 10.0, 0.0, 0.0, 301.993377, 0.0, 0.0, 0.0, 0.8, 30.0, 0.7, 0.7, 0.0 };
+float gF_ModeCVarValues[MODECVAR_COUNT] = 
+{
+	6.5,  // sv_accelerate
+	0.0,  // sv_accelerate_use_weapon_speed
+	100.0,  // sv_airaccelerate
+	30.0,  // sv_air_max_wishspeed
+	1.0,  // sv_enablebunnyhopping
+	5.2,  // sv_friction
+	800.0,  // sv_gravity
+	301.993377,  // sv_jump_impulse
+	1.0,  // sv_ladder_scale_speed
+	0.0,  // sv_ledge_mantle_helper
+	320.0,  // sv_maxspeed
+	3500.0,  // sv_maxvelocity
+	0.0,  // sv_staminajumpcost
+	0.0,  // sv_staminalandcost
+	0.0,  // sv_staminamax
+	0.0,  // sv_staminarecoveryrate
+	0.7,  // sv_standable_normal
+	0.0,  // sv_timebetweenducks
+	0.7,  // sv_walkable_normal
+	10.0,  // sv_wateraccelerate
+	0.8,  // sv_water_movespeed_multiplier
+	0.0,  // sv_water_swim_mode 
+	0.0,  // sv_weapon_encumbrance_per_item
+	0.0 // sv_weapon_encumbrance_scale
+};
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
@@ -54,20 +82,24 @@ bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 
 
-// =========================  PLUGIN  ========================= //
-
-public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
-{
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	return APLRes_Success;
-}
+// =====[ PLUGIN EVENTS ]=====
 
 public void OnPluginStart()
 {
 	CreateConVars();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+	if (LibraryExists("gokz-core"))
+	{
+		gB_GOKZCore = true;
+		GOKZ_SetModeLoaded(Mode_SimpleKZ, true, MODE_VERSION);
+	}
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -86,70 +118,35 @@ public void OnPluginEnd()
 	}
 }
 
-public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("gokz-core"))
-	{
-		gB_GOKZCore = true;
-		GOKZ_SetModeLoaded(Mode_SimpleKZ, true, MODE_VERSION);
-	}
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+	else if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_SimpleKZ, true, MODE_VERSION);
-	}
-	else if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
 	}
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	if (StrEqual(name, "gokz-core"))
-	{
-		gB_GOKZCore = false;
-	}
+	gB_GOKZCore = gB_GOKZCore && !StrEqual(name, "gokz-core");
 }
 
 
 
-// =========================  GENERAL  ========================= //
-
-public void OnGameFrame()
-{
-	/* 
-		Why are we using OnGameFrame() for slope boost fix?
-		
-		MovementAPI measures landing speed, calls forwards etc. during 
-		OnPlayerRunCmd.	We want the slope fix to apply it's speed before 
-		MovementAPI does this, so that we can apply tweaks based on the 
-		'fixed' landing speed.
-	*/
-	for (int client = 1; client < MaxClients; client++)
-	{
-		if (IsClientInGame(client) && IsPlayerAlive(client) && IsUsingMode(client))
-		{
-			SlopeFix(client);
-		}
-	}
-}
-
-
-
-// =========================  CLIENT  ========================= //
+// =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	if (IsUsingMode(client))
+	{
+		ReplicateConVars(client);
+	}
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -159,7 +156,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		return Plugin_Continue;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player, angles);
 	if (gB_Jumpbugged[player.id])
@@ -197,7 +194,7 @@ public void Movement_OnStartTouchGround(int client)
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	ReduceDuckSlowdown(player);
 	gF_PreVelModLanding[player.id] = gF_PreVelMod[player.id];
 }
@@ -209,7 +206,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (jumped)
 	{
 		TweakJump(player);
@@ -241,7 +238,7 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 		return;
 	}
 	
-	KZPlayer player = new KZPlayer(client);
+	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore && newMoveType == MOVETYPE_WALK)
 	{
 		player.gokzHitPerf = false;
@@ -249,17 +246,9 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	}
 }
 
-public void GOKZ_OnOptionChanged(int client, Option option, int newValue)
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
-	if (option == Option_Mode && newValue == Mode_SimpleKZ)
-	{
-		ReplicateConVars(client);
-	}
-}
-
-public void GOKZ_OnClientSetup(int client)
-{
-	if (IsUsingMode(client))
+	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]) && newValue == Mode_SimpleKZ)
 	{
 		ReplicateConVars(client);
 	}
@@ -267,19 +256,42 @@ public void GOKZ_OnClientSetup(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ OTHER EVENTS ]=====
 
-static bool IsUsingMode(int client)
+public void OnGameFrame()
+{
+	/*
+		Why are we using OnGameFrame() for slope boost fix?
+		
+		MovementAPI measures landing speed, calls forwards etc. during 
+		OnPlayerRunCmd.	We want the slope fix to apply it's speed before 
+		MovementAPI does this, so that we can apply tweaks based on the 
+		'fixed' landing speed.
+	*/
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client) && IsPlayerAlive(client) && IsUsingMode(client))
+		{
+			SlopeFix(client);
+		}
+	}
+}
+
+
+
+// =====[ GENERAL ]=====
+
+bool IsUsingMode(int client)
 {
 	// If GOKZ core isn't loaded, then apply mode at all times
-	return !gB_GOKZCore || GOKZ_GetOption(client, Option_Mode) == Mode_SimpleKZ;
+	return !gB_GOKZCore || GOKZ_GetCoreOption(client, Option_Mode) == Mode_SimpleKZ;
 }
 
 
 
-// CONVARS
+// =====[ CONVARS ]=====
 
-static void CreateConVars()
+void CreateConVars()
 {
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
@@ -287,7 +299,7 @@ static void CreateConVars()
 	}
 }
 
-static void TweakConVars()
+void TweakConVars()
 {
 	for (int i = 0; i < MODECVAR_COUNT; i++)
 	{
@@ -295,7 +307,7 @@ static void TweakConVars()
 	}
 }
 
-static void ReplicateConVars(int client)
+void ReplicateConVars(int client)
 {
 	// Replicate convars only when player changes mode in GOKZ
 	// so that lagg isn't caused by other players using other
@@ -314,14 +326,14 @@ static void ReplicateConVars(int client)
 
 
 
-// VELOCITY MODIFIER
+// =====[ VELOCITY MODIFIER ]=====
 
-static void TweakVelMod(KZPlayer player, const float angles[3])
+void TweakVelMod(KZPlayer player, const float angles[3])
 {
 	player.velocityModifier = CalcPrestrafeVelMod(player, angles) * CalcWeaponVelMod(player);
 }
 
-static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
+float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 {
 	// If player is in mid air, decrement their velocity modifier
 	if (!player.onGround)
@@ -371,7 +383,7 @@ static float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	return gF_PreVelMod[player.id];
 }
 
-static bool ValidPrestrafeTurning(KZPlayer player, const float angles[3])
+bool ValidPrestrafeTurning(KZPlayer player, const float angles[3])
 {
 	// If missed a few ticks, then forgive but multiply required angle change
 	if (gI_PreTicksSinceIncrement[player.id] <= PRE_GRACE_TICKS)
@@ -382,23 +394,23 @@ static bool ValidPrestrafeTurning(KZPlayer player, const float angles[3])
 	return FloatAbs(CalcDeltaAngle(gF_OldAngles[player.id][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE;
 }
 
-static bool ValidPrestrafeButtons(KZPlayer player)
+bool ValidPrestrafeButtons(KZPlayer player)
 {
-	bool forwardOrBack = player.buttons & IN_FORWARD && !(player.buttons & IN_BACK) || !(player.buttons & IN_FORWARD) && player.buttons & IN_BACK;
-	bool leftOrRight = player.buttons & IN_MOVELEFT && !(player.buttons & IN_MOVERIGHT) || !(player.buttons & IN_MOVELEFT) && player.buttons & IN_MOVERIGHT;
-	return forwardOrBack && leftOrRight;
+	bool forwardOrBack = player.buttons & (IN_FORWARD | IN_BACK) && !(player.buttons & IN_FORWARD && player.buttons & IN_BACK);
+	bool leftOrRight = player.buttons & (IN_MOVELEFT | IN_MOVERIGHT) && !(player.buttons & IN_MOVELEFT && player.buttons & IN_MOVERIGHT);
+	return forwardOrBack || leftOrRight;
 }
 
-static float CalcWeaponVelMod(KZPlayer player)
+float CalcWeaponVelMod(KZPlayer player)
 {
 	return SPEED_NORMAL / player.maxSpeed;
 }
 
 
 
-// JUMPING
+// =====[ JUMPING ]=====
 
-static void TweakJump(KZPlayer player)
+void TweakJump(KZPlayer player)
 {
 	if (player.takeoffCmdNum - player.landingCmdNum <= PERF_TICKS)
 	{
@@ -434,7 +446,7 @@ static void TweakJump(KZPlayer player)
 	}
 }
 
-static void TweakJumpbug(KZPlayer player)
+void TweakJumpbug(KZPlayer player)
 {
 	if (player.speed > SPEED_NORMAL)
 	{
@@ -448,7 +460,7 @@ static void TweakJumpbug(KZPlayer player)
 }
 
 // Takeoff speed assuming player has met the conditions to need tweaking
-static float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
+float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 {
 	// Formula
 	if (jumpbug)
@@ -464,7 +476,8 @@ static float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 
 
 
-// SLOPEFIX
+// =====[ SLOPEFIX ]=====
+
 // ORIGINAL AUTHORS : Mev & Blacky
 // URL : https://forums.alliedmods.net/showthread.php?p=2322788
 // NOTE : Modified by DanZay for this plugin
@@ -495,7 +508,7 @@ void SlopeFix(int client)
 		{
 			// Gets the normal vector of the surface under the player
 			float vPlane[3], vLast[3];
-			TR_GetPlaneNormal(INVALID_HANDLE, vPlane);
+			TR_GetPlaneNormal(null, vPlane);
 			
 			// Make sure it's not flat ground and not a surf ramp (1.0 = flat ground, < 0.7 = surf ramp)
 			if (0.7 <= vPlane[2] < 1.0)
@@ -548,9 +561,9 @@ public bool TraceRayDontHitSelf(int entity, int mask, any data)
 
 
 
-// OTHER
+// =====[ OTHER ]=====
 
-static void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
+void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 {
 	if (player.onGround && buttons & IN_JUMP && !(gI_OldButtons[player.id] & IN_JUMP) && !(gI_OldButtons[player.id] & IN_DUCK))
 	{
@@ -558,7 +571,7 @@ static void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 	}
 }
 
-static void ReduceDuckSlowdown(KZPlayer player)
+void ReduceDuckSlowdown(KZPlayer player)
 {
 	if (player.duckSpeed < DUCK_SPEED_MINIMUM)
 	{

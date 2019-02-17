@@ -1,102 +1,254 @@
-/*
-	Options
-	
-	Player options to customise their experience.
-*/
+static StringMap optionData;
+static StringMap optionDescriptions;
 
 
 
-#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-core-options.cfg"
+// =====[ PUBLIC ]=====
 
-static int defaultOptions[OPTION_COUNT];
-static int options[OPTION_COUNT][MAXPLAYERS + 1];
-
-static int optionCounts[OPTION_COUNT] = 
+bool RegisterOption(const char[] name, const char[] description, OptionType type, any defaultValue, any minValue, any maxValue)
 {
-	MODE_COUNT, 
-	STYLE_COUNT, 
-	TPMENU_COUNT, 
-	SHOWINGINFOPANEL_COUNT, 
-	SHOWINGKEYS_COUNT, 
-	SHOWINGPLAYERS_COUNT, 
-	SHOWINGWEAPON_COUNT, 
-	AUTORESTART_COUNT, 
-	SLAYONEND_COUNT, 
-	PISTOL_COUNT, 
-	CHECKPOINTMESSAGES_COUNT, 
-	CHECKPOINTSOUNDS_COUNT, 
-	TELEPORTSOUNDS_COUNT, 
-	ERRORSOUNDS_COUNT, 
-	TIMERTEXT_COUNT, 
-	SPEEDTEXT_COUNT, 
-	JUMPBEAM_COUNT, 
-	HELPANDTIPS_COUNT
-};
-
-
-
-// =========================  PUBLIC  ========================= //
-
-int GetOption(int client, Option option)
-{
-	return options[option][client];
-}
-
-void SetOption(int client, Option option, int optionValue, bool printMessage = false)
-{
-	// Handle unique case of modes, where some values may not be available
-	if (option == Option_Mode && !GetModeLoaded(optionValue))
+	if (!IsValueInRange(type, defaultValue, minValue, maxValue))
 	{
-		if (printMessage)
+		LogError("Failed to register option \"%s\" due to invalid default value and value range.", name);
+		return false;
+	}
+	
+	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH - 1)
+	{
+		LogError("Failed to register option \"%s\" because its name is too long.", name);
+		return false;
+	}
+	
+	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH - 1)
+	{
+		LogError("Failed to register option \"%s\" because its description is too long.", name);
+		return false;
+	}
+	
+	ArrayList data;
+	Handle cookie;
+	if (IsRegisteredOption(name))
+	{
+		optionData.GetValue(name, data);
+		cookie = GetOptionProp(name, OptionProp_Cookie);
+	}
+	else
+	{
+		data = new ArrayList(1, view_as<int>(OPTIONPROP_COUNT));
+		cookie = RegClientCookie(name, description, CookieAccess_Private);
+	}
+	
+	data.Set(view_as<int>(OptionProp_Cookie), cookie);
+	data.Set(view_as<int>(OptionProp_Type), type);
+	data.Set(view_as<int>(OptionProp_DefaultValue), defaultValue);
+	data.Set(view_as<int>(OptionProp_MinValue), minValue);
+	data.Set(view_as<int>(OptionProp_MaxValue), maxValue);
+	
+	optionData.SetValue(name, data, true);
+	optionDescriptions.SetString(name, description, true);
+	
+	// Support late-loading/registering
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (AreClientCookiesCached(client))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", optionValue);
+			LoadOption(client, name);
 		}
-		SetOption(client, Option_Mode, GetALoadedMode(), printMessage);
-		return;
 	}
 	
-	// Don't need to do anything if their option is already set at that value
-	if (GetOption(client, option) == optionValue)
+	return true;
+}
+
+any GetOptionProp(const char[] option, OptionProp prop)
+{
+	ArrayList data;
+	if (!optionData.GetValue(option, data))
 	{
-		return;
+		LogError("Failed to get option property of unregistered option \"%s\".", option);
+		return -1;
 	}
 	
-	// Set the option otherwise
-	options[option][client] = optionValue;
-	if (printMessage)
+	return data.Get(view_as<int>(prop));
+}
+
+bool SetOptionProp(const char[] option, OptionProp prop, any newValue)
+{
+	ArrayList data;
+	if (!optionData.GetValue(option, data))
 	{
-		PrintOptionChangeMessage(client, option, optionValue);
+		LogError("Failed to set property of unregistered option \"%s\".", option);
+		return false;
 	}
 	
-	Call_GOKZ_OnOptionChanged(client, option, optionValue);
+	if (prop == OptionProp_Cookie)
+	{
+		LogError("Failed to set cookie of option \"%s\" as it is read-only.");
+		return false;
+	}
+	
+	OptionType type = GetOptionProp(option, OptionProp_Type);
+	any defaultValue = GetOptionProp(option, OptionProp_DefaultValue);
+	any minValue = GetOptionProp(option, OptionProp_MinValue);
+	any maxValue = GetOptionProp(option, OptionProp_MaxValue);
+	
+	switch (prop)
+	{
+		case OptionProp_DefaultValue:
+		{
+			if (!IsValueInRange(type, newValue, minValue, maxValue))
+			{
+				LogError("Failed to set default value of option \"%s\" due to invalid default value and value range.", option);
+				return false;
+			}
+		}
+		case OptionProp_MinValue:
+		{
+			if (!IsValueInRange(type, defaultValue, newValue, maxValue))
+			{
+				LogError("Failed to set minimum value of option \"%s\" due to invalid default value and value range.", option);
+				return false;
+			}
+		}
+		case OptionProp_MaxValue:
+		{
+			if (!IsValueInRange(type, defaultValue, minValue, newValue))
+			{
+				LogError("Failed to set maximum value of option \"%s\" due to invalid default value and value range.", option);
+				return false;
+			}
+		}
+	}
+	
+	data.Set(view_as<int>(prop), newValue);
+	return optionData.SetValue(option, data, true);
 }
 
-void CycleOption(int client, Option option, bool printMessage = false)
+any GetOption(int client, const char[] option)
 {
-	SetOption(client, option, (GetOption(client, option) + 1) % optionCounts[option], printMessage);
+	if (!IsRegisteredOption(option))
+	{
+		LogError("Failed to get value of unregistered option \"%s\".", option);
+		return -1;
+	}
+	
+	Handle cookie = GetOptionProp(option, OptionProp_Cookie);
+	OptionType type = GetOptionProp(option, OptionProp_Type);
+	char value[100];
+	GetClientCookie(client, cookie, value, sizeof(value));
+	
+	if (type == OptionType_Float)
+	{
+		return StringToFloat(value);
+	}
+	else //if (type == OptionType_Int)
+	{
+		return StringToInt(value);
+	}
 }
 
-int GetDefaultOption(Option option)
+bool SetOption(int client, const char[] option, any newValue)
 {
-	return defaultOptions[option];
+	if (!IsRegisteredOption(option))
+	{
+		LogError("Failed to set value of unregistered option \"%s\".", option);
+		return false;
+	}
+	
+	if (GetOption(client, option) == newValue)
+	{
+		return true;
+	}
+	
+	OptionType type = GetOptionProp(option, OptionProp_Type);
+	any minValue = GetOptionProp(option, OptionProp_MinValue);
+	any maxValue = GetOptionProp(option, OptionProp_MaxValue);
+	
+	if (!IsValueInRange(type, newValue, minValue, maxValue))
+	{
+		LogError("Failed to set value of option \"%s\" because desired value was outside registered value range.", option);
+		return false;
+	}
+	
+	char newValueString[100];
+	if (type == OptionType_Float)
+	{
+		FloatToString(newValue, newValueString, sizeof(newValueString));
+	}
+	else //if (type == OptionType_Int)
+	{
+		IntToString(newValue, newValueString, sizeof(newValueString));
+	}
+	
+	Handle cookie = GetOptionProp(option, OptionProp_Cookie);
+	SetClientCookie(client, cookie, newValueString);
+	
+	if (IsClientInGame(client))
+	{
+		Call_GOKZ_OnOptionChanged(client, option, newValue);
+	}
+	
+	return true;
+}
+
+bool IsRegisteredOption(const char[] option)
+{
+	int dummy;
+	return optionData.GetValue(option, dummy);
 }
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ EVENTS ]=====
 
-void SetupClientOptions(int client)
+void OnPluginStart_Options()
 {
-	SetDefaultOptions(client);
+	optionData = new StringMap();
+	optionDescriptions = new StringMap();
+	RegisterOptions();
+}
+
+void OnClientCookiesCached_Options(int client)
+{
+	StringMapSnapshot optionDataSnapshot = optionData.Snapshot();
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
+	
+	for (int i = 0; i < optionDataSnapshot.Length; i++)
+	{
+		optionDataSnapshot.GetKey(i, option, sizeof(option));
+		LoadOption(client, option);
+	}
+	
+	delete optionDataSnapshot;
+}
+
+void OnClientPutInServer_Options(int client)
+{
+	if (!GetModeLoaded(GOKZ_GetCoreOption(client, Option_Mode)))
+	{
+		GOKZ_SetCoreOption(client, Option_Mode, GetALoadedMode());
+	}
+}
+
+void OnOptionChanged_Options(int client, Option option, int newValue)
+{
+	if (option == Option_Mode && !GetModeLoaded(newValue))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", newValue);
+		GOKZ_SetCoreOption(client, Option_Mode, GetALoadedMode());
+	}
+	else
+	{
+		PrintOptionChangeMessage(client, option, newValue);
+	}
 }
 
 void OnModeUnloaded_Options(int mode)
 {
-	for (int client = 1; client < MaxClients; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (IsClientInGame(client) && GetOption(client, Option_Mode) == mode)
+		if (IsClientInGame(client) && GOKZ_GetCoreOption(client, Option_Mode) == mode)
 		{
-			SetOption(client, Option_Mode, GetALoadedMode(), true);
+			GOKZ_SetCoreOption(client, Option_Mode, GetALoadedMode());
 		}
 	}
 }
@@ -108,108 +260,149 @@ void OnMapStart_Options()
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
+static void RegisterOptions()
+{
+	for (Option option; option < OPTION_COUNT; option++)
+	{
+		RegisterOption(gC_CoreOptionNames[option], gC_CoreOptionDescriptions[option], 
+			OptionType_Int, gI_CoreOptionDefaults[option], 0, gI_CoreOptionCounts[option] - 1);
+	}
+}
+
+static bool IsValueInRange(OptionType type, any value, any minValue, any maxValue)
+{
+	if (type == OptionType_Float)
+	{
+		return FloatCompare(minValue, value) <= 0 && FloatCompare(value, maxValue) <= 0;
+	}
+	else //if (type == OptionType_Int)
+	{
+		return minValue <= value && value <= maxValue;
+	}
+}
+
+static bool LoadOption(int client, const char[] option)
+{
+	char valueString[100];
+	Handle cookie = GetOptionProp(option, OptionProp_Cookie);
+	GetClientCookie(client, cookie, valueString, sizeof(valueString));
+	
+	// If there's no stored value for the option, set it to default
+	if (valueString[0] == '\0')
+	{
+		SetOption(client, option, GetOptionProp(option, OptionProp_DefaultValue));
+		return;
+	}
+	
+	OptionType type = GetOptionProp(option, OptionProp_Type);
+	any minValue = GetOptionProp(option, OptionProp_MinValue);
+	any maxValue = GetOptionProp(option, OptionProp_MaxValue);
+	any value;
+	
+	// If stored option isn't a valid float or integer, or is out of range, set it to default
+	if (type == OptionType_Float && StringToFloatEx(valueString, value) == 0)
+	{
+		SetOption(client, option, GetOptionProp(option, OptionProp_DefaultValue));
+	}
+	else if (type == OptionType_Int && StringToIntEx(valueString, value) == 0)
+	{
+		SetOption(client, option, GetOptionProp(option, OptionProp_DefaultValue));
+	}
+	else if (!IsValueInRange(type, value, minValue, maxValue))
+	{
+		SetOption(client, option, GetOptionProp(option, OptionProp_DefaultValue));
+	}
+}
+
+// Load default optionData from a config file, creating one and adding optionData if necessary
 static void LoadDefaultOptions()
 {
-	KeyValues kv = new KeyValues("options");
+	KeyValues oldKV = new KeyValues(GOKZ_CFG_OPTIONS_ROOT);
 	
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	if (FileExists(GOKZ_CFG_OPTIONS) && !oldKV.ImportFromFile(GOKZ_CFG_OPTIONS))
 	{
-		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
+		LogError("Failed to load file: \"%s\".", GOKZ_CFG_OPTIONS);
+		delete oldKV;
 		return;
 	}
 	
-	for (Option option; option < OPTION_COUNT; option++)
+	KeyValues newKV = new KeyValues(GOKZ_CFG_OPTIONS_ROOT); // This one will be sorted by option name
+	StringMapSnapshot optionDataSnapshot = optionData.Snapshot();
+	ArrayList optionDataSnapshotArray = new ArrayList(ByteCountToCells(GOKZ_OPTION_MAX_NAME_LENGTH), 0);
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
+	char optionDescription[GOKZ_OPTION_MAX_DESC_LENGTH];
+	
+	// Sort the optionData by name
+	for (int i = 0; i < optionDataSnapshot.Length; i++)
 	{
-		defaultOptions[option] = kv.GetNum(gC_KeysOptions[option]);
+		optionDataSnapshot.GetKey(i, option, sizeof(option));
+		optionDataSnapshotArray.PushString(option);
 	}
+	SortADTArray(optionDataSnapshotArray, Sort_Ascending, Sort_String);
+	
+	// Get the values from the KeyValues, otherwise set them
+	for (int i = 0; i < optionDataSnapshotArray.Length; i++)
+	{
+		oldKV.Rewind();
+		newKV.Rewind();
+		optionDataSnapshotArray.GetString(i, option, sizeof(option));
+		optionDescriptions.GetString(option, optionDescription, sizeof(optionDescription));
+		
+		newKV.JumpToKey(option, true);
+		newKV.SetString(GOKZ_CFG_OPTIONS_DESCRIPTION, optionDescription);
+		
+		OptionType type = GetOptionProp(option, OptionProp_Type);
+		if (type == OptionType_Float)
+		{
+			if (oldKV.JumpToKey(option, false) && oldKV.JumpToKey(GOKZ_CFG_OPTIONS_DEFAULT, false))
+			{
+				oldKV.GoBack();
+				newKV.SetFloat(GOKZ_CFG_OPTIONS_DEFAULT, oldKV.GetFloat(GOKZ_CFG_OPTIONS_DEFAULT));
+				SetOptionProp(option, OptionProp_DefaultValue, oldKV.GetFloat(GOKZ_CFG_OPTIONS_DEFAULT));
+			}
+			else
+			{
+				newKV.SetFloat(GOKZ_CFG_OPTIONS_DEFAULT, GetOptionProp(option, OptionProp_DefaultValue));
+			}
+		}
+		else if (type == OptionType_Int)
+		{
+			if (oldKV.JumpToKey(option, false) && oldKV.JumpToKey(GOKZ_CFG_OPTIONS_DEFAULT, false))
+			{
+				oldKV.GoBack();
+				newKV.SetNum(GOKZ_CFG_OPTIONS_DEFAULT, oldKV.GetNum(GOKZ_CFG_OPTIONS_DEFAULT));
+				SetOptionProp(option, OptionProp_DefaultValue, oldKV.GetNum(GOKZ_CFG_OPTIONS_DEFAULT));
+			}
+			else
+			{
+				newKV.SetNum(GOKZ_CFG_OPTIONS_DEFAULT, GetOptionProp(option, OptionProp_DefaultValue));
+			}
+		}
+	}
+	
+	newKV.Rewind();
+	newKV.ExportToFile(GOKZ_CFG_OPTIONS);
+	
+	delete oldKV;
+	delete newKV;
+	delete optionDataSnapshot;
+	delete optionDataSnapshotArray;
 }
 
-static void SetDefaultOptions(int client)
+static void PrintOptionChangeMessage(int client, Option option, int newValue)
 {
-	for (Option option; option < OPTION_COUNT; option++)
-	{
-		SetOption(client, option, GetDefaultOption(option));
-	}
-}
-
-static void PrintOptionChangeMessage(int client, Option option, int optionValue) {
-	if (!IsClientInGame(client))
-	{
-		return;
-	}
-	
-	// NOTE: Not all options have a message for when they are changed.
+	// NOTE: Not all optionData have a message for when they are changed.
 	switch (option)
 	{
 		case Option_Mode:
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Switched Mode", gC_ModeNames[GetOption(client, Option_Mode)]);
-		}
-		case Option_ShowingTPMenu:
-		{
-			switch (optionValue)
-			{
-				case ShowingTPMenu_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Disable");
-				}
-				case ShowingTPMenu_Simple:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable (Simple)");
-				}
-				case ShowingTPMenu_Advanced:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Teleport Menu - Enable (Advanced)");
-				}
-			}
-		}
-		case Option_ShowingInfoPanel:
-		{
-			switch (optionValue)
-			{
-				case ShowingInfoPanel_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Info Panel - Disable");
-				}
-				case ShowingInfoPanel_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Info Panel - Enable");
-				}
-			}
-		}
-		case Option_ShowingPlayers:
-		{
-			switch (optionValue)
-			{
-				case ShowingPlayers_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Players - Disable");
-				}
-				case ShowingPlayers_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Players - Enable");
-				}
-			}
-		}
-		case Option_ShowingWeapon:
-		{
-			switch (optionValue)
-			{
-				case ShowingWeapon_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Weapon - Disable");
-				}
-				case ShowingWeapon_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Show Weapon - Enable");
-				}
-			}
+			GOKZ_PrintToChat(client, true, "%t", "Switched Mode", gC_ModeNames[newValue]);
 		}
 		case Option_AutoRestart:
 		{
-			switch (optionValue)
+			switch (newValue)
 			{
 				case AutoRestart_Disabled:
 				{
@@ -218,34 +411,6 @@ static void PrintOptionChangeMessage(int client, Option option, int optionValue)
 				case AutoRestart_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Auto Restart - Enable");
-				}
-			}
-		}
-		case Option_SlayOnEnd:
-		{
-			switch (optionValue)
-			{
-				case SlayOnEnd_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Disable");
-				}
-				case SlayOnEnd_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Slay On End - Enable");
-				}
-			}
-		}
-		case Option_HelpAndTips:
-		{
-			switch (optionValue)
-			{
-				case HelpAndTips_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Disable");
-				}
-				case HelpAndTips_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Help And Tips - Enable");
 				}
 			}
 		}

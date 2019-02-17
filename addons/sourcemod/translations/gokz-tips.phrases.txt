@@ -1,0 +1,19 @@
+"Phrases"
+{
+	// =====[ CHAT MESSAGES ]=====
+	"Option - Tips - Enable"
+	{
+		"en"		"{grey}You will now see random tips in chat periodically."
+	}
+	"Option - Tips - Disable"
+	{
+		"en"		"{grey}You will no longer see random tips in chat periodically."
+	}
+
+
+	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Tips"
+	{
+		"en"		"Tips"
+	}
+}

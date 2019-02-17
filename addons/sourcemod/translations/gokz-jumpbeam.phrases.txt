@@ -1,0 +1,29 @@
+"Phrases"
+{
+	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Jump Beam"
+	{
+		"en"		"Jump beam"
+		"chi"		"起跳轨迹"
+	}
+	"Options Menu - Feet"
+	{
+		"en"		"Feet"
+		"chi"		"腿部"
+	}
+	"Options Menu - Head"
+	{
+		"en"		"Head"
+		"chi"		"头部"
+	}
+	"Options Menu - Feet and Head"
+	{
+		"en"		"Feet and head"
+		"chi"		"腿部和头部"
+	}
+	"Options Menu - Ground"
+	{
+		"en"		"Ground"
+		"chi"		"地面"
+	}
+}

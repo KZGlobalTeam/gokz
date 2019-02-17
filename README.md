@@ -21,10 +21,11 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
 
 ### Server Requirements
 
- * [SourceMod 1.9+](https://www.sourcemod.net/downloads.php?branch=stable)
  * 128 Tick (`-tickrate 128`)
- * [MovementAPI Plugin 1.1.0+](https://github.com/danzayau/MovementAPI)
- * [DHooks Extension](https://forums.alliedmods.net/showthread.php?t=180114)
+ * [SourceMod ^1.9](https://www.sourcemod.net/downloads.php?branch=stable)
+ * clientprefs Extension (comes packaged with SourceMod)
+ * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showthread.php?t=180114)
+ * [MovementAPI Plugin ^1.1.2](https://github.com/danzayau/MovementAPI)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-globals plugin)
  * Optional - [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (prevent "Datatable warning" server console spam)
  * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (auto-update the plugins)
@@ -34,14 +35,14 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
  * Ensure your server is up to date and meets the above requirements.
  * Download and extract `GOKZ-latest.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
  * Add a MySQL or SQLite database called `gokz` to `csgo/addons/sourcemod/configs/databases.cfg`.
-
-When the plugins first load, various configuration files will be auto-generated and can be found in `csgo/cfg/sourcemod/gokz`.
-
-Use the `!updatemappool` or `sm_updatemappool` in console to populate the ranked map pool with those in `csgo/cfg/sourcemod/gokz/mappool.cfg`.
+ * Configure the `clientprefs` database as desired (can be same database).
+ * When the plugins first load, various configuration files will be auto-generated and can be found in `csgo/cfg/sourcemod/gokz`.
+ * Use the `!updatemappool` or `sm_updatemappool` in console to populate the ranked map pool with those in `csgo/cfg/sourcemod/gokz/gokz-localranks-mappool.cfg`.
 
 ### Updating
 
- * Download and extract `GOKZ-latest-upgrade.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
+ * Minor updates - Download and extract `GOKZ-latest-upgrade.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
+ * Major updates - Check the new version's release notes for specific instructions.
 
 ### Commands
 

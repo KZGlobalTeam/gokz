@@ -1,14 +1,14 @@
 /*
-	Miscellaneous
-	
 	Miscellaneous functions.
 */
 
 
 
+// =====[ COMPLETION MVP STARS ]=====
+
 void CompletionMVPStarsUpdate(int client)
 {
-	DB_GetCompletion(client, GetSteamAccountID(client), GOKZ_GetDefaultOption(Option_Mode), false);
+	DB_GetCompletion(client, GetSteamAccountID(client), GOKZ_GetDefaultMode(), false);
 }
 
 void CompletionMVPStarsUpdateAll()
@@ -24,20 +24,20 @@ void CompletionMVPStarsUpdateAll()
 
 
 
-// =========================  ANNOUNCEMENTS  ========================= //
+// =====[ ANNOUNCEMENTS ]=====
 
 void PrecacheAnnouncementSounds()
 {
 	if (!LoadSounds())
 	{
-		SetFailState("Invalid or missing %s", SOUNDS_CFG_PATH);
+		SetFailState("Failed to load file: \"%s\".", LR_CFG_SOUNDS);
 	}
 }
 
 static bool LoadSounds()
 {
 	KeyValues kv = new KeyValues("sounds");
-	if (!kv.ImportFromFile(SOUNDS_CFG_PATH))
+	if (!kv.ImportFromFile(LR_CFG_SOUNDS))
 	{
 		return false;
 	}
@@ -47,9 +47,9 @@ static bool LoadSounds()
 	kv.GetString("beatrecord", gC_BeatRecordSound, sizeof(gC_BeatRecordSound));
 	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", gC_BeatRecordSound);
 	AddFileToDownloadsTable(downloadPath);
-	PrecacheSound(gC_BeatRecordSound);
+	PrecacheSound(gC_BeatRecordSound, true);
 	
-	kv.Close();
+	delete kv;
 	return true;
 }
 
@@ -203,7 +203,7 @@ void AnnounceNewRecord(int client, int course, int mode, int recordType)
 
 
 
-// =========================  MISSED RECORD TRACKING  ========================= //
+// =====[ MISSED RECORD TRACKING ]=====
 
 void ResetRecordMissed(int client)
 {
@@ -220,9 +220,9 @@ void UpdateRecordMissed(int client)
 		return;
 	}
 	
-	int course = GOKZ_GetCurrentCourse(client);
-	int mode = GOKZ_GetOption(client, Option_Mode);
-	float currentTime = GOKZ_GetCurrentTime(client);
+	int course = GOKZ_GetCourse(client);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	float currentTime = GOKZ_GetTime(client);
 	
 	bool nubRecordExists = gB_RecordExistsCache[course][mode][TimeType_Nub];
 	float nubRecordTime = gF_RecordTimesCache[course][mode][TimeType_Nub];
@@ -255,7 +255,7 @@ void UpdateRecordMissed(int client)
 
 
 
-// =========================  MISSED PB TRACKING  ========================= //
+// =====[ MISSED PB TRACKING ]=====
 
 #define MISSED_PB_SOUND "buttons/button18.wav"
 
@@ -274,9 +274,9 @@ void UpdatePBMissed(int client)
 		return;
 	}
 	
-	int course = GOKZ_GetCurrentCourse(client);
-	int mode = GOKZ_GetOption(client, Option_Mode);
-	float currentTime = GOKZ_GetCurrentTime(client);
+	int course = GOKZ_GetCourse(client);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	float currentTime = GOKZ_GetTime(client);
 	
 	bool nubPBExists = gB_PBExistsCache[client][course][mode][TimeType_Nub];
 	float nubPBTime = gF_PBTimesCache[client][course][mode][TimeType_Nub];

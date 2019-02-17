@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Player Not Found"
 	{
 		// Your search for player 'Bill' returned with no results.
@@ -328,7 +328,7 @@
 	}
 
 
-	// Map Top Menu ////////////////////////////////////////////////////////////
+	// =====[ MAP TOP MENU ]=====
 	"Map Top Mode Menu - Title"
 	{
 		// Map Top
@@ -371,19 +371,18 @@
 		"en"		"Bonus Top\n \nMap - {1} (Bonus {2})\nMode - {3}\n "
 		"chi"		"加成阶层排行\n \n地图 - {1} (加成{2}阶)\n模式 - {3}\n "
 	}
-	"Map Top Menu - Top 20"
+	"Map Top Menu - Top"
 	{
 		// Top 20 PRO
-		"#format"	"{1:s}"
-		"en"		"Top 20 {1}"
-		"chi"		"{1} 前20"
+		"#format"	"{1:d},{2:s}"
+		"en"		"Top {1} {2}"
+		"chi"		"{2} 前{1}"
 	}
 	"Map Top Menu - Global Top"
 	{
 		// Global Top PRO
 		"#format"	"{1:s}"
 		"en"		"Global Top {1}"
-		"chi"		"{1} 世界前20"
 	}
 	"Map Top Submenu - Title"
 	{
@@ -392,9 +391,9 @@
 		// Map - kz_map
 		// Mode - Vanilla
 		//
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"Server Top 20 {1} Times\n \nMap - {2}\nMode - {3}\n "
-		"chi"		"服务器 {1} 前20\n \n地图- {2}\n模式 - {3}\n "	
+		"#format"	"{1:d},{2:s},{3:s},{4:s}"
+		"en"		"Server Top {1} {2} Times\n \nMap - {3}\nMode - {4}\n "
+		"chi"		"服务器 {2} 前{1}\n \n地图- {3}\n模式 - {4}\n "	
 	}
 	"Map Top Submenu - Title (Bonus)"
 	{
@@ -403,13 +402,13 @@
 		// Map - kz_map (Bonus 1)
 		// Mode - Vanilla
 		//
-		"#format"	"{1:s},{2:s},{3:d},{4:s}"
-		"en"		"Server Top 20 {1} Times\n \nMap - {2} (Bonus {3})\nMode - {4}\n "
-		"chi"		"服务器 {1} 前20\n \n地图 - {2} (加成{3}阶)\n模式 - {4}\n "
+		"#format"	"{1:d},{2:s},{3:s},{4:d},{5:s}"
+		"en"		"Server Top {1} {2} Times\n \nMap - {3} (Bonus {4})\nMode - {5}\n "
+		"chi"		"服务器 {2} 前{1}\n \n地图 - {3} (加成{4}阶)\n模式 - {5}\n "
 	}
 
 
-	// Player Top Menu ////////////////////////////////////////////////////////////
+	// =====[ PLAYER TOP MENU ]=====
 	"Player Top Mode Menu - Title"
 	{
 		// Top Record Holders
@@ -427,12 +426,12 @@
 		"en"		"Top Record Holders\n \nMode - {1}\n "
 		"chi"		"头名记录保持者\n \n模式 - {1}\n "
 	}
-	"Player Top Menu - Top 20"
+	"Player Top Menu - Top"
 	{
 		// Top 20 PRO
-		"#format"	"{1:s}"
-		"en"		"Top 20 {1}"
-		"chi"		"{1} 前20"
+		"#format"	"{1:d},{2:s}"
+		"en"		"Top {1} {2}"
+		"chi"		"{2} 前{1}"
 	}
 	"Player Top Submenu - Title"
 	{
@@ -440,13 +439,13 @@
 		//
 		// Mode - Vanilla
 		//
-		"#format"	"{1:s},{2:s}"
-		"en"		"Top 20 {1:s} Server Record Holders\n \nMode - {2}\n "
-		"chi"		"服务器记录保持者 {1:s} 前20\n \n模式 - {2}\n "
+		"#format"	"{1:d},{2:s},{3:s}"
+		"en"		"Top {1} {2} Server Record Holders\n \nMode - {3}\n "
+		"chi"		"服务器记录保持者 {2} 前{1}\n \n模式 - {3}\n "
 	}
 
 
-	// Recent Records Menu ////////////////////////////////////////////////////////////
+	// =====[ RECENT RECORDS MENU ]=====
 	"Recent Records Menu - Title"
 	{
 		// Recently Broken Records

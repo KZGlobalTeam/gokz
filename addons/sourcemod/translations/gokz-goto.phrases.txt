@@ -1,0 +1,34 @@
+Phrases
+{
+	// =====[ CHAT MESSAGES ]=====
+	"Timer Stopped (Goto)"
+	{
+		"en"		"{darkred}Your timer has stopped because you used !goto."
+		"chi"		"{darkred}你使用了!goto功能,计时已中止."
+	}
+	"Goto Success"
+	{
+		// You have teleported to Bill.
+		"#format"	"{1:N}"
+		"en"		"{grey}You have teleported to {lime}{1}{grey}."
+		"chi"		"{grey}你传送到了玩家{lime}{1}{grey}身边."
+	}
+	"Goto Failure (Not Yourself)"
+	{
+		"en"		"{darkred}You can't teleport to yourself."
+		"chi"		"{darkred}你不能传送到你自己脸上."
+	}
+	"Goto Failure (Dead)"
+	{
+		"en"		"{darkred}The player you specified is not alive."
+		"chi"		"{darkred}你传送的玩家不再是存活状态."
+	}
+
+
+	// =====[ GOTO MENU ]=====
+	"Goto Menu - Title"
+	{
+		"en"		"Go to Player"
+		"chi"		"传送到玩家"
+	}
+}

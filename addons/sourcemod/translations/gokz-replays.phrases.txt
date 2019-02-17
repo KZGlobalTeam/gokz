@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"No Replays Found (Map)"
 	{
 		"en"		"{darkred}No replays for this map were found."
@@ -20,7 +20,7 @@
 	}
 
 
-	// Replay Menu ////////////////////////////////////////////////////////////
+	// =====[ REPLAY MENU ]=====
 	"Replay Menu - Title"
 	{
 		// Load a Replay

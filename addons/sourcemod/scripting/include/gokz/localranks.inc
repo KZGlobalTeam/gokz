@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Local Ranks Include File
+/*
+	gokz-localranks Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -23,7 +23,17 @@ enum
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define LR_CFG_MAP_POOL "cfg/sourcemod/gokz/gokz-localranks-mappool.cfg"
+#define LR_CFG_SOUNDS "cfg/sourcemod/gokz/gokz-localranks-sounds.cfg"
+#define LR_COMMAND_COOLDOWN 2.5
+#define LR_MAP_TOP_CUTOFF 20
+#define LR_PLAYER_TOP_CUTOFF 20
+
+
+
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player's time has been processed by GOKZ Local Ranks.
@@ -44,7 +54,6 @@ enum
  * @param pbDiffPro		Difference between new time and PRO PB in seconds (-'ve means beat PB).
  * @param rankPro		New rank of the player's PB PRO time.
  * @param maxRankPro	New total number of players with PRO times.
- * @noreturn
  */
 forward void GOKZ_LR_OnTimeProcessed(
 	int client, 
@@ -74,7 +83,6 @@ forward void GOKZ_LR_OnTimeProcessed(
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
  * @param recordType		Type of record.
- * @noreturn
  */
 forward void GOKZ_LR_OnNewRecord(
 	int client, 
@@ -95,7 +103,6 @@ forward void GOKZ_LR_OnNewRecord(
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
  * @param recordType		Type of record.
- * @noreturn
  */
 forward void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int mode, int style, int recordType);
 
@@ -109,13 +116,12 @@ forward void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, in
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
  * @param recordType		Type of record.
- * @noreturn
  */
 forward void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, int style, int recordType);
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets whether player has missed the server record time.
@@ -140,13 +146,12 @@ native bool GOKZ_LR_GetPBMissed(int client, int timeType);
  * Don't use if the client hasn't opened the map top menu before.
  *
  * @param client		Client index.
- * @noreturn
  */
 native void GOKZ_LR_ReopenMapTopMenu(int client);
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_localranks = 
 {

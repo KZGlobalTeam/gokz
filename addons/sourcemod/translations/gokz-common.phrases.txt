@@ -1,0 +1,91 @@
+"Phrases"
+{
+	// =====[ CHAT MESSAGES ]=====
+	"No Players Found"
+	{
+		"en"		"{darkred}No players were found."
+		"chi"		"{darkred}查无此人."
+	}
+	"See Console"
+	{
+		"en"		"{grey}See console for command output."
+		"chi"		"{grey}请移步至控制台(~键)查看输出信息."
+	}
+	"Must Be Alive"
+	{
+		"en"		"{darkred}You must be alive to do that."
+		"chi"		"{darkred}你必须活着才能那么做."
+	}
+	"Invalid Bonus Number"
+	{
+		// 'asdf' is not a valid bonus number.
+		"#format"	"{1:s}"
+		"en"		"{grey}'{default}{1}{grey}' is not a valid bonus number."
+		"chi"		"{grey}字符'{default}{1}{grey}'无效,不是有效数字."
+	}
+	"Player No Longer Valid"
+	{
+		"en"		"{darkred}The player you specified is no longer valid."
+		"chi"		"{darkred}你观察过的玩家已经不存在."
+	}
+	"Please Wait Before Using Command Again"
+	{
+		"en"		"{grey}Please wait before using that command again."
+		"chi"		"{grey}请勿频繁输入指令,请稍后再试."
+	}
+	"Please Wait Before Using Command"
+	{
+		// Please wait 2.5 seconds before using that command.
+		"#format"	"{1:.1f}"
+		"en"		"{grey}Please wait {default}{1} {grey}seconds before using that command."
+		"chi"		"{grey}请在{default}{1}{grey}秒后再使用该指令."
+	}
+	"Timer Stopped"
+	{
+		"en"		"{darkred}Your timer has stopped."
+		"chi"		"{darkred}计时已暂停."
+	}
+
+
+	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Enabled"
+	{
+		"en"		"Enabled"
+		"chi"		"开启"
+	}
+	"Options Menu - Disabled"
+	{
+		"en"		"Disabled"
+		"chi"		"关闭"
+	}
+	"Options Menu - Top"
+	{
+		"en"		"Top"
+		"chi"		"最顶"
+	}
+	"Options Menu - Bottom"
+	{
+		"en"		"Bottom"
+		"chi"		"最底"
+	}
+	"Options Menu - Always"
+	{
+		"en"		"Always"
+		"chi"		"总是"
+	}
+	"Options Menu - Spectating"
+	{
+		"en"		"Spectating"
+		"chi"		"观察"
+	}
+	"Options Menu - Simple"
+	{
+		"en"		"Simple"
+		"chi"		"简易"
+	}
+	"Options Menu - Advanced"
+	{
+		"en"		"Advanced"
+		"chi"		"高级"
+	}
+}

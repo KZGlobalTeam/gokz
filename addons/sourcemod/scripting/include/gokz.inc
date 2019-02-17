@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Stocks
+/*
+	GOKZ General Include
 
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -9,19 +9,11 @@
 #endif
 #define _gokz_included_
 
-
-
-// =========================  DEFINITIONS  ========================= //
-
-#define GOKZ_VERSION "1.3.2"
-#define TICKRATE 128.0
-#define EPSILON 0.000001
-#define SPEED_NORMAL 250.0
-#define SPEED_NO_WEAPON 260.0
+#include <movement>
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum ObsMode
 {
@@ -36,7 +28,18 @@ enum ObsMode
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define GOKZ_VERSION "2.0.0-dev"
+#define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
+#define TICK_RATE 128.0
+#define EPSILON 0.000001
+#define SPEED_NORMAL 250.0
+#define SPEED_NO_WEAPON 260.0
+
+
+
+// =====[ STOCKS ]=====
 
 /**
  * Represents a time float as a string e.g. 01:23.45.
@@ -165,7 +168,6 @@ stock int IntMin(int value1, int value2)
  * @param input			Input string.
  * @param output		Output buffer.
  * @param size			Maximum size of output.
- * @noreturn
  */
 stock void String_ToLower(const char[] input, char[] output, int size)
 {
@@ -211,7 +213,6 @@ stock int GetObserverTarget(int client)
  *
  * @param client		Client being spectated.
  * @param sound			Sound to play.
- * @noreturn
  */
 stock void EmitSoundToClientSpectators(int client, const char[] sound)
 {
@@ -254,20 +255,21 @@ stock float CalcDeltaAngle(float startAngle, float endAngle)
  * @param input				Input String.
  * @param output			Output String.
  * @param size				Max Size of the Output string
- * @noreturn
  */
 stock void Color_StripFromChatText(const char[] input, char[] output, int size)
 {
 	int x = 0;
 	for (int i = 0; input[i] != '\0'; i++) {
 		
-		if (x + 1 == size) {
+		if (x + 1 == size)
+		{
 			break;
 		}
 		
 		int character = input[i];
 		
-		if (character > 0x08) {
+		if (character > 0x08)
+		{
 			output[x++] = character;
 		}
 	}
@@ -328,7 +330,6 @@ stock int NextIndex(int index, int max)
  * @param buffer		Output buffer.
  * @param bufferSize	Size of buffer.
  * @param index			Index of current/most recent value of input array.
- * @noreturn
  */
 stock void SortByRecent(const int[] input, int inputSize, int[] buffer, int bufferSize, int index)
 {
@@ -368,4 +369,49 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
 	}
 	
 	return IDNumberPart1 + (IDNumberPart2 << 1);
+}
+
+/**
+ * Teleports a player and removes their velocity and base velocity
+ * immediately and also after a 0.1 second delay. Automatically
+ * makes the player crouch if there is a ceiling above them.
+ *
+ * @param client		Client index.
+ * @param origin		Origin to teleport to.
+ * @param angles		Eye angles to set.
+ */
+stock void TeleportPlayer(int client, const float origin[3], const float angles[3])
+{
+	Movement_SetOrigin(client, origin);
+	Movement_SetEyeAngles(client, angles);
+	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetGravity(client, 1.0);
+	CreateTimer(0.1, Timer_RemoveBoosts, GetClientUserId(client)); // Prevent booster exploits
+	
+	// Duck the player if there is something blocking them from above
+	Handle trace = TR_TraceHullFilterEx(origin, 
+		origin, 
+		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
+		view_as<float>( { 16.0, 16.0, 72.0 } ), 
+		MASK_PLAYERSOLID, 
+		TraceEntityFilterPlayers, 
+		client);
+	if (TR_DidHit(trace))
+	{
+		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
+	}
+	delete trace;
+}
+
+public Action Timer_RemoveBoosts(Handle timer, int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (IsValidClient(client))
+	{
+		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+		Movement_SetGravity(client, 1.0);
+	}
+	return Plugin_Continue;
 } 

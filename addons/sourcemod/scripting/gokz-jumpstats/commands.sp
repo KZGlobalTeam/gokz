@@ -1,26 +1,12 @@
-/*
-	Commands
-	
-	Commands for player and admin use.
-*/
-
-
-
-// =========================  PUBLIC  ========================= //
-
-void CreateCommands()
+void RegisterCommands()
 {
 	RegConsoleCmd("sm_jumpstats", CommandJumpstats, "[KZ] Open the jumpstats options menu.");
 	RegConsoleCmd("sm_ljstats", CommandJumpstats, "[KZ] Open the jumpstats options menu.");
 	RegConsoleCmd("sm_js", CommandJumpstats, "[KZ] Open the jumpstats options menu.");
 }
 
-
-
-// =========================  COMMAND HANDLERS  ========================= //
-
 public Action CommandJumpstats(int client, int args)
 {
-	DisplayOptionsMenu(client);
+	DisplayJumpstatsOptionsMenu(client);
 	return Plugin_Handled;
 } 

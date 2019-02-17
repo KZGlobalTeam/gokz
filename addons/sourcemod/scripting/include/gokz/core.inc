@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Core Include File
+/*
+	gokz-core Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -9,18 +9,14 @@
 #endif
 #define _gokz_core_included_
 
+#include <topmenus>
+
 #include <gokz>
 #include <movementapi>
 
 
 
-// =========================  DEFINITIONS  ========================= //
-
-#define MAX_COURSES 256
-
-
-
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -36,26 +32,32 @@ enum
 	MAPPREFIX_COUNT
 };
 
+enum OptionProp
+{
+	OptionProp_Cookie = 0, 
+	OptionProp_Type, 
+	OptionProp_DefaultValue, 
+	OptionProp_MinValue, 
+	OptionProp_MaxValue, 
+	OPTIONPROP_COUNT
+};
+
+enum OptionType
+{
+	OptionType_Int = 0, 
+	OptionType_Float
+};
+
 enum Option
 {
-	Option_Mode = 0, 
+	OPTION_INVALID = -1, 
+	Option_Mode, 
 	Option_Style, 
-	Option_ShowingTPMenu, 
-	Option_ShowingInfoPanel, 
-	Option_ShowingKeys, 
-	Option_ShowingPlayers, 
-	Option_ShowingWeapon, 
 	Option_AutoRestart, 
-	Option_SlayOnEnd, 
-	Option_Pistol, 
 	Option_CheckpointMessages, 
 	Option_CheckpointSounds, 
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
-	Option_TimerText, 
-	Option_SpeedText, 
-	Option_JumpBeam, 
-	Option_HelpAndTips, 
 	OPTION_COUNT
 };
 
@@ -75,68 +77,9 @@ enum
 
 enum
 {
-	ShowingTPMenu_Disabled = 0, 
-	ShowingTPMenu_Simple, 
-	ShowingTPMenu_Advanced, 
-	TPMENU_COUNT
-};
-
-enum
-{
-	ShowingInfoPanel_Disabled = 0, 
-	ShowingInfoPanel_Enabled, 
-	SHOWINGINFOPANEL_COUNT
-};
-
-enum
-{
-	ShowingKeys_Spectating = 0, 
-	ShowingKeys_Always, 
-	ShowingKeys_Disabled, 
-	SHOWINGKEYS_COUNT
-};
-
-enum
-{
-	ShowingPlayers_Disabled = 0, 
-	ShowingPlayers_Enabled, 
-	SHOWINGPLAYERS_COUNT
-};
-
-enum
-{
-	ShowingWeapon_Disabled = 0, 
-	ShowingWeapon_Enabled, 
-	SHOWINGWEAPON_COUNT
-};
-
-enum
-{
 	AutoRestart_Disabled = 0, 
 	AutoRestart_Enabled, 
 	AUTORESTART_COUNT
-};
-
-enum
-{
-	SlayOnEnd_Disabled = 0, 
-	SlayOnEnd_Enabled, 
-	SLAYONEND_COUNT
-};
-
-enum
-{
-	Pistol_USP = 0, 
-	Pistol_Glock, 
-	Pistol_P250, 
-	Pistol_Dualies, 
-	Pistol_Deagle, 
-	Pistol_CZ75A, 
-	Pistol_FiveSeveN, 
-	Pistol_Tec9, 
-	Pistol_R8Revolver, 
-	Pistol_Disabled, 
-	PISTOL_COUNT
 };
 
 enum
@@ -169,71 +112,72 @@ enum
 
 enum
 {
-	TimerText_Disabled = 0, 
-	TimerText_InfoPanel, 
-	TimerText_Bottom, 
-	TimerText_Top, 
-	TIMERTEXT_COUNT
-};
-
-enum
-{
-	SpeedText_Disabled = 0, 
-	SpeedText_InfoPanel, 
-	SpeedText_Bottom, 
-	SPEEDTEXT_COUNT
-};
-
-enum
-{
-	JumpBeam_Disabled = 0, 
-	JumpBeam_Feet, 
-	JumpBeam_Head, 
-	JumpBeam_FeetAndHead, 
-	JumpBeam_Ground, 
-	JUMPBEAM_COUNT
-};
-
-enum
-{
-	HelpAndTips_Disabled = 0, 
-	HelpAndTips_Enabled, 
-	HELPANDTIPS_COUNT
-};
-
-enum
-{
 	ModeCVar_Accelerate = 0, 
-	ModeCVar_Friction, 
-	ModeCVar_AirAccelerate, 
-	ModeCVar_LadderScaleSpeed, 
-	ModeCVar_MaxVelocity, 
-	ModeCVar_Gravity, 
-	ModeCVar_EnableBunnyhopping, 
-	ModeCVar_AutoBunnyhopping, 
-	ModeCVar_StaminaMax, 
-	ModeCVar_StaminaLandCost, 
-	ModeCVar_StaminaJumpCost, 
-	ModeCVar_StaminaRecoveryRate, 
-	ModeCVar_MaxSpeed, 
-	ModeCVar_WaterAccelerate, 
-	ModeCVar_TimeBetweenDucks, 
 	ModeCVar_AccelerateUseWeaponSpeed, 
-	ModeCVar_JumpImpulse, 
-	ModeCVar_WeaponEncumbrance, 
-	MoveCVar_WeaponEncumbrancePerItem, 
-	MoveCVar_WaterSwimMode, 
-	MoveCVar_WaterMoveSpeedMultiplier, 
+	ModeCVar_AirAccelerate, 
 	ModeCVar_AirMaxWishSpeed, 
-	ModeCVar_StandableNormal, 
-	ModeCVar_WalkableNormal, 
+	ModeCVar_EnableBunnyhopping, 
+	ModeCVar_Friction, 
+	ModeCVar_Gravity, 
+	ModeCVar_JumpImpulse, 
+	ModeCVar_LadderScaleSpeed, 
 	ModeCVar_LedgeMantleHelper, 
+	ModeCVar_MaxSpeed, 
+	ModeCVar_MaxVelocity, 
+	ModeCVar_StaminaJumpCost, 
+	ModeCVar_StaminaLandCost, 
+	ModeCVar_StaminaMax, 
+	ModeCVar_StaminaRecoveryRate, 
+	ModeCVar_StandableNormal, 
+	ModeCVar_TimeBetweenDucks, 
+	ModeCVar_WalkableNormal, 
+	ModeCVar_WaterAccelerate, 
+	MoveCVar_WaterMoveSpeedMultiplier, 
+	MoveCVar_WaterSwimMode, 
+	MoveCVar_WeaponEncumbrancePerItem, 
+	ModeCVar_WeaponEncumbranceScale, 
 	MODECVAR_COUNT
 };
 
 
 
-// =========================  PHRASES  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define GOKZ_MAX_CHECKPOINTS 32
+#define GOKZ_MAX_COURSES 100
+
+#define GOKZ_SKZ_VIRTUAL_BUTTON_RADIUS 32.0
+#define GOKZ_KZT_VIRTUAL_BUTTON_RADIUS 70.0
+#define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.15
+#define GOKZ_LADDER_NO_CHECKPOINT_TIME 1.5
+#define GOKZ_PAUSE_COOLDOWN 1.0
+#define GOKZ_TIMER_START_GROUND_TICKS 4
+
+#define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
+#define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
+#define GOKZ_SOUND_TIMER_STOP "buttons/button18.wav"
+
+#define GOKZ_START_BUTTON_NAME "climb_startbutton"
+#define GOKZ_END_BUTTON_NAME "climb_endbutton"
+#define GOKZ_BONUS_START_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_startbutton$"
+#define GOKZ_BONUS_END_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_endbutton$"
+
+#define GOKZ_CFG_SERVER "sourcemod/gokz/gokz.cfg"
+#define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/options.cfg"
+#define GOKZ_CFG_OPTIONS_SORTING "cfg/sourcemod/gokz/options_menu_sorting.cfg"
+#define GOKZ_CFG_OPTIONS_ROOT "Options"
+#define GOKZ_CFG_OPTIONS_DESCRIPTION "description"
+#define GOKZ_CFG_OPTIONS_DEFAULT "default"
+
+#define GOKZ_OPTION_MAX_NAME_LENGTH 30
+#define GOKZ_OPTION_MAX_DESC_LENGTH 255
+#define GENERAL_OPTION_CATEGORY "General"
+
+stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
+{
+	"NUB", 
+	"PRO"
+};
 
 stock char gC_ModeNames[MODE_COUNT][] = 
 {
@@ -249,108 +193,148 @@ stock char gC_ModeNamesShort[MODE_COUNT][] =
 	"KZT"
 };
 
+stock char gC_ModeKeys[MODE_COUNT][] = 
+{
+	"vanilla", 
+	"simplekz", 
+	"kztimer"
+};
+
+stock char gC_ModeStartSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/button9.wav", 
+	"buttons/button3.wav"
+};
+
+stock char gC_ModeEndSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/bell1.wav", 
+	"buttons/button3.wav"
+};
+
+stock char gC_ModeFalseEndSounds[MODE_COUNT][] = 
+{
+	"common/wpn_select.wav", 
+	"buttons/button11.wav", 
+	"buttons/button2.wav"
+};
+
+stock char gC_StyleNames[STYLE_COUNT][] = 
+{
+	"Normal"
+};
+
 stock char gC_StyleNamesShort[STYLE_COUNT][] = 
 {
 	"NRM"
 };
 
-stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
+stock char gC_CoreOptionNames[OPTION_COUNT][] = 
 {
-	"NUB", 
-	"PRO"
+	"GOKZ - Mode", 
+	"GOKZ - Style", 
+	"GOKZ - Auto Restart", 
+	"GOKZ - Checkpoint Messages", 
+	"GOKZ - Checkpoint Sounds", 
+	"GOKZ - Teleport Sounds", 
+	"GOKZ - Error Sounds"
 };
 
-stock char gC_PistolNames[PISTOL_COUNT][] = 
+stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
 {
-	"P2000 / USP-S", 
-	"Glock-18", 
-	"P250", 
-	"Dual Berettas", 
-	"Desert Eagle", 
-	"CZ75-Auto", 
-	"Five-SeveN", 
-	"Tec-9", 
-	"R8 Revolver", 
-	"DISABLED" // Disabled option
+	"Movement Mode - 0 = Vanilla, 1 = SimpleKZ, 2 = KZTimer", 
+	"Movement Style - 0 = Normal", 
+	"Automatic Restart Upon Teleport to Start - 0 = Disabled, 1 = Enabled", 
+	"Checkpoint Messages - 0 = Disabled, 1 = Enabled", 
+	"Checkpoint Sounds - 0 = Disabled, 1 = Enabled", 
+	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
+	"Error Sounds - 0 = Disabled, 1 = Enabled"
 };
 
+stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
+{
+	"Options Menu - Mode", 
+	"Options Menu - Style", 
+	"Options Menu - Auto Restart", 
+	"Options Menu - Checkpoint Messages", 
+	"Options Menu - Checkpoint Sounds", 
+	"Options Menu - Teleport Sounds", 
+	"Options Menu - Error Sounds"
+};
 
+stock int gI_CoreOptionCounts[OPTION_COUNT] = 
+{
+	MODE_COUNT, 
+	STYLE_COUNT, 
+	AUTORESTART_COUNT, 
+	CHECKPOINTMESSAGES_COUNT, 
+	CHECKPOINTSOUNDS_COUNT, 
+	TELEPORTSOUNDS_COUNT, 
+	ERRORSOUNDS_COUNT
+};
 
-// =========================  OTHER  ========================= //
+stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
+{
+	Mode_KZTimer, 
+	Style_Normal, 
+	AutoRestart_Disabled, 
+	CheckpointMessages_Disabled, 
+	CheckpointSounds_Enabled, 
+	TeleportSounds_Disabled, 
+	ErrorSounds_Enabled
+};
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
 {
 	"sv_accelerate", 
-	"sv_friction", 
-	"sv_airaccelerate", 
-	"sv_ladder_scale_speed", 
-	"sv_maxvelocity", 
-	"sv_gravity", 
-	"sv_enablebunnyhopping", 
-	"sv_autobunnyhopping", 
-	"sv_staminamax", 
-	"sv_staminalandcost", 
-	"sv_staminajumpcost", 
-	"sv_staminarecoveryrate", 
-	"sv_maxspeed", 
-	"sv_wateraccelerate", 
-	"sv_timebetweenducks", 
 	"sv_accelerate_use_weapon_speed", 
-	"sv_jump_impulse", 
-	"sv_weapon_encumbrance_scale", 
-	"sv_weapon_encumbrance_per_item", 
-	"sv_water_swim_mode", 
-	"sv_water_movespeed_multiplier", 
+	"sv_airaccelerate", 
 	"sv_air_max_wishspeed", 
+	"sv_enablebunnyhopping", 
+	"sv_friction", 
+	"sv_gravity", 
+	"sv_jump_impulse", 
+	"sv_ladder_scale_speed", 
+	"sv_ledge_mantle_helper", 
+	"sv_maxspeed", 
+	"sv_maxvelocity", 
+	"sv_staminajumpcost", 
+	"sv_staminalandcost", 
+	"sv_staminamax", 
+	"sv_staminarecoveryrate", 
 	"sv_standable_normal", 
+	"sv_timebetweenducks", 
 	"sv_walkable_normal", 
-	"sv_ledge_mantle_helper"
+	"sv_wateraccelerate", 
+	"sv_water_movespeed_multiplier", 
+	"sv_water_swim_mode", 
+	"sv_weapon_encumbrance_per_item", 
+	"sv_weapon_encumbrance_scale"
 };
 
-// Used and recommended for key value files
-stock char gC_KeysOptions[OPTION_COUNT][] = 
+stock char gC_RadioCommands[][] = 
 {
-	"mode", 
-	"style", 
-	"tpmenu", 
-	"infopanel", 
-	"showkeys", 
-	"showplayers", 
-	"showweapon", 
-	"autorestart", 
-	"slayonend", 
-	"pistol", 
-	"checkpointmessages", 
-	"checkpointsounds", 
-	"teleportsounds", 
-	"errorsounds", 
-	"timertext", 
-	"speedtext", 
-	"jumpbeam", 
-	"helpandtips"
+	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
+	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
+	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
+	"enemydown", "compliment", "thanks", "cheer"
 };
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 /**
- * Called when a player has been set up e.g. options, timer etc.
+ * Called when a player's option's value is changed.
+ * Only called if client is in game.
  *
  * @param client		Client index.
- * @noreturn
- */
-forward void GOKZ_OnClientSetup(int client);
-
-/**
- * Called when a player changes an option.
- *
- * @param client		Client index.
- * @param option		Option that was changed.
+ * @param option		Option name.
  * @param newValue		New value of the option.
- * @noreturn
  */
-forward void GOKZ_OnOptionChanged(int client, Option option, int newValue);
+forward void GOKZ_OnOptionChanged(int client, const char[] option, any newValue);
 
 /**
  * Called when a player starts their timer.
@@ -366,7 +350,6 @@ forward Action GOKZ_OnTimerStart(int client, int course);
  *
  * @param client		Client index.
  * @param course    	Course number.
- * @noreturn
  */
 forward void GOKZ_OnTimerStart_Post(int client, int course);
 
@@ -388,7 +371,6 @@ forward Action GOKZ_OnTimerEnd(int client, int course, float time, int teleports
  * @param course    		Course number.
  * @param time				Player's end time.
  * @param teleportsUsed		Number of teleports used by player.
- * @noreturn
  */
 forward void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed);
 
@@ -407,7 +389,6 @@ forward Action GOKZ_OnTimerEndMessage(int client, int course, float time, int te
  * Called when a player's timer has been forcefully stopped.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnTimerStopped(int client);
 
@@ -423,7 +404,6 @@ forward Action GOKZ_OnPause(int client);
  * Called when a player has paused.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnPause_Post(int client);
 
@@ -439,7 +419,6 @@ forward Action GOKZ_OnResume(int client);
  * Called when a player has resumed.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnResume_Post(int client);
 
@@ -455,7 +434,6 @@ forward Action GOKZ_OnMakeCheckpoint(int client);
  * Called when a player has made a checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnMakeCheckpoint_Post(int client);
 
@@ -471,7 +449,6 @@ forward Action GOKZ_OnTeleportToCheckpoint(int client);
  * Called when a player has teleported to their checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnTeleportToCheckpoint_Post(int client);
 
@@ -487,7 +464,6 @@ forward Action GOKZ_OnPrevCheckpoint(int client);
  * Called when a player has gone to a previous checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnPrevCheckpoint_Post(int client);
 
@@ -503,7 +479,6 @@ forward Action GOKZ_OnNextCheckpoint(int client);
  * Called when a player has gone to a next checkpoint.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnNextCheckpoint_Post(int client);
 
@@ -521,7 +496,6 @@ forward Action GOKZ_OnTeleportToStart(int client, bool customPos);
  *
  * @param client		Client index.
  * @param customPos		Whether a custom start position is in use.
- * @noreturn
  */
 forward void GOKZ_OnTeleportToStart_Post(int client, bool customPos);
 
@@ -537,7 +511,6 @@ forward Action GOKZ_OnUndoTeleport(int client);
  * Called when a player has undone a teleport.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnUndoTeleport_Post(int client);
 
@@ -546,7 +519,6 @@ forward void GOKZ_OnUndoTeleport_Post(int client);
  * i.e. a catch-all for teleport to checkpoint, teleport to start, undo teleport etc.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnCountedTeleport_Post(int client);
 
@@ -557,7 +529,6 @@ forward void GOKZ_OnCountedTeleport_Post(int client);
  * @param client		Client index.
  * @param jumped		Whether player jumped.
  * @param ladderJump	Whether it was a ladder jump.
- * @noreturn
  */
 forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
 
@@ -566,7 +537,6 @@ forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
  * A jump is deemed invalid if the player is teleported.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnJumpInvalidated(int client);
 
@@ -574,7 +544,6 @@ forward void GOKZ_OnJumpInvalidated(int client);
  * Called when a player has been switched to a team.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnJoinTeam(int client, int team);
 
@@ -582,7 +551,6 @@ forward void GOKZ_OnJoinTeam(int client, int team);
  * Called the first time the player spawns in on a team.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_OnFirstSpawn(int client);
 
@@ -590,7 +558,6 @@ forward void GOKZ_OnFirstSpawn(int client);
  * Called when a mode has been loaded.
  *
  * @param mode			Mode loaded.
- * @noreturn
  */
 forward void GOKZ_OnModeLoaded(int mode);
 
@@ -598,7 +565,6 @@ forward void GOKZ_OnModeLoaded(int mode);
  * Called when a mode has been unloaded.
  *
  * @param mode			Mode unloaded.
- * @noreturn
  */
 forward void GOKZ_OnModeUnloaded(int mode);
 
@@ -606,16 +572,47 @@ forward void GOKZ_OnModeUnloaded(int mode);
  * Called when a plugin other than gokz-core calls a native 
  * that may affect the player's timer or teleport count in 
  * their favour e.g. GOKZ_StartTimer, GOKZ_EndTimer,
- * GOKZ_SetCurrentTime and GOKZ_SetTeleportCount.
+ * GOKZ_SetTime and GOKZ_SetTeleportCount.
  *
  * @param plugin		Handle of the calling plugin.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
 forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
 
+/**
+ * Called when a player's custom start position is set.
+ *
+ * @param client		Client index.
+ * @param origin		New custom start position origin.
+ * @param angles		New custom start position eye angles.
+ */
+forward void GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3], const float angles[3]);
+
+/**
+ * Called when a player's custom start position is cleared.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnCustomStartPositionCleared_Post(int client);
+
+/**
+ * Called when the options menu has been created and 3rd 
+ * party plugins can grab the handle or add categories.
+ *
+ * @param topMenu		Options top menu handle.
+ */
+forward void GOKZ_OnOptionsMenuCreated(TopMenu topMenu);
+
+/**
+ * Called when the options menu is ready to have items added.
+ *
+ * @param topMenu		Options top menu handle.
+ */
+forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
 
 
-// =========================  NATIVES  ========================= //
+
+// =====[ NATIVES ]=====
 
 /**
  * Gets whether a mode is loaded.
@@ -639,7 +636,6 @@ native int GOKZ_GetModeVersion(int mode);
  * @param mode			Mode.
  * @param loaded		Whether mode is loaded.
  * @param version		Version number of the mode.
- * @noreturn
  */
 native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
 
@@ -651,6 +647,14 @@ native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
 native int GOKZ_GetLoadedModeCount();
 
 /**
+ * Gets the Handle to the options top menu.
+ *
+ * @return				Handle to the options top menu, 
+ *						or null if not created yet.
+ */
+native TopMenu GOKZ_GetOptionsTopMenu();
+
+/**
  * Prints a message to a client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
  * the beginning of the message e.g. "{default}Hello!".
@@ -659,7 +663,6 @@ native int GOKZ_GetLoadedModeCount();
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
- * @noreturn
  */
 native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, any...);
 
@@ -669,7 +672,7 @@ native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, an
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @return				Whether native was allowed to proceed.
+ * @return				Whether player's timer was started.
  */
 native bool GOKZ_StartTimer(int client, int course);
 
@@ -679,7 +682,7 @@ native bool GOKZ_StartTimer(int client, int course);
  *
  * @param client    	Client index.
  * @param course    	Course number.
- * @return				Whether native was allowed to proceed.
+ * @return				Whether player's timer was ended.
  */
 native bool GOKZ_EndTimer(int client, int course);
 
@@ -696,17 +699,8 @@ native bool GOKZ_StopTimer(int client, bool playSound = true);
  * Forces all players' timers to stop. Intended for run invalidation.
  *
  * @param playSound		Whether to play the timer stop sound.
- * @noreturn
  */
 native void GOKZ_StopTimerAll(bool playSound = true);
-
-/**
- * Gets whether client has been set up by GOKZ e.g. options, timer etc.
- *
- * @param client		Client index.
- * @return				Whether client has been set up.
- */
-native bool GOKZ_IsClientSetUp(int client);
 
 /**
  * Gets whether or not the player's timer is running i.e. isn't 'stopped'.
@@ -720,9 +714,9 @@ native bool GOKZ_GetTimerRunning(int client);
  * Gets the course the player is currently running.
  *
  * @param client    	Client index.
- * @param course    	Course number.
+ * @return		    	Course number.
  */
-native bool GOKZ_GetCurrentCourse(int client);
+native int GOKZ_GetCourse(int client);
 
 /**
  * Gets whether the player is paused.
@@ -738,7 +732,7 @@ native bool GOKZ_GetPaused(int client);
  * @param client    	Client index.
  * @return				Player's current run time.
  */
-native float GOKZ_GetCurrentTime(int client);
+native float GOKZ_GetTime(int client);
 
 /**
  * Gets the player's current run time.
@@ -748,7 +742,7 @@ native float GOKZ_GetCurrentTime(int client);
  * @param time			Run time to set to.
  * @return				Whether native was allowed to proceed.
  */
-native bool GOKZ_SetCurrentTime(int client, float time);
+native bool GOKZ_SetTime(int client, float time);
 
 /**
  * Gets the player's current checkpoint count.
@@ -790,15 +784,23 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
  * Teleports the player to start, or respawns them.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_TeleportToStart(int client);
+
+/**
+ * Gets whether player has a start position they can
+ * teleport to, whether it is custom or not.
+ * 
+ *
+ * @param client    	Client index.
+ * @return				Whether player has a start position.
+ */
+native bool GOKZ_GetHasStartPosition(int client);
 
 /**
  * Set a new checkpoint at the player's current position.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_MakeCheckpoint(int client);
 
@@ -806,39 +808,70 @@ native void GOKZ_MakeCheckpoint(int client);
  * Teleports the player to their last checkpoint.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_TeleportToCheckpoint(int client);
+
+/**
+ * Gets whether the player can teleport to their checkpoint
+ * e.g. will return false if player has no checkpoints.
+ *
+ * @param client		Client index.
+ * @return				Whether player can teleport to checkpoint.
+ */
+native bool GOKZ_GetCanTeleportToCheckpoint(int client);
 
 /**
  * Teleport the player back to a previous checkpoint.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_PrevCheckpoint(int client);
+
+/**
+ * Gets whether the player can go to their previous checkpoint
+ * e.g. will return false if player has no checkpoints.
+ *
+ * @param client		Client index.
+ * @return				Whether player can go to previous checkpoint.
+ */
+native bool GOKZ_GetCanPrevCheckpoint(int client);
 
 /**
  * Teleport the player to a more recent checkpoint.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_NextCheckpoint(int client);
+
+/**
+ * Gets whether the player can go to their next checkpoint
+ * e.g. will return false if player has no checkpoints.
+ *
+ * @param client		Client index.
+ * @return				Whether player can go to next checkpoint.
+ */
+native bool GOKZ_GetCanNextCheckpoint(int client);
 
 /**
  * Teleport the player to where they last teleported from.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_UndoTeleport(int client);
+
+/**
+ * Gets whether the player can undo their teleport
+ * e.g. will return false if teleport was from midair.
+ *
+ * @param client		Client index.
+ * @return				Whether player can undo teleport.
+ */
+native bool GOKZ_GetCanUndoTeleport(int client);
 
 /**
  * Pause the player's timer and freeze them.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_Pause(int client);
 
@@ -846,7 +879,6 @@ native void GOKZ_Pause(int client);
  * Resumes the player's timer and unfreezes them.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_Resume(int client);
 
@@ -854,7 +886,6 @@ native void GOKZ_Resume(int client);
  * Toggles the paused state of the player.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_TogglePause(int client);
 
@@ -862,37 +893,65 @@ native void GOKZ_TogglePause(int client);
  * Plays the error sound to the client if they have the option enabled.
  *
  * @param client		Client index.
- * @noreturn
  */
 native void GOKZ_PlayErrorSound(int client);
 
 /**
- * Gets the default option value as set by a config file.
+ * Registers an option with gokz-core, which uses clientprefs to
+ * keep track of the option's value and to save it to a database.
+ * This also effectively provides natives and forwards for other 
+ * plugins to access any options that have been registered.
  *
- * @param option		GOKZ option.
- * @return				Default option value.
+ * @param name			Option name.
+ * @param description	Option description.
+ * @param type			Type to treat the option value as.
+ * @param defaultValue	Default value of option.
+ * @param minValue		Minimum value of option.
+ * @param maxValue		Maximum value of option.
+ * @return				Whether registration was successful.
  */
-native int GOKZ_GetDefaultOption(Option option);
+native bool GOKZ_RegisterOption(const char[] name, const char[] description, OptionType type, any defaultValue, any minValue, any maxValue);
+
+/**
+ * Gets a property of a registered option. If used outside of
+ * gokz-core to get the cookie, a clone of its Handle is returned.
+ *
+ * @param option		Option name.
+ * @param prop			Option property to get.
+ * @return				Value of property, or -1 (int) if option isn't registered.
+ */
+native any GOKZ_GetOptionProp(const char[] option, OptionProp prop);
+
+/**
+ * Sets a property of a registered option. For safety and simplicity,
+ * the cookie property is read-only and will fail to be set.
+ *
+ * @param option		Option name.
+ * @param prop			Option property to set.
+ * @param value			Value to set the property to.
+ * @return				Whether option property was successfully set.
+ */
+native bool GOKZ_SetOptionProp(const char[] option, OptionProp prop, any value);
 
 /**
  * Gets the current value of a player's option.
  *
  * @param client		Client index.
- * @param option		GOKZ option.
- * @return				Current value of option.
+ * @param option		Option name.
+ * @return				Current value of option, or -1 (int) if option isn't registered.
  */
-native int GOKZ_GetOption(int client, Option option);
+native any GOKZ_GetOption(int client, const char[] option);
 
 /**
- * Sets the player's option value.
+ * Sets the player's option's value. Fails if option doesn't exist,
+ * or if desired value is outside the registered value range.
  *
  * @param client		Client index.
- * @param option		GOKZ option.
- * @param optionValue	New option value.
- * @param printMessage	Whether to print option change messages.
- * @noreturn
+ * @param option		Option name.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
  */
-native void GOKZ_SetOption(int client, Option option, int optionValue, bool printMessage = false);
+native bool GOKZ_SetOption(int client, const char[] option, any value);
 
 /**
  * Gets whether player's last takeoff was a perfect bunnyhop as adjusted by GOKZ.
@@ -944,24 +1003,21 @@ native bool GOKZ_GetValidJump(int client);
  *
  * @param client		Client index.
  * @param team			Which team to switch to.
- * @noreturn
  */
 native void GOKZ_JoinTeam(int client, int team);
 
 
 
-// =========================  STOCKS  ========================= //
+// =====[ STOCKS ]=====
 
 /**
- * Prints a message to all clients' chat, formatting colours and optionally 
+ * Prints a message to all client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
  * the beginning of the message e.g. "{default}Hello!".
  *
- * @param client		Client index.
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
- * @noreturn
  */
 stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 {
@@ -986,7 +1042,6 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
  * @param addPrefix		Whether to add the chat prefix.
  * @param format		Formatting rules.
  * @param any			Variable number of format parameters.
- * @noreturn
  */
 stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] format, any...)
 {
@@ -1003,29 +1058,29 @@ stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] f
 }
 
 /**
+ * Gets the player's current time type.
+ *
+ * @param client		Client index.
+ * @return				Player's current time type.
+ */
+stock int GOKZ_GetTimeType(int client)
+{
+	return GOKZ_GetTimeTypeEx(GOKZ_GetTeleportCount(client));
+}
+
+/**
  * Gets the time type given a teleport count.
  *
  * @param teleports		Teleport count.
  * @return				Time type.
  */
-stock int GOKZ_GetTimeType(int teleportCount)
+stock int GOKZ_GetTimeTypeEx(int teleportCount)
 {
 	if (teleportCount == 0)
 	{
 		return TimeType_Pro;
 	}
 	return TimeType_Nub;
-}
-
-/**
- * Gets the player's current time type.
- *
- * @param client		Client index.
- * @return				Player's current time type.
- */
-stock int GOKZ_GetCurrentTimeType(int client)
-{
-	return GOKZ_GetTimeType(GOKZ_GetTeleportCount(client));
 }
 
 /**
@@ -1036,11 +1091,10 @@ stock int GOKZ_GetCurrentTimeType(int client)
  * @param client				Client index to check selected mode.
  * @param menu					Menu to populate items with.
  * @param disableUnloadedModes	Draw items for unloaded modes as disabled.
- * @noreturn
  */
 stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedModes)
 {
-	int selectedMode = GOKZ_GetOption(client, Option_Mode);
+	int selectedMode = GOKZ_GetCoreOption(client, Option_Mode);
 	char display[32];
 	
 	menu.RemoveAllItems();
@@ -1065,370 +1119,113 @@ stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedMode
 	}
 }
 
+/**
+ * Increment an (integer-type) option's value.
+ * Loops back to min. value if max. value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		Option name.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_CycleOption(int client, const char[] option)
+{
+	int maxValue = GOKZ_GetOptionProp(option, OptionProp_MaxValue);
+	if (maxValue == -1)
+	{
+		return false;
+	}
+	
+	int newValue = GOKZ_GetOption(client, option) + 1;
+	if (newValue > GOKZ_GetOptionProp(option, OptionProp_MaxValue))
+	{
+		newValue = GOKZ_GetOptionProp(option, OptionProp_MinValue);
+	}
+	return GOKZ_SetOption(client, option, newValue);
+}
 
+/**
+ * Returns whether an option is a gokz-core option.
+ *
+ * @param option		Option name.
+ * @param optionEnum	Variable to store enumerated gokz-core option (if it is one).
+ * @return				Whether option is a gokz-core option.
+ */
+stock bool GOKZ_IsCoreOption(const char[] option, Option &optionEnum = OPTION_INVALID)
+{
+	for (Option i; i < OPTION_COUNT; i++)
+	{
+		if (StrEqual(option, gC_CoreOptionNames[i]))
+		{
+			optionEnum = i;
+			return true;
+		}
+	}
+	return false;
+}
 
-// =========================  METHODMAP  ========================= //
+/**
+ * Gets a property of a gokz-core option.
+ *
+ * @param coreOption	gokz-core option.
+ * @param prop			Option property to get.
+ * @return				Value of property, or -1 if option isn't registered.
+ */
+stock any GOKZ_GetCoreOptionProp(Option option, OptionProp prop)
+{
+	return GOKZ_GetOptionProp(gC_CoreOptionNames[option], prop);
+}
 
-methodmap KZPlayer < MovementAPIPlayer {
-	
-	public KZPlayer(int client) {
-		return view_as<KZPlayer>(new MovementAPIPlayer(client));
-	}
-	
-	
-	// =========================  TIMER  ========================= //
-	
-	public void StartTimer(int course) {
-		GOKZ_StartTimer(this.id, course);
-	}
-	
-	public void EndTimer(int course) {
-		GOKZ_EndTimer(this.id, course);
-	}
-	
-	public bool StopTimer() {
-		return GOKZ_StopTimer(this.id);
-	}
-	
-	public void TeleportToStart() {
-		GOKZ_TeleportToStart(this.id);
-	}
-	
-	public void MakeCheckpoint() {
-		GOKZ_MakeCheckpoint(this.id);
-	}
-	
-	public void TeleportToCheckpoint() {
-		GOKZ_TeleportToCheckpoint(this.id);
-	}
-	
-	public void PrevCheckpoint() {
-		GOKZ_PrevCheckpoint(this.id);
-	}
-	
-	public void NextCheckpoint() {
-		GOKZ_NextCheckpoint(this.id);
-	}
-	
-	public void UndoTeleport() {
-		GOKZ_UndoTeleport(this.id);
-	}
-	
-	public void Pause() {
-		GOKZ_Pause(this.id);
-	}
-	
-	public void Resume() {
-		GOKZ_Resume(this.id);
-	}
-	
-	public void TogglePause() {
-		GOKZ_TogglePause(this.id);
-	}
-	
-	public void PlayErrorSound() {
-		GOKZ_PlayErrorSound(this.id);
-	}
-	
-	property bool timerRunning {
-		public get() {
-			return GOKZ_GetTimerRunning(this.id);
-		}
-	}
-	
-	property int currentCourse {
-		public get() {
-			return GOKZ_GetCurrentCourse(this.id);
-		}
-	}
-	
-	property bool paused {
-		public get() {
-			return GOKZ_GetPaused(this.id);
-		}
-		public set(bool pause) {
-			if (pause) {
-				this.Pause();
-			}
-			else {
-				this.Resume();
-			}
-		}
-	}
-	
-	property float currentTime {
-		public get() {
-			return GOKZ_GetCurrentTime(this.id);
-		}
-		public set(float value) {
-			GOKZ_SetCurrentTime(this.id, value);
-		}
-	}
-	
-	property int checkpointCount {
-		public get() {
-			return GOKZ_GetCheckpointCount(this.id);
-		}
-		public set(int value) {
-			GOKZ_SetCheckpointCount(this.id, value);
-		}
-	}
-	
-	property int teleportCount {
-		public get() {
-			return GOKZ_GetTeleportCount(this.id);
-		}
-		public set(int value) {
-			GOKZ_SetTeleportCount(this.id, value);
-		}
-	}
-	
-	
-	// =========================  OPTIONS  ========================= //
-	
-	public int GetOption(Option option) {
-		return GOKZ_GetOption(this.id, option);
-	}
-	
-	public void SetOption(Option option, int optionValue, bool printMessage = false) {
-		GOKZ_SetOption(this.id, option, optionValue, printMessage);
-	}
-	
-	property int mode {
-		public get() {
-			return this.GetOption(Option_Mode);
-		}
-		public set(int value) {
-			this.SetOption(Option_Mode, value);
-		}
-	}
-	
-	property int style {
-		public get() {
-			return this.GetOption(Option_Style);
-		}
-		public set(int value) {
-			this.SetOption(Option_Style, value);
-		}
-	}
-	
-	property int showingTPMenu {
-		public get() {
-			return this.GetOption(Option_ShowingTPMenu);
-		}
-		public set(int value) {
-			this.SetOption(Option_ShowingTPMenu, value);
-		}
-	}
-	
-	property int showingInfoPanel {
-		public get() {
-			return this.GetOption(Option_ShowingInfoPanel);
-		}
-		public set(int value) {
-			this.SetOption(Option_ShowingInfoPanel, value);
-		}
-	}
-	
-	property int showingKeys {
-		public get() {
-			return this.GetOption(Option_ShowingKeys);
-		}
-		public set(int value) {
-			this.SetOption(Option_ShowingKeys, value);
-		}
-	}
-	
-	property int showingPlayers {
-		public get() {
-			return this.GetOption(Option_ShowingPlayers);
-		}
-		public set(int value) {
-			this.SetOption(Option_ShowingPlayers, value);
-		}
-	}
-	
-	property int showingWeapon {
-		public get() {
-			return this.GetOption(Option_ShowingWeapon);
-		}
-		public set(int value) {
-			this.SetOption(Option_ShowingWeapon, value);
-		}
-	}
-	
-	property int autoRestart {
-		public get() {
-			return this.GetOption(Option_AutoRestart);
-		}
-		public set(int value) {
-			this.SetOption(Option_AutoRestart, value);
-		}
-	}
-	
-	property int slayOnEnd {
-		public get() {
-			return this.GetOption(Option_SlayOnEnd);
-		}
-		public set(int value) {
-			this.SetOption(Option_SlayOnEnd, value);
-		}
-	}
-	
-	property int pistol {
-		public get() {
-			return this.GetOption(Option_Pistol);
-		}
-		public set(int value) {
-			this.SetOption(Option_Pistol, value);
-		}
-	}
-	
-	property int checkpointMessages {
-		public get() {
-			return this.GetOption(Option_CheckpointMessages);
-		}
-		public set(int value) {
-			this.SetOption(Option_CheckpointMessages, value);
-		}
-	}
-	
-	property int checkpointSounds {
-		public get() {
-			return this.GetOption(Option_CheckpointSounds);
-		}
-		public set(int value) {
-			this.SetOption(Option_CheckpointSounds, value);
-		}
-	}
-	
-	property int teleportSounds {
-		public get() {
-			return this.GetOption(Option_TeleportSounds);
-		}
-		public set(int value) {
-			this.SetOption(Option_TeleportSounds, value);
-		}
-	}
-	
-	property int errorSounds {
-		public get() {
-			return this.GetOption(Option_ErrorSounds);
-		}
-		public set(int value) {
-			this.SetOption(Option_ErrorSounds, value);
-		}
-	}
-	
-	property int timerText {
-		public get() {
-			return this.GetOption(Option_TimerText);
-		}
-		public set(int value) {
-			this.SetOption(Option_TimerText, value);
-		}
-	}
-	
-	property int speedText {
-		public get() {
-			return this.GetOption(Option_SpeedText);
-		}
-		public set(int value) {
-			this.SetOption(Option_SpeedText, value);
-		}
-	}
-	
-	property int jumpBeam {
-		public get() {
-			return this.GetOption(Option_JumpBeam);
-		}
-		public set(int value) {
-			this.SetOption(Option_JumpBeam, value);
-		}
-	}
-	
-	property int helpAndTips {
-		public get() {
-			return this.GetOption(Option_HelpAndTips);
-		}
-		public set(int value) {
-			this.SetOption(Option_HelpAndTips, value);
-		}
-	}
-	
-	
-	// =========================  MISC  ========================= //
-	
-	property bool gokzHitPerf {
-		public get() {
-			return GOKZ_GetHitPerf(this.id);
-		}
-		public set(bool value) {
-			GOKZ_SetHitPerf(this.id, value);
-		}
-	}
-	
-	property float gokzTakeoffSpeed {
-		public get() {
-			return GOKZ_GetTakeoffSpeed(this.id);
-		}
-		public set(float value) {
-			GOKZ_SetTakeoffSpeed(this.id, value);
-		}
-	}
-	
-	property bool validJump {
-		public get() {
-			return GOKZ_GetValidJump(this.id);
-		}
-	}
-	
-	property bool valid {
-		public get() {
-			return IsValidClient(this.id);
-		}
-	}
-	
-	property bool inGame {
-		public get() {
-			return IsClientInGame(this.id);
-		}
-	}
-	
-	property bool authorized {
-		public get() {
-			return IsClientAuthorized(this.id);
-		}
-	}
-	
-	property bool fake {
-		public get() {
-			return IsFakeClient(this.id);
-		}
-	}
-	
-	property bool alive {
-		public get() {
-			return IsPlayerAlive(this.id);
-		}
-	}
-	
-	property ObsMode observerMode {
-		public get() {
-			return GetObserverMode(this.id);
-		}
-	}
-	
-	property int observerTarget {
-		public get() {
-			return GetObserverTarget(this.id);
-		}
-	}
+/**
+ * Gets the current value of a player's gokz-core option.
+ *
+ * @param client		Client index.
+ * @param option		gokz-core option.
+ * @return				Current value of option.
+ */
+stock any GOKZ_GetCoreOption(int client, Option option)
+{
+	return GOKZ_GetOption(client, gC_CoreOptionNames[option]);
+}
+
+/**
+ * Sets the player's gokz-core option's value.
+ *
+ * @param client		Client index.
+ * @param option		gokz-core option.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_SetCoreOption(int client, Option option, any value)
+{
+	return GOKZ_SetOption(client, gC_CoreOptionNames[option], value);
+}
+
+/**
+ * Increment an integer-type gokz-core option's value.
+ * Loops back to '0' if max value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		gokz-core option.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_CycleCoreOption(int client, Option option)
+{
+	return GOKZ_CycleOption(client, gC_CoreOptionNames[option]);
+}
+
+/**
+ * Gets the current default mode.
+ *
+ * @return				Default mode.
+ */
+stock int GOKZ_GetDefaultMode()
+{
+	return GOKZ_GetCoreOptionProp(Option_Mode, OptionProp_DefaultValue);
 }
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_core = 
 {
@@ -1449,33 +1246,40 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
+	MarkNativeAsOptional("GOKZ_GetOptionsTopMenu");
 	
 	MarkNativeAsOptional("GOKZ_StartTimer");
 	MarkNativeAsOptional("GOKZ_EndTimer");
 	MarkNativeAsOptional("GOKZ_StopTimer");
 	MarkNativeAsOptional("GOKZ_StopTimerAll");
 	MarkNativeAsOptional("GOKZ_TeleportToStart");
+	MarkNativeAsOptional("GOKZ_GetHasStartPosition");
 	MarkNativeAsOptional("GOKZ_MakeCheckpoint");
-	MarkNativeAsOptional("GOKZ_PrevCheckpoint");
-	MarkNativeAsOptional("GOKZ_NextCheckpoint");
 	MarkNativeAsOptional("GOKZ_TeleportToCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanTeleportToCheckpoint");
+	MarkNativeAsOptional("GOKZ_PrevCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanPrevCheckpoint");
+	MarkNativeAsOptional("GOKZ_NextCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanNextCheckpoint");
 	MarkNativeAsOptional("GOKZ_UndoTeleport");
+	MarkNativeAsOptional("GOKZ_GetCanUndoTeleport");
 	MarkNativeAsOptional("GOKZ_Pause");
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	
-	MarkNativeAsOptional("GOKZ_IsClientSetUp");
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
-	MarkNativeAsOptional("GOKZ_GetCurrentCourse");
+	MarkNativeAsOptional("GOKZ_GetCourse");
 	MarkNativeAsOptional("GOKZ_GetPaused");
-	MarkNativeAsOptional("GOKZ_GetCurrentTime");
-	MarkNativeAsOptional("GOKZ_SetCurrentTime");
+	MarkNativeAsOptional("GOKZ_GetTime");
+	MarkNativeAsOptional("GOKZ_SetTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_SetTeleportCount");
-	MarkNativeAsOptional("GOKZ_GetDefaultOption");
+	MarkNativeAsOptional("GOKZ_RegisterOption");
+	MarkNativeAsOptional("GOKZ_GetOptionProp");
+	MarkNativeAsOptional("GOKZ_SetOptionProp");
 	MarkNativeAsOptional("GOKZ_GetOption");
 	MarkNativeAsOptional("GOKZ_SetOption");
 	MarkNativeAsOptional("GOKZ_GetHitPerf");

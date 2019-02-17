@@ -5,89 +5,29 @@
 		"en"		"{grey}Open the {default}!options {grey}menu to easily view and change most of the settings available to you."
 		"chi"		"{grey}聊天框中输入 {default}!options {grey}显示可用选项."
 	}
-	"!menu"
-	{
-		"en"		"{grey}Type {default}!menu {grey}to open or close your teleport menu."
-		"chi"		"{grey}聊天框中输入 {default}!menu {grey}打开简易存点菜单."
-	}
-	"!adv"
-	{
-		"en"		"{grey}Use {default}!adv {grey}to bring up the advanced teleport menu."
-		"chi"		"{grey}聊天框中输入 {default}!adv {grey}打开高级存点菜单."
-	}
 	"!mode"
 	{
 		"en"		"{grey}The {default}!mode {grey}menu is where you can easily switch between the different movement modes."
 		"chi"		"{grey}聊天框中输入 {default}!mode {grey}切换模式."
 	}
-	"!pistol"
-	{
-		"en"		"{grey}You can switch pistols through the {default}!pistol {grey}menu."
-		"chi"		"{grey} 聊天框中输入{default}!pistol {grey}切换手枪."
-	}
 	"!nc"
 	{
-		"en"		"Use {default}!nc {grey}as a toggle or bind a key to {default}+noclip {grey}and hold it to be able to fly around the map."
-		"chi"		"聊天框中输入 {default}!nc {grey}或再控制台中为某个按键绑定{default}+noclip {grey}以使用穿墙模式."
+		"en"		"{grey}Use {default}!nc {grey}as a toggle or bind a key to {default}+noclip {grey}and hold it to be able to fly around the map."
+		"chi"		"{grey}聊天框中输入 {default}!nc {grey}或再控制台中为某个按键绑定{default}+noclip {grey}以使用穿墙模式."
 	}
 	"Quick Switch Mode"
 	{
 		"en"		"{grey}You can switch to a mode by typing its abbreviation. For example, type {default}!s{grey}/{default}!skz{grey} to switch to {purple}SimpleKZ{grey}."
 		"chi"		"{grey}可通过输入!+首字母或者缩写快速开启某些功能.例如:{default}!s{grey}/{default}!skz{grey}来打开{purple}SimpleKZ{grey}."
 	}
-	"Hide Clutter"
-	{
-		"en"		"{grey}Hate having ugly clutter on your screen? Enter {default}cl_draw_only_deathnotices 1 {grey}in console to clean it all up."
-		"chi"		"{grey}被刷屏了?请在控制台中输入{default}cl_draw_only_deathnotices 1{grey}."
-	}
-	"!stopsound"
-	{
-		"en"		"{grey}Getting annoyed by obnoxious music and sounds from the map? Use {default}!stopsound {grey}to make it stop!"
-		"chi"		"{grey}觉的地图很吵?请在控制台中输入{default}!stopsound {grey}屏蔽地图音效."
-	}
-	"!spec"
-	{
-		"en"		"{grey}Type {default}!spec <player>{grey} to start watching a fellow player, and {default}!resume {grey}to get back to where you left off."
-		"chi"		"{grey}聊天框中输入{default}!spec <玩家昵称>{grey}观察其他玩家视角;再次输入{default}!resume {grey}来返回你观察前的位置."
-	}
-	"!measure"
-	{
-		"en"		"{grey}Having trouble with a jump? Use the {default}!measure {grey}menu to find out exactly how long it is."
-		"chi"		"{grey}有些地方跳不过去?聊天框中输入{default}!measure {grey}量一下对面究竟有多远."
-	}
-	"!goto"
-	{
-		"en"		"{grey}Type {default}!goto <player> {grey}to teleport to another player."
-		"chi"		"{grey}聊天框中输入{default}!goto <player> {grey}以传送到其他玩家身边(注意:会停止你当前的计时)."
-	}
 	"Custom Start Position"
 	{
 		"en"		"{grey}You can use {default}!setstartpos{grey}/{default}!ssp {grey}and {default}!clearstartpos{grey}/{default}!csp {grey}to control your start teleport position."
 		"chi"		"{grey}可通过{default}!setstartpos{grey}/{default}!ssp {grey}以及{default}!clearstartpos{grey}/{default}!csp {grey}来创建/清除自定义传送点."
 	}
-	"!tips"
-	{
-		"en"		"{grey}Tired of seeing tips flooding your chat? You can easily toggle help and tips by typing {default}!tips{grey}."
-		"chi"		"{grey}被提示信息刷屏了? 聊天框中输入{default}!tips{grey}以关闭."
-	}
 	"!autorestart"
 	{
 		"en"		"{grey}Tired of pressing E? Enable the {default}!autorestart {grey}option!"
 		"chi"		"{grey}不想对着起点按E? 聊天框中输入{default}!autorestart {grey}即可!"
-	}
-	"!panel"
-	{
-		"en"		"{grey}You can toggle your centre panel by typing {default}!panel{grey}."
-		"chi"		"{grey}聊天框中输入{default}!panel{grey}以开启/关闭中央面板."
-	}
-	"Binding Teleport Commands"
-	{
-		"en"		"{grey}You can bind keys to {default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {default}sm_start{grey}, and more instead of using the teleport menu."
-		"chi"		"{grey}可在控制台绑定{default}sm_checkpoint{grey}, {default}sm_gocheck{grey}, {default}sm_start{grey}等按键快捷存点."
-	}
-	"!specs"
-	{
-		"en"		"{grey}Check who's snooping around by typing {default}!specs{grey}."
-		"chi"		"{grey}聊天框中输入{default}!specs{grey}查看有哪些玩家在暗中观察."
 	}
 }

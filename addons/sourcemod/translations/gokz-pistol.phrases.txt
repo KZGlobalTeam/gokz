@@ -1,0 +1,17 @@
+"Phrases"
+{
+	// =====[ PISTOL MENU ]=====
+	"Pistol Menu - Title"
+	{
+		"en"		"Pick a Pistol"
+		"chi"		"选择一把手枪"
+	}
+
+
+	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Pistol"
+	{
+		"en"		"Pistol"
+		"chi"		"手枪"
+	}
+}

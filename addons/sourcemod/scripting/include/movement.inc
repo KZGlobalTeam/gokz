@@ -1,17 +1,19 @@
 /*
-	Movement Function Stock Library
+	MovementAPI Function Stock Library
 
 	Website: https://github.com/danzayau/MovementAPI
 */
 
 #if defined _movement_included_
- #endinput
+  #endinput
 #endif
 #define _movement_included_
 
+#include <sdktools>
 
 
-// =========================  STOCKS  ========================= //
+
+// =====[ STOCKS ]=====
 
 /**
  * Calculates the horizontal distance between two vectors.
@@ -109,7 +111,7 @@ stock void Movement_GetOriginEx(int client, float result[3])
 	if (TR_DidHit(trace))
 	{
 		TR_GetEndPosition(result, trace);
-		result[2] = result[2] - 0.03125; // Get rid of the offset
+		result[2] = result[2] - 0.03125; // Get rid of the offset (CS:GO quirk?)
 	}
 	else
 	{
@@ -395,9 +397,9 @@ stock bool Movement_GetNoclipping(int client)
 
 
 
-// =========================  METHODMAP  ========================= //
+// =====[ METHODMAP ]=====
 
-methodmap MovementPlayer __nullable__ {
+methodmap MovementPlayer {
 	
 	public MovementPlayer(int client) {
 		return view_as<MovementPlayer>(client);

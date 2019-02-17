@@ -1,6 +1,6 @@
 "Phrases"
 {
-	// General ////////////////////////////////////////////////////////////
+	// =====[ GENERAL ]=====
 	"Offset"
 	{
 		"en"		"Offset"
@@ -48,7 +48,7 @@
 	}
 
 
-	// Chat Messages ////////////////////////////////////////////////////////////
+	// =====[ CHAT MESSAGES ]=====
 	"Dropped Too Far (Weird Jump)"
 	{
 		// You fell too for for a valid Weird Jump (96.0/64.0).
@@ -75,7 +75,7 @@
 	}
 
 
-	// Headers 
+	// =====[ CONSOLE MESSAGES ]===== 
 	// NOTE: For table formatting in console, these should be 12 characters long.
 	"Sync (Table)"
 	{
@@ -99,28 +99,27 @@
 	}
 
 
-	// Jumpstats Options Menu ////////////////////////////////////////////////////////////
-	"Jumpstats Options Menu - Title"
+	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Jumpstats"
 	{
-		"en"		"Jumpstats Options"
-		"chi"		"起跳数据选项"
+		"en"		"Jumpstats"
 	}
-	"Jumpstats Options Menu - Master Switch"
+	"Options Menu - Jumpstats Master Switch"
 	{
 		"en"		"Jumpstats"
 		"chi"		"起跳数据显示"
 	}
-	"Jumpstats Options Menu - Chat Report"
+	"Options Menu - Jumpstats Chat Report"
 	{
 		"en"		"Chat report"
 		"chi"		"聊天框显示"
 	}
-	"Jumpstats Options Menu - Console Report"
+	"Options Menu - Jumpstats Console Report"
 	{
 		"en"		"Console report"
 		"chi"		"控制台输出显示"
 	}
-	"Jumpstats Options Menu - Sounds"
+	"Options Menu - Jumpstats Sounds"
 	{
 		"en"		"Sounds"
 		"chi"		"音效"
