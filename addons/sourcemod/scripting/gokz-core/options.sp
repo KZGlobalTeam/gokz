@@ -244,7 +244,7 @@ void OnOptionChanged_Options(int client, Option option, int newValue)
 
 void OnModeUnloaded_Options(int mode)
 {
-	for (int client = 1; client < MaxClients; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client) && GOKZ_GetCoreOption(client, Option_Mode) == mode)
 		{

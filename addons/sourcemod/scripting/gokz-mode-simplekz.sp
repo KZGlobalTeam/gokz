@@ -268,7 +268,7 @@ public void OnGameFrame()
 		MovementAPI does this, so that we can apply tweaks based on the 
 		'fixed' landing speed.
 	*/
-	for (int client = 1; client < MaxClients; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client) && IsPlayerAlive(client) && IsUsingMode(client))
 		{
