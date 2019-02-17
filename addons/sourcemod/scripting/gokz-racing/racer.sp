@@ -258,7 +258,7 @@ bool SendRequest(int host, int target)
 	data.WriteCell(GetClientUserId(host));
 	data.WriteCell(GetClientUserId(target));
 	data.WriteCell(raceID);
-	CreateTimer(float(RC_REQUEST_TIMEOUT_TIME), Timer_RequestTimeout, data);
+	CreateTimer(RC_REQUEST_TIMEOUT_TIME, Timer_RequestTimeout, data);
 	
 	Call_OnRequestReceived(target, raceID);
 	
@@ -296,6 +296,8 @@ int SendRequestAll(int host)
 			sentCount++;
 		}
 	}
+	
+	GOKZ_PrintToChat(host, true, "%t", "You Invited Everyone");
 	
 	return sentCount;
 }

@@ -14,12 +14,12 @@ static int lastRaceID;
 
 // =====[ GENERAL ]=====
 
-int GetRaceInfo(int raceID, RaceInfo infoIndex)
+int GetRaceInfo(int raceID, RaceInfo prop)
 {
 	ArrayList info;
 	if (raceInfo.GetValue(IntToStringEx(raceID), info))
 	{
-		return info.Get(view_as<int>(infoIndex));
+		return info.Get(view_as<int>(prop));
 	}
 	else
 	{
@@ -27,24 +27,23 @@ int GetRaceInfo(int raceID, RaceInfo infoIndex)
 	}
 }
 
-static bool SetRaceInfo(int raceID, RaceInfo infoIndex, int value)
+static bool SetRaceInfo(int raceID, RaceInfo prop, int value)
 {
 	ArrayList info;
 	if (raceInfo.GetValue(IntToStringEx(raceID), info))
 	{
-		info.Set(view_as<int>(infoIndex), value);
+		int oldValue = info.Get(view_as<int>(prop));
+		if (oldValue != value)
+		{
+			info.Set(view_as<int>(prop), value);
+			Call_OnRaceInfoChanged(raceID, prop, oldValue, value);
+		}
 		return true;
 	}
 	else
 	{
 		return false;
 	}
-}
-
-bool IsValidRaceID(int raceID)
-{
-	any dummy;
-	return raceInfo.GetValue(IntToStringEx(raceID), dummy);
 }
 
 int IncrementFinishedRacerCount(int raceID)
@@ -121,6 +120,8 @@ int RegisterRace(int host, int type, int course, int mode, int teleportRule)
 	
 	raceInfo.SetValue(IntToStringEx(raceID), info);
 	
+	Call_OnRaceRegistered(raceID);
+	
 	return raceID;
 }
 
@@ -147,13 +148,11 @@ bool StartRace(int raceID)
 		if (GetRaceID(client) == raceID)
 		{
 			StartRacer(client);
+			GOKZ_PrintToChat(client, true, "%t", "Race Countdown Started");
 		}
 	}
 	
-	StartCountdownHUD(raceID);
-	CreateTimer(float(RC_COUNTDOWN_TIME), Timer_EndCountdown, raceID);
-	
-	Call_OnRaceStarted(raceID);
+	CreateTimer(RC_COUNTDOWN_TIME, Timer_EndCountdown, raceID);
 	
 	return true;
 }
@@ -169,13 +168,15 @@ public Action Timer_EndCountdown(Handle timer, int raceID)
 
 bool AbortRace(int raceID)
 {
-	Call_OnRaceAborted(raceID); // Call before aborting so race is accessible
+	SetRaceInfo(raceID, RaceInfo_Status, RaceStatus_Aborting);
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (GetRaceID(client) == raceID)
 		{
 			AbortRacer(client);
+			GOKZ_PrintToChat(client, true, "%t", "Race Has Been Aborted");
+			GOKZ_PlayErrorSound(client);
 		}
 	}
 	

@@ -149,4 +149,15 @@
 		"en"		"Show weapon"
 		"chi"		"屏蔽武器显示"
 	}
+
+
+	// =====[ RACING ]=====
+	"Get Ready"
+	{
+		"en"		"GET READY"
+	}
+	"Go!"
+	{
+		"en"		"GO!"
+	}
 }
