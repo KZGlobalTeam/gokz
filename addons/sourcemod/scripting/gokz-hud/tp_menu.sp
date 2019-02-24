@@ -15,92 +15,16 @@
 #define ITEM_INFO_PAUSE "pause"
 #define ITEM_INFO_START "start"
 
-static bool TPMenuIsShowing[MAXPLAYERS + 1];
-
 
 
 // =====[ EVENTS ]=====
 
-void OnPlayerSpawn_TPMenu(client)
-{
-	UpdateTPMenu(client);
-}
-
 void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum)
 {
-	if (!IsPlayerAlive(client))
-	{
-		return;
-	}
-	
-	// Checks option and that no other menu is open instead of rudely interrupting it
-	if (GetClientMenu(client) == MenuSource_None)
-	{
-		DisplayTPMenu(client);
-	}
-	else if (cmdnum % 6 == 0 && GOKZ_GetTimerRunning(client)
-		 && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	if (cmdnum % 6 == 3)
 	{
 		UpdateTPMenu(client);
 	}
-}
-
-void OnOptionChanged_TPMenu(int client, HUDOption option)
-{
-	if (option == HUDOption_TPMenu)
-	{
-		UpdateTPMenu(client);
-	}
-}
-
-void OnTimerStart_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnTimerEnd_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnTimerStopped_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnPause_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnResume_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnMakeCheckpoint_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnCountedTeleport_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnJoinTeam_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnCustomStartPositionSet_TPMenu(int client)
-{
-	UpdateTPMenu(client);
-}
-
-void OnCustomStartPositionCleared_TPMenu(int client)
-{
-	UpdateTPMenu(client);
 }
 
 public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
@@ -140,11 +64,11 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 		}
 		
 		// Menu closes when player selects something, so...
-		TPMenuIsShowing[param1] = false;
+		gB_MenuShowing[param1] = false;
 	}
 	else if (action == MenuAction_Cancel)
 	{
-		TPMenuIsShowing[param1] = false;
+		gB_MenuShowing[param1] = false;
 	}
 	else if (action == MenuAction_End)
 	{
@@ -152,109 +76,86 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 	}
 }
 
-public int PanelHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Cancel)
-	{
-		TPMenuIsShowing[param1] = false;
-	}
-}
-
 
 
 // =====[ PRIVATE ]=====
 
-// Update the TP menu i.e. item text, item disabled/enabled
 static void UpdateTPMenu(int client)
 {
-	// Only cancel the menu if we know it's the TP menu
-	if (TPMenuIsShowing[client])
+	KZPlayer player = KZPlayer(client);
+	
+	if (player.fake || !player.alive || player.tpMenu == TPMenu_Disabled)
 	{
-		CancelClientMenu(client);
+		return;
+	}
+	
+	// If there is no menu showing, or if the TP menu is currently showing with timer text
+	if (GetClientMenu(client) == MenuSource_None
+		 || gB_MenuShowing[player.id] && player.timerText == TimerText_TPMenu && player.alive && player.timerRunning && !player.paused)
+	{
+		ShowTPMenu(player);
 	}
 }
 
-static void DisplayTPMenu(int client)
+static void ShowTPMenu(KZPlayer player)
 {
-	if (GOKZ_HUD_GetOption(client, HUDOption_TPMenu) != TPMenu_Disabled)
+	Menu menu = new Menu(MenuHandler_TPMenu);
+	menu.OptionFlags = MENUFLAG_NO_SOUND;
+	menu.ExitButton = false;
+	menu.Pagination = MENU_NO_PAGINATION;
+	TPMenuSetTitle(player, menu);
+	TPMenuAddItems(player, menu);
+	menu.Display(player.id, MENU_TIME_FOREVER);
+	gB_MenuShowing[player.id] = true;
+	
+	static int test1 = 0;
+	PrintToServer("menu %d", test1++);
+}
+
+static void TPMenuSetTitle(KZPlayer player, Menu menu)
+{
+	if (player.timerRunning && player.timerText == TimerText_TPMenu)
 	{
-		Menu menu = new Menu(MenuHandler_TPMenu);
-		menu.OptionFlags = MENUFLAG_NO_SOUND;
-		menu.ExitButton = false;
-		menu.Pagination = MENU_NO_PAGINATION;
-		TPMenuSetTitle(client, menu);
-		TPMenuAddItems(client, menu);
-		menu.Display(client, MENU_TIME_FOREVER);
-		TPMenuIsShowing[client] = true;
-	}
-	else if (GOKZ_GetTimerRunning(client) && 
-		GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
-	{
-		// Use a Panel if want to only show timer text as it doesn't seem
-		// to be possible to display a Menu with no items.
-		Panel panel = new Panel(null);
-		panel.SetTitle(GetTimerTextMenuTitleString(client));
-		panel.Send(client, PanelHandler_TPMenu, MENU_TIME_FOREVER);
-		delete panel;
-		TPMenuIsShowing[client] = true;
+		menu.SetTitle(FormatTimerTextForMenu(player));
 	}
 }
 
-static void TPMenuSetTitle(int client, Menu menu)
+static void TPMenuAddItems(KZPlayer player, Menu menu)
 {
-	if (GOKZ_GetTimerRunning(client) && 
-		GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
-	{
-		menu.SetTitle(GetTimerTextMenuTitleString(client));
-	}
-}
-
-static char[] GetTimerTextMenuTitleString(int client)
-{
-	char timerTextString[32];
-	FormatEx(timerTextString, sizeof(timerTextString), 
-		"%s %s", 
-		gC_TimeTypeNames[GOKZ_GetTimeType(client)], 
-		GOKZ_FormatTime(GOKZ_GetTime(client)));
-	return timerTextString;
-}
-
-static void TPMenuAddItems(int client, Menu menu)
-{
-	switch (GOKZ_HUD_GetOption(client, HUDOption_TPMenu))
+	switch (player.tpMenu)
 	{
 		case TPMenu_Simple:
 		{
-			TPMenuAddItemCheckpoint(client, menu);
-			TPMenuAddItemTeleport(client, menu);
-			TPMenuAddItemPause(client, menu);
-			TPMenuAddItemStart(client, menu);
+			TPMenuAddItemCheckpoint(player, menu);
+			TPMenuAddItemTeleport(player, menu);
+			TPMenuAddItemPause(player, menu);
+			TPMenuAddItemStart(player, menu);
 		}
 		case TPMenu_Advanced:
 		{
-			TPMenuAddItemCheckpoint(client, menu);
-			TPMenuAddItemTeleport(client, menu);
-			TPMenuAddItemPrevCheckpoint(client, menu);
-			TPMenuAddItemNextCheckpoint(client, menu);
-			TPMenuAddItemUndo(client, menu);
-			TPMenuAddItemPause(client, menu);
-			TPMenuAddItemStart(client, menu);
+			TPMenuAddItemCheckpoint(player, menu);
+			TPMenuAddItemTeleport(player, menu);
+			TPMenuAddItemPrevCheckpoint(player, menu);
+			TPMenuAddItemNextCheckpoint(player, menu);
+			TPMenuAddItemUndo(player, menu);
+			TPMenuAddItemPause(player, menu);
+			TPMenuAddItemStart(player, menu);
 		}
 	}
 }
 
-static void TPMenuAddItemCheckpoint(int client, Menu menu)
+static void TPMenuAddItemCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[16];
-	FormatEx(display, sizeof(display), "%T", "TP Menu - Checkpoint", client);
+	FormatEx(display, sizeof(display), "%T", "TP Menu - Checkpoint", player.id);
 	menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
 }
 
-static void TPMenuAddItemTeleport(int client, Menu menu)
+static void TPMenuAddItemTeleport(KZPlayer player, Menu menu)
 {
 	char display[16];
-	FormatEx(display, sizeof(display), "%T", "TP Menu - Teleport", client);
-	if (GOKZ_GetCanTeleportToCheckpoint(client))
+	FormatEx(display, sizeof(display), "%T", "TP Menu - Teleport", player.id);
+	if (player.canTeleportToCheckpoint)
 	{
 		menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DEFAULT);
 	}
@@ -264,11 +165,11 @@ static void TPMenuAddItemTeleport(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddItemPrevCheckpoint(int client, Menu menu)
+static void TPMenuAddItemPrevCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[16];
-	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", client);
-	if (GOKZ_GetCanPrevCheckpoint(client))
+	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", player.id);
+	if (player.canPrevCheckpoint)
 	{
 		menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DEFAULT);
 	}
@@ -278,11 +179,11 @@ static void TPMenuAddItemPrevCheckpoint(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddItemNextCheckpoint(int client, Menu menu)
+static void TPMenuAddItemNextCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[16];
-	FormatEx(display, sizeof(display), "%T", "TP Menu - Next CP", client);
-	if (GOKZ_GetCanNextCheckpoint(client))
+	FormatEx(display, sizeof(display), "%T", "TP Menu - Next CP", player.id);
+	if (player.canNextCheckpoint)
 	{
 		menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DEFAULT);
 	}
@@ -292,11 +193,11 @@ static void TPMenuAddItemNextCheckpoint(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddItemUndo(int client, Menu menu)
+static void TPMenuAddItemUndo(KZPlayer player, Menu menu)
 {
 	char display[16];
-	FormatEx(display, sizeof(display), "%T", "TP Menu - Undo TP", client);
-	if (GOKZ_GetCanUndoTeleport(client))
+	FormatEx(display, sizeof(display), "%T", "TP Menu - Undo TP", player.id);
+	if (player.canUndoTeleport)
 	{
 		menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DEFAULT);
 	}
@@ -306,32 +207,32 @@ static void TPMenuAddItemUndo(int client, Menu menu)
 	}
 }
 
-static void TPMenuAddItemPause(int client, Menu menu)
+static void TPMenuAddItemPause(KZPlayer player, Menu menu)
 {
 	char display[16];
-	if (GOKZ_GetPaused(client))
+	if (player.paused)
 	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", client);
+		FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", player.id);
 		menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
 	}
 	else
 	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Pause", client);
+		FormatEx(display, sizeof(display), "%T", "TP Menu - Pause", player.id);
 		menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
 	}
 }
 
-static void TPMenuAddItemStart(int client, Menu menu)
+static void TPMenuAddItemStart(KZPlayer player, Menu menu)
 {
 	char display[16];
-	if (GOKZ_GetHasStartPosition(client))
+	if (player.hasStartPosition)
 	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Restart", client);
+		FormatEx(display, sizeof(display), "%T", "TP Menu - Restart", player.id);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
 	}
 	else
 	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Respawn", client);
+		FormatEx(display, sizeof(display), "%T", "TP Menu - Respawn", player.id);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
 	}
 } 

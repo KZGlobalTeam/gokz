@@ -25,10 +25,12 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-hud.txt"
 
 bool gB_GOKZRacing;
+bool gB_MenuShowing[MAXPLAYERS + 1];
 
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
+#include "gokz-hud/menu.sp"
 #include "gokz-hud/options.sp"
 #include "gokz-hud/options_menu.sp"
 #include "gokz-hud/racing_text.sp"
@@ -106,7 +108,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	if (IsValidClient(client))
 	{
 		OnPlayerSpawn_HideWeapon(client);
-		OnPlayerSpawn_TPMenu(client);
+		OnPlayerSpawn_Menu(client);
 	}
 }
 
@@ -117,55 +119,55 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 
 public void GOKZ_OnJoinTeam(int client, int team)
 {
-	OnJoinTeam_TPMenu(client);
+	OnJoinTeam_Menu(client);
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	OnTimerStart_TimerText(client);
-	OnTimerStart_TPMenu(client);
+	OnTimerStart_Menu(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	OnTimerEnd_TimerText(client);
-	OnTimerEnd_TPMenu(client);
+	OnTimerEnd_Menu(client);
 }
 
 public void GOKZ_OnTimerStopped(int client)
 {
 	OnTimerStopped_TimerText(client);
-	OnTimerStopped_TPMenu(client);
+	OnTimerStopped_Menu(client);
 }
 
 public void GOKZ_OnPause_Post(int client)
 {
-	OnPause_TPMenu(client);
+	OnPause_Menu(client);
 }
 
 public void GOKZ_OnResume_Post(int client)
 {
-	OnResume_TPMenu(client);
+	OnResume_Menu(client);
 }
 
 public void GOKZ_OnMakeCheckpoint_Post(int client)
 {
-	OnMakeCheckpoint_TPMenu(client);
+	OnMakeCheckpoint_Menu(client);
 }
 
 public void GOKZ_OnCountedTeleport_Post(int client)
 {
-	OnCountedTeleport_TPMenu(client);
+	OnCountedTeleport_Menu(client);
 }
 
 public void GOKZ_OnCustomStartPositionSet_Post(int client, const float position[3], const float angles[3])
 {
-	OnCustomStartPositionSet_TPMenu(client);
+	OnCustomStartPositionSet_Menu(client);
 }
 
 public void GOKZ_OnCustomStartPositionCleared_Post(int client)
 {
-	OnCustomStartPositionCleared_TPMenu(client);
+	OnCustomStartPositionCleared_Menu(client);
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
@@ -175,7 +177,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	{
 		OnOptionChanged_SpeedText(client, hudOption);
 		OnOptionChanged_TimerText(client, hudOption);
-		OnOptionChanged_TPMenu(client, hudOption);
+		OnOptionChanged_Menu(client, hudOption);
 		OnOptionChanged_HideWeapon(client, hudOption);
 		OnOptionChanged_Options(client, hudOption, newValue);
 	}
