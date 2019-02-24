@@ -30,7 +30,7 @@
 	}
 	"You Invited Everyone"
 	{
-		"en"		"{grey}You have invited everyone that is ready to race."
+		"en"		"{grey}You have invited everyone that is available to be challenged."
 	}
 	"Player Already In A Race"
 	{
@@ -48,7 +48,7 @@
 	}
 	"No One Accepted"
 	{
-		"en"		"{darkred}No one has accepted your race."
+		"en"		"{darkred}No one has accepted the race yet."
 	}
 	"Race Already Started"
 	{
@@ -56,7 +56,7 @@
 	}
 	"No Opponents Available"
 	{
-		"en"		"{darkred}No one is ready to be challenged."
+		"en"		"{darkred}No one is currently available to be challenged."
 	}
 	"Race Rules"
 	{
@@ -82,25 +82,25 @@
 	}
 	"Race Request Received"
 	{
-		// You have been invited to a race hosted by Bob.
+		// Bob has invited you to a race.
 		"#format"	"{1:N}"
-		"en"		"{grey}You have been invited to a race hosted by {lime}{1}{grey}."
+		"en"		"{lime}{1} {grey}has invited you to a race."
 	}
 	"Race Request Accepted"
 	{
-		// Alice has accepted the race hosted by Bob!
-		"#format"	"{1:N},{2:N}"
-		"en"		"{lime}{1} {grey}has accepted the race hosted by {lime}{2}{grey}!"
+		// Alice has accepted the race!
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has accepted the race!"
 	}
 	"Race Request Not Accepted In Time (Host)"
 	{
-		// Alice did not accept the race in time.
+		// Alice didn't accept the race in time.
 		"#format"	"{1:N}"
-		"en"		"{lime}{1} {grey}did not accept the race invitation in time."
+		"en"		"{lime}{1} {grey}didn't accept the race in time."
 	}
 	"Race Request Not Accepted In Time (Target)"
 	{
-		"en"		"{grey}You did not respond to the race invitation in time."
+		"en"		"{grey}You didn't accept the race in time."
 	}
 	"Race Won"
 	{
@@ -110,15 +110,15 @@
 	}
 	"Race Placed"
 	{
-		// Alice finished the race! [#2]
+		// Alice has finished the race! [#2]
 		"#format"	"{1:N},{2:d}"
-		"en"		"{lime}{1} {grey}finished the race! [#{default}{2}{grey}]"
+		"en"		"{lime}{1} {grey}has finished the race! [#{default}{2}{grey}]"
 	}
 	"Race Lost"
 	{
-		// Alice lost the race! [#5]
+		// Alice came last in the race. [#5]
 		"#format"	"{1:N},{2:d}"
-		"en"		"{lime}{1} {grey}lost the race! [#{default}{2}{grey}]"
+		"en"		"{lime}{1} {grey}came last in the race. [#{default}{2}{grey}]"
 	}
 	"Race Surrendered"
 	{
@@ -146,13 +146,13 @@
 	}
 	"Duel Request Not Accepted In Time (Host)"
 	{
-		// Alice did not accept the duel in time.
+		// Alice didn't accept the duel in time.
 		"#format"	"{1:N}"
-		"en"		"{lime}{1} {grey}did not accept the duel in time."
+		"en"		"{lime}{1} {grey}didn't accept the duel in time."
 	}
 	"Duel Request Not Accepted In Time (Target)"
 	{
-		"en"		"You did not accept the duel in time."
+		"en"		"You didn't accept the duel in time."
 	}
 	"Duel Won"
 	{
