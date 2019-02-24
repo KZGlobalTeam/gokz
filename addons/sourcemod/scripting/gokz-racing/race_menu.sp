@@ -62,10 +62,9 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 			{
 				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuTeleport[param1]);
 			}
-			if (SendRequestAll(param1) > 0)
-			{
-				GOKZ_PrintToChat(param1, true, "%t", "You Invited Everyone");
-			}
+			
+			SendRequestAll(param1);
+			GOKZ_PrintToChat(param1, true, "%t", "You Invited Everyone");
 			DisplayRaceMenu(param1, false);
 		}
 		else if (StrEqual(info, ITEM_INFO_MODE, false))

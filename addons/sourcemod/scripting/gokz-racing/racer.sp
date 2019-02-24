@@ -296,9 +296,6 @@ int SendRequestAll(int host)
 			sentCount++;
 		}
 	}
-	
-	GOKZ_PrintToChat(host, true, "%t", "You Invited Everyone");
-	
 	return sentCount;
 }
 
