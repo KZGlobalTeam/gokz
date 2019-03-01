@@ -51,7 +51,8 @@ int gI_BhopPostJumpInputs[MAXPLAYERS + 1][AC_MAX_BHOP_SAMPLES];
 bool gB_BhopPostJumpInputsPending[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_autoban;
-ConVar gCV_gokz_autoban_duration;
+ConVar gCV_gokz_autoban_duration_bhop_hack;
+ConVar gCV_gokz_autoban_duration_bhop_macro;
 ConVar gCV_sv_autobunnyhopping;
 
 #include "gokz-anticheat/api.sp"
@@ -170,8 +171,31 @@ static void CreateConVars()
 	AutoExecConfig_SetFile("gokz-anticheat", "sourcemod/gokz");
 	AutoExecConfig_SetCreateFile(true);
 	
-	gCV_gokz_autoban = AutoExecConfig_CreateConVar("gokz_autoban", "1", "Whether to autoban players when they are suspected of cheating.", _, true, 0.0, true, 1.0);
-	gCV_gokz_autoban_duration = AutoExecConfig_CreateConVar("gokz_autoban_duration", "0", "Duration of anticheat autobans in minutes (0 for permanent).", _, true, 0.0);
+	gCV_gokz_autoban = AutoExecConfig_CreateConVar(
+		"gokz_autoban", 
+		"1", 
+		"Whether to autoban players when they are suspected of cheating.", 
+		_, 
+		true, 
+		0.0, 
+		true, 
+		1.0);
+	
+	gCV_gokz_autoban_duration_bhop_hack = AutoExecConfig_CreateConVar(
+		"gokz_autoban_duration_bhop_hack", 
+		"0", 
+		"Duration of anticheat autobans for bunnyhop hacking in minutes (0 for permanent).", 
+		_, 
+		true, 
+		0.0);
+	
+	gCV_gokz_autoban_duration_bhop_macro = AutoExecConfig_CreateConVar(
+		"gokz_autoban_duration_bhop_macro", 
+		"44640",  // 31 days
+		"Duration of anticheat autobans for bunnyhop macroing in minutes (0 for permanent).", 
+		_, 
+		true, 
+		0.0);
 	
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
@@ -197,27 +221,35 @@ static void BanSuspect(int client, ACReason reason)
 	{
 		case ACReason_BhopHack:
 		{
-			AutoBanClient(client, "gokz-anticheat - Bhop hacking", "You have been banned for using a bhop hack");
+			AutoBanClient(
+				client, 
+				gCV_gokz_autoban_duration_bhop_hack.IntValue, 
+				"gokz-anticheat - Bhop hacking", 
+				"You have been banned for using a bhop hack");
 		}
 		case ACReason_BhopMacro:
 		{
-			AutoBanClient(client, "gokz-anticheat - Bhop macroing", "You have been banned for using a bhop macro");
+			AutoBanClient(
+				client, 
+				gCV_gokz_autoban_duration_bhop_macro.IntValue, 
+				"gokz-anticheat - Bhop macroing", 
+				"You have been banned for using a bhop macro");
 		}
 	}
 }
 
-static void AutoBanClient(int client, const char[] reason, const char[] kickMessage)
+static void AutoBanClient(int client, int minutes, const char[] reason, const char[] kickMessage)
 {
 	if (gB_SourceBansPP)
 	{
-		SBPP_BanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, reason);
+		SBPP_BanPlayer(0, client, minutes, reason);
 	}
 	else if (gB_SourceBans)
 	{
-		SBBanPlayer(0, client, gCV_gokz_autoban_duration.IntValue, reason);
+		SBBanPlayer(0, client, minutes, reason);
 	}
 	else
 	{
-		BanClient(client, gCV_gokz_autoban_duration.IntValue, BANFLAG_AUTO, reason, kickMessage, "gokz-anticheat", 0);
+		BanClient(client, minutes, BANFLAG_AUTO, reason, kickMessage, "gokz-anticheat", 0);
 	}
 } 
