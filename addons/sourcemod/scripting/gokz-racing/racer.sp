@@ -351,4 +351,6 @@ void OnClientDisconnect_Racer(int client)
 			SurrenderRacer(client);
 		}
 	}
+	
+	ResetRacer(client);
 } 
