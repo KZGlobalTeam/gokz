@@ -153,15 +153,15 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player);
-	if (gB_Jumpbugged[player.id])
+	if (gB_Jumpbugged[player.ID])
 	{
 		TweakJumpbug(player);
 	}
 	
-	gB_Jumpbugged[player.id] = false;
-	gI_OldButtons[player.id] = buttons;
-	gB_OldOnGround[player.id] = Movement_GetOnGround(client);
-	gF_OldAngles[player.id] = angles;
+	gB_Jumpbugged[player.ID] = false;
+	gI_OldButtons[player.ID] = buttons;
+	gB_OldOnGround[player.ID] = Movement_GetOnGround(client);
+	gF_OldAngles[player.ID] = angles;
 	Movement_GetVelocity(client, gF_OldVelocity[client]);
 	
 	return Plugin_Continue;
@@ -206,8 +206,8 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	}
 	else if (gB_GOKZCore)
 	{
-		player.gokzHitPerf = false;
-		player.gokzTakeoffSpeed = player.takeoffSpeed;
+		player.GOKZHitPerf = false;
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
 }
 
@@ -224,7 +224,7 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	}
 }
 
-public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
+public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
 	if (!IsUsingMode(client))
 	{
@@ -232,10 +232,10 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	}
 	
 	KZPlayer player = KZPlayer(client);
-	if (gB_GOKZCore && newMoveType == MOVETYPE_WALK)
+	if (gB_GOKZCore && newMovetype == MOVETYPE_WALK)
 	{
-		player.gokzHitPerf = false;
-		player.gokzTakeoffSpeed = player.takeoffSpeed;
+		player.GOKZHitPerf = false;
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
 }
 
@@ -300,91 +300,91 @@ void ReplicateConVars(int client)
 
 void TweakVelMod(KZPlayer player)
 {
-	player.velocityModifier = CalcPrestrafeVelMod(player) * CalcWeaponVelMod(player);
+	player.VelocityModifier = CalcPrestrafeVelMod(player) * CalcWeaponVelMod(player);
 }
 
 // Adapted from KZTimerGlobal
 float CalcPrestrafeVelMod(KZPlayer player)
 {
-	if (!player.onGround)
+	if (!player.OnGround)
 	{
-		return gF_PreVelMod[player.id];
+		return gF_PreVelMod[player.ID];
 	}
 	
-	if (!player.turning)
+	if (!player.Turning)
 	{
-		if (GetEngineTime() - gF_PreVelModLastChange[player.id] > 0.2)
+		if (GetEngineTime() - gF_PreVelModLastChange[player.ID] > 0.2)
 		{
-			gF_PreVelMod[player.id] = 1.0;
-			gF_PreVelModLastChange[player.id] = GetEngineTime();
+			gF_PreVelMod[player.ID] = 1.0;
+			gF_PreVelModLastChange[player.ID] = GetEngineTime();
 		}
-		else if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX + 0.007)
+		else if (gF_PreVelMod[player.ID] > PRE_VELMOD_MAX + 0.007)
 		{
 			return PRE_VELMOD_MAX - 0.001; // Returning without setting the variable is intentional
 		}
 	}
-	else if ((player.buttons & IN_MOVELEFT || player.buttons & IN_MOVERIGHT) && player.speed > 248.9)
+	else if ((player.Buttons & IN_MOVELEFT || player.Buttons & IN_MOVERIGHT) && player.Speed > 248.9)
 	{
 		float increment = 0.0009;
-		if (gF_PreVelMod[player.id] > 1.04)
+		if (gF_PreVelMod[player.ID] > 1.04)
 		{
 			increment = 0.001;
 		}
 		
-		bool forwards = GetClientMovingDirection(player.id, false) > 0.0;
+		bool forwards = GetClientMovingDirection(player.ID, false) > 0.0;
 		
-		if ((player.buttons & IN_MOVERIGHT && player.turningRight || player.turningLeft && !forwards)
-			 || (player.buttons & IN_MOVELEFT && player.turningLeft || player.turningRight && !forwards))
+		if ((player.Buttons & IN_MOVERIGHT && player.TurningRight || player.TurningLeft && !forwards)
+			 || (player.Buttons & IN_MOVELEFT && player.TurningLeft || player.TurningRight && !forwards))
 		{
-			gI_PreTickCounter[player.id]++;
+			gI_PreTickCounter[player.ID]++;
 			
-			if (gI_PreTickCounter[player.id] < 75)
+			if (gI_PreTickCounter[player.ID] < 75)
 			{
-				gF_PreVelMod[player.id] += increment;
-				if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX)
+				gF_PreVelMod[player.ID] += increment;
+				if (gF_PreVelMod[player.ID] > PRE_VELMOD_MAX)
 				{
-					if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX + 0.007)
+					if (gF_PreVelMod[player.ID] > PRE_VELMOD_MAX + 0.007)
 					{
-						gF_PreVelMod[player.id] = PRE_VELMOD_MAX - 0.001;
+						gF_PreVelMod[player.ID] = PRE_VELMOD_MAX - 0.001;
 					}
 					else
 					{
-						gF_PreVelMod[player.id] -= 0.007;
+						gF_PreVelMod[player.ID] -= 0.007;
 					}
 				}
-				gF_PreVelMod[player.id] += increment;
+				gF_PreVelMod[player.ID] += increment;
 			}
 			else
 			{
-				gF_PreVelMod[player.id] -= 0.0045;
-				gI_PreTickCounter[player.id] -= 2;
+				gF_PreVelMod[player.ID] -= 0.0045;
+				gI_PreTickCounter[player.ID] -= 2;
 				
-				if (gF_PreVelMod[player.id] < 1.0)
+				if (gF_PreVelMod[player.ID] < 1.0)
 				{
-					gF_PreVelMod[player.id] = 1.0;
-					gI_PreTickCounter[player.id] = 0;
+					gF_PreVelMod[player.ID] = 1.0;
+					gI_PreTickCounter[player.ID] = 0;
 				}
 			}
 		}
 		else
 		{
-			gF_PreVelMod[player.id] -= 0.04;
+			gF_PreVelMod[player.ID] -= 0.04;
 			
-			if (gF_PreVelMod[player.id] < 1.0)
+			if (gF_PreVelMod[player.ID] < 1.0)
 			{
-				gF_PreVelMod[player.id] = 1.0;
+				gF_PreVelMod[player.ID] = 1.0;
 			}
 		}
 		
-		gF_PreVelModLastChange[player.id] = GetEngineTime();
+		gF_PreVelModLastChange[player.ID] = GetEngineTime();
 	}
 	else
 	{
-		gI_PreTickCounter[player.id] = 0;
+		gI_PreTickCounter[player.ID] = 0;
 		return 1.0; // Returning without setting the variable is intentional
 	}
 	
-	return gF_PreVelMod[player.id];
+	return gF_PreVelMod[player.ID];
 }
 
 // Adapted from KZTimerGlobal
@@ -423,7 +423,7 @@ float GetClientMovingDirection(int client, bool ladder)
 
 float CalcWeaponVelMod(KZPlayer player)
 {
-	return SPEED_NORMAL / player.maxSpeed;
+	return SPEED_NORMAL / player.MaxSpeed;
 }
 
 
@@ -432,9 +432,9 @@ float CalcWeaponVelMod(KZPlayer player)
 
 void TweakJump(KZPlayer player)
 {
-	if (player.hitPerf)
+	if (player.HitPerf)
 	{
-		if (player.takeoffSpeed > PERF_SPEED_CAP)
+		if (player.TakeoffSpeed > PERF_SPEED_CAP)
 		{
 			// Note that resulting velocity has same direction as landing velocity, not current velocity
 			float velocity[3], baseVelocity[3], newVelocity[3];
@@ -447,33 +447,33 @@ void TweakJump(KZPlayer player)
 			player.SetVelocity(newVelocity);
 			if (gB_GOKZCore)
 			{
-				player.gokzHitPerf = true;
-				player.gokzTakeoffSpeed = player.speed;
+				player.GOKZHitPerf = true;
+				player.GOKZTakeoffSpeed = player.Speed;
 			}
 		}
 		else if (gB_GOKZCore)
 		{
-			player.gokzHitPerf = true;
-			player.gokzTakeoffSpeed = player.takeoffSpeed;
+			player.GOKZHitPerf = true;
+			player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 		}
 	}
 	else if (gB_GOKZCore)
 	{
-		player.gokzHitPerf = false;
-		player.gokzTakeoffSpeed = player.takeoffSpeed;
+		player.GOKZHitPerf = false;
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
 }
 
 void TweakJumpbug(KZPlayer player)
 {
-	if (player.speed > PERF_SPEED_CAP)
+	if (player.Speed > PERF_SPEED_CAP)
 	{
-		Movement_SetSpeed(player.id, PERF_SPEED_CAP, true);
+		Movement_SetSpeed(player.ID, PERF_SPEED_CAP, true);
 	}
 	if (gB_GOKZCore)
 	{
-		player.gokzHitPerf = true;
-		player.gokzTakeoffSpeed = player.speed;
+		player.GOKZHitPerf = true;
+		player.GOKZTakeoffSpeed = player.Speed;
 	}
 }
 
@@ -483,7 +483,7 @@ void TweakJumpbug(KZPlayer player)
 
 void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 {
-	if (player.onGround && buttons & IN_JUMP && !(gI_OldButtons[player.id] & IN_JUMP) && !(gI_OldButtons[player.id] & IN_DUCK))
+	if (player.OnGround && buttons & IN_JUMP && !(gI_OldButtons[player.ID] & IN_JUMP) && !(gI_OldButtons[player.ID] & IN_DUCK))
 	{
 		buttons &= ~IN_DUCK;
 	}
@@ -491,8 +491,8 @@ void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 
 void ReduceDuckSlowdown(KZPlayer player)
 {
-	if (player.duckSpeed < DUCK_SPEED_MINIMUM)
+	if (player.DuckSpeed < DUCK_SPEED_MINIMUM)
 	{
-		player.duckSpeed = DUCK_SPEED_MINIMUM;
+		player.DuckSpeed = DUCK_SPEED_MINIMUM;
 	}
 } 

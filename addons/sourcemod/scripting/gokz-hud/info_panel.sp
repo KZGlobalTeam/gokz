@@ -12,7 +12,7 @@
 bool IsDrawingInfoPanel(int client)
 {
 	KZPlayer player = KZPlayer(client);
-	return player.infoPanel != InfoPanel_Disabled
+	return player.InfoPanel != InfoPanel_Disabled
 	 && !NothingEnabledInInfoPanel(player);
 }
 
@@ -36,31 +36,31 @@ static void UpdateInfoPanel(int client)
 {
 	KZPlayer player = KZPlayer(client);
 	
-	if (player.fake || !IsDrawingInfoPanel(player.id))
+	if (player.Fake || !IsDrawingInfoPanel(player.ID))
 	{
 		return;
 	}
 	
-	if (player.alive)
+	if (player.Alive)
 	{
-		PrintHintText(player.id, "%s", GetInfoPanel(player, player));
+		PrintHintText(player.ID, "%s", GetInfoPanel(player, player));
 	}
 	else
 	{
-		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
-		if (targetPlayer.id != -1 && !targetPlayer.fake)
+		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
+		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
 		{
-			PrintHintText(player.id, "%s", GetInfoPanel(player, targetPlayer));
+			PrintHintText(player.ID, "%s", GetInfoPanel(player, targetPlayer));
 		}
 	}
 }
 
 static bool NothingEnabledInInfoPanel(KZPlayer player)
 {
-	bool noTimerText = player.timerText != TimerText_InfoPanel;
-	bool noSpeedText = player.speedText != SpeedText_InfoPanel || player.paused;
-	bool noKeys = player.showKeys == ShowKeys_Disabled
-	 || player.showKeys == ShowKeys_Spectating && player.alive;
+	bool noTimerText = player.TimerText != TimerText_InfoPanel;
+	bool noSpeedText = player.SpeedText != SpeedText_InfoPanel || player.Paused;
+	bool noKeys = player.ShowKeys == ShowKeys_Disabled
+	 || player.ShowKeys == ShowKeys_Spectating && player.Alive;
 	return noTimerText && noSpeedText && noKeys;
 }
 
@@ -78,28 +78,28 @@ static char[] GetInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 {
 	char timeString[128];
-	if (player.timerText != TimerText_InfoPanel)
+	if (player.TimerText != TimerText_InfoPanel)
 	{
 		timeString = "";
 	}
-	else if (targetPlayer.timerRunning)
+	else if (targetPlayer.TimerRunning)
 	{
-		switch (targetPlayer.timeType)
+		switch (targetPlayer.TimeType)
 		{
 			case TimeType_Nub:
 			{
 				FormatEx(timeString, sizeof(timeString), 
 					"%T: <font color='#ead18a'>%s</font> %s\n", 
-					"Info Panel Text - Time", player.id, 
-					GOKZ_FormatTime(targetPlayer.time, false), 
+					"Info Panel Text - Time", player.ID, 
+					GOKZ_FormatTime(targetPlayer.Time, false), 
 					GetPausedString(player, targetPlayer));
 			}
 			case TimeType_Pro:
 			{
 				FormatEx(timeString, sizeof(timeString), 
 					"%T: <font color='#b5d4ee'>%s</font> %s\n", 
-					"Info Panel Text - Time", player.id, 
-					GOKZ_FormatTime(targetPlayer.time, false), 
+					"Info Panel Text - Time", player.ID, 
+					GOKZ_FormatTime(targetPlayer.Time, false), 
 					GetPausedString(player, targetPlayer));
 			}
 		}
@@ -108,8 +108,8 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 	{
 		FormatEx(timeString, sizeof(timeString), 
 			"%T: <font color='#ea4141'>%T</font> %s\n", 
-			"Info Panel Text - Time", player.id, 
-			"Info Panel Text - Stopped", player.id, 
+			"Info Panel Text - Time", player.ID, 
+			"Info Panel Text - Stopped", player.ID, 
 			GetPausedString(player, targetPlayer));
 	}
 	return timeString;
@@ -118,11 +118,11 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 static char[] GetPausedString(KZPlayer player, KZPlayer targetPlayer)
 {
 	char pausedString[64];
-	if (targetPlayer.paused)
+	if (targetPlayer.Paused)
 	{
 		FormatEx(pausedString, sizeof(pausedString), 
 			"(<font color='#ffffff'>%T</font>)", 
-			"Info Panel Text - PAUSED", player.id);
+			"Info Panel Text - PAUSED", player.ID);
 	}
 	else
 	{
@@ -134,25 +134,25 @@ static char[] GetPausedString(KZPlayer player, KZPlayer targetPlayer)
 static char[] GetSpeedString(KZPlayer player, KZPlayer targetPlayer)
 {
 	char speedString[128];
-	if (player.speedText != SpeedText_InfoPanel || targetPlayer.paused)
+	if (player.SpeedText != SpeedText_InfoPanel || targetPlayer.Paused)
 	{
 		speedString = "";
 	}
 	else
 	{
-		if (targetPlayer.onGround || targetPlayer.onLadder || targetPlayer.noclipping)
+		if (targetPlayer.OnGround || targetPlayer.OnLadder || targetPlayer.Noclipping)
 		{
 			FormatEx(speedString, sizeof(speedString), 
 				"%T: <font color='#ffffff'>%.0f</font> u/s\n", 
-				"Info Panel Text - Speed", player.id, 
-				RoundFloat(targetPlayer.speed * 10) / 10.0);
+				"Info Panel Text - Speed", player.ID, 
+				RoundFloat(targetPlayer.Speed * 10) / 10.0);
 		}
 		else
 		{
 			FormatEx(speedString, sizeof(speedString), 
 				"%T: <font color='#ffffff'>%.0f</font> %s\n", 
-				"Info Panel Text - Speed", player.id, 
-				RoundFloat(targetPlayer.speed * 10) / 10.0, 
+				"Info Panel Text - Speed", player.ID, 
+				RoundFloat(targetPlayer.Speed * 10) / 10.0, 
 				GetTakeoffString(targetPlayer));
 		}
 	}
@@ -162,17 +162,17 @@ static char[] GetSpeedString(KZPlayer player, KZPlayer targetPlayer)
 static char[] GetTakeoffString(KZPlayer targetPlayer)
 {
 	char takeoffString[64];
-	if (targetPlayer.gokzHitPerf)
+	if (targetPlayer.GOKZHitPerf)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#40ff40'>%.0f</font>)", 
-			RoundFloat(targetPlayer.gokzTakeoffSpeed * 10) / 10.0);
+			RoundFloat(targetPlayer.GOKZTakeoffSpeed * 10) / 10.0);
 	}
 	else
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#ffffff'>%.0f</font>)", 
-			RoundFloat(targetPlayer.gokzTakeoffSpeed * 10) / 10.0);
+			RoundFloat(targetPlayer.GOKZTakeoffSpeed * 10) / 10.0);
 	}
 	return takeoffString;
 }
@@ -180,20 +180,20 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 static char[] GetKeysString(KZPlayer player, KZPlayer targetPlayer)
 {
 	char keysString[64];
-	if (player.showKeys == ShowKeys_Disabled)
+	if (player.ShowKeys == ShowKeys_Disabled)
 	{
 		keysString = "";
 	}
-	else if (player.showKeys == ShowKeys_Spectating && player.alive)
+	else if (player.ShowKeys == ShowKeys_Spectating && player.Alive)
 	{
 		keysString = "";
 	}
 	else
 	{
-		int buttons = targetPlayer.buttons;
+		int buttons = targetPlayer.Buttons;
 		FormatEx(keysString, sizeof(keysString), 
 			"%T: <font color='#ffffff'>%c %c %c %c %c %c</font>\n", 
-			"Info Panel Text - Keys", player.id, 
+			"Info Panel Text - Keys", player.ID, 
 			buttons & IN_MOVELEFT ? 'A' : '_', 
 			buttons & IN_FORWARD ? 'W' : '_', 
 			buttons & IN_BACK ? 'S' : '_', 

@@ -15,7 +15,7 @@ static float lastTouchLadderTime[MAXPLAYERS + 1];
 
 bool BhopTriggersJustTouched(int client)
 {
-	if (Movement_GetMoveType(client) == MOVETYPE_LADDER)
+	if (Movement_GetMovetype(client) == MOVETYPE_LADDER)
 	{
 		return GetEngineTime() - lastTouchLadderTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME
 		 && GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME;
@@ -59,9 +59,9 @@ void OnStartTouchGround_MapBhopTriggers(int client)
 	lastTouchGroundTime[client] = GetEngineTime();
 }
 
-void OnChangeMoveType_MapBhopTriggers(int client, MoveType newMoveType)
+void OnChangeMovetype_MapBhopTriggers(int client, MoveType newMovetype)
 {
-	if (newMoveType == MOVETYPE_LADDER)
+	if (newMovetype == MOVETYPE_LADDER)
 	{
 		lastTouchLadderTime[client] = GetEngineTime();
 	}

@@ -212,12 +212,12 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	return MRES_Ignored;
 }
 
-public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
+public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
-	OnChangeMoveType_Timer(client, newMoveType);
-	OnChangeMoveType_Pause(client, newMoveType);
-	OnChangeMoveType_ValidJump(client, oldMoveType, newMoveType);
-	OnChangeMoveType_MapBhopTriggers(client, newMoveType);
+	OnChangeMovetype_Timer(client, newMovetype);
+	OnChangeMovetype_Pause(client, newMovetype);
+	OnChangeMovetype_ValidJump(client, oldMovetype, newMovetype);
+	OnChangeMovetype_MapBhopTriggers(client, newMovetype);
 }
 
 public void Movement_OnStartTouchGround(int client)

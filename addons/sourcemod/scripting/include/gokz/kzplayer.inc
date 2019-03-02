@@ -24,45 +24,45 @@ methodmap KZPlayer < MovementAPIPlayer {
 	
 	// =====[ GENERAL ]=====
 	
-	property bool valid {
+	property bool Valid {
 		public get() {
-			return IsValidClient(this.id);
+			return IsValidClient(this.ID);
 		}
 	}
 	
-	property bool inGame {
+	property bool InGame {
 		public get() {
-			return IsClientInGame(this.id);
+			return IsClientInGame(this.ID);
 		}
 	}
 	
-	property bool authorized {
+	property bool Authorized {
 		public get() {
-			return IsClientAuthorized(this.id);
+			return IsClientAuthorized(this.ID);
 		}
 	}
 	
-	property bool fake {
+	property bool Fake {
 		public get() {
-			return IsFakeClient(this.id);
+			return IsFakeClient(this.ID);
 		}
 	}
 	
-	property bool alive {
+	property bool Alive {
 		public get() {
-			return IsPlayerAlive(this.id);
+			return IsPlayerAlive(this.ID);
 		}
 	}
 	
-	property ObsMode observerMode {
+	property ObsMode ObserverMode {
 		public get() {
-			return GetObserverMode(this.id);
+			return GetObserverMode(this.ID);
 		}
 	}
 	
-	property int observerTarget {
+	property int ObserverTarget {
 		public get() {
-			return GetObserverTarget(this.id);
+			return GetObserverTarget(this.ID);
 		}
 	}
 	
@@ -72,102 +72,102 @@ methodmap KZPlayer < MovementAPIPlayer {
 	#if defined _gokz_core_included_
 	
 	public void StartTimer(int course) {
-		GOKZ_StartTimer(this.id, course);
+		GOKZ_StartTimer(this.ID, course);
 	}
 	
 	public void EndTimer(int course) {
-		GOKZ_EndTimer(this.id, course);
+		GOKZ_EndTimer(this.ID, course);
 	}
 	
 	public bool StopTimer() {
-		return GOKZ_StopTimer(this.id);
+		return GOKZ_StopTimer(this.ID);
 	}
 	
 	public void TeleportToStart() {
-		GOKZ_TeleportToStart(this.id);
+		GOKZ_TeleportToStart(this.ID);
 	}
 	
-	property bool hasStartPosition {
+	property bool HasStartPosition {
 		public get() {
-			return GOKZ_GetHasStartPosition(this.id);
+			return GOKZ_GetHasStartPosition(this.ID);
 		}
 	}
 	
 	public void MakeCheckpoint() {
-		GOKZ_MakeCheckpoint(this.id);
+		GOKZ_MakeCheckpoint(this.ID);
 	}
 	
 	public void TeleportToCheckpoint() {
-		GOKZ_TeleportToCheckpoint(this.id);
+		GOKZ_TeleportToCheckpoint(this.ID);
 	}
 	
-	property bool canTeleportToCheckpoint {
+	property bool CanTeleportToCheckpoint {
 		public get() {
-			return GOKZ_GetCanTeleportToCheckpoint(this.id);
+			return GOKZ_GetCanTeleportToCheckpoint(this.ID);
 		}
 	}
 	
 	public void PrevCheckpoint() {
-		GOKZ_PrevCheckpoint(this.id);
+		GOKZ_PrevCheckpoint(this.ID);
 	}
 	
-	property bool canPrevCheckpoint {
+	property bool CanPrevCheckpoint {
 		public get() {
-			return GOKZ_GetCanPrevCheckpoint(this.id);
+			return GOKZ_GetCanPrevCheckpoint(this.ID);
 		}
 	}
 	
 	public void NextCheckpoint() {
-		GOKZ_NextCheckpoint(this.id);
+		GOKZ_NextCheckpoint(this.ID);
 	}
 	
-	property bool canNextCheckpoint {
+	property bool CanNextCheckpoint {
 		public get() {
-			return GOKZ_GetCanNextCheckpoint(this.id);
+			return GOKZ_GetCanNextCheckpoint(this.ID);
 		}
 	}
 	
 	public void UndoTeleport() {
-		GOKZ_UndoTeleport(this.id);
+		GOKZ_UndoTeleport(this.ID);
 	}
 	
-	property bool canUndoTeleport {
+	property bool CanUndoTeleport {
 		public get() {
-			return GOKZ_GetCanUndoTeleport(this.id);
+			return GOKZ_GetCanUndoTeleport(this.ID);
 		}
 	}
 	
 	public void Pause() {
-		GOKZ_Pause(this.id);
+		GOKZ_Pause(this.ID);
 	}
 	
 	public void Resume() {
-		GOKZ_Resume(this.id);
+		GOKZ_Resume(this.ID);
 	}
 	
 	public void TogglePause() {
-		GOKZ_TogglePause(this.id);
+		GOKZ_TogglePause(this.ID);
 	}
 	
 	public void PlayErrorSound() {
-		GOKZ_PlayErrorSound(this.id);
+		GOKZ_PlayErrorSound(this.ID);
 	}
 	
-	property bool timerRunning {
+	property bool TimerRunning {
 		public get() {
-			return GOKZ_GetTimerRunning(this.id);
+			return GOKZ_GetTimerRunning(this.ID);
 		}
 	}
 	
-	property int course {
+	property int Course {
 		public get() {
-			return GOKZ_GetCourse(this.id);
+			return GOKZ_GetCourse(this.ID);
 		}
 	}
 	
-	property bool paused {
+	property bool Paused {
 		public get() {
-			return GOKZ_GetPaused(this.id);
+			return GOKZ_GetPaused(this.ID);
 		}
 		public set(bool pause) {
 			if (pause) {
@@ -179,88 +179,88 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property float time {
+	property float Time {
 		public get() {
-			return GOKZ_GetTime(this.id);
+			return GOKZ_GetTime(this.ID);
 		}
 		public set(float value) {
-			GOKZ_SetTime(this.id, value);
+			GOKZ_SetTime(this.ID, value);
 		}
 	}
 	
-	property int checkpointCount {
+	property int CheckpointCount {
 		public get() {
-			return GOKZ_GetCheckpointCount(this.id);
+			return GOKZ_GetCheckpointCount(this.ID);
 		}
 		public set(int value) {
-			GOKZ_SetCheckpointCount(this.id, value);
+			GOKZ_SetCheckpointCount(this.ID, value);
 		}
 	}
 	
-	property int teleportCount {
+	property int TeleportCount {
 		public get() {
-			return GOKZ_GetTeleportCount(this.id);
+			return GOKZ_GetTeleportCount(this.ID);
 		}
 		public set(int value) {
-			GOKZ_SetTeleportCount(this.id, value);
+			GOKZ_SetTeleportCount(this.ID, value);
 		}
 	}
 	
-	property int timeType {
+	property int TimeType {
 		public get() {
-			return GOKZ_GetTimeType(this.id);
+			return GOKZ_GetTimeType(this.ID);
 		}
 	}
 	
-	property bool gokzHitPerf {
+	property bool GOKZHitPerf {
 		public get() {
-			return GOKZ_GetHitPerf(this.id);
+			return GOKZ_GetHitPerf(this.ID);
 		}
 		public set(bool value) {
-			GOKZ_SetHitPerf(this.id, value);
+			GOKZ_SetHitPerf(this.ID, value);
 		}
 	}
 	
-	property float gokzTakeoffSpeed {
+	property float GOKZTakeoffSpeed {
 		public get() {
-			return GOKZ_GetTakeoffSpeed(this.id);
+			return GOKZ_GetTakeoffSpeed(this.ID);
 		}
 		public set(float value) {
-			GOKZ_SetTakeoffSpeed(this.id, value);
+			GOKZ_SetTakeoffSpeed(this.ID, value);
 		}
 	}
 	
-	property bool validJump {
+	property bool ValidJump {
 		public get() {
-			return GOKZ_GetValidJump(this.id);
+			return GOKZ_GetValidJump(this.ID);
 		}
 	}
 	
 	public any GetOption(const char[] option) {
-		return GOKZ_GetOption(this.id, option);
+		return GOKZ_GetOption(this.ID, option);
 	}
 	
 	public bool SetOption(const char[] option, any value) {
-		return GOKZ_SetOption(this.id, option, value);
+		return GOKZ_SetOption(this.ID, option, value);
 	}
 	
 	public bool CycleOption(const char[] option) {
-		return GOKZ_CycleOption(this.id, option);
+		return GOKZ_CycleOption(this.ID, option);
 	}
 	
 	public any GetCoreOption(Option option) {
-		return GOKZ_GetCoreOption(this.id, option);
+		return GOKZ_GetCoreOption(this.ID, option);
 	}
 	
 	public bool SetCoreOption(Option option, int value) {
-		return GOKZ_SetCoreOption(this.id, option, value);
+		return GOKZ_SetCoreOption(this.ID, option, value);
 	}
 	
 	public bool CycleCoreOption(Option option) {
-		return GOKZ_CycleCoreOption(this.id, option);
+		return GOKZ_CycleCoreOption(this.ID, option);
 	}
 	
-	property int mode {
+	property int Mode {
 		public get() {
 			return this.GetCoreOption(Option_Mode);
 		}
@@ -269,7 +269,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int style {
+	property int Style {
 		public get() {
 			return this.GetCoreOption(Option_Style);
 		}
@@ -278,7 +278,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int autoRestart {
+	property int AutoRestart {
 		public get() {
 			return this.GetCoreOption(Option_AutoRestart);
 		}
@@ -287,7 +287,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int checkpointMessages {
+	property int CheckpointMessages {
 		public get() {
 			return this.GetCoreOption(Option_CheckpointMessages);
 		}
@@ -296,7 +296,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int checkpointSounds {
+	property int CheckpointSounds {
 		public get() {
 			return this.GetCoreOption(Option_CheckpointSounds);
 		}
@@ -305,7 +305,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int teleportSounds {
+	property int TeleportSounds {
 		public get() {
 			return this.GetCoreOption(Option_TeleportSounds);
 		}
@@ -314,7 +314,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int errorSounds {
+	property int ErrorSounds {
 		public get() {
 			return this.GetCoreOption(Option_ErrorSounds);
 		}
@@ -332,18 +332,18 @@ methodmap KZPlayer < MovementAPIPlayer {
 	#if defined _gokz_hud_included_
 	
 	public any GetHUDOption(HUDOption option) {
-		return GOKZ_HUD_GetOption(this.id, option);
+		return GOKZ_HUD_GetOption(this.ID, option);
 	}
 	
 	public bool SetHUDOption(HUDOption option, any value) {
-		return GOKZ_HUD_SetOption(this.id, option, value);
+		return GOKZ_HUD_SetOption(this.ID, option, value);
 	}
 	
 	public bool CycleHUDOption(HUDOption option) {
-		return GOKZ_HUD_CycleOption(this.id, option);
+		return GOKZ_HUD_CycleOption(this.ID, option);
 	}
 	
-	property int tpMenu {
+	property int TPMenu {
 		public get() {
 			return this.GetHUDOption(HUDOption_TPMenu);
 		}
@@ -352,7 +352,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int infoPanel {
+	property int InfoPanel {
 		public get() {
 			return this.GetHUDOption(HUDOption_InfoPanel);
 		}
@@ -361,7 +361,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int showKeys {
+	property int ShowKeys {
 		public get() {
 			return this.GetHUDOption(HUDOption_ShowKeys);
 		}
@@ -370,7 +370,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int timerText {
+	property int TimerText {
 		public get() {
 			return this.GetHUDOption(HUDOption_TimerText);
 		}
@@ -379,7 +379,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int speedText {
+	property int SpeedText {
 		public get() {
 			return this.GetHUDOption(HUDOption_SpeedText);
 		}
@@ -388,7 +388,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int showWeapon {
+	property int ShowWeapon {
 		public get() {
 			return this.GetHUDOption(HUDOption_ShowWeapon);
 		}
@@ -405,7 +405,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 	// =====[ PISTOL ]=====
 	#if defined _gokz_pistol_included_
 	
-	property int pistol {
+	property int Pistol {
 		public get() {
 			return this.GetOption(PISTOL_OPTION_NAME);
 		}
@@ -423,18 +423,18 @@ methodmap KZPlayer < MovementAPIPlayer {
 	#if defined _gokz_jumpbeam_included_
 	
 	public any GetJBOption(JBOption option) {
-		return GOKZ_JB_GetOption(this.id, option);
+		return GOKZ_JB_GetOption(this.ID, option);
 	}
 	
 	public bool SetJBOption(JBOption option, any value) {
-		return GOKZ_JB_SetOption(this.id, option, value);
+		return GOKZ_JB_SetOption(this.ID, option, value);
 	}
 	
 	public bool CycleJBOption(JBOption option) {
-		return GOKZ_JB_CycleOption(this.id, option);
+		return GOKZ_JB_CycleOption(this.ID, option);
 	}
 	
-	property int jbType {
+	property int JBType {
 		public get() {
 			return this.GetJBOption(JBOption_Type);
 		}
@@ -451,7 +451,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 	// =====[ TIPS ]=====
 	#if defined _gokz_tips_included_
 	
-	property int tips {
+	property int Tips {
 		public get() {
 			return this.GetOption(TIPS_OPTION_NAME);
 		}
@@ -468,7 +468,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 	// =====[ QUIET ]=====
 	#if defined _gokz_quiet_included_
 	
-	property int showPlayers {
+	property int ShowPlayers {
 		public get() {
 			return this.GetOption(gC_QTOptionNames[QTOption_ShowPlayers]);
 		}
@@ -485,7 +485,7 @@ methodmap KZPlayer < MovementAPIPlayer {
 	// =====[ SLAY ON END ]=====
 	#if defined _gokz_slayonend_included_
 	
-	property int slayOnEnd {
+	property int SlayOnEnd {
 		public get() {
 			return this.GetOption(SLAYONEND_OPTION_NAME);
 		}

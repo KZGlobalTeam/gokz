@@ -172,11 +172,11 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			if (repFlags & FL_ONGROUND && Movement_GetSpeed(client) < SPEED_NORMAL * 2)
 			{
 				SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
-				Movement_SetMoveType(client, MOVETYPE_WALK);
+				Movement_SetMovetype(client, MOVETYPE_WALK);
 			}
 			else
 			{
-				Movement_SetMoveType(client, MOVETYPE_NOCLIP);
+				Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 			}
 			
 			playbackTick[bot]++;

@@ -36,18 +36,13 @@
 // =====[ FORWARDS ]=====
 
 /**
- * Called when a player starts ducking.
+ * Called when a player's movetype changes.
  *
  * @param client		Client index.
+ * @param oldMovetype	Player's old movetype.
+ * @param newMovetype	Player's new movetype.
  */
-forward void Movement_OnStartDucking(int client);
-
-/**
- * Called when a player stops ducking.
- *
- * @param client		Client index.
- */
-forward void Movement_OnStopDucking(int client);
+forward void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype);
 
 /**
  * Called when a player touches the ground.
@@ -65,23 +60,28 @@ forward void Movement_OnStartTouchGround(int client);
 forward void Movement_OnStopTouchGround(int client, bool jumped);
 
 /**
- * Called when the player's move type changes.
+ * Called when a player starts ducking.
  *
  * @param client		Client index.
- * @param oldMoveType	Player's old move type.
- * @param newMoveType	Player's new move type.
  */
-forward void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType);
+forward void Movement_OnStartDucking(int client);
 
 /**
- * Called when the player jumps (player_jump event), including 'jumpbugs'.
+ * Called when a player stops ducking.
+ *
+ * @param client		Client index.
+ */
+forward void Movement_OnStopDucking(int client);
+
+/**
+ * Called when a player jumps (player_jump event), including 'jumpbugs'.
  * Setting velocity when this is called may not be effective.
  *
  * If the player 'jumpbugs', then they will not call Movement_OnStopTouchGround
  * because their FL_ONGROUND flag was not detected as true prior to the jump.
  *
  * @param client		Client index.
- * @param jumpbug		Whether the player 'jumpbugged'.
+ * @param jumpbug		Whether player 'jumpbugged'.
  */
 forward void Movement_OnPlayerJump(int client, bool jumpbug);
 
@@ -90,7 +90,7 @@ forward void Movement_OnPlayerJump(int client, bool jumpbug);
 // =====[ NATIVES ]=====
 
 /**
- * Gets whether player's last takeoff was a jump.
+ * Gets whether a player's last takeoff was a jump.
  *
  * @param client		Client index.
  * @return				Whether player's last takeoff was a jump.
@@ -98,7 +98,7 @@ forward void Movement_OnPlayerJump(int client, bool jumpbug);
 native bool Movement_GetJumped(int client);
 
 /**
- * Gets whether player's last takeoff was a perfect bunnyhop.
+ * Gets whether a player's last takeoff was a perfect bunnyhop.
  *
  * @param client		Client index.
  * @return				Whether player's last takeoff was a perfect bunnyhop.
@@ -106,7 +106,7 @@ native bool Movement_GetJumped(int client);
 native bool Movement_GetHitPerf(int client);
 
 /**
- * Gets the player's origin at the time of their last takeoff.
+ * Gets a player's origin at the time of their last takeoff.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -114,7 +114,7 @@ native bool Movement_GetHitPerf(int client);
 native void Movement_GetTakeoffOrigin(int client, float result[3]);
 
 /**
- * Gets the player's velocity at the time of their last takeoff.
+ * Gets a player's velocity at the time of their last takeoff.
  *
  * If sv_enablebunnyhopping is 0, CS:GO may adjust the player's 
  * velocity after the takeoff velocity has already been measured.
@@ -125,7 +125,7 @@ native void Movement_GetTakeoffOrigin(int client, float result[3]);
 native void Movement_GetTakeoffVelocity(int client, float result[3]);
 
 /**
- * Gets the player's horizontal speed at the time of their last takeoff.
+ * Gets a player's horizontal speed at the time of their last takeoff.
  *
  * If sv_enablebunnyhopping is 0, CS:GO may adjust the player's 
  * velocity after the takeoff velocity has already been measured.
@@ -136,7 +136,7 @@ native void Movement_GetTakeoffVelocity(int client, float result[3]);
 native float Movement_GetTakeoffSpeed(int client);
 
 /**
- * Gets player's 'tickcount' at the time of their last takeoff.
+ * Gets a player's 'tickcount' at the time of their last takeoff.
  *
  * @param client		Client index.
  * @return				Player's last takeoff 'tickcount'.
@@ -144,7 +144,7 @@ native float Movement_GetTakeoffSpeed(int client);
 native int Movement_GetTakeoffTick(int client);
 
 /**
- * Gets player's 'cmdnum' at the time of their last takeoff.
+ * Gets a player's 'cmdnum' at the time of their last takeoff.
  *
  * @param client		Client index.
  * @return				Player's last takeoff 'cmdnum'.
@@ -152,7 +152,7 @@ native int Movement_GetTakeoffTick(int client);
 native int Movement_GetTakeoffCmdNum(int client);
 
 /**
- * Gets the player's origin at the time of their last landing.
+ * Gets a player's origin at the time of their last landing.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -160,7 +160,7 @@ native int Movement_GetTakeoffCmdNum(int client);
 native void Movement_GetLandingOrigin(int client, float result[3]);
 
 /**
- * Gets the player's velocity at the time of their last landing.
+ * Gets a player's velocity at the time of their last landing.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -168,7 +168,7 @@ native void Movement_GetLandingOrigin(int client, float result[3]);
 native void Movement_GetLandingVelocity(int client, float result[3]);
 
 /**
- * Gets the player's horizontal speed at the time of their last landing.
+ * Gets a player's horizontal speed at the time of their last landing.
  *
  * @param client		Client index.
  * @return				Last landing speed of the player (horizontal).
@@ -176,7 +176,7 @@ native void Movement_GetLandingVelocity(int client, float result[3]);
 native float Movement_GetLandingSpeed(int client);
 
 /**
- * Gets player's 'tickcount' at the time of their last landing.
+ * Gets a player's 'tickcount' at the time of their last landing.
  *
  * @param client		Client index.
  * @return				Player's last landing 'tickcount'.
@@ -184,7 +184,7 @@ native float Movement_GetLandingSpeed(int client);
 native int Movement_GetLandingTick(int client);
 
 /**
- * Gets player's 'cmdnum' at the time of their last landing.
+ * Gets a player's 'cmdnum' at the time of their last landing.
  *
  * @param client		Client index.
  * @return				Player's last landing 'cmdnum'.
@@ -192,7 +192,7 @@ native int Movement_GetLandingTick(int client);
 native int Movement_GetLandingCmdNum(int client);
 
 /**
- * Gets whether player is turning their aim horizontally.
+ * Gets whether a player is turning their aim horizontally.
  *
  * @param client		Client index.
  * @return				Whether player is turning their aim horizontally.
@@ -200,7 +200,7 @@ native int Movement_GetLandingCmdNum(int client);
 native bool Movement_GetTurning(int client);
 
 /**
- * Gets whether player is turning their aim left.
+ * Gets whether a player is turning their aim left.
  *
  * @param client		Client index.
  * @return				Whether player is turning their aim left.
@@ -208,7 +208,7 @@ native bool Movement_GetTurning(int client);
 native bool Movement_GetTurningLeft(int client);
 
 /**
- * Gets whether player is turning their aim right.
+ * Gets whether a player is turning their aim right.
  *
  * @param client		Client index.
  * @return				Whether player is turning their aim right.
@@ -234,91 +234,91 @@ methodmap MovementAPIPlayer < MovementPlayer {
 		return view_as<MovementAPIPlayer>(MovementPlayer(client));
 	}
 	
-	property bool jumped {
+	property bool Jumped {
 		public get() {
-			return Movement_GetJumped(this.id);
+			return Movement_GetJumped(this.ID);
 		}
 	}
 	
-	property bool hitPerf {
+	property bool HitPerf {
 		public get() {
-			return Movement_GetHitPerf(this.id);
+			return Movement_GetHitPerf(this.ID);
 		}
 	}
 	
 	public void GetTakeoffOrigin(float buffer[3]) {
-		Movement_GetTakeoffOrigin(this.id, buffer);
+		Movement_GetTakeoffOrigin(this.ID, buffer);
 	}
 	
 	public void GetTakeoffVelocity(float buffer[3]) {
-		Movement_GetTakeoffVelocity(this.id, buffer);
+		Movement_GetTakeoffVelocity(this.ID, buffer);
 	}
 	
-	property float takeoffSpeed {
+	property float TakeoffSpeed {
 		public get() {
-			return Movement_GetTakeoffSpeed(this.id);
+			return Movement_GetTakeoffSpeed(this.ID);
 		}
 	}
 	
-	property int takeoffTick {
+	property int TakeoffTick {
 		public get() {
-			return Movement_GetTakeoffTick(this.id);
+			return Movement_GetTakeoffTick(this.ID);
 		}
 	}
 	
-	property int takeoffCmdNum {
+	property int TakeoffCmdNum {
 		public get() {
-			return Movement_GetTakeoffCmdNum(this.id);
+			return Movement_GetTakeoffCmdNum(this.ID);
 		}
 	}
 	
 	public void GetLandingOrigin(float buffer[3]) {
-		Movement_GetLandingOrigin(this.id, buffer);
+		Movement_GetLandingOrigin(this.ID, buffer);
 	}
 	
 	public void GetLandingVelocity(float buffer[3]) {
-		Movement_GetLandingVelocity(this.id, buffer);
+		Movement_GetLandingVelocity(this.ID, buffer);
 	}
 	
-	property float landingSpeed {
+	property float LandingSpeed {
 		public get() {
-			return Movement_GetLandingSpeed(this.id);
+			return Movement_GetLandingSpeed(this.ID);
 		}
 	}
 	
-	property int landingTick {
+	property int LandingTick {
 		public get() {
-			return Movement_GetLandingTick(this.id);
+			return Movement_GetLandingTick(this.ID);
 		}
 	}
 	
-	property int landingCmdNum {
+	property int LandingCmdNum {
 		public get() {
-			return Movement_GetLandingCmdNum(this.id);
+			return Movement_GetLandingCmdNum(this.ID);
 		}
 	}
 	
-	property bool turning {
+	property bool Turning {
 		public get() {
-			return Movement_GetTurning(this.id);
+			return Movement_GetTurning(this.ID);
 		}
 	}
 	
-	property bool turningLeft {
+	property bool TurningLeft {
 		public get() {
-			return Movement_GetTurningLeft(this.id);
+			return Movement_GetTurningLeft(this.ID);
 		}
 	}
 	
-	property bool turningRight {
+	property bool TurningRight {
 		public get() {
-			return Movement_GetTurningRight(this.id);
+			return Movement_GetTurningRight(this.ID);
 		}
 	}
 	
-	property float maxSpeed {
+	property float MaxSpeed {
 		public get() {
-			return Movement_GetMaxSpeed(this.id);
+			return Movement_GetMaxSpeed(this.ID);
 		}
 	}
 }

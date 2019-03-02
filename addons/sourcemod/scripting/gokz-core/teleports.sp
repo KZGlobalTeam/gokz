@@ -72,7 +72,7 @@ void MakeCheckpoint(int client)
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
-	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
+	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
 		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
@@ -97,7 +97,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (!Movement_GetOnGround(client) && Movement_GetMoveType(client) != MOVETYPE_LADDER)
+	if (!Movement_GetOnGround(client) && Movement_GetMovetype(client) != MOVETYPE_LADDER)
 	{
 		if (showError)
 		{
@@ -523,7 +523,7 @@ static void CheckpointTeleportDo(int client)
 	{
 		if (!GOKZ_GetPaused(client))
 		{
-			Movement_SetMoveType(client, MOVETYPE_LADDER);
+			Movement_SetMovetype(client, MOVETYPE_LADDER);
 		}
 		else
 		{

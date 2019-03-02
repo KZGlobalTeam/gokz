@@ -156,12 +156,12 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore)
 	{
-		player.gokzHitPerf = Movement_GetHitPerf(client);
-		player.gokzTakeoffSpeed = player.takeoffSpeed;
+		player.GOKZHitPerf = Movement_GetHitPerf(client);
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
 }
 
-public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType newMoveType)
+public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
 	if (!IsUsingMode(client))
 	{
@@ -169,10 +169,10 @@ public void Movement_OnChangeMoveType(int client, MoveType oldMoveType, MoveType
 	}
 	
 	KZPlayer player = KZPlayer(client);
-	if (gB_GOKZCore && newMoveType == MOVETYPE_WALK)
+	if (gB_GOKZCore && newMovetype == MOVETYPE_WALK)
 	{
-		player.gokzHitPerf = false;
-		player.gokzTakeoffSpeed = player.takeoffSpeed;
+		player.GOKZHitPerf = false;
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
 }
 
@@ -186,8 +186,8 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	KZPlayer player = KZPlayer(client);
 	if (jumpbug)
 	{
-		player.gokzHitPerf = true;
-		player.gokzTakeoffSpeed = player.speed;
+		player.GOKZHitPerf = true;
+		player.GOKZTakeoffSpeed = player.Speed;
 	}
 }
 

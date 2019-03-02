@@ -67,7 +67,7 @@ stock int Movement_GetButtons(int client)
 }
 
 /**
- * Gets the player's origin.
+ * Gets a player's origin.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -78,7 +78,7 @@ stock void Movement_GetOrigin(int client, float result[3])
 }
 
 /**
- * Gets the player's origin.
+ * Gets a player's origin.
  * If the player is on the ground, a trace hull is used to find the
  * exact height of the ground the player is standing on. This is thus
  * more accurate than Movement_GetOrigin when player is on ground.
@@ -126,7 +126,7 @@ public bool TraceEntityFilterPlayers(int entity, int contentsMask)
 }
 
 /**
- * Sets the player's origin by teleporting them.
+ * Sets a player's origin by teleporting them.
  *
  * @param client		Client index.
  * @param origin		New origin.
@@ -137,7 +137,7 @@ stock void Movement_SetOrigin(int client, const float origin[3])
 }
 
 /**
- * Gets the player's velocity.
+ * Gets a player's velocity.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -148,7 +148,7 @@ stock void Movement_GetVelocity(int client, float result[3])
 }
 
 /**
- * Sets the player's velocity by teleporting them.
+ * Sets a player's velocity by teleporting them.
  *
  * @param client		Client index.
  * @param velocity		New velocity.
@@ -159,7 +159,7 @@ stock void Movement_SetVelocity(int client, const float velocity[3])
 }
 
 /**
- * Gets the player's horizontal speed.
+ * Gets a player's horizontal speed.
  *
  * @param client		Client index.
  * @return				Player's horizontal speed.
@@ -172,7 +172,7 @@ stock float Movement_GetSpeed(int client)
 }
 
 /**
- * Sets the player's horizontal speed.
+ * Sets a player's horizontal speed.
  *
  * @param client		Client index.
  * @param value			New horizontal speed.
@@ -193,7 +193,7 @@ stock void Movement_SetSpeed(int client, float value, bool applyBaseVel = false)
 }
 
 /**
- * Gets the player's vertical velocity.
+ * Gets a player's vertical velocity.
  *
  * @param client		Client index.
  * @return				Player's vertical velocity.
@@ -206,7 +206,7 @@ stock float Movement_GetVerticalVelocity(int client)
 }
 
 /**
- * Sets the player's vertical velocity.
+ * Sets a player's vertical velocity.
  *
  * @param client		Client index.
  * @param value			New vertical velocity.
@@ -220,7 +220,7 @@ stock void Movement_SetVerticalVelocity(int client, float value)
 }
 
 /**
- * Gets the player's base velocity.
+ * Gets a player's base velocity.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -231,7 +231,7 @@ stock void Movement_GetBaseVelocity(int client, float result[3])
 }
 
 /**
- * Sets the player's base velocity.
+ * Sets a player's base velocity.
  *
  * @param client		Client index.
  * @param baseVelocity	New base velocity.
@@ -242,7 +242,7 @@ stock void Movement_SetBaseVelocity(int client, const float baseVelocity[3])
 }
 
 /**
- * Gets the player's eye angles.
+ * Gets a player's eye angles.
  *
  * @param client		Client index.
  * @param result		Resultant vector.
@@ -253,7 +253,7 @@ stock void Movement_GetEyeAngles(int client, float result[3])
 }
 
 /**
- * Sets the player's eye angles by teleporting them.
+ * Sets a player's eye angles by teleporting them.
  *
  * @param client		Client index.
  * @param eyeAngles		New eye angles.
@@ -264,7 +264,7 @@ stock void Movement_SetEyeAngles(int client, const float eyeAngles[3])
 }
 
 /**
- * Gets whether player is on the ground.
+ * Gets whether a player is on the ground.
  *
  * @param client		Client index.
  * @return				Whether player is on the ground.
@@ -275,7 +275,7 @@ stock bool Movement_GetOnGround(int client)
 }
 
 /**
- * Gets whether player is ducking or ducked.
+ * Gets whether a player is ducking or ducked.
  *
  * @param client		Client index.
  * @return				Whether player is ducking or ducked.
@@ -286,7 +286,7 @@ stock bool Movement_GetDucking(int client)
 }
 
 /**
- * Gets the player's "m_flDuckSpeed" value.
+ * Gets a player's "m_flDuckSpeed" value.
  *
  * @param client			Client index.
  * @return					Value of "m_flDuckSpeed".
@@ -297,7 +297,7 @@ stock float Movement_GetDuckSpeed(int client)
 }
 
 /**
- * Sets the player's "m_flDuckSpeed" value.
+ * Sets a player's "m_flDuckSpeed" value.
  *
  * @param client			Client index.
  * @param value				New "m_flDuckSpeed" value.
@@ -308,7 +308,7 @@ stock void Movement_SetDuckSpeed(int client, float value)
 }
 
 /**
- * Gets the player's "m_flVelocityModifier" value.
+ * Gets a player's "m_flVelocityModifier" value.
  *
  * @param client		Client index.
  * @return				Value of "m_flVelocityModifier".
@@ -319,7 +319,7 @@ stock float Movement_GetVelocityModifier(int client)
 }
 
 /**
- * Sets the player's "m_flVelocityModifier" value.
+ * Sets a player's "m_flVelocityModifier" value.
  *
  * @param client		Client index.
  * @param value			New "m_flVelocityModifier" value.
@@ -330,7 +330,7 @@ stock void Movement_SetVelocityModifier(int client, float value)
 }
 
 /**
- * Gets the player's gravity scale factor.
+ * Gets a player's gravity scale factor.
  *
  * @param client			Client index.
  * @return					Gravity scale factor.
@@ -341,7 +341,7 @@ stock float Movement_GetGravity(int client)
 }
 
 /**
- * Sets the player's gravity scale factor.
+ * Sets a player's gravity scale factor.
  *
  * @param client			Client index.
  * @param value				Desired gravity scale factor.
@@ -352,29 +352,29 @@ stock void Movement_SetGravity(int client, float value)
 }
 
 /**
- * Gets the player's move type.
+ * Gets a player's movetype.
  *
  * @param client		Client index.
- * @return				Player's move type.
+ * @return				Player's movetype.
  */
-stock MoveType Movement_GetMoveType(int client)
+stock MoveType Movement_GetMovetype(int client)
 {
 	return GetEntityMoveType(client);
 }
 
 /**
- * Sets the player's move type.
+ * Sets a player's movetype.
  *
  * @param client		Client index.
- * @param moveType 		New move type.
+ * @param movetype 		New movetype.
  */
-stock void Movement_SetMoveType(int client, MoveType moveType)
+stock void Movement_SetMovetype(int client, MoveType movetype)
 {
-	SetEntityMoveType(client, moveType);
+	SetEntityMoveType(client, movetype);
 }
 
 /**
- * Gets whether player is on a ladder.
+ * Gets whether a player is on a ladder.
  *
  * @param client		Client index.
  * @return				Whether player is on a ladder.
@@ -385,7 +385,7 @@ stock bool Movement_GetOnLadder(int client)
 }
 
 /**
- * Gets whether player is noclipping.
+ * Gets whether a player is noclipping.
  *
  * @param client		Client index.
  * @return				Whether player is noclipping.
@@ -405,125 +405,125 @@ methodmap MovementPlayer {
 		return view_as<MovementPlayer>(client);
 	}
 	
-	property int id {
+	property int ID {
 		public get() {
 			return view_as<int>(this);
 		}
 	}
 	
-	property int buttons {
+	property int Buttons {
 		public get() {
-			return Movement_GetButtons(this.id);
+			return Movement_GetButtons(this.ID);
 		}
 	}
 	
 	public void GetOrigin(float result[3]) {
-		Movement_GetOrigin(this.id, result);
+		Movement_GetOrigin(this.ID, result);
 	}
 	
 	public void SetOrigin(const float origin[3]) {
-		Movement_SetOrigin(this.id, origin);
+		Movement_SetOrigin(this.ID, origin);
 	}
 	
 	public void GetVelocity(float result[3]) {
-		Movement_GetVelocity(this.id, result);
+		Movement_GetVelocity(this.ID, result);
 	}
 	
 	public void SetVelocity(const float velocity[3]) {
-		Movement_SetVelocity(this.id, velocity);
+		Movement_SetVelocity(this.ID, velocity);
 	}
 	
-	property float speed {
+	property float Speed {
 		public get() {
-			return Movement_GetSpeed(this.id);
+			return Movement_GetSpeed(this.ID);
 		}
 		public set(float value) {
-			Movement_SetSpeed(this.id, value);
+			Movement_SetSpeed(this.ID, value);
 		}
 	}
 	
-	property float verticalVelocity {
+	property float VerticalVelocity {
 		public get() {
-			return Movement_GetVerticalVelocity(this.id);
+			return Movement_GetVerticalVelocity(this.ID);
 		}
 		public set(float value) {
-			Movement_SetVerticalVelocity(this.id, value);
+			Movement_SetVerticalVelocity(this.ID, value);
 		}
 	}
 	
 	public void GetBaseVelocity(float result[3]) {
-		Movement_GetBaseVelocity(this.id, result);
+		Movement_GetBaseVelocity(this.ID, result);
 	}
 	
 	public void SetBaseVelocity(const float baseVelocity[3]) {
-		Movement_SetBaseVelocity(this.id, baseVelocity);
+		Movement_SetBaseVelocity(this.ID, baseVelocity);
 	}
 	
 	public void GetEyeAngles(float result[3]) {
-		Movement_GetEyeAngles(this.id, result);
+		Movement_GetEyeAngles(this.ID, result);
 	}
 	
 	public void SetEyeAngles(const float eyeAngles[3]) {
-		Movement_SetEyeAngles(this.id, eyeAngles);
+		Movement_SetEyeAngles(this.ID, eyeAngles);
 	}
 	
-	property bool onGround {
+	property bool OnGround {
 		public get() {
-			return Movement_GetOnGround(this.id);
+			return Movement_GetOnGround(this.ID);
 		}
 	}
 	
-	property bool ducking {
+	property bool Ducking {
 		public get() {
-			return Movement_GetDucking(this.id);
+			return Movement_GetDucking(this.ID);
 		}
 	}
 	
-	property float duckSpeed {
+	property float DuckSpeed {
 		public get() {
-			return Movement_GetDuckSpeed(this.id);
+			return Movement_GetDuckSpeed(this.ID);
 		}
 		public set(float value) {
-			Movement_SetDuckSpeed(this.id, value);
+			Movement_SetDuckSpeed(this.ID, value);
 		}
 	}
 	
-	property float velocityModifier {
+	property float VelocityModifier {
 		public get() {
-			return Movement_GetVelocityModifier(this.id);
+			return Movement_GetVelocityModifier(this.ID);
 		}
 		public set(float value) {
-			Movement_SetVelocityModifier(this.id, value);
+			Movement_SetVelocityModifier(this.ID, value);
 		}
 	}
 	
-	property float gravity {
+	property float Gravity {
 		public get() {
-			return Movement_GetGravity(this.id);
+			return Movement_GetGravity(this.ID);
 		}
 		public set(float value) {
-			Movement_SetGravity(this.id, value);
+			Movement_SetGravity(this.ID, value);
 		}
 	}
 	
-	property MoveType moveType {
+	property MoveType Movetype {
 		public get() {
-			return Movement_GetMoveType(this.id);
+			return Movement_GetMovetype(this.ID);
 		}
-		public set(MoveType moveType) {
-			Movement_SetMoveType(this.id, moveType);
-		}
-	}
-	
-	property bool onLadder {
-		public get() {
-			return Movement_GetOnLadder(this.id);
+		public set(MoveType movetype) {
+			Movement_SetMovetype(this.ID, movetype);
 		}
 	}
 	
-	property bool noclipping {
+	property bool OnLadder {
 		public get() {
-			return Movement_GetNoclipping(this.id);
+			return Movement_GetOnLadder(this.ID);
+		}
+	}
+	
+	property bool Noclipping {
+		public get() {
+			return Movement_GetNoclipping(this.ID);
 		}
 	}
 } 

@@ -9,7 +9,7 @@
 void SendTime(int client, int course, float time, int teleportsUsed)
 {
 	KZPlayer player = KZPlayer(client);
-	int mode = player.mode;
+	int mode = player.Mode;
 	
 	if (GlobalsEnabled(mode))
 	{

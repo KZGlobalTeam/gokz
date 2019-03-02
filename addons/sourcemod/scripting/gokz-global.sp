@@ -128,7 +128,7 @@ public void GlobalAPI_OnPlayer_Joined(int client, bool banned)
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	KZPlayer player = KZPlayer(client);
-	int mode = player.mode;
+	int mode = player.Mode;
 	gB_InValidRun[client] = GlobalsEnabled(mode);
 }
 

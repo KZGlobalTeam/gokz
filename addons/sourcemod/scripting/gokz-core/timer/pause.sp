@@ -51,9 +51,9 @@ void Pause(int client)
 	
 	// Pause
 	paused[client] = true;
-	pausedOnLadder[client] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
+	pausedOnLadder[client] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
 	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetMoveType(client, MOVETYPE_NONE);
+	Movement_SetMovetype(client, MOVETYPE_NONE);
 	if (GetTimerRunning(client))
 	{
 		hasPausedInThisRun[client] = true;
@@ -89,11 +89,11 @@ void Resume(int client)
 	// Resume
 	if (pausedOnLadder[client])
 	{
-		Movement_SetMoveType(client, MOVETYPE_LADDER);
+		Movement_SetMovetype(client, MOVETYPE_LADDER);
 	}
 	else
 	{
-		Movement_SetMoveType(client, MOVETYPE_WALK);
+		Movement_SetMovetype(client, MOVETYPE_WALK);
 	}
 	paused[client] = false;
 	if (GetTimerRunning(client))
@@ -134,10 +134,10 @@ void OnTimerStart_Pause(int client)
 	GOKZ_Resume(client);
 }
 
-void OnChangeMoveType_Pause(int client, MoveType newMoveType)
+void OnChangeMovetype_Pause(int client, MoveType newMovetype)
 {
 	// Check if player has escaped MOVETYPE_NONE
-	if (!paused[client] || newMoveType == MOVETYPE_NONE)
+	if (!paused[client] || newMovetype == MOVETYPE_NONE)
 	{
 		return;
 	}

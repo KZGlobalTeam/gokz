@@ -43,20 +43,20 @@ static void UpdateSpeedText(int client)
 {
 	KZPlayer player = KZPlayer(client);
 	
-	if (player.fake
-		 || player.speedText != SpeedText_Bottom)
+	if (player.Fake
+		 || player.SpeedText != SpeedText_Bottom)
 	{
 		return;
 	}
 	
-	if (player.alive)
+	if (player.Alive)
 	{
 		ShowSpeedText(player, player);
 	}
 	else
 	{
-		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
-		if (targetPlayer.id != -1 && !targetPlayer.fake)
+		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
+		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
 		{
 			ShowSpeedText(player, targetPlayer);
 		}
@@ -70,13 +70,13 @@ static void ClearSpeedText(int client)
 
 static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 {
-	if (targetPlayer.paused)
+	if (targetPlayer.Paused)
 	{
 		return;
 	}
 	
 	int colour[4]; // RGBA
-	if (targetPlayer.gokzHitPerf && !targetPlayer.onGround && !targetPlayer.onLadder && !targetPlayer.noclipping)
+	if (targetPlayer.GOKZHitPerf && !targetPlayer.OnGround && !targetPlayer.OnLadder && !targetPlayer.Noclipping)
 	{
 		colour =  { 64, 255, 64, 0 };
 	}
@@ -85,12 +85,12 @@ static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 		colour =  { 255, 255, 255, 0 };
 	}
 	
-	switch (player.speedText)
+	switch (player.SpeedText)
 	{
 		case SpeedText_Bottom:
 		{
 			// Set params based on the available screen space at max scaling HUD
-			if (!IsDrawingInfoPanel(player.id))
+			if (!IsDrawingInfoPanel(player.ID))
 			{
 				SetHudTextParams(-1.0, 0.75, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
@@ -101,17 +101,17 @@ static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 		}
 	}
 	
-	if (targetPlayer.onGround || targetPlayer.onLadder || targetPlayer.noclipping)
+	if (targetPlayer.OnGround || targetPlayer.OnLadder || targetPlayer.Noclipping)
 	{
-		ShowSyncHudText(player.id, speedHudSynchronizer, 
+		ShowSyncHudText(player.ID, speedHudSynchronizer, 
 			"%.0f", 
-			RoundFloat(targetPlayer.speed * 10) / 10.0);
+			RoundFloat(targetPlayer.Speed * 10) / 10.0);
 	}
 	else
 	{
-		ShowSyncHudText(player.id, speedHudSynchronizer, 
+		ShowSyncHudText(player.ID, speedHudSynchronizer, 
 			"%.0f\n(%.0f)", 
-			RoundFloat(targetPlayer.speed * 10) / 10.0, 
-			RoundFloat(targetPlayer.gokzTakeoffSpeed * 10) / 10.0);
+			RoundFloat(targetPlayer.Speed * 10) / 10.0, 
+			RoundFloat(targetPlayer.GOKZTakeoffSpeed * 10) / 10.0);
 	}
 } 

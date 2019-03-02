@@ -181,9 +181,9 @@ void OnPlayerRunCmdPost_Timer(int client)
 	}
 }
 
-void OnChangeMoveType_Timer(int client, MoveType newMoveType)
+void OnChangeMovetype_Timer(int client, MoveType newMovetype)
 {
-	if (!IsValidMoveType(newMoveType))
+	if (!IsValidMovetype(newMovetype))
 	{
 		if (TimerStop(client))
 		{
@@ -237,12 +237,12 @@ void OnRoundStart_Timer()
 
 static bool IsPlayerValidMoveType(int client)
 {
-	return IsValidMoveType(Movement_GetMoveType(client));
+	return IsValidMovetype(Movement_GetMovetype(client));
 }
 
-static bool IsValidMoveType(MoveType moveType)
+static bool IsValidMovetype(MoveType movetype)
 {
-	return moveType == MOVETYPE_WALK || moveType == MOVETYPE_LADDER || moveType == MOVETYPE_NONE;
+	return movetype == MOVETYPE_WALK || movetype == MOVETYPE_LADDER || movetype == MOVETYPE_NONE;
 }
 
 static bool JustStartedTimer(int client)

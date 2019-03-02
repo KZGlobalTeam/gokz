@@ -42,13 +42,13 @@ void ToggleNoclip(int client)
 		return;
 	}
 	
-	if (Movement_GetMoveType(client) != MOVETYPE_NOCLIP)
+	if (Movement_GetMovetype(client) != MOVETYPE_NOCLIP)
 	{
-		Movement_SetMoveType(client, MOVETYPE_NOCLIP);
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 	}
 	else
 	{
-		Movement_SetMoveType(client, MOVETYPE_WALK);
+		Movement_SetMovetype(client, MOVETYPE_WALK);
 	}
 }
 
@@ -128,7 +128,7 @@ void JoinTeam(int client, int newTeam)
 	{
 		player.GetOrigin(savedOrigin[client]);
 		player.GetEyeAngles(savedAngles[client]);
-		savedOnLadder[client] = player.moveType == MOVETYPE_LADDER;
+		savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
 		Call_GOKZ_OnJoinTeam(client, newTeam);
@@ -145,7 +145,7 @@ void JoinTeam(int client, int newTeam)
 			player.SetEyeAngles(savedAngles[client]);
 			if (savedOnLadder[client])
 			{
-				player.moveType = MOVETYPE_LADDER;
+				player.Movetype = MOVETYPE_LADDER;
 			}
 			hasSavedPosition[client] = false;
 		}
@@ -204,7 +204,7 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 
 static bool IsValidStopTouchGround(int client)
 {
-	if (Movement_GetMoveType(client) != MOVETYPE_WALK)
+	if (Movement_GetMovetype(client) != MOVETYPE_WALK)
 	{
 		return false;
 	}
@@ -228,9 +228,9 @@ static bool DidInvalidVelocityTeleport(int client, int cmdnum)
 	 || cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
 }
 
-void OnChangeMoveType_ValidJump(int client, MoveType oldMoveType, MoveType newMoveType)
+void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMovetype)
 {
-	if (oldMoveType == MOVETYPE_LADDER && newMoveType == MOVETYPE_WALK) // Ladderjump
+	if (oldMovetype == MOVETYPE_LADDER && newMovetype == MOVETYPE_WALK) // Ladderjump
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, false, true);

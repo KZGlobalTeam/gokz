@@ -18,8 +18,8 @@ char[] FormatTimerTextForMenu(KZPlayer targetPlayer)
 	char timerTextString[32];
 	FormatEx(timerTextString, sizeof(timerTextString), 
 		"%s %s", 
-		gC_TimeTypeNames[targetPlayer.timeType], 
-		GOKZ_FormatTime(targetPlayer.time));
+		gC_TimeTypeNames[targetPlayer.TimeType], 
+		GOKZ_FormatTime(targetPlayer.Time));
 	return timerTextString;
 }
 
@@ -80,19 +80,19 @@ static void UpdateTimerText(int client)
 {
 	KZPlayer player = KZPlayer(client);
 	
-	if (player.fake)
+	if (player.Fake)
 	{
 		return;
 	}
 	
-	if (player.alive)
+	if (player.Alive)
 	{
 		ShowTimerText(player, player);
 	}
 	else
 	{
-		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
-		if (targetPlayer.id != -1 && !targetPlayer.fake)
+		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
+		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
 		{
 			ShowTimerText(player, targetPlayer);
 		}
@@ -106,16 +106,16 @@ static void ClearTimerText(int client)
 
 static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 {
-	if (!targetPlayer.timerRunning)
+	if (!targetPlayer.TimerRunning)
 	{
-		if (player.id != targetPlayer.id)
+		if (player.ID != targetPlayer.ID)
 		{
-			CancelGOKZHUDMenu(player.id);
+			CancelGOKZHUDMenu(player.ID);
 		}
 		return;
 	}
 	
-	if (player.timerText == TimerText_TPMenu)
+	if (player.TimerText == TimerText_TPMenu)
 	{
 		// If there is no menu showing, or if the TP menu is currently showing;
 		// and if player is spectating, or is alive with TP menu disabled and not paused
@@ -123,28 +123,28 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 		// Note that we don't mind if player we're spectating is paused etc. as there are too
 		// many variables to track whether we need to update the timer text for the spectator.
 		
-		if ((gB_MenuShowing[player.id] || GetClientMenu(player.id) == MenuSource_None)
-			 && (player.id != targetPlayer.id || player.tpMenu == TPMenu_Disabled && !player.paused))
+		if ((gB_MenuShowing[player.ID] || GetClientMenu(player.ID) == MenuSource_None)
+			 && (player.ID != targetPlayer.ID || player.TPMenu == TPMenu_Disabled && !player.Paused))
 		{
 			// Use a Panel if want to show ONLY timer text (not TP menu)
 			// as it doesn't seem to be possible to display a Menu with no items.
 			Panel panel = new Panel(null);
 			panel.SetTitle(FormatTimerTextForMenu(targetPlayer));
-			panel.Send(player.id, PanelHandler_Menu, MENU_TIME_FOREVER);
+			panel.Send(player.ID, PanelHandler_Menu, MENU_TIME_FOREVER);
 			delete panel;
-			gB_MenuShowing[player.id] = true;
+			gB_MenuShowing[player.ID] = true;
 		}
 	}
-	else if (player.timerText == TimerText_Top || player.timerText == TimerText_Bottom)
+	else if (player.TimerText == TimerText_Top || player.TimerText == TimerText_Bottom)
 	{
 		int colour[4]; // RGBA
-		switch (targetPlayer.timeType)
+		switch (targetPlayer.TimeType)
 		{
 			case TimeType_Nub:colour =  { 234, 209, 138, 0 };
 			case TimeType_Pro:colour =  { 181, 212, 238, 0 };
 		}
 		
-		switch (player.timerText)
+		switch (player.TimerText)
 		{
 			case TimerText_Top:
 			{
@@ -156,6 +156,6 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 			}
 		}
 		
-		ShowSyncHudText(player.id, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.time));
+		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.Time));
 	}
 } 

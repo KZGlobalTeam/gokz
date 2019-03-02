@@ -505,28 +505,28 @@ static void EndStrafes(int client)
 static void UpdateStrafes(int client)
 {
 	KZPlayer player = KZPlayer(client);
-	if (player.turningLeft && strafesDirection[player.id] != StrafeDirection_Left)
+	if (player.TurningLeft && strafesDirection[player.ID] != StrafeDirection_Left)
 	{
-		strafesDirection[player.id] = StrafeDirection_Left;
-		strafesCurrent[player.id]++;
+		strafesDirection[player.ID] = StrafeDirection_Left;
+		strafesCurrent[player.ID]++;
 	}
-	else if (player.turningRight && strafesDirection[player.id] != StrafeDirection_Right)
+	else if (player.TurningRight && strafesDirection[player.ID] != StrafeDirection_Right)
 	{
-		strafesDirection[player.id] = StrafeDirection_Right;
-		strafesCurrent[player.id]++;
+		strafesDirection[player.ID] = StrafeDirection_Right;
+		strafesCurrent[player.ID]++;
 	}
 	
 	if (strafesCurrent[client] < JS_MAX_TRACKED_STRAFES)
 	{
 		strafesTicks[client][strafesCurrent[client]]++;
-		if (player.speed > lastTickSpeed[client])
+		if (player.Speed > lastTickSpeed[client])
 		{
 			strafesGainTicks[client][strafesCurrent[client]]++;
-			strafesGain[client][strafesCurrent[client]] += player.speed - lastTickSpeed[client];
+			strafesGain[client][strafesCurrent[client]] += player.Speed - lastTickSpeed[client];
 		}
 		else
 		{
-			strafesLoss[client][strafesCurrent[client]] += lastTickSpeed[client] - player.speed;
+			strafesLoss[client][strafesCurrent[client]] += lastTickSpeed[client] - player.Speed;
 		}
 	}
 }

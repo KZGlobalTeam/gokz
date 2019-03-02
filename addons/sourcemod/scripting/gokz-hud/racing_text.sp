@@ -71,19 +71,19 @@ static void UpdateRacingText(int client)
 {
 	KZPlayer player = KZPlayer(client);
 	
-	if (player.fake)
+	if (player.Fake)
 	{
 		return;
 	}
 	
-	if (player.alive)
+	if (player.Alive)
 	{
 		ShowRacingText(player, player);
 	}
 	else
 	{
-		KZPlayer targetPlayer = KZPlayer(player.observerTarget);
-		if (targetPlayer.id != -1 && !targetPlayer.fake)
+		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
+		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
 		{
 			ShowRacingText(player, targetPlayer);
 		}
@@ -97,12 +97,12 @@ static void ClearRacingText(int client)
 
 static void ShowRacingText(KZPlayer player, KZPlayer targetPlayer)
 {
-	if (GOKZ_RC_GetStatus(targetPlayer.id) != RacerStatus_Racing)
+	if (GOKZ_RC_GetStatus(targetPlayer.ID) != RacerStatus_Racing)
 	{
 		return;
 	}
 	
-	int raceStatus = GOKZ_RC_GetRaceInfo(GOKZ_RC_GetRaceID(targetPlayer.id), RaceInfo_Status);
+	int raceStatus = GOKZ_RC_GetRaceInfo(GOKZ_RC_GetRaceID(targetPlayer.ID), RaceInfo_Status);
 	if (raceStatus == RaceStatus_Countdown)
 	{
 		ShowCountdownText(player, targetPlayer);
@@ -115,12 +115,12 @@ static void ShowRacingText(KZPlayer player, KZPlayer targetPlayer)
 
 static void ShowCountdownText(KZPlayer player, KZPlayer targetPlayer)
 {
-	float timeToStart = (countdownStartTime[targetPlayer.id] + RC_COUNTDOWN_TIME) - GetGameTime();
+	float timeToStart = (countdownStartTime[targetPlayer.ID] + RC_COUNTDOWN_TIME) - GetGameTime();
 	int colour[4];
 	GetCountdownColour(timeToStart, colour);
 	
 	SetHudTextParams(-1.0, 0.3, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
-	ShowSyncHudText(player.id, racingHudSynchronizer, "%t\n\n%d", "Get Ready", IntMax(RoundToCeil(timeToStart), 1));
+	ShowSyncHudText(player.ID, racingHudSynchronizer, "%t\n\n%d", "Get Ready", IntMax(RoundToCeil(timeToStart), 1));
 }
 
 static float[] GetCountdownColour(float timeToStart, int buffer[4])
@@ -153,11 +153,11 @@ static float[] GetCountdownColour(float timeToStart, int buffer[4])
 
 static void ShowStartedText(KZPlayer player, KZPlayer targetPlayer)
 {
-	if (targetPlayer.timerRunning)
+	if (targetPlayer.TimerRunning)
 	{
 		return;
 	}
 	
 	SetHudTextParams(-1.0, 0.3, 1.0, 0, 255, 0, 255, 0, 1.0, 0.0, 0.0);
-	ShowSyncHudText(player.id, racingHudSynchronizer, "%t", "Go!");
+	ShowSyncHudText(player.ID, racingHudSynchronizer, "%t", "Go!");
 } 

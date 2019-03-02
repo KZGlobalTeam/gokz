@@ -34,7 +34,7 @@ public Action CommandTier(int client, int args)
 public Action CommandPrintRecords(int client, int args)
 {
 	KZPlayer player = KZPlayer(client);
-	int mode = player.mode;
+	int mode = player.Mode;
 	
 	if (args == 0)
 	{  // Print record times for current map and their current mode
@@ -52,7 +52,7 @@ public Action CommandPrintRecords(int client, int args)
 public Action CommandPrintBonusRecords(int client, int args)
 {
 	KZPlayer player = KZPlayer(client);
-	int mode = player.mode;
+	int mode = player.Mode;
 	
 	if (args == 0)
 	{  // Print Bonus 1 record times for current map and their current mode
