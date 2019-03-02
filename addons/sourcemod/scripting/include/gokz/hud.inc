@@ -196,7 +196,7 @@ stock any GOKZ_HUD_GetOption(int client, HUDOption option)
 }
 
 /**
- * Sets the player's gokz-hud option's value.
+ * Sets a player's gokz-hud option's value.
  *
  * @param client		Client index.
  * @param option		gokz-hud option.

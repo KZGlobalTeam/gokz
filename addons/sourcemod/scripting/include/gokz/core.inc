@@ -524,7 +524,7 @@ forward void GOKZ_OnCountedTeleport_Post(int client);
 
 /**
  * Called when player's begins a jump that is deemed valid.
- * A jump is deemed invalid if the player is teleported.
+ * A jump is deemed invalid if a player is teleported.
  *
  * @param client		Client index.
  * @param jumped		Whether player jumped.
@@ -534,7 +534,7 @@ forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
 
 /**
  * Called when player's current jump is invalidated.
- * A jump is deemed invalid if the player is teleported.
+ * A jump is deemed invalid if a player is teleported.
  *
  * @param client		Client index.
  */
@@ -548,7 +548,7 @@ forward void GOKZ_OnJumpInvalidated(int client);
 forward void GOKZ_OnJoinTeam(int client, int team);
 
 /**
- * Called the first time the player spawns in on a team.
+ * Called the first time a player spawns in on a team.
  *
  * @param client		Client index.
  */
@@ -570,7 +570,7 @@ forward void GOKZ_OnModeUnloaded(int mode);
 
 /**
  * Called when a plugin other than gokz-core calls a native 
- * that may affect the player's timer or teleport count in 
+ * that may affect a player's timer or teleport count in 
  * their favour e.g. GOKZ_StartTimer, GOKZ_EndTimer,
  * GOKZ_SetTime and GOKZ_SetTeleportCount.
  *
@@ -667,7 +667,7 @@ native TopMenu GOKZ_GetOptionsTopMenu();
 native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, any...);
 
 /**
- * Starts the player's timer for a course on the current map.
+ * Starts a player's timer for a course on the current map.
  * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
@@ -677,7 +677,7 @@ native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, an
 native bool GOKZ_StartTimer(int client, int course);
 
 /**
- * Ends the player's timer for a course on the current map.
+ * Ends a player's timer for a course on the current map.
  * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
@@ -687,7 +687,7 @@ native bool GOKZ_StartTimer(int client, int course);
 native bool GOKZ_EndTimer(int client, int course);
 
 /**
- * Forces the player's timer to stop. Intended for run invalidation.
+ * Forces a player's timer to stop. Intended for run invalidation.
  *
  * @param client    	Client index.
  * @param playSound		Whether to play the timer stop sound.
@@ -703,7 +703,7 @@ native bool GOKZ_StopTimer(int client, bool playSound = true);
 native void GOKZ_StopTimerAll(bool playSound = true);
 
 /**
- * Gets whether or not the player's timer is running i.e. isn't 'stopped'.
+ * Gets whether or not a player's timer is running i.e. isn't 'stopped'.
  *
  * @param client    	Client index.
  * @return				Whether player's timer is running.
@@ -711,7 +711,7 @@ native void GOKZ_StopTimerAll(bool playSound = true);
 native bool GOKZ_GetTimerRunning(int client);
 
 /**
- * Gets the course the player is currently running.
+ * Gets the course a player is currently running.
  *
  * @param client    	Client index.
  * @return		    	Course number.
@@ -719,7 +719,7 @@ native bool GOKZ_GetTimerRunning(int client);
 native int GOKZ_GetCourse(int client);
 
 /**
- * Gets whether the player is paused.
+ * Gets whether a player is paused.
  *
  * @param client    	Client index.
  * @return				Whether player is paused.
@@ -727,7 +727,7 @@ native int GOKZ_GetCourse(int client);
 native bool GOKZ_GetPaused(int client);
 
 /**
- * Gets the player's current run time.
+ * Gets a player's current run time.
  *
  * @param client    	Client index.
  * @return				Player's current run time.
@@ -735,7 +735,7 @@ native bool GOKZ_GetPaused(int client);
 native float GOKZ_GetTime(int client);
 
 /**
- * Gets the player's current run time.
+ * Gets a player's current run time.
  * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
@@ -745,7 +745,7 @@ native float GOKZ_GetTime(int client);
 native bool GOKZ_SetTime(int client, float time);
 
 /**
- * Gets the player's current checkpoint count.
+ * Gets a player's current checkpoint count.
  *
  * @param client    	Client index.
  * @return				Player's current checkpoint count.
@@ -753,7 +753,7 @@ native bool GOKZ_SetTime(int client, float time);
 native int GOKZ_GetCheckpointCount(int client);
 
 /**
- * Sets the player's current checkpoint count.
+ * Sets a player's current checkpoint count.
  * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
@@ -763,7 +763,7 @@ native int GOKZ_GetCheckpointCount(int client);
 native int GOKZ_SetCheckpointCount(int client, int cpCount);
 
 /**
- * Gets the player's current teleport count.
+ * Gets a player's current teleport count.
  *
  * @param client    	Client index.
  * @return				Player's current teleport count.
@@ -771,7 +771,7 @@ native int GOKZ_SetCheckpointCount(int client, int cpCount);
 native int GOKZ_GetTeleportCount(int client);
 
 /**
- * Sets the player's current teleport count.
+ * Sets a player's current teleport count.
  * This can be blocked by OnTimerNativeCalledExternally().
  *
  * @param client    	Client index.
@@ -781,14 +781,14 @@ native int GOKZ_GetTeleportCount(int client);
 native bool GOKZ_SetTeleportCount(int client, int tpCount);
 
 /**
- * Teleports the player to start, or respawns them.
+ * Teleports a player to start, or respawns them.
  *
  * @param client    	Client index.
  */
 native void GOKZ_TeleportToStart(int client);
 
 /**
- * Gets whether player has a start position they can
+ * Gets whether a player has a start position they can
  * teleport to, whether it is custom or not.
  * 
  *
@@ -798,21 +798,21 @@ native void GOKZ_TeleportToStart(int client);
 native bool GOKZ_GetHasStartPosition(int client);
 
 /**
- * Set a new checkpoint at the player's current position.
+ * Set a new checkpoint at a player's current position.
  *
  * @param client    	Client index.
  */
 native void GOKZ_MakeCheckpoint(int client);
 
 /**
- * Teleports the player to their last checkpoint.
+ * Teleports a player to their last checkpoint.
  *
  * @param client    	Client index.
  */
 native void GOKZ_TeleportToCheckpoint(int client);
 
 /**
- * Gets whether the player can teleport to their checkpoint
+ * Gets whether a player can teleport to their checkpoint
  * e.g. will return false if player has no checkpoints.
  *
  * @param client		Client index.
@@ -821,14 +821,14 @@ native void GOKZ_TeleportToCheckpoint(int client);
 native bool GOKZ_GetCanTeleportToCheckpoint(int client);
 
 /**
- * Teleport the player back to a previous checkpoint.
+ * Teleport a player back to a previous checkpoint.
  *
  * @param client    	Client index.
  */
 native void GOKZ_PrevCheckpoint(int client);
 
 /**
- * Gets whether the player can go to their previous checkpoint
+ * Gets whether a player can go to their previous checkpoint
  * e.g. will return false if player has no checkpoints.
  *
  * @param client		Client index.
@@ -837,14 +837,14 @@ native void GOKZ_PrevCheckpoint(int client);
 native bool GOKZ_GetCanPrevCheckpoint(int client);
 
 /**
- * Teleport the player to a more recent checkpoint.
+ * Teleport a player to a more recent checkpoint.
  *
  * @param client    	Client index.
  */
 native void GOKZ_NextCheckpoint(int client);
 
 /**
- * Gets whether the player can go to their next checkpoint
+ * Gets whether a player can go to their next checkpoint
  * e.g. will return false if player has no checkpoints.
  *
  * @param client		Client index.
@@ -853,14 +853,14 @@ native void GOKZ_NextCheckpoint(int client);
 native bool GOKZ_GetCanNextCheckpoint(int client);
 
 /**
- * Teleport the player to where they last teleported from.
+ * Teleport a player to where they last teleported from.
  *
  * @param client    	Client index.
  */
 native void GOKZ_UndoTeleport(int client);
 
 /**
- * Gets whether the player can undo their teleport
+ * Gets whether a player can undo their teleport
  * e.g. will return false if teleport was from midair.
  *
  * @param client		Client index.
@@ -869,28 +869,28 @@ native void GOKZ_UndoTeleport(int client);
 native bool GOKZ_GetCanUndoTeleport(int client);
 
 /**
- * Pause the player's timer and freeze them.
+ * Pause a player's timer and freeze them.
  *
  * @param client    	Client index.
  */
 native void GOKZ_Pause(int client);
 
 /**
- * Resumes the player's timer and unfreezes them.
+ * Resumes a player's timer and unfreezes them.
  *
  * @param client    	Client index.
  */
 native void GOKZ_Resume(int client);
 
 /**
- * Toggles the paused state of the player.
+ * Toggles the paused state of a player.
  *
  * @param client    	Client index.
  */
 native void GOKZ_TogglePause(int client);
 
 /**
- * Plays the error sound to the client if they have the option enabled.
+ * Plays the error sound to a player if they have the option enabled.
  *
  * @param client		Client index.
  */
@@ -943,7 +943,7 @@ native bool GOKZ_SetOptionProp(const char[] option, OptionProp prop, any value);
 native any GOKZ_GetOption(int client, const char[] option);
 
 /**
- * Sets the player's option's value. Fails if option doesn't exist,
+ * Sets a player's option's value. Fails if option doesn't exist,
  * or if desired value is outside the registered value range.
  *
  * @param client		Client index.
@@ -972,7 +972,7 @@ native bool GOKZ_GetHitPerf(int client);
 native void GOKZ_SetHitPerf(int client, bool hitPerf);
 
 /**
- * Gets the player's horizontal speed at the time of their last takeoff as recorded by GOKZ.
+ * Gets a player's horizontal speed at the time of their last takeoff as recorded by GOKZ.
  *
  * @param client		Client index.
  * @return				Player's last takeoff speed as recorded by GOKZ.
@@ -980,7 +980,7 @@ native void GOKZ_SetHitPerf(int client, bool hitPerf);
 native float GOKZ_GetTakeoffSpeed(int client);
 
 /**
- * Sets the player's recorded horizontal speed at the time of their last takeoff.
+ * Sets a player's recorded horizontal speed at the time of their last takeoff.
  * Intended to be called by GOKZ mode plugins only.
  *
  * @param client		Client index.
@@ -990,7 +990,7 @@ native float GOKZ_GetTakeoffSpeed(int client);
 native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
 
 /**
- * Gets whether the player's current or last jump/airtime is valid.
+ * Gets whether a player's current or last jump/airtime is valid.
  * A jump is deemed invalid if the player is teleported.
  *
  * @param client		Client index.
@@ -999,7 +999,7 @@ native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
 native bool GOKZ_GetValidJump(int client);
 
 /**
- * Has the client switch to a team via GOKZ Core.
+ * Has a player switch to a team via GOKZ Core.
  *
  * @param client		Client index.
  * @param team			Which team to switch to.

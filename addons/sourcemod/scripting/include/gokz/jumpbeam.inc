@@ -107,7 +107,7 @@ stock any GOKZ_JB_GetOption(int client, JBOption option)
 }
 
 /**
- * Sets the player's gokz-jumpbeam option's value.
+ * Sets a player's gokz-jumpbeam option's value.
  *
  * @param client		Client index.
  * @param option		gokz-jumpbeam option.

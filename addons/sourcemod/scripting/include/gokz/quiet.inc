@@ -93,7 +93,7 @@ stock any GOKZ_QT_GetOption(int client, QTOption option)
 }
 
 /**
- * Sets the player's gokz-quiet option's value.
+ * Sets a player's gokz-quiet option's value.
  *
  * @param client		Client index.
  * @param option		gokz-quiet option.

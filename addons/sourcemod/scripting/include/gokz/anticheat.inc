@@ -47,7 +47,7 @@ forward void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[]
 // =====[ NATIVES ]=====
 
 /**
- * Gets the number of recent bhop samples available for the player.
+ * Gets the number of recent bhop samples available for a player.
  *
  * @param client		Client index.
  * @return				Number of bhop samples available.
@@ -55,7 +55,7 @@ forward void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[]
 native int GOKZ_AC_GetSampleSize(int client);
 
 /**
- * Gets whether the player hit a perfect bhop for a number of 
+ * Gets whether a player hit a perfect bhop for a number of 
  * recent bhops. Buffer must be large enough to fit the sample
  * size.
  *
@@ -67,7 +67,7 @@ native int GOKZ_AC_GetSampleSize(int client);
 native int GOKZ_AC_GetHitPerf(int client, bool[] buffer, int sampleSize);
 
 /**
- * Gets the player's number of perfect bhops out of a sample 
+ * Gets a player's number of perfect bhops out of a sample 
  * size of bhops.
  *
  * @param client		Client index.
@@ -77,7 +77,7 @@ native int GOKZ_AC_GetHitPerf(int client, bool[] buffer, int sampleSize);
 native int GOKZ_AC_GetPerfCount(int client, int sampleSize);
 
 /**
- * Gets the player's ratio of perfect bhops to normal bhops.
+ * Gets a player's ratio of perfect bhops to normal bhops.
  *
  * @param client		Client index.
  * @param sampleSize	Maximum recent bhop samples to include in calculation.
@@ -86,7 +86,7 @@ native int GOKZ_AC_GetPerfCount(int client, int sampleSize);
 native float GOKZ_AC_GetPerfRatio(int client, int sampleSize);
 
 /**
- * Gets the player's jump input counts for a number of recent 
+ * Gets a player's jump input counts for a number of recent 
  * bhops. Buffer must be large enough to fit the sample size.
  *
  * @param client		Client index.
@@ -97,7 +97,7 @@ native float GOKZ_AC_GetPerfRatio(int client, int sampleSize);
 native int GOKZ_AC_GetJumpInputs(int client, int[] buffer, int sampleSize);
 
 /**
- * Gets the player's average number of jump inputs for a number 
+ * Gets a player's average number of jump inputs for a number 
  * of recent bhops.
  *
  * @param client		Client index.
@@ -107,7 +107,7 @@ native int GOKZ_AC_GetJumpInputs(int client, int[] buffer, int sampleSize);
 native float GOKZ_AC_GetAverageJumpInputs(int client, int sampleSize);
 
 /**
- * Gets the player's jump input counts prior to a number of recent 
+ * Gets a player's jump input counts prior to a number of recent 
  * bhops. Buffer must be large enough to fit the sample size. 
  * Includes the jump input that resulted in the jump.
  *
@@ -119,7 +119,7 @@ native float GOKZ_AC_GetAverageJumpInputs(int client, int sampleSize);
 native int GOKZ_AC_GetPreJumpInputs(int client, int[] buffer, int sampleSize);
 
 /**
- * Gets the player's jump input counts after a number of recent 
+ * Gets a player's jump input counts after a number of recent 
  * bhops. Buffer must be large enough to fit the sample size. 
  * Excludes the jump input that resulted in the jump.
  *

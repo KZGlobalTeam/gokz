@@ -226,7 +226,7 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
 native int GOKZ_JS_GetDefaultOption(JSOption option);
 
 /**
- * Declare the player's current jump an invalid jumpstat.
+ * Declare a player's current jump an invalid jumpstat.
  *
  * @param client    	Client index.
  */
@@ -269,7 +269,7 @@ stock any GOKZ_JS_GetOption(int client, JSOption option)
 }
 
 /**
- * Sets the player's gokz-jumpstats option's value.
+ * Sets a player's gokz-jumpstats option's value.
  *
  * @param client		Client index.
  * @param option		gokz-jumpstats option.
