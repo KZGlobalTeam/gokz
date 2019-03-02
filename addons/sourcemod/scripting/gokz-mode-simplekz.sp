@@ -143,6 +143,7 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
@@ -185,6 +186,24 @@ public void SDKHook_OnClientPreThink_Post(int client)
 	{
 		TweakConVars();
 	}
+}
+
+public void SDKHook_OnClientPostThink(int client)
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	
+	/*
+		Why are we using PostThink for slope boost fix?
+		
+		MovementAPI measures landing speed, calls forwards etc. during 
+		PostThink_Post. We want the slope fix to apply it's speed before 
+		MovementAPI does this, so that we can apply tweaks based on the 
+		'fixed' landing speed.
+	*/
+	SlopeFix(client);
 }
 
 public void Movement_OnStartTouchGround(int client)
@@ -251,29 +270,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]) && newValue == Mode_SimpleKZ)
 	{
 		ReplicateConVars(client);
-	}
-}
-
-
-
-// =====[ OTHER EVENTS ]=====
-
-public void OnGameFrame()
-{
-	/*
-		Why are we using OnGameFrame() for slope boost fix?
-		
-		MovementAPI measures landing speed, calls forwards etc. during 
-		OnPlayerRunCmd.	We want the slope fix to apply it's speed before 
-		MovementAPI does this, so that we can apply tweaks based on the 
-		'fixed' landing speed.
-	*/
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		if (IsClientInGame(client) && IsPlayerAlive(client) && IsUsingMode(client))
-		{
-			SlopeFix(client);
-		}
 	}
 }
 
