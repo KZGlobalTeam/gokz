@@ -76,7 +76,7 @@ public void OnLibraryRemoved(const char[] name)
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
 {
-	if (client != 0 && gCV_gokz_chat_processing.BoolValue)
+	if (gCV_gokz_chat_processing.BoolValue && IsClientInGame(client))
 	{
 		OnClientSayCommand_ChatProcessing(client, command, sArgs);
 		return Plugin_Handled;
