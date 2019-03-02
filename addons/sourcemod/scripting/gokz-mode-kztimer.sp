@@ -303,23 +303,24 @@ void TweakVelMod(KZPlayer player)
 	player.velocityModifier = CalcPrestrafeVelMod(player) * CalcWeaponVelMod(player);
 }
 
+// Adapted from KZTimerGlobal
 float CalcPrestrafeVelMod(KZPlayer player)
 {
-	// No changes to prestrafe velocity modifier in midair
 	if (!player.onGround)
 	{
 		return gF_PreVelMod[player.id];
 	}
 	
-	bool changed = false;
-	
-	// KZTimer prestrafe (not exactly the same, and is only for 128 tick)
 	if (!player.turning)
 	{
 		if (GetEngineTime() - gF_PreVelModLastChange[player.id] > 0.2)
 		{
 			gF_PreVelMod[player.id] = 1.0;
-			changed = true;
+			gF_PreVelModLastChange[player.id] = GetEngineTime();
+		}
+		else if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX + 0.007)
+		{
+			return PRE_VELMOD_MAX - 0.001; // Returning without setting the variable is intentional
 		}
 	}
 	else if ((player.buttons & IN_MOVELEFT || player.buttons & IN_MOVERIGHT) && player.speed > 248.9)
@@ -330,54 +331,94 @@ float CalcPrestrafeVelMod(KZPlayer player)
 			increment = 0.001;
 		}
 		
-		gI_PreTickCounter[player.id]++;
-		if (gI_PreTickCounter[player.id] < 75)
+		bool forwards = GetClientMovingDirection(player.id, false) > 0.0;
+		
+		if ((player.buttons & IN_MOVERIGHT && player.turningRight || player.turningLeft && !forwards)
+			 || (player.buttons & IN_MOVELEFT && player.turningLeft || player.turningRight && !forwards))
 		{
-			gF_PreVelMod[player.id] += increment;
-			if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX)
+			gI_PreTickCounter[player.id]++;
+			
+			if (gI_PreTickCounter[player.id] < 75)
 			{
-				if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX + 0.007)
+				gF_PreVelMod[player.id] += increment;
+				if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX)
 				{
-					gF_PreVelMod[player.id] = PRE_VELMOD_MAX - 0.001;
+					if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX + 0.007)
+					{
+						gF_PreVelMod[player.id] = PRE_VELMOD_MAX - 0.001;
+					}
+					else
+					{
+						gF_PreVelMod[player.id] -= 0.007;
+					}
 				}
-				else
+				gF_PreVelMod[player.id] += increment;
+			}
+			else
+			{
+				gF_PreVelMod[player.id] -= 0.0045;
+				gI_PreTickCounter[player.id] -= 2;
+				
+				if (gF_PreVelMod[player.id] < 1.0)
 				{
-					gF_PreVelMod[player.id] -= 0.007;
+					gF_PreVelMod[player.id] = 1.0;
+					gI_PreTickCounter[player.id] = 0;
 				}
 			}
-			gF_PreVelMod[player.id] += increment;
 		}
 		else
 		{
-			gF_PreVelMod[player.id] -= 0.0045;
-			gI_PreTickCounter[player.id] -= 2;
+			gF_PreVelMod[player.id] -= 0.04;
+			
+			if (gF_PreVelMod[player.id] < 1.0)
+			{
+				gF_PreVelMod[player.id] = 1.0;
+			}
 		}
 		
-		changed = true;
+		gF_PreVelModLastChange[player.id] = GetEngineTime();
 	}
 	else
 	{
-		gF_PreVelMod[player.id] -= 0.04;
-		changed = true;
-	}
-	
-	// Keep prestrafe velocity modifier within range
-	if (gF_PreVelMod[player.id] < 1.0)
-	{
-		gF_PreVelMod[player.id] = 1.0;
 		gI_PreTickCounter[player.id] = 0;
-	}
-	else if (gF_PreVelMod[player.id] > PRE_VELMOD_MAX)
-	{
-		gF_PreVelMod[player.id] = PRE_VELMOD_MAX;
-	}
-	
-	if (changed)
-	{
-		gF_PreVelModLastChange[player.id] = GetEngineTime();
+		return 1.0; // Returning without setting the variable is intentional
 	}
 	
 	return gF_PreVelMod[player.id];
+}
+
+// Adapted from KZTimerGlobal
+float GetClientMovingDirection(int client, bool ladder)
+{
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", fVelocity);
+	
+	float fEyeAngles[3];
+	GetClientEyeAngles(client, fEyeAngles);
+	
+	if (fEyeAngles[0] > 70.0)fEyeAngles[0] = 70.0;
+	if (fEyeAngles[0] < -70.0)fEyeAngles[0] = -70.0;
+	
+	float fViewDirection[3];
+	
+	if (ladder)
+	{
+		GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", fViewDirection);
+	}
+	else
+	{
+		GetAngleVectors(fEyeAngles, fViewDirection, NULL_VECTOR, NULL_VECTOR);
+	}
+	
+	NormalizeVector(fVelocity, fVelocity);
+	NormalizeVector(fViewDirection, fViewDirection);
+	
+	float direction = GetVectorDotProduct(fVelocity, fViewDirection);
+	if (ladder)
+	{
+		direction = direction * -1;
+	}
+	return direction;
 }
 
 float CalcWeaponVelMod(KZPlayer player)
