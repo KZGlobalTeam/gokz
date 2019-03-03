@@ -58,7 +58,10 @@ void OnRaceInfoChanged_RacingText(int raceID, RaceInfo prop, int newValue)
 	{
 		for (int client = 1; client <= MaxClients; client++)
 		{
-			UpdateRacingText(client);
+			if (GOKZ_RC_GetRaceID(client) == raceID)
+			{
+				UpdateRacingText(client);
+			}
 		}
 	}
 }
