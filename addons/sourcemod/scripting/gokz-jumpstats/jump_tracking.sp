@@ -7,6 +7,7 @@
 static float lastTickSpeed[MAXPLAYERS + 1]; // Last recorded horizontal speed
 static int lastPlayerJumpTick[MAXPLAYERS + 1];
 static int entityTouchCount[MAXPLAYERS + 1];
+static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected
 
 
 
@@ -14,12 +15,31 @@ static int entityTouchCount[MAXPLAYERS + 1];
 
 void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump)
 {
+	if (!validCmd[client])
+	{
+		return;
+	}
+	
 	BeginJumpstat(client, jumped, ladderJump);
 }
 
 void OnStartTouchGround_JumpTracking(int client)
 {
 	EndJumpstat(client);
+}
+
+void OnPlayerRunCmd_JumpTracking(int client)
+{
+	if (!IsPlayerAlive(client))
+	{
+		return;
+	}
+	
+	// Don't bother checking if player is already in air and jumpstat is already invalid
+	if (Movement_GetOnGround(client) || GetValidJumpstat(client))
+	{
+		UpdateValidCmd(client);
+	}
 }
 
 void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
@@ -119,18 +139,23 @@ static void EndJumpstat(int client)
 
 static void UpdateJumpstat(int client)
 {
-	if (CheckGravity(client) && CheckBaseVelocity(client) && CheckInWater(client))
+	UpdateHeight(client);
+	UpdateMaxSpeed(client);
+	UpdateStrafes(client);
+	UpdateSync(client);
+	UpdateDuration(client);
+}
+
+static void UpdateValidCmd(int client)
+{
+	if (!CheckGravity(client) || !CheckBaseVelocity(client) || !CheckInWater(client))
 	{
-		// Passed all checks
-		UpdateHeight(client);
-		UpdateMaxSpeed(client);
-		UpdateStrafes(client);
-		UpdateSync(client);
-		UpdateDuration(client);
+		InvalidateJumpstat(client);
+		validCmd[client] = false;
 	}
 	else
 	{
-		InvalidateJumpstat(client);
+		validCmd[client] = true;
 	}
 }
 
