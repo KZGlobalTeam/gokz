@@ -107,9 +107,6 @@ static void ShowTPMenu(KZPlayer player)
 	TPMenuAddItems(player, menu);
 	menu.Display(player.ID, MENU_TIME_FOREVER);
 	gB_MenuShowing[player.ID] = true;
-	
-	static int test1 = 0;
-	PrintToServer("menu %d", test1++);
 }
 
 static void TPMenuSetTitle(KZPlayer player, Menu menu)
