@@ -20,7 +20,7 @@ void OnPluginStart_SpeedText()
 
 void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum)
 {
-	if (cmdnum % 6 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum - 1)
+	if (cmdnum % 6 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum)
 	{
 		UpdateSpeedText(client);
 	}

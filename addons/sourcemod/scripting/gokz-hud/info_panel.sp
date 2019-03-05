@@ -22,7 +22,7 @@ bool IsDrawingInfoPanel(int client)
 
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum)
 {
-	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum - 1)
+	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum)
 	{
 		UpdateInfoPanel(client);
 	}
