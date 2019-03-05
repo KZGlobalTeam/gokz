@@ -191,7 +191,7 @@ static void CreateConVars()
 	
 	gCV_gokz_autoban_duration_bhop_macro = AutoExecConfig_CreateConVar(
 		"gokz_autoban_duration_bhop_macro", 
-		"44640",  // 31 days
+		"43200",  // 30 days
 		"Duration of anticheat autobans for bunnyhop macroing in minutes (0 for permanent).", 
 		_, 
 		true, 
