@@ -220,12 +220,11 @@ void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 	velocityTeleported[client] = false;
 }
 
+// Returns whether client didn't just hit a perfect bunnyhop
 static bool DidInvalidVelocityTeleport(int client, int cmdnum)
 {
-	// Return whether client didn't just hit a perf
-	return !Movement_GetJumped(client)
-	 || !GOKZ_GetHitPerf(client)
-	 || cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
+	return !(Movement_GetJumped(client) && GOKZ_GetHitPerf(client)
+		 && cmdnum == Movement_GetTakeoffCmdNum(client));
 }
 
 void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMovetype)

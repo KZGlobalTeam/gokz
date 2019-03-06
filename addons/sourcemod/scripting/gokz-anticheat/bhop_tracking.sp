@@ -242,7 +242,7 @@ static bool HitBhop(int client, int cmdnum)
 
 static bool JustJumped(int client, int cmdnum)
 {
-	return Movement_GetJumped(client) && Movement_GetTakeoffCmdNum(client) == cmdnum - 1;
+	return Movement_GetJumped(client) && Movement_GetTakeoffCmdNum(client) == cmdnum;
 }
 
 // Records current button inputs
