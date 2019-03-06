@@ -1,0 +1,163 @@
+"Phrases"
+{
+	// =====[ CHAT MESSAGES ]=====
+	"Option - Teleport Menu - Disable"
+	{
+		"en"		"{grey}The teleport menu has been disabled."
+		"chi"		"{grey}存点菜单已关闭."
+	}
+	"Option - Teleport Menu - Enable (Simple)"
+	{
+		"en"		"{grey}The simple teleport menu has been enabled."
+		"chi"		"{grey}简易存点菜单已开启."
+	}
+	"Option - Teleport Menu - Enable (Advanced)"
+	{
+		"en"		"{grey}The advanced teleport menu has been enabled."
+		"chi"		"{grey}高级存点菜单已开启."
+	}
+	"Option - Info Panel - Enable"
+	{
+		"en"		"{grey}Your centre information panel has been enabled."
+		"chi"		"{grey}你的中心面板已打开."
+	}
+	"Option - Info Panel - Disable"
+	{
+		"en"		"{grey}Your centre information panel has been disabled."
+		"chi"		"{grey}你的中心面板已关闭."
+	}
+	"Option - Show Weapon - Enable"
+	{
+		"en"		"{grey}You are now showing your weapon."
+		"chi"		"{grey}你现在能看到你的武器了."
+	}
+	"Option - Show Weapon - Disable"
+	{
+		"en"		"{grey}You are now hiding your weapon."
+		"chi"		"{grey}你现在屏蔽了你的武器显示."
+	}
+
+
+	// =====[ INFO PANEL ]=====
+	"Info Panel Text - Time"
+	{
+		"en"		"Time"
+		"chi"		"计时"
+	}
+	"Info Panel Text - Stopped"
+	{
+		"en"		"Stopped"
+		"chi"		"计时停止"
+	}
+	"Info Panel Text - PAUSED"
+	{
+		"en"		"PAUSED"
+		"chi"		"计时暂停"
+	}
+	"Info Panel Text - Speed"
+	{
+		"en"		"Speed"
+		"chi"		"速度"
+	}
+	"Info Panel Text - Keys"
+	{
+		"en"		"Keys"
+		"chi"		"按键"
+	}
+
+
+	// =====[ TELEPORT MENU ]=====
+	"TP Menu - Checkpoint"
+	{
+		"en"		"Checkpoint"
+		"chi"		"存点"
+	}
+	"TP Menu - Teleport"
+	{
+		"en"		"Teleport"
+		"chi"		"传送"
+	}
+	"TP Menu - Prev CP"
+	{
+		"en"		"Prev CP"
+		"chi"		"上一个存点"
+	}
+	"TP Menu - Next CP"
+	{
+		"en"		"Next CP"
+		"chi"		"下一个存点"
+	}
+	"TP Menu - Undo TP"
+	{
+		"en"		"Undo TP"
+		"chi"		"撤销存点"
+	}
+	"TP Menu - Pause"
+	{
+		"en"		"Pause"
+		"chi"		"暂停计时"
+	}
+	"TP Menu - Resume"
+	{
+		"en"		"Resume"
+		"chi"		"恢复计时"
+	}
+	"TP Menu - Restart"
+	{
+		"en"		"Restart"
+		"chi"		"重新开始"
+	}
+	"TP Menu - Respawn"
+	{
+		"en"		"Respawn"
+		"chi"		"重生"
+	}
+
+
+	// =====[ OPTIONS MENU ]=====
+	"Options Menu - HUD"
+	{
+		"en"		"HUD"
+	}
+	"Options Menu - Teleport Menu"
+	{
+		"en"		"Teleport menu"
+		"chi"		"存点菜单"
+	}
+	"Options Menu - Info Panel"
+	{
+		"en"		"Centre panel"
+		"chi"		"中心面板"
+	}
+	"Options Menu - Show Keys"
+	{
+		"en"		"Show key presses"
+		"chi"		"显示按键"
+	}
+	"Options Menu - Timer Text"
+	{
+		"en"		"Timer text"
+		"chi"		"计时器音效"
+	}
+	"Options Menu - Speed Text"
+	{
+		"en"		"Speed text"
+		"chi"		"空速文字"
+	}
+	"Options Menu - Show Weapon"
+	{
+		"en"		"Show weapon"
+		"chi"		"屏蔽武器显示"
+	}
+
+
+	// =====[ RACING ]=====
+	"Get Ready"
+	{
+		"en"		"GET READY"
+	}
+	"Go!"
+	{
+		"en"		"GO!"
+	}
+}

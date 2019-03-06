@@ -1,65 +1,10 @@
 /*
-	Options
-	
-	Player options to customise their experience.
+	Options for jumpstats, including an option to disable it completely.
 */
 
 
 
-#define OPTIONS_CFG_PATH "cfg/sourcemod/gokz/gokz-jumpstats-options.cfg"
-
-static int defaultOptions[JSOPTION_COUNT];
-static int options[JSOPTION_COUNT][MAXPLAYERS + 1];
-static int optionCounts[JSOPTION_COUNT] = 
-{
-	JUMPSTATSMASTER_COUNT, 
-	DISTANCETIER_COUNT, 
-	DISTANCETIER_COUNT, 
-	DISTANCETIER_COUNT
-};
-
-
-
-// =========================  PUBLIC  ========================= //
-
-int GetOption(int client, JSOption option)
-{
-	return options[option][client];
-}
-
-void SetOption(int client, JSOption option, int optionValue, bool printMessage = false)
-{
-	// Special case for minimum sound tier - there is no sound for the 'Meh' tier
-	if (option == JSOption_MinSoundTier && optionValue == DistanceTier_Meh)
-	{
-		optionValue = DistanceTier_Impressive;
-	}
-	
-	// Don't need to do anything if their option is already set at that value
-	if (GetOption(client, option) == optionValue)
-	{
-		return;
-	}
-	
-	// Set the option otherwise
-	options[option][client] = optionValue;
-	if (printMessage)
-	{
-		PrintOptionChangeMessage(client, option);
-	}
-	
-	Call_OnOptionChanged(client, option, optionValue);
-}
-
-void CycleOption(int client, JSOption option, bool printMessage = false)
-{
-	SetOption(client, option, (GetOption(client, option) + 1) % optionCounts[option], printMessage);
-}
-
-int GetDefaultOption(JSOption option)
-{
-	return defaultOptions[option];
-}
+// =====[ PUBLIC ]=====
 
 bool GetJumpstatsDisabled(int client)
 {
@@ -71,59 +16,58 @@ bool GetJumpstatsDisabled(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ EVENTS ]=====
+
+void OnOptionsMenuReady_Options()
+{
+	RegisterOptions();
+}
 
 void OnClientPutInServer_Options(int client)
 {
-	SetDefaultOptions(client);
-}
-
-void OnMapStart_Options()
-{
-	LoadDefaultOptions();
-}
-
-
-
-// =========================  PRIVATE  ========================= //
-
-static void LoadDefaultOptions()
-{
-	KeyValues kv = new KeyValues("options");
-	
-	if (!kv.ImportFromFile(OPTIONS_CFG_PATH))
+	if (GOKZ_JS_GetOption(client, JSOption_MinSoundTier) == DistanceTier_Meh)
 	{
-		LogError("Could not read default options config file: %s", OPTIONS_CFG_PATH);
-		return;
-	}
-	
-	for (JSOption option; option < JSOPTION_COUNT; option++)
-	{
-		defaultOptions[option] = kv.GetNum(gC_KeysJSOptions[option]);
+		GOKZ_JS_SetOption(client, JSOption_MinSoundTier, DistanceTier_Impressive);
 	}
 }
 
-static void SetDefaultOptions(int client)
+void OnOptionChanged_Options(int client, const char[] option, any newValue)
+{
+	JSOption jsOption;
+	if (GOKZ_JS_IsJSOption(option, jsOption))
+	{
+		if (jsOption == JSOption_MinSoundTier && newValue == DistanceTier_Meh)
+		{
+			GOKZ_JS_SetOption(client, JSOption_MinSoundTier, DistanceTier_Impressive);
+		}
+		else
+		{
+			PrintOptionChangeMessage(client, jsOption, newValue);
+		}
+	}
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void RegisterOptions()
 {
 	for (JSOption option; option < JSOPTION_COUNT; option++)
 	{
-		SetOption(client, option, GetDefaultOption(option));
+		GOKZ_RegisterOption(gC_JSOptionNames[option], gC_JSOptionDescriptions[option], 
+			OptionType_Int, gI_JSOptionDefaults[option], 0, gI_JSOptionCounts[option] - 1);
 	}
 }
 
-static void PrintOptionChangeMessage(int client, JSOption option)
+static void PrintOptionChangeMessage(int client, JSOption option, any newValue)
 {
-	if (!IsClientInGame(client))
-	{
-		return;
-	}
-	
 	// NOTE: Not all options have a message for when they are changed.
 	switch (option)
 	{
 		case JSOption_JumpstatsMaster:
 		{
-			switch (GetOption(client, option))
+			switch (newValue)
 			{
 				case JumpstatsMaster_Enabled:
 				{

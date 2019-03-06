@@ -1,14 +1,9 @@
-/*	
-	Teleports
-	
-	Checkpoints and teleporting functionality.
+/*
+	Checkpoints and teleporting, including ability to go back
+	to previous checkpoint, go to next checkpoint, and undo.
 */
 
 
-
-#define MAX_STORED_CHECKPOINTS 32
-#define SOUND_CHECKPOINT "buttons/blip1.wav"
-#define SOUND_TELEPORT "buttons/blip1.wav"
 
 static int checkpointCount[MAXPLAYERS + 1]; // Absolute total number of checkpoints
 static int storedCheckpointCount[MAXPLAYERS + 1]; // Current number of valid stored checkpoints
@@ -20,9 +15,9 @@ static float startAngles[MAXPLAYERS + 1][3];
 static bool hasCustomStartPosition[MAXPLAYERS + 1];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
-static float checkpointOrigin[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
-static float checkpointAngles[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS][3];
-static bool checkpointOnLadder[MAXPLAYERS + 1][MAX_STORED_CHECKPOINTS];
+static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
+static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
+static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
 static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
 static float undoOrigin[MAXPLAYERS + 1][3];
@@ -30,7 +25,7 @@ static float undoAngles[MAXPLAYERS + 1][3];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 int GetCheckpointCount(int client)
 {
@@ -50,15 +45,6 @@ int GetTeleportCount(int client)
 void SetTeleportCount(int client, int tpCount)
 {
 	teleportCount[client] = tpCount;
-}
-
-void SetupClientTeleports(int client)
-{
-	checkpointCount[client] = 0;
-	storedCheckpointCount[client] = 0;
-	checkpointPrevCount[client] = 0;
-	teleportCount[client] = 0;
-	hasCustomStartPosition[client] = false;
 }
 
 
@@ -81,17 +67,17 @@ void MakeCheckpoint(int client)
 	
 	// Make Checkpoint
 	checkpointCount[client]++;
-	storedCheckpointCount[client] = IntMin(storedCheckpointCount[client] + 1, MAX_STORED_CHECKPOINTS);
+	storedCheckpointCount[client] = IntMin(storedCheckpointCount[client] + 1, GOKZ_MAX_CHECKPOINTS);
 	checkpointPrevCount[client] = 0;
-	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
+	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
-	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
-	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_CHECKPOINT);
+		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
 	}
-	if (GetOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Make Checkpoint");
 	}
@@ -111,7 +97,7 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (!Movement_GetOnGround(client) && Movement_GetMoveType(client) != MOVETYPE_LADDER)
+	if (!Movement_GetOnGround(client) && Movement_GetMovetype(client) != MOVETYPE_LADDER)
 	{
 		if (showError)
 		{
@@ -208,7 +194,7 @@ void PrevCheckpoint(int client)
 	
 	storedCheckpointCount[client]--;
 	checkpointPrevCount[client]++;
-	checkpointIndex[client] = PrevIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
+	checkpointIndex[client] = PrevIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
@@ -267,7 +253,7 @@ void NextCheckpoint(int client)
 	
 	storedCheckpointCount[client]++;
 	checkpointPrevCount[client]--;
-	checkpointIndex[client] = NextIndex(checkpointIndex[client], MAX_STORED_CHECKPOINTS);
+	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	CheckpointTeleportDo(client);
 	
 	// Call Post Forward
@@ -351,6 +337,11 @@ void TeleportToStart(int client)
 	Call_GOKZ_OnTeleportToStart_Post(client, hasCustomStartPosition[client]);
 }
 
+bool GetHasStartPosition(int client)
+{
+	return GetHasStartedTimerThisMap(client) || GetHasCustomStartPosition(client);
+}
+
 bool GetHasCustomStartPosition(int client)
 {
 	return hasCustomStartPosition[client];
@@ -369,18 +360,20 @@ void SetCustomStartPosition(int client)
 	Movement_GetEyeAngles(client, customStartAngles[client]);
 	hasCustomStartPosition[client] = true;
 	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
-	if (GetOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_CHECKPOINT);
+		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
 	}
-	UpdateTPMenu(client);
+	
+	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
 }
 
 void ClearCustomStartPosition(int client)
 {
 	hasCustomStartPosition[client] = false;
 	GOKZ_PrintToChat(client, true, "%t", "Cleared Custom Start Position");
-	UpdateTPMenu(client);
+	
+	Call_GOKZ_OnCustomStartPositionCleared_Post(client);
 }
 
 
@@ -450,63 +443,17 @@ bool CanUndoTeleport(int client, bool showError = false)
 }
 
 
-// GOTO
 
-// Returns whether teleport to target was successful
-bool GotoPlayer(int client, int target, bool printMessage = true)
+// =====[ EVENTS ]=====
+
+void OnClientPutInServer_Teleports(int client)
 {
-	if (target == client)
-	{
-		if (printMessage)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Not Yourself)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
-	if (!IsPlayerAlive(target))
-	{
-		if (printMessage)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Goto Failure (Dead)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
-	
-	float targetOrigin[3];
-	float targetAngles[3];
-	
-	Movement_GetOrigin(target, targetOrigin);
-	Movement_GetEyeAngles(target, targetAngles);
-	
-	// Leave spectators if necessary
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
-	{
-		CS_SwitchTeam(client, CS_TEAM_T);
-	}
-	// Respawn the player if necessary
-	if (!IsPlayerAlive(client))
-	{
-		CS_RespawnPlayer(client);
-	}
-	
-	TeleportDo(client, targetOrigin, targetAngles);
-	
-	GOKZ_PrintToChat(client, true, "%t", "Goto Success", target);
-	
-	if (GetTimerRunning(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Time Stopped (Goto)");
-		GOKZ_StopTimer(client);
-	}
-	
-	return true;
+	checkpointCount[client] = 0;
+	storedCheckpointCount[client] = 0;
+	checkpointPrevCount[client] = 0;
+	teleportCount[client] = 0;
+	hasCustomStartPosition[client] = false;
 }
-
-
-
-// =========================  LISTENERS  ========================= //
 
 void OnTimerStart_Teleports(int client)
 {
@@ -520,7 +467,7 @@ void OnTimerStart_Teleports(int client)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static int NextIndex(int current, int maximum)
 {
@@ -552,35 +499,15 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	lastTeleportInBhopTrigger[client] = BhopTriggersJustTouched(client);
 	lastTeleportOnGround[client] = Movement_GetOnGround(client);
 	
-	// Do Teleport
 	teleportCount[client]++;
-	Movement_SetOrigin(client, destOrigin);
-	Movement_SetEyeAngles(client, destAngles);
-	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetGravity(client, 1.0);
-	CreateTimer(0.1, Timer_RemoveBoosts, GetClientUserId(client)); // Prevent booster exploits
-	
-	// Duck the player if there is something blocking them from above
-	Handle trace = TR_TraceHullFilterEx(destOrigin, 
-		destOrigin, 
-		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
-		view_as<float>( { 16.0, 16.0, 72.0 } ), 
-		MASK_PLAYERSOLID, 
-		TraceEntityFilterPlayers, 
-		client);
-	if (TR_DidHit(trace))
-	{
-		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
-	}
-	delete trace;
+	TeleportPlayer(client, destOrigin, destAngles);
 	
 	undoOrigin[client] = oldOrigin;
 	undoAngles[client] = oldAngles;
 	
-	if (GetOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
+	if (GOKZ_GetCoreOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_TELEPORT);
+		EmitSoundToClient(client, GOKZ_SOUND_TELEPORT);
 	}
 	
 	// Call Post Foward
@@ -596,7 +523,7 @@ static void CheckpointTeleportDo(int client)
 	{
 		if (!GOKZ_GetPaused(client))
 		{
-			Movement_SetMoveType(client, MOVETYPE_LADDER);
+			Movement_SetMovetype(client, MOVETYPE_LADDER);
 		}
 		else
 		{
@@ -607,16 +534,4 @@ static void CheckpointTeleportDo(int client)
 	{
 		SetPausedOnLadder(client, false);
 	}
-}
-
-public Action Timer_RemoveBoosts(Handle timer, int userid)
-{
-	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client))
-	{
-		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-		Movement_SetGravity(client, 1.0);
-	}
-	return Plugin_Continue;
 } 

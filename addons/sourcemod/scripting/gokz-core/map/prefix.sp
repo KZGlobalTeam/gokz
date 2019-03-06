@@ -10,7 +10,7 @@ static int currentMapPrefix;
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 int GetCurrentMapPrefix()
 {
@@ -19,7 +19,7 @@ int GetCurrentMapPrefix()
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ LISTENERS ]=====
 
 void OnMapStart_Prefix()
 {

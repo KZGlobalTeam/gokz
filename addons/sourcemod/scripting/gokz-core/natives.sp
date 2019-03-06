@@ -1,11 +1,3 @@
-/*
-	Natives
-	
-	GOKZ Core plugin natives.
-*/
-
-
-
 void CreateNatives()
 {
 	CreateNative("GOKZ_GetModeLoaded", Native_GetModeLoaded);
@@ -13,33 +5,40 @@ void CreateNatives()
 	CreateNative("GOKZ_SetModeLoaded", Native_SetModeLoaded);
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
+	CreateNative("GOKZ_GetOptionsTopMenu", Native_GetOptionsTopMenu);
 	
 	CreateNative("GOKZ_StartTimer", Native_StartTimer);
 	CreateNative("GOKZ_EndTimer", Native_EndTimer);
 	CreateNative("GOKZ_StopTimer", Native_StopTimer);
 	CreateNative("GOKZ_StopTimerAll", Native_StopTimerAll);
 	CreateNative("GOKZ_TeleportToStart", Native_TeleportToStart);
+	CreateNative("GOKZ_GetHasStartPosition", Native_GetHasStartPosition);
 	CreateNative("GOKZ_MakeCheckpoint", Native_MakeCheckpoint);
 	CreateNative("GOKZ_TeleportToCheckpoint", Native_TeleportToCheckpoint);
+	CreateNative("GOKZ_GetCanTeleportToCheckpoint", Native_GetCanTeleportToCheckpoint);
 	CreateNative("GOKZ_PrevCheckpoint", Native_PrevCheckpoint);
+	CreateNative("GOKZ_GetCanPrevCheckpoint", Native_GetCanPrevCheckpoint);
 	CreateNative("GOKZ_NextCheckpoint", Native_NextCheckpoint);
+	CreateNative("GOKZ_GetCanNextCheckpoint", Native_GetCanNextCheckpoint);
 	CreateNative("GOKZ_UndoTeleport", Native_UndoTeleport);
+	CreateNative("GOKZ_GetCanUndoTeleport", Native_GetCanUndoTeleport);
 	CreateNative("GOKZ_Pause", Native_Pause);
 	CreateNative("GOKZ_Resume", Native_Resume);
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
 	
-	CreateNative("GOKZ_IsClientSetUp", Native_IsClientSetUp);
 	CreateNative("GOKZ_GetTimerRunning", Native_GetTimerRunning);
-	CreateNative("GOKZ_GetCurrentCourse", Native_GetCurrentCourse);
+	CreateNative("GOKZ_GetCourse", Native_GetCourse);
 	CreateNative("GOKZ_GetPaused", Native_GetPaused);
-	CreateNative("GOKZ_GetCurrentTime", Native_GetCurrentTime);
-	CreateNative("GOKZ_SetCurrentTime", Native_SetCurrentTime);
+	CreateNative("GOKZ_GetTime", Native_GetTime);
+	CreateNative("GOKZ_SetTime", Native_SetTime);
 	CreateNative("GOKZ_GetCheckpointCount", Native_GetCheckpointCount);
 	CreateNative("GOKZ_SetCheckpointCount", Native_SetCheckpointCount);
 	CreateNative("GOKZ_GetTeleportCount", Native_GetTeleportCount);
 	CreateNative("GOKZ_SetTeleportCount", Native_SetTeleportCount);
-	CreateNative("GOKZ_GetDefaultOption", Native_GetDefaultOption);
+	CreateNative("GOKZ_RegisterOption", Native_RegisterOption);
+	CreateNative("GOKZ_GetOptionProp", Native_GetOptionProp);
+	CreateNative("GOKZ_SetOptionProp", Native_SetOptionProp);
 	CreateNative("GOKZ_GetOption", Native_GetOption);
 	CreateNative("GOKZ_SetOption", Native_SetOption);
 	CreateNative("GOKZ_GetHitPerf", Native_GetHitPerf);
@@ -87,6 +86,11 @@ public int Native_PrintToChat(Handle plugin, int numParams)
 	CPrintToChat(client, "%s", buffer);
 }
 
+public int Native_GetOptionsTopMenu(Handle plugin, int numParams)
+{
+	return view_as<int>(GetOptionsTopMenu());
+}
+
 public int Native_StartTimer(Handle plugin, int numParams)
 {
 	if (BlockedExternallyCalledTimerNative(plugin))
@@ -94,8 +98,7 @@ public int Native_StartTimer(Handle plugin, int numParams)
 		return view_as<int>(false);
 	}
 	
-	TimerStart(GetNativeCell(1), GetNativeCell(2));
-	return view_as<int>(true);
+	return view_as<int>(TimerStart(GetNativeCell(1), GetNativeCell(2)));
 }
 
 public int Native_EndTimer(Handle plugin, int numParams)
@@ -105,8 +108,7 @@ public int Native_EndTimer(Handle plugin, int numParams)
 		return view_as<int>(false);
 	}
 	
-	TimerEnd(GetNativeCell(1), GetNativeCell(2));
-	return view_as<int>(true);
+	return view_as<int>(TimerEnd(GetNativeCell(1), GetNativeCell(2)));
 }
 
 public int Native_StopTimer(Handle plugin, int numParams)
@@ -124,6 +126,11 @@ public int Native_TeleportToStart(Handle plugin, int numParams)
 	TeleportToStart(GetNativeCell(1));
 }
 
+public int Native_GetHasStartPosition(Handle plugin, int numParams)
+{
+	return GetHasStartPosition(GetNativeCell(1));
+}
+
 public int Native_MakeCheckpoint(Handle plugin, int numParams)
 {
 	MakeCheckpoint(GetNativeCell(1));
@@ -134,9 +141,19 @@ public int Native_TeleportToCheckpoint(Handle plugin, int numParams)
 	TeleportToCheckpoint(GetNativeCell(1));
 }
 
+public int Native_GetCanTeleportToCheckpoint(Handle plugin, int numParams)
+{
+	return CanTeleportToCheckpoint(GetNativeCell(1));
+}
+
 public int Native_PrevCheckpoint(Handle plugin, int numParams)
 {
 	PrevCheckpoint(GetNativeCell(1));
+}
+
+public int Native_GetCanPrevCheckpoint(Handle plugin, int numParams)
+{
+	return CanPrevCheckpoint(GetNativeCell(1));
 }
 
 public int Native_NextCheckpoint(Handle plugin, int numParams)
@@ -144,9 +161,19 @@ public int Native_NextCheckpoint(Handle plugin, int numParams)
 	NextCheckpoint(GetNativeCell(1));
 }
 
+public int Native_GetCanNextCheckpoint(Handle plugin, int numParams)
+{
+	return CanNextCheckpoint(GetNativeCell(1));
+}
+
 public int Native_UndoTeleport(Handle plugin, int numParams)
 {
 	UndoTeleport(GetNativeCell(1));
+}
+
+public int Native_GetCanUndoTeleport(Handle plugin, int numParams)
+{
+	return CanUndoTeleport(GetNativeCell(1));
 }
 
 public int Native_Pause(Handle plugin, int numParams)
@@ -169,17 +196,12 @@ public int Native_PlayErrorSound(Handle plugin, int numParams)
 	PlayErrorSound(GetNativeCell(1));
 }
 
-public int Native_IsClientSetUp(Handle plugin, int numParams)
-{
-	return view_as<int>(gB_ClientIsSetUp[GetNativeCell(1)]);
-}
-
 public int Native_GetTimerRunning(Handle plugin, int numParams)
 {
 	return view_as<int>(GetTimerRunning(GetNativeCell(1)));
 }
 
-public int Native_GetCurrentCourse(Handle plugin, int numParams)
+public int Native_GetCourse(Handle plugin, int numParams)
 {
 	return GetCurrentCourse(GetNativeCell(1));
 }
@@ -189,12 +211,12 @@ public int Native_GetPaused(Handle plugin, int numParams)
 	return view_as<int>(GetPaused(GetNativeCell(1)));
 }
 
-public int Native_GetCurrentTime(Handle plugin, int numParams)
+public int Native_GetTime(Handle plugin, int numParams)
 {
 	return view_as<int>(GetCurrentTime(GetNativeCell(1)));
 }
 
-public int Native_SetCurrentTime(Handle plugin, int numParams)
+public int Native_SetTime(Handle plugin, int numParams)
 {
 	if (BlockedExternallyCalledTimerNative(plugin))
 	{
@@ -237,19 +259,51 @@ public int Native_SetTeleportCount(Handle plugin, int numParams)
 	return view_as<int>(true);
 }
 
-public int Native_GetDefaultOption(Handle plugin, int numParams)
+public int Native_RegisterOption(Handle plugin, int numParams)
 {
-	return GetDefaultOption(GetNativeCell(1));
+	char name[30];
+	GetNativeString(1, name, sizeof(name));
+	char description[255];
+	GetNativeString(2, description, sizeof(description));
+	return view_as<int>(RegisterOption(name, description, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5), GetNativeCell(6)));
+}
+
+public int Native_GetOptionProp(Handle plugin, int numParams)
+{
+	char option[30];
+	GetNativeString(1, option, sizeof(option));
+	OptionProp prop = GetNativeCell(2);
+	any value = GetOptionProp(option, prop);
+	
+	// Return clone of Handle if called by another plugin
+	if (prop == OptionProp_Cookie && plugin != gH_ThisPlugin)
+	{
+		value = CloneHandle(value, plugin);
+	}
+	
+	return value;
+}
+
+public int Native_SetOptionProp(Handle plugin, int numParams)
+{
+	char option[30];
+	GetNativeString(1, option, sizeof(option));
+	OptionProp prop = GetNativeCell(2);
+	return SetOptionProp(option, prop, GetNativeCell(3));
 }
 
 public int Native_GetOption(Handle plugin, int numParams)
 {
-	return GetOption(GetNativeCell(1), GetNativeCell(2));
+	char option[30];
+	GetNativeString(2, option, sizeof(option));
+	return view_as<int>(GetOption(GetNativeCell(1), option));
 }
 
 public int Native_SetOption(Handle plugin, int numParams)
 {
-	SetOption(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3), GetNativeCell(4));
+	char option[30];
+	GetNativeString(2, option, sizeof(option));
+	return view_as<int>(SetOption(GetNativeCell(1), option, GetNativeCell(3)));
 }
 
 public int Native_GetHitPerf(Handle plugin, int numParams)
@@ -284,11 +338,11 @@ public int Native_JoinTeam(Handle plugin, int numParams)
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static bool BlockedExternallyCalledTimerNative(Handle plugin)
 {
-	if (plugin != g_ThisPlugin)
+	if (plugin != gH_ThisPlugin)
 	{
 		Action result;
 		Call_GOKZ_OnTimerNativeCalledExternally(plugin, result);

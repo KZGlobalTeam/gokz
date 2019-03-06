@@ -11,7 +11,6 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <gokz/jumpstats>
 #include <updater>
 
 #pragma newdecls required
@@ -23,50 +22,40 @@ public Plugin myinfo =
 {
 	name = "GOKZ Local DB", 
 	author = "DanZay", 
-	description = "GOKZ Local Database Module", 
+	description = "Provides database for players, maps, courses and times", 
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
-#define UPDATE_URL "http://updater.gokz.org/gokz-localdb.txt"
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-localdb.txt"
 
-bool gB_GOKZJumpstats;
-Regex gRE_BonusStartButton;
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
+Regex gRE_BonusStartButton;
 
 #include "gokz-localdb/api.sp"
 #include "gokz-localdb/commands.sp"
-#include "gokz-localdb/database.sp"
 
-#include "gokz-localdb/database/sql.sp"
-#include "gokz-localdb/database/create_tables.sp"
-#include "gokz-localdb/database/load_jsoptions.sp"
-#include "gokz-localdb/database/load_options.sp"
-#include "gokz-localdb/database/save_jsoptions.sp"
-#include "gokz-localdb/database/save_options.sp"
-#include "gokz-localdb/database/save_time.sp"
-#include "gokz-localdb/database/setup_client.sp"
-#include "gokz-localdb/database/setup_database.sp"
-#include "gokz-localdb/database/setup_map.sp"
-#include "gokz-localdb/database/setup_map_courses.sp"
-#include "gokz-localdb/database/set_cheater.sp"
+#include "gokz-localdb/db/sql.sp"
+#include "gokz-localdb/db/helpers.sp"
+#include "gokz-localdb/db/create_tables.sp"
+#include "gokz-localdb/db/save_time.sp"
+#include "gokz-localdb/db/set_cheater.sp"
+#include "gokz-localdb/db/setup_client.sp"
+#include "gokz-localdb/db/setup_database.sp"
+#include "gokz-localdb/db/setup_map.sp"
+#include "gokz-localdb/db/setup_map_courses.sp"
 
 
 
-// =========================  PLUGIN  ========================= //
+// =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-	if (GetEngineVersion() != Engine_CSGO)
-	{
-		SetFailState("This plugin is only for CS:GO.");
-	}
-	
 	CreateNatives();
 	RegPluginLibrary("gokz-localdb");
 	return APLRes_Success;
@@ -74,64 +63,41 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	CreateGlobalForwards();
 	CreateRegexes();
-	CreateCommands();
+	CreateGlobalForwards();
+	RegisterCommands();
 }
 
 public void OnAllPluginsLoaded()
 {
-	gB_GOKZJumpstats = LibraryExists("gokz-jumpstats");
 	if (LibraryExists("updater"))
 	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 	
 	DB_SetupDatabase();
 	
+	char auth[32];
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (GOKZ_IsClientSetUp(client))
+		if (IsClientAuthorized(client) && GetClientAuthId(client, AuthId_Engine, auth, sizeof(auth)))
 		{
-			GOKZ_OnClientSetup(client);
+			OnClientAuthorized(client, auth);
 		}
 	}
 }
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "gokz-jumpstats"))
+	if (StrEqual(name, "updater"))
 	{
-		gB_GOKZJumpstats = true;
-		
-		// Late-loading gokz-jumpstats options
-		if (gH_DB == null)
-		{
-			return;
-		}
-		
-		for (int client = 1; client <= MaxClients; client++)
-		{
-			if (GOKZ_IsClientSetUp(client) && !IsFakeClient(client))
-			{
-				DB_LoadJSOptions(client);
-			}
-		}
-	}
-	else if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
+		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 
-public void OnLibraryRemoved(const char[] name)
-{
-	gB_GOKZJumpstats = gB_GOKZJumpstats && !StrEqual(name, "gokz-replays");
-}
 
 
-
-// =========================  OTHER  ========================= //
+// =====[ OTHER EVENTS ]=====
 
 public void OnConfigsExecuted()
 {
@@ -143,48 +109,28 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 	DB_SetupMapCourses();
 }
 
-public void GOKZ_OnClientSetup(int client)
+public void OnClientAuthorized(int client, const char[] auth)
 {
-	if (IsFakeClient(client) || gH_DB == null)
-	{
-		return;
-	}
-	
 	DB_SetupClient(client);
-	DB_LoadOptions(client);
-	DB_LoadJSOptions(client);
 }
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
-	DB_SaveOptions(client);
-	DB_SaveJSOptions(client);
-	
 	gB_ClientSetUp[client] = false;
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
-	if (IsFakeClient(client))
-	{
-		return;
-	}
-	
-	int mode = GOKZ_GetOption(client, Option_Mode);
-	int style = GOKZ_GetOption(client, Option_Style);
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
 }
 
 
 
-// =========================  PRIVATE  ========================= //
+// =====[ PRIVATE ]=====
 
 static void CreateRegexes()
 {
-	gRE_BonusStartButton = CompileRegex("^climb_bonus(\\d+)_startbutton$");
+	gRE_BonusStartButton = CompileRegex(GOKZ_BONUS_START_BUTTON_NAME_REGEX);
 } 

@@ -1,11 +1,3 @@
-/*
-	API
-	
-	GOKZ Local DB API.
-*/
-
-
-
 static Handle H_OnDatabaseConnect;
 static Handle H_OnClientSetup;
 static Handle H_OnMapSetup;
@@ -13,7 +5,7 @@ static Handle H_OnTimeInserted;
 
 
 
-// =========================  FORWARDS  ========================= //
+// =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
@@ -62,7 +54,7 @@ void Call_OnTimeInserted(int client, int steamID, int mapID, int course, int mod
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 void CreateNatives()
 {
@@ -79,7 +71,7 @@ public int Native_GetDatabase(Handle plugin, int numParams)
 {
 	if (gH_DB == null)
 	{
-		return view_as<int>(INVALID_HANDLE);
+		return view_as<int>(gH_DB);
 	}
 	return view_as<int>(CloneHandle(gH_DB));
 }

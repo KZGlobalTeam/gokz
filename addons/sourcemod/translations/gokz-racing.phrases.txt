@@ -1,0 +1,218 @@
+"Phrases"
+{
+	// =====[ GENERAL ]=====
+	"Teleport Rule - None"
+	{
+		"en"		"No teleports"
+	}
+	"Teleport Rule - Unlimited"
+	{
+		"en"		"Unlimited teleports"
+	}
+
+
+	// =====[ CHAT MESSAGES ]=====
+	"Checkpoints Not Allowed During Race"
+	{
+		"en"		"{darkred}You aren't allowed to checkpoint during this race."
+	}
+	"Undo TP Not Allowed During Race"
+	{
+		"en"		"{darkred}You aren't allowed to undo TP during this race."
+	}
+	"You Are Already Part Of A Race"
+	{
+		"en"		"{darkred}You are already participating in a race."
+	}
+	"You Are Not Hosting A Race"
+	{
+		"en"		"{darkred}You are not hosting a race."
+	}
+	"You Invited Everyone"
+	{
+		"en"		"{grey}You have invited everyone that is available to be challenged."
+	}
+	"Player Already In A Race"
+	{
+		// Alice is already in a race.
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {darkred}is already in a race."
+	}
+	"Race Countdown Started"
+	{
+		"en"		"{grey}The countdown has started! {default}Get ready!"
+	}
+	"Race Has Been Aborted"
+	{
+		"en"		"{darkred}The race has been aborted."
+	}
+	"No One Accepted"
+	{
+		"en"		"{darkred}No one has accepted the race yet."
+	}
+	"Race Already Started"
+	{
+		"en"		"{darkred}The race has already started."
+	}
+	"No Opponents Available"
+	{
+		"en"		"{darkred}No one is currently available to be challenged."
+	}
+	"Race Rules"
+	{
+		// Rules [SimpleKZ | No teleports]
+		"#format"	"{1:s},{2:t}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {default}{2}{grey}"
+	}
+	"You Have Seconds To Accept"
+	{
+		// You have 15 seconds to !accept.
+		"#format"	"{1:d}"
+		"en"		"{grey}You have {default}{1} {grey}seconds to {default}!accept{grey}."
+	}
+	"You Have Declined"
+	{
+		"en"		"{grey}You have declined."
+	}
+	"Player Has Declined"
+	{
+		// Alice has declined.
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has declined."
+	}
+	"Race Request Received"
+	{
+		// Bob has invited you to a race.
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has invited you to a race."
+	}
+	"Race Request Accepted"
+	{
+		// Alice has accepted the race!
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has accepted the race!"
+	}
+	"Race Request Not Accepted In Time (Host)"
+	{
+		// Alice didn't accept the race in time.
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}didn't accept the race in time."
+	}
+	"Race Request Not Accepted In Time (Target)"
+	{
+		"en"		"{grey}You didn't accept the race in time."
+	}
+	"Race Won"
+	{
+		// Alice has won the race!
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has won the race!"
+	}
+	"Race Placed"
+	{
+		// Alice has finished the race! [#2]
+		"#format"	"{1:N},{2:d}"
+		"en"		"{lime}{1} {grey}has finished the race! [#{default}{2}{grey}]"
+	}
+	"Race Lost"
+	{
+		// Alice came last in the race. [#5]
+		"#format"	"{1:N},{2:d}"
+		"en"		"{lime}{1} {grey}came last in the race. [#{default}{2}{grey}]"
+	}
+	"Race Surrendered"
+	{
+		// Alice has surrendered!
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has surrendered!"
+	}
+	"Duel Request Sent"
+	{
+		// You have challenged Alice to a duel.
+		"#format"	"{1:N}"
+		"en"		"{grey}You have challenged {lime}{1}{grey} to a duel."
+	}
+	"Duel Request Received"
+	{
+		// Alice has challenged you to a duel!
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}has challenged you to a duel!"
+	}
+	"Duel Request Accepted"
+	{
+		// Alice has accepted a duel against Bob.
+		"#format"	"{1:N},{2:N}"
+		"en"		"{lime}{1} {grey}has accepted a duel against {lime}{2}{grey}!"
+	}
+	"Duel Request Not Accepted In Time (Host)"
+	{
+		// Alice didn't accept the duel in time.
+		"#format"	"{1:N}"
+		"en"		"{lime}{1} {grey}didn't accept the duel in time."
+	}
+	"Duel Request Not Accepted In Time (Target)"
+	{
+		"en"		"You didn't accept the duel in time."
+	}
+	"Duel Won"
+	{
+		// Alice won their duel against Bob!
+		"#format"	"{1:N},{2:N}"
+		"en"		"{lime}{1} {grey}won their duel against {lime}{2}{grey}!"
+	}
+	"Duel Surrendered"
+	{
+		// Alice surrendered in their duel against Bob!
+		"#format"	"{1:N},{2:N}"
+		"en"		"{lime}{1} {grey}has surrendered in their duel against {lime}{2}{grey}!"
+	}
+
+
+	// =====[ RACE MENU ]=====
+	"Race Menu - Title"
+	{
+		"en"		"Host a Race"
+	}
+	"Race Menu - Start Race"
+	{
+		"en"		"Start race"
+	}
+	"Race Menu - Abort Race"
+	{
+		"en"		"Abort race"
+	}
+	"Race Menu - Invite Everyone"
+	{
+		"en"		"Invite everyone"
+	}
+	"Race Menu - Rules"
+	{
+		"en"		"Rules"
+	}
+
+
+	// =====[ DUEL MENU ]=====
+	"Duel Menu - Title"
+	{
+		"en"		"Start a Duel"
+	}
+	"Duel Menu - Choose Opponent"
+	{
+		"en"		"Send challenge"
+	}
+	"Duel Opponent Selection Menu - Title"
+	{
+		"en"		"Choose Your Opponent"
+	}
+
+
+	// =====[ OTHER MENUS ]=====
+	"Mode Rule Menu - Title"
+	{
+		"en"		"Set Rule - Mode"
+	}
+	"Teleport Rule Menu - Title"
+	{
+		"en"		"Set Rule - Teleporting"
+	}
+}

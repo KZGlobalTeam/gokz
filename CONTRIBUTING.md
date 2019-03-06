@@ -16,7 +16,7 @@ Once your pull request is checked and approved, your branch will be merged into 
 
 To keep our code beautiful and maintainable, please adhere to the style guide.
 
-As a general rule, the style of your code should match what already exists. It is *highly recommended* to use [**SPEdit**](https://github.com/JulienKluge/Spedit) and its built-in syntax reformatter to assist formatting your code to match the project's style.
+As a general rule, the style of your code should match what already exists. It is recommended to use [**SPEdit**](https://github.com/JulienKluge/Spedit) and its built-in syntax reformatter to assist formatting your code to match the project's style.
 
 Our SourcePawn code is written in the [transitional syntax](https://wiki.alliedmods.net/SourcePawn_Transitional_Syntax) introduced with SourceMod 1.7.
 
@@ -66,5 +66,3 @@ float gF_SomeFloatVar;
 * Avoid introducing global variables. Instead, consider writing public accessor functions (`SetX`, `GetX`).
 
 * Keep guard clauses (early `return`) such as `IsValidClient` checks at the top of function implementations.
-
-* Implement forwards as they are defined in their `.inc` file i.e. don't change their parameter variable names.

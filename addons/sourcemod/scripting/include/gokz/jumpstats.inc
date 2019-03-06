@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Jumpstats Include File
+/*
+	gokz-jumpstats Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,7 +11,7 @@
 
 
 
-// =========================  ENUMERATIONS  ========================= //
+// =====[ ENUMS ]=====
 
 enum
 {
@@ -47,7 +47,8 @@ enum
 
 enum JSOption
 {
-	JSOption_JumpstatsMaster = 0, 
+	JSOPTION_INVALID = -1, 
+	JSOption_JumpstatsMaster, 
 	JSOption_MinChatTier, 
 	JSOption_MinConsoleTier, 
 	JSOption_MinSoundTier, 
@@ -63,7 +64,15 @@ enum
 
 
 
-// =========================  PHRASES  ========================= //
+// =====[ CONSTANTS ]=====
+
+#define JS_CFG_TIERS "cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"
+#define JS_CFG_SOUNDS "cfg/sourcemod/gokz/gokz-jumpstats-sounds.cfg"
+#define JS_OPTION_CATEGORY "Jumpstats"
+#define JS_MAX_LADDERJUMP_OFFSET 2.0
+#define JS_MAX_BHOP_GROUND_TICKS 5
+#define JS_MAX_WEIRDJUMP_FALL_OFFSET 64.0
+#define JS_MAX_TRACKED_STRAFES 32
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
@@ -89,6 +98,16 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"??"
 };
 
+stock char gC_JumpTypeKeys[JUMPTYPE_COUNT - 2][] = 
+{
+	"longjump", 
+	"bhop", 
+	"multibhop", 
+	"weirdjump", 
+	"ladderjump", 
+	"ladderhop"
+};
+
 stock char gC_DistanceTiers[DISTANCETIER_COUNT][] = 
 {
 	"None", 
@@ -99,36 +118,75 @@ stock char gC_DistanceTiers[DISTANCETIER_COUNT][] =
 	"Ownage"
 };
 
+stock char gC_DistanceTierKeys[DISTANCETIER_COUNT][] = 
+{
+	"none", 
+	"meh", 
+	"impressive", 
+	"perfect", 
+	"godlike", 
+	"ownage"
+};
+
+stock char gC_DistanceTierChatColours[DISTANCETIER_COUNT][] = 
+{
+	"{grey}", 
+	"{grey}", 
+	"{blue}", 
+	"{green}", 
+	"{darkred}", 
+	"{gold}"
+};
+
+stock char gC_JSOptionNames[JSOPTION_COUNT][] = 
+{
+	"GOKZ JS - Master Switch", 
+	"GOKZ JS - Chat Report", 
+	"GOKZ JS - Console Report", 
+	"GOKZ JS - Sounds"
+};
+
+stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 
+{
+	"Master Switch for All Jumpstats Functionality - 0 = Disabled, 1 = Enabled", 
+	"Minimum Tier for Jumpstats Chat Report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
+	"Minimum Tier for Jumpstats Console report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
+	"Minimum Tier for Jumpstats Sounds - 0 = Disabled, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage"
+};
+
+stock char gI_JSOptionPhrases[JSOPTION_COUNT][] = 
+{
+	"Options Menu - Jumpstats Master Switch", 
+	"Options Menu - Jumpstats Chat Report", 
+	"Options Menu - Jumpstats Console Report", 
+	"Options Menu - Jumpstats Sounds", 
+};
+
+stock int gI_JSOptionDefaults[JSOPTION_COUNT] = 
+{
+	JumpstatsMaster_Enabled, 
+	DistanceTier_Meh, 
+	DistanceTier_Meh, 
+	DistanceTier_Impressive
+};
+
+stock int gI_JSOptionCounts[JSOPTION_COUNT] = 
+{
+	JUMPSTATSMASTER_COUNT, 
+	DISTANCETIER_COUNT, 
+	DISTANCETIER_COUNT, 
+	DISTANCETIER_COUNT
+};
 
 
-// =========================  OTHER  ========================= //
 
-// Used and recommended for key value files
-stock char gC_KeysJumpType[JUMPTYPE_COUNT - 2][] =  { "longjump", "bhop", "multibhop", "weirdjump", "ladderjump", "ladderhop" };
-stock char gC_KeysMode[MODE_COUNT][] =  { "vanilla", "simplekz", "kztimer" };
-stock char gC_KeysDistanceTier[DISTANCETIER_COUNT][] =  { "none", "meh", "impressive", "perfect", "godlike", "ownage" };
-stock char gC_KeysJSOptions[JSOPTION_COUNT][] =  { "masterswitch", "chatreport", "consolereport", "sounds" };
-
-
-
-// =========================  FORWARDS  ========================= //
-
-/**
- * Called when a player changes a jumpstats option.
- *
- * @param client		Client index.
- * @param option		Option that was changed.
- * @param newValue		New value of the option.
- * @noreturn
- */
-forward void GOKZ_JS_OnOptionChanged(int client, JSOption option, int newValue);
+// =====[ FORWARDS ]=====
 
 /**
  * Called when a player begins their jump.
  *
  * @param client		Client index.
  * @param jumpType		Type of jump.
- * @noreturn
  */
 forward void GOKZ_JS_OnTakeoff(int client, int jumpType);
 
@@ -145,7 +203,6 @@ forward void GOKZ_JS_OnTakeoff(int client, int jumpType);
  * @param strafes		Number of strafes.
  * @param sync			Percentage of time that speed was gained.
  * @param duration		Duration of the jump in seconds.
- * @noreturn
  */
 forward void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration);
 
@@ -153,13 +210,12 @@ forward void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float o
  * Called when player's current jump has been declared an invalid jumpstat.
  *
  * @param client		Client index.
- * @noreturn
  */
 forward void GOKZ_JS_OnJumpInvalidated(int client);
 
 
 
-// =========================  NATIVES  ========================= //
+// =====[ NATIVES ]=====
 
 /**
  * Gets the default jumpstats option value as set by a config file.
@@ -170,36 +226,77 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
 native int GOKZ_JS_GetDefaultOption(JSOption option);
 
 /**
- * Gets the current value of a player's jumpstats option.
- *
- * @param client		Client index.
- * @param option		GOKZ Jumpstats option.
- * @return				Current value of option.
- */
-native int GOKZ_JS_GetOption(int client, JSOption option);
-
-/**
- * Sets the player's jumpstats option value.
- *
- * @param client		Client index.
- * @param option		GOKZ Jumpstats option.
- * @param optionValue	New option value.
- * @param printMessage	Whether to print option change messages.
- * @noreturn
- */
-native void GOKZ_JS_SetOption(int client, JSOption option, int optionValue, bool printMessage = false);
-
-/**
- * Declare the player's current jump an invalid jumpstat.
+ * Declare a player's current jump an invalid jumpstat.
  *
  * @param client    	Client index.
- * @noreturn
  */
 native void GOKZ_JS_InvalidateJump(int client);
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ STOCKS ]=====
+
+/**
+ * Returns whether an option is a gokz-jumpstats option.
+ *
+ * @param option		Option name.
+ * @param optionEnum	Variable to store enumerated gokz-jumpstats option (if it is one).
+ * @return				Whether option is a gokz-jumpstats option.
+ */
+stock bool GOKZ_JS_IsJSOption(const char[] option, JSOption &optionEnum = JSOPTION_INVALID)
+{
+	for (JSOption i; i < JSOPTION_COUNT; i++)
+	{
+		if (StrEqual(option, gC_JSOptionNames[i]))
+		{
+			optionEnum = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Gets the current value of a player's gokz-jumpstats option.
+ *
+ * @param client		Client index.
+ * @param option		gokz-jumpstats option.
+ * @return				Current value of option.
+ */
+stock any GOKZ_JS_GetOption(int client, JSOption option)
+{
+	return GOKZ_GetOption(client, gC_JSOptionNames[option]);
+}
+
+/**
+ * Sets a player's gokz-jumpstats option's value.
+ *
+ * @param client		Client index.
+ * @param option		gokz-jumpstats option.
+ * @param value			New option value.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_JS_SetOption(int client, JSOption option, any value)
+{
+	return GOKZ_SetOption(client, gC_JSOptionNames[option], value);
+}
+
+/**
+ * Increment an integer-type gokz-jumpstats option's value.
+ * Loops back to '0' if max value is exceeded.
+ *
+ * @param client		Client index.
+ * @param option		gokz-jumpstats option.
+ * @return				Whether option was successfully set.
+ */
+stock bool GOKZ_JS_CycleOption(int client, JSOption option)
+{
+	return GOKZ_CycleOption(client, gC_JSOptionNames[option]);
+}
+
+
+
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_jumpstats = 
 {
@@ -215,9 +312,6 @@ public SharedPlugin __pl_gokz_jumpstats =
 #if !defined REQUIRE_PLUGIN
 public void __pl_gokz_jumpstats_SetNTVOptional()
 {
-	MarkNativeAsOptional("GOKZ_JS_GetDefaultOptions");
-	MarkNativeAsOptional("GOKZ_JS_GetOption");
-	MarkNativeAsOptional("GOKZ_JS_SetOption");
 	MarkNativeAsOptional("GOKZ_JS_InvalidateJump");
 }
 #endif

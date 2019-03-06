@@ -1,13 +1,3 @@
-/*	
-	Pause
-	
-	Pausing and resuming functionality.
-*/
-
-
-
-#define PAUSE_COOLDOWN 1.0
-
 static bool paused[MAXPLAYERS + 1];
 static bool pausedOnLadder[MAXPLAYERS + 1];
 static float lastPauseTime[MAXPLAYERS + 1];
@@ -17,7 +7,7 @@ static bool hasResumedInThisRun[MAXPLAYERS + 1];
 
 
 
-// =========================  PUBLIC  ========================= //
+// =====[ PUBLIC ]=====
 
 bool GetPaused(int client)
 {
@@ -36,7 +26,7 @@ void Pause(int client)
 		return;
 	}
 	if (GetTimerRunning(client) && hasResumedInThisRun[client]
-		 && GetEngineTime() - lastResumeTime[client] < PAUSE_COOLDOWN)
+		 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
 		GOKZ_PlayErrorSound(client);
@@ -61,9 +51,9 @@ void Pause(int client)
 	
 	// Pause
 	paused[client] = true;
-	pausedOnLadder[client] = Movement_GetMoveType(client) == MOVETYPE_LADDER;
+	pausedOnLadder[client] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
 	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetMoveType(client, MOVETYPE_NONE);
+	Movement_SetMovetype(client, MOVETYPE_NONE);
 	if (GetTimerRunning(client))
 	{
 		hasPausedInThisRun[client] = true;
@@ -81,7 +71,7 @@ void Resume(int client)
 		return;
 	}
 	if (GetTimerRunning(client) && hasPausedInThisRun[client]
-		 && GetEngineTime() - lastPauseTime[client] < PAUSE_COOLDOWN)
+		 && GetEngineTime() - lastPauseTime[client] < GOKZ_PAUSE_COOLDOWN)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Just Paused)");
 		GOKZ_PlayErrorSound(client);
@@ -99,11 +89,11 @@ void Resume(int client)
 	// Resume
 	if (pausedOnLadder[client])
 	{
-		Movement_SetMoveType(client, MOVETYPE_LADDER);
+		Movement_SetMovetype(client, MOVETYPE_LADDER);
 	}
 	else
 	{
-		Movement_SetMoveType(client, MOVETYPE_WALK);
+		Movement_SetMovetype(client, MOVETYPE_WALK);
 	}
 	paused[client] = false;
 	if (GetTimerRunning(client))
@@ -130,9 +120,9 @@ void TogglePause(int client)
 
 
 
-// =========================  LISTENERS  ========================= //
+// =====[ EVENTS ]=====
 
-void SetupClientPause(int client)
+void OnClientPutInServer_Pause(int client)
 {
 	paused[client] = false;
 }
@@ -144,10 +134,10 @@ void OnTimerStart_Pause(int client)
 	GOKZ_Resume(client);
 }
 
-void OnChangeMoveType_Pause(int client, MoveType newMoveType)
+void OnChangeMovetype_Pause(int client, MoveType newMovetype)
 {
 	// Check if player has escaped MOVETYPE_NONE
-	if (!paused[client] || newMoveType == MOVETYPE_NONE)
+	if (!paused[client] || newMovetype == MOVETYPE_NONE)
 	{
 		return;
 	}

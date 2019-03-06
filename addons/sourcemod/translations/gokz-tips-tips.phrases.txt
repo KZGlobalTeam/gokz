@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"!tips"
+	{
+		"en"		"{grey}Don't need these tips like this one showing up in chat? You can toggle them by typing {default}!tips{grey}."
+	}
+}

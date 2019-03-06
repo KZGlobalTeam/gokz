@@ -1,5 +1,5 @@
-/* 	
-	GOKZ Replays Include File
+/*
+	gokz-replays Plugin Include
 	
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
@@ -11,17 +11,56 @@
 
 
 
-// =========================  DEFINITIONS  ========================= //
+// =====[ CONSTANTS ]=====
 
-#define REPLAY_DIRECTORY "data/gokz-replays" // In Path_SM
-#define REPLAY_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters"
-#define REPLAY_FILE_EXTENSION "replay"
-#define REPLAY_MAGIC_NUMBER 0x676F6B7A
-#define REPLAY_FORMAT_VERSION 0x01
+#define RP_DIRECTORY "data/gokz-replays" // In Path_SM
+#define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
+#define RP_FILE_EXTENSION "replay"
+#define RP_MAGIC_NUMBER 0x676F6B7A
+#define RP_FORMAT_VERSION 0x01
+#define RP_NAV_FILE "maps/gokz-replays.nav"
+#define RP_TICK_DATA_BLOCKSIZE 7
+#define RP_CACHE_BLOCKSIZE 4
+#define RP_MAX_BOTS 2
+#define RP_PLAYBACK_BREATHER_TIME 2.0
 
 
 
-// =========================  DEPENDENCY  ========================= //
+// =====[ FORWARDS ]=====
+
+/**
+ * Called when a replay of a player is written to disk.
+ * This includes replays of cheaters which are saved if
+ * the player is marked as a cheater by gokz-localdb.
+ *
+ * @param client			Client index.
+ * @param filePath			Replay file path.
+ */
+forward void GOKZ_RP_OnReplaySaved(int client, const char[] filePath);
+
+/**
+ * Called when a currently being recorded replay is discarded from
+ * memory and recording has been stopped (without writing it to disk).
+ *
+ * @param client			Client index.
+ */
+forward void GOKZ_RP_OnReplayDiscarded(int client);
+
+/**
+ * Called when a player has ended their timer, and gokz-replays has
+ * processed the time and has possibly written a replay to disk.
+ *
+ * @param client			Client index.
+ * @param filePath			Replay file path, or "" if no replay saved.
+ * @param course    		Course number.
+ * @param time				Player's end time.
+ * @param teleportsUsed		Number of teleports used by player.
+ */
+forward void GOKZ_RP_OnTimerEnd_Post(int client, const char[] filePath, int course, float time, int teleportsUsed);
+
+
+
+// =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_replays = 
 {
