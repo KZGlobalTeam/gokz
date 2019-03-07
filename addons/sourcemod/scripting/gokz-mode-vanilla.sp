@@ -38,7 +38,7 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 	1.0,  // sv_accelerate_use_weapon_speed
 	12.0,  // sv_airaccelerate
 	30.0,  // sv_air_max_wishspeed
-	1.0,  // sv_enablebunnyhopping
+	0.0,  // sv_enablebunnyhopping
 	5.2,  // sv_friction
 	800.0,  // sv_gravity
 	301.993377,  // sv_jump_impulse
