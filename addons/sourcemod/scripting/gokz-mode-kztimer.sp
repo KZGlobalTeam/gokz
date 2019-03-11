@@ -247,6 +247,12 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	}
 }
 
+public void GOKZ_OnCountedTeleport_Post(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	ResetPrestrafeVelMod(player);
+}
+
 
 
 // =====[ GENERAL ]=====
@@ -419,6 +425,12 @@ float GetClientMovingDirection(int client, bool ladder)
 		direction = direction * -1;
 	}
 	return direction;
+}
+
+void ResetPrestrafeVelMod(KZPlayer player)
+{
+	gF_PreVelMod[player.ID] = 1.0;
+	gI_PreTickCounter[player.ID] = 0;
 }
 
 float CalcWeaponVelMod(KZPlayer player)
