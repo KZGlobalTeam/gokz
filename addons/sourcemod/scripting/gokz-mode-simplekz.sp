@@ -273,6 +273,12 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	}
 }
 
+public void GOKZ_OnCountedTeleport_Post(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	ResetPrestrafeVelMod(player);
+}
+
 
 
 // =====[ GENERAL ]=====
@@ -395,6 +401,11 @@ bool ValidPrestrafeButtons(KZPlayer player)
 	bool forwardOrBack = player.Buttons & (IN_FORWARD | IN_BACK) && !(player.Buttons & IN_FORWARD && player.Buttons & IN_BACK);
 	bool leftOrRight = player.Buttons & (IN_MOVELEFT | IN_MOVERIGHT) && !(player.Buttons & IN_MOVELEFT && player.Buttons & IN_MOVERIGHT);
 	return forwardOrBack || leftOrRight;
+}
+
+void ResetPrestrafeVelMod(KZPlayer player)
+{
+	gF_PreVelMod[player.ID] = 1.0;
 }
 
 float CalcWeaponVelMod(KZPlayer player)
