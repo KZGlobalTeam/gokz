@@ -163,6 +163,19 @@ stock int IntMin(int value1, int value2)
 }
 
 /**
+ * Rounds a float to the nearest specified power of 10.
+ *
+ * @param value			Value to round.
+ * @param power			Power of 10 to round to.
+ * @return				Rounded value.
+ */
+stock float RoundToPowerOf10(float value, int power)
+{
+	float pow = Pow(10.0, float(power));
+	return RoundFloat(value / pow) * pow; 
+}
+
+/**
  * Sets all characters in a string to lower case.
  *
  * @param input			Input string.

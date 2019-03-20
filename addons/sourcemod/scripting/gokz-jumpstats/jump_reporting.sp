@@ -88,25 +88,25 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 		gC_ModeNames[GOKZ_GetCoreOption(jumper, Option_Mode)], 
 		offset, "Offset", 
 		height, "Height", 
-		RoundFloat(preSpeed), "Pre", 
-		RoundFloat(maxSpeed), "Max", 
+		RoundToPowerOf10(preSpeed, -3), "Pre", 
+		RoundToPowerOf10(maxSpeed, -3), "Max", 
 		strafes, strafes == 1 ? "Strafe" : "Strafes", 
 		sync, "Sync", 
 		duration, "Airtime");
-	PrintToConsole(client, "  #. %12t%12t%12t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)");
+	PrintToConsole(client, "  #.  %12t%12t%12t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)");
 	if (GetStrafeAirtime(jumper, 0) > 0.001)
 	{
-		PrintToConsole(client, "  0. -           -           -           %3d%%", RoundFloat(GetStrafeAirtime(jumper, 0)));
+		PrintToConsole(client, "  0.  ------      ------      ------      %5.1f%%", GetStrafeAirtime(jumper, 0));
 	}
 	for (int strafe = 1; strafe <= strafes && strafe < JS_MAX_TRACKED_STRAFES; strafe++)
 	{
 		PrintToConsole(client, 
-			" %2d. %3.0f%%        %-11.3f %-11.3f %3d%%", 
+			" %2d.  %5.1f%%      %6.3f      %6.3f      %5.1f%%", 
 			strafe, 
 			GetStrafeSync(jumper, strafe), 
 			GetStrafeGain(jumper, strafe), 
 			GetStrafeLoss(jumper, strafe), 
-			RoundFloat(GetStrafeAirtime(jumper, strafe)));
+			GetStrafeAirtime(jumper, strafe));
 	}
 	PrintToConsole(client, ""); // New line
 }
