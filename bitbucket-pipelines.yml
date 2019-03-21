@@ -23,6 +23,10 @@ pipelines:
     '{master,dev}':
       - step: *compile
 
+  pull-requests:
+    '*':
+      - step: *compile
+
   tags:
     '*':
       - step: *compile

@@ -30,7 +30,7 @@ enum ObsMode
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_VERSION "2.0.1"
+#define GOKZ_VERSION "2.0.2"
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
 #define TICK_RATE 128.0
 #define EPSILON 0.000001
@@ -160,6 +160,19 @@ stock int IntMin(int value1, int value2)
 		return value1;
 	}
 	return value2;
+}
+
+/**
+ * Rounds a float to the nearest specified power of 10.
+ *
+ * @param value			Value to round.
+ * @param power			Power of 10 to round to.
+ * @return				Rounded value.
+ */
+stock float RoundToPowerOf10(float value, int power)
+{
+	float pow = Pow(10.0, float(power));
+	return RoundFloat(value / pow) * pow; 
 }
 
 /**

@@ -30,7 +30,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 5
+#define MODE_VERSION 6
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
@@ -273,6 +273,12 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	}
 }
 
+public void GOKZ_OnCountedTeleport_Post(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	ResetPrestrafeVelMod(player);
+}
+
 
 
 // =====[ GENERAL ]=====
@@ -395,6 +401,11 @@ bool ValidPrestrafeButtons(KZPlayer player)
 	bool forwardOrBack = player.Buttons & (IN_FORWARD | IN_BACK) && !(player.Buttons & IN_FORWARD && player.Buttons & IN_BACK);
 	bool leftOrRight = player.Buttons & (IN_MOVELEFT | IN_MOVERIGHT) && !(player.Buttons & IN_MOVELEFT && player.Buttons & IN_MOVERIGHT);
 	return forwardOrBack || leftOrRight;
+}
+
+void ResetPrestrafeVelMod(KZPlayer player)
+{
+	gF_PreVelMod[player.ID] = 1.0;
 }
 
 float CalcWeaponVelMod(KZPlayer player)
