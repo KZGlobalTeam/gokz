@@ -69,6 +69,7 @@ enum
 #define JS_CFG_TIERS "cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"
 #define JS_CFG_SOUNDS "cfg/sourcemod/gokz/gokz-jumpstats-sounds.cfg"
 #define JS_OPTION_CATEGORY "Jumpstats"
+#define JS_MAX_NORMAL_OFFSET 0.6
 #define JS_MAX_LADDERJUMP_OFFSET 2.0
 #define JS_MAX_BHOP_GROUND_TICKS 5
 #define JS_MAX_WEIRDJUMP_FALL_OFFSET 64.0
