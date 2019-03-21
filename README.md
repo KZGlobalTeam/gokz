@@ -39,6 +39,8 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
  * When the plugins first load, various configuration files will be auto-generated and can be found in `csgo/cfg/sourcemod/gokz`.
  * Use `sm_updatemappool` to populate the ranked map pool with those in `csgo/cfg/sourcemod/gokz/gokz-localranks-mappool.cfg`.
 
+Please refer to the wiki for a [more detailed installation guide](https://bitbucket.org/kztimerglobalteam/gokz/wiki/Installation%20Guide).
+
 ### Updating
 
  * Minor updates - Download and extract `GOKZ-latest-upgrade.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
@@ -61,7 +63,7 @@ To add a timer button to a map, use a `func_button` with a specific name.
 
 ## Contributing
 
-All contributions are greatly appreciated! If you are interested, please see [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+GOKZ is an open-source, community-driven project. If you are interested in helping out, please see [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## Authors
 
