@@ -45,6 +45,11 @@ void OnStartButtonPress_VirtualButtons(int client, int course)
 
 void OnEndButtonPress_VirtualButtons(int client, int course)
 {
+	if (IsPlayerStuck(client))
+	{
+		return;
+	}
+	
 	Movement_GetOrigin(client, virtualEndOrigin[client]);
 	virtualEndCourse[client] = course;
 	hasVirtualEndButton[client] = true;
