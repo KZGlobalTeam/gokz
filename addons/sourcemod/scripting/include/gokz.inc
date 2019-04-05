@@ -443,6 +443,6 @@ stock bool IsPlayerStuck(int client)
 	GetClientMaxs(client, vecMax);
 	GetClientAbsOrigin(client, vecOrigin);
 	
-	TR_TraceHullFilter(vecOrigin, vecOrigin, vecMin, vecMax, MASK_SOLID, TraceEntityFilterPlayers);
+	TR_TraceHullFilter(vecOrigin, vecOrigin, vecMin, vecMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	return TR_DidHit(); // head in wall ?
 } 
