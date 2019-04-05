@@ -45,6 +45,12 @@ void OnStartButtonPress_VirtualButtons(int client, int course)
 
 void OnEndButtonPress_VirtualButtons(int client, int course)
 {
+	// Prevent setting end virtual button to where it would usually be unreachable
+	if (IsPlayerStuck(client))
+	{
+		return;
+	}
+	
 	Movement_GetOrigin(client, virtualEndOrigin[client]);
 	virtualEndCourse[client] = course;
 	hasVirtualEndButton[client] = true;

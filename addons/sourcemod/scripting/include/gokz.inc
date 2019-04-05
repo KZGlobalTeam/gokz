@@ -172,7 +172,7 @@ stock int IntMin(int value1, int value2)
 stock float RoundToPowerOf10(float value, int power)
 {
 	float pow = Pow(10.0, float(power));
-	return RoundFloat(value / pow) * pow; 
+	return RoundFloat(value / pow) * pow;
 }
 
 /**
@@ -427,4 +427,22 @@ public Action Timer_RemoveBoosts(Handle timer, int userid)
 		Movement_SetGravity(client, 1.0);
 	}
 	return Plugin_Continue;
+}
+
+/**
+ * Returns whether the player is stuck e.g. in a wall after noclipping.
+ *
+ * @param client		Client index.
+ * @return				Whether player is stuck.
+ */
+stock bool IsPlayerStuck(int client)
+{
+	float vecMin[3], vecMax[3], vecOrigin[3];
+	
+	GetClientMins(client, vecMin);
+	GetClientMaxs(client, vecMax);
+	GetClientAbsOrigin(client, vecOrigin);
+	
+	TR_TraceHullFilter(vecOrigin, vecOrigin, vecMin, vecMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	return TR_DidHit(); // head in wall ?
 } 
