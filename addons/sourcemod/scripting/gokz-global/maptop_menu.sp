@@ -57,10 +57,8 @@ public int MenuHandler_MapTopModeMenu(Menu menu, MenuAction action, int param1, 
 {
 	if (action == MenuAction_Select)
 	{
-		char info[8];
-		menu.GetItem(param2, info, sizeof(info));
-		int mode = StringToInt(info);
-		DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], mode);
+		// param1 = client, param2 = mode
+		DisplayMapTopMenu(param1, mapTopMap[param1], mapTopCourse[param1], param2);
 	}
 	else if (action == MenuAction_End)
 	{

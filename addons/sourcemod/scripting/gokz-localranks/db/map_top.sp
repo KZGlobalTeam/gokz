@@ -309,6 +309,7 @@ public int MenuHandler_MapTopMode(Menu menu, MenuAction action, int param1, int 
 {
 	if (action == MenuAction_Select)
 	{
+		// param1 = client, param2 = mode
 		DisplayMapTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)
