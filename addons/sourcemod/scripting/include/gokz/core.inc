@@ -162,6 +162,11 @@ enum
 #define GOKZ_BONUS_START_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_startbutton$"
 #define GOKZ_BONUS_END_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_endbutton$"
 
+#define GOKZ_START_ZONE_NAME "climb_startzone"
+#define GOKZ_END_ZONE_NAME "climb_endzone"
+#define GOKZ_BONUS_START_ZONE_NAME_REGEX "^climb_bonus(\\d+)_startzone$"
+#define GOKZ_BONUS_END_ZONE_NAME_REGEX "^climb_bonus(\\d+)_endzone$"
+
 #define GOKZ_CFG_SERVER "sourcemod/gokz/gokz.cfg"
 #define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/options.cfg"
 #define GOKZ_CFG_OPTIONS_SORTING "cfg/sourcemod/gokz/options_menu_sorting.cfg"
@@ -672,9 +677,10 @@ native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, an
  *
  * @param client    	Client index.
  * @param course    	Course number.
+ * @param allowMidair	Whether player is allowed to start timer midair.
  * @return				Whether player's timer was started.
  */
-native bool GOKZ_StartTimer(int client, int course);
+native bool GOKZ_StartTimer(int client, int course, bool allowOffGround = false);
 
 /**
  * Ends a player's timer for a course on the current map.

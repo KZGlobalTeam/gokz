@@ -56,6 +56,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/bhop_triggers.sp"
 #include "gokz-core/map/prefix.sp"
+#include "gokz-core/map/zones.sp"
 
 #include "gokz-core/menus/mode_menu.sp"
 #include "gokz-core/menus/options_menu.sp"
@@ -98,6 +99,7 @@ public void OnPluginStart()
 	RegisterCommands();
 	
 	OnPluginStart_MapButtons();
+	OnPluginStart_MapZones();
 	OnPluginStart_Options();
 }
 
@@ -295,6 +297,7 @@ public void OnEntityCreated(int entity, const char[] classname)
 public void OnEntitySpawned(int entity)
 {
 	OnEntitySpawned_MapButtons(entity);
+	OnEntitySpawned_MapZones(entity);
 	OnEntitySpawned_MapBhopTriggers(entity);
 }
 

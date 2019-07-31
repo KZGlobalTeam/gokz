@@ -49,10 +49,10 @@ int GetCurrentTimeType(int client)
 	return TimeType_Nub;
 }
 
-bool TimerStart(int client, int course, bool allowOffGround = false)
+bool TimerStart(int client, int course, bool allowMidair = false)
 {
 	if (!IsPlayerAlive(client)
-		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS) && !allowOffGround
+		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS) && !allowMidair
 		 || !IsPlayerValidMoveType(client)
 		 || JustStartedTimer(client))
 	{
