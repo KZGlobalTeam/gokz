@@ -75,7 +75,8 @@ public void OnEndButtonPress(const char[] name, int caller, int activator, float
 
 public void OnBonusStartButtonPress(const char[] name, int caller, int activator, float delay)
 {
-	if (!IsValidEntity(caller) || !IsValidClient(activator)) {
+	if (!IsValidEntity(caller) || !IsValidClient(activator))
+	{
 		return;
 	}
 	

@@ -128,6 +128,15 @@
 		"en"		"{grey}You have cleared your custom start position."
 		"chi"		"{grey}你清除了自定义起始点."
 	}
+	"No Start Found"
+	{
+		"en"		"{grey}The start of the main course was not found."
+	}
+	"No Start Found (Bonus)"
+	{
+		"#format"	"{1:d}"
+		"en"		"{grey}The start of {bluegrey}Bonus {1} was not found."
+	}
 	"Option - Auto Restart - Enable"
 	{
 		"en"		"{grey}Your timer will now restart upon teleporting to start."

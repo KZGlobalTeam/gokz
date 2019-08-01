@@ -157,6 +157,9 @@ enum
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
 #define GOKZ_SOUND_TIMER_STOP "buttons/button18.wav"
 
+#define GOKZ_START_NAME "climb_start"
+#define GOKZ_BONUS_START_NAME_REGEX "^climb_bonus(\\d+)_start$"
+
 #define GOKZ_START_BUTTON_NAME "climb_startbutton"
 #define GOKZ_END_BUTTON_NAME "climb_endbutton"
 #define GOKZ_BONUS_START_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_startbutton$"

@@ -56,6 +56,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/bhop_triggers.sp"
 #include "gokz-core/map/prefix.sp"
+#include "gokz-core/map/starts.sp"
 #include "gokz-core/map/zones.sp"
 
 #include "gokz-core/menus/mode_menu.sp"
@@ -99,6 +100,7 @@ public void OnPluginStart()
 	RegisterCommands();
 	
 	OnPluginStart_MapButtons();
+	OnPluginStart_MapStarts();
 	OnPluginStart_MapZones();
 	OnPluginStart_Options();
 }
@@ -148,6 +150,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
 	OnClientPutInServer_ClanTag(client);
+	OnClientPutInServer_MapStarts(client);
 	HookClientEvents(client);
 }
 
@@ -270,8 +273,9 @@ public void GOKZ_OnJoinTeam(int client, int team)
 public void OnMapStart()
 {
 	OnMapStart_KZConfig();
-	OnMapStart_Prefix();
 	OnMapStart_Options();
+	OnMapStart_Prefix();
+	OnMapStart_MapStarts();
 }
 
 public void OnConfigsExecuted()
@@ -296,9 +300,10 @@ public void OnEntityCreated(int entity, const char[] classname)
 
 public void OnEntitySpawned(int entity)
 {
-	OnEntitySpawned_MapButtons(entity);
-	OnEntitySpawned_MapZones(entity);
 	OnEntitySpawned_MapBhopTriggers(entity);
+	OnEntitySpawned_MapButtons(entity);
+	OnEntitySpawned_MapStarts(entity);
+	OnEntitySpawned_MapZones(entity);
 }
 
 public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start post no copy hook

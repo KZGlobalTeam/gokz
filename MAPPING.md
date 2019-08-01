@@ -31,3 +31,14 @@ To add a timer zone to a map, use a `trigger_multiple` with a specific name.
  * End zones are named `climb_endzone`.
  * Bonus start zones are named `climb_bonusX_startzone` where X is the bonus number.
  * Bonus end zones are named `climb_bonusX_endzone` where X is the bonus number.
+
+### Course Starts
+
+Course starts mark where players will be placed when they are teleported to a course.
+
+To add a course start, use a `info_teleport_destination` with a specific name.
+
+ * Main course start is named `climb_start`.
+ * Bonus course starts are named `climb_bonusX_start` where X is the bonus number.
+
+**TIP** - Be sure to set the angles of the start to face an appropriate direction.

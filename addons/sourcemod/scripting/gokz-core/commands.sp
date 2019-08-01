@@ -5,9 +5,12 @@ void RegisterCommands()
 	RegConsoleCmd("sm_prev", CommandPrevCheckpoint, "[KZ] Go back a checkpoint.");
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
-	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
-	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
-	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to the start of the map.");
+	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
+	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
+	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
+	RegConsoleCmd("sm_main", CommandMain, "[KZ] Teleport to the start of the main course.");
+	RegConsoleCmd("sm_bonus", CommandBonus, "[KZ] Teleport to the start of a bonus. Usage: `!bonus <#bonus>");
+	RegConsoleCmd("sm_b", CommandBonus, "[KZ] Teleport to the start of a bonus. Usage: `!b <#bonus>");
 	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
 	RegConsoleCmd("sm_ssp", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
 	RegConsoleCmd("sm_clearstartpos", CommandClearStartPos, "[KZ] Clear your custom start position.");
@@ -92,9 +95,59 @@ public Action CommandTeleportToStart(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandMain(int client, int args)
+{
+	if (SetCustomStartPositionToMap(client, 0, true))
+	{
+		GOKZ_TeleportToStart(client);
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "No Start Found", 1);
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandBonus(int client, int args)
+{
+	if (args == 0)
+	{  // Go to Bonus 1
+		if (SetCustomStartPositionToMap(client, 1, true))
+		{
+			GOKZ_TeleportToStart(client);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", 1);
+		}
+	}
+	else
+	{  // Go to specified Bonus #
+		char argBonus[4];
+		GetCmdArg(1, argBonus, sizeof(argBonus));
+		int bonus = StringToInt(argBonus);
+		if (bonus > 0 && bonus < GOKZ_MAX_COURSES)
+		{
+			if (SetCustomStartPositionToMap(client, bonus, true))
+			{
+				GOKZ_TeleportToStart(client);
+			}
+			else
+			{
+				GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", bonus);
+			}
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Bonus Number", argBonus);
+		}
+	}
+	return Plugin_Handled;
+}
+
 public Action CommandSetStartPos(int client, int args)
 {
-	SetCustomStartPosition(client);
+	SetCustomStartPositionToCurrent(client);
 	return Plugin_Handled;
 }
 
