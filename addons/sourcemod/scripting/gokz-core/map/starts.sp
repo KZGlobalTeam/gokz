@@ -32,7 +32,7 @@ void OnEntitySpawned_MapStarts(int entity)
 	{
 		if (StrEqual(GOKZ_START_NAME, tempString, false))
 		{
-			Storestart(0, entity);
+			StoreStart(0, entity);
 		}
 		else if (MatchRegex(RE_BonusStart, tempString) > 0)
 		{
@@ -40,7 +40,7 @@ void OnEntitySpawned_MapStarts(int entity)
 			int course = StringToInt(tempString);
 			if (course > 0 && course < GOKZ_MAX_COURSES)
 			{
-				Storestart(course, entity);
+				StoreStart(course, entity);
 			}
 		}
 	}
@@ -74,7 +74,7 @@ bool SetCustomStartPositionToMap(int client, int course, bool quiet = false)
 
 // =====[ PRIVATE ]=====
 
-static void Storestart(int course, int entity)
+static void StoreStart(int course, int entity)
 {
 	float origin[3], angles[3];
 	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
