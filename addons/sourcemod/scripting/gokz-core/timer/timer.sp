@@ -164,12 +164,13 @@ void TimerStopAll(bool playSound = true)
 void OnClientPutInServer_Timer(int client)
 {
 	timerRunning[client] = false;
+	currentTime[client] = 0.0;
+	currentCourse[client] = 0;
 	hasStartedTimerThisMap[client] = false;
 	hasEndedTimerThisMap[client] = false;
-	currentTime[client] = 0.0;
 	lastEndTime[client] = 0.0;
-	lastStartSoundTime[client] = 0.0;
 	lastFalseEndTime[client] = 0.0;
+	lastStartSoundTime[client] = 0.0;
 }
 
 void OnPlayerRunCmdPost_Timer(int client)
