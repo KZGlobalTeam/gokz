@@ -126,7 +126,7 @@ public Action CommandBonus(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0 && bonus < GOKZ_MAX_COURSES)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			if (SetCustomStartPositionToMap(client, bonus, true))
 			{

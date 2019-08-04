@@ -1233,6 +1233,18 @@ stock int GOKZ_GetDefaultMode()
 	return GOKZ_GetCoreOptionProp(Option_Mode, OptionProp_DefaultValue);
 }
 
+/**
+ * Returns whether a course number is a valid (within valid range).
+ *
+ * @param course		Course number.
+ * @param bonus			Whether to only consider bonus course numbers as valid.
+ * @return				Whether course number is valid.
+ */
+stock bool GOKZ_IsValidCourse(int course, bool bonus = false)
+{
+	return (!bonus && course == 0) || (0 < course && course < GOKZ_MAX_COURSES);
+}
+
 
 
 // =====[ DEPENDENCY ]=====

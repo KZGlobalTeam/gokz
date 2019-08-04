@@ -67,7 +67,7 @@ public Action CommandBMapTop(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), bonus);
 		}
@@ -82,7 +82,7 @@ public Action CommandBMapTop(int client, int args)
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_OpenMapTopModeMenu_FindMap(client, argMap, bonus);
 		}
@@ -137,7 +137,7 @@ public Action CommandBPB(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -152,7 +152,7 @@ public Action CommandBPB(int client, int args)
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintPBs_FindMap(client, GetSteamAccountID(client), argMap, bonus, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -168,7 +168,7 @@ public Action CommandBPB(int client, int args)
 		GetCmdArg(2, argMap, sizeof(argMap));
 		GetCmdArg(3, argPlayer, sizeof(argPlayer));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintPBs_FindPlayerAndMap(client, argPlayer, argMap, bonus, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -224,7 +224,7 @@ public Action CommandBWR(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetCoreOption(client, Option_Mode));
 			if (gB_GOKZGlobal)
@@ -243,7 +243,7 @@ public Action CommandBWR(int client, int args)
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintRecords_FindMap(client, argMap, bonus, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -291,7 +291,7 @@ public Action CommandBAVG(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetCoreOption(client, Option_Mode));
 		}
@@ -306,7 +306,7 @@ public Action CommandBAVG(int client, int args)
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintAverage_FindMap(client, argMap, bonus, GOKZ_GetCoreOption(client, Option_Mode));
 		}

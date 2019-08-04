@@ -9,6 +9,7 @@
 #endif
 #define _gokz_included_
 
+#include <regex>
 #include <movement>
 
 
@@ -445,4 +446,39 @@ stock bool IsPlayerStuck(int client)
 	
 	TR_TraceHullFilter(vecOrigin, vecOrigin, vecMin, vecMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	return TR_DidHit(); // head in wall ?
+}
+
+/**
+ * Retrieves the name of an entity.
+ *
+ * @param entity			Index of the entity.
+ * @param buffer			Buffer to store the name.
+ * @param maxlength			Maximum length of the buffer.
+ * @return					Number of non-null bytes written.
+ */
+stock int GetEntityName(int entity, char[] buffer, int maxlength)
+{
+	return GetEntPropString(entity, Prop_Data, "m_iName", buffer, maxlength);
+}
+
+/**
+ * Returns an integer from an entity's name as matched using a regular expression.
+ *
+ * @param entity		Entity index.
+ * @param re			Regular expression to match the integer with.
+ * @returns				Integer found in the entity's name, or -1 if not found.
+ */
+stock int GetIntFromEntityName(int entity, Regex re)
+{
+	int num = -1;
+	char buffer[32];
+	GetEntityName(entity, buffer, sizeof(buffer));
+	
+	if (re.Match(buffer) > 0)
+	{
+		re.GetSubString(1, buffer, sizeof(buffer));
+		num = StringToInt(buffer);
+	}
+	
+	return num;
 } 

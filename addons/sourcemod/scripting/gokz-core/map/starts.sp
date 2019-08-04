@@ -20,28 +20,29 @@ void OnPluginStart_MapStarts()
 
 void OnEntitySpawned_MapStarts(int entity)
 {
-	char tempString[32];
+	char buffer[32];
 	
-	GetEntityClassname(entity, tempString, sizeof(tempString));
-	if (!StrEqual("info_teleport_destination", tempString, false))
+	GetEntityClassname(entity, buffer, sizeof(buffer));
+	if (!StrEqual("info_teleport_destination", buffer, false))
 	{
 		return;
 	}
 	
-	if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
+	if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
 	{
-		if (StrEqual(GOKZ_START_NAME, tempString, false))
+		return;
+	}
+	
+	if (StrEqual(GOKZ_START_NAME, buffer, false))
+	{
+		StoreStart(0, entity);
+	}
+	else
+	{
+		int course = GetStartBonusNumber(entity);
+		if (GOKZ_IsValidCourse(course, true))
 		{
-			StoreStart(0, entity);
-		}
-		else if (MatchRegex(RE_BonusStart, tempString) > 0)
-		{
-			GetRegexSubString(RE_BonusStart, 1, tempString, sizeof(tempString));
-			int course = StringToInt(tempString);
-			if (course > 0 && course < GOKZ_MAX_COURSES)
-			{
-				StoreStart(course, entity);
-			}
+			StoreStart(course, entity);
 		}
 	}
 }
@@ -84,4 +85,9 @@ static void StoreStart(int course, int entity)
 	startExists[course] = true;
 	startOrigin[course] = origin;
 	startAngles[course] = angles;
+}
+
+static int GetStartBonusNumber(int entity)
+{
+	return GetIntFromEntityName(entity, RE_BonusStart);
 } 

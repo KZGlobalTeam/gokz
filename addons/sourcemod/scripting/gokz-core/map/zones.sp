@@ -19,34 +19,36 @@ void OnPluginStart_MapZones()
 
 void OnEntitySpawned_MapZones(int entity)
 {
-	char tempString[32];
+	char buffer[32];
 	
-	GetEntityClassname(entity, tempString, sizeof(tempString));
-	if (!StrEqual("trigger_multiple", tempString, false))
+	GetEntityClassname(entity, buffer, sizeof(buffer));
+	if (!StrEqual("trigger_multiple", buffer, false))
 	{
 		return;
 	}
 	
-	if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
+	if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
 	{
-		if (StrEqual(GOKZ_START_ZONE_NAME, tempString, false))
-		{
-			HookSingleEntityOutput(entity, "OnStartTouch", OnStartZoneStartTouch);
-			HookSingleEntityOutput(entity, "OnEndTouch", OnStartZoneEndTouch);
-		}
-		else if (StrEqual(GOKZ_END_ZONE_NAME, tempString, false))
-		{
-			HookSingleEntityOutput(entity, "OnStartTouch", OnEndZoneStartTouch);
-		}
-		else if (MatchRegex(RE_BonusStartZone, tempString) > 0)
-		{
-			HookSingleEntityOutput(entity, "OnStartTouch", OnBonusStartZoneStartTouch);
-			HookSingleEntityOutput(entity, "OnEndTouch", OnBonusStartZoneEndTouch);
-		}
-		else if (MatchRegex(RE_BonusEndZone, tempString) > 0)
-		{
-			HookSingleEntityOutput(entity, "OnStartTouch", OnBonusEndZoneStartTouch);
-		}
+		return;
+	}
+	
+	if (StrEqual(GOKZ_START_ZONE_NAME, buffer, false))
+	{
+		HookSingleEntityOutput(entity, "OnStartTouch", OnStartZoneStartTouch);
+		HookSingleEntityOutput(entity, "OnEndTouch", OnStartZoneEndTouch);
+	}
+	else if (StrEqual(GOKZ_END_ZONE_NAME, buffer, false))
+	{
+		HookSingleEntityOutput(entity, "OnStartTouch", OnEndZoneStartTouch);
+	}
+	else if (RE_BonusStartZone.Match(buffer) > 0)
+	{
+		HookSingleEntityOutput(entity, "OnStartTouch", OnBonusStartZoneStartTouch);
+		HookSingleEntityOutput(entity, "OnEndTouch", OnBonusStartZoneEndTouch);
+	}
+	else if (RE_BonusEndZone.Match(buffer) > 0)
+	{
+		HookSingleEntityOutput(entity, "OnStartTouch", OnBonusEndZoneStartTouch);
 	}
 }
 
@@ -57,6 +59,7 @@ public void OnStartZoneStartTouch(const char[] name, int caller, int activator, 
 		return;
 	}
 	
+	// Set start position to course if they weren't running it before
 	if (GOKZ_GetCourse(activator) != 0)
 	{
 		SetCustomStartPositionToMap(activator, 0, true);
@@ -95,11 +98,12 @@ public void OnBonusStartZoneStartTouch(const char[] name, int caller, int activa
 	}
 	
 	int course = GetStartZoneBonusNumber(caller);
-	if (course == -1)
+	if (!GOKZ_IsValidCourse(course, true))
 	{
 		return;
 	}
 	
+	// Set start position to course if they weren't running it before
 	if (GOKZ_GetCourse(activator) != course)
 	{
 		SetCustomStartPositionToMap(activator, course, true);
@@ -114,7 +118,7 @@ public void OnBonusStartZoneEndTouch(const char[] name, int caller, int activato
 	}
 	
 	int course = GetStartZoneBonusNumber(caller);
-	if (course == -1)
+	if (!GOKZ_IsValidCourse(course, true))
 	{
 		return;
 	}
@@ -134,7 +138,7 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 	}
 	
 	int course = GetEndZoneBonusNumber(caller);
-	if (course == -1)
+	if (!GOKZ_IsValidCourse(course, true))
 	{
 		return;
 	}
@@ -148,31 +152,10 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 
 static int GetStartZoneBonusNumber(int entity)
 {
-	return GetZoneBonusNumber(entity, RE_BonusStartZone);
+	return GetIntFromEntityName(entity, RE_BonusStartZone);
 }
 
 static int GetEndZoneBonusNumber(int entity)
 {
-	return GetZoneBonusNumber(entity, RE_BonusEndZone);
-}
-
-static int GetZoneBonusNumber(int entity, Regex re)
-{
-	int course;
-	char tempString[32];
-	GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	
-	if (re.Match(tempString) > 0)
-	{
-		re.GetSubString(1, tempString, sizeof(tempString));
-		course = StringToInt(tempString);
-		
-		// Check validity
-		if (course < 0 && course >= GOKZ_MAX_COURSES)
-		{
-			course = -1;
-		}
-	}
-	
-	return course;
+	return GetIntFromEntityName(entity, RE_BonusEndZone);
 } 

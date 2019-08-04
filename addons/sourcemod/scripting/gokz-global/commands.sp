@@ -63,7 +63,7 @@ public Action CommandPrintBonusRecords(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0 && bonus < GOKZ_MAX_COURSES)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			PrintRecords(client, gC_CurrentMap, bonus, mode);
 		}
@@ -78,7 +78,7 @@ public Action CommandPrintBonusRecords(int client, int args)
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0 && bonus < GOKZ_MAX_COURSES)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			PrintRecords(client, argMap, bonus, mode);
 		}
@@ -116,7 +116,7 @@ public Action CommandBonusMapTop(int client, int args)
 		char argBonus[4];
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DisplayMapTopModeMenu(client, gC_CurrentMap, bonus);
 		}
@@ -131,7 +131,7 @@ public Action CommandBonusMapTop(int client, int args)
 		GetCmdArg(1, argBonus, sizeof(argBonus));
 		GetCmdArg(2, argMap, sizeof(argMap));
 		int bonus = StringToInt(argBonus);
-		if (bonus > 0)
+		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DisplayMapTopModeMenu(client, argMap, bonus);
 		}

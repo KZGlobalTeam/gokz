@@ -19,32 +19,34 @@ void OnPluginStart_MapButtons()
 
 void OnEntitySpawned_MapButtons(int entity)
 {
-	char tempString[32];
+	char buffer[32];
 	
-	GetEntityClassname(entity, tempString, sizeof(tempString));
-	if (!StrEqual("func_button", tempString, false))
+	GetEntityClassname(entity, buffer, sizeof(buffer));
+	if (!StrEqual("func_button", buffer, false))
 	{
 		return;
 	}
 	
-	if (GetEntPropString(entity, Prop_Data, "m_iName", tempString, sizeof(tempString)) > 0)
+	if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
 	{
-		if (StrEqual(GOKZ_START_BUTTON_NAME, tempString, false))
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
-		}
-		else if (StrEqual(GOKZ_END_BUTTON_NAME, tempString, false))
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
-		}
-		else if (MatchRegex(RE_BonusStartButton, tempString) > 0)
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
-		}
-		else if (MatchRegex(RE_BonusEndButton, tempString) > 0)
-		{
-			HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
-		}
+		return;
+	}
+	
+	if (StrEqual(GOKZ_START_BUTTON_NAME, buffer, false))
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
+	}
+	else if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
+	}
+	else if (RE_BonusStartButton.Match(buffer) > 0)
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
+	}
+	else if (RE_BonusEndButton.Match(buffer) > 0)
+	{
+		HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
 	}
 }
 
@@ -80,20 +82,13 @@ public void OnBonusStartButtonPress(const char[] name, int caller, int activator
 		return;
 	}
 	
-	char tempString[32];
-	GetEntPropString(caller, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	
-	if (MatchRegex(RE_BonusStartButton, tempString) > 0)
+	int course = GetStartButtonBonusNumber(caller);
+	if (GOKZ_IsValidCourse(course, true))
 	{
-		GetRegexSubString(RE_BonusStartButton, 1, tempString, sizeof(tempString));
-		int course = StringToInt(tempString);
-		if (course > 0 && course < GOKZ_MAX_COURSES)
+		if (GOKZ_StartTimer(activator, course))
 		{
-			if (GOKZ_StartTimer(activator, course))
-			{
-				// Only called on success to prevent virtual button exploits
-				OnStartButtonPress_VirtualButtons(activator, course);
-			}
+			// Only called on success to prevent virtual button exploits
+			OnStartButtonPress_VirtualButtons(activator, course);
 		}
 	}
 }
@@ -105,17 +100,24 @@ public void OnBonusEndButtonPress(const char[] name, int caller, int activator, 
 		return;
 	}
 	
-	char tempString[32];
-	GetEntPropString(caller, Prop_Data, "m_iName", tempString, sizeof(tempString));
-	
-	if (MatchRegex(RE_BonusEndButton, tempString) > 0)
+	int course = GetEndButtonBonusNumber(caller);
+	if (GOKZ_IsValidCourse(course, true))
 	{
-		GetRegexSubString(RE_BonusEndButton, 1, tempString, sizeof(tempString));
-		int course = StringToInt(tempString);
-		if (course > 0 && course < GOKZ_MAX_COURSES)
-		{
-			GOKZ_EndTimer(activator, course);
-			OnEndButtonPress_VirtualButtons(activator, course);
-		}
+		GOKZ_EndTimer(activator, course);
+		OnEndButtonPress_VirtualButtons(activator, course);
 	}
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static int GetStartButtonBonusNumber(int entity)
+{
+	return GetIntFromEntityName(entity, RE_BonusStartButton);
+}
+
+static int GetEndButtonBonusNumber(int entity)
+{
+	return GetIntFromEntityName(entity, RE_BonusEndButton);
 } 
