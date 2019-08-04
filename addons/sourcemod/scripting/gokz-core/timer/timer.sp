@@ -4,7 +4,8 @@ static int currentCourse[MAXPLAYERS + 1];
 static bool hasStartedTimerThisMap[MAXPLAYERS + 1];
 static bool hasEndedTimerThisMap[MAXPLAYERS + 1];
 static float lastTimerEndTime[MAXPLAYERS + 1];
-static float lastFalseEndTime[MAXPLAYERS + 1];
+static float lastStartSoundTime[MAXPLAYERS + 1];
+static float lastFalseEndSoundTime[MAXPLAYERS + 1];
 
 
 
@@ -52,7 +53,7 @@ int GetCurrentTimeType(int client)
 bool TimerStart(int client, int course, bool allowMidair = false)
 {
 	if (!IsPlayerAlive(client)
-		 || (!Movement_GetOnGround(client) || !gB_OldOnGround[client] || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS) && !allowMidair
+		 || (!Movement_GetOnGround(client) || JustLanded(client)) && !allowMidair
 		 || !IsPlayerValidMoveType(client)
 		 || JustStartedTimer(client))
 	{
@@ -89,11 +90,7 @@ bool TimerEnd(int client, int course)
 	
 	if (!timerRunning[client] || course != currentCourse[client])
 	{
-		if (!JustEndedTimer(client) && !JustFalseEndedTimer(client))
-		{
-			PlayTimerFalseEndSound(client);
-		}
-		lastFalseEndTime[client] = GetGameTime();
+		PlayTimerFalseEndSound(client);
 		return false;
 	}
 	
@@ -170,7 +167,8 @@ void OnClientPutInServer_Timer(int client)
 	hasEndedTimerThisMap[client] = false;
 	currentTime[client] = 0.0;
 	lastTimerEndTime[client] = 0.0;
-	lastFalseEndTime[client] = 0.0;
+	lastStartSoundTime[client] = 0.0;
+	lastFalseEndSoundTime[client] = 0.0;
 }
 
 void OnPlayerRunCmdPost_Timer(int client)
@@ -242,28 +240,41 @@ static bool IsPlayerValidMoveType(int client)
 
 static bool IsValidMovetype(MoveType movetype)
 {
-	return movetype == MOVETYPE_WALK || movetype == MOVETYPE_LADDER || movetype == MOVETYPE_NONE;
+	return movetype == MOVETYPE_WALK
+	 || movetype == MOVETYPE_LADDER
+	 || movetype == MOVETYPE_NONE;
+}
+
+static bool JustLanded(int client)
+{
+	return !gB_OldOnGround[client]
+	 || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS;
 }
 
 static bool JustStartedTimer(int client)
 {
-	return timerRunning[client] && GetCurrentTime(client) < 0.05;
+	return timerRunning[client] && GetCurrentTime(client) < EPSILON;
 }
 
 static bool JustEndedTimer(int client)
 {
-	return GetHasEndedTimerThisMap(client) && (GetGameTime() - lastTimerEndTime[client]) < 1.0;
-}
-
-static bool JustFalseEndedTimer(int client)
-{
-	return (GetGameTime() - lastFalseEndTime[client]) < 0.05;
+	return GetHasEndedTimerThisMap(client)
+	 && (GetGameTime() - lastTimerEndTime[client]) < 1.0;
 }
 
 static void PlayTimerStartSound(int client)
 {
-	EmitSoundToClient(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	if (!JustHeardStartSound(client))
+	{
+		EmitSoundToClient(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		lastStartSoundTime[client] = GetGameTime();
+	}
+}
+
+static bool JustHeardStartSound(int client)
+{
+	return (GetGameTime() - lastStartSoundTime[client]) < GOKZ_TIMER_SOUND_COOLDOWN;
 }
 
 static void PlayTimerEndSound(int client)
@@ -274,8 +285,17 @@ static void PlayTimerEndSound(int client)
 
 static void PlayTimerFalseEndSound(int client)
 {
-	EmitSoundToClient(client, gC_ModeFalseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-	EmitSoundToClientSpectators(client, gC_ModeFalseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+	if (!JustEndedTimer(client) && !JustHeardFalseEndSound(client))
+	{
+		EmitSoundToClient(client, gC_ModeFalseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		EmitSoundToClientSpectators(client, gC_ModeFalseEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		lastFalseEndSoundTime[client] = GetGameTime();
+	}
+}
+
+static bool JustHeardFalseEndSound(int client)
+{
+	return (GetGameTime() - lastFalseEndSoundTime[client]) < GOKZ_TIMER_SOUND_COOLDOWN;
 }
 
 static void PlayTimerStopSound(int client)
@@ -286,7 +306,7 @@ static void PlayTimerStopSound(int client)
 
 static void PrintEndTimeString(int client)
 {
-	if (currentCourse[client] == 0)
+	if (GetCurrentCourse(client) == 0)
 	{
 		switch (GetCurrentTimeType(client))
 		{
@@ -294,14 +314,14 @@ static void PrintEndTimeString(int client)
 			{
 				GOKZ_PrintToChatAll(true, "%t", "Beat Map (NUB)", 
 					client, 
-					GOKZ_FormatTime(currentTime[client]), 
+					GOKZ_FormatTime(GetCurrentTime(client)), 
 					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 			case TimeType_Pro:
 			{
 				GOKZ_PrintToChatAll(true, "%t", "Beat Map (PRO)", 
 					client, 
-					GOKZ_FormatTime(currentTime[client]), 
+					GOKZ_FormatTime(GetCurrentTime(client)), 
 					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 		}
@@ -315,7 +335,7 @@ static void PrintEndTimeString(int client)
 				GOKZ_PrintToChatAll(true, "%t", "Beat Bonus (NUB)", 
 					client, 
 					currentCourse[client], 
-					GOKZ_FormatTime(currentTime[client]), 
+					GOKZ_FormatTime(GetCurrentTime(client)), 
 					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 			case TimeType_Pro:
@@ -323,7 +343,7 @@ static void PrintEndTimeString(int client)
 				GOKZ_PrintToChatAll(true, "%t", "Beat Bonus (PRO)", 
 					client, 
 					currentCourse[client], 
-					GOKZ_FormatTime(currentTime[client]), 
+					GOKZ_FormatTime(GetCurrentTime(client)), 
 					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 			}
 		}

@@ -162,10 +162,10 @@ public void OnClientDisconnect(int client)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_Timer(client); // This should be first!
-	OnPlayerRunCmdPost_VirtualButtons(client, buttons);
+	OnPlayerRunCmdPost_VirtualButtons(client, buttons); // Emulate buttons first
+	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
 	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
-	UpdateOldVariables(client, buttons); // This should be last!
+	UpdateOldVariables(client, buttons); // This should be last
 }
 
 public Action OnClientCommandKeyValues(int client, KeyValues kv)
