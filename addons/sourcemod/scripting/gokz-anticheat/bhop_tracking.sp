@@ -105,7 +105,7 @@ void OnClientPutInServer_BhopTracking(int client)
 	ResetBhopStats(client);
 }
 
-void OnPlayerRunCmdPost_BhopTracking(int client, int cmdnum)
+void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 {
 	if (!IsPlayerAlive(client) || IsFakeClient(client) || gCV_sv_autobunnyhopping.BoolValue)
 	{
@@ -113,6 +113,9 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int cmdnum)
 	}
 	
 	int nextIndex = NextIndex(gI_BhopIndex[client], AC_MAX_BHOP_SAMPLES);
+	
+	// Record buttons BEFORE checking for bhop
+	RecordButtons(client, buttons);
 	
 	// If bhop was last tick, then record the pre bhop inputs.
 	// Require two times the button sample size since the last
@@ -134,9 +137,6 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int cmdnum)
 		gI_BhopCount[client]++;
 		CheckForBhopMacro(client);
 	}
-	
-	// Record buttons AFTER checking for bhop
-	RecordButtons(client, gI_OldButtons[client]);
 	
 	// Record last jump takeoff time
 	if (JustJumped(client, cmdnum))
@@ -226,7 +226,6 @@ static void ResetBhopStats(int client)
 {
 	gI_ButtonCount[client] = 0;
 	gI_ButtonsIndex[client] = 0;
-	gI_OldButtons[client] = 0;
 	gI_BhopCount[client] = 0;
 	gI_BhopIndex[client] = 0;
 	gI_BhopLastTakeoffCmdnum[client] = 0;

@@ -39,7 +39,6 @@ bool gB_SourceBans;
 int gI_ButtonCount[MAXPLAYERS + 1];
 int gI_ButtonsIndex[MAXPLAYERS + 1];
 int gI_Buttons[MAXPLAYERS + 1][AC_MAX_BUTTON_SAMPLES];
-int gI_OldButtons[MAXPLAYERS + 1];
 
 int gI_BhopCount[MAXPLAYERS + 1];
 int gI_BhopIndex[MAXPLAYERS + 1];
@@ -129,8 +128,7 @@ public void OnClientPutInServer(int client)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_BhopTracking(client, cmdnum);
-	gI_OldButtons[client] = buttons;
+	OnPlayerRunCmdPost_BhopTracking(client, buttons, cmdnum);
 }
 
 public void GOKZ_OnFirstSpawn(int client)
