@@ -261,7 +261,5 @@ static void HookEvents()
 
 static void UpdateCurrentMap()
 {
-	GetCurrentMap(gC_CurrentMap, sizeof(gC_CurrentMap));
-	GetMapDisplayName(gC_CurrentMap, gC_CurrentMap, sizeof(gC_CurrentMap));
-	String_ToLower(gC_CurrentMap, gC_CurrentMap, sizeof(gC_CurrentMap));
+	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
 } 

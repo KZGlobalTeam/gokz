@@ -464,11 +464,12 @@ stock int GetEntityName(int entity, char[] buffer, int maxlength)
 /**
  * Returns an integer from an entity's name as matched using a regular expression.
  *
- * @param entity		Entity index.
- * @param re			Regular expression to match the integer with.
- * @returns				Integer found in the entity's name, or -1 if not found.
+ * @param entity			Entity index.
+ * @param re				Regular expression to match the integer with.
+ * @param substringID		ID of the substring that will contain the integer.
+ * @returns					Integer found in the entity's name, or -1 if not found.
  */
-stock int GetIntFromEntityName(int entity, Regex re)
+stock int MatchIntFromEntityName(int entity, Regex re, int substringID)
 {
 	int num = -1;
 	char buffer[32];
@@ -481,4 +482,19 @@ stock int GetIntFromEntityName(int entity, Regex re)
 	}
 	
 	return num;
+}
+
+/**
+ * Gets the current map's display name in lower case.
+ *
+ * @param buffer			Buffer to store the map name.
+ * @param maxlength			Maximum length of buffer.
+ * @noreturn
+ */
+stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
+{
+	char map[PLATFORM_MAX_PATH];
+	GetCurrentMap(map, sizeof(map));
+	GetMapDisplayName(map, map, sizeof(map));
+	String_ToLower(map, buffer, maxlength);
 } 
