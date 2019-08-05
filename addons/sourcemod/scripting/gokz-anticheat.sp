@@ -136,7 +136,7 @@ public void GOKZ_OnFirstSpawn(int client)
 	GOKZ_PrintToChat(client, false, "%t", "Anti-Cheat Warning");
 }
 
-public void GOKZ_AM_OnPlayerSuspected(int client, ACReason reason, const char[] notes, const char[] stats)
+public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] notes, const char[] stats)
 {
 	LogSuspicion(client, reason, notes, stats);
 }
