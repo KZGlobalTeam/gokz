@@ -32,21 +32,26 @@ void OnEntitySpawned_MapButtons(int entity)
 		return;
 	}
 	
+	int course = 0;
 	if (StrEqual(GOKZ_START_BUTTON_NAME, buffer, false))
 	{
 		HookSingleEntityOutput(entity, "OnPressed", OnStartButtonPress);
+		RegisterCourseStart(course);
 	}
 	else if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
 	{
 		HookSingleEntityOutput(entity, "OnPressed", OnEndButtonPress);
+		RegisterCourseEnd(course);
 	}
-	else if (RE_BonusStartButton.Match(buffer) > 0)
+	else if ((course = GetStartButtonBonusNumber(entity)) != -1)
 	{
 		HookSingleEntityOutput(entity, "OnPressed", OnBonusStartButtonPress);
+		RegisterCourseStart(course);
 	}
-	else if (RE_BonusEndButton.Match(buffer) > 0)
+	else if ((course = GetEndButtonBonusNumber(entity)) != -1)
 	{
 		HookSingleEntityOutput(entity, "OnPressed", OnBonusEndButtonPress);
+		RegisterCourseEnd(course);
 	}
 }
 

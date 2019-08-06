@@ -275,6 +275,7 @@ public void OnMapStart()
 	OnMapStart_KZConfig();
 	OnMapStart_Options();
 	OnMapStart_Prefix();
+	OnMapStart_CourseRegister();
 	OnMapStart_MapStarts();
 }
 

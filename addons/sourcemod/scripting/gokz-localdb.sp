@@ -1,10 +1,6 @@
 #include <sourcemod>
 
-#include <sdktools>
 #include <geoip>
-#include <regex>
-
-#include <gokz>
 
 #include <gokz/core>
 #include <gokz/localdb>
@@ -35,7 +31,6 @@ bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
-Regex gRE_BonusStartButton;
 
 #include "gokz-localdb/api.sp"
 #include "gokz-localdb/commands.sp"
@@ -63,7 +58,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	CreateRegexes();
 	CreateGlobalForwards();
 	RegisterCommands();
 }
@@ -119,18 +113,17 @@ public void OnClientDisconnect(int client)
 	gB_ClientSetUp[client] = false;
 }
 
+public void GOKZ_OnCourseRegistered(int course)
+{
+	if (gB_MapSetUp)
+	{
+		DB_SetupMapCourse(course);
+	}
+}
+
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
-}
-
-
-
-// =====[ PRIVATE ]=====
-
-static void CreateRegexes()
-{
-	gRE_BonusStartButton = CompileRegex(GOKZ_BONUS_START_BUTTON_NAME_REGEX);
 } 

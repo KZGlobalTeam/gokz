@@ -32,23 +32,28 @@ void OnEntitySpawned_MapZones(int entity)
 		return;
 	}
 	
+	int course = 0;
 	if (StrEqual(GOKZ_START_ZONE_NAME, buffer, false))
 	{
 		HookSingleEntityOutput(entity, "OnStartTouch", OnStartZoneStartTouch);
 		HookSingleEntityOutput(entity, "OnEndTouch", OnStartZoneEndTouch);
+		RegisterCourseStart(course);
 	}
 	else if (StrEqual(GOKZ_END_ZONE_NAME, buffer, false))
 	{
 		HookSingleEntityOutput(entity, "OnStartTouch", OnEndZoneStartTouch);
+		RegisterCourseEnd(course);
 	}
-	else if (RE_BonusStartZone.Match(buffer) > 0)
+	else if ((course = GetStartZoneBonusNumber(entity)) != -1)
 	{
 		HookSingleEntityOutput(entity, "OnStartTouch", OnBonusStartZoneStartTouch);
 		HookSingleEntityOutput(entity, "OnEndTouch", OnBonusStartZoneEndTouch);
+		RegisterCourseStart(course);
 	}
-	else if (RE_BonusEndZone.Match(buffer) > 0)
+	else if ((course = GetEndZoneBonusNumber(entity)) != -1)
 	{
 		HookSingleEntityOutput(entity, "OnStartTouch", OnBonusEndZoneStartTouch);
+		RegisterCourseEnd(course);
 	}
 }
 

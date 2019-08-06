@@ -344,4 +344,46 @@ public Action Timer_TimeLimit(Handle timer)
 public Action Timer_EndRound(Handle timer)
 {
 	CS_TerminateRound(1.0, CSRoundEnd_Draw, true);
+}
+
+
+
+// =====[ COURSE REGISTER ]=====
+
+static bool startRegistered[GOKZ_MAX_COURSES];
+static bool endRegistered[GOKZ_MAX_COURSES];
+static bool courseRegistered[GOKZ_MAX_COURSES];
+
+bool GetCourseRegistered(int course)
+{
+	return courseRegistered[course];
+}
+
+void RegisterCourseStart(int course)
+{
+	startRegistered[course] = true;
+	TryRegisterCourse(course);
+}
+
+void RegisterCourseEnd(int course)
+{
+	endRegistered[course] = true;
+	TryRegisterCourse(course);
+}
+
+void OnMapStart_CourseRegister()
+{
+	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
+	{
+		courseRegistered[course] = false;
+	}
+}
+
+static void TryRegisterCourse(int course)
+{
+	if (!courseRegistered[course] && startRegistered[course] && endRegistered[course])
+	{
+		courseRegistered[course] = true;
+		Call_GOKZ_OnCourseRegistered(course);
+	}
 } 

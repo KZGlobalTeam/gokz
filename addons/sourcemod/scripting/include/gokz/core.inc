@@ -619,6 +619,14 @@ forward void GOKZ_OnOptionsMenuCreated(TopMenu topMenu);
  */
 forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
 
+/**
+ * Called when a course is registered. A course is registered if both the
+ * start and end of it (e.g. timer buttons) have been detected.
+ *
+ * @param course		Course number.
+ */
+forward void GOKZ_OnCourseRegistered(int course);
+
 
 
 // =====[ NATIVES ]=====
@@ -662,6 +670,15 @@ native int GOKZ_GetLoadedModeCount();
  *						or null if not created yet.
  */
 native TopMenu GOKZ_GetOptionsTopMenu();
+
+/**
+ * Gets whether a course is registered. A course is registered if both the
+ * start and end of it (e.g. timer buttons) have been detected.
+ *
+ * @param course		Course number.
+ * @return				Whether course has been registered.
+ */
+native bool GOKZ_GetCourseRegistered(int course);
 
 /**
  * Prints a message to a client's chat, formatting colours and optionally 
