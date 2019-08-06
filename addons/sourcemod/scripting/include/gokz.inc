@@ -489,7 +489,6 @@ stock int MatchIntFromEntityName(int entity, Regex re, int substringID)
  *
  * @param buffer			Buffer to store the map name.
  * @param maxlength			Maximum length of buffer.
- * @noreturn
  */
 stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
 {

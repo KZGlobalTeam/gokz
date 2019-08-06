@@ -977,7 +977,6 @@ native bool GOKZ_GetHitPerf(int client);
  *
  * @param client		Client index.
  * @param hitPerf		Whether player's last takeoff was a GOKZ perfect b-hop.
- * @noreturn		
  */
 native void GOKZ_SetHitPerf(int client, bool hitPerf);
 
@@ -994,8 +993,7 @@ native float GOKZ_GetTakeoffSpeed(int client);
  * Intended to be called by GOKZ mode plugins only.
  *
  * @param client		Client index.
- * @param takeoffSpeed	Player's last takeoff speed as recorded by GOKZ.
- * @noreturn		
+ * @param takeoffSpeed	Player's last takeoff speed as recorded by GOKZ.		
  */
 native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
 
