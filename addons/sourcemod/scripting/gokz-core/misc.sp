@@ -190,8 +190,7 @@ static void InvalidateJump(int client)
 
 void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
-	// Make sure leaving the ground wasn't caused by anything fishy
-	if (IsValidStopTouchGround(client))
+	if (Movement_GetMovetype(client) == MOVETYPE_WALK)
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
@@ -202,29 +201,19 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	}
 }
 
-static bool IsValidStopTouchGround(int client)
-{
-	if (Movement_GetMovetype(client) != MOVETYPE_WALK)
-	{
-		return false;
-	}
-	return true;
-}
-
 void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 {
-	if (velocityTeleported[client] && DidInvalidVelocityTeleport(client, cmdnum))
+	if (velocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
 	{
 		InvalidateJump(client);
 	}
 	velocityTeleported[client] = false;
 }
 
-// Returns whether client didn't just hit a perfect bunnyhop
-static bool DidInvalidVelocityTeleport(int client, int cmdnum)
+static bool JustHitPerfBhop(int client, int cmdnum)
 {
-	return !(Movement_GetJumped(client) && GOKZ_GetHitPerf(client)
-		 && cmdnum == Movement_GetTakeoffCmdNum(client));
+	return Movement_GetJumped(client) && GOKZ_GetHitPerf(client)
+	 && cmdnum == Movement_GetTakeoffCmdNum(client);
 }
 
 void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMovetype)
