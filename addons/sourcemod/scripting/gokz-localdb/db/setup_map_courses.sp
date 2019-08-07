@@ -22,8 +22,8 @@ void DB_SetupMapCourses()
 			case DatabaseType_SQLite:FormatEx(query, sizeof(query), sqlite_mapcourses_insert, gI_DBCurrentMapID, course);
 			case DatabaseType_MySQL:FormatEx(query, sizeof(query), mysql_mapcourses_insert, gI_DBCurrentMapID, course);
 		}
+		txn.AddQuery(query);
 	}
-	txn.AddQuery(query);
 	
 	SQL_ExecuteTransaction(gH_DB, txn, INVALID_FUNCTION, DB_TxnFailure_Generic, _, DBPrio_High);
 }
