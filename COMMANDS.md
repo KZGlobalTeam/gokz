@@ -10,7 +10,7 @@
  * `!pause`/`!resume` - Toggle pausing your timer and stopping you in your position.
  * `!undo` - Undo teleport.
  * `!start`/`!restart`/`!r` - Teleport to your start position.
- * `!main` - Teleport to the start of the main course.
+ * `!main`/`!m` - Teleport to the start of the main course.
  * `!bonus`/`!b` - Teleport to the start of a bonus. Usage: `!b <#bonus>`
  * `!stop` - Stop your timer.
  * `!autorestart` - Toggle auto restart upon teleporting to start.

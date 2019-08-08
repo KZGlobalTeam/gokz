@@ -9,6 +9,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_main", CommandMain, "[KZ] Teleport to the start of the main course.");
+	RegConsoleCmd("sm_m", CommandMain, "[KZ] Teleport to the start of the main course.");
 	RegConsoleCmd("sm_bonus", CommandBonus, "[KZ] Teleport to the start of a bonus. Usage: `!bonus <#bonus>");
 	RegConsoleCmd("sm_b", CommandBonus, "[KZ] Teleport to the start of a bonus. Usage: `!b <#bonus>");
 	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
