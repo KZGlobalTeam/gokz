@@ -158,13 +158,12 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	{
 		player.GOKZHitPerf = player.HitPerf;
 		
-		// sv_enablebunnyhopping 0 enables soft cap to bunnyhop speed. If the player
-		// hits a perfect bunnyhop over 315 speed, their speed is reduced to 286.
-		// These values have been hard coded below as it is hard, if not impossible,
-		// to capture this speed reduction dynamically.
-		if (player.HitPerf && player.TakeoffSpeed > 315.0)
+		// sv_enablebunnyhopping 0 enables a limit to bunnyhop speed. If the player
+		// hits a perfect bunnyhop over 1.1 x m_flMaxspeed, their speed is reduced.
+		float speedCap = GetEntPropFloat(client, Prop_Data, "m_flMaxspeed") * 1.1;
+		if (player.HitPerf && player.TakeoffSpeed > speedCap)
 		{
-			player.GOKZTakeoffSpeed = 286.0;
+			player.GOKZTakeoffSpeed = speedCap;
 		}
 		else
 		{
