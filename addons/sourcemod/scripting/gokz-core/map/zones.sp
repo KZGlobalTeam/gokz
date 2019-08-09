@@ -67,7 +67,7 @@ public void OnStartZoneStartTouch(const char[] name, int caller, int activator, 
 	// Set start position to course if they weren't running it before
 	if (GOKZ_GetCourse(activator) != 0)
 	{
-		SetCustomStartPositionToMap(activator, 0, true);
+		SetCustomStartPositionToMap(activator, 0);
 	}
 }
 
@@ -111,7 +111,7 @@ public void OnBonusStartZoneStartTouch(const char[] name, int caller, int activa
 	// Set start position to course if they weren't running it before
 	if (GOKZ_GetCourse(activator) != course)
 	{
-		SetCustomStartPositionToMap(activator, course, true);
+		SetCustomStartPositionToMap(activator, course);
 	}
 }
 

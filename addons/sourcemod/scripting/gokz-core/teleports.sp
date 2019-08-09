@@ -347,21 +347,13 @@ bool GetHasCustomStartPosition(int client)
 	return hasCustomStartPosition[client];
 }
 
-void SetCustomStartPosition(int client, const float origin[3], const float angles[3], bool quiet = false)
+void SetCustomStartPosition(int client, const float origin[3], const float angles[3])
 {
 	customStartOrigin[client] = origin;
 	customStartAngles[client] = angles;
 	hasCustomStartPosition[client] = true;
 	
-	if (!quiet)
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
-		if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
-		{
-			EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
-		}
-	}
-	
+	// Call Post Forward
 	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
 }
 

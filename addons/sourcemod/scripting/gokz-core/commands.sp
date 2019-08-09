@@ -149,6 +149,13 @@ public Action CommandBonus(int client, int args)
 public Action CommandSetStartPos(int client, int args)
 {
 	SetCustomStartPositionToCurrent(client);
+	
+	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
+	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	{
+		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
+	}
+	
 	return Plugin_Handled;
 }
 

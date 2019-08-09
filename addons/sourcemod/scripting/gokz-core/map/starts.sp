@@ -67,7 +67,20 @@ bool SetCustomStartPositionToMap(int client, int course, bool quiet = false)
 		return false;
 	}
 	
-	SetCustomStartPosition(client, startOrigin[course], startAngles[course], quiet);
+	SetCustomStartPosition(client, startOrigin[course], startAngles[course]);
+	
+	if (!quiet)
+	{
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Set Start Position (Main)");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Set Start Position (Bonus)", course);
+		}
+	}
+	
 	return true;
 }
 
