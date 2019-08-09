@@ -214,19 +214,13 @@ public Action CommandToggleNoclip(int client, int args)
 
 public Action CommandEnableNoclip(int client, int args)
 {
-	if (IsPlayerAlive(client))
-	{
-		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
-	}
+	EnableNoclip(client);
 	return Plugin_Handled;
 }
 
 public Action CommandDisableNoclip(int client, int args)
 {
-	if (IsPlayerAlive(client))
-	{
-		Movement_SetMovetype(client, MOVETYPE_WALK);
-	}
+	DisableNoclip(client);
 	return Plugin_Handled;
 }
 

@@ -52,6 +52,22 @@ void ToggleNoclip(int client)
 	}
 }
 
+void EnableNoclip(int client)
+{
+	if (IsPlayerAlive(client))
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+	}
+}
+
+void DisableNoclip(int client)
+{
+	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+	}
+}
+
 
 
 // =====[ PLAYER COLLISION ]=====
