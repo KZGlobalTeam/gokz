@@ -103,6 +103,11 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 	DB_SetupMapCourses();
 }
 
+public void OnMapEnd()
+{
+	gB_MapSetUp = false;
+}
+
 public void OnClientAuthorized(int client, const char[] auth)
 {
 	DB_SetupClient(client);
