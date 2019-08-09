@@ -52,6 +52,22 @@ void ToggleNoclip(int client)
 	}
 }
 
+void EnableNoclip(int client)
+{
+	if (IsPlayerAlive(client))
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+	}
+}
+
+void DisableNoclip(int client)
+{
+	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+	}
+}
+
 
 
 // =====[ PLAYER COLLISION ]=====
@@ -190,8 +206,7 @@ static void InvalidateJump(int client)
 
 void OnStopTouchGround_ValidJump(int client, bool jumped)
 {
-	// Make sure leaving the ground wasn't caused by anything fishy
-	if (IsValidStopTouchGround(client))
+	if (Movement_GetMovetype(client) == MOVETYPE_WALK)
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, jumped, false);
@@ -202,29 +217,19 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	}
 }
 
-static bool IsValidStopTouchGround(int client)
-{
-	if (Movement_GetMovetype(client) != MOVETYPE_WALK)
-	{
-		return false;
-	}
-	return true;
-}
-
 void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 {
-	if (velocityTeleported[client] && DidInvalidVelocityTeleport(client, cmdnum))
+	if (velocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
 	{
 		InvalidateJump(client);
 	}
 	velocityTeleported[client] = false;
 }
 
-// Returns whether client didn't just hit a perfect bunnyhop
-static bool DidInvalidVelocityTeleport(int client, int cmdnum)
+static bool JustHitPerfBhop(int client, int cmdnum)
 {
-	return !(Movement_GetJumped(client) && GOKZ_GetHitPerf(client)
-		 && cmdnum == Movement_GetTakeoffCmdNum(client));
+	return Movement_GetJumped(client) && GOKZ_GetHitPerf(client)
+	 && cmdnum == Movement_GetTakeoffCmdNum(client);
 }
 
 void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -344,4 +349,46 @@ public Action Timer_TimeLimit(Handle timer)
 public Action Timer_EndRound(Handle timer)
 {
 	CS_TerminateRound(1.0, CSRoundEnd_Draw, true);
+}
+
+
+
+// =====[ COURSE REGISTER ]=====
+
+static bool startRegistered[GOKZ_MAX_COURSES];
+static bool endRegistered[GOKZ_MAX_COURSES];
+static bool courseRegistered[GOKZ_MAX_COURSES];
+
+bool GetCourseRegistered(int course)
+{
+	return courseRegistered[course];
+}
+
+void RegisterCourseStart(int course)
+{
+	startRegistered[course] = true;
+	TryRegisterCourse(course);
+}
+
+void RegisterCourseEnd(int course)
+{
+	endRegistered[course] = true;
+	TryRegisterCourse(course);
+}
+
+void OnMapStart_CourseRegister()
+{
+	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
+	{
+		courseRegistered[course] = false;
+	}
+}
+
+static void TryRegisterCourse(int course)
+{
+	if (!courseRegistered[course] && startRegistered[course] && endRegistered[course])
+	{
+		courseRegistered[course] = true;
+		Call_GOKZ_OnCourseRegistered(course);
+	}
 } 

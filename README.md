@@ -52,14 +52,7 @@ Please see [COMMANDS.md](COMMANDS.md) for a list of player and admin commands.
 
 ### Mapping
 
-To add a timer button to a map, use a `func_button` with a specific name.
-
- * Start button is named `climb_startbutton`.
- * End button is named `climb_endbutton`.
- * Bonus start buttons are named `climb_bonusX_startbutton` where X is the bonus number.
- * Bonus end buttons are named `climb_bonusX_endbutton` where X is the bonus number.
-
-**TIP** - Enable both the `Don't move` and `Toggle` flags to easily avoid any usability issues.
+Please see [MAPPING.md](MAPPING.md) to see how to make maps that work with GOKZ.
 
 ## Contributing
 

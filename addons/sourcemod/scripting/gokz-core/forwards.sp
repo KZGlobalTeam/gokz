@@ -33,6 +33,7 @@ static Handle H_OnCustomStartPositionSet_Post;
 static Handle H_OnCustomStartPositionCleared_Post;
 static Handle H_OnOptionsMenuCreated;
 static Handle H_OnOptionsMenuReady;
+static Handle H_OnCourseRegistered;
 
 
 
@@ -73,6 +74,7 @@ void CreateGlobalForwards()
 	H_OnCustomStartPositionCleared_Post = CreateGlobalForward("GOKZ_OnCustomStartPositionCleared_Post", ET_Ignore, Param_Cell);
 	H_OnOptionsMenuCreated = CreateGlobalForward("GOKZ_OnOptionsMenuCreated", ET_Ignore, Param_Cell);
 	H_OnOptionsMenuReady = CreateGlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
+	H_OnCourseRegistered = CreateGlobalForward("GOKZ_OnCourseRegistered", ET_Ignore, Param_Cell);
 }
 
 void Call_GOKZ_OnOptionChanged(int client, const char[] option, int optionValue)
@@ -337,5 +339,12 @@ void Call_GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
 	Call_StartForward(H_OnOptionsMenuReady);
 	Call_PushCell(topMenu);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnCourseRegistered(int course)
+{
+	Call_StartForward(H_OnCourseRegistered);
+	Call_PushCell(course);
 	Call_Finish();
 } 

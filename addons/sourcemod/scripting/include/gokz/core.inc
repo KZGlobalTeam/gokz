@@ -152,15 +152,24 @@ enum
 #define GOKZ_LADDER_NO_CHECKPOINT_TIME 1.5
 #define GOKZ_PAUSE_COOLDOWN 1.0
 #define GOKZ_TIMER_START_GROUND_TICKS 4
+#define GOKZ_TIMER_SOUND_COOLDOWN 0.1
 
 #define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
 #define GOKZ_SOUND_TIMER_STOP "buttons/button18.wav"
 
+#define GOKZ_START_NAME "climb_start"
+#define GOKZ_BONUS_START_NAME_REGEX "^climb_bonus(\\d+)_start$"
+
 #define GOKZ_START_BUTTON_NAME "climb_startbutton"
 #define GOKZ_END_BUTTON_NAME "climb_endbutton"
 #define GOKZ_BONUS_START_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_startbutton$"
 #define GOKZ_BONUS_END_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_endbutton$"
+
+#define GOKZ_START_ZONE_NAME "climb_startzone"
+#define GOKZ_END_ZONE_NAME "climb_endzone"
+#define GOKZ_BONUS_START_ZONE_NAME_REGEX "^climb_bonus(\\d+)_startzone$"
+#define GOKZ_BONUS_END_ZONE_NAME_REGEX "^climb_bonus(\\d+)_endzone$"
 
 #define GOKZ_CFG_SERVER "sourcemod/gokz/gokz.cfg"
 #define GOKZ_CFG_OPTIONS "cfg/sourcemod/gokz/options.cfg"
@@ -610,6 +619,14 @@ forward void GOKZ_OnOptionsMenuCreated(TopMenu topMenu);
  */
 forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
 
+/**
+ * Called when a course is registered. A course is registered if both the
+ * start and end of it (e.g. timer buttons) have been detected.
+ *
+ * @param course		Course number.
+ */
+forward void GOKZ_OnCourseRegistered(int course);
+
 
 
 // =====[ NATIVES ]=====
@@ -655,6 +672,15 @@ native int GOKZ_GetLoadedModeCount();
 native TopMenu GOKZ_GetOptionsTopMenu();
 
 /**
+ * Gets whether a course is registered. A course is registered if both the
+ * start and end of it (e.g. timer buttons) have been detected.
+ *
+ * @param course		Course number.
+ * @return				Whether course has been registered.
+ */
+native bool GOKZ_GetCourseRegistered(int course);
+
+/**
  * Prints a message to a client's chat, formatting colours and optionally 
  * adding the chat prefix. If using the chat prefix, specify a colour at 
  * the beginning of the message e.g. "{default}Hello!".
@@ -672,9 +698,10 @@ native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, an
  *
  * @param client    	Client index.
  * @param course    	Course number.
+ * @param allowMidair	Whether player is allowed to start timer midair.
  * @return				Whether player's timer was started.
  */
-native bool GOKZ_StartTimer(int client, int course);
+native bool GOKZ_StartTimer(int client, int course, bool allowOffGround = false);
 
 /**
  * Ends a player's timer for a course on the current map.
@@ -967,7 +994,6 @@ native bool GOKZ_GetHitPerf(int client);
  *
  * @param client		Client index.
  * @param hitPerf		Whether player's last takeoff was a GOKZ perfect b-hop.
- * @noreturn		
  */
 native void GOKZ_SetHitPerf(int client, bool hitPerf);
 
@@ -984,8 +1010,7 @@ native float GOKZ_GetTakeoffSpeed(int client);
  * Intended to be called by GOKZ mode plugins only.
  *
  * @param client		Client index.
- * @param takeoffSpeed	Player's last takeoff speed as recorded by GOKZ.
- * @noreturn		
+ * @param takeoffSpeed	Player's last takeoff speed as recorded by GOKZ.		
  */
 native void GOKZ_SetTakeoffSpeed(int client, float takeoffSpeed);
 
@@ -1221,6 +1246,18 @@ stock bool GOKZ_CycleCoreOption(int client, Option option)
 stock int GOKZ_GetDefaultMode()
 {
 	return GOKZ_GetCoreOptionProp(Option_Mode, OptionProp_DefaultValue);
+}
+
+/**
+ * Returns whether a course number is a valid (within valid range).
+ *
+ * @param course		Course number.
+ * @param bonus			Whether to only consider bonus course numbers as valid.
+ * @return				Whether course number is valid.
+ */
+stock bool GOKZ_IsValidCourse(int course, bool bonus = false)
+{
+	return (!bonus && course == 0) || (0 < course && course < GOKZ_MAX_COURSES);
 }
 
 

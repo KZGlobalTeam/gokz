@@ -121,7 +121,7 @@ void OnMapStart_ReplayCache()
 		mode = GetModeIDFromString(pieces[1]);
 		style = GetStyleIDFromString(pieces[2]);
 		timeType = GetTimeTypeIDFromString(pieces[3]);
-		if (course < 0 || course >= GOKZ_MAX_COURSES || mode == -1 || style == -1 || timeType == -1)
+		if (!GOKZ_IsValidCourse(course) || mode == -1 || style == -1 || timeType == -1)
 		{
 			continue;
 		}

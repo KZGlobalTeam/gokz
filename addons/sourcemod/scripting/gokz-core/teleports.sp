@@ -347,7 +347,17 @@ bool GetHasCustomStartPosition(int client)
 	return hasCustomStartPosition[client];
 }
 
-void SetCustomStartPosition(int client)
+void SetCustomStartPosition(int client, const float origin[3], const float angles[3])
+{
+	customStartOrigin[client] = origin;
+	customStartAngles[client] = angles;
+	hasCustomStartPosition[client] = true;
+	
+	// Call Post Forward
+	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
+}
+
+void SetCustomStartPositionToCurrent(int client)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -356,16 +366,11 @@ void SetCustomStartPosition(int client)
 		return;
 	}
 	
-	Movement_GetOrigin(client, customStartOrigin[client]);
-	Movement_GetEyeAngles(client, customStartAngles[client]);
-	hasCustomStartPosition[client] = true;
-	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
-	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
-	{
-		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
-	}
+	float origin[3], angles[3];
+	Movement_GetOrigin(client, origin);
+	Movement_GetEyeAngles(client, angles);
 	
-	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
+	SetCustomStartPosition(client, origin, angles);
 }
 
 void ClearCustomStartPosition(int client)

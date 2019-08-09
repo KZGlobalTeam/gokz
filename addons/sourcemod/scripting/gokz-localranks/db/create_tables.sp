@@ -6,20 +6,22 @@
 
 void DB_CreateTables()
 {
-	SQL_LockDatabase(gH_DB);
+	Transaction txn = SQL_CreateTransaction();
 	
 	// Create/alter database tables
 	switch (g_DBType)
 	{
 		case DatabaseType_SQLite:
 		{
-			SQL_FastQuery(gH_DB, sqlite_maps_alter1);
+			txn.AddQuery(sqlite_maps_alter1);
 		}
 		case DatabaseType_MySQL:
 		{
-			SQL_FastQuery(gH_DB, mysql_maps_alter1);
+			txn.AddQuery(mysql_maps_alter1);
 		}
 	}
 	
-	SQL_UnlockDatabase(gH_DB);
+	// No error logs for this transaction as it will always throw an error
+	// if the column already exists, which is more annoying than helpful.
+	SQL_ExecuteTransaction(gH_DB, txn, _, _, _, DBPrio_High);
 } 

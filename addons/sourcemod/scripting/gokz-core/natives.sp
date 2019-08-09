@@ -6,6 +6,7 @@ void CreateNatives()
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
 	CreateNative("GOKZ_GetOptionsTopMenu", Native_GetOptionsTopMenu);
+	CreateNative("GOKZ_GetCourseRegistered", Native_GetCourseRegistered);
 	
 	CreateNative("GOKZ_StartTimer", Native_StartTimer);
 	CreateNative("GOKZ_EndTimer", Native_EndTimer);
@@ -91,6 +92,11 @@ public int Native_GetOptionsTopMenu(Handle plugin, int numParams)
 	return view_as<int>(GetOptionsTopMenu());
 }
 
+public int Native_GetCourseRegistered(Handle plugin, int numParams)
+{
+	return view_as<int>(GetCourseRegistered(GetNativeCell(1)));
+}
+
 public int Native_StartTimer(Handle plugin, int numParams)
 {
 	if (BlockedExternallyCalledTimerNative(plugin))
@@ -98,7 +104,7 @@ public int Native_StartTimer(Handle plugin, int numParams)
 		return view_as<int>(false);
 	}
 	
-	return view_as<int>(TimerStart(GetNativeCell(1), GetNativeCell(2)));
+	return view_as<int>(TimerStart(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3)));
 }
 
 public int Native_EndTimer(Handle plugin, int numParams)

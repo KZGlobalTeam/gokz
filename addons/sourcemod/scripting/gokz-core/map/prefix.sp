@@ -23,10 +23,20 @@ int GetCurrentMapPrefix()
 
 void OnMapStart_Prefix()
 {
-	char map[64], mapPieces[5][64], mapPrefix[1][64];
-	GetCurrentMap(map, sizeof(map));
-	int lastPiece = ExplodeString(map, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
-	ExplodeString(mapPieces[lastPiece - 1], "_", mapPrefix, sizeof(mapPrefix), sizeof(mapPrefix[]));
+	char map[PLATFORM_MAX_PATH], mapPrefix[PLATFORM_MAX_PATH];
+	GetCurrentMapDisplayName(map, sizeof(map));
+	
+	// Get all characters before the first '_' character
+	for (int i = 0; i < sizeof(mapPrefix); i++)
+	{
+		if (map[i] == '\0' || map[i] == '_')
+		{
+			break;
+		}
+		
+		mapPrefix[i] = map[i];
+	}
+	
 	if (StrEqual(mapPrefix[0], "kzpro", false))
 	{
 		currentMapPrefix = MapPrefix_KZPro;

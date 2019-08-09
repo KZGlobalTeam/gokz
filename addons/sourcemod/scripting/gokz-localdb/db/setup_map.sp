@@ -11,13 +11,8 @@ void DB_SetupMap()
 	
 	char query[1024];
 	
-	char map[64];
-	GetCurrentMap(map, sizeof(map));
-	// Get just the map name (e.g. remove workshop/id/ prefix)
-	char mapPieces[5][64];
-	int lastPiece = ExplodeString(map, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
-	FormatEx(map, sizeof(map), "%s", mapPieces[lastPiece - 1]);
-	String_ToLower(map, map, sizeof(map));
+	char map[PLATFORM_MAX_PATH];
+	GetCurrentMapDisplayName(map, sizeof(map));
 	
 	Transaction txn = SQL_CreateTransaction();
 	

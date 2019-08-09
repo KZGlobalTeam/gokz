@@ -9,6 +9,7 @@
 #endif
 #define _gokz_included_
 
+#include <regex>
 #include <movement>
 
 
@@ -30,7 +31,7 @@ enum ObsMode
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_VERSION "2.0.4"
+#define GOKZ_VERSION "2.1.0"
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
 #define TICK_RATE 128.0
 #define EPSILON 0.000001
@@ -445,4 +446,54 @@ stock bool IsPlayerStuck(int client)
 	
 	TR_TraceHullFilter(vecOrigin, vecOrigin, vecMin, vecMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	return TR_DidHit(); // head in wall ?
+}
+
+/**
+ * Retrieves the name of an entity.
+ *
+ * @param entity			Index of the entity.
+ * @param buffer			Buffer to store the name.
+ * @param maxlength			Maximum length of the buffer.
+ * @return					Number of non-null bytes written.
+ */
+stock int GetEntityName(int entity, char[] buffer, int maxlength)
+{
+	return GetEntPropString(entity, Prop_Data, "m_iName", buffer, maxlength);
+}
+
+/**
+ * Returns an integer from an entity's name as matched using a regular expression.
+ *
+ * @param entity			Entity index.
+ * @param re				Regular expression to match the integer with.
+ * @param substringID		ID of the substring that will contain the integer.
+ * @returns					Integer found in the entity's name, or -1 if not found.
+ */
+stock int MatchIntFromEntityName(int entity, Regex re, int substringID)
+{
+	int num = -1;
+	char buffer[32];
+	GetEntityName(entity, buffer, sizeof(buffer));
+	
+	if (re.Match(buffer) > 0)
+	{
+		re.GetSubString(1, buffer, sizeof(buffer));
+		num = StringToInt(buffer);
+	}
+	
+	return num;
+}
+
+/**
+ * Gets the current map's display name in lower case.
+ *
+ * @param buffer			Buffer to store the map name.
+ * @param maxlength			Maximum length of buffer.
+ */
+stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
+{
+	char map[PLATFORM_MAX_PATH];
+	GetCurrentMap(map, sizeof(map));
+	GetMapDisplayName(map, map, sizeof(map));
+	String_ToLower(map, buffer, maxlength);
 } 

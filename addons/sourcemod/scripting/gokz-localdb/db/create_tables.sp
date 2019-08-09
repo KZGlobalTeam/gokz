@@ -6,25 +6,25 @@
 
 void DB_CreateTables()
 {
-	SQL_LockDatabase(gH_DB);
+	Transaction txn = SQL_CreateTransaction();
 	
 	switch (g_DBType)
 	{
 		case DatabaseType_SQLite:
 		{
-			SQL_FastQuery(gH_DB, sqlite_players_create);
-			SQL_FastQuery(gH_DB, sqlite_maps_create);
-			SQL_FastQuery(gH_DB, sqlite_mapcourses_create);
-			SQL_FastQuery(gH_DB, sqlite_times_create);
+			txn.AddQuery(sqlite_players_create);
+			txn.AddQuery(sqlite_maps_create);
+			txn.AddQuery(sqlite_mapcourses_create);
+			txn.AddQuery(sqlite_times_create);
 		}
 		case DatabaseType_MySQL:
 		{
-			SQL_FastQuery(gH_DB, mysql_players_create);
-			SQL_FastQuery(gH_DB, mysql_maps_create);
-			SQL_FastQuery(gH_DB, mysql_mapcourses_create);
-			SQL_FastQuery(gH_DB, mysql_times_create);
+			txn.AddQuery(mysql_players_create);
+			txn.AddQuery(mysql_maps_create);
+			txn.AddQuery(mysql_mapcourses_create);
+			txn.AddQuery(mysql_times_create);
 		}
 	}
 	
-	SQL_UnlockDatabase(gH_DB);
+	SQL_ExecuteTransaction(gH_DB, txn, _, DB_TxnFailure_Generic, _, DBPrio_High);
 } 
