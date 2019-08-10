@@ -34,7 +34,7 @@ To add a timer zone to a map, use a `trigger_multiple` with a specific name.
 
 ### Course Starts
 
-Course starts mark where players will be placed when they are teleported to a course.
+Course starts mark where players will be placed when they are teleported to a course e.g. using the `!b` command.
 
 To add a course start, use an `info_teleport_destination` with a specific name.
 

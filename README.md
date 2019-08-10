@@ -26,7 +26,7 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
  * [SourceMod ^1.9](https://www.sourcemod.net/downloads.php?branch=stable)
  * clientprefs Extension (comes packaged with SourceMod)
  * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showthread.php?t=180114)
- * [MovementAPI Plugin ^2.0.0](https://github.com/danzayau/MovementAPI)
+ * [MovementAPI Plugin ^2.0.1](https://github.com/danzayau/MovementAPI)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-globals plugin)
  * Optional - A "console cleaner" extension to prevent `Datatable warning` server console spam
  * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (automatically install minor GOKZ updates)
