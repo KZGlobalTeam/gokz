@@ -41,6 +41,8 @@ Handle gH_DHooks_OnTeleport;
 
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
+bool gB_OriginTeleported[MAXPLAYERS + 1];
+bool gB_VelocityTeleported[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_chat_prefix;
 ConVar gCV_sv_full_alltalk;
@@ -211,9 +213,8 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 
 public MRESReturn DHooks_OnTeleport(int client, Handle params)
 {
-	bool originTp = !DHookIsNullParam(params, 1); // Origin affected
-	bool velocityTp = !DHookIsNullParam(params, 3); // Velocity affected
-	OnTeleport_ValidJump(client, originTp, velocityTp);
+	gB_OriginTeleported[client] = !DHookIsNullParam(params, 1); // Origin affected
+	gB_VelocityTeleported[client] = !DHookIsNullParam(params, 3); // Velocity affected
 	return MRES_Ignored;
 }
 
@@ -392,4 +393,6 @@ static void UpdateOldVariables(int client, int buttons)
 		gB_OldOnGround[client] = Movement_GetOnGround(client);
 	}
 	gI_OldButtons[client] = buttons;
+	gB_OriginTeleported[client] = false;
+	gB_VelocityTeleported[client] = false;
 } 
