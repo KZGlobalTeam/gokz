@@ -218,8 +218,7 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 
 void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 {
-	if (gB_OriginTeleported[client]
-		 || gB_VelocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
+	if (gB_VelocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
 	{
 		InvalidateJump(client);
 	}
@@ -257,6 +256,14 @@ void OnPlayerSpawn_ValidJump(int client)
 void OnPlayerDeath_ValidJump(int client)
 {
 	InvalidateJump(client);
+}
+
+void OnTeleport_ValidJump(int client)
+{
+	if (gB_OriginTeleported[client])
+	{
+		InvalidateJump(client);
+	}
 }
 
 
