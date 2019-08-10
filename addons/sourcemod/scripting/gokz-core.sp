@@ -41,6 +41,7 @@ Handle gH_DHooks_OnTeleport;
 
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
+bool gB_OldTeleported[MAXPLAYERS + 1];
 bool gB_OriginTeleported[MAXPLAYERS + 1];
 bool gB_VelocityTeleported[MAXPLAYERS + 1];
 
@@ -167,7 +168,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmdPost_VirtualButtons(client, buttons); // Emulate buttons first
 	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
 	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
-	UpdateOldVariables(client, buttons); // This should be last
+	UpdateTrackingVariables(client, buttons); // This should be last
 }
 
 public Action OnClientCommandKeyValues(int client, KeyValues kv)
@@ -387,13 +388,14 @@ static void HookClientEvents(int client)
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
 
-static void UpdateOldVariables(int client, int buttons)
+static void UpdateTrackingVariables(int client, int buttons)
 {
 	if (IsPlayerAlive(client))
 	{
 		gB_OldOnGround[client] = Movement_GetOnGround(client);
 	}
 	gI_OldButtons[client] = buttons;
+	gB_OldTeleported[client] = gB_OriginTeleported[client] || gB_VelocityTeleported[client];
 	gB_OriginTeleported[client] = false;
 	gB_VelocityTeleported[client] = false;
 } 

@@ -54,8 +54,7 @@ bool TimerStart(int client, int course, bool allowMidair = false)
 {
 	if (!IsPlayerAlive(client)
 		 || JustStartedTimer(client)
-		 || gB_OriginTeleported[client]
-		 || gB_VelocityTeleported[client]
+		 || JustTeleported(client)
 		 || !IsPlayerValidMoveType(client)
 		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
 		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client)))
@@ -248,6 +247,11 @@ static bool IsValidMovetype(MoveType movetype)
 	return movetype == MOVETYPE_WALK
 	 || movetype == MOVETYPE_LADDER
 	 || movetype == MOVETYPE_NONE;
+}
+
+static bool JustTeleported(int client)
+{
+	return gB_OldTeleported[client] || gB_OriginTeleported[client] || gB_VelocityTeleported[client];
 }
 
 static bool JustLanded(int client)
