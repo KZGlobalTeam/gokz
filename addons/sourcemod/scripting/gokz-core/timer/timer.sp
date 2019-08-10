@@ -53,9 +53,12 @@ int GetCurrentTimeType(int client)
 bool TimerStart(int client, int course, bool allowMidair = false)
 {
 	if (!IsPlayerAlive(client)
-		 || (!Movement_GetOnGround(client) || JustLanded(client)) && !allowMidair
+		 || JustStartedTimer(client)
+		 || gB_OriginTeleported[client]
+		 || gB_VelocityTeleported[client]
 		 || !IsPlayerValidMoveType(client)
-		 || JustStartedTimer(client))
+		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
+		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client)))
 	{
 		return false;
 	}

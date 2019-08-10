@@ -78,11 +78,7 @@ public void OnStartZoneEndTouch(const char[] name, int caller, int activator, fl
 		return;
 	}
 	
-	// Prevent pre-hopping and exploits
-	if (GOKZ_GetValidJump(activator) && !GOKZ_GetHitPerf(activator))
-	{
-		GOKZ_StartTimer(activator, 0, true);
-	}
+	GOKZ_StartTimer(activator, 0, true);
 }
 
 public void OnEndZoneStartTouch(const char[] name, int caller, int activator, float delay)
@@ -128,11 +124,7 @@ public void OnBonusStartZoneEndTouch(const char[] name, int caller, int activato
 		return;
 	}
 	
-	// Prevent pre-hopping and exploits
-	if (GOKZ_GetValidJump(activator) && !GOKZ_GetHitPerf(activator))
-	{
-		GOKZ_StartTimer(activator, course, true);
-	}
+	GOKZ_StartTimer(activator, course, true);
 }
 
 public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activator, float delay)
