@@ -251,13 +251,14 @@ static bool IsValidMovetype(MoveType movetype)
 
 static bool JustTeleported(int client)
 {
-	return gB_OldTeleported[client] || gB_OriginTeleported[client] || gB_VelocityTeleported[client];
+	return gB_OriginTeleported[client] || gB_VelocityTeleported[client]
+	 || gI_CmdNum[client] - gI_TeleportCmdNum[client] <= GOKZ_TIMER_START_GROUND_TICKS;
 }
 
 static bool JustLanded(int client)
 {
 	return !gB_OldOnGround[client]
-	 || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS;
+	 || gI_CmdNum[client] - Movement_GetLandingCmdNum(client) <= GOKZ_TIMER_START_NO_TELEPORT_TICKS;
 }
 
 static bool JustStartedTimer(int client)
