@@ -329,7 +329,7 @@ stock char gC_RadioCommands[][] =
 	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
 	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
 	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
-	"enemydown", "compliment", "thanks", "cheer"
+	"enemydown", "compliment", "thanks", "cheer", "go_a", "go_b", "sorry", "needrop"
 };
 
 
