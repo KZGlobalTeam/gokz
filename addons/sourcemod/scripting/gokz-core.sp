@@ -39,8 +39,12 @@ public Plugin myinfo =
 Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
 
+int gI_CmdNum[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
+int gI_TeleportCmdNum[MAXPLAYERS + 1];
+bool gB_OriginTeleported[MAXPLAYERS + 1];
+bool gB_VelocityTeleported[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_chat_prefix;
 ConVar gCV_sv_full_alltalk;
@@ -160,12 +164,18 @@ public void OnClientDisconnect(int client)
 	OnClientDisconnect_ValidJump(client);
 }
 
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	gI_CmdNum[client] = cmdnum;
+	return Plugin_Continue;
+}
+
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
 	OnPlayerRunCmdPost_VirtualButtons(client, buttons); // Emulate buttons first
 	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
 	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
-	UpdateOldVariables(client, buttons); // This should be last
+	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
 }
 
 public Action OnClientCommandKeyValues(int client, KeyValues kv)
@@ -211,9 +221,9 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 
 public MRESReturn DHooks_OnTeleport(int client, Handle params)
 {
-	bool originTp = !DHookIsNullParam(params, 1); // Origin affected
-	bool velocityTp = !DHookIsNullParam(params, 3); // Velocity affected
-	OnTeleport_ValidJump(client, originTp, velocityTp);
+	gB_OriginTeleported[client] = !DHookIsNullParam(params, 1); // Origin affected
+	gB_VelocityTeleported[client] = !DHookIsNullParam(params, 3); // Velocity affected
+	OnTeleport_ValidJump(client);
 	return MRES_Ignored;
 }
 
@@ -385,11 +395,19 @@ static void HookClientEvents(int client)
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
 
-static void UpdateOldVariables(int client, int buttons)
+static void UpdateTrackingVariables(int client, int cmdnum, int buttons)
 {
 	if (IsPlayerAlive(client))
 	{
 		gB_OldOnGround[client] = Movement_GetOnGround(client);
 	}
+	
 	gI_OldButtons[client] = buttons;
+	
+	if (gB_OriginTeleported[client] || gB_VelocityTeleported[client])
+	{
+		gI_TeleportCmdNum[client] = cmdnum;
+	}
+	gB_OriginTeleported[client] = false;
+	gB_VelocityTeleported[client] = false;
 } 

@@ -21,7 +21,7 @@ float GetCurrentTime(int client)
 	return currentTime[client];
 }
 
-float SetCurrentTime(int client, float time)
+void SetCurrentTime(int client, float time)
 {
 	currentTime[client] = time;
 }
@@ -29,6 +29,11 @@ float SetCurrentTime(int client, float time)
 int GetCurrentCourse(int client)
 {
 	return currentCourse[client];
+}
+
+void SetCurrentCourse(int client, int course)
+{
+	currentCourse[client] = course;
 }
 
 bool GetHasStartedTimerThisMap(int client)
@@ -53,9 +58,11 @@ int GetCurrentTimeType(int client)
 bool TimerStart(int client, int course, bool allowMidair = false)
 {
 	if (!IsPlayerAlive(client)
-		 || (!Movement_GetOnGround(client) || JustLanded(client)) && !allowMidair
+		 || JustStartedTimer(client)
+		 || JustTeleported(client)
 		 || !IsPlayerValidMoveType(client)
-		 || JustStartedTimer(client))
+		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
+		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client)))
 	{
 		return false;
 	}
@@ -247,10 +254,16 @@ static bool IsValidMovetype(MoveType movetype)
 	 || movetype == MOVETYPE_NONE;
 }
 
+static bool JustTeleported(int client)
+{
+	return gB_OriginTeleported[client] || gB_VelocityTeleported[client]
+	 || gI_CmdNum[client] - gI_TeleportCmdNum[client] <= GOKZ_TIMER_START_GROUND_TICKS;
+}
+
 static bool JustLanded(int client)
 {
 	return !gB_OldOnGround[client]
-	 || GetGameTickCount() - Movement_GetLandingTick(client) <= GOKZ_TIMER_START_GROUND_TICKS;
+	 || gI_CmdNum[client] - Movement_GetLandingCmdNum(client) <= GOKZ_TIMER_START_NO_TELEPORT_TICKS;
 }
 
 static bool JustStartedTimer(int client)

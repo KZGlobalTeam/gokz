@@ -188,7 +188,6 @@ void JoinTeam(int client, int newTeam)
 */
 
 static bool validJump[MAXPLAYERS + 1];
-static bool velocityTeleported[MAXPLAYERS + 1];
 
 bool GetValidJump(int client)
 {
@@ -219,11 +218,10 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 
 void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 {
-	if (velocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
+	if (gB_VelocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
 	{
 		InvalidateJump(client);
 	}
-	velocityTeleported[client] = false;
 }
 
 static bool JustHitPerfBhop(int client, int cmdnum)
@@ -260,15 +258,11 @@ void OnPlayerDeath_ValidJump(int client)
 	InvalidateJump(client);
 }
 
-void OnTeleport_ValidJump(int client, bool originTp, bool velocityTp)
+void OnTeleport_ValidJump(int client)
 {
-	if (originTp)
+	if (gB_OriginTeleported[client])
 	{
 		InvalidateJump(client);
-	}
-	if (velocityTp)
-	{
-		velocityTeleported[client] = true;
 	}
 }
 

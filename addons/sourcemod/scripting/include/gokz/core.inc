@@ -151,6 +151,7 @@ enum
 #define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.15
 #define GOKZ_LADDER_NO_CHECKPOINT_TIME 1.5
 #define GOKZ_PAUSE_COOLDOWN 1.0
+#define GOKZ_TIMER_START_NO_TELEPORT_TICKS 4
 #define GOKZ_TIMER_START_GROUND_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.1
 
@@ -321,14 +322,6 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_water_swim_mode", 
 	"sv_weapon_encumbrance_per_item", 
 	"sv_weapon_encumbrance_scale"
-};
-
-stock char gC_RadioCommands[][] = 
-{
-	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
-	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
-	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
-	"enemydown", "compliment", "thanks", "cheer"
 };
 
 
