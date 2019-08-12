@@ -21,7 +21,7 @@ float GetCurrentTime(int client)
 	return currentTime[client];
 }
 
-float SetCurrentTime(int client, float time)
+void SetCurrentTime(int client, float time)
 {
 	currentTime[client] = time;
 }
@@ -29,6 +29,11 @@ float SetCurrentTime(int client, float time)
 int GetCurrentCourse(int client)
 {
 	return currentCourse[client];
+}
+
+void SetCurrentCourse(int client, int course)
+{
+	currentCourse[client] = course;
 }
 
 bool GetHasStartedTimerThisMap(int client)
