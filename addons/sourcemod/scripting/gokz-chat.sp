@@ -45,6 +45,8 @@ public void OnPluginStart()
 	
 	CreateConVars();
 	HookEvents();
+	
+	OnPluginStart_BlockRadio();
 }
 
 public void OnAllPluginsLoaded()
@@ -224,4 +226,29 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 	char reason[128];
 	event.GetString("reason", reason, sizeof(reason));
 	GOKZ_PrintToChatAll(false, "%t", "Client Disconnection Message", client, reason);
+}
+
+
+
+// =====[ BLOCK RADIO ]=====
+
+static char radioCommands[][] = 
+{
+	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", 
+	"fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", 
+	"needbackup", "sectorclear", "inposition", "reportingin", "getout", "negative", 
+	"enemydown", "compliment", "thanks", "cheer", "go_a", "go_b", "sorry", "needrop"
+};
+
+public void OnPluginStart_BlockRadio()
+{
+	for (int i = 0; i < sizeof(radioCommands); i++)
+	{
+		AddCommandListener(CommandBlock, radioCommands[i]);
+	}
+}
+
+public Action CommandBlock(int client, const char[] command, int argc)
+{
+	return Plugin_Handled;
 } 

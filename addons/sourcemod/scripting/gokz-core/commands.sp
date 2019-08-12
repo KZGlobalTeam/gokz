@@ -40,15 +40,6 @@ void RegisterCommands()
 void AddCommandsListeners()
 {
 	AddCommandListener(CommandJoinTeam, "jointeam");
-	for (int i = 0; i < sizeof(gC_RadioCommands); i++)
-	{
-		AddCommandListener(CommandBlock, gC_RadioCommands[i]);
-	}
-}
-
-public Action CommandBlock(int client, const char[] command, int argc)
-{
-	return Plugin_Handled;
 }
 
 public Action CommandJoinTeam(int client, const char[] command, int argc)
