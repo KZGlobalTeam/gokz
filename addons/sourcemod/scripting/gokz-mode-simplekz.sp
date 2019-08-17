@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 6
+#define MODE_VERSION 7
 #define DUCK_SPEED_MINIMUM 7.0
 #define PERF_TICKS 2
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
@@ -340,8 +340,11 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	{
 		gF_PreVelMod[player.ID] -= PRE_VELMOD_DECREMENT_MIDAIR;
 	}
-	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier
-	else if (ValidPrestrafeTurning(player, angles) && ValidPrestrafeButtons(player))
+	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier.
+	// Also require duck speed to be at normal value to prevent exploit where you build prestrafe while ducked then stand up.
+	// This "duck speed solution" doesn't prevent players from prestrafing while ducked.
+	else if (ValidPrestrafeTurning(player, angles) && ValidPrestrafeButtons(player)
+		 && player.DuckSpeed >= DUCK_SPEED_MINIMUM - EPSILON)
 	{
 		// If player changes their prestrafe direction, reset it
 		if (player.TurningLeft && !gB_PreTurningLeft[player.ID] || player.TurningRight && gB_PreTurningLeft[player.ID])
