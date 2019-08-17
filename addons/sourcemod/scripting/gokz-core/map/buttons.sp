@@ -62,11 +62,7 @@ public void OnStartButtonPress(const char[] name, int caller, int activator, flo
 		return;
 	}
 	
-	if (GOKZ_StartTimer(activator, 0))
-	{
-		// Only called on success to prevent virtual button exploits
-		OnStartButtonPress_VirtualButtons(activator, 0);
-	}
+	ProcessStartButtonPress(activator, 0);
 }
 
 public void OnEndButtonPress(const char[] name, int caller, int activator, float delay)
@@ -76,8 +72,7 @@ public void OnEndButtonPress(const char[] name, int caller, int activator, float
 		return;
 	}
 	
-	GOKZ_EndTimer(activator, 0);
-	OnEndButtonPress_VirtualButtons(activator, 0);
+	ProcessEndButtonPress(activator, 0);
 }
 
 public void OnBonusStartButtonPress(const char[] name, int caller, int activator, float delay)
@@ -88,14 +83,12 @@ public void OnBonusStartButtonPress(const char[] name, int caller, int activator
 	}
 	
 	int course = GetStartButtonBonusNumber(caller);
-	if (GOKZ_IsValidCourse(course, true))
+	if (!GOKZ_IsValidCourse(course, true))
 	{
-		if (GOKZ_StartTimer(activator, course))
-		{
-			// Only called on success to prevent virtual button exploits
-			OnStartButtonPress_VirtualButtons(activator, course);
-		}
+		return;
 	}
+	
+	ProcessStartButtonPress(activator, course);
 }
 
 public void OnBonusEndButtonPress(const char[] name, int caller, int activator, float delay)
@@ -106,16 +99,32 @@ public void OnBonusEndButtonPress(const char[] name, int caller, int activator, 
 	}
 	
 	int course = GetEndButtonBonusNumber(caller);
-	if (GOKZ_IsValidCourse(course, true))
+	if (!GOKZ_IsValidCourse(course, true))
 	{
-		GOKZ_EndTimer(activator, course);
-		OnEndButtonPress_VirtualButtons(activator, course);
+		return;
 	}
+	
+	ProcessEndButtonPress(activator, course);
 }
 
 
 
 // =====[ PRIVATE ]=====
+
+static void ProcessStartButtonPress(int client, int course)
+{
+	if (GOKZ_StartTimer(client, course))
+	{
+		// Only called on success to prevent virtual button exploits
+		OnStartButtonPress_VirtualButtons(client, course);
+	}
+}
+
+static void ProcessEndButtonPress(int client, int course)
+{
+	GOKZ_EndTimer(client, course);
+	OnEndButtonPress_VirtualButtons(client, course);
+}
 
 static int GetStartButtonBonusNumber(int entity)
 {

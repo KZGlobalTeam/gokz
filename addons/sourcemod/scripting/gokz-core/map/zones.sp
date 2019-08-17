@@ -64,13 +64,7 @@ public void OnStartZoneStartTouch(const char[] name, int caller, int activator, 
 		return;
 	}
 	
-	// Set start position to course if they weren't running it before
-	if (GOKZ_GetCourse(activator) != 0)
-	{
-		GOKZ_StopTimer(activator);
-		SetCurrentCourse(activator, 0);
-		SetCustomStartPositionToMap(activator, 0);
-	}
+	SetUpClientForCourse(activator, 0);
 }
 
 public void OnStartZoneEndTouch(const char[] name, int caller, int activator, float delay)
@@ -106,13 +100,7 @@ public void OnBonusStartZoneStartTouch(const char[] name, int caller, int activa
 		return;
 	}
 	
-	// Set start position to course if they weren't running it before
-	if (GOKZ_GetCourse(activator) != course)
-	{
-		GOKZ_StopTimer(activator);
-		SetCurrentCourse(activator, course);
-		SetCustomStartPositionToMap(activator, course);
-	}
+	SetUpClientForCourse(activator, course);
 }
 
 public void OnBonusStartZoneEndTouch(const char[] name, int caller, int activator, float delay)
@@ -150,6 +138,17 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 
 
 // =====[ PRIVATE ]=====
+
+static void SetUpClientForCourse(int client, int course)
+{
+	// Set start position to course if they weren't running it before
+	if (GOKZ_GetCourse(client) != course)
+	{
+		GOKZ_StopTimer(client);
+		SetCurrentCourse(client, course);
+		SetCustomStartPositionToMap(client, course);
+	}
+}
 
 static int GetStartZoneBonusNumber(int entity)
 {
