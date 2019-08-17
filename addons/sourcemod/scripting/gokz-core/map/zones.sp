@@ -142,7 +142,7 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 static void SetUpClientForCourse(int client, int course)
 {
 	// Set start position to course if they weren't running it before
-	if (GOKZ_GetCourse(client) != course)
+	if (GOKZ_GetCourse(client) != course || !GetHasCustomStartPosition(client))
 	{
 		GOKZ_StopTimer(client);
 		SetCurrentCourse(client, course);
