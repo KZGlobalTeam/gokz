@@ -52,6 +52,13 @@
 
  * `!goto` - Teleport to another player. Usage: `!goto <player>`
 
+### gokz-saveloc
+
+ * `!saveloc` - Save location. Usage: `!saveloc <name>`
+ * `!loadloc` - Load location. Usage: `!loadloc <#id OR name>`
+ * `!locmenu` - Open location menu.
+ * `!nameloc` - Name location. Usage: `!nameloc <#id> <name>`
+
 ### gokz-spec
 
  * `!spec` - Spectate another player. Usage `!spec <player>`
