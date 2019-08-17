@@ -1,9 +1,7 @@
 #include <sourcemod>
 
-#include <sdktools>
 #include <sdkhooks>
-
-#include <gokz>
+#include <sdktools>
 
 #include <movementapi>
 

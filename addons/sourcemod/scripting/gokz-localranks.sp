@@ -3,12 +3,11 @@
 #include <cstrike>
 #include <sdktools>
 
-#include <colorvariables>
-#include <gokz>
-
 #include <gokz/core>
 #include <gokz/localdb>
 #include <gokz/localranks>
+
+#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN

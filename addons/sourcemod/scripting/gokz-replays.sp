@@ -4,8 +4,6 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#include <gokz>
-
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>

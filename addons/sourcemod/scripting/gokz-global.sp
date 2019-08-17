@@ -2,14 +2,13 @@
 
 #include <sdktools>
 
-#include <autoexecconfig>
-#include <gokz>
-
 #include <GlobalAPI-Core>
-#include <gokz/core>
 #include <gokz/anticheat>
-#include <gokz/replays>
+#include <gokz/core>
 #include <gokz/global>
+#include <gokz/replays>
+
+#include <autoexecconfig>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN

@@ -9,7 +9,6 @@
 #endif
 #define _gokz_included_
 
-#include <regex>
 #include <movement>
 
 
@@ -459,29 +458,6 @@ stock bool IsPlayerStuck(int client)
 stock int GetEntityName(int entity, char[] buffer, int maxlength)
 {
 	return GetEntPropString(entity, Prop_Data, "m_iName", buffer, maxlength);
-}
-
-/**
- * Returns an integer from an entity's name as matched using a regular expression.
- *
- * @param entity			Entity index.
- * @param re				Regular expression to match the integer with.
- * @param substringID		ID of the substring that will contain the integer.
- * @returns					Integer found in the entity's name, or -1 if not found.
- */
-stock int MatchIntFromEntityName(int entity, Regex re, int substringID)
-{
-	int num = -1;
-	char buffer[32];
-	GetEntityName(entity, buffer, sizeof(buffer));
-	
-	if (re.Match(buffer) > 0)
-	{
-		re.GetSubString(1, buffer, sizeof(buffer));
-		num = StringToInt(buffer);
-	}
-	
-	return num;
 }
 
 /**

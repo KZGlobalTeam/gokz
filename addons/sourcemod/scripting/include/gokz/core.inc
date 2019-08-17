@@ -9,10 +9,10 @@
 #endif
 #define _gokz_core_included_
 
+#include <regex>
 #include <topmenus>
 
 #include <gokz>
-#include <movementapi>
 
 
 
@@ -1251,6 +1251,29 @@ stock int GOKZ_GetDefaultMode()
 stock bool GOKZ_IsValidCourse(int course, bool bonus = false)
 {
 	return (!bonus && course == 0) || (0 < course && course < GOKZ_MAX_COURSES);
+}
+
+/**
+ * Returns an integer from an entity's name as matched using a regular expression.
+ *
+ * @param entity			Entity index.
+ * @param re				Regular expression to match the integer with.
+ * @param substringID		ID of the substring that will contain the integer.
+ * @returns					Integer found in the entity's name, or -1 if not found.
+ */
+stock int GOKZ_MatchIntFromEntityName(int entity, Regex re, int substringID)
+{
+	int num = -1;
+	char buffer[32];
+	GetEntityName(entity, buffer, sizeof(buffer));
+	
+	if (re.Match(buffer) > 0)
+	{
+		re.GetSubString(1, buffer, sizeof(buffer));
+		num = StringToInt(buffer);
+	}
+	
+	return num;
 }
 
 

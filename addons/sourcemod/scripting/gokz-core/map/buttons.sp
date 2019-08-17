@@ -119,10 +119,10 @@ public void OnBonusEndButtonPress(const char[] name, int caller, int activator, 
 
 static int GetStartButtonBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusStartButton, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusStartButton, 1);
 }
 
 static int GetEndButtonBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusEndButton, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusEndButton, 1);
 } 

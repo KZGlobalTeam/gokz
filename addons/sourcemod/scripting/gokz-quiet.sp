@@ -1,8 +1,7 @@
 #include <sourcemod>
 
-#include <sdkhooks>
-
 #include <cstrike>
+#include <sdkhooks>
 
 #include <gokz/core>
 #include <gokz/quiet>
@@ -10,6 +9,9 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 

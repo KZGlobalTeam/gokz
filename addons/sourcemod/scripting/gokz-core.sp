@@ -1,18 +1,17 @@
 #include <sourcemod>
 
 #include <clientprefs>
+#include <cstrike>
 #include <dhooks>
-#include <sdktools>
+#include <regex>
 #include <sdkhooks>
+#include <sdktools>
+
+#include <gokz/core>
+#include <movementapi>
 
 #include <autoexecconfig>
-#include <colorvariables>
-#include <cstrike>
-#include <gokz>
-#include <regex>
-
-#include <movementapi>
-#include <gokz/core>
+#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN

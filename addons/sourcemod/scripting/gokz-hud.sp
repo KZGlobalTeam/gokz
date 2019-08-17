@@ -5,11 +5,13 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
+#include <gokz/racing>
 #include <updater>
 
-#include <gokz/racing>
-
 #include <gokz/kzplayer>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 

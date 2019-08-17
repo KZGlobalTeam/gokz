@@ -153,10 +153,10 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 
 static int GetStartZoneBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusStartZone, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusStartZone, 1);
 }
 
 static int GetEndZoneBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusEndZone, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusEndZone, 1);
 } 

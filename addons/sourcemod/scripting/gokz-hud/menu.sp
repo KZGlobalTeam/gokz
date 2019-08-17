@@ -18,7 +18,7 @@ void CancelGOKZHUDMenu(int client)
 
 // =====[ EVENTS ]=====
 
-void OnPlayerSpawn_Menu(client)
+void OnPlayerSpawn_Menu(int client)
 {
 	CancelGOKZHUDMenu(client);
 }

@@ -9,8 +9,9 @@
 #endif
 #define _gokz_kzplayer_included_
 
-#include <gokz>
 #include <movementapi>
+
+#include <gokz>
 
 
 

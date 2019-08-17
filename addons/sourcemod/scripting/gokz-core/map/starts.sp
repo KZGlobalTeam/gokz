@@ -102,5 +102,5 @@ static void StoreStart(int course, int entity)
 
 static int GetStartBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusStart, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusStart, 1);
 } 
