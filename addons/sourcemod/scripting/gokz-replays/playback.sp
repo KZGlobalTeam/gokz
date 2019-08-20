@@ -361,11 +361,29 @@ static void SetBotStuff(int bot)
 		GOKZ_JoinTeam(client, CS_TEAM_T);
 	}
 	
-	// Pull out the bot's knife
-	int weapon = GetPlayerWeaponSlot(client, 2);
-	if (weapon != -1)
+	// Set bot weapon according to mode of the replay
+	// Always start by removing the pistol
+	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
+	if (currentPistol != -1)
 	{
-		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+		RemovePlayerItem(client, currentPistol);
+	}
+	
+	if (botMode[bot] == Mode_Vanilla)
+	{
+		// If Vanilla replay, hold out a knife
+		int currentKnife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
+		if (currentKnife != -1)
+		{
+			RemovePlayerItem(client, currentKnife);
+		}
+		
+		GivePlayerItem(client, "weapon_knife");
+	}
+	else
+	{
+		// For other modes, wield a USP-S
+		GivePlayerItem(client, "weapon_usp_silencer");
 	}
 }
 
