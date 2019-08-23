@@ -84,6 +84,11 @@ bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 public void OnPluginStart()
 {
+	if (FloatAbs(1.0 / GetTickInterval() - 128.0) > EPSILON)
+	{
+		SetFailState("gokz-mode-simplekz only supports 128 tickrate servers.");
+	}
+
 	CreateConVars();
 }
 

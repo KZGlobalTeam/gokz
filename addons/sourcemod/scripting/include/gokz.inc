@@ -32,7 +32,6 @@ enum ObsMode
 
 #define GOKZ_VERSION "2.1.1"
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
-#define TICK_RATE 128.0
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
