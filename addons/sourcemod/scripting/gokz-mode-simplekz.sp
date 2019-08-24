@@ -29,7 +29,7 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
 #define MODE_VERSION 7
-#define DUCK_SPEED_MINIMUM 7.0
+#define LANDING_DUCK_SPEED_MINIMUM 6.0 // Approx. equal to if you just ducked/unducked for the first time in a while
 #define PERF_TICKS 2
 #define PS_MAX_REWARD_TURN_RATE 0.46875 // Degrees per tick (60 degrees per second)
 #define PS_SPEED_MAX 26.38 // Units
@@ -624,8 +624,8 @@ void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 
 void ReduceDuckSlowdown(KZPlayer player)
 {
-	if (player.DuckSpeed < DUCK_SPEED_MINIMUM)
+	if (player.DuckSpeed < LANDING_DUCK_SPEED_MINIMUM)
 	{
-		player.DuckSpeed = DUCK_SPEED_MINIMUM;
+		player.DuckSpeed = LANDING_DUCK_SPEED_MINIMUM;
 	}
 } 
