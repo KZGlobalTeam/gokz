@@ -111,7 +111,7 @@ static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 	{
 		ShowSyncHudText(player.ID, speedHudSynchronizer, 
 			"%.0f\n(%.0f)", 
-			RoundFloat(targetPlayer.Speed * 10) / 10.0, 
-			RoundFloat(targetPlayer.GOKZTakeoffSpeed * 10) / 10.0);
+			RoundToPowerOfTen(targetPlayer.Speed, -2), 
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
 	}
 } 

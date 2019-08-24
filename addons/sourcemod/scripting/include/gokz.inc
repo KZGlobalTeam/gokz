@@ -168,7 +168,7 @@ stock int IntMin(int value1, int value2)
  * @param power			Power of 10 to round to.
  * @return				Rounded value.
  */
-stock float RoundToPowerOf10(float value, int power)
+stock float RoundToPowerOfTen(float value, int power)
 {
 	float pow = Pow(10.0, float(power));
 	return RoundFloat(value / pow) * pow;

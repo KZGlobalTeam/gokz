@@ -88,20 +88,20 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 		gC_ModeNames[GOKZ_GetCoreOption(jumper, Option_Mode)], 
 		offset, "Offset", 
 		height, "Height", 
-		RoundToPowerOf10(preSpeed, -3), "Pre", 
-		RoundToPowerOf10(maxSpeed, -3), "Max", 
+		RoundToPowerOfTen(preSpeed, -2), "Pre", 
+		RoundToPowerOfTen(maxSpeed, -2), "Max", 
 		strafes, strafes == 1 ? "Strafe" : "Strafes", 
 		sync, "Sync", 
 		duration, "Airtime");
 	PrintToConsole(client, "  #.  %12t%12t%12t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)");
 	if (GetStrafeAirtime(jumper, 0) > 0.001)
 	{
-		PrintToConsole(client, "  0.  ------      ------      ------      %5.1f%%", GetStrafeAirtime(jumper, 0));
+		PrintToConsole(client, "  0.  ----      -----     -----     %3.0f%%", GetStrafeAirtime(jumper, 0));
 	}
 	for (int strafe = 1; strafe <= strafes && strafe < JS_MAX_TRACKED_STRAFES; strafe++)
 	{
 		PrintToConsole(client, 
-			" %2d.  %5.1f%%      %6.3f      %6.3f      %5.1f%%", 
+			" %2d.  %3.0f%%      %5.2f     %5.2f     %3.0f%%", 
 			strafe, 
 			GetStrafeSync(jumper, strafe), 
 			GetStrafeGain(jumper, strafe), 
@@ -149,9 +149,9 @@ static char[] GetPreSpeedString(int client, int jumper, float preSpeed)
 {
 	char preSpeedString[32];
 	FormatEx(preSpeedString, sizeof(preSpeedString), 
-		"%s%d{grey} %T", 
+		"%s%.0f{grey} %T", 
 		GOKZ_GetHitPerf(jumper) ? "{green}" : "{lime}", 
-		RoundFloat(preSpeed), 
+		RoundToPowerOfTen(preSpeed, -2), 
 		"Pre", client);
 	return preSpeedString;
 }
@@ -160,8 +160,8 @@ static char[] GetMaxSpeedString(int client, float maxSpeed)
 {
 	char maxSpeedString[32];
 	FormatEx(maxSpeedString, sizeof(maxSpeedString), 
-		"{lime}%d{grey} %T", 
-		RoundFloat(maxSpeed), 
+		"{lime}%.0f{grey} %T", 
+		RoundToPowerOfTen(maxSpeed, -2), 
 		"Max", client);
 	return maxSpeedString;
 }

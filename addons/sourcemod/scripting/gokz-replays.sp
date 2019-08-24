@@ -60,7 +60,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-replays only supports 128 tickrate servers.");
 	}
-
+	
 	LoadTranslations("gokz-replays.phrases");
 	
 	CreateGlobalForwards();

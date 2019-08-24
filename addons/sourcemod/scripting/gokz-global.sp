@@ -70,7 +70,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-global currently only supports 128 tickrate servers.");
 	}
-
+	
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-global.phrases");
 	

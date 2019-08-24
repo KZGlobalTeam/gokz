@@ -82,7 +82,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-mode-kztimer only supports 128 tickrate servers.");
 	}
-
+	
 	CreateConVars();
 }
 
