@@ -85,7 +85,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 		jumper, 
 		distance, 
 		gC_JumpTypes[jumpType], 
-		gC_ModeNames[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+		gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
 		offset, "Offset", 
 		height, "Height", 
 		RoundToPowerOfTen(preSpeed, -2), "Pre", 
