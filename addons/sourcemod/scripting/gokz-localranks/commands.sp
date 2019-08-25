@@ -4,20 +4,20 @@ static float lastCommandTime[MAXPLAYERS + 1];
 
 void RegisterCommands()
 {
-	RegConsoleCmd("sm_top", CommandTop, "[KZ] Opens a menu showing the top record holders.");
-	RegConsoleCmd("sm_maptop", CommandMapTop, "[KZ] Opens a menu showing the top times of a map. Usage: !maptop <map>");
-	RegConsoleCmd("sm_bmaptop", CommandBMapTop, "[KZ] Opens a menu showing the top bonus times of a map. Usage: !btop <#bonus> <map>");
-	RegConsoleCmd("sm_pb", CommandPB, "[KZ] Prints PB map times and ranks to chat. Usage: !pb <map> <player>");
-	RegConsoleCmd("sm_bpb", CommandBPB, "[KZ] Prints PB bonus times and ranks to chat. Usage: !bpb <#bonus> <map> <player>");
-	RegConsoleCmd("sm_wr", CommandWR, "[KZ] Prints map record times to chat. Usage: !wr <map>");
-	RegConsoleCmd("sm_bwr", CommandBWR, "[KZ] Prints bonus record times to chat. Usage: !bwr <#bonus> <map>");
-	RegConsoleCmd("sm_avg", CommandAVG, "[KZ] Prints the average map run time to chat. Usage !avg <map>");
-	RegConsoleCmd("sm_bavg", CommandBAVG, "[KZ] Prints the average bonus run time to chat. Usage !bavg <#bonus> <map>");
-	RegConsoleCmd("sm_pc", CommandPC, "[KZ] Prints map completion to chat. Usage: !pc <player>");
-	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Opens a menu showing recently broken records.");
-	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Opens a menu showing recently broken records.");
+	RegConsoleCmd("sm_top", CommandTop, "[KZ] Open a menu showing the top record holders.");
+	RegConsoleCmd("sm_maptop", CommandMapTop, "[KZ] Open a menu showing the top main course times of a map. Usage: !maptop <map>");
+	RegConsoleCmd("sm_bmaptop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !btop <#bonus> <map>");
+	RegConsoleCmd("sm_pb", CommandPB, "[KZ] Show PB main course times and ranks in chat. Usage: !pb <map> <player>");
+	RegConsoleCmd("sm_bpb", CommandBPB, "[KZ] Show PB bonus times and ranks in chat. Usage: !bpb <#bonus> <map> <player>");
+	RegConsoleCmd("sm_wr", CommandWR, "[KZ] Show main course record times in chat. Usage: !wr <map>");
+	RegConsoleCmd("sm_bwr", CommandBWR, "[KZ] Show bonus record times in chat. Usage: !bwr <#bonus> <map>");
+	RegConsoleCmd("sm_avg", CommandAVG, "[KZ] Show the average main course run time in chat. Usage !avg <map>");
+	RegConsoleCmd("sm_bavg", CommandBAVG, "[KZ] Show the average bonus run time in chat. Usage !bavg <#bonus> <map>");
+	RegConsoleCmd("sm_pc", CommandPC, "[KZ] Show course completion in chat. Usage: !pc <player>");
+	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
+	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 	
-	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Updates the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
+	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
 }
 
 public Action CommandTop(int client, int args)

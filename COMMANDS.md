@@ -7,16 +7,16 @@
  * `!gocheck` - Teleport to your current checkpoint.
  * `!prev` - Go back a checkpoint.
  * `!next` - Go forward a checkpoint.
- * `!pause`/`!resume` - Toggle pausing your timer and stopping you in your position.
  * `!undo` - Undo teleport.
  * `!start`/`!restart`/`!r` - Teleport to your start position.
+ * `!setstartpos`/`!ssp` - Set your custom start position to your current position.
+ * `!clearstartpos`/`!csp` - Clear your custom start position.
  * `!main`/`!m` - Teleport to the start of the main course.
  * `!bonus`/`!b` - Teleport to the start of a bonus. Usage: `!b <#bonus>`
+ * `!pause`/`!resume` - Toggle pausing your timer and stopping you in your position.
  * `!stop` - Stop your timer.
  * `!autorestart` - Toggle auto restart upon teleporting to start.
- * `!setstartpos`/`!ssp` - Set your current position as your custom start position.
- * `!clearstartpos`/`!csp` - Clear your custom start position.
- * `!mode` - Opens up the movement mode selection menu.
+ * `!mode` - Open the movement mode selection menu.
  * `!vanilla`/`!vnl`/`!v` - Switch to the Vanilla mode.
  * `!simplekz`/`!skz`/`!s` - Switch to the SimpleKZ mode.
  * `!kztimer`/`!kzt`/`!k` - Switch to the KZTimer mode.
@@ -37,7 +37,7 @@
 
 ### gokz-quiet
 
- * `!hide` - Toggles the visibility of other players.
+ * `!hide` - Toggle the visibility of other players.
  * `!stopsound` - Stop all sounds e.g. map soundscapes (music).
 
 ### gokz-pistol
@@ -66,11 +66,15 @@
 
 ### gokz-jumpstats
 
- * `!jumpstats`/`!js`/`!ljstats` - Opens the jumpstats options menu.
+ * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
+
+### gokz-anticheat
+
+ * `!bhopcheck` - Show bunnyhop stats report including perf ratio and scroll pattern.
 
 ### gokz-replays
 
- * `!replay` - Opens the replay loading menu.
+ * `!replay` - Open the replay loading menu.
 
 ### gokz-racing
 
@@ -85,34 +89,34 @@
 
 Many of these commands return results for your currently selected mode.
 
- * `!top` - Opens a menu showing the top record holders
- * `!maptop` - Opens a menu showing the top times of a map. Usage: `!maptop <map>`
- * `!bmaptop` - Opens a menu showing the top bonus times of a map. Usage: `!btop <#bonus> <map>`
- * `!pb` - Prints map times and ranks to chat. Usage: `!pb <map> <player>`
- * `!bpb` - Prints PB bonus times and ranks to chat. Usage: `!bpb <#bonus> <map> <player>`
- * `!wr` - Prints map record times to chat. Usage: `!wr <map>`
- * `!bwr` - Prints bonus record times to chat. Usage: `!bwr <#bonus> <map>`
- * `!avg` - Prints the average map run time to chat. Usage `!avg <map>`
- * `!bavg` - Prints the average bonus run time to chat. Usage `!bavg <#bonus> <map>`
- * `!pc` - Prints map completion to chat. Usage: `!pc <player>`
- * `!rr`/`!latest` - Opens a menu showing recently broken records.
+ * `!top` - Open a menu showing the top record holders
+ * `!maptop` - Open a menu showing the top main course times of a map. Usage: `!maptop <map>`
+ * `!bmaptop` - Open a menu showing the top bonus times of a map. Usage: `!btop <#bonus> <map>`
+ * `!pb` - Show PB main course times and ranks in chat. Usage: `!pb <map> <player>`
+ * `!bpb` - Show PB bonus times and ranks in chat. Usage: `!bpb <#bonus> <map> <player>`
+ * `!wr` - Show main course record times in chat. Usage: `!wr <map>`
+ * `!bwr` - Show bonus record times in chat. Usage: `!bwr <#bonus> <map>`
+ * `!avg` - Show the average main course run time in chat. Usage `!avg <map>`
+ * `!bavg` - Show the average bonus run time in chat. Usage `!bavg <#bonus> <map>`
+ * `!pc` - Show course completion in chat. Usage: `!pc <player>`
+ * `!rr`/`!latest` - Open a menu showing recently broken records.
 
 ### gokz-global
 
- * `!globalcheck`/`!gc` - Prints whether global records are currently enabled.
- * `!tier` - Prints the map's tier to chat.
- * `!gr`/`!gwr` - Prints a map's global record times. Usage: `!gr <map>`
- * `!gbr`/`!gbwr` - Prints a map's global bonus record times. Usage: `!bgr <#bonus> <map>`
- * `!gmaptop` - Opens a menu showing the top global times of a map. Usage: `!gmaptop <map>`
- * `!gbmaptop` - Opens a menu showing the top global bonus times of a map. Usage: `!gbmaptop <#bonus> <map>`
+ * `!globalcheck`/`!gc` - Show whether global records are currently enabled in chat.
+ * `!tier` - Show the map's tier in chat.
+ * `!gr`/`!gwr` - Show main course global record times in chat. Usage: `!gr <map>`
+ * `!gbr`/`!gbwr` - Show bonus global record times in chat. Usage: `!bgr <#bonus> <map>`
+ * `!gmaptop` - Open a menu showing the top global main course times of a map. Usage: `!gmaptop <map>`
+ * `!gbmaptop` - Open a menu showing the top global bonus times of a map. Usage: `!gbmaptop <#bonus> <map>`
 
 # Admin Commands
 
 ### gokz-localdb
 
- * `!setcheater` - Sets a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
- * `!setnotcheater` - Sets a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
+ * `!setcheater` - Set a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
+ * `!setnotcheater` - Set a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
 
 ### gokz-localranks
 
- * `!updatemappool` - Updates the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.
+ * `!updatemappool` - Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.
