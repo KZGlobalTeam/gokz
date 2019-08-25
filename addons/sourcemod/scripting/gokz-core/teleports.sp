@@ -10,6 +10,7 @@ static int storedCheckpointCount[MAXPLAYERS + 1]; // Current number of valid sto
 static int checkpointPrevCount[MAXPLAYERS + 1]; // Number of checkpoints back from latest checkpoint
 static int checkpointIndex[MAXPLAYERS + 1];
 static int teleportCount[MAXPLAYERS + 1];
+static bool hasStartPosition[MAXPLAYERS + 1];
 static float startOrigin[MAXPLAYERS + 1][3];
 static float startAngles[MAXPLAYERS + 1][3];
 static bool hasCustomStartPosition[MAXPLAYERS + 1];
@@ -311,7 +312,7 @@ void TeleportToStart(int client)
 		CS_SwitchTeam(client, CS_TEAM_CT);
 	}
 	
-	if (hasCustomStartPosition[client])
+	if (GetHasCustomStartPosition(client))
 	{
 		if (!IsPlayerAlive(client))
 		{
@@ -320,7 +321,7 @@ void TeleportToStart(int client)
 		TeleportDo(client, customStartOrigin[client], customStartAngles[client]);
 		GOKZ_StopTimer(client, false);
 	}
-	else if (GetHasStartedTimerThisMap(client))
+	else if (GetHasStartPosition(client))
 	{
 		if (!IsPlayerAlive(client))
 		{
@@ -339,7 +340,37 @@ void TeleportToStart(int client)
 
 bool GetHasStartPosition(int client)
 {
-	return GetHasStartedTimerThisMap(client) || GetHasCustomStartPosition(client);
+	return hasStartPosition[client] || GetHasCustomStartPosition(client);
+}
+
+void SetStartPosition(int client, const float origin[3], const float angles[3])
+{
+	startOrigin[client] = origin;
+	startAngles[client] = angles;
+	hasStartPosition[client] = true;
+}
+
+void SetStartPositionToCurrent(int client)
+{
+	float origin[3], angles[3];
+	Movement_GetOrigin(client, origin);
+	Movement_GetEyeAngles(client, angles);
+	
+	SetStartPosition(client, origin, angles);
+}
+
+bool SetStartPositionToMapStart(int client, int course)
+{
+	float origin[3], angles[3];
+	
+	if (!GetMapStartPosition(course, origin, angles))
+	{
+		return false;
+	}
+	
+	SetStartPosition(client, origin, angles);
+	
+	return true;
 }
 
 bool GetHasCustomStartPosition(int client)
@@ -457,7 +488,11 @@ void OnClientPutInServer_Teleports(int client)
 	storedCheckpointCount[client] = 0;
 	checkpointPrevCount[client] = 0;
 	teleportCount[client] = 0;
+	hasStartPosition[client] = false;
 	hasCustomStartPosition[client] = false;
+	
+	// Set start position to main course if we know of it
+	SetStartPositionToMapStart(client, 0);
 }
 
 void OnTimerStart_Teleports(int client)
@@ -466,8 +501,16 @@ void OnTimerStart_Teleports(int client)
 	storedCheckpointCount[client] = 0;
 	checkpointPrevCount[client] = 0;
 	teleportCount[client] = 0;
-	Movement_GetOrigin(client, startOrigin[client]);
-	Movement_GetEyeAngles(client, startAngles[client]);
+}
+
+void OnStartButtonPress_Teleports(int client)
+{
+	SetStartPositionToCurrent(client);
+}
+
+void OnStartZoneStartTouch_Teleports(int client, int course)
+{
+	SetStartPositionToMapStart(client, course);
 }
 
 

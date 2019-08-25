@@ -89,13 +89,13 @@ public Action CommandTeleportToStart(int client, int args)
 
 public Action CommandMain(int client, int args)
 {
-	if (SetCustomStartPositionToMap(client, 0, true))
+	if (SetStartPositionToMapStart(client, 0))
 	{
 		GOKZ_TeleportToStart(client);
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, true, "%t", "No Start Found", 1);
+		GOKZ_PrintToChat(client, true, "%t", "No Start Found");
 	}
 	return Plugin_Handled;
 }
@@ -104,7 +104,7 @@ public Action CommandBonus(int client, int args)
 {
 	if (args == 0)
 	{  // Go to Bonus 1
-		if (SetCustomStartPositionToMap(client, 1, true))
+		if (SetStartPositionToMapStart(client, 1))
 		{
 			GOKZ_TeleportToStart(client);
 		}
@@ -120,7 +120,7 @@ public Action CommandBonus(int client, int args)
 		int bonus = StringToInt(argBonus);
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
-			if (SetCustomStartPositionToMap(client, bonus, true))
+			if (SetStartPositionToMapStart(client, bonus))
 			{
 				GOKZ_TeleportToStart(client);
 			}

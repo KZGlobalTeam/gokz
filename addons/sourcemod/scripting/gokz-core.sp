@@ -149,7 +149,6 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
 	OnClientPutInServer_ClanTag(client);
-	OnClientPutInServer_MapStarts(client);
 	HookClientEvents(client);
 }
 

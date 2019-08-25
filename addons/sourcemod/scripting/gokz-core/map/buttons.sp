@@ -115,7 +115,8 @@ static void ProcessStartButtonPress(int client, int course)
 {
 	if (GOKZ_StartTimer(client, course))
 	{
-		// Only called on success to prevent virtual button exploits
+		// Only calling on success is intended behaviour (and prevents virtual button exploits)
+		OnStartButtonPress_Teleports(client);
 		OnStartButtonPress_VirtualButtons(client, course);
 	}
 }

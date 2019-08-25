@@ -32,7 +32,9 @@ To add a timer zone to a map, use a `trigger_multiple` with a specific name.
  * Bonus start zones are named `climb_bonusX_startzone` where X is the bonus number.
  * Bonus end zones are named `climb_bonusX_endzone` where X is the bonus number.
 
-Entering the start zone of a course the player is currently not running will stop their timer and set their start position to the start of that course (see Course Starts).
+Entering a start zone will stop the player's timer and set their start position to the start of that course (see Course Starts).
+
+Make it impossible for the player to be in multiple start zones for different courses to easily avoid any usability issues.
 
 ## Course Starts
 
