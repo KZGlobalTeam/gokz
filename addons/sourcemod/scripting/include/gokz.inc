@@ -11,6 +11,8 @@
 
 #include <movement>
 
+#include <gokz/version>
+
 
 
 // =====[ ENUMS ]=====
@@ -30,7 +32,6 @@ enum ObsMode
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_VERSION "2.2.0"
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
 #define EPSILON 0.000001
 #define SPEED_NORMAL 250.0
