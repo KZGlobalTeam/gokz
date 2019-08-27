@@ -368,7 +368,9 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 		return gF_PSVelMod[player.ID];
 	}
 	
-	float baseSpeed = player.Speed / gF_PSVelMod[player.ID]; // Current speed without bonus
+	// Current speed without bonus
+	float baseSpeed = FloatMin(SPEED_NORMAL, player.Speed / gF_PSVelMod[player.ID]);
+	
 	float newBonusSpeed = gF_PSBonusSpeed[player.ID];
 	
 	// If player is in mid air, decrement their velocity modifier
@@ -420,7 +422,7 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	else
 	{
 		// Scale the bonus speed based on current base speed and turn rate
-		float baseSpeedScaleFactor = FloatMin(1.0, baseSpeed / SPEED_NORMAL);
+		float baseSpeedScaleFactor = baseSpeed / SPEED_NORMAL; // Max 1.0
 		float turnRateScaleFactor = FloatMin(1.0, gF_PSTurningRate[player.ID] / PS_MAX_REWARD_TURN_RATE);
 		float scaledMaxBonusSpeed = PS_SPEED_MAX * baseSpeedScaleFactor * turnRateScaleFactor;
 		newBonusSpeed = FloatMin(newBonusSpeed, scaledMaxBonusSpeed);
