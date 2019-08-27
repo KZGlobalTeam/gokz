@@ -32,6 +32,13 @@ enum
 	MAPPREFIX_COUNT
 };
 
+enum
+{
+	StartPositionType_Button, 
+	StartPositionType_MapStart, 
+	STARTPOSITIONTYPE_COUNT
+};
+
 enum OptionProp
 {
 	OptionProp_Cookie = 0, 

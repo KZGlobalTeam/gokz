@@ -13,6 +13,7 @@ static int teleportCount[MAXPLAYERS + 1];
 static bool hasStartPosition[MAXPLAYERS + 1];
 static float startOrigin[MAXPLAYERS + 1][3];
 static float startAngles[MAXPLAYERS + 1][3];
+static int startType[MAXPLAYERS + 1];
 static bool hasCustomStartPosition[MAXPLAYERS + 1];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
@@ -314,15 +315,21 @@ void TeleportToStart(int client)
 	
 	if (GetHasCustomStartPosition(client))
 	{
+		GOKZ_StopTimer(client, false);
+		
 		if (!IsPlayerAlive(client))
 		{
 			CS_RespawnPlayer(client);
 		}
 		TeleportDo(client, customStartOrigin[client], customStartAngles[client]);
-		GOKZ_StopTimer(client, false);
 	}
 	else if (GetHasStartPosition(client))
 	{
+		if (startType[client] != StartPositionType_Button)
+		{
+			GOKZ_StopTimer(client, false);
+		}
+		
 		if (!IsPlayerAlive(client))
 		{
 			CS_RespawnPlayer(client);
@@ -343,20 +350,21 @@ bool GetHasStartPosition(int client)
 	return hasStartPosition[client] || GetHasCustomStartPosition(client);
 }
 
-void SetStartPosition(int client, const float origin[3], const float angles[3])
+void SetStartPosition(int client, const float origin[3], const float angles[3], int type)
 {
+	hasStartPosition[client] = true;
 	startOrigin[client] = origin;
 	startAngles[client] = angles;
-	hasStartPosition[client] = true;
+	startType[client] = type;
 }
 
-void SetStartPositionToCurrent(int client)
+void SetStartPositionToCurrent(int client, int type)
 {
 	float origin[3], angles[3];
 	Movement_GetOrigin(client, origin);
 	Movement_GetEyeAngles(client, angles);
 	
-	SetStartPosition(client, origin, angles);
+	SetStartPosition(client, origin, angles, type);
 }
 
 bool SetStartPositionToMapStart(int client, int course)
@@ -368,7 +376,7 @@ bool SetStartPositionToMapStart(int client, int course)
 		return false;
 	}
 	
-	SetStartPosition(client, origin, angles);
+	SetStartPosition(client, origin, angles, StartPositionType_MapStart);
 	
 	return true;
 }
@@ -505,7 +513,7 @@ void OnTimerStart_Teleports(int client)
 
 void OnStartButtonPress_Teleports(int client)
 {
-	SetStartPositionToCurrent(client);
+	SetStartPositionToCurrent(client, StartPositionType_Button);
 }
 
 void OnStartZoneStartTouch_Teleports(int client, int course)
