@@ -29,7 +29,6 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
 #define MODE_VERSION 7
-#define LANDING_DUCK_SPEED_MINIMUM 6.0 // Approx. equal to if you just ducked/unducked for the first time in a while
 #define PERF_TICKS 2
 #define PS_MAX_REWARD_TURN_RATE 0.46875 // Degrees per tick (60 degrees per second)
 #define PS_SPEED_MAX 26.38 // Units
@@ -37,6 +36,8 @@ public Plugin myinfo =
 #define PS_SPEED_DECREMENT 0.33 // Units per tick
 #define PS_SPEED_DECREMENT_MIDAIR 0.33 // Units per tick (lose all pre speed in 0 offset jump)
 #define PS_GRACE_TICKS 3 // No. of ticks allowed to fail prestrafe checks when prestrafing - helps players with low fps
+#define DUCK_SPEED_NORMAL 8.0
+#define DUCK_SPEED_MINIMUM 6.0234375 // Equal to if you just ducked/unducked for the first time in a while
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {
@@ -166,6 +167,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
+	ReduceDuckSlowdown(player);
 	TweakVelMod(player, angles);
 	if (gB_Jumpbugged[player.ID])
 	{
@@ -221,7 +223,6 @@ public void Movement_OnStartTouchGround(int client)
 	}
 	
 	KZPlayer player = KZPlayer(client);
-	ReduceDuckSlowdown(player);
 	gF_PSVelModLanding[player.ID] = gF_PSVelMod[player.ID];
 }
 
@@ -323,9 +324,11 @@ void TweakConVars()
 
 void ReplicateConVars(int client)
 {
-	// Replicate convars only when player changes mode in GOKZ
-	// so that lagg isn't caused by other players using other
-	// modes, and also as an optimisation.
+	/*
+		Replicate convars only when player changes mode in GOKZ
+		so that lagg isn't caused by other players using other
+		modes, and also as an optimisation.
+	*/
 	
 	if (IsFakeClient(client))
 	{
@@ -624,8 +627,25 @@ void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 
 void ReduceDuckSlowdown(KZPlayer player)
 {
-	if (player.DuckSpeed < LANDING_DUCK_SPEED_MINIMUM)
+	/*
+		Duck speed is reduced by the game upon ducking or unducking.
+		The goal here is to accept that duck speed is reduced, but
+		stop it from being reduced further when spamming duck.
+
+		This is done by enforcing a minimum duck speed equivalent to
+		the value as if the player only ducked once. When not in not
+		in the middle of ducking, duck speed is reset to its normal
+		value in effort to reduce the number of times the minimum
+		duck speed is enforced. This should reduce noticeable lagg.
+	*/
+	
+	if (!GetEntProp(player.ID, Prop_Send, "m_bDucking")
+		 && player.DuckSpeed < DUCK_SPEED_NORMAL - EPSILON)
 	{
-		player.DuckSpeed = LANDING_DUCK_SPEED_MINIMUM;
+		player.DuckSpeed = DUCK_SPEED_NORMAL;
+	}
+	else if (player.DuckSpeed < DUCK_SPEED_MINIMUM - EPSILON)
+	{
+		player.DuckSpeed = DUCK_SPEED_MINIMUM;
 	}
 } 
