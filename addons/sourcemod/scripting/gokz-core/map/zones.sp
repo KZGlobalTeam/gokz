@@ -6,6 +6,7 @@
 
 static Regex RE_BonusStartZone;
 static Regex RE_BonusEndZone;
+static bool touchedGroundSinceTouchingStartZone[MAXPLAYERS + 1];
 
 
 
@@ -15,6 +16,11 @@ void OnPluginStart_MapZones()
 {
 	RE_BonusStartZone = CompileRegex(GOKZ_BONUS_START_ZONE_NAME_REGEX);
 	RE_BonusEndZone = CompileRegex(GOKZ_BONUS_END_ZONE_NAME_REGEX);
+}
+
+void OnStartTouchGround_MapZones(int client)
+{
+	touchedGroundSinceTouchingStartZone[client] = true;
 }
 
 void OnEntitySpawned_MapZones(int entity)
@@ -141,6 +147,8 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 
 static void ProcessStartZoneStartTouch(int client, int course)
 {
+	touchedGroundSinceTouchingStartZone[client] = Movement_GetOnGround(client);
+	
 	GOKZ_StopTimer(client, false);
 	SetCurrentCourse(client, course);
 	
@@ -149,6 +157,11 @@ static void ProcessStartZoneStartTouch(int client, int course)
 
 static void ProcessStartZoneEndTouch(int client, int course)
 {
+	if (!touchedGroundSinceTouchingStartZone[client])
+	{
+		return;
+	}
+	
 	GOKZ_StartTimer(client, course, true);
 }
 

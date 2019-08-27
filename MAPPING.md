@@ -13,13 +13,13 @@ To add a timer button to a map, use a `func_button` with a specific name.
  * Bonus start buttons are named `climb_bonusX_startbutton` where X is the bonus number.
  * Bonus end buttons are named `climb_bonusX_endbutton` where X is the bonus number.
 
-Enable both the `Don't move` and `Toggle` flags to easily avoid any usability issues.
+To avoid usability issues, enable both the `Don't move` and `Toggle` flags on the `func_button`.
 
 ## Timer Zones
 
-Start timer zones start the player's timer when they leave them.
+Start zones start the player's timer when they leave them.
 
-End timer zones end the player's timer when they enter them.
+End zones end the player's timer when they enter them.
 
 Start zones allow the timer to be started in midair, unless they have hit a perfect bunnyhop.
 
@@ -34,7 +34,7 @@ To add a timer zone to a map, use a `trigger_multiple` with a specific name.
 
 Entering a start zone will stop the player's timer and set their start position to the start of that course (see Course Starts).
 
-Make it impossible for the player to be in multiple start zones for different courses to easily avoid any usability issues.
+To avoid usability issues, ensure it is impossible for the player to be in multiple start zones at once.
 
 ## Course Starts
 

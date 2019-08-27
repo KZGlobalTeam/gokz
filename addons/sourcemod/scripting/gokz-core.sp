@@ -231,6 +231,7 @@ public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType
 
 public void Movement_OnStartTouchGround(int client)
 {
+	OnStartTouchGround_MapZones(client);
 	OnStartTouchGround_MapBhopTriggers(client);
 }
 
