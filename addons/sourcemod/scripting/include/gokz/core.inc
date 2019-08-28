@@ -32,9 +32,11 @@ enum
 	MAPPREFIX_COUNT
 };
 
-enum
+enum StartPositionType
 {
-	StartPositionType_Button, 
+	StartPositionType_Spawn, 
+	StartPositionType_Custom, 
+	StartPositionType_MapButton, 
 	StartPositionType_MapStart, 
 	STARTPOSITIONTYPE_COUNT
 };
@@ -495,18 +497,16 @@ forward void GOKZ_OnNextCheckpoint_Post(int client);
  * Called when a player teleports to start.
  *
  * @param client		Client index.
- * @param customPos		Whether a custom start position is in use.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
-forward Action GOKZ_OnTeleportToStart(int client, bool customPos);
+forward Action GOKZ_OnTeleportToStart(int client);
 
 /**
  * Called when a player has teleported to start.
  *
  * @param client		Client index.
- * @param customPos		Whether a custom start position is in use.
  */
-forward void GOKZ_OnTeleportToStart_Post(int client, bool customPos);
+forward void GOKZ_OnTeleportToStart_Post(int client);
 
 /**
  * Called when a player undoes a teleport.
@@ -530,6 +530,16 @@ forward void GOKZ_OnUndoTeleport_Post(int client);
  * @param client		Client index.
  */
 forward void GOKZ_OnCountedTeleport_Post(int client);
+
+/**
+ * Called when a player's start position is set.
+ *
+ * @param client		Client index.
+ * @param type			Start position type.
+ * @param origin		Start position origin.
+ * @param angles		Start position eye angles.
+ */
+forward void GOKZ_OnStartPositionSet_Post(int client, StartPositionType type, const float origin[3], const float angles[3]);
 
 /**
  * Called when player's begins a jump that is deemed valid.
@@ -587,22 +597,6 @@ forward void GOKZ_OnModeUnloaded(int mode);
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
 forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
-
-/**
- * Called when a player's custom start position is set.
- *
- * @param client		Client index.
- * @param origin		New custom start position origin.
- * @param angles		New custom start position eye angles.
- */
-forward void GOKZ_OnCustomStartPositionSet_Post(int client, const float origin[3], const float angles[3]);
-
-/**
- * Called when a player's custom start position is cleared.
- *
- * @param client		Client index.
- */
-forward void GOKZ_OnCustomStartPositionCleared_Post(int client);
 
 /**
  * Called when the options menu has been created and 3rd 
@@ -815,14 +809,13 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
 native void GOKZ_TeleportToStart(int client);
 
 /**
- * Gets whether a player has a start position they can
- * teleport to, whether it is custom or not.
- * 
+ * Gets the type of start position the player currently has.
+ * The "Spawn" type means teleport to start will respawn the player.
  *
  * @param client    	Client index.
- * @return				Whether player has a start position.
+ * @return				Player's current start position type.
  */
-native bool GOKZ_GetHasStartPosition(int client);
+native StartPositionType GOKZ_GetStartPositionType(int client);
 
 /**
  * Set a new checkpoint at a player's current position.

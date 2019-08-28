@@ -247,9 +247,9 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_Teleports(client);
 }
 
-public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
+public void GOKZ_OnTeleportToStart_Post(int client)
 {
-	OnTeleportToStart_Timer(client, customPos);
+	OnTeleportToStart_Timer(client);
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)

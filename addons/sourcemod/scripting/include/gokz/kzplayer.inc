@@ -88,9 +88,9 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_TeleportToStart(this.ID);
 	}
 	
-	property bool HasStartPosition {
+	property StartPositionType StartPositionType {
 		public get() {
-			return GOKZ_GetHasStartPosition(this.ID);
+			return GOKZ_GetStartPositionType(this.ID);
 		}
 	}
 	

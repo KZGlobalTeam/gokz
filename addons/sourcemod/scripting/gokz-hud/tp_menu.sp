@@ -222,14 +222,19 @@ static void TPMenuAddItemPause(KZPlayer player, Menu menu)
 static void TPMenuAddItemStart(KZPlayer player, Menu menu)
 {
 	char display[16];
-	if (player.HasStartPosition)
+	if (player.StartPositionType == StartPositionType_Spawn)
+	{
+		FormatEx(display, sizeof(display), "%T", "TP Menu - Respawn", player.ID);
+		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
+	}
+	else if (player.TimerRunning)
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Restart", player.ID);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
 	}
 	else
 	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Respawn", player.ID);
+		FormatEx(display, sizeof(display), "%T", "TP Menu - Start", player.ID);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
 	}
 } 

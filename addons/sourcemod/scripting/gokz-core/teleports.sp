@@ -10,11 +10,10 @@ static int storedCheckpointCount[MAXPLAYERS + 1]; // Current number of valid sto
 static int checkpointPrevCount[MAXPLAYERS + 1]; // Number of checkpoints back from latest checkpoint
 static int checkpointIndex[MAXPLAYERS + 1];
 static int teleportCount[MAXPLAYERS + 1];
-static bool hasStartPosition[MAXPLAYERS + 1];
-static float startOrigin[MAXPLAYERS + 1][3];
-static float startAngles[MAXPLAYERS + 1][3];
-static int startType[MAXPLAYERS + 1];
-static bool hasCustomStartPosition[MAXPLAYERS + 1];
+static StartPositionType startType[MAXPLAYERS + 1];
+static StartPositionType nonCustomStartType[MAXPLAYERS + 1];
+static float nonCustomStartOrigin[MAXPLAYERS + 1][3];
+static float nonCustomStartAngles[MAXPLAYERS + 1][3];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
@@ -301,7 +300,7 @@ void TeleportToStart(int client)
 {
 	// Call Pre Forward
 	Action result;
-	Call_GOKZ_OnTeleportToStart(client, hasCustomStartPosition[client], result);
+	Call_GOKZ_OnTeleportToStart(client, result);
 	if (result != Plugin_Continue)
 	{
 		return;
@@ -313,58 +312,92 @@ void TeleportToStart(int client)
 		CS_SwitchTeam(client, CS_TEAM_CT);
 	}
 	
-	if (GetHasCustomStartPosition(client))
+	if (startType[client] != StartPositionType_MapButton)
 	{
 		GOKZ_StopTimer(client, false);
-		
+	}
+	
+	if (startType[client] == StartPositionType_Spawn)
+	{
+		CS_RespawnPlayer(client);
+	}
+	else if (startType[client] == StartPositionType_Custom)
+	{
 		if (!IsPlayerAlive(client))
 		{
 			CS_RespawnPlayer(client);
 		}
 		TeleportDo(client, customStartOrigin[client], customStartAngles[client]);
 	}
-	else if (GetHasStartPosition(client))
+	else
 	{
-		if (startType[client] != StartPositionType_Button)
-		{
-			GOKZ_StopTimer(client, false);
-		}
-		
 		if (!IsPlayerAlive(client))
 		{
 			CS_RespawnPlayer(client);
 		}
-		TeleportDo(client, startOrigin[client], startAngles[client]);
-	}
-	else
-	{
-		CS_RespawnPlayer(client);
+		TeleportDo(client, nonCustomStartOrigin[client], nonCustomStartAngles[client]);
 	}
 	
 	// Call Post Forward
-	Call_GOKZ_OnTeleportToStart_Post(client, hasCustomStartPosition[client]);
+	Call_GOKZ_OnTeleportToStart_Post(client);
 }
 
-bool GetHasStartPosition(int client)
+StartPositionType GetStartPositionType(int client)
 {
-	return hasStartPosition[client] || GetHasCustomStartPosition(client);
+	return startType[client];
 }
 
-void SetStartPosition(int client, const float origin[3], const float angles[3], int type)
+// Note: Use ClearStartPosition to switch off StartPositionType_Custom
+void SetStartPosition(int client, StartPositionType type, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR)
 {
-	hasStartPosition[client] = true;
-	startOrigin[client] = origin;
-	startAngles[client] = angles;
-	startType[client] = type;
+	if (type == StartPositionType_Custom)
+	{
+		startType[client] = StartPositionType_Custom;
+		
+		if (!IsNullVector(origin))
+		{
+			customStartOrigin[client] = origin;
+		}
+		
+		if (!IsNullVector(angles))
+		{
+			customStartAngles[client] = angles;
+		}
+		
+		// Call Post Forward
+		Call_GOKZ_OnStartPositionSet_Post(client, startType[client], customStartOrigin[client], customStartAngles[client]);
+	}
+	else
+	{
+		nonCustomStartType[client] = type;
+		
+		if (!IsNullVector(origin))
+		{
+			nonCustomStartOrigin[client] = origin;
+		}
+		
+		if (!IsNullVector(angles))
+		{
+			nonCustomStartAngles[client] = angles;
+		}
+		
+		if (startType[client] != StartPositionType_Custom)
+		{
+			startType[client] = type;
+			
+			// Call Post Forward
+			Call_GOKZ_OnStartPositionSet_Post(client, startType[client], nonCustomStartOrigin[client], nonCustomStartAngles[client]);
+		}
+	}
 }
 
-void SetStartPositionToCurrent(int client, int type)
+void SetStartPositionToCurrent(int client, StartPositionType type)
 {
 	float origin[3], angles[3];
 	Movement_GetOrigin(client, origin);
 	Movement_GetEyeAngles(client, angles);
 	
-	SetStartPosition(client, origin, angles, type);
+	SetStartPosition(client, type, origin, angles);
 }
 
 bool SetStartPositionToMapStart(int client, int course)
@@ -376,48 +409,24 @@ bool SetStartPositionToMapStart(int client, int course)
 		return false;
 	}
 	
-	SetStartPosition(client, origin, angles, StartPositionType_MapStart);
+	SetStartPosition(client, StartPositionType_MapStart, origin, angles);
 	
 	return true;
 }
 
-bool GetHasCustomStartPosition(int client)
+bool ClearCustomStartPosition(int client)
 {
-	return hasCustomStartPosition[client];
-}
-
-void SetCustomStartPosition(int client, const float origin[3], const float angles[3])
-{
-	customStartOrigin[client] = origin;
-	customStartAngles[client] = angles;
-	hasCustomStartPosition[client] = true;
-	
-	// Call Post Forward
-	Call_GOKZ_OnCustomStartPositionSet_Post(client, customStartOrigin[client], customStartAngles[client]);
-}
-
-void SetCustomStartPositionToCurrent(int client)
-{
-	if (!IsPlayerAlive(client))
+	if (GetStartPositionType(client) != StartPositionType_Custom)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-		GOKZ_PlayErrorSound(client);
-		return;
+		return false;
 	}
 	
-	float origin[3], angles[3];
-	Movement_GetOrigin(client, origin);
-	Movement_GetEyeAngles(client, angles);
+	startType[client] = nonCustomStartType[client];
 	
-	SetCustomStartPosition(client, origin, angles);
-}
-
-void ClearCustomStartPosition(int client)
-{
-	hasCustomStartPosition[client] = false;
-	GOKZ_PrintToChat(client, true, "%t", "Cleared Custom Start Position");
+	// Call Post Forward
+	Call_GOKZ_OnStartPositionSet_Post(client, startType[client], nonCustomStartOrigin[client], nonCustomStartAngles[client]);
 	
-	Call_GOKZ_OnCustomStartPositionCleared_Post(client);
+	return true;
 }
 
 
@@ -496,8 +505,8 @@ void OnClientPutInServer_Teleports(int client)
 	storedCheckpointCount[client] = 0;
 	checkpointPrevCount[client] = 0;
 	teleportCount[client] = 0;
-	hasStartPosition[client] = false;
-	hasCustomStartPosition[client] = false;
+	startType[client] = StartPositionType_Spawn;
+	nonCustomStartType[client] = StartPositionType_Spawn;
 	
 	// Set start position to main course if we know of it
 	SetStartPositionToMapStart(client, 0);
@@ -513,7 +522,12 @@ void OnTimerStart_Teleports(int client)
 
 void OnStartButtonPress_Teleports(int client)
 {
-	SetStartPositionToCurrent(client, StartPositionType_Button);
+	SetStartPositionToCurrent(client, StartPositionType_MapButton);
+}
+
+void OnVirtualStartButtonPress_Teleports(int client)
+{
+	SetStartPositionToCurrent(client, StartPositionType_MapButton);
 }
 
 void OnStartZoneStartTouch_Teleports(int client, int course)

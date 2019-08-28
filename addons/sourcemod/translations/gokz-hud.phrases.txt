@@ -102,6 +102,11 @@
 		"en"		"Resume"
 		"chi"		"恢复计时"
 	}
+	"TP Menu - Start"
+	{
+		"en"		"Start"
+		"chi"		"开始"
+	}
 	"TP Menu - Restart"
 	{
 		"en"		"Restart"

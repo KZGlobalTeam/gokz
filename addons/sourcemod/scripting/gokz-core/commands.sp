@@ -95,7 +95,7 @@ public Action CommandTeleportToStart(int client, int args)
 
 public Action CommandSetStartPos(int client, int args)
 {
-	SetCustomStartPositionToCurrent(client);
+	SetStartPositionToCurrent(client, StartPositionType_Custom);
 	
 	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
@@ -108,7 +108,11 @@ public Action CommandSetStartPos(int client, int args)
 
 public Action CommandClearStartPos(int client, int args)
 {
-	ClearCustomStartPosition(client);
+	if (ClearCustomStartPosition(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Cleared Custom Start Position");
+	}
+	
 	return Plugin_Handled;
 }
 
