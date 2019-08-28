@@ -72,6 +72,7 @@ static char[] GetInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 		GetTimeString(player, targetPlayer), 
 		GetSpeedString(player, targetPlayer), 
 		GetKeysString(player, targetPlayer));
+	TrimString(infoPanelText);
 	return infoPanelText;
 }
 
