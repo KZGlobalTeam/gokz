@@ -72,6 +72,7 @@ static char[] GetInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 		GetTimeString(player, targetPlayer), 
 		GetSpeedString(player, targetPlayer), 
 		GetKeysString(player, targetPlayer));
+	TrimString(infoPanelText);
 	return infoPanelText;
 }
 
@@ -145,14 +146,14 @@ static char[] GetSpeedString(KZPlayer player, KZPlayer targetPlayer)
 			FormatEx(speedString, sizeof(speedString), 
 				"%T: <font color='#ffffff'>%.0f</font> u/s\n", 
 				"Info Panel Text - Speed", player.ID, 
-				RoundFloat(targetPlayer.Speed * 10) / 10.0);
+				RoundToPowerOfTen(targetPlayer.Speed, -2));
 		}
 		else
 		{
 			FormatEx(speedString, sizeof(speedString), 
 				"%T: <font color='#ffffff'>%.0f</font> %s\n", 
 				"Info Panel Text - Speed", player.ID, 
-				RoundFloat(targetPlayer.Speed * 10) / 10.0, 
+				RoundToPowerOfTen(targetPlayer.Speed, -2), 
 				GetTakeoffString(targetPlayer));
 		}
 	}
@@ -166,13 +167,13 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#40ff40'>%.0f</font>)", 
-			RoundFloat(targetPlayer.GOKZTakeoffSpeed * 10) / 10.0);
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
 	}
 	else
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#ffffff'>%.0f</font>)", 
-			RoundFloat(targetPlayer.GOKZTakeoffSpeed * 10) / 10.0);
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
 	}
 	return takeoffString;
 }

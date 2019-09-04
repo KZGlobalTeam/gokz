@@ -1,9 +1,7 @@
 #include <sourcemod>
 
-#include <sdktools>
 #include <sdkhooks>
-
-#include <gokz>
+#include <sdktools>
 
 #include <movementapi>
 
@@ -80,6 +78,11 @@ bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 public void OnPluginStart()
 {
+	if (FloatAbs(1.0 / GetTickInterval() - 128.0) > EPSILON)
+	{
+		SetFailState("gokz-mode-kztimer only supports 128 tickrate servers.");
+	}
+	
 	CreateConVars();
 }
 

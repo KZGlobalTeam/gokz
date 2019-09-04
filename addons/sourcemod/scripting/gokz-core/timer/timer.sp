@@ -55,11 +55,11 @@ int GetCurrentTimeType(int client)
 	return TimeType_Nub;
 }
 
-bool TimerStart(int client, int course, bool allowMidair = false)
+bool TimerStart(int client, int course, bool allowMidair = false, bool autoRestart = false)
 {
 	if (!IsPlayerAlive(client)
 		 || JustStartedTimer(client)
-		 || JustTeleported(client)
+		 || JustTeleported(client) && !autoRestart
 		 || !IsPlayerValidMoveType(client)
 		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
 		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client)))
@@ -199,16 +199,19 @@ void OnChangeMovetype_Timer(int client, MoveType newMovetype)
 	}
 }
 
-void OnTeleportToStart_Timer(int client, bool customPos)
+void OnTeleportToStart_Timer(int client)
 {
-	if (GetCurrentMapPrefix() == MapPrefix_KZPro)
+	if (GOKZ_GetStartPositionType(client) != StartPositionType_MapButton
+		 || GetCurrentMapPrefix() == MapPrefix_KZPro)
 	{
 		TimerStop(client, false);
 	}
-	if (GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Enabled
-		 && !customPos && GetHasStartedTimerThisMap(client))
+	
+	if (GetHasStartedTimerThisMap(client)
+		 && GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Enabled
+		 && GOKZ_GetStartPositionType(client) == StartPositionType_MapButton)
 	{
-		TimerStart(client, GetCurrentCourse(client), true);
+		TimerStart(client, GetCurrentCourse(client), true, true);
 	}
 }
 

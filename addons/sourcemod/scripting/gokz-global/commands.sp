@@ -1,14 +1,14 @@
 void RegisterCommands()
 {
-	RegConsoleCmd("sm_globalcheck", CommandGlobalCheck, "[KZ] Prints whether global records are currently enabled.");
-	RegConsoleCmd("sm_gc", CommandGlobalCheck, "[KZ] Prints whether global records are currently enabled.");
-	RegConsoleCmd("sm_tier", CommandTier, "[KZ] Prints the map's tier to chat.");
-	RegConsoleCmd("sm_gr", CommandPrintRecords, "[KZ] Prints a map's global record times. Usage: !gr <map>");
-	RegConsoleCmd("sm_gwr", CommandPrintRecords, "[KZ] Prints a map's global record times. Usage: !gr <map>");
-	RegConsoleCmd("sm_gbr", CommandPrintBonusRecords, "[KZ] Prints a map's global bonus record times. Usage: !bgr <#bonus> <map>");
-	RegConsoleCmd("sm_gbwr", CommandPrintBonusRecords, "[KZ] Prints a map's global bonus record times. Usage: !bgr <#bonus> <map>");
-	RegConsoleCmd("sm_gmaptop", CommandMapTop, "[KZ] Opens a menu showing the top global times of a map. Usage: !gmaptop <map>");
-	RegConsoleCmd("sm_gbmaptop", CommandBonusMapTop, "[KZ] Opens a menu showing the top global bonus times of a map. Usage: !gbmaptop <#bonus> <map>");
+	RegConsoleCmd("sm_globalcheck", CommandGlobalCheck, "[KZ] Show whether global records are currently enabled in chat.");
+	RegConsoleCmd("sm_gc", CommandGlobalCheck, "[KZ] Show whether global records are currently enabled in chat.");
+	RegConsoleCmd("sm_tier", CommandTier, "[KZ] Show the map's tier in chat.");
+	RegConsoleCmd("sm_gr", CommandPrintRecords, "[KZ] Show main course global record times in chat. Usage: !gr <map>");
+	RegConsoleCmd("sm_gwr", CommandPrintRecords, "[KZ] Show main course global record times in chat. Usage: !gr <map>");
+	RegConsoleCmd("sm_gbr", CommandPrintBonusRecords, "[KZ] Show bonus global record times in chat. Usage: !bgr <#bonus> <map>");
+	RegConsoleCmd("sm_gbwr", CommandPrintBonusRecords, "[KZ] Show bonus global record times in chat. Usage: !bgr <#bonus> <map>");
+	RegConsoleCmd("sm_gmaptop", CommandMapTop, "[KZ] Open a menu showing the top global main course times of a map. Usage: !gmaptop <map>");
+	RegConsoleCmd("sm_gbmaptop", CommandBonusMapTop, "[KZ] Open a menu showing the top global bonus times of a map. Usage: !gbmaptop <#bonus> <map>");
 }
 
 public Action CommandGlobalCheck(int client, int args)

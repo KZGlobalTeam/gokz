@@ -18,7 +18,7 @@ void CancelGOKZHUDMenu(int client)
 
 // =====[ EVENTS ]=====
 
-void OnPlayerSpawn_Menu(client)
+void OnPlayerSpawn_Menu(int client)
 {
 	CancelGOKZHUDMenu(client);
 }
@@ -71,12 +71,7 @@ void OnJoinTeam_Menu(int client)
 	CancelGOKZHUDMenu(client);
 }
 
-void OnCustomStartPositionSet_Menu(int client)
-{
-	CancelGOKZHUDMenu(client);
-}
-
-void OnCustomStartPositionCleared_Menu(int client)
+void OnStartPositionSet_Menu(int client)
 {
 	CancelGOKZHUDMenu(client);
 } 

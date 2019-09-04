@@ -13,7 +13,7 @@ void CreateNatives()
 	CreateNative("GOKZ_StopTimer", Native_StopTimer);
 	CreateNative("GOKZ_StopTimerAll", Native_StopTimerAll);
 	CreateNative("GOKZ_TeleportToStart", Native_TeleportToStart);
-	CreateNative("GOKZ_GetHasStartPosition", Native_GetHasStartPosition);
+	CreateNative("GOKZ_GetStartPositionType", Native_GetStartPositionType);
 	CreateNative("GOKZ_MakeCheckpoint", Native_MakeCheckpoint);
 	CreateNative("GOKZ_TeleportToCheckpoint", Native_TeleportToCheckpoint);
 	CreateNative("GOKZ_GetCanTeleportToCheckpoint", Native_GetCanTeleportToCheckpoint);
@@ -132,9 +132,9 @@ public int Native_TeleportToStart(Handle plugin, int numParams)
 	TeleportToStart(GetNativeCell(1));
 }
 
-public int Native_GetHasStartPosition(Handle plugin, int numParams)
+public int Native_GetStartPositionType(Handle plugin, int numParams)
 {
-	return GetHasStartPosition(GetNativeCell(1));
+	return view_as<int>(GetStartPositionType(GetNativeCell(1)));
 }
 
 public int Native_MakeCheckpoint(Handle plugin, int numParams)

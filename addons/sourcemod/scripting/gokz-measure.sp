@@ -8,6 +8,9 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#pragma newdecls required
+#pragma semicolon 1
+
 
 
 public Plugin myinfo = 

@@ -3,9 +3,6 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#include <gokz>
-
-#include <movementapi>
 #include <gokz/core>
 #include <gokz/jumpstats>
 

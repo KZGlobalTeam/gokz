@@ -1,8 +1,7 @@
 #include <sourcemod>
 
-#include <sdkhooks>
-
 #include <cstrike>
+#include <sdkhooks>
 
 #include <gokz/core>
 #include <gokz/quiet>
@@ -10,6 +9,9 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 
@@ -262,7 +264,7 @@ void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, i
 
 void RegisterCommands()
 {
-	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle hiding other players.");
+	RegConsoleCmd("sm_hide", CommandToggleShowPlayers, "[KZ] Toggle the visibility of other players.");
 	RegConsoleCmd("sm_stopsound", CommandStopSound, "[KZ] Stop all sounds e.g. map soundscapes (music).");
 }
 

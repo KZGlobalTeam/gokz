@@ -5,11 +5,13 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
+#include <gokz/racing>
 #include <updater>
 
-#include <gokz/racing>
-
 #include <gokz/kzplayer>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 
@@ -160,14 +162,9 @@ public void GOKZ_OnCountedTeleport_Post(int client)
 	OnCountedTeleport_Menu(client);
 }
 
-public void GOKZ_OnCustomStartPositionSet_Post(int client, const float position[3], const float angles[3])
+public void GOKZ_OnStartPositionSet_Post(int client, StartPositionType type, const float origin[3], const float angles[3])
 {
-	OnCustomStartPositionSet_Menu(client);
-}
-
-public void GOKZ_OnCustomStartPositionCleared_Post(int client)
-{
-	OnCustomStartPositionCleared_Menu(client);
+	OnStartPositionSet_Menu(client);
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)

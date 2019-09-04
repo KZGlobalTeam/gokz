@@ -62,11 +62,14 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 	{
 		if (GetHasVirtualStartButton(client) && InRangeOfVirtualStart(client) && CanReachVirtualStart(client))
 		{
-			TimerStart(client, virtualStartCourse[client]);
+			if (GOKZ_StartTimer(client, virtualStartCourse[client]))
+			{
+				OnVirtualStartButtonPress_Teleports(client);
+			}
 		}
 		else if (GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
 		{
-			TimerEnd(client, virtualEndCourse[client]);
+			GOKZ_EndTimer(client, virtualEndCourse[client]);
 		}
 	}
 }

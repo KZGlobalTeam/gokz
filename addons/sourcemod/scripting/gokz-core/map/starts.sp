@@ -55,31 +55,15 @@ void OnMapStart_MapStarts()
 	}
 }
 
-void OnClientPutInServer_MapStarts(int client)
-{
-	SetCustomStartPositionToMap(client, 0, true);
-}
-
-bool SetCustomStartPositionToMap(int client, int course, bool quiet = false)
+bool GetMapStartPosition(int course, float origin[3], float angles[3])
 {
 	if (!startExists[course])
 	{
 		return false;
 	}
 	
-	SetCustomStartPosition(client, startOrigin[course], startAngles[course]);
-	
-	if (!quiet)
-	{
-		if (course == 0)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Set Start Position (Main)");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Set Start Position (Bonus)", course);
-		}
-	}
+	origin = startOrigin[course];
+	angles = startAngles[course];
 	
 	return true;
 }
@@ -102,5 +86,5 @@ static void StoreStart(int course, int entity)
 
 static int GetStartBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusStart, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusStart, 1);
 } 

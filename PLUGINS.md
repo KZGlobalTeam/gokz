@@ -71,6 +71,10 @@ Allows players to initiate 1v1 duels and multiplayer races.
 
 Records and allows playback the player's movement of the server's record times. **Requires gokz-localranks.**
 
+### gokz-saveloc
+
+Allows players to save/load locations that preserve position, angles, and velocity.
+
 ### gokz-slayonend
 
 Adds an option which slays the player a few seconds after ending their timer to help de-glitch POV demos.

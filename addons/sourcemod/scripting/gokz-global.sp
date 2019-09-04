@@ -2,14 +2,13 @@
 
 #include <sdktools>
 
-#include <autoexecconfig>
-#include <gokz>
-
 #include <GlobalAPI-Core>
-#include <gokz/core>
 #include <gokz/anticheat>
-#include <gokz/replays>
+#include <gokz/core>
 #include <gokz/global>
+#include <gokz/replays>
+
+#include <autoexecconfig>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -67,6 +66,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	if (FloatAbs(1.0 / GetTickInterval() - 128.0) > EPSILON)
+	{
+		SetFailState("gokz-global currently only supports 128 tickrate servers.");
+	}
+	
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-global.phrases");
 	

@@ -1,18 +1,17 @@
 #include <sourcemod>
 
 #include <clientprefs>
+#include <cstrike>
 #include <dhooks>
-#include <sdktools>
+#include <regex>
 #include <sdkhooks>
+#include <sdktools>
+
+#include <gokz/core>
+#include <movementapi>
 
 #include <autoexecconfig>
-#include <colorvariables>
-#include <cstrike>
-#include <gokz>
-#include <regex>
-
-#include <movementapi>
-#include <gokz/core>
+#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -79,10 +78,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	if (GetEngineVersion() != Engine_CSGO)
 	{
 		SetFailState("GOKZ only supports CS:GO servers.");
-	}
-	if (FloatAbs(1.0 / GetTickInterval() - TICK_RATE) > EPSILON)
-	{
-		SetFailState("GOKZ only supports 128 tickrate servers.");
 	}
 	
 	gH_ThisPlugin = myself;
@@ -154,7 +149,6 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
 	OnClientPutInServer_ClanTag(client);
-	OnClientPutInServer_MapStarts(client);
 	HookClientEvents(client);
 }
 
@@ -237,6 +231,7 @@ public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType
 
 public void Movement_OnStartTouchGround(int client)
 {
+	OnStartTouchGround_MapZones(client);
 	OnStartTouchGround_MapBhopTriggers(client);
 }
 
@@ -252,9 +247,9 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 	OnTimerStart_Teleports(client);
 }
 
-public void GOKZ_OnTeleportToStart_Post(int client, bool customPos)
+public void GOKZ_OnTeleportToStart_Post(int client)
 {
-	OnTeleportToStart_Timer(client, customPos);
+	OnTeleportToStart_Timer(client);
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)

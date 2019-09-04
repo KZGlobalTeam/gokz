@@ -1,20 +1,17 @@
 #include <sourcemod>
 
-#include <autoexecconfig>
-#include <colorvariables>
-#include <gokz>
+#include <gokz/anticheat>
+#include <gokz/core>
 
 #include <movementapi>
-#include <gokz/core>
-#include <gokz/anticheat>
+
+#include <autoexecconfig>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
 #include <sourcebanspp>
 #include <updater>
-
-#include <gokz/kzplayer>
 
 #pragma newdecls required
 #pragma semicolon 1

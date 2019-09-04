@@ -1,7 +1,5 @@
 #include <sourcemod>
 
-#include <gokz>
-
 #include <gokz/core>
 #include <gokz/racing>
 

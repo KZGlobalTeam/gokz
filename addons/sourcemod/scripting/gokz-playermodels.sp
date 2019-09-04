@@ -1,15 +1,18 @@
 #include <sourcemod>
 
-#include <autoexecconfig>
-
 #include <cstrike>
 #include <sdktools>
 
 #include <gokz/core>
 
+#include <autoexecconfig>
+
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 

@@ -6,6 +6,7 @@
 
 static Regex RE_BonusStartZone;
 static Regex RE_BonusEndZone;
+static bool touchedGroundSinceTouchingStartZone[MAXPLAYERS + 1];
 
 
 
@@ -15,6 +16,11 @@ void OnPluginStart_MapZones()
 {
 	RE_BonusStartZone = CompileRegex(GOKZ_BONUS_START_ZONE_NAME_REGEX);
 	RE_BonusEndZone = CompileRegex(GOKZ_BONUS_END_ZONE_NAME_REGEX);
+}
+
+void OnStartTouchGround_MapZones(int client)
+{
+	touchedGroundSinceTouchingStartZone[client] = true;
 }
 
 void OnEntitySpawned_MapZones(int entity)
@@ -64,13 +70,7 @@ public void OnStartZoneStartTouch(const char[] name, int caller, int activator, 
 		return;
 	}
 	
-	// Set start position to course if they weren't running it before
-	if (GOKZ_GetCourse(activator) != 0)
-	{
-		GOKZ_StopTimer(activator);
-		SetCurrentCourse(activator, 0);
-		SetCustomStartPositionToMap(activator, 0);
-	}
+	ProcessStartZoneStartTouch(activator, 0);
 }
 
 public void OnStartZoneEndTouch(const char[] name, int caller, int activator, float delay)
@@ -80,7 +80,7 @@ public void OnStartZoneEndTouch(const char[] name, int caller, int activator, fl
 		return;
 	}
 	
-	GOKZ_StartTimer(activator, 0, true);
+	ProcessStartZoneEndTouch(activator, 0);
 }
 
 public void OnEndZoneStartTouch(const char[] name, int caller, int activator, float delay)
@@ -90,7 +90,7 @@ public void OnEndZoneStartTouch(const char[] name, int caller, int activator, fl
 		return;
 	}
 	
-	GOKZ_EndTimer(activator, 0);
+	ProcessEndZoneStartTouch(activator, 0);
 }
 
 public void OnBonusStartZoneStartTouch(const char[] name, int caller, int activator, float delay)
@@ -106,13 +106,7 @@ public void OnBonusStartZoneStartTouch(const char[] name, int caller, int activa
 		return;
 	}
 	
-	// Set start position to course if they weren't running it before
-	if (GOKZ_GetCourse(activator) != course)
-	{
-		GOKZ_StopTimer(activator);
-		SetCurrentCourse(activator, course);
-		SetCustomStartPositionToMap(activator, course);
-	}
+	ProcessStartZoneStartTouch(activator, course);
 }
 
 public void OnBonusStartZoneEndTouch(const char[] name, int caller, int activator, float delay)
@@ -128,7 +122,7 @@ public void OnBonusStartZoneEndTouch(const char[] name, int caller, int activato
 		return;
 	}
 	
-	GOKZ_StartTimer(activator, course, true);
+	ProcessStartZoneEndTouch(activator, course);
 }
 
 public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activator, float delay)
@@ -144,19 +138,44 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 		return;
 	}
 	
-	GOKZ_EndTimer(activator, course);
+	ProcessEndZoneStartTouch(activator, course);
 }
 
 
 
 // =====[ PRIVATE ]=====
 
+static void ProcessStartZoneStartTouch(int client, int course)
+{
+	touchedGroundSinceTouchingStartZone[client] = Movement_GetOnGround(client);
+	
+	GOKZ_StopTimer(client, false);
+	SetCurrentCourse(client, course);
+	
+	OnStartZoneStartTouch_Teleports(client, course);
+}
+
+static void ProcessStartZoneEndTouch(int client, int course)
+{
+	if (!touchedGroundSinceTouchingStartZone[client])
+	{
+		return;
+	}
+	
+	GOKZ_StartTimer(client, course, true);
+}
+
+static void ProcessEndZoneStartTouch(int client, int course)
+{
+	GOKZ_EndTimer(client, course);
+}
+
 static int GetStartZoneBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusStartZone, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusStartZone, 1);
 }
 
 static int GetEndZoneBonusNumber(int entity)
 {
-	return MatchIntFromEntityName(entity, RE_BonusEndZone, 1);
+	return GOKZ_MatchIntFromEntityName(entity, RE_BonusEndZone, 1);
 } 

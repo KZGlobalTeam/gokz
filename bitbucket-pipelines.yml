@@ -1,4 +1,4 @@
-image: i386/alpine:3.8
+image: i386/alpine:3.9
 
 definitions:
   step: &compile
@@ -10,6 +10,8 @@ definitions:
       - apk add wget libc6-compat libstdc++
       - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar x -vzf -
       - cd ./addons/sourcemod/scripting
+      - export BITBUCKET_COMMIT_SHORT=$(echo ${BITBUCKET_COMMIT} | cut -c1-7)
+      - echo "#define GOKZ_VERSION \"${BITBUCKET_COMMIT_SHORT}\"" > include/gokz/version.inc
       - for file in gokz-*.sp; do ./spcomp $file; done;
       - cd ../../../
       - mv addons/sourcemod/scripting/*.smx addons/sourcemod/plugins
@@ -20,7 +22,7 @@ pipelines:
       - step: *compile
 
   branches:
-    '{master,dev}':
+    '{dev}':
       - step: *compile
 
   pull-requests:
@@ -29,22 +31,34 @@ pipelines:
 
   tags:
     '*':
-      - step: *compile
+      - step:
+          name: Compile Plugins
+          artifacts:
+            - addons/sourcemod/plugins/gokz-*.smx
+          script:
+            - apk update
+            - apk add wget libc6-compat libstdc++
+            - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar x -vzf -
+            - cd ./addons/sourcemod/scripting
+            - echo "#define GOKZ_VERSION \"${BITBUCKET_TAG}\"" > include/gokz/version.inc
+            - for file in gokz-*.sp; do ./spcomp $file; done;
+            - cd ../../../
+            - mv addons/sourcemod/scripting/*.smx addons/sourcemod/plugins
       - step: 
-          name: Build Releases
-          trigger: manual
+          name: Build Release
           artifacts:
             - builds/*
           script:
             - apk update
             - apk add zip
             - mkdir builds
-            - zip -r builds/GOKZ-latest.zip . -x builds\* *.git* bitbucket-pipelines.yml
-            - zip -r builds/GOKZ-v${BITBUCKET_TAG}.zip . -x builds\* *.git* bitbucket-pipelines.yml
-            - zip -r builds/GOKZ-latest-upgrade.zip . -x builds\* cfg\* *.git* bitbucket-pipelines.yml
-            - zip -r builds/GOKZ-v${BITBUCKET_TAG}-upgrade.zip . -x builds\* cfg\* *.git* bitbucket-pipelines.yml
+            - zip -r builds/GOKZ-latest.zip . -x builds\* *.git* *.md bitbucket-pipelines.yml LICENSE addons/sourcemod/scripting\*
+            - cp builds/GOKZ-latest.zip builds/GOKZ-v${BITBUCKET_TAG}.zip
+            - zip -r builds/GOKZ-latest-upgrade.zip . -x builds\* *.git* *.md bitbucket-pipelines.yml LICENSE addons/sourcemod/scripting\* cfg\*
+            - cp builds/GOKZ-latest-upgrade.zip builds/GOKZ-v${BITBUCKET_TAG}-upgrade.zip
       - step:
-          name: Deploy Releases
+          name: Upload Release
+          trigger: manual
           script:
             - apk update
             - apk add curl

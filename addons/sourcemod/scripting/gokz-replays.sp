@@ -4,8 +4,6 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#include <gokz>
-
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
@@ -58,6 +56,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	if (FloatAbs(1.0 / GetTickInterval() - 128.0) > EPSILON)
+	{
+		SetFailState("gokz-replays only supports 128 tickrate servers.");
+	}
+	
 	LoadTranslations("gokz-replays.phrases");
 	
 	CreateGlobalForwards();

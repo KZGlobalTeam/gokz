@@ -1,15 +1,19 @@
 #include <sourcemod>
 
-#include <autoexecconfig>
-#include <colorvariables>
 #include <cstrike>
 
 #include <gokz/core>
+
+#include <autoexecconfig>
+#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <basecomm>
 #include <updater>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 

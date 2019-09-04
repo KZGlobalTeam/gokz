@@ -1,15 +1,18 @@
 #include <sourcemod>
 
-#include <autoexecconfig>
-
 #include <gokz/core>
 #include <gokz/tips>
+
+#include <autoexecconfig>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
 
 #include <gokz/kzplayer>
+
+#pragma newdecls required
+#pragma semicolon 1
 
 
 

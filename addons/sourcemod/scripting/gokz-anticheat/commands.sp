@@ -1,6 +1,6 @@
 void RegisterCommands()
 {
-	RegConsoleCmd("sm_bhopcheck", CommandBhopCheck, "[KZ] Shows bunnyhop stats report including perf ratio and scroll pattern.");
+	RegConsoleCmd("sm_bhopcheck", CommandBhopCheck, "[KZ] Show bunnyhop stats report including perf ratio and scroll pattern.");
 }
 
 public Action CommandBhopCheck(int client, int args)

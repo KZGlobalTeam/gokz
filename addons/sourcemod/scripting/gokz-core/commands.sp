@@ -1,5 +1,7 @@
 void RegisterCommands()
 {
+	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
+	RegConsoleCmd("sm_o", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_checkpoint", CommandMakeCheckpoint, "[KZ] Set a checkpoint.");
 	RegConsoleCmd("sm_gocheck", CommandTeleportToCheckpoint, "[KZ] Teleport to your current checkpoint.");
 	RegConsoleCmd("sm_prev", CommandPrevCheckpoint, "[KZ] Go back a checkpoint.");
@@ -8,23 +10,18 @@ void RegisterCommands()
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
+	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your custom start position to your current position.");
+	RegConsoleCmd("sm_ssp", CommandSetStartPos, "[KZ] Set your custom start position to your current position.");
+	RegConsoleCmd("sm_clearstartpos", CommandClearStartPos, "[KZ] Clear your custom start position.");
+	RegConsoleCmd("sm_csp", CommandClearStartPos, "[KZ] Clear your custom start position.");
 	RegConsoleCmd("sm_main", CommandMain, "[KZ] Teleport to the start of the main course.");
 	RegConsoleCmd("sm_m", CommandMain, "[KZ] Teleport to the start of the main course.");
 	RegConsoleCmd("sm_bonus", CommandBonus, "[KZ] Teleport to the start of a bonus. Usage: `!bonus <#bonus>");
 	RegConsoleCmd("sm_b", CommandBonus, "[KZ] Teleport to the start of a bonus. Usage: `!b <#bonus>");
-	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
-	RegConsoleCmd("sm_ssp", CommandSetStartPos, "[KZ] Set your current position as your custom start position.");
-	RegConsoleCmd("sm_clearstartpos", CommandClearStartPos, "[KZ] Clear your custom start position.");
-	RegConsoleCmd("sm_csp", CommandClearStartPos, "[KZ] Clear your custom start position.");
 	RegConsoleCmd("sm_pause", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
-	RegConsoleCmd("sm_options", CommandOptions, "[KZ] Open the options menu.");
-	RegConsoleCmd("sm_o", CommandOptions, "[KZ] Open the options menu.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
-	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
-	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
-	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
 	RegConsoleCmd("sm_mode", CommandMode, "[KZ] Open the movement mode selection menu.");
 	RegConsoleCmd("sm_vanilla", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
 	RegConsoleCmd("sm_vnl", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
@@ -35,11 +32,20 @@ void RegisterCommands()
 	RegConsoleCmd("sm_kztimer", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
 	RegConsoleCmd("sm_kzt", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
 	RegConsoleCmd("sm_k", CommandKZTimer, "[KZ] Switch to the KZTimer mode.");
+	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
+	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
+	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
 }
 
 void AddCommandsListeners()
 {
 	AddCommandListener(CommandJoinTeam, "jointeam");
+}
+
+public Action CommandOptions(int client, int args)
+{
+	DisplayOptionsMenu(client);
+	return Plugin_Handled;
 }
 
 public Action CommandJoinTeam(int client, const char[] command, int argc)
@@ -87,15 +93,38 @@ public Action CommandTeleportToStart(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandSetStartPos(int client, int args)
+{
+	SetStartPositionToCurrent(client, StartPositionType_Custom);
+	
+	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
+	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
+	{
+		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
+	}
+	
+	return Plugin_Handled;
+}
+
+public Action CommandClearStartPos(int client, int args)
+{
+	if (ClearCustomStartPosition(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Cleared Custom Start Position");
+	}
+	
+	return Plugin_Handled;
+}
+
 public Action CommandMain(int client, int args)
 {
-	if (SetCustomStartPositionToMap(client, 0, true))
+	if (SetStartPositionToMapStart(client, 0))
 	{
 		GOKZ_TeleportToStart(client);
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, true, "%t", "No Start Found", 1);
+		GOKZ_PrintToChat(client, true, "%t", "No Start Found");
 	}
 	return Plugin_Handled;
 }
@@ -104,7 +133,7 @@ public Action CommandBonus(int client, int args)
 {
 	if (args == 0)
 	{  // Go to Bonus 1
-		if (SetCustomStartPositionToMap(client, 1, true))
+		if (SetStartPositionToMapStart(client, 1))
 		{
 			GOKZ_TeleportToStart(client);
 		}
@@ -120,7 +149,7 @@ public Action CommandBonus(int client, int args)
 		int bonus = StringToInt(argBonus);
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
-			if (SetCustomStartPositionToMap(client, bonus, true))
+			if (SetStartPositionToMapStart(client, bonus))
 			{
 				GOKZ_TeleportToStart(client);
 			}
@@ -134,25 +163,6 @@ public Action CommandBonus(int client, int args)
 			GOKZ_PrintToChat(client, true, "%t", "Invalid Bonus Number", argBonus);
 		}
 	}
-	return Plugin_Handled;
-}
-
-public Action CommandSetStartPos(int client, int args)
-{
-	SetCustomStartPositionToCurrent(client);
-	
-	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
-	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
-	{
-		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
-	}
-	
-	return Plugin_Handled;
-}
-
-public Action CommandClearStartPos(int client, int args)
-{
-	ClearCustomStartPosition(client);
 	return Plugin_Handled;
 }
 
@@ -178,12 +188,6 @@ public Action CommandStopTimer(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action CommandOptions(int client, int args)
-{
-	DisplayOptionsMenu(client);
-	return Plugin_Handled;
-}
-
 public Action CommandToggleAutoRestart(int client, int args)
 {
 	if (GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Disabled)
@@ -194,24 +198,6 @@ public Action CommandToggleAutoRestart(int client, int args)
 	{
 		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Disabled);
 	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleNoclip(int client, int args)
-{
-	ToggleNoclip(client);
-	return Plugin_Handled;
-}
-
-public Action CommandEnableNoclip(int client, int args)
-{
-	EnableNoclip(client);
-	return Plugin_Handled;
-}
-
-public Action CommandDisableNoclip(int client, int args)
-{
-	DisableNoclip(client);
 	return Plugin_Handled;
 }
 
@@ -236,6 +222,24 @@ public Action CommandSimpleKZ(int client, int args)
 public Action CommandKZTimer(int client, int args)
 {
 	SwitchToModeIfAvailable(client, Mode_KZTimer);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleNoclip(int client, int args)
+{
+	ToggleNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandEnableNoclip(int client, int args)
+{
+	EnableNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandDisableNoclip(int client, int args)
+{
+	DisableNoclip(client);
 	return Plugin_Handled;
 }
 

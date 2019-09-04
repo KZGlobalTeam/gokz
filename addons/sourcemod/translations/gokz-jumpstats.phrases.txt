@@ -71,31 +71,32 @@
 	// =====[ CONSOLE MESSAGES ]===== 
 	"Console Jump Report"
 	{
-		// Bill jumped 268.3485 units with a Long Jump [SimpleKZ | 0.0 Offset | 55.8 Height | 276.000 Pre | 337.676 Max | 8 Strafes | 61% Sync | 0.765 Airtime]
-		"#format"	"{1:N},{2:.4f},{3:s},{4:s},{5:.1f},{6:t},{7:.1f},{8:t},{9:.3f},{10:t},{11:.3f},{12:t},{13:d},{14:t},{15:.1f},{16:t},{17:.3f},{18:t}"
-		"en"		"{1} jumped {2} units with a {3} [{4} | {5} {6} | {7} {8} | {9} {10} | {11} {12} | {13} {14} | {15}%% {16} | {17} {18}]"
-		"chi"		"{1} 以{3}方式跳出了{2} 单位  [{4} | {5} {6} | {7} {8} | {9} {10} | {11} {12} | {13} {14} | {15}%% {16} | {17} {18}]"
+		// Bill jumped 268.3485 units with a Long Jump
+		// SimpleKZ | 0.0 Offset | 55.8 Height | 276.000 Pre | 337.676 Max | 8 Strafes | 61% Sync | 0.765 Airtime
+		"#format"	"{1:N},{2:.4f},{3:s},{4:s},{5:.1f},{6:t},{7:.1f},{8:t},{9:.2f},{10:t},{11:.2f},{12:t},{13:d},{14:t},{15:.1f},{16:t},{17:.3f},{18:t}"
+		"en"		"{1} jumped {2} units with a {3}\n{4} | {5} {6} | {7} {8} | {9} {10} | {11} {12} | {13} {14} | {15}%% {16} | {17} {18}"
+		"chi"		"{1} 以{3}方式跳出了{2} 单位\n{4} | {5} {6} | {7} {8} | {9} {10} | {11} {12} | {13} {14} | {15}%% {16} | {17} {18}"
 	}
-	// NOTE: For table formatting in console, these 'headers' should be 12 characters long.
+	// NOTE: For table formatting in console, these 'headers' should be 10 characters long.
 	"Sync (Table)"
 	{
-		"en"		"Sync        "
-		"chi"		"同步        "
+		"en"		"Sync      "
+		"chi"		"同步      "
 	}
 	"Gain (Table)"
 	{
-		"en"		"Gain        "
-		"chi"		"获得        "
+		"en"		"Gain      "
+		"chi"		"获得      "
 	}
 	"Loss (Table)"
 	{
-		"en"		"Loss        "
-		"chi"		"损失        "
+		"en"		"Loss      "
+		"chi"		"损失      "
 	}
 	"Airtime (Table)"
 	{
-		"en"		"Airtime     "
-		"chi"		"滞空时间    "
+		"en"		"Airtime   "
+		"chi"		"滞空时间  "
 	}
 
 

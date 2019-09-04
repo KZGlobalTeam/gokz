@@ -11,6 +11,9 @@
 
 #include <gokz/kzplayer>
 
+#pragma newdecls required
+#pragma semicolon 1
+
 
 
 public Plugin myinfo = 

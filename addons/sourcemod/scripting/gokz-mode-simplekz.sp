@@ -1,9 +1,7 @@
 #include <sourcemod>
 
-#include <sdktools>
 #include <sdkhooks>
-
-#include <gokz>
+#include <sdktools>
 
 #include <movementapi>
 
@@ -30,15 +28,16 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 6
-#define DUCK_SPEED_MINIMUM 7.0
+#define MODE_VERSION 7
 #define PERF_TICKS 2
-#define PRE_VELMOD_MAX 1.104 // Calculated 276/250
-#define PRE_MINIMUM_DELTA_ANGLE 0.3515625 // Calculated 45 degrees/128 ticks 
-#define PRE_VELMOD_INCREMENT 0.0014 // Per tick when prestrafing
-#define PRE_VELMOD_DECREMENT 0.0021 // Per tick when not prestrafing
-#define PRE_VELMOD_DECREMENT_MIDAIR 0.0011063829787234 // Per tick when in air - Calculated 0.104velmod/94ticks (lose all pre in 0 offset, normal jump duration)
-#define PRE_GRACE_TICKS 3 // Number of ticks you're allowed to fail prestrafe checks when prestrafing - Helps players with low fps
+#define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
+#define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
+#define PS_SPEED_MAX 26.54321 // Units
+#define PS_SPEED_INCREMENT 0.35 // Units per tick
+#define PS_SPEED_DECREMENT_MIDAIR 0.2824 // Units per tick (lose PS_SPEED_MAX in 0 offset jump i.e. 94 ticks)
+#define PS_GRACE_TICKS 3 // No. of ticks allowed to fail prestrafe checks when prestrafing - helps players with low fps
+#define DUCK_SPEED_NORMAL 8.0
+#define DUCK_SPEED_MINIMUM 6.0234375 // Equal to if you just ducked/unducked for the first time in a while
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {
@@ -70,10 +69,12 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
-float gF_PreVelMod[MAXPLAYERS + 1];
-float gF_PreVelModLanding[MAXPLAYERS + 1];
-bool gB_PreTurningLeft[MAXPLAYERS + 1];
-int gI_PreTicksSinceIncrement[MAXPLAYERS + 1];
+float gF_PSBonusSpeed[MAXPLAYERS + 1];
+float gF_PSVelMod[MAXPLAYERS + 1];
+float gF_PSVelModLanding[MAXPLAYERS + 1];
+bool gB_PSTurningLeft[MAXPLAYERS + 1];
+float gF_PSTurnRate[MAXPLAYERS + 1];
+int gI_PSTicksSinceIncrement[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
@@ -86,6 +87,11 @@ bool gB_Jumpbugged[MAXPLAYERS + 1];
 
 public void OnPluginStart()
 {
+	if (FloatAbs(1.0 / GetTickInterval() - 128.0) > EPSILON)
+	{
+		SetFailState("gokz-mode-simplekz only supports 128 tickrate servers.");
+	}
+	
 	CreateConVars();
 }
 
@@ -142,6 +148,8 @@ public void OnLibraryRemoved(const char[] name)
 
 public void OnClientPutInServer(int client)
 {
+	ResetClient(client);
+	
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
 	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 	if (IsUsingMode(client))
@@ -159,6 +167,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
+	ReduceDuckSlowdown(player);
 	TweakVelMod(player, angles);
 	if (gB_Jumpbugged[player.ID])
 	{
@@ -168,7 +177,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gB_Jumpbugged[player.ID] = false;
 	gI_OldButtons[player.ID] = buttons;
 	gB_OldOnGround[player.ID] = Movement_GetOnGround(client);
-	gF_OldAngles[player.ID] = angles;
+	Movement_GetEyeAngles(client, gF_OldAngles[player.ID]);
 	Movement_GetVelocity(client, gF_OldVelocity[client]);
 	
 	return Plugin_Continue;
@@ -214,8 +223,7 @@ public void Movement_OnStartTouchGround(int client)
 	}
 	
 	KZPlayer player = KZPlayer(client);
-	ReduceDuckSlowdown(player);
-	gF_PreVelModLanding[player.ID] = gF_PreVelMod[player.ID];
+	gF_PSVelModLanding[player.ID] = gF_PSVelMod[player.ID];
 }
 
 public void Movement_OnStopTouchGround(int client, bool jumped)
@@ -275,8 +283,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 public void GOKZ_OnCountedTeleport_Post(int client)
 {
-	KZPlayer player = KZPlayer(client);
-	ResetPrestrafeVelMod(player);
+	ResetClient(client);
 }
 
 
@@ -287,6 +294,12 @@ bool IsUsingMode(int client)
 {
 	// If GOKZ core isn't loaded, then apply mode at all times
 	return !gB_GOKZCore || GOKZ_GetCoreOption(client, Option_Mode) == Mode_SimpleKZ;
+}
+
+void ResetClient(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	ResetVelMod(player);
 }
 
 
@@ -311,9 +324,11 @@ void TweakConVars()
 
 void ReplicateConVars(int client)
 {
-	// Replicate convars only when player changes mode in GOKZ
-	// so that lagg isn't caused by other players using other
-	// modes, and also as an optimisation.
+	/*
+		Replicate convars only when player changes mode in GOKZ
+		so that lagg isn't caused by other players using other
+		modes, and also as an optimisation.
+	*/
 	
 	if (IsFakeClient(client))
 	{
@@ -335,65 +350,105 @@ void TweakVelMod(KZPlayer player, const float angles[3])
 	player.VelocityModifier = CalcPrestrafeVelMod(player, angles) * CalcWeaponVelMod(player);
 }
 
+void ResetVelMod(KZPlayer player)
+{
+	gF_PSBonusSpeed[player.ID] = 0.0;
+	gF_PSVelMod[player.ID] = 1.0;
+	gF_PSTurnRate[player.ID] = 0.0;
+}
+
 float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 {
+	gI_PSTicksSinceIncrement[player.ID]++;
+	
+	// Short circuit if speed is 0 (also avoids divide by 0 errors)
+	if (player.Speed < EPSILON)
+	{
+		ResetVelMod(player);
+		return gF_PSVelMod[player.ID];
+	}
+	
+	// Current speed without bonus
+	float baseSpeed = FloatMin(SPEED_NORMAL, player.Speed / gF_PSVelMod[player.ID]);
+	
+	float newBonusSpeed = gF_PSBonusSpeed[player.ID];
+	
 	// If player is in mid air, decrement their velocity modifier
 	if (!player.OnGround)
 	{
-		gF_PreVelMod[player.ID] -= PRE_VELMOD_DECREMENT_MIDAIR;
+		newBonusSpeed -= PS_SPEED_DECREMENT_MIDAIR;
 	}
-	// If player is turning at the required speed, and has the correct button inputs, increment their velocity modifier
-	else if (ValidPrestrafeTurning(player, angles) && ValidPrestrafeButtons(player))
+	// If player is turning at the required speed, and has the correct button inputs, reward it
+	else if (player.Turning && ValidPrestrafeButtons(player))
 	{
 		// If player changes their prestrafe direction, reset it
-		if (player.TurningLeft && !gB_PreTurningLeft[player.ID] || player.TurningRight && gB_PreTurningLeft[player.ID])
+		if (player.TurningLeft && !gB_PSTurningLeft[player.ID]
+			 || player.TurningRight && gB_PSTurningLeft[player.ID])
 		{
-			gF_PreVelMod[player.ID] = 1.0;
+			ResetVelMod(player);
+			newBonusSpeed = 0.0;
 		}
-		gB_PreTurningLeft[player.ID] = player.TurningLeft;
 		
-		// If missed a few ticks, then forgive and multiply increment amount by the number of ticks
-		if (gI_PreTicksSinceIncrement[player.ID] <= PRE_GRACE_TICKS)
+		// Keep track of the direction of the turn
+		gB_PSTurningLeft[player.ID] = player.TurningLeft;
+		
+		// Step one of calculating new turn rate
+		float newTurningRate = FloatAbs(CalcDeltaAngle(gF_OldAngles[player.ID][1], angles[1]));
+		
+		// If no turning for just a few ticks, then forgive and calculate reward based on that no. of ticks
+		if (gI_PSTicksSinceIncrement[player.ID] <= PS_GRACE_TICKS)
 		{
-			gF_PreVelMod[player.ID] += PRE_VELMOD_INCREMENT * gI_PreTicksSinceIncrement[player.ID];
+			// This turn occurred over multiple ticks, so scale appropriately
+			// Also cap turn rate at maximum reward turn rate
+			newTurningRate = FloatMin(PS_MAX_REWARD_TURN_RATE, 
+				newTurningRate / gI_PSTicksSinceIncrement[player.ID]);
+			
+			// Limit how fast turn rate can decrease (also scaled appropriately)
+			gF_PSTurnRate[player.ID] = FloatMax(newTurningRate, 
+				gF_PSTurnRate[player.ID] - PS_MAX_TURN_RATE_DECREMENT * gI_PSTicksSinceIncrement[player.ID]);
+			
+			newBonusSpeed += CalcPreRewardSpeed(gF_PSTurnRate[player.ID], baseSpeed) * gI_PSTicksSinceIncrement[player.ID];
 		}
 		else
 		{
-			gF_PreVelMod[player.ID] += PRE_VELMOD_INCREMENT;
+			// Cap turn rate at maximum reward turn rate
+			newTurningRate = FloatMin(PS_MAX_REWARD_TURN_RATE, newTurningRate);
+			
+			// Limit how fast turn rate can decrease
+			gF_PSTurnRate[player.ID] = FloatMax(newTurningRate, 
+				gF_PSTurnRate[player.ID] - PS_MAX_TURN_RATE_DECREMENT);
+			
+			// This is normal turning behaviour
+			newBonusSpeed += CalcPreRewardSpeed(gF_PSTurnRate[player.ID], baseSpeed);
 		}
-		gI_PreTicksSinceIncrement[player.ID] = 1;
+		
+		gI_PSTicksSinceIncrement[player.ID] = 0;
+	}
+	else if (gI_PSTicksSinceIncrement[player.ID] > PS_GRACE_TICKS)
+	{
+		// They definitely aren't turning, but limit how fast turn rate can decrease
+		gF_PSTurnRate[player.ID] = FloatMax(0.0, 
+			gF_PSTurnRate[player.ID] - PS_MAX_TURN_RATE_DECREMENT);
+	}
+	
+	if (newBonusSpeed < 0.0)
+	{
+		// Keep velocity modifier positive
+		newBonusSpeed = 0.0;
 	}
 	else
 	{
-		gI_PreTicksSinceIncrement[player.ID]++;
-		if (gI_PreTicksSinceIncrement[player.ID] > PRE_GRACE_TICKS)
-		{
-			gF_PreVelMod[player.ID] -= PRE_VELMOD_DECREMENT;
-		}
+		// Scale the bonus speed based on current base speed and turn rate
+		float baseSpeedScaleFactor = baseSpeed / SPEED_NORMAL; // Max 1.0
+		float turnRateScaleFactor = FloatMin(1.0, gF_PSTurnRate[player.ID] / PS_MAX_REWARD_TURN_RATE);
+		float scaledMaxBonusSpeed = PS_SPEED_MAX * baseSpeedScaleFactor * turnRateScaleFactor;
+		newBonusSpeed = FloatMin(newBonusSpeed, scaledMaxBonusSpeed);
 	}
 	
-	// Keep prestrafe velocity modifier within range
-	if (gF_PreVelMod[player.ID] < 1.0)
-	{
-		gF_PreVelMod[player.ID] = 1.0;
-	}
-	else if (gF_PreVelMod[player.ID] > PRE_VELMOD_MAX)
-	{
-		gF_PreVelMod[player.ID] = PRE_VELMOD_MAX;
-	}
+	gF_PSBonusSpeed[player.ID] = newBonusSpeed;
+	gF_PSVelMod[player.ID] = 1.0 + (newBonusSpeed / baseSpeed);
 	
-	return gF_PreVelMod[player.ID];
-}
-
-bool ValidPrestrafeTurning(KZPlayer player, const float angles[3])
-{
-	// If missed a few ticks, then forgive but multiply required angle change
-	if (gI_PreTicksSinceIncrement[player.ID] <= PRE_GRACE_TICKS)
-	{
-		return FloatAbs(CalcDeltaAngle(gF_OldAngles[player.ID][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE * gI_PreTicksSinceIncrement[player.ID];
-	}
-	// else
-	return FloatAbs(CalcDeltaAngle(gF_OldAngles[player.ID][1], angles[1])) >= PRE_MINIMUM_DELTA_ANGLE;
+	return gF_PSVelMod[player.ID];
 }
 
 bool ValidPrestrafeButtons(KZPlayer player)
@@ -403,9 +458,20 @@ bool ValidPrestrafeButtons(KZPlayer player)
 	return forwardOrBack || leftOrRight;
 }
 
-void ResetPrestrafeVelMod(KZPlayer player)
+float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 {
-	gF_PreVelMod[player.ID] = 1.0;
+	// Formula
+	float reward;
+	if (yawDiff >= PS_MAX_REWARD_TURN_RATE)
+	{
+		reward = PS_SPEED_INCREMENT;
+	}
+	else
+	{
+		reward = PS_SPEED_INCREMENT * (yawDiff / PS_MAX_REWARD_TURN_RATE);
+	}
+	
+	return reward * baseSpeed / SPEED_NORMAL;
 }
 
 float CalcWeaponVelMod(KZPlayer player)
@@ -433,7 +499,7 @@ void TweakJump(KZPlayer player)
 			AddVectors(newVelocity, baseVelocity, newVelocity);
 			player.SetVelocity(newVelocity);
 			// Restore prestrafe lost due to briefly being on the ground
-			gF_PreVelMod[player.ID] = gF_PreVelModLanding[player.ID];
+			gF_PSVelMod[player.ID] = gF_PSVelModLanding[player.ID];
 			if (gB_GOKZCore)
 			{
 				player.GOKZHitPerf = true;
@@ -472,11 +538,11 @@ float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 	// Formula
 	if (jumpbug)
 	{
-		return FloatMin(player.Speed, (0.2 * player.Speed + 200) * gF_PreVelMod[player.ID]);
+		return FloatMin(player.Speed, (0.2 * player.Speed + 200) * gF_PSVelMod[player.ID]);
 	}
 	else if (player.LandingSpeed > SPEED_NORMAL)
 	{
-		return FloatMin(player.LandingSpeed, (0.2 * player.LandingSpeed + 200) * gF_PreVelModLanding[player.ID]);
+		return FloatMin(player.LandingSpeed, (0.2 * player.LandingSpeed + 200) * gF_PSVelModLanding[player.ID]);
 	}
 	return player.LandingSpeed;
 }
@@ -524,7 +590,7 @@ void SlopeFix(int client)
 					Copy the ClipVelocity function from sdk2013 
 					(https://mxr.alliedmods.net/hl2sdk-sdk2013/source/game/shared/gamemovement.cpp#3145)
 					With some minor changes to make it actually work
-					*/
+				*/
 				vLast[0] = gF_OldVelocity[client][0];
 				vLast[1] = gF_OldVelocity[client][1];
 				vLast[2] = gF_OldVelocity[client][2];
@@ -580,7 +646,24 @@ void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 
 void ReduceDuckSlowdown(KZPlayer player)
 {
-	if (player.DuckSpeed < DUCK_SPEED_MINIMUM)
+	/*
+		Duck speed is reduced by the game upon ducking or unducking.
+		The goal here is to accept that duck speed is reduced, but
+		stop it from being reduced further when spamming duck.
+
+		This is done by enforcing a minimum duck speed equivalent to
+		the value as if the player only ducked once. When not in not
+		in the middle of ducking, duck speed is reset to its normal
+		value in effort to reduce the number of times the minimum
+		duck speed is enforced. This should reduce noticeable lagg.
+	*/
+	
+	if (!GetEntProp(player.ID, Prop_Send, "m_bDucking")
+		 && player.DuckSpeed < DUCK_SPEED_NORMAL - EPSILON)
+	{
+		player.DuckSpeed = DUCK_SPEED_NORMAL;
+	}
+	else if (player.DuckSpeed < DUCK_SPEED_MINIMUM - EPSILON)
 	{
 		player.DuckSpeed = DUCK_SPEED_MINIMUM;
 	}
