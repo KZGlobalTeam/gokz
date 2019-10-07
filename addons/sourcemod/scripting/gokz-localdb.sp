@@ -60,6 +60,7 @@ public void OnPluginStart()
 {
 	CreateGlobalForwards();
 	RegisterCommands();
+	DB_SetupDatabase();
 }
 
 public void OnAllPluginsLoaded()
@@ -68,8 +69,6 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	
-	DB_SetupDatabase();
 	
 	char auth[32];
 	for (int client = 1; client <= MaxClients; client++)
