@@ -29,9 +29,6 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-jumpstats.txt"
 
-Database gH_DB = null;
-DatabaseType g_DBType = DatabaseType_None;
-
 #include "gokz-jumpstats/api.sp"
 #include "gokz-jumpstats/commands.sp"
 #include "gokz-jumpstats/distance_tiers.sp"
@@ -39,11 +36,6 @@ DatabaseType g_DBType = DatabaseType_None;
 #include "gokz-jumpstats/jump_tracking.sp"
 #include "gokz-jumpstats/options.sp"
 #include "gokz-jumpstats/options_menu.sp"
-#include "gokz-jumpstats/db/sql.sp"
-#include "gokz-jumpstats/db/create_tables.sp"
-#include "gokz-jumpstats/db/print_record.sp"
-#include "gokz-jumpstats/db/save_record.sp"
-#include "gokz-jumpstats/db/server_top.sp"
 
 
 
@@ -76,17 +68,6 @@ public void OnAllPluginsLoaded()
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
 		GOKZ_OnOptionsMenuReady(topMenu);
-	}
-	
-	gH_DB = GOKZ_DB_GetDatabase();
-	if (gH_DB != null)
-	{
-		g_DBType = GOKZ_DB_GetDatabaseType();
-		DB_CreateTables();
-	}
-	else
-	{
-		LogError("Failed to establish database connection.");
 	}
 	
 	for (int client = 1; client <= MaxClients; client++)
@@ -157,7 +138,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
 	OnLanding_JumpReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
-	OnLanding_SaveJumpstat(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
 }
 
 public void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)

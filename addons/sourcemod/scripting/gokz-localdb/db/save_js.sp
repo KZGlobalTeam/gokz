@@ -2,7 +2,14 @@
 public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
-	if (GetDistanceTier(jumpType, mode, distance, offset) == DistanceTier_None)
+	
+	
+	// No tiers given for 'Invalid' jumps.
+	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
+		 || jumpType != JumpType_LadderJump && offset < -JS_MAX_NORMAL_OFFSET
+		 || offset < -JS_MAX_LADDERJUMP_OFFSET
+		 || jumpType == JumpType_LadderJump && distance < JS_MIN_LAJ_BLOCK_DISTANCE
+		 || jumpType != JumpType_LadderJump && distance < JS_MIN_BLOCK_DISTANCE)
 	{
 		return;
 	}
@@ -21,7 +28,7 @@ public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, flo
 	Transaction txn_noblock = SQL_CreateTransaction();
 	FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 0);
 	txn_noblock.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupRecordForSave, DB_TxnFailure_Generic, data_noblock, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data_noblock, DBPrio_Low);
 	
 	if(block > 0)
 	{
@@ -35,11 +42,11 @@ public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, flo
 		Transaction txn_block = SQL_CreateTransaction();
 		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 1);
 		txn_block.AddQuery(query);
-		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupRecordForSave, DB_TxnFailure_Generic, data_block, DBPrio_Low);
+		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data_block, DBPrio_Low);
 	}
 }
 
-public void DB_TxnSuccess_LookupRecordForSave(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = data.ReadCell();
@@ -76,10 +83,10 @@ public void DB_TxnSuccess_LookupRecordForSave(Handle db, DataPack data, int numQ
 	
 	Transaction txn = SQL_CreateTransaction();
 	txn.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveRecord, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveJSRecord, DB_TxnFailure_Generic, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_SaveRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = data.ReadCell();

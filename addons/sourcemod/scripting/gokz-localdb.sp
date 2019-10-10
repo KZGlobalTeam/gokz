@@ -3,6 +3,7 @@
 #include <geoip>
 
 #include <gokz/core>
+#include <gokz/jumpstats>
 #include <gokz/localdb>
 
 #undef REQUIRE_EXTENSIONS
@@ -39,6 +40,7 @@ int gI_DBCurrentMapID;
 #include "gokz-localdb/db/helpers.sp"
 #include "gokz-localdb/db/create_tables.sp"
 #include "gokz-localdb/db/save_time.sp"
+#include "gokz-localdb/db/save_js.sp"
 #include "gokz-localdb/db/set_cheater.sp"
 #include "gokz-localdb/db/setup_client.sp"
 #include "gokz-localdb/db/setup_database.sp"
@@ -130,4 +132,9 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
-} 
+}
+
+public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+{
+	OnLanding_SaveJumpstat(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+}

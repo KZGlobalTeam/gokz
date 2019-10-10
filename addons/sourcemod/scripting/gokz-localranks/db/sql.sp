@@ -324,3 +324,32 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
     AND a.Created>b.Created AND a.RunTime>b.RunTime) \
     ORDER BY a.Created DESC \
     LIMIT %d"; 
+
+
+
+// =====[ JUMPSTATS ]=====
+    
+char sql_jumpstats_gettop[] = "\
+SELECT p.Alias, j.Block, j.Distance \
+    FROM \
+        Jumpstats j \
+    INNER JOIN \
+        Players p ON \
+            p.SteamID32=j.SteamID32 \
+    WHERE \
+        p.Cheater = 0 AND \
+        j.JumpType = %d AND \
+        j.Mode = %d AND \
+        j.IsBlockJump = %d \
+    ORDER BY j.Block DESC, j.Distance DESC \
+    LIMIT %d";
+    
+char sql_jumpstats_getrecord[] = "\
+SELECT JumpID, Distance, Block \
+    FROM \
+        Jumpstats \
+    WHERE \
+        SteamID32 = %d AND \
+        JumpType = %d AND \
+        Mode = %d AND \
+        IsBlockJump = %d";

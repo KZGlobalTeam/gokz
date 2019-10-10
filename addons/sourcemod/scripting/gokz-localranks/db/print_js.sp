@@ -1,3 +1,6 @@
+/*
+	Prints the player's personal best jumps.
+*/
 
 void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 {
@@ -10,8 +13,8 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 		steamid = GetSteamAccountID(client);
 		FormatEx(alias, sizeof(alias), "%N", client);
 	
-		DB_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 0);
-		DB_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 1);
+		DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 0);
+		DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 1);
 	}
 	else
 	{
@@ -20,11 +23,11 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 		data.WriteCell(jumpType);
 		data.WriteCell(mode);
 		
-		DB_FindPlayer(jumper, DB_TxnSuccess_LookupPlayer, data);
+		DB_FindPlayer(jumper, DB_JS_TxnSuccess_LookupPlayer, data);
 	}
 }
 
-public void DB_TxnSuccess_LookupPlayer(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_JS_TxnSuccess_LookupPlayer(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
 	int client = data.ReadCell();
@@ -43,11 +46,11 @@ public void DB_TxnSuccess_LookupPlayer(Handle db, DataPack data, int numQueries,
 	int steamid = SQL_FetchInt(results[0], JumpstatDB_FindPlayer_SteamID32);
 	SQL_FetchString(results[0], JumpstatDB_FindPlayer_Alias, alias, sizeof(alias));
 	
-	DB_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 0);
-	DB_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 1);
+	DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 0);
+	DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 1);
 }
 
-void DB_OpenPlayerRecord(int client, int steamid, char[] alias, int jumpType, int mode, int block)
+void DB_JS_OpenPlayerRecord(int client, int steamid, char[] alias, int jumpType, int mode, int block)
 {
 	char query[1024];
 	
@@ -60,10 +63,10 @@ void DB_OpenPlayerRecord(int client, int steamid, char[] alias, int jumpType, in
 	Transaction txn = SQL_CreateTransaction();
 	FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, block);
 	txn.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenPlayerRecord, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_JS_TxnSuccess_OpenPlayerRecord, DB_TxnFailure_Generic, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	char alias[33];
 	data.Reset();
@@ -96,20 +99,4 @@ public void DB_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQuer
 	{
 		GOKZ_PrintToChat(client, true, "%s block %s record of %s: %d block (%.4f jump)", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, block, distance);
 	}
-}
-
-void DB_FindPlayer(const char[] playerSearch, SQLTxnSuccess onSuccess, any data = 0, DBPriority priority = DBPrio_Normal)
-{
-	char query[1024], playerEscaped[MAX_NAME_LENGTH * 2 + 1];
-	SQL_EscapeString(gH_DB, playerSearch, playerEscaped, sizeof(playerEscaped));
-	
-	String_ToLower(playerEscaped, playerEscaped, sizeof(playerEscaped));
-	
-	Transaction txn = SQL_CreateTransaction();
-	
-	// Look for player name and retrieve their SteamID32 and full alias.
-	FormatEx(query, sizeof(query), sql_players_searchbyalias, playerEscaped, playerEscaped);
-	txn.AddQuery(query);
-	
-	SQL_ExecuteTransaction(gH_DB, txn, onSuccess, DB_TxnFailure_Generic, data, priority);
 }
