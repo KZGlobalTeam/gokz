@@ -400,7 +400,7 @@ static float CalcDistance(int client)
 {
 	float takeoffOrigin[3], landingOrigin[3], distance;
 	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	Movement_GetLandingOrigin(client, landingOrigin);
+	Movement_GetNobugLandingOrigin(client, landingOrigin);
 	distance = GetVectorHorizontalDistance(takeoffOrigin, landingOrigin);
 	if (GetType(client) != JumpType_LadderJump)
 	{
@@ -463,7 +463,7 @@ static void EndBlockDistance(int client)
 		}
 		
 		Movement_GetTakeoffOrigin(client, takeoffOrigin);
-		Movement_GetLandingOrigin(client, landingOrigin);
+		Movement_GetNobugLandingOrigin(client, landingOrigin);
 		
 		// Get the orientation of the block.
 		coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
@@ -554,7 +554,7 @@ static void EndBlockDistance(int client)
 		}
 		
 		Movement_GetTakeoffOrigin(client, takeoffOrigin);
-		Movement_GetLandingOrigin(client, landingOrigin);
+		Movement_GetNobugLandingOrigin(client, landingOrigin);
 		
 		// Get the orientation of the block.
 		coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
@@ -814,7 +814,7 @@ static void EndOffset(int client)
 {
 	float takeoffOrigin[3], landingOrigin[3];
 	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	Movement_GetLandingOrigin(client, landingOrigin);
+	Movement_GetNobugLandingOrigin(client, landingOrigin);
 	offsetLast[client] = landingOrigin[2] - takeoffOrigin[2];
 }
 
