@@ -152,6 +152,14 @@ native int Movement_GetTakeoffTick(int client);
 native int Movement_GetTakeoffCmdNum(int client);
 
 /**
+ * Gets a player's origin at the time of their last landing with the distbug fixed.
+ *
+ * @param client		Client index.
+ * @param result		Resultant vector.
+ */
+native void Movement_GetNobugLandingOrigin(int client, float result[3]);
+
+/**
  * Gets a player's origin at the time of their last landing.
  *
  * @param client		Client index.
