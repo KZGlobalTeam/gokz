@@ -350,7 +350,8 @@ static void DoFailstatChatReport(int client, int jumper, int jumpType, int tier,
 		return;
 	}
 	
-	if (jumpType == JumpType_LongJump)
+	if (jumpType == JumpType_LongJump
+		|| jumpType == JumpType_LadderJump)
 	{
 		GOKZ_PrintToChat(client, true, 
 			"%s %s: %.1f [%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 

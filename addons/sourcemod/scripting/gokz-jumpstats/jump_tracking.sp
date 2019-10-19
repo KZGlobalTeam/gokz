@@ -126,9 +126,10 @@ static void EndJumpstat(int client)
 {
 	UpdateJumpstat(client); // Measure last tick of jumpstat
 	
+	// The order is important here!
 	EndType(client);
-	EndDistance(client);
 	EndOffset(client);
+	EndDistance(client);
 	EndBlockDistance(client);
 	EndHeight(client);
 	EndMaxSpeed(client);
@@ -163,6 +164,13 @@ static void UpdateValidCmd(int client)
 	{
 		validCmd[client] = true;
 	}
+}
+
+static void CopyVector(float src[3], float dest[3])
+{
+	dest[0] = src[0];
+	dest[1] = src[1];
+	dest[2] = src[2];
 }
 
 
@@ -234,6 +242,11 @@ int GetType(int client)
 int GetTypeCurrent(int client)
 {
 	return jumpTypeCurrent[client];
+}
+
+void SetTypeCurrent(int client, int type)
+{
+	jumpTypeCurrent[client] = type;
 }
 
 bool GetValidJumpstat(int client)
@@ -400,7 +413,14 @@ static float CalcDistance(int client)
 {
 	float takeoffOrigin[3], landingOrigin[3], distance;
 	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	Movement_GetNobugLandingOrigin(client, landingOrigin);
+	if(FloatAbs(GetOffsetNobug(client) - GetOffset(client)) < EPSILON)
+	{
+		Movement_GetNobugLandingOrigin(client, landingOrigin);
+	}
+	else
+	{
+		FailstatGetFailOrigin(client, takeoffOrigin[2], landingOrigin);
+	}
 	distance = GetVectorHorizontalDistance(takeoffOrigin, landingOrigin);
 	if (GetType(client) != JumpType_LadderJump)
 	{
@@ -440,177 +460,186 @@ float GetBlockEdge(int client)
 
 static void EndBlockDistance(int client)
 {
+	int jumpType;
+	float distance, takeoffOrigin[3], landingOrigin[3];
+	
 	blockDistance[client] = 0;
 	blockEdge[client] = 0.0;
 	blockDeviation[client] = 0.0;
 	
-	int jumpType = GetType(client);
-	if (jumpType == JumpType_LongJump || 
+	Movement_GetTakeoffOrigin(client, takeoffOrigin);
+	Movement_GetNobugLandingOrigin(client, landingOrigin);
+	
+	distance = GetDistance(client);
+	jumpType = GetType(client);
+	if ((jumpType == JumpType_LongJump || 
 		jumpType == JumpType_Bhop || 
 		jumpType == JumpType_MultiBhop || 
 		jumpType == JumpType_Ladderhop || 
 		jumpType == JumpType_WeirdJump)
+		&& distance >= JS_MIN_BLOCK_DISTANCE)
 	{
-		Handle trace;
-		int coordDist, coordDev;
-		float takeoffOrigin[3], landingOrigin[3], middle[3];
-		float startBlock[3], endBlock[3], sweepBoxMin[3], sweepBoxMax[3];
-		
-		// Not doing the calculations in the obvious cases.
-		if(GetDistance(client) < JS_MIN_BLOCK_DISTANCE)
-		{
-			return;
-		}
-		
-		Movement_GetTakeoffOrigin(client, takeoffOrigin);
-		Movement_GetNobugLandingOrigin(client, landingOrigin);
-		
-		// Get the orientation of the block.
-		coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
-		coordDev = !coordDist;
-		
-		// Get the deviation.
-		blockDeviation[client] = FloatAbs(landingOrigin[coordDev] - takeoffOrigin[coordDev]);
-		
-		// We can't make measurements from within an entity, so we assume the
-		// player had a remotely reasonable edge and that the middle of the jump
-		// is not over a block and then start measuring things out from there.
-		middle[coordDist] = (takeoffOrigin[coordDist] + landingOrigin[coordDist]) / 2;
-		middle[coordDev] = (takeoffOrigin[coordDev] + landingOrigin[coordDev]) / 2;
-		middle[2] = takeoffOrigin[2] - 1.0;
-		
-		// Setup a sweeping line that starts in the middle and tries to search for the smallest
-		// block within the deviation of the player.
-		sweepBoxMin[coordDist] = 0.0;
-		sweepBoxMin[coordDev] = -blockDeviation[client] - 16.0;
-		sweepBoxMin[2] = 0.0;
-		sweepBoxMax[coordDist] = 0.0;
-		sweepBoxMax[coordDev] = blockDeviation[client] + 16.0;
-		sweepBoxMax[2] = 0.0;
-		
-		// Modify the takeoff and landing origins to line up with the middle and respect
-		// the bounding box of the player.
-		if(takeoffOrigin[coordDist] > landingOrigin[coordDist])
-		{
-			takeoffOrigin[coordDist] += 16.0;
-			landingOrigin[coordDist] -= 16.0;
-		}
-		else
-		{
-			takeoffOrigin[coordDist] -= 16.0;
-			landingOrigin[coordDist] += 16.0;
-		}
-		takeoffOrigin[coordDev] = middle[coordDev];
-		landingOrigin[coordDev] = middle[coordDev];
-		takeoffOrigin[2] = middle[2];
-		landingOrigin[2] = middle[2];
-		
-		// Search for the starting block.
-		trace = TR_TraceHullEx(middle, takeoffOrigin, sweepBoxMin, sweepBoxMax, MASK_SOLID);
-		if(!TR_DidHit(trace))
-		{
-			CloseHandle(trace);
-			return;
-		}
-		TR_GetEndPosition(startBlock, trace);
-		CloseHandle(trace);
-		
-		// Search for the ending block.
-		trace = TR_TraceHullEx(middle, landingOrigin, sweepBoxMin, sweepBoxMax, MASK_SOLID);
-		if(!TR_DidHit(trace))
-		{
-			CloseHandle(trace);
-			return;
-		}
-		TR_GetEndPosition(endBlock, trace);
-		CloseHandle(trace);
-		
-		// Make sure the edges of the blocks are parallel.
-		if(!BlockAreEdgesParallel(startBlock, endBlock, blockDeviation[client] + 32.0, coordDist, coordDev))
-		{
-			return;
-		}
-		
-		// Calculate distance and edge.
-		blockDistance[client] = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
-		blockEdge[client] = FloatAbs(startBlock[coordDist] - takeoffOrigin[coordDist]);
-		
-		if(blockDistance[client] < JS_MIN_BLOCK_DISTANCE)
-		{
-			blockDistance[client] = 0;
-		}
+		CalcBlockStats(client, takeoffOrigin, landingOrigin);
 	}
-	else if (jumpType == JumpType_LadderJump)
+	else if(jumpType == JumpType_LadderJump && distance >= JS_MIN_LAJ_BLOCK_DISTANCE)
 	{
-		Handle trace;
-		int coordDist, coordDev, distSign;
-		float takeoffOrigin[3], landingOrigin[3];
-		float sweepBoxMin[3], sweepBoxMax[3], blockPosition[3], traceEnd[3], ladderPosition[3];
-		
-		// Not doing the calculations in the obvious cases.
-		if(GetDistance(client) < JS_MIN_LAJ_BLOCK_DISTANCE)
-		{
-			return;
-		}
-		
-		Movement_GetTakeoffOrigin(client, takeoffOrigin);
-		Movement_GetNobugLandingOrigin(client, landingOrigin);
-		
-		// Get the orientation of the block.
-		coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
-		coordDev = !coordDist;
-		distSign = landingOrigin[coordDist] > takeoffOrigin[coordDist] ? 1 : -1;
-		
-		// Get the deviation.
-		blockDeviation[client] = FloatAbs(landingOrigin[coordDev] - takeoffOrigin[coordDev]);
-		
-		// Make sure we don't collide with the player model.
-		takeoffOrigin[2] -= 5.0;
-		landingOrigin[2] = takeoffOrigin[2];
-		
-		// Setup a line to search for the ladder.
-		sweepBoxMin[coordDist] = 0.0;
-		sweepBoxMin[coordDev] = -20.0;
-		sweepBoxMin[2] = 0.0;
-		sweepBoxMax[coordDist] = 0.0;
-		sweepBoxMax[coordDev] = 20.0;
-		sweepBoxMax[2] = 0.0;
-		traceEnd[coordDist] = takeoffOrigin[coordDist] + distSign * JS_MIN_LAJ_BLOCK_DISTANCE;
-		traceEnd[coordDev] = takeoffOrigin[coordDev];
-		traceEnd[2] = takeoffOrigin[2];
-		
-		// Should serve as a very primitive check to make sure that
-		// non-aligned ladders can't be abused.
-		takeoffOrigin[coordDist] += distSign * 15.9;
-		
-		// Search for the ladder.
-		trace = TR_TraceHullEx(takeoffOrigin, traceEnd, sweepBoxMin, sweepBoxMax, MASK_ALL);
-		if(!TR_DidHit(trace))
-		{
-			CloseHandle(trace);
-			return;
-		}
-		TR_GetEndPosition(ladderPosition, trace);
-		CloseHandle(trace);
-		
-		// This should indicate a malaligned ladder.
-		if(FloatAbs(ladderPosition[coordDist] - takeoffOrigin[coordDist]) < EPSILON)
-		{
-			return;
-		}
+		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin);
+	}
+}
 
-		// Find the block.
-		landingOrigin[coordDist] += distSign * 16.0;
-		
-		if(!BlockTraceAlignedPos(traceEnd, landingOrigin, blockPosition, coordDist))
-		{
-			return;
-		}
-		
-		// Calculate distance and edge.
-		blockDistance[client] = RoundFloat(FloatAbs(blockPosition[coordDist] - ladderPosition[coordDist]));
-		blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]) - 0.1;
+static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrigin[3])
+{
+	Handle trace;
+	int coordDist, coordDev;
+	float middle[3], startBlock[3], endBlock[3], sweepBoxMin[3], sweepBoxMax[3];
+	
+	// Get the orientation of the block.
+	coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
+	coordDev = !coordDist;
+	
+	// We can't make measurements from within an entity, so we assume the
+	// player had a remotely reasonable edge and that the middle of the jump
+	// is not over a block and then start measuring things out from there.
+	middle[coordDist] = (takeoffOrigin[coordDist] + landingOrigin[coordDist]) / 2;
+	middle[coordDev] = (takeoffOrigin[coordDev] + landingOrigin[coordDev]) / 2;
+	middle[2] = takeoffOrigin[2] - 1.0;
+	
+	// Get the deviation.
+	blockDeviation[client] = FloatAbs(landingOrigin[coordDev] - takeoffOrigin[coordDev]);
+	
+	// Setup a sweeping line that starts in the middle and tries to search for the smallest
+	// block within the deviation of the player.
+	sweepBoxMin[coordDist] = 0.0;
+	sweepBoxMin[coordDev] = -blockDeviation[client] - 16.0;
+	sweepBoxMin[2] = 0.0;
+	sweepBoxMax[coordDist] = 0.0;
+	sweepBoxMax[coordDev] = blockDeviation[client] + 16.0;
+	sweepBoxMax[2] = 0.0;
+	
+	// Modify the takeoff and landing origins to line up with the middle and respect
+	// the bounding box of the player.
+	if(takeoffOrigin[coordDist] > landingOrigin[coordDist])
+	{
+		takeoffOrigin[coordDist] += 16.0;
+		landingOrigin[coordDist] -= 16.0;
 	}
+	else
+	{
+		takeoffOrigin[coordDist] -= 16.0;
+		landingOrigin[coordDist] += 16.0;
+	}
+	takeoffOrigin[coordDev] = middle[coordDev];
+	landingOrigin[coordDev] = middle[coordDev];
+	takeoffOrigin[2] = middle[2];
+	landingOrigin[2] = middle[2];
+	
+	// Search for the starting block.
+	trace = TR_TraceHullFilterEx(middle, takeoffOrigin, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	if(!TR_DidHit(trace))
+	{
+		CloseHandle(trace);
+		return;
+	}
+	TR_GetEndPosition(startBlock, trace);
+	CloseHandle(trace);
+	
+	// Search for the ending block.
+	trace = TR_TraceHullFilterEx(middle, landingOrigin, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	if(!TR_DidHit(trace))
+	{
+		CloseHandle(trace);
+		return;
+	}
+	TR_GetEndPosition(endBlock, trace);
+	CloseHandle(trace);
+	
+	// Make sure the edges of the blocks are parallel.
+	if(!BlockAreEdgesParallel(startBlock, endBlock, blockDeviation[client] + 32.0, coordDist, coordDev))
+	{
+		return;
+	}
+	
+	// Calculate distance and edge.
+	blockDistance[client] = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
+	blockEdge[client] = FloatAbs(startBlock[coordDist] - takeoffOrigin[coordDist]);
+	
+	if(blockDistance[client] < JS_MIN_BLOCK_DISTANCE)
+	{
+		blockDistance[client] = 0;
+	}
+}
+
+static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landingOrigin[3])
+{
+	Handle trace;
+	int coordDist, coordDev, distSign;
+	float sweepBoxMin[3], sweepBoxMax[3], blockPosition[3], traceEnd[3], ladderPosition[3], normalVector[3];
+	
+	// Get the orientation of the block.
+	coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
+	coordDev = !coordDist;
+	distSign = landingOrigin[coordDist] > takeoffOrigin[coordDist] ? 1 : -1;
+	
+	// Get the deviation.
+	blockDeviation[client] = FloatAbs(landingOrigin[coordDev] - takeoffOrigin[coordDev]);
+	
+	// Make sure we'll find the block and ladder.
+	landingOrigin[2] -= 5.0;
+	takeoffOrigin[2] = landingOrigin[2];
+	
+	// Setup a line to search for the ladder.
+	sweepBoxMin[coordDist] = 0.0;
+	sweepBoxMin[coordDev] = -20.0;
+	sweepBoxMin[2] = 0.0;
+	sweepBoxMax[coordDist] = 0.0;
+	sweepBoxMax[coordDev] = 20.0;
+	sweepBoxMax[2] = 0.0;
+	traceEnd[coordDist] = takeoffOrigin[coordDist] + distSign * JS_MIN_LAJ_BLOCK_DISTANCE;
+	traceEnd[coordDev] = takeoffOrigin[coordDev];
+	traceEnd[2] = takeoffOrigin[2];
+	
+	// Should serve as a very primitive check to make sure that
+	// non-aligned ladders can't be abused.
+	takeoffOrigin[coordDist] += distSign * 15.9;
+	
+	// Search for the ladder.
+	trace = TR_TraceHullFilterEx(takeoffOrigin, traceEnd, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	if(!TR_DidHit(trace))
+	{
+		CloseHandle(trace);
+		return;
+	}
+	TR_GetEndPosition(ladderPosition, trace);
+	CloseHandle(trace);
+	
+	// This should indicate a malaligned ladder.
+	if(FloatAbs(ladderPosition[coordDist] - takeoffOrigin[coordDist]) < EPSILON)
+	{
+		return;
+	}
+
+	// Find the block.
+	landingOrigin[coordDist] += distSign * 16.0;
+	trace = TR_TraceRayFilterEx(traceEnd, landingOrigin, MASK_SOLID, RayType_EndPoint, TraceEntityFilterPlayers);
+	if(!TR_DidHit(trace))
+	{
+		CloseHandle(trace);
+		return;
+	}
+	TR_GetEndPosition(blockPosition, trace);
+	
+	// Make sure the block is aligned.
+	TR_GetPlaneNormal(trace, normalVector);
+	if(FloatAbs(FloatAbs(normalVector[coordDist]) - EPSILON) == 1.0)
+	{
+		CloseHandle(trace);
+		return;
+	}
+	CloseHandle(trace);
+	
+	// Calculate distance and edge.
+	blockDistance[client] = RoundFloat(FloatAbs(blockPosition[coordDist] - ladderPosition[coordDist]));
+	blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]) - 0.1;
 }
 
 static bool BlockAreEdgesParallel(const float startBlock[3], const float endBlock[3], float deviation, int coordDist, int coordDev)
@@ -621,6 +650,8 @@ static bool BlockAreEdgesParallel(const float startBlock[3], const float endBloc
 	// their normals to determine whether they're parallel or not.
 	offset = startBlock[coordDist] > endBlock[coordDist] ? 0.1 : -0.1;
 	
+	// We search for the blocks on both sides of the player, on one of the sides
+	// there has to be a valid block.
 	start[coordDist] = startBlock[coordDist] - offset;
 	start[coordDev] = startBlock[coordDev] - deviation;
 	start[2] = startBlock[2];
@@ -660,7 +691,7 @@ static bool BlockAreEdgesParallel(const float startBlock[3], const float endBloc
 static bool BlockTraceAligned(const float origin[3], const float end[3], int coordDist)
 {
 	float normalVector[3];
-	Handle trace = TR_TraceRayEx(origin, end, MASK_SOLID, RayType_EndPoint);
+	Handle trace = TR_TraceRayFilterEx(origin, end, MASK_SOLID, RayType_EndPoint, TraceEntityFilterPlayers);
 	if(!TR_DidHit(trace))
 	{
 		return false;
@@ -670,24 +701,6 @@ static bool BlockTraceAligned(const float origin[3], const float end[3], int coo
 	{
 		return false;
 	}
-	CloseHandle(trace);
-	return true;
-}
-
-static bool BlockTraceAlignedPos(const float origin[3], const float end[3], float positionVector[3], int coordDist)
-{
-	float normalVector[3];
-	Handle trace = TR_TraceRayEx(origin, end, MASK_SOLID, RayType_EndPoint);
-	if(!TR_DidHit(trace))
-	{
-		return false;
-	}
-	TR_GetPlaneNormal(trace, normalVector);
-	if(FloatAbs(FloatAbs(normalVector[coordDist]) - EPSILON) == 1.0)
-	{
-		return false;
-	}
-	TR_GetEndPosition(positionVector, trace);
 	CloseHandle(trace);
 	return true;
 }
@@ -696,6 +709,10 @@ static bool BlockTraceAlignedPos(const float origin[3], const float end[3], floa
 
 // =====[ FAILSTATS ]=====
 static float failstatDistance[MAXPLAYERS + 1];
+static float failstatLastPos[MAXPLAYERS + 1][3];
+static float failstatLastVel[MAXPLAYERS + 1][3];
+static int failstatLastType[MAXPLAYERS + 1];
+static float failstatBlockHeight[MAXPLAYERS + 1];
 
 float GetFailstat(int client)
 {
@@ -704,99 +721,137 @@ float GetFailstat(int client)
 
 static void BeginFailstat(int client)
 {
-	failstatDistance[client] = -1.0;
+	Movement_GetTakeoffOrigin(client, failstatLastPos[client]);
+	failstatDistance[client] = -2.0;
+	failstatLastType[client] = GetTypeCurrent(client);
+	failstatBlockHeight[client] = failstatLastPos[client][2];
 }
 
 static void UpdateFailstat(int client)
 {
-	int jumpType = GetTypeCurrent(client);
-	if (jumpType == JumpType_LongJump || 
-		jumpType == JumpType_Bhop || 
-		jumpType == JumpType_MultiBhop || 
-		jumpType == JumpType_Ladderhop || 
-		jumpType == JumpType_WeirdJump)
-	{
-		Handle trace;
-		int coordDist, coordDev;
-		float takeoffOrigin[3], landingOrigin[3], middle[3];
-		float startBlock[3], endBlock[3], sweepBoxMin[3], sweepBoxMax[3];
+	int coordDist, distSign;
+	float takeoffOrigin[3], landingOrigin[3];
 	
-		Movement_GetTakeoffOrigin(client, takeoffOrigin);
-		Movement_GetOrigin(client, middle);
+	Movement_GetTakeoffOrigin(client, takeoffOrigin);
+	Movement_GetOrigin(client, landingOrigin);
+	
+	// For ladderjumps we have to find the landing block early so we know at which point the jump failed.
+	// For this, we search for the block at the highest point of the jump, assuming the player already
+	// traveled a significant enough distance in the direction of the block at this time.
+	if(failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] < -1.0 && landingOrigin[2] < failstatLastPos[client][2])
+	{
+		float traceStart[3], traceEnd[3];
 		
-		// Only do that calculation once.
-		if (middle[2] >= takeoffOrigin[2] || failstatDistance[client] >= 0.0)
-		{
-			return;
-		}
-		failstatDistance[client] = 0.0;
-		middle[2] -= 1.0;
+		// Mark the height calculations as done.
+		failstatDistance[client] = -1.0;
 		
-		// Get the orientation of the block.
-		coordDist = FloatAbs(middle[0] - takeoffOrigin[0]) < FloatAbs(middle[1] - takeoffOrigin[1]);
-		coordDev = !coordDist;
-			
-		// Get the deviation.
-		blockDeviation[client] = FloatAbs(middle[coordDev] - takeoffOrigin[coordDev]);
+		// Get the coordinate system orientation.
+		coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
+		distSign = landingOrigin[coordDist] > takeoffOrigin[coordDist] ? 1 : -1;
 		
-		// Setup a sweeping line that starts in the middle and tries to search for the smallest
-		// block within the deviation of the player.
-		sweepBoxMin[coordDist] = 0.0;
-		sweepBoxMin[coordDev] = -blockDeviation[client] - 16.0;
-		sweepBoxMin[2] = 0.0;
-		sweepBoxMax[coordDist] = 0.0;
-		sweepBoxMax[coordDev] = blockDeviation[client] + 16.0;
-		sweepBoxMax[2] = 0.0;
+		// Setup the trace.
+		CopyVector(takeoffOrigin, traceStart);
+		traceStart[coordDist] += distSign * JS_MAX_LAJ_FAILSTAT_DISTANCE;
+		CopyVector(traceStart, traceEnd);
+		traceStart[2] += 20.0;
+		traceEnd[2] -= 20.0;
+		takeoffOrigin[coordDist] += distSign * JS_MIN_LAJ_BLOCK_DISTANCE;
 		
-		// Modify the takeoff origin to line up with the middle and respect
-		// the bounding box of the player.
-		takeoffOrigin[coordDist] += takeoffOrigin[coordDist] > middle[coordDist] ? 16.0 : -16.0;
-		takeoffOrigin[coordDev] = middle[coordDev];
-		takeoffOrigin[2] = middle[2];
-		
-		// Search for the starting block.
-		trace = TR_TraceHullEx(middle, takeoffOrigin, sweepBoxMin, sweepBoxMax, MASK_SOLID);
+		// Find the block height.
+		Handle trace = TR_TraceRayEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint);
 		if(!TR_DidHit(trace))
 		{
+			// Mark the calculation as failed.
+			failstatDistance[client] = 0.0;
 			CloseHandle(trace);
 			return;
 		}
-		TR_GetEndPosition(startBlock, trace);
+		TR_GetEndPosition(landingOrigin, trace);
 		CloseHandle(trace);
+		failstatBlockHeight[client] = landingOrigin[2];
 		
-		// Construct the maximum landing origin, assuming the player reached
-		// at least the middle of the gap.
-		landingOrigin[coordDist] = 2 * middle[coordDist] - takeoffOrigin[coordDist];
-		landingOrigin[coordDev] = middle[coordDev];
-		landingOrigin[2] = middle[2];
+		// Calculate offset.
+		SetOffset(client, landingOrigin[2] - takeoffOrigin[2]);
+	}
+	
+	// Only do that calculation once.
+	if (landingOrigin[2] >= failstatBlockHeight[client] || failstatDistance[client] >= 0.0)
+	{
+		Movement_GetVelocity(client, failstatLastVel[client]);
+		CopyVector(landingOrigin, failstatLastPos[client]);
+		failstatLastType[client] = GetTypeCurrent(client);
+		return;
+	}
+	
+	// Mark the calculation as done.
+	failstatDistance[client] = 0.0;
+	
+	// Calculate the true origin where the player would have hit the ground.
+	FailstatGetFailOrigin(client, takeoffOrigin[2], landingOrigin);
+	
+	// Get the orientation of the coordinate system.
+	coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
+	
+	// Calculate the jump distance.
+	failstatDistance[client] = FloatAbs(landingOrigin[coordDist] - takeoffOrigin[coordDist]);
+	
+	// Construct the maximum landing origin, assuming the player reached
+	// at least the middle of the gap.
+	landingOrigin[coordDist] = 2 * landingOrigin[coordDist] - takeoffOrigin[coordDist];
+	
+	if ((failstatLastType[client] == JumpType_LongJump || 
+		failstatLastType[client] == JumpType_Bhop || 
+		failstatLastType[client] == JumpType_MultiBhop || 
+		failstatLastType[client] == JumpType_Ladderhop || 
+		failstatLastType[client] == JumpType_WeirdJump)
+		&& failstatDistance[client] >= JS_MIN_BLOCK_DISTANCE)
+	{
+		// Add the player model to the distance.
+		failstatDistance[client] += 32.0;
 		
-		// Search for the ending block.
-		trace = TR_TraceHullEx(middle, landingOrigin, sweepBoxMin, sweepBoxMax, MASK_SOLID);
-		if(!TR_DidHit(trace))
-		{
-			CloseHandle(trace);
-			return;
-		}
-		TR_GetEndPosition(endBlock, trace);
-		CloseHandle(trace);
-		
-		// Make sure the edges of the blocks are parallel.
-		if(!BlockAreEdgesParallel(startBlock, endBlock, blockDeviation[client] + 32.0, coordDist, coordDev))
-		{
-			return;
-		}
-		
-		// Calculate distance and edge.
-		blockDistance[client] = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
-		blockEdge[client] = FloatAbs(startBlock[coordDist] - takeoffOrigin[coordDist]);
-		failstatDistance[client] = FloatAbs(middle[coordDist] - takeoffOrigin[coordDist]) + 16.0;
+		CalcBlockStats(client, takeoffOrigin, landingOrigin);
+	}
+	else if(failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] >= JS_MIN_LAJ_BLOCK_DISTANCE)
+	{
+		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin);
+	}
+	else
+	{
+		return;
+	}
+	
+	if(GetBlockDistance(client) > 0)
+	{
+		// Temporarily validate the jump.
+		int currentType = GetTypeCurrent(client);
+		SetTypeCurrent(client, failstatLastType[client]);
 		
 		// Call the callback for the reporting.
 		Call_OnFailstat(client, GetTypeCurrent(client), GetFailstat(client), GetHeightCurrent(client),
 			GOKZ_GetTakeoffSpeed(client), GetMaxSpeedCurrent(client), GetStrafesCurrent(client), GetSyncCurrent(client),
 			GetDurationCurrent(client), GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client),
 			GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client));
+		
+		// Restore previous jump type so we don't mess with jump invalidation.
+		jumpTypeLast[client] = currentType;
+		jumpTypeCurrent[client] = currentType;
 	}
+}
+
+static void FailstatGetFailOrigin(int client, float planeHeight, float result[3])
+{
+	float newVel[3];
+	
+	// Calculate the actual velocity.
+	ScaleVector(failstatLastVel[client], GetTickInterval());
+	
+	// Calculate at which percentage of the velocity vector we hit the plane.
+	float scale = (planeHeight - failstatLastPos[client][2]) / failstatLastVel[client][2];
+	
+	// Calculate the position we hit the plane.
+	CopyVector(failstatLastVel[client], newVel);
+	ScaleVector(newVel, scale);
+	AddVectors(failstatLastPos[client], newVel, result);
 }
 
 
@@ -804,17 +859,30 @@ static void UpdateFailstat(int client)
 // =====[ OFFSET ]=====
 
 static float offsetLast[MAXPLAYERS + 1];
+static float offsetLastNobug[MAXPLAYERS + 1];
 
 float GetOffset(int client)
 {
 	return offsetLast[client];
 }
 
+float GetOffsetNobug(int client)
+{
+	return offsetLastNobug[client];
+}
+
+static void SetOffset(int client, float offset)
+{
+	offsetLast[client] = offset;
+}
+
 static void EndOffset(int client)
 {
-	float takeoffOrigin[3], landingOrigin[3];
+	float takeoffOrigin[3], landingOriginNobug[3], landingOrigin[3];
 	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	Movement_GetNobugLandingOrigin(client, landingOrigin);
+	Movement_GetLandingOrigin(client, landingOrigin);
+	Movement_GetNobugLandingOrigin(client, landingOriginNobug);
+	offsetLastNobug[client] = landingOriginNobug[2] - takeoffOrigin[2];
 	offsetLast[client] = landingOrigin[2] - takeoffOrigin[2];
 }
 

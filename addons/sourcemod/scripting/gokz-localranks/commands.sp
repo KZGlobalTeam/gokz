@@ -24,6 +24,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Display your ladderjump personal best.");
 	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Display your ladderhop personal best.");
 	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Display the top jumpstats on this server.");
+	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Display the top jumpstats on this server.");
 	
 	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
 }
