@@ -814,6 +814,9 @@ static void UpdateFailstat(int client)
 	else if(failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] >= JS_MIN_LAJ_BLOCK_DISTANCE)
 	{
 		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin);
+		
+		// The offset is more useful for ladder jumps than the edge.
+		blockEdge[client] = GetOffset(client);
 	}
 	else
 	{

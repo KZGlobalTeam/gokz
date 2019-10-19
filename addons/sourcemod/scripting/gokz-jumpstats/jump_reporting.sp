@@ -262,7 +262,7 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 		PrintToConsole(client, "%t", "Console Block Jump Report", 
 			gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 			block, "Block", 
-			edge, "Edge",
+			edge, jumpType == JumpType_LadderJump ? "Offset" : "Edge",
 			strafes, strafes == 1 ? "Strafe" : "Strafes", 
 			sync, "Sync", 
 			RoundToPowerOfTen(preSpeed, -2), "Pre", 
@@ -363,7 +363,7 @@ static void DoFailstatChatReport(int client, int jumper, int jumpType, int tier,
 			GetMaxSpeedString(client, maxSpeed), 
 			GetSyncString(client, sync),
 			GetWReleaseString(client, releaseW),
-			GetEdgeString(client, edge));
+			GetEdgeString(client, edge, jumpType));
 	}
 	else if (jumpType == JumpType_Bhop || 
 		jumpType == JumpType_MultiBhop || 
@@ -379,7 +379,7 @@ static void DoFailstatChatReport(int client, int jumper, int jumpType, int tier,
 			GetPreSpeedString(client, jumper, preSpeed), 
 			GetMaxSpeedString(client, maxSpeed), 
 			GetSyncString(client, sync),
-			GetEdgeString(client, edge));
+			GetEdgeString(client, edge, jumpType));
 	}
 }
 
@@ -450,13 +450,13 @@ static char[] GetWReleaseString(int client, int releaseW)
 	return releaseWString;
 }
 
-static char[] GetEdgeString(int client, float edge)
+static char[] GetEdgeString(int client, float edge, int jumpType)
 {
 	char edgeString[32];
 	FormatEx(edgeString, sizeof(edgeString), 
 		"{lime}%.2f{grey} %T", 
 		edge, 
-		"Edge", client);
+		jumpType == JumpType_LadderJump ? "Offset" : "Edge", client);
 	return edgeString;
 }
 
