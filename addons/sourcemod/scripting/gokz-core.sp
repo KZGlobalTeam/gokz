@@ -252,6 +252,11 @@ public void GOKZ_OnTeleportToStart_Post(int client)
 	OnTeleportToStart_Timer(client);
 }
 
+public void GOKZ_OnCountedTeleport_Post(int client)
+{
+	OnCountedTeleport_VirtualButtons(client);
+}
+
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	Option coreOption;

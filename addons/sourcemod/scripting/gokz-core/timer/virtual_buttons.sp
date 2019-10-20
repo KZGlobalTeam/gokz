@@ -5,6 +5,9 @@
 
 
 
+static float lastUsePressTime[MAXPLAYERS + 1];
+static bool hasEndedTimerSincePressingUse[MAXPLAYERS + 1];
+static bool hasTeleportedSincePressingUse[MAXPLAYERS + 1];
 static bool hasVirtualStartButton[MAXPLAYERS + 1];
 static bool hasVirtualEndButton[MAXPLAYERS + 1];
 static float virtualStartOrigin[MAXPLAYERS + 1][3];
@@ -60,6 +63,13 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 {
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
+		lastUsePressTime[client] = GetGameTime();
+		hasEndedTimerSincePressingUse[client] = false;
+		hasTeleportedSincePressingUse[client] = false;
+	}
+	
+	if (PassesUseCheck(client))
+	{
 		if (GetHasVirtualStartButton(client) && InRangeOfVirtualStart(client) && CanReachVirtualStart(client))
 		{
 			if (GOKZ_StartTimer(client, virtualStartCourse[client]))
@@ -69,14 +79,34 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 		}
 		else if (GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
 		{
-			GOKZ_EndTimer(client, virtualEndCourse[client]);
+			if (GOKZ_EndTimer(client, virtualEndCourse[client]))
+			{
+				hasEndedTimerSincePressingUse[client] = true;
+			}
 		}
 	}
+}
+
+void OnCountedTeleport_VirtualButtons(int client)
+{
+	hasTeleportedSincePressingUse[client] = true;
 }
 
 
 
 // =====[ PRIVATE ]=====
+
+static bool PassesUseCheck(int client)
+{
+	if (GetGameTime() - lastUsePressTime[client] < GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME + EPSILON
+		 && !hasEndedTimerSincePressingUse[client]
+		 && !hasTeleportedSincePressingUse[client])
+	{
+		return true;
+	}
+	
+	return false;
+}
 
 static bool InRangeOfVirtualStart(int client)
 {
