@@ -1,6 +1,6 @@
-static Handle H_OnTakeoff;
-static Handle H_OnLanding;
-static Handle H_OnJumpInvalidated;
+static GlobalForward H_OnTakeoff;
+static GlobalForward H_OnLanding;
+static GlobalForward H_OnJumpInvalidated;
 
 
 
@@ -8,9 +8,9 @@ static Handle H_OnJumpInvalidated;
 
 void CreateGlobalForwards()
 {
-	H_OnTakeoff = CreateGlobalForward("GOKZ_JS_OnTakeoff", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnLanding = CreateGlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float);
-	H_OnJumpInvalidated = CreateGlobalForward("GOKZ_JS_OnJumpInvalidated", ET_Ignore, Param_Cell);
+	H_OnTakeoff = new GlobalForward("GOKZ_JS_OnTakeoff", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnLanding = new GlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float);
+	H_OnJumpInvalidated = new GlobalForward("GOKZ_JS_OnJumpInvalidated", ET_Ignore, Param_Cell);
 }
 
 void Call_OnTakeoff(int client, int jumpType)

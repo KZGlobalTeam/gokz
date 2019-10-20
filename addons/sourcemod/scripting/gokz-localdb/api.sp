@@ -1,7 +1,7 @@
-static Handle H_OnDatabaseConnect;
-static Handle H_OnClientSetup;
-static Handle H_OnMapSetup;
-static Handle H_OnTimeInserted;
+static GlobalForward H_OnDatabaseConnect;
+static GlobalForward H_OnClientSetup;
+static GlobalForward H_OnMapSetup;
+static GlobalForward H_OnTimeInserted;
 
 
 
@@ -9,10 +9,10 @@ static Handle H_OnTimeInserted;
 
 void CreateGlobalForwards()
 {
-	H_OnDatabaseConnect = CreateGlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell);
-	H_OnClientSetup = CreateGlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
-	H_OnMapSetup = CreateGlobalForward("GOKZ_DB_OnMapSetup", ET_Ignore, Param_Cell);
-	H_OnTimeInserted = CreateGlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnDatabaseConnect = new GlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell);
+	H_OnClientSetup = new GlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+	H_OnMapSetup = new GlobalForward("GOKZ_DB_OnMapSetup", ET_Ignore, Param_Cell);
+	H_OnTimeInserted = new GlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
 
 void Call_OnDatabaseConnect()

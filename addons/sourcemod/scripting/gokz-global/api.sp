@@ -1,4 +1,4 @@
-static Handle H_OnNewTopTime;
+static GlobalForward H_OnNewTopTime;
 
 
 
@@ -6,7 +6,7 @@ static Handle H_OnNewTopTime;
 
 void CreateGlobalForwards()
 {
-	H_OnNewTopTime = CreateGlobalForward("GOKZ_GL_OnNewTopTime", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnNewTopTime = new GlobalForward("GOKZ_GL_OnNewTopTime", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
 
 void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall)

@@ -20,7 +20,7 @@ void AddToReplayInfoCache(int course, int mode, int style, int timeType)
 // Use this to sort the cache after finished adding to it
 void SortReplayInfoCache()
 {
-	SortADTArrayCustom(g_ReplayInfoCache, SortFunc_ReplayInfoCache);
+	g_ReplayInfoCache.SortCustom(SortFunc_ReplayInfoCache);
 }
 
 public int SortFunc_ReplayInfoCache(int index1, int index2, Handle array, Handle hndl)

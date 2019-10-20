@@ -376,11 +376,11 @@ static void HookEvents()
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
-	Handle gameData = LoadGameConfigFile("sdktools.games");
+	GameData gameData = new GameData("sdktools.games");
 	int offset;
 	
 	// Setup DHooks OnTeleport for players
-	offset = GameConfGetOffset(gameData, "Teleport");
+	offset = gameData.GetOffset("Teleport");
 	gH_DHooks_OnTeleport = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnTeleport);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_ObjectPtr);
