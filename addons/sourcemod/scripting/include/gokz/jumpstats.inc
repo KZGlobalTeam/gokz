@@ -45,7 +45,7 @@ enum
 	DISTANCETIER_COUNT
 };
 
-enum JSOption
+enum JSOption:
 {
 	JSOPTION_INVALID = -1, 
 	JSOption_JumpstatsMaster, 

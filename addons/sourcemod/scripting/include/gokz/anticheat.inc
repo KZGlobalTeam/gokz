@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum ACReason
+enum ACReason:
 {
 	ACReason_BhopMacro, 
 	ACReason_BhopHack

@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum HUDOption
+enum HUDOption:
 {
 	HUDOPTION_INVALID = -1, 
 	HUDOption_TPMenu, 

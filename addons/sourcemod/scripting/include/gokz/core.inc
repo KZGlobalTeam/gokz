@@ -32,7 +32,7 @@ enum
 	MAPPREFIX_COUNT
 };
 
-enum StartPositionType
+enum StartPositionType:
 {
 	StartPositionType_Spawn, 
 	StartPositionType_Custom, 
@@ -41,7 +41,7 @@ enum StartPositionType
 	STARTPOSITIONTYPE_COUNT
 };
 
-enum OptionProp
+enum OptionProp:
 {
 	OptionProp_Cookie = 0, 
 	OptionProp_Type, 
@@ -51,13 +51,13 @@ enum OptionProp
 	OPTIONPROP_COUNT
 };
 
-enum OptionType
+enum OptionType:
 {
 	OptionType_Int = 0, 
 	OptionType_Float
 };
 
-enum Option
+enum Option:
 {
 	OPTION_INVALID = -1, 
 	Option_Mode, 

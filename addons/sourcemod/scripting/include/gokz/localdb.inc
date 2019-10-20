@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum DatabaseType
+enum DatabaseType:
 {
 	DatabaseType_None = -1, 
 	DatabaseType_MySQL, 

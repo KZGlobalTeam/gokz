@@ -8,7 +8,7 @@ definitions:
     script:
       - apk update
       - apk add wget libc6-compat libstdc++
-      - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar x -vzf -
+      - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=${SM_VERSION}" | tar x -vzf -
       - cd ./addons/sourcemod/scripting
       - export BITBUCKET_COMMIT_SHORT=$(echo ${BITBUCKET_COMMIT} | cut -c1-7)
       - echo "#define GOKZ_VERSION \"${BITBUCKET_COMMIT_SHORT}\"" > include/gokz/version.inc
@@ -38,7 +38,7 @@ pipelines:
           script:
             - apk update
             - apk add wget libc6-compat libstdc++
-            - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=1.9" | tar x -vzf -
+            - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=${SM_VERSION}" | tar x -vzf -
             - cd ./addons/sourcemod/scripting
             - echo "#define GOKZ_VERSION \"${BITBUCKET_TAG}\"" > include/gokz/version.inc
             - for file in gokz-*.sp; do ./spcomp $file; done;
