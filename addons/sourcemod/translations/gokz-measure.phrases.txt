@@ -8,6 +8,13 @@
 		"en"		"{default}Distance{grey} - Horizontal: {default}{1}{grey} ({default}{2}{grey}), Vertical: {default}{3}{grey}"
 		"chi"		"{default}距离{grey} - 水平位移: {default}{1}{grey} ({default}{2}{grey}), 垂直位移: {default}{3}{grey}"
 	}
+	"Block Measure Result"
+	{
+		// Distance: 262.0
+		"#format"	"{1:d}"
+		"en"		"{default}Distance{grey}: {default}{1}{grey}"
+		"chi"		"{default}距离{grey}: {default}{1}{grey}"
+	}
 	"Measure Failure (Points Not Set)"
 	{
 		"en"		"{darkred}You must set both points to measure a distance."
@@ -17,6 +24,10 @@
 	{
 		"en"		"{darkred}You are not aiming at anything solid!"
 		"chi"		"{darkred}准星瞄准位置不是实体."
+	}
+	"Measure Failure (Blocks not aligned)"
+	{
+		"en"		"{darkred}You are not looking at an aligned block!"
 	}
 
 
@@ -40,5 +51,9 @@
 	{
 		"en"		"Get Distance"
 		"chi"		"获取两点间距离"
+	}
+	"Measure Menu - Measure Block"
+	{
+		"en"		"Measure Block"
 	}
 }
