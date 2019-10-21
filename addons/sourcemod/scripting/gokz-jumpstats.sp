@@ -140,9 +140,9 @@ public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float of
 	OnLanding_JumpReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
 }
 
-public void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+public void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
-	OnFailstat_FailstatReporting(client, jumpType, distance, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	OnFailstat_FailstatReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
 }
 
 public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost

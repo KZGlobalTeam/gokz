@@ -138,8 +138,8 @@ static void EndJumpstat(int client)
 	EndDuration(client);
 	
 	Call_OnLanding(client, GetType(client), GetDistance(client), GetOffset(client), GetHeight(client), 
-		GOKZ_GetTakeoffSpeed(client), GetMaxSpeed(client), GetStrafes(client), GetSync(client), GetDuration(client),
-		GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client),
+		GOKZ_GetTakeoffSpeed(client), GetMaxSpeed(client), GetStrafes(client), GetSync(client), GetDuration(client), 
+		GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client), 
 		GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client));
 }
 
@@ -355,10 +355,10 @@ int GetWRelease(int client)
 
 static void UpdateWRelease(int client)
 {
-	if(Movement_GetOnGround(client) || Movement_GetOnLadder(client))
+	if (Movement_GetOnGround(client) || Movement_GetOnLadder(client))
 	{
 		releaseWGroundTouched[client] = true;
-		if(Movement_GetButtons(client) & (IN_FORWARD | IN_BACK))
+		if (Movement_GetButtons(client) & (IN_FORWARD | IN_BACK))
 		{
 			releaseWCurrent[client] = 0;
 		}
@@ -369,13 +369,13 @@ static void UpdateWRelease(int client)
 	}
 	else
 	{
-		if(Movement_GetButtons(client) & (IN_FORWARD | IN_BACK))
+		if (Movement_GetButtons(client) & (IN_FORWARD | IN_BACK))
 		{
 			releaseWCurrent[client]++;
 		}
 		else
 		{
-			if(releaseWGroundTouched[client])
+			if (releaseWGroundTouched[client])
 			{
 				releaseWGroundTouched[client] = false;
 				releaseWLast[client] = releaseWCurrent[client];
@@ -413,7 +413,7 @@ static float CalcDistance(int client)
 {
 	float takeoffOrigin[3], landingOrigin[3], distance;
 	Movement_GetTakeoffOrigin(client, takeoffOrigin);
-	if(FloatAbs(GetOffsetNobug(client) - GetOffset(client)) < EPSILON)
+	if (FloatAbs(GetOffsetNobug(client) - GetOffset(client)) < EPSILON)
 	{
 		Movement_GetNobugLandingOrigin(client, landingOrigin);
 	}
@@ -473,15 +473,15 @@ static void EndBlockDistance(int client)
 	distance = GetDistance(client);
 	jumpType = GetType(client);
 	if ((jumpType == JumpType_LongJump || 
-		jumpType == JumpType_Bhop || 
-		jumpType == JumpType_MultiBhop || 
-		jumpType == JumpType_Ladderhop || 
-		jumpType == JumpType_WeirdJump)
-		&& distance >= JS_MIN_BLOCK_DISTANCE)
+			jumpType == JumpType_Bhop || 
+			jumpType == JumpType_MultiBhop || 
+			jumpType == JumpType_Ladderhop || 
+			jumpType == JumpType_WeirdJump)
+		 && distance >= JS_MIN_BLOCK_DISTANCE)
 	{
 		CalcBlockStats(client, takeoffOrigin, landingOrigin);
 	}
-	else if(jumpType == JumpType_LadderJump && distance >= JS_MIN_LAJ_BLOCK_DISTANCE)
+	else if (jumpType == JumpType_LadderJump && distance >= JS_MIN_LAJ_BLOCK_DISTANCE)
 	{
 		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin);
 	}
@@ -518,7 +518,7 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	
 	// Modify the takeoff and landing origins to line up with the middle and respect
 	// the bounding box of the player.
-	if(takeoffOrigin[coordDist] > landingOrigin[coordDist])
+	if (takeoffOrigin[coordDist] > landingOrigin[coordDist])
 	{
 		takeoffOrigin[coordDist] += 16.0;
 		landingOrigin[coordDist] -= 16.0;
@@ -535,7 +535,7 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	
 	// Search for the starting block.
 	trace = TR_TraceHullFilterEx(middle, takeoffOrigin, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-	if(!TR_DidHit(trace))
+	if (!TR_DidHit(trace))
 	{
 		CloseHandle(trace);
 		return;
@@ -545,7 +545,7 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	
 	// Search for the ending block.
 	trace = TR_TraceHullFilterEx(middle, landingOrigin, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-	if(!TR_DidHit(trace))
+	if (!TR_DidHit(trace))
 	{
 		CloseHandle(trace);
 		return;
@@ -554,7 +554,7 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	CloseHandle(trace);
 	
 	// Make sure the edges of the blocks are parallel.
-	if(!BlockAreEdgesParallel(startBlock, endBlock, blockDeviation[client] + 32.0, coordDist, coordDev))
+	if (!BlockAreEdgesParallel(startBlock, endBlock, blockDeviation[client] + 32.0, coordDist, coordDev))
 	{
 		return;
 	}
@@ -563,7 +563,7 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	blockDistance[client] = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
 	blockEdge[client] = FloatAbs(startBlock[coordDist] - takeoffOrigin[coordDist]);
 	
-	if(blockDistance[client] < JS_MIN_BLOCK_DISTANCE)
+	if (blockDistance[client] < JS_MIN_BLOCK_DISTANCE)
 	{
 		blockDistance[client] = 0;
 	}
@@ -583,6 +583,13 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	// Get the deviation.
 	blockDeviation[client] = FloatAbs(landingOrigin[coordDev] - takeoffOrigin[coordDev]);
 	
+	// Make sure the ladder is aligned.
+	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", normalVector);
+	if (FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) > EPSILON)
+	{
+		return;
+	}
+	
 	// Make sure we'll find the block and ladder.
 	landingOrigin[2] -= 5.0;
 	takeoffOrigin[2] = landingOrigin[2];
@@ -598,13 +605,9 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	traceEnd[coordDev] = takeoffOrigin[coordDev];
 	traceEnd[2] = takeoffOrigin[2];
 	
-	// Should serve as a very primitive check to make sure that
-	// non-aligned ladders can't be abused.
-	takeoffOrigin[coordDist] += distSign * 15.9;
-	
 	// Search for the ladder.
 	trace = TR_TraceHullFilterEx(takeoffOrigin, traceEnd, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-	if(!TR_DidHit(trace))
+	if (!TR_DidHit(trace))
 	{
 		CloseHandle(trace);
 		return;
@@ -612,16 +615,10 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	TR_GetEndPosition(ladderPosition, trace);
 	CloseHandle(trace);
 	
-	// This should indicate a malaligned ladder.
-	if(FloatAbs(ladderPosition[coordDist] - takeoffOrigin[coordDist]) < EPSILON)
-	{
-		return;
-	}
-
 	// Find the block.
 	landingOrigin[coordDist] += distSign * 16.0;
 	trace = TR_TraceRayFilterEx(traceEnd, landingOrigin, MASK_SOLID, RayType_EndPoint, TraceEntityFilterPlayers);
-	if(!TR_DidHit(trace))
+	if (!TR_DidHit(trace))
 	{
 		CloseHandle(trace);
 		return;
@@ -630,7 +627,7 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	
 	// Make sure the block is aligned.
 	TR_GetPlaneNormal(trace, normalVector);
-	if(FloatAbs(FloatAbs(normalVector[coordDist]) - EPSILON) == 1.0)
+	if (FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) > EPSILON)
 	{
 		CloseHandle(trace);
 		return;
@@ -639,7 +636,7 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	
 	// Calculate distance and edge.
 	blockDistance[client] = RoundFloat(FloatAbs(blockPosition[coordDist] - ladderPosition[coordDist]));
-	blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]) - 0.1;
+	blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]);
 }
 
 static bool BlockAreEdgesParallel(const float startBlock[3], const float endBlock[3], float deviation, int coordDist, int coordDev)
@@ -660,11 +657,11 @@ static bool BlockAreEdgesParallel(const float startBlock[3], const float endBloc
 	end[coordDev] = startBlock[coordDev] - deviation;
 	end[2] = startBlock[2];
 	
-	if(BlockTraceAligned(start, end, coordDist))
+	if (BlockTraceAligned(start, end, coordDist))
 	{
 		start[coordDist] = endBlock[coordDist] + offset;
 		end[coordDist] = endBlock[coordDist] - offset;
-		if(BlockTraceAligned(start, end, coordDist))
+		if (BlockTraceAligned(start, end, coordDist))
 		{
 			return true;
 		}
@@ -675,11 +672,11 @@ static bool BlockAreEdgesParallel(const float startBlock[3], const float endBloc
 	start[coordDev] = startBlock[coordDev] + deviation;
 	end[coordDev] = startBlock[coordDev] + deviation;
 	
-	if(BlockTraceAligned(start, end, coordDist))
+	if (BlockTraceAligned(start, end, coordDist))
 	{
 		start[coordDist] = endBlock[coordDist] + offset;
 		end[coordDist] = endBlock[coordDist] - offset;
-		if(BlockTraceAligned(start, end, coordDist))
+		if (BlockTraceAligned(start, end, coordDist))
 		{
 			return true;
 		}
@@ -692,12 +689,12 @@ static bool BlockTraceAligned(const float origin[3], const float end[3], int coo
 {
 	float normalVector[3];
 	Handle trace = TR_TraceRayFilterEx(origin, end, MASK_SOLID, RayType_EndPoint, TraceEntityFilterPlayers);
-	if(!TR_DidHit(trace))
+	if (!TR_DidHit(trace))
 	{
 		return false;
 	}
 	TR_GetPlaneNormal(trace, normalVector);
-	if(FloatAbs(FloatAbs(normalVector[coordDist]) - EPSILON) == 1.0)
+	if (FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) > EPSILON)
 	{
 		return false;
 	}
@@ -738,7 +735,7 @@ static void UpdateFailstat(int client)
 	// For ladderjumps we have to find the landing block early so we know at which point the jump failed.
 	// For this, we search for the block at the highest point of the jump, assuming the player already
 	// traveled a significant enough distance in the direction of the block at this time.
-	if(failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] < -1.0 && landingOrigin[2] < failstatLastPos[client][2])
+	if (failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] < -1.0 && landingOrigin[2] < failstatLastPos[client][2])
 	{
 		float traceStart[3], traceEnd[3];
 		
@@ -758,8 +755,8 @@ static void UpdateFailstat(int client)
 		takeoffOrigin[coordDist] += distSign * JS_MIN_LAJ_BLOCK_DISTANCE;
 		
 		// Find the block height.
-		Handle trace = TR_TraceRayEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint);
-		if(!TR_DidHit(trace))
+		Handle trace = TR_TraceRayFilterEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint, TraceEntityFilterPlayers);
+		if (!TR_DidHit(trace))
 		{
 			// Mark the calculation as failed.
 			failstatDistance[client] = 0.0;
@@ -793,46 +790,43 @@ static void UpdateFailstat(int client)
 	coordDist = FloatAbs(landingOrigin[0] - takeoffOrigin[0]) < FloatAbs(landingOrigin[1] - takeoffOrigin[1]);
 	
 	// Calculate the jump distance.
-	failstatDistance[client] = FloatAbs(landingOrigin[coordDist] - takeoffOrigin[coordDist]);
+	failstatDistance[client] = FloatAbs(GetVectorHorizontalDistance(landingOrigin, takeoffOrigin));
 	
 	// Construct the maximum landing origin, assuming the player reached
 	// at least the middle of the gap.
 	landingOrigin[coordDist] = 2 * landingOrigin[coordDist] - takeoffOrigin[coordDist];
 	
 	if ((failstatLastType[client] == JumpType_LongJump || 
-		failstatLastType[client] == JumpType_Bhop || 
-		failstatLastType[client] == JumpType_MultiBhop || 
-		failstatLastType[client] == JumpType_Ladderhop || 
-		failstatLastType[client] == JumpType_WeirdJump)
-		&& failstatDistance[client] >= JS_MIN_BLOCK_DISTANCE)
+			failstatLastType[client] == JumpType_Bhop || 
+			failstatLastType[client] == JumpType_MultiBhop || 
+			failstatLastType[client] == JumpType_Ladderhop || 
+			failstatLastType[client] == JumpType_WeirdJump)
+		 && failstatDistance[client] >= JS_MIN_BLOCK_DISTANCE)
 	{
 		// Add the player model to the distance.
 		failstatDistance[client] += 32.0;
 		
 		CalcBlockStats(client, takeoffOrigin, landingOrigin);
 	}
-	else if(failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] >= JS_MIN_LAJ_BLOCK_DISTANCE)
+	else if (failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] >= JS_MIN_LAJ_BLOCK_DISTANCE)
 	{
 		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin);
-		
-		// The offset is more useful for ladder jumps than the edge.
-		blockEdge[client] = GetOffset(client);
 	}
 	else
 	{
 		return;
 	}
 	
-	if(GetBlockDistance(client) > 0)
+	if (GetBlockDistance(client) > 0)
 	{
 		// Temporarily validate the jump.
 		int currentType = GetTypeCurrent(client);
 		SetTypeCurrent(client, failstatLastType[client]);
 		
 		// Call the callback for the reporting.
-		Call_OnFailstat(client, GetTypeCurrent(client), GetFailstat(client), GetHeightCurrent(client),
-			GOKZ_GetTakeoffSpeed(client), GetMaxSpeedCurrent(client), GetStrafesCurrent(client), GetSyncCurrent(client),
-			GetDurationCurrent(client), GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client),
+		Call_OnFailstat(client, GetTypeCurrent(client), GetFailstat(client), GetOffset(client), GetHeightCurrent(client), 
+			GOKZ_GetTakeoffSpeed(client), GetMaxSpeedCurrent(client), GetStrafesCurrent(client), GetSyncCurrent(client), 
+			GetDurationCurrent(client), GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client), 
 			GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client));
 		
 		// Restore previous jump type so we don't mess with jump invalidation.
@@ -887,6 +881,38 @@ static void EndOffset(int client)
 	Movement_GetNobugLandingOrigin(client, landingOriginNobug);
 	offsetLastNobug[client] = landingOriginNobug[2] - takeoffOrigin[2];
 	offsetLast[client] = landingOrigin[2] - takeoffOrigin[2];
+	if(GetType(client) == JumpType_LadderJump)
+	{
+		TraceLadderOffset(client, takeoffOrigin, landingOrigin);
+	}
+}
+
+static void TraceLadderOffset(int client, float takeoffOrigin[3], float landingOrigin[3])
+{
+	float traceOrigin[3], traceEnd[3], ladderTop[3], ladderNormal[3];
+	
+	// 10 units is the furthest away from the ladder surface you can get while still being on the ladder.
+	float mins[3] = { -16.0, -16.0, 0.0 };
+	float maxs[3] = { 16.0, 16.0, 0.0 };
+	
+	// Get normal vector of the ladder.
+	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
+	
+	traceOrigin[0] = takeoffOrigin[0] - 10.0 * ladderNormal[0];
+	traceOrigin[1] = takeoffOrigin[1] - 10.0 * ladderNormal[1];
+	traceOrigin[2] = takeoffOrigin[2] + 400.0 * GetTickInterval(); // ~400 ups is the fastest vertical speed on ladders
+	
+	CopyVector(traceOrigin, traceEnd);
+	traceEnd[2] = takeoffOrigin[2] - 400.0 * GetTickInterval();
+	
+	Handle trace = TR_TraceHullFilterEx(traceOrigin, traceEnd, mins, maxs, CONTENTS_LADDER, TraceEntityFilterPlayers);
+	
+	TR_GetEndPosition(ladderTop, trace);
+	if(!TR_DidHit(trace) || FloatAbs(ladderTop[2] - landingOrigin[2]) > EPSILON + 0.031250)
+	{
+		InvalidateJumpstat(client);
+	}
+	CloseHandle(trace);
 }
 
 

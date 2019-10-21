@@ -246,6 +246,7 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
  * @param client		Client index.
  * @param jumpType		Type of jump they landed.
  * @param distance		Horizontal distance of the jump.
+ * @param offset		Vertical distance of the jump.
  * @param height		Max height of the player relative to their takeoff origin.
  * @param preSpeed		Takeoff speed.
  * @param maxSpeed		Max horizontal speed reached.
@@ -260,7 +261,7 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
  * @param edge          Distance from the edge of the jumpoff block to the player jumpoff position.
  * @param releaseW      Tick relative to the jumpoff that the forward key was released.
  */
-forward void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW);
+forward void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW);
 
 
 
