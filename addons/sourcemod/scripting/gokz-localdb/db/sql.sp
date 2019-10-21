@@ -185,6 +185,11 @@ CREATE TABLE IF NOT EXISTS Jumpstats ( \
     Distance INTEGER NOT NULL, \
     IsBlockJump INTEGER NOT NULL, \
     Block INTEGER NOT NULL, \
+    Strafes INTEGER NOT NULL, \
+    Sync INTEGER NOT NULL, \
+    Pre INTEGER NOT NULL, \
+    Max INTEGER NOT NULL, \
+    Airtime INTEGER NOT NULL, \
     Created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP, \
     CONSTRAINT PK_Jumpstats PRIMARY KEY (JumpID), \
     CONSTRAINT FK_Jumpstats_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) \
@@ -199,14 +204,19 @@ CREATE TABLE IF NOT EXISTS Jumpstats ( \
     Distance INTEGER UNSIGNED NOT NULL, \
     IsBlockJump TINYINT UNSIGNED NOT NULL, \
     Block SMALLINT UNSIGNED NOT NULL, \
+    Strafes INTEGER UNSIGNED NOT NULL, \
+    Sync INTEGER UNSIGNED NOT NULL, \
+    Pre INTEGER UNSIGNED NOT NULL, \
+    Max INTEGER UNSIGNED NOT NULL, \
+    Airtime INTEGER UNSIGNED NOT NULL, \
     Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, \
     CONSTRAINT PK_Jumpstats PRIMARY KEY (JumpID), \
     CONSTRAINT FK_Jumpstats_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) \
     ON UPDATE CASCADE ON DELETE CASCADE)";
 
 char sql_jumpstats_insert[] = "\
-INSERT INTO Jumpstats (SteamID32, JumpType, Mode, Distance, IsBlockJump, Block) \
-    VALUES (%d, %d, %d, %d, %d, %d)";
+INSERT INTO Jumpstats (SteamID32, JumpType, Mode, Distance, IsBlockJump, Block, Strafes, Sync, Pre, Max, Airtime) \
+    VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)";
 
 char sql_jumpstats_update[] = "\
 UPDATE Jumpstats \
@@ -216,16 +226,41 @@ UPDATE Jumpstats \
         Mode = %d, \
         Distance = %d, \
         IsBlockJump = %d, \
-        Block = %d \
+        Block = %d, \
+        Strafes = %d, \
+        Sync = %d, \
+        Pre = %d, \
+        Max = %d, \
+        Airtime = %d \
     WHERE \
         JumpID = %d";
 
 char sql_jumpstats_getrecord[] = "\
-SELECT JumpID, Distance, Block \
+SELECT JumpID, Distance, Block, Strafes, Sync, Pre, Max, Airtime \
     FROM \
         Jumpstats \
     WHERE \
         SteamID32 = %d AND \
         JumpType = %d AND \
         Mode = %d AND \
-        IsBlockJump = %d";
+        IsBlockJump = %d \
+    ORDER BY Block DESC, Distance DESC";
+
+char sql_jumpstats_deleterecord[] = "\
+DELETE \
+    FROM \
+        Jumpstats \
+    WHERE \
+        JumpID = \
+        ( \
+            SELECT JumpID \
+                FROM \
+                    Jumpstats \
+                WHERE \
+                    SteamID32 = %d AND \
+                    JumpType = %d AND \
+                    Mode = %d AND \
+                    IsBlockJump = %d \
+                ORDER BY Block DESC, Distance DESC \
+                LIMIT 1 \
+        )";

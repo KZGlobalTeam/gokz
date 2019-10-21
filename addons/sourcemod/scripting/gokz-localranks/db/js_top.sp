@@ -10,7 +10,7 @@ void DB_GetJumpTop(int client)
 	char query[1024];
 	
 	Transaction txn = SQL_CreateTransaction();
-	FormatEx(query, sizeof(query), sql_jumpstats_gettop, jumpTopType[client], jumpTopMode[client], jumpTopBlockType[client], JS_TOP_RECORD_COUNT);
+	FormatEx(query, sizeof(query), sql_jumpstats_gettop, jumpTopType[client], jumpTopMode[client], jumpTopBlockType[client], jumpTopType[client], jumpTopMode[client], jumpTopBlockType[client], JS_TOP_RECORD_COUNT);
 	txn.AddQuery(query);
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_GetJumpTop, DB_TxnFailure_Generic, client, DBPrio_Low);
 }
@@ -29,37 +29,70 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 		return;
 	}
 	
-	char display[128], alias[33];
-	int distance;
+	char display[128], alias[33], title[65];
+	int block, strafes;
+	float distance, sync, pre, max, airtime;
 	
 	Menu menu = new Menu(MenuHandler_JumpTopList);
 	menu.Pagination = 5;
 	
 	if(jumpTopBlockType[client] == 0)
 	{
+		FormatEx(title, sizeof(title), "%s %s Top", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]]);
+		strcopy(display, sizeof(display), "----------------------------------------------------------------");
+		display[strlen(title)] = '\0';
+		
+		PrintToConsole(client, title);
+		PrintToConsole(client, display);
+		
 		for(int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
-			distance = SQL_FetchInt(results[0], JumpstatDB_Top20_Distance);
-			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, float(distance) / 10000, alias);
+			distance = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Distance)) / GOKZ_DB_JS_DISTANCE_PRECISION;
+			strafes = SQL_FetchInt(results[0], JumpstatDB_Top20_Strafes);
+			sync = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Sync)) / GOKZ_DB_JS_SYNC_PRECISION;
+			pre = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Pre)) / GOKZ_DB_JS_PRE_PRECISION;
+			max = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Max)) / GOKZ_DB_JS_MAX_PRECISION;
+			airtime = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Air)) / GOKZ_DB_JS_AIRTIME_PRECISION;
+			
+			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
+			
+			PrintToConsole(client, "#%-2d   %.4f   %s   [%d Strafes | %.2f%% Sync | %.2f Pre | %.2f Max | %.4f Air]",
+				i + 1, distance, alias, strafes, sync, pre, max, airtime);
 		}
 	}
 	else
 	{
-		int block;
+		FormatEx(title, sizeof(title), "%s Block %s Top", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]]);
+		strcopy(display, sizeof(display), "----------------------------------------------------------------");
+		display[strlen(title)] = '\0';
+		
+		PrintToConsole(client, title);
+		PrintToConsole(client, display);
+		
 		for(int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
 			block = SQL_FetchInt(results[0], JumpstatDB_Top20_Block);
-			distance = SQL_FetchInt(results[0], JumpstatDB_Top20_Distance);
-			FormatEx(display, sizeof(display), "#%-2d   %d Block (%.4f)   %s", i + 1, block, float(distance) / 10000, alias);
+			distance = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Distance)) / GOKZ_DB_JS_DISTANCE_PRECISION;
+			strafes = SQL_FetchInt(results[0], JumpstatDB_Top20_Strafes);
+			sync = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Sync)) / GOKZ_DB_JS_SYNC_PRECISION;
+			pre = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Pre)) / GOKZ_DB_JS_PRE_PRECISION;
+			max = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Max)) / GOKZ_DB_JS_MAX_PRECISION;
+			airtime = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Air)) / GOKZ_DB_JS_AIRTIME_PRECISION;
+			
+			FormatEx(display, sizeof(display), "#%-2d   %d Block (%.4f)   %s", i + 1, block, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
+			
+			PrintToConsole(client, "#%-2d   %d Block (%.4f)   %s   [%d Strafes | %.2f%% Sync | %.2f Pre | %.2f Max | %.4f Air]",
+				i + 1, block, distance, alias, strafes, sync, pre, max, airtime);
 		}
 	}
 	menu.Display(client, MENU_TIME_FOREVER);
+	PrintToConsole(client, "");
 }
 
 // =====[ MENUS ]=====
