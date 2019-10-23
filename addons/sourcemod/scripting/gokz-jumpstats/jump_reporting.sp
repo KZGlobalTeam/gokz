@@ -263,7 +263,7 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 		PrintToConsole(client, "%t", "Console Block Jump Report", 
 			gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 			block, "Block", 
-			edge, jumpType == JumpType_LadderJump ? "Offset" : "Edge",
+			edge, "Edge",
 			strafes, strafes == 1 ? "Strafe" : "Strafes", 
 			sync, "Sync", 
 			RoundToPowerOfTen(preSpeed, -2), "Pre", 
