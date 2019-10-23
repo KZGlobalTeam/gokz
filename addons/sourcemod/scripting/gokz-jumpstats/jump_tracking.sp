@@ -636,7 +636,7 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	
 	// Calculate distance and edge.
 	blockDistance[client] = RoundFloat(FloatAbs(blockPosition[coordDist] - ladderPosition[coordDist]));
-	blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]);
+	blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]) - 16.0;
 }
 
 static bool BlockAreEdgesParallel(const float startBlock[3], const float endBlock[3], float deviation, int coordDist, int coordDev)
