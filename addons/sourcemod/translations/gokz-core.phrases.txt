@@ -147,6 +147,14 @@
 		"en"		"{grey}Your timer will no longer restart upon teleporting to start buttons."
 		"chi"		"{grey}你的计时器直到传送到起点前不再重置."
 	}
+	"Locked Timer Tech Position"
+	{
+		"en" "{grey}Locked timer tech position"
+	}
+	"Unlocked Timer Tech Position"
+	{
+		"en" "{grey}Unlocked timer tech position"
+	}
 
 
 	// =====[ MODE MENU ]=====

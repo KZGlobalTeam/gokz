@@ -11,6 +11,7 @@ static float virtualStartOrigin[MAXPLAYERS + 1][3];
 static float virtualEndOrigin[MAXPLAYERS + 1][3];
 static int virtualStartCourse[MAXPLAYERS + 1];
 static int virtualEndCourse[MAXPLAYERS + 1];
+static bool virtualButtonsLocked[MAXPLAYERS + 1];
 
 
 
@@ -26,6 +27,16 @@ bool GetHasVirtualEndButton(int client)
 	return hasVirtualEndButton[client];
 }
 
+void LockVirtualButtons(int client)
+{
+	virtualButtonsLocked[client] = true;
+}
+
+void UnlockVirtualButtons(int client)
+{
+	virtualButtonsLocked[client] = false;
+}
+
 
 
 // =====[ EVENTS ]=====
@@ -34,13 +45,17 @@ void OnClientPutInServer_VirtualButtons(int client)
 {
 	hasVirtualEndButton[client] = false;
 	hasVirtualStartButton[client] = false;
+	virtualButtonsLocked[client] = false;
 }
 
 void OnStartButtonPress_VirtualButtons(int client, int course)
 {
-	Movement_GetOrigin(client, virtualStartOrigin[client]);
-	virtualStartCourse[client] = course;
-	hasVirtualStartButton[client] = true;
+	if(!virtualButtonsLocked[client])
+	{
+		Movement_GetOrigin(client, virtualStartOrigin[client]);
+		virtualStartCourse[client] = course;
+		hasVirtualStartButton[client] = true;
+	}
 }
 
 void OnEndButtonPress_VirtualButtons(int client, int course)
