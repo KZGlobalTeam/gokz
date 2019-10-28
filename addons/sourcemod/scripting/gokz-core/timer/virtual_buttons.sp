@@ -65,10 +65,13 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	{
 		return;
 	}
-	
-	Movement_GetOrigin(client, virtualEndOrigin[client]);
-	virtualEndCourse[client] = course;
-	hasVirtualEndButton[client] = true;
+
+	if(!virtualButtonsLocked[client])
+	{
+		Movement_GetOrigin(client, virtualEndOrigin[client]);
+		virtualEndCourse[client] = course;
+		hasVirtualEndButton[client] = true;
+	}
 }
 
 void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
