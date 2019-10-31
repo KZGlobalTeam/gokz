@@ -7,6 +7,12 @@
 
 
 
+static bool infoPanelDuckPressedLast[MAXPLAYERS + 1];
+static bool infoPanelOnGroundLast[MAXPLAYERS + 1];
+static bool infoPanelShowDuckString[MAXPLAYERS + 1];
+
+
+
 // =====[ PUBLIC ]=====
 
 bool IsDrawingInfoPanel(int client)
@@ -26,6 +32,8 @@ void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum)
 	{
 		UpdateInfoPanel(client);
 	}
+	infoPanelOnGroundLast[client] = Movement_GetOnGround(client);
+	infoPanelDuckPressedLast[client] = Movement_GetDucking(client);
 }
 
 
@@ -147,6 +155,7 @@ static char[] GetSpeedString(KZPlayer player, KZPlayer targetPlayer)
 				"%T: <font color='#ffffff'>%.0f</font> u/s\n", 
 				"Info Panel Text - Speed", player.ID, 
 				RoundToPowerOfTen(targetPlayer.Speed, -2));
+			infoPanelShowDuckString[targetPlayer.ID] = false;
 		}
 		else
 		{
@@ -162,18 +171,35 @@ static char[] GetSpeedString(KZPlayer player, KZPlayer targetPlayer)
 
 static char[] GetTakeoffString(KZPlayer targetPlayer)
 {
-	char takeoffString[64];
+	char takeoffString[96], duckString[32];
+	
+	// The last line disables the crouch indicator for bhops
+	if((infoPanelShowDuckString[targetPlayer.ID]
+		|| (infoPanelOnGroundLast[targetPlayer.ID] && infoPanelDuckPressedLast[targetPlayer.ID]))
+		&& Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS)
+	{
+		duckString = " <font color='#8080ff'>C</font>";
+		infoPanelShowDuckString[targetPlayer.ID] = true;
+	}
+	else
+	{
+		duckString = "";
+		infoPanelShowDuckString[targetPlayer.ID] = false;
+	}
+	
 	if (targetPlayer.GOKZHitPerf)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
-			"(<font color='#40ff40'>%.0f</font>)", 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
+			"(<font color='#40ff40'>%.0f</font>)%s", 
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2),
+			duckString);
 	}
 	else
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
-			"(<font color='#ffffff'>%.0f</font>)", 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
+			"(<font color='#ffffff'>%.0f</font>)%s", 
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2),
+			duckString);
 	}
 	return takeoffString;
 }
