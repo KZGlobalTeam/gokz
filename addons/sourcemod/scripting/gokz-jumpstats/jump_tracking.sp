@@ -945,6 +945,10 @@ static void BeginDuration(int client)
 static void EndDuration(int client)
 {
 	durationTicksLast[client] = durationTicksCurrent[client];
+	if(durationTicksLast[client] > 100)
+	{
+		InvalidateJumpstat(client);
+	}
 }
 
 static int GetDurationTicksCurrent(int client)
