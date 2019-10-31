@@ -35,10 +35,8 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
-	RegConsoleCmd("sm_locktimer", CommandLockTimerTech, "[KZ] Lock timer tech.");
-	RegConsoleCmd("sm_ltt", CommandLockTimerTech, "[KZ] Lock timer tech.");
-	RegConsoleCmd("sm_unlocktimer", CommandUnlockTimerTech, "[KZ] Unlock timer tech.");
-	RegConsoleCmd("sm_utt", CommandUnlockTimerTech, "[KZ] Unlock timer tech.");
+	RegConsoleCmd("sm_virtualbuttons", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
+	RegConsoleCmd("sm_vb", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
 }
 
 void AddCommandsListeners()
@@ -247,17 +245,16 @@ public Action CommandDisableNoclip(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action CommandLockTimerTech(int client, int args)
+public Action CommandToggleVirtualButtonsLock(int client, int args)
 {
-	LockVirtualButtons(client);
-	GOKZ_PrintToChat(client, true, "%t", "Locked Timer Tech Position");
-	return Plugin_Handled;
-}
-
-public Action CommandUnlockTimerTech(int client, int args)
-{
-	UnlockVirtualButtons(client);
-	GOKZ_PrintToChat(client, true, "%t", "Unlocked Timer Tech Position");
+	if (ToggleVirtualButtonsLock(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Locked Virtual Buttons");
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Unlocked Virtual Buttons");
+	}
 	return Plugin_Handled;
 }
 
@@ -275,4 +272,4 @@ static void SwitchToModeIfAvailable(int client, int mode)
 	{
 		GOKZ_SetCoreOption(client, Option_Mode, mode);
 	}
-} 
+}

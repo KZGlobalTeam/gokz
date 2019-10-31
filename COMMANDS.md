@@ -22,6 +22,7 @@
  * `!kztimer`/`!kzt`/`!k` - Switch to the KZTimer mode.
  * `!nc` - Toggle noclip.
  * `+noclip` - Noclip (bind a key to it).
+ * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
 
 ### gokz-hud
 

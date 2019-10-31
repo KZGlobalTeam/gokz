@@ -30,14 +30,10 @@ bool GetHasVirtualEndButton(int client)
 	return hasVirtualEndButton[client];
 }
 
-void LockVirtualButtons(int client)
+bool ToggleVirtualButtonsLock(int client)
 {
-	virtualButtonsLocked[client] = true;
-}
-
-void UnlockVirtualButtons(int client)
-{
-	virtualButtonsLocked[client] = false;
+	virtualButtonsLocked[client] = !virtualButtonsLocked[client];
+	return virtualButtonsLocked[client];
 }
 
 
@@ -53,7 +49,7 @@ void OnClientPutInServer_VirtualButtons(int client)
 
 void OnStartButtonPress_VirtualButtons(int client, int course)
 {
-	if(!virtualButtonsLocked[client])
+	if (!virtualButtonsLocked[client])
 	{
 		Movement_GetOrigin(client, virtualStartOrigin[client]);
 		virtualStartCourse[client] = course;
@@ -68,8 +64,8 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	{
 		return;
 	}
-
-	if(!virtualButtonsLocked[client])
+	
+	if (!virtualButtonsLocked[client])
 	{
 		Movement_GetOrigin(client, virtualEndOrigin[client]);
 		virtualEndCourse[client] = course;
@@ -168,4 +164,4 @@ static bool CanReachButton(int client, const float buttonOrigin[3])
 	bool didHit = TR_DidHit(trace);
 	delete trace;
 	return !didHit;
-} 
+}
