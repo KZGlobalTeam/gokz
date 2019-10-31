@@ -35,6 +35,10 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
+	RegConsoleCmd("sm_locktimer", CommandLockTimerTech, "[KZ] Lock timer tech.");
+	RegConsoleCmd("sm_ltt", CommandLockTimerTech, "[KZ] Lock timer tech.");
+	RegConsoleCmd("sm_unlocktimer", CommandUnlockTimerTech, "[KZ] Unlock timer tech.");
+	RegConsoleCmd("sm_utt", CommandUnlockTimerTech, "[KZ] Unlock timer tech.");
 }
 
 void AddCommandsListeners()
@@ -240,6 +244,20 @@ public Action CommandEnableNoclip(int client, int args)
 public Action CommandDisableNoclip(int client, int args)
 {
 	DisableNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandLockTimerTech(int client, int args)
+{
+	LockVirtualButtons(client);
+	GOKZ_PrintToChat(client, true, "%t", "Locked Timer Tech Position");
+	return Plugin_Handled;
+}
+
+public Action CommandUnlockTimerTech(int client, int args)
+{
+	UnlockVirtualButtons(client);
+	GOKZ_PrintToChat(client, true, "%t", "Unlocked Timer Tech Position");
 	return Plugin_Handled;
 }
 
