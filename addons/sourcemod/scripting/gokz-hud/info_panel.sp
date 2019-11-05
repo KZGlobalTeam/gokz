@@ -176,7 +176,8 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 	// The last line disables the crouch indicator for bhops
 	if((infoPanelShowDuckString[targetPlayer.ID]
 		|| (infoPanelOnGroundLast[targetPlayer.ID] && infoPanelDuckPressedLast[targetPlayer.ID]))
-		&& Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS)
+		&& Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
+		&& targetPlayer.Jumped)
 	{
 		duckString = " <font color='#8080ff'>C</font>";
 		infoPanelShowDuckString[targetPlayer.ID] = true;
