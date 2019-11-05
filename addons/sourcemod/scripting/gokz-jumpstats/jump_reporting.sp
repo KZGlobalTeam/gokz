@@ -207,7 +207,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 	PrintToConsole(client, "  #.  %12t%12t%12t%12t%12t%9t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)", "Width (Table)", "Overlap (Table)", "Dead Air (Table)");
 	if (GetStrafeAirtime(jumper, 0) > 0.001)
 	{
-		PrintToConsole(client, "  0.  ----        -----       -----       %3.0f%%        -----       --       --", GetStrafeAirtime(jumper, 0));
+		PrintToConsole(client, "  0.  ----      -----     -----     %3.0f%%      -----     --     --", GetStrafeAirtime(jumper, 0));
 	}
 	for (int strafe = 1; strafe <= strafes && strafe < JS_MAX_TRACKED_STRAFES; strafe++)
 	{
