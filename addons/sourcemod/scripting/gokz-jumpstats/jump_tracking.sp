@@ -422,6 +422,14 @@ static float CalcDistance(int client)
 		FailstatGetFailOrigin(client, takeoffOrigin[2], landingOrigin);
 	}
 	distance = GetVectorHorizontalDistance(takeoffOrigin, landingOrigin);
+	
+	// Check whether the distance is NaN
+	if(distance != distance)
+	{
+		InvalidateJumpstat(client);
+		return distance;
+	}
+	
 	if (GetType(client) != JumpType_LadderJump)
 	{
 		distance += 32.0;
@@ -752,7 +760,6 @@ static void UpdateFailstat(int client)
 		CopyVector(traceStart, traceEnd);
 		traceStart[2] += 20.0;
 		traceEnd[2] -= 20.0;
-		takeoffOrigin[coordDist] += distSign * JS_MIN_LAJ_BLOCK_DISTANCE;
 		
 		// Find the block height.
 		Handle trace = TR_TraceRayFilterEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint, TraceEntityFilterPlayers);
