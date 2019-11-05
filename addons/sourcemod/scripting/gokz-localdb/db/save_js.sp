@@ -3,11 +3,10 @@ public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, flo
 {
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	
-	
 	// No tiers given for 'Invalid' jumps.
 	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
 		 || jumpType != JumpType_LadderJump && offset < -JS_MAX_NORMAL_OFFSET
-		 || offset < -JS_MAX_LADDERJUMP_OFFSET
+		 || distance > JS_MAX_JUMP_DISTANCE
 		 || jumpType == JumpType_LadderJump && distance < JS_MIN_LAJ_BLOCK_DISTANCE
 		 || jumpType != JumpType_LadderJump && distance < JS_MIN_BLOCK_DISTANCE)
 	{
