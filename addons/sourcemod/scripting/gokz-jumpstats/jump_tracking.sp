@@ -1144,6 +1144,13 @@ static void EndStrafes(int client)
 
 static void UpdateStrafes(int client)
 {
+	// Invalidate jump when using turnbinds
+	if(Movement_GetButtons(client) & (IN_LEFT | IN_RIGHT))
+	{
+		InvalidateJumpstat(client);
+		return;
+	}
+	
 	KZPlayer player = KZPlayer(client);
 	if (player.TurningLeft && strafesDirection[player.ID] != StrafeDirection_Left)
 	{
