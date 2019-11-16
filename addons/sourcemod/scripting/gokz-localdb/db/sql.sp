@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS Maps ( \
 char sqlite_maps_insert[] = "\
 INSERT OR IGNORE INTO Maps (Name, LastPlayed) \
     VALUES ('%s', CURRENT_TIMESTAMP)";
-  
+
 char sqlite_maps_update[] = "\
 UPDATE OR IGNORE Maps \
     SET LastPlayed=CURRENT_TIMESTAMP \
@@ -170,4 +170,97 @@ char sql_times_insert[] = "\
 INSERT INTO Times (SteamID32, MapCourseID, Mode, Style, RunTime, Teleports) \
     SELECT %d, MapCourseID, %d, %d, %d, %d \
     FROM MapCourses \
-    WHERE MapID=%d AND Course=%d"; 
+    WHERE MapID=%d AND Course=%d";
+
+
+
+// =====[ JUMPSTATS ]=====
+
+char sqlite_jumpstats_create[] = "\
+CREATE TABLE IF NOT EXISTS Jumpstats ( \
+    JumpID INTEGER NOT NULL, \
+    SteamID32 INTEGER NOT NULL, \
+    JumpType INTEGER NOT NULL, \
+    Mode INTEGER NOT NULL, \
+    Distance INTEGER NOT NULL, \
+    IsBlockJump INTEGER NOT NULL, \
+    Block INTEGER NOT NULL, \
+    Strafes INTEGER NOT NULL, \
+    Sync INTEGER NOT NULL, \
+    Pre INTEGER NOT NULL, \
+    Max INTEGER NOT NULL, \
+    Airtime INTEGER NOT NULL, \
+    Created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP, \
+    CONSTRAINT PK_Jumpstats PRIMARY KEY (JumpID), \
+    CONSTRAINT FK_Jumpstats_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) \
+    ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char mysql_jumpstats_create[] = "\
+CREATE TABLE IF NOT EXISTS Jumpstats ( \
+    JumpID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT, \
+    SteamID32 INTEGER UNSIGNED NOT NULL, \
+    JumpType TINYINT UNSIGNED NOT NULL, \
+    Mode TINYINT UNSIGNED NOT NULL, \
+    Distance INTEGER UNSIGNED NOT NULL, \
+    IsBlockJump TINYINT UNSIGNED NOT NULL, \
+    Block SMALLINT UNSIGNED NOT NULL, \
+    Strafes INTEGER UNSIGNED NOT NULL, \
+    Sync INTEGER UNSIGNED NOT NULL, \
+    Pre INTEGER UNSIGNED NOT NULL, \
+    Max INTEGER UNSIGNED NOT NULL, \
+    Airtime INTEGER UNSIGNED NOT NULL, \
+    Created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, \
+    CONSTRAINT PK_Jumpstats PRIMARY KEY (JumpID), \
+    CONSTRAINT FK_Jumpstats_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) \
+    ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char sql_jumpstats_insert[] = "\
+INSERT INTO Jumpstats (SteamID32, JumpType, Mode, Distance, IsBlockJump, Block, Strafes, Sync, Pre, Max, Airtime) \
+    VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)";
+
+char sql_jumpstats_update[] = "\
+UPDATE Jumpstats \
+    SET \
+        SteamID32 = %d, \
+        JumpType = %d, \
+        Mode = %d, \
+        Distance = %d, \
+        IsBlockJump = %d, \
+        Block = %d, \
+        Strafes = %d, \
+        Sync = %d, \
+        Pre = %d, \
+        Max = %d, \
+        Airtime = %d \
+    WHERE \
+        JumpID = %d";
+
+char sql_jumpstats_getrecord[] = "\
+SELECT JumpID, Distance, Block, Strafes, Sync, Pre, Max, Airtime \
+    FROM \
+        Jumpstats \
+    WHERE \
+        SteamID32 = %d AND \
+        JumpType = %d AND \
+        Mode = %d AND \
+        IsBlockJump = %d \
+    ORDER BY Block DESC, Distance DESC";
+
+char sql_jumpstats_deleterecord[] = "\
+DELETE \
+    FROM \
+        Jumpstats \
+    WHERE \
+        JumpID = \
+        ( \
+            SELECT JumpID \
+                FROM \
+                    Jumpstats \
+                WHERE \
+                    SteamID32 = %d AND \
+                    JumpType = %d AND \
+                    Mode = %d AND \
+                    IsBlockJump = %d \
+                ORDER BY Block DESC, Distance DESC \
+                LIMIT 1 \
+        )";

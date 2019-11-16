@@ -526,4 +526,4 @@ methodmap MovementPlayer {
 			return Movement_GetNoclipping(this.ID);
 		}
 	}
-} 
+}
