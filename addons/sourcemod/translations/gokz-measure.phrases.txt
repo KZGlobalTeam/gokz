@@ -10,9 +10,9 @@
 	}
 	"Block Measure Result"
 	{
-		// Distance: 262.0
+		// Block Distance - Horizontal: 262.0
 		"#format"	"{1:d}"
-		"en"		"{default}Distance{grey}: {default}{1}{grey}"
+		"en"		"{default}Block Distance{grey} - Horizontal: {default}{1}{grey}"
 		"chi"		"{default}距离{grey}: {default}{1}{grey}"
 	}
 	"Measure Failure (Points Not Set)"
@@ -27,7 +27,7 @@
 	}
 	"Measure Failure (Blocks not aligned)"
 	{
-		"en"		"{darkred}You are not looking at an aligned block!"
+		"en"		"{darkred}You are not aiming at the front of a block!"
 	}
 
 
@@ -49,11 +49,11 @@
 	}
 	"Measure Menu - Get Distance"
 	{
-		"en"		"Get Distance"
+		"en"		"Get Distance (A to B)"
 		"chi"		"获取两点间距离"
 	}
-	"Measure Menu - Measure Block"
+	"Measure Menu - Get Block Distance"
 	{
-		"en"		"Measure Block"
+		"en"		"Get Block Distance"
 	}
 }

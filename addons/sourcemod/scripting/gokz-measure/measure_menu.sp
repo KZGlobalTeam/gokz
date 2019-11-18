@@ -8,7 +8,7 @@
 #define ITEM_INFO_POINT_A "a"
 #define ITEM_INFO_POINT_B "b"
 #define ITEM_INFO_GET_DISTANCE "get"
-#define ITEM_INFO_MEASURE_BLOCK "block"
+#define ITEM_INFO_GET_BLOCK_DISTANCE "block"
 
 static bool measurePosSet[MAXPLAYERS + 1][2];
 static float measurePos[MAXPLAYERS + 1][2][3];
@@ -69,7 +69,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 				GOKZ_PlayErrorSound(param1);
 			}
 		}
-		else if (StrEqual(info, ITEM_INFO_MEASURE_BLOCK, false))
+		else if (StrEqual(info, ITEM_INFO_GET_BLOCK_DISTANCE, false))
 		{
 			float angles[3];
 			MeasureGetPos(param1, 0);
@@ -113,10 +113,10 @@ static void MeasureMenuAddItems(int client, Menu menu)
 	menu.AddItem(ITEM_INFO_POINT_A, display);
 	FormatEx(display, sizeof(display), "%T", "Measure Menu - Point B", client);
 	menu.AddItem(ITEM_INFO_POINT_B, display);
-	FormatEx(display, sizeof(display), "%T", "Measure Menu - Get Distance", client);
+	FormatEx(display, sizeof(display), "%T\n ", "Measure Menu - Get Distance", client);
 	menu.AddItem(ITEM_INFO_GET_DISTANCE, display);
-	FormatEx(display, sizeof(display), "%T", "Measure Menu - Measure Block", client);
-	menu.AddItem(ITEM_INFO_MEASURE_BLOCK, display);
+	FormatEx(display, sizeof(display), "%T", "Measure Menu - Get Block Distance", client);
+	menu.AddItem(ITEM_INFO_GET_BLOCK_DISTANCE, display);
 }
 
 static void MeasureGetPos(int client, int arg)
