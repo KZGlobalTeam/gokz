@@ -8,9 +8,11 @@
 #define ITEM_INFO_POINT_A "a"
 #define ITEM_INFO_POINT_B "b"
 #define ITEM_INFO_GET_DISTANCE "get"
+#define ITEM_INFO_MEASURE_BLOCK "block"
 
 static bool measurePosSet[MAXPLAYERS + 1][2];
 static float measurePos[MAXPLAYERS + 1][2][3];
+static float measureNormal[MAXPLAYERS + 1][2][3];
 static Handle P2PRed[MAXPLAYERS + 1];
 static Handle P2PGreen[MAXPLAYERS + 1];
 
@@ -67,6 +69,25 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 				GOKZ_PlayErrorSound(param1);
 			}
 		}
+		else if (StrEqual(info, ITEM_INFO_MEASURE_BLOCK, false))
+		{
+			float angles[3];
+			MeasureGetPos(param1, 0);
+			GetVectorAngles(measureNormal[param1][0], angles);
+			MeasureGetPosEx(param1, 1, measurePos[param1][0], angles);
+			AddVectors(measureNormal[param1][0], measureNormal[param1][1], angles);
+			if(GetVectorLength(angles, true) > EPSILON ||
+				FloatAbs(measureNormal[param1][0][2]) > EPSILON ||
+				FloatAbs(measureNormal[param1][1][2]) > EPSILON)
+			{
+				GOKZ_PrintToChat(param1, true, "%t", "Measure Failure (Blocks not aligned)");
+				GOKZ_PlayErrorSound(param1);
+				DisplayMeasureMenu(param1, false);
+				return;
+			}
+			GOKZ_PrintToChat(param1, true, "%t", "Block Measure Result", RoundFloat(GetVectorHorizontalDistance(measurePos[param1][0], measurePos[param1][1])));
+			MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
+		}
 		
 		DisplayMeasureMenu(param1, false);
 	}
@@ -94,6 +115,8 @@ static void MeasureMenuAddItems(int client, Menu menu)
 	menu.AddItem(ITEM_INFO_POINT_B, display);
 	FormatEx(display, sizeof(display), "%T", "Measure Menu - Get Distance", client);
 	menu.AddItem(ITEM_INFO_GET_DISTANCE, display);
+	FormatEx(display, sizeof(display), "%T", "Measure Menu - Measure Block", client);
+	menu.AddItem(ITEM_INFO_MEASURE_BLOCK, display);
 }
 
 static void MeasureGetPos(int client, int arg)
@@ -104,7 +127,12 @@ static void MeasureGetPos(int client, int arg)
 	GetClientEyePosition(client, origin);
 	GetClientEyeAngles(client, angles);
 	
-	Handle trace = TR_TraceRayFilterEx(origin, angles, MASK_SHOT, RayType_Infinite, TraceFilterPlayers, client);
+	MeasureGetPosEx(client, arg, origin, angles);
+}
+
+static void MeasureGetPosEx(int client, int arg, float origin[3], float angles[3])
+{
+	Handle trace = TR_TraceRayFilterEx(origin, angles, MASK_PLAYERSOLID, RayType_Infinite, TraceFilterPlayers, client);
 	
 	if (!TR_DidHit(trace))
 	{
@@ -114,12 +142,9 @@ static void MeasureGetPos(int client, int arg)
 		return;
 	}
 	
-	TR_GetEndPosition(origin, trace);
+	TR_GetEndPosition(measurePos[client][arg], trace);
+	TR_GetPlaneNormal(trace, measureNormal[client][arg]);
 	CloseHandle(trace);
-	
-	measurePos[client][arg][0] = origin[0];
-	measurePos[client][arg][1] = origin[1];
-	measurePos[client][arg][2] = origin[2];
 	
 	if (arg == 0)
 	{
