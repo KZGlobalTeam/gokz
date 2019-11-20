@@ -16,7 +16,6 @@ int GetDistanceTier(int jumpType, int mode, float distance, float offset)
 	// No tiers given for 'Invalid' jumps.
 	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
 		 || jumpType != JumpType_LadderJump && offset < -JS_MAX_NORMAL_OFFSET
-		 || offset < -JS_MAX_LADDERJUMP_OFFSET
 		 || distance > JS_MAX_JUMP_DISTANCE)
 	{
 		// TODO Give a tier to "Other" jumps
@@ -85,4 +84,4 @@ static bool LoadDistanceTiers()
 	}
 	delete kv;
 	return true;
-} 
+}
