@@ -175,7 +175,8 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 	
 	// The last line disables the crouch indicator for bhops
 	if((infoPanelShowDuckString[targetPlayer.ID]
-		|| (infoPanelOnGroundLast[targetPlayer.ID] && infoPanelDuckPressedLast[targetPlayer.ID]))
+		|| (infoPanelOnGroundLast[targetPlayer.ID]
+			&& (infoPanelDuckPressedLast[targetPlayer.ID] || (GOKZ_GetCoreOption(targetPlayer.ID, Option_Mode) == Mode_Vanilla && Movement_GetDucking(targetPlayer.ID)))))
 		&& Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
 		&& targetPlayer.Jumped)
 	{
