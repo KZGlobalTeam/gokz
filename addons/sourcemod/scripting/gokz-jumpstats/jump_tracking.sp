@@ -898,13 +898,13 @@ static void TraceLadderOffset(int client, float takeoffOrigin[3], float landingO
 {
 	float traceOrigin[3], traceEnd[3], ladderTop[3], ladderNormal[3];
 	
-	// 10 units is the furthest away from the ladder surface you can get while still being on the ladder.
-	float mins[3] =  { -16.0, -16.0, 0.0 };
-	float maxs[3] =  { 16.0, 16.0, 0.0 };
+	float mins[3] = { -16.0, -16.0, 0.0 };
+	float maxs[3] = { 16.0, 16.0, 0.0 };
 	
 	// Get normal vector of the ladder.
 	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
 	
+	// 10 units is the furthest away from the ladder surface you can get while still being on the ladder.
 	traceOrigin[0] = takeoffOrigin[0] - 10.0 * ladderNormal[0];
 	traceOrigin[1] = takeoffOrigin[1] - 10.0 * ladderNormal[1];
 	traceOrigin[2] = takeoffOrigin[2] + 400.0 * GetTickInterval(); // ~400 ups is the fastest vertical speed on ladders
@@ -952,7 +952,7 @@ static void BeginDuration(int client)
 static void EndDuration(int client)
 {
 	durationTicksLast[client] = durationTicksCurrent[client];
-	if (durationTicksLast[client] > 100)
+	if (GetType(client) != JumpType_LadderJump && durationTicksLast[client] > 100)
 	{
 		InvalidateJumpstat(client);
 	}
@@ -1236,4 +1236,4 @@ static void UpdateSync(int client)
 	{
 		syncGainTicksCurrent[client]++;
 	}
-} 
+}
