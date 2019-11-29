@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS Maps ( \
 char sqlite_maps_insert[] = "\
 INSERT OR IGNORE INTO Maps (Name, LastPlayed) \
     VALUES ('%s', CURRENT_TIMESTAMP)";
-
+  
 char sqlite_maps_update[] = "\
 UPDATE OR IGNORE Maps \
     SET LastPlayed=CURRENT_TIMESTAMP \
@@ -236,7 +236,7 @@ UPDATE Jumpstats \
         JumpID = %d";
 
 char sql_jumpstats_getrecord[] = "\
-SELECT JumpID, Distance, Block, Strafes, Sync, Pre, Max, Airtime \
+SELECT JumpID, Distance, Block \
     FROM \
         Jumpstats \
     WHERE \
