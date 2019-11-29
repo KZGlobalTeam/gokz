@@ -8,11 +8,12 @@
 
 bool GetJumpstatsDisabled(int client)
 {
-	return GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled
+	return GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled
 	 || (GOKZ_JS_GetOption(client, JSOption_MinChatTier) == DistanceTier_None
 		 && GOKZ_JS_GetOption(client, JSOption_MinConsoleTier) == DistanceTier_None
 		 && GOKZ_JS_GetOption(client, JSOption_MinSoundTier) == DistanceTier_None
-		 && GOKZ_JS_GetOption(client, JSOption_Failstats) == Failstats_Disabled);
+		 && GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled
+		 && GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled);
 }
 
 
@@ -70,11 +71,11 @@ static void PrintOptionChangeMessage(int client, JSOption option, any newValue)
 		{
 			switch (newValue)
 			{
-				case JumpstatsMaster_Enabled:
+				case JSToggleOption_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Jumpstats Option - Master Switch - Enable");
 				}
-				case JumpstatsMaster_Disabled:
+				case JSToggleOption_Disabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Jumpstats Option - Master Switch - Disable");
 				}

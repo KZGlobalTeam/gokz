@@ -79,25 +79,24 @@ void OnFailstat_FailstatReporting(int client, int jumpType, float distance, floa
 
 static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
-	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled)
+	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
 	{
 		return;
 	}
 	
-	DoChatReport(client, jumper, jumpType, tier, distance, preSpeed, maxSpeed, strafes, sync, releaseW);
+	DoChatReport(client, false, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, block, width, overlap, deadair, deviation, edge, releaseW);
 	DoConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
 	PlayJumpstatSound(client, tier);
 }
 
 static void DoFailstatReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
-	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JumpstatsMaster_Disabled
-		 || GOKZ_JS_GetOption(client, JSOption_Failstats) == Failstats_Disabled)
+	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
 	{
 		return;
 	}
 	
-	DoFailstatChatReport(client, jumper, jumpType, tier, distance, preSpeed, maxSpeed, strafes, sync, releaseW, edge, offset);
+	DoChatReport(client, true, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, block, width, overlap, deadair, deviation, edge, releaseW);
 	DoFailstatConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
 }
 
@@ -113,7 +112,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 		return;
 	}
 	
-	if (block < JS_MIN_LAJ_BLOCK_DISTANCE || (jumpType != JumpType_LadderJump && block < JS_MIN_BLOCK_DISTANCE))
+	if(block == 0)
 	{
 		if (jumpType == JumpType_Bhop || 
 			jumpType == JumpType_MultiBhop || 
@@ -124,16 +123,16 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				jumper, 
 				distance, 
 				gC_JumpTypes[jumpType], 
-				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 				strafes, strafes == 1 ? "Strafe" : "Strafes", 
 				sync, "Sync", 
 				RoundToPowerOfTen(preSpeed, -2), "Pre", 
-				RoundToPowerOfTen(maxSpeed, -2), "Max", 
-				overlap, "Overlap", 
-				deadair, "Dead Air", 
-				width / strafes, "Avg. Width", 
+				RoundToPowerOfTen(maxSpeed, -2), "Max",
+				overlap, "Overlap",
+				deadair, "Dead Air",
+				width / strafes, "Avg. Width",
 				height, "Height", 
-				duration, "Airtime", 
+				duration, "Airtime",
 				offset, "Offset");
 		}
 		else
@@ -142,17 +141,17 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				jumper, 
 				distance, 
 				gC_JumpTypes[jumpType], 
-				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 				strafes, strafes == 1 ? "Strafe" : "Strafes", 
 				sync, "Sync", 
 				RoundToPowerOfTen(preSpeed, -2), "Pre", 
-				RoundToPowerOfTen(maxSpeed, -2), "Max", 
-				releaseW, "W Release", 
-				overlap, "Overlap", 
-				deadair, "Dead Air", 
-				width / strafes, "Avg. Width", 
+				RoundToPowerOfTen(maxSpeed, -2), "Max",
+				releaseW, "W Release",
+				overlap, "Overlap",
+				deadair, "Dead Air",
+				width / strafes, "Avg. Width",
 				height, "Height", 
-				duration, "Airtime", 
+				duration, "Airtime",
 				offset, "Offset");
 		}
 	}
@@ -169,37 +168,37 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 			jumpType == JumpType_WeirdJump)
 		{
 			PrintToConsole(client, "%t", "Console Block Hop Report", 
-				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 				block, "Block", 
-				edge, "Edge", 
+				edge, "Edge",
 				strafes, strafes == 1 ? "Strafe" : "Strafes", 
 				sync, "Sync", 
 				RoundToPowerOfTen(preSpeed, -2), "Pre", 
-				RoundToPowerOfTen(maxSpeed, -2), "Max", 
-				overlap, "Overlap", 
-				deadair, "Dead Air", 
-				deviation, "Deviation", 
-				width / strafes, "Avg. Width", 
-				height, "Height", 
+				RoundToPowerOfTen(maxSpeed, -2), "Max",
+				overlap, "Overlap",
+				deadair, "Dead Air",
+				deviation, "Deviation",
+				width / strafes, "Avg. Width",
+				height, "Height",
 				duration, "Airtime");
 		}
 		else
 		{
 			PrintToConsole(client, "%t", "Console Block Jump Report", 
-				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+				gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 				block, "Block", 
-				edge, "Edge", 
+				edge, "Edge",
 				strafes, strafes == 1 ? "Strafe" : "Strafes", 
 				sync, "Sync", 
 				RoundToPowerOfTen(preSpeed, -2), "Pre", 
-				RoundToPowerOfTen(maxSpeed, -2), "Max", 
-				releaseW, "W Release", 
-				overlap, "Overlap", 
-				deadair, "Dead Air", 
-				deviation, "Deviation", 
-				width / strafes, "Avg. Width", 
-				height, "Height", 
-				duration, "Airtime", 
+				RoundToPowerOfTen(maxSpeed, -2), "Max",  
+				releaseW, "W Release",
+				overlap, "Overlap",
+				deadair, "Dead Air",
+				deviation, "Deviation",
+				width / strafes, "Avg. Width",
+				height, "Height",
+				duration, "Airtime",
 				offset);
 		}
 	}
@@ -217,9 +216,9 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 			GetStrafeSync(jumper, strafe), 
 			GetStrafeGain(jumper, strafe), 
 			GetStrafeLoss(jumper, strafe), 
-			GetStrafeAirtime(jumper, strafe), 
-			GetStrafeWidth(jumper, strafe), 
-			GetStrafeOverlap(jumper, strafe), 
+			GetStrafeAirtime(jumper, strafe),
+			GetStrafeWidth(jumper, strafe),
+			GetStrafeOverlap(jumper, strafe),
 			GetStrafeDeadair(jumper, strafe));
 	}
 	PrintToConsole(client, ""); // New line
@@ -228,7 +227,8 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
 	int minConsoleTier = GOKZ_JS_GetOption(client, JSOption_MinConsoleTier);
-	if (minConsoleTier == 0 || minConsoleTier > tier) // 0 means disabled
+	if (minConsoleTier == 0 || minConsoleTier > tier // 0 means disabled
+		|| GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled) 
 	{
 		return;
 	}
@@ -244,37 +244,37 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 		jumpType == JumpType_WeirdJump)
 	{
 		PrintToConsole(client, "%t", "Console Block Hop Report", 
-			gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+			gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 			block, "Block", 
-			edge, "Edge", 
+			edge, "Edge",
 			strafes, strafes == 1 ? "Strafe" : "Strafes", 
 			sync, "Sync", 
 			RoundToPowerOfTen(preSpeed, -2), "Pre", 
 			RoundToPowerOfTen(maxSpeed, -2), "Max", 
-			overlap, "Overlap", 
-			deadair, "Dead Air", 
-			deviation, "Deviation", 
-			width / strafes, "Avg. Width", 
-			height, "Height", 
+			overlap, "Overlap",
+			deadair, "Dead Air",
+			deviation, "Deviation",
+			width / strafes, "Avg. Width",
+			height, "Height",
 			duration, "Airtime");
 	}
 	else
 	{
 		PrintToConsole(client, "%t", "Console Block Jump Report", 
-			gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)], 
+			gC_ModeNamesShort[GOKZ_GetCoreOption(jumper, Option_Mode)],
 			block, "Block", 
-			edge, "Edge", 
+			edge, "Edge",
 			strafes, strafes == 1 ? "Strafe" : "Strafes", 
 			sync, "Sync", 
 			RoundToPowerOfTen(preSpeed, -2), "Pre", 
 			RoundToPowerOfTen(maxSpeed, -2), "Max", 
-			releaseW, "W Release", 
-			overlap, "Overlap", 
-			deadair, "Dead Air", 
-			deviation, "Deviation", 
-			width / strafes, "Avg. Width", 
-			height, "Height", 
-			duration, "Airtime", 
+			releaseW, "W Release",
+			overlap, "Overlap",
+			deadair, "Dead Air",
+			deviation, "Deviation",
+			width / strafes, "Avg. Width",
+			height, "Height",
+			duration, "Airtime",
 			offset);
 	}
 	PrintToConsole(client, "  #.  %12t%12t%12t%12t%12t%9t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)", "Width (Table)", "Overlap (Table)", "Dead Air (Table)");
@@ -290,9 +290,9 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 			GetStrafeSync(jumper, strafe), 
 			GetStrafeGain(jumper, strafe), 
 			GetStrafeLoss(jumper, strafe), 
-			GetStrafeAirtime(jumper, strafe), 
-			FloatAbs(GetStrafeWidth(jumper, strafe)), 
-			GetStrafeOverlap(jumper, strafe), 
+			GetStrafeAirtime(jumper, strafe),
+			FloatAbs(GetStrafeWidth(jumper, strafe)),
+			GetStrafeOverlap(jumper, strafe),
 			GetStrafeDeadair(jumper, strafe));
 	}
 	PrintToConsole(client, ""); // New line
@@ -302,7 +302,7 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 
 // CHAT REPORT
 
-static void DoChatReport(int client, int jumper, int jumpType, int tier, float distance, float preSpeed, float maxSpeed, int strafes, float sync, int releaseW)
+static void DoChatReport(int client, bool isFailstat, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
 	int minChatTier = GOKZ_JS_GetOption(client, JSOption_MinChatTier);
 	if (minChatTier == 0 || minChatTier > tier) // 0 means disabled
@@ -310,145 +310,101 @@ static void DoChatReport(int client, int jumper, int jumpType, int tier, float d
 		return;
 	}
 	
-	if (jumpType == JumpType_LongJump
-		 || jumpType == JumpType_LadderJump)
+	char typePostfix[3] = "", color[16] = "", blockStats[32] = "", extBlockStats[32] = "", releaseWStats[32] = "", edgeOffset[32] = "", offsetEdge[32] = "";
+	
+	if(isFailstat)
 	{
-		GOKZ_PrintToChat(client, true, 
-			"%s%s{grey}: %s%.1f {grey}[%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
-			gC_DistanceTierChatColours[tier], 
-			gC_JumpTypesShort[jumpType], 
-			gC_DistanceTierChatColours[tier], 
-			distance, 
-			GetStrafesString(client, strafes), 
-			GetPreSpeedString(client, jumper, preSpeed), 
-			GetMaxSpeedString(client, maxSpeed), 
-			GetSyncString(client, sync), 
-			GetWReleaseString(client, releaseW));
+		if(GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled)
+		{
+			return;
+		}
+		strcopy(typePostfix, sizeof(typePostfix), "-F");
+		strcopy(color, sizeof(color), "{grey}");
 	}
-	else if (jumpType == JumpType_Bhop || 
-		jumpType == JumpType_MultiBhop || 
-		jumpType == JumpType_Ladderhop || 
-		jumpType == JumpType_WeirdJump)
+	else
 	{
-		GOKZ_PrintToChat(client, true, 
-			"%s%s{grey}: %s%.1f {grey}[%s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
-			gC_DistanceTierChatColours[tier], 
-			gC_JumpTypesShort[jumpType], 
-			gC_DistanceTierChatColours[tier], 
-			distance, 
-			GetStrafesString(client, strafes), 
-			GetPreSpeedString(client, jumper, preSpeed), 
-			GetMaxSpeedString(client, maxSpeed), 
-			GetSyncString(client, sync));
-	}
-}
-
-static void DoFailstatChatReport(int client, int jumper, int jumpType, int tier, float distance, float preSpeed, float maxSpeed, int strafes, float sync, int releaseW, float edge, float offset)
-{
-	int minChatTier = GOKZ_JS_GetOption(client, JSOption_MinChatTier);
-	if (minChatTier == 0 || minChatTier > tier // 0 means disabled
-		 || GOKZ_JS_GetOption(client, JSOption_Failstats) != Failstats_ConsoleChat)
-	{
-		return;
+		strcopy(color, sizeof(color), gC_DistanceTierChatColours[tier]);
 	}
 	
-	if (jumpType == JumpType_LongJump)
+	if(block > 0)
 	{
-		GOKZ_PrintToChat(client, true, 
-			"%s %s: %.1f [%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
-			"Failed", 
-			gC_JumpTypesShort[jumpType], 
-			distance, 
-			GetStrafesString(client, strafes), 
-			GetPreSpeedString(client, jumper, preSpeed), 
-			GetMaxSpeedString(client, maxSpeed), 
-			GetSyncString(client, sync), 
-			GetWReleaseString(client, releaseW), 
-			GetEdgeString(client, edge));
+		if(jumpType != JumpType_LadderJump)
+		{
+			FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetEdgeString(client, edge));
+		}
+		FormatEx(blockStats, sizeof(blockStats), " | %s", GetEdgeString(client, edge));
+		FormatEx(extBlockStats, sizeof(extBlockStats), " | %s", GetDeviationString(client, deviation));
 	}
-	else if (jumpType == JumpType_LadderJump)
+	
+	if (jumpType == JumpType_LongJump
+		|| jumpType == JumpType_LadderJump)
 	{
-		GOKZ_PrintToChat(client, true, 
-			"%s %s: %.1f [%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
-			"Failed", 
-			gC_JumpTypesShort[jumpType], 
-			distance, 
-			GetStrafesString(client, strafes), 
-			GetPreSpeedString(client, jumper, preSpeed), 
-			GetMaxSpeedString(client, maxSpeed), 
-			GetSyncString(client, sync), 
-			GetWReleaseString(client, releaseW), 
-			GetOffsetString(client, offset));
+		FormatEx(releaseWStats, sizeof(releaseWStats), " | %s", GetWReleaseString(client, releaseW));
 	}
-	else if (jumpType == JumpType_Bhop || 
-		jumpType == JumpType_MultiBhop || 
-		jumpType == JumpType_Ladderhop || 
-		jumpType == JumpType_WeirdJump)
+	
+	if(jumpType == JumpType_LadderJump)
 	{
-		GOKZ_PrintToChat(client, true, 
-			"%s %s: %.1f [%s {grey}| %s {grey}| %s {grey}| %s {grey}| %s{grey}]", 
-			"Failed", 
-			gC_JumpTypesShort[jumpType], 
-			distance, 
-			GetStrafesString(client, strafes), 
-			GetPreSpeedString(client, jumper, preSpeed), 
-			GetMaxSpeedString(client, maxSpeed), 
-			GetSyncString(client, sync), 
-			GetEdgeString(client, edge));
+		FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetLadderOffsetString(client, offset));
+		FormatEx(offsetEdge, sizeof(offsetEdge), " | %s", GetEdgeString(client, edge));
+	}
+	else
+	{
+		FormatEx(offsetEdge, sizeof(offsetEdge), " | %s", GetOffsetString(client, offset));
+	}
+	
+	GOKZ_PrintToChat(client, true,
+		"%s%s%s{grey}: %s%.1f{grey} | %s | %s%s%s",
+		color,
+		gC_JumpTypesShort[jumpType],
+		typePostfix,
+		color,
+		distance,
+		GetStrafesSyncString(client, strafes, sync),
+		GetSpeedString(client, preSpeed, maxSpeed),
+		edgeOffset,
+		releaseWStats);
+	
+	if(GOKZ_JS_GetOption(client, JSOption_ExtendedChatReport) == JSToggleOption_Enabled)
+	{
+		GOKZ_PrintToChat(client, false,
+			"%s | %s%s%s | %s | %s",
+			GetOverlapString(client, overlap),
+			GetDeadairString(client, deadair),
+			offsetEdge,
+			extBlockStats,
+			GetWidthString(client, width, strafes),
+			GetHeightString(client, height));
 	}
 }
 
-static char[] GetStrafesString(int client, int strafes)
+static char[] GetStrafesSyncString(int client, int strafes, float sync)
 {
-	char strafesString[32];
+	char strafesString[64];
 	FormatEx(strafesString, sizeof(strafesString), 
-		"{lime}%d{grey} %T", 
-		strafes, 
-		strafes == 1 ? "Strafe" : "Strafes", client);
+		"{lime}%d{grey} %T ({lime}%.0f%%%%{grey})", 
+		strafes, "Strafes", client, sync);
 	return strafesString;
 }
 
-static char[] GetPreSpeedString(int client, int jumper, float preSpeed)
+static char[] GetSpeedString(int client, float preSpeed, float maxSpeed)
 {
-	char preSpeedString[32];
-	FormatEx(preSpeedString, sizeof(preSpeedString), 
-		"%s%.0f{grey} %T", 
-		GOKZ_GetHitPerf(jumper) ? "{green}" : "{lime}", 
-		RoundToPowerOfTen(preSpeed, -2), 
-		"Pre", client);
-	return preSpeedString;
-}
-
-static char[] GetMaxSpeedString(int client, float maxSpeed)
-{
-	char maxSpeedString[32];
-	FormatEx(maxSpeedString, sizeof(maxSpeedString), 
-		"{lime}%.0f{grey} %T", 
-		RoundToPowerOfTen(maxSpeed, -2), 
-		"Max", client);
-	return maxSpeedString;
-}
-
-static char[] GetSyncString(int client, float sync)
-{
-	char syncString[32];
-	FormatEx(syncString, sizeof(syncString), 
-		"{lime}%.0f%%%%{grey} %T", 
-		sync, 
-		"Sync", client);
-	return syncString;
+	char speedString[64];
+	FormatEx(speedString, sizeof(speedString), 
+		"{lime}%.0f{grey} / {lime}%.0f{grey} %T", 
+		preSpeed, maxSpeed, "Speed", client);
+	return speedString;
 }
 
 static char[] GetWReleaseString(int client, int releaseW)
 {
 	char releaseWString[32];
-	if (releaseW == 0)
+	if(releaseW == 0)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), 
 			"{green}✓{grey} %T", 
 			"W Release", client);
 	}
-	else if (releaseW > 0)
+	else if(releaseW > 0)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), 
 			"{red}+%d{grey} %T", 
@@ -469,7 +425,7 @@ static char[] GetEdgeString(int client, float edge)
 {
 	char resultString[32];
 	FormatEx(resultString, sizeof(resultString), 
-		"{lime}%.2f{grey} %T", 
+		"{lime}%.1f{grey} %T", 
 		edge, "Edge", client);
 	return resultString;
 }
@@ -478,8 +434,62 @@ static char[] GetOffsetString(int client, float offset)
 {
 	char resultString[32];
 	FormatEx(resultString, sizeof(resultString), 
-		"{lime}%.2f{grey} %T", 
+		"{lime}%.1f{grey} %T", 
 		offset, "Offset", client);
+	return resultString;
+}
+
+static char[] GetLadderOffsetString(int client, float offset)
+{
+	char resultString[32];
+	FormatEx(resultString, sizeof(resultString), 
+		"{lime}%.1f{grey} %T", 
+		offset, "Ladder Offset", client);
+	return resultString;
+}
+
+static char[] GetDeviationString(int client, float deviation)
+{
+	char resultString[32];
+	FormatEx(resultString, sizeof(resultString), 
+		"{lime}%.1f{grey} %T", 
+		deviation, "Deviation", client);
+	return resultString;
+}
+
+static char[] GetOverlapString(int client, int overlap)
+{
+	char resultString[32];
+	FormatEx(resultString, sizeof(resultString), 
+		"{lime}%d{grey} %T", 
+		overlap, "Overlap", client);
+	return resultString;
+}
+
+static char[] GetDeadairString(int client, int deadair)
+{
+	char resultString[32];
+	FormatEx(resultString, sizeof(resultString), 
+		"{lime}%d{grey} %T", 
+		deadair, "Dead Air", client);
+	return resultString;
+}
+
+static char[] GetWidthString(int client, float width, int strafes)
+{
+	char resultString[32];
+	FormatEx(resultString, sizeof(resultString), 
+		"{lime}%.1f°{grey} %T", 
+		width / strafes, "Width", client);
+	return resultString;
+}
+
+static char[] GetHeightString(int client, float height)
+{
+	char resultString[32];
+	FormatEx(resultString, sizeof(resultString), 
+		"{lime}%.1f{grey} %T", 
+		height, "Height", client);
 	return resultString;
 }
 
