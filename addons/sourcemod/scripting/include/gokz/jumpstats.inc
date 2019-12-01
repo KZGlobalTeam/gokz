@@ -67,10 +67,6 @@ enum
 
 
 
-// =====[ STRUCTS ]=====
-
-
-
 // =====[ CONSTANTS ]=====
 
 #define JS_CFG_TIERS "cfg/sourcemod/gokz/gokz-jumpstats-tiers.cfg"
