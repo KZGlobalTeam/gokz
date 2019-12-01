@@ -112,7 +112,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 		return;
 	}
 	
-	if(block == 0)
+	if (block == 0)
 	{
 		if (jumpType == JumpType_Bhop || 
 			jumpType == JumpType_MultiBhop || 
@@ -312,9 +312,9 @@ static void DoChatReport(int client, bool isFailstat, int jumpType, int tier, fl
 	
 	char typePostfix[3] = "", color[16] = "", blockStats[32] = "", extBlockStats[32] = "", releaseWStats[32] = "", edgeOffset[32] = "", offsetEdge[32] = "";
 	
-	if(isFailstat)
+	if (isFailstat)
 	{
-		if(GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled)
+		if (GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled)
 		{
 			return;
 		}
@@ -326,9 +326,9 @@ static void DoChatReport(int client, bool isFailstat, int jumpType, int tier, fl
 		strcopy(color, sizeof(color), gC_DistanceTierChatColours[tier]);
 	}
 	
-	if(block > 0)
+	if (block > 0)
 	{
-		if(jumpType != JumpType_LadderJump)
+		if (jumpType != JumpType_LadderJump)
 		{
 			FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetEdgeString(client, edge));
 		}
@@ -342,7 +342,7 @@ static void DoChatReport(int client, bool isFailstat, int jumpType, int tier, fl
 		FormatEx(releaseWStats, sizeof(releaseWStats), " | %s", GetWReleaseString(client, releaseW));
 	}
 	
-	if(jumpType == JumpType_LadderJump)
+	if (jumpType == JumpType_LadderJump)
 	{
 		FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetLadderOffsetString(client, offset));
 		FormatEx(offsetEdge, sizeof(offsetEdge), " | %s", GetEdgeString(client, edge));
@@ -364,7 +364,7 @@ static void DoChatReport(int client, bool isFailstat, int jumpType, int tier, fl
 		edgeOffset,
 		releaseWStats);
 	
-	if(GOKZ_JS_GetOption(client, JSOption_ExtendedChatReport) == JSToggleOption_Enabled)
+	if (GOKZ_JS_GetOption(client, JSOption_ExtendedChatReport) == JSToggleOption_Enabled)
 	{
 		GOKZ_PrintToChat(client, false,
 			"%s | %s%s%s | %s | %s",
@@ -398,13 +398,13 @@ static char[] GetSpeedString(int client, float preSpeed, float maxSpeed)
 static char[] GetWReleaseString(int client, int releaseW)
 {
 	char releaseWString[32];
-	if(releaseW == 0)
+	if (releaseW == 0)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), 
 			"{green}✓{grey} %T", 
 			"W Release", client);
 	}
-	else if(releaseW > 0)
+	else if (releaseW > 0)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), 
 			"{red}+%d{grey} %T", 

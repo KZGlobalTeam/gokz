@@ -17,13 +17,13 @@ void DB_GetJumpTop(int client)
 
 void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] results, any[] queryData)
 {
-	if(!IsValidClient(client))
+	if (!IsValidClient(client))
 	{
 		return;
 	}
 	
 	int rows = SQL_GetRowCount(results[0]);
-	if(rows == 0)
+	if (rows == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Not record found.");
 		return;
@@ -36,7 +36,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 	Menu menu = new Menu(MenuHandler_JumpTopList);
 	menu.Pagination = 5;
 	
-	if(jumpTopBlockType[client] == 0)
+	if (jumpTopBlockType[client] == 0)
 	{
 		FormatEx(title, sizeof(title), "%s %s %T", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]], "Top", client);
 		strcopy(display, sizeof(display), "----------------------------------------------------------------");
@@ -45,7 +45,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 		PrintToConsole(client, title);
 		PrintToConsole(client, display);
 		
-		for(int i = 0; i < rows; i++)
+		for (int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
@@ -72,7 +72,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 		PrintToConsole(client, title);
 		PrintToConsole(client, display);
 		
-		for(int i = 0; i < rows; i++)
+		for (int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
@@ -205,7 +205,7 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 {
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
-		if(jumpTopType[param1] == JumpType_LadderJump)
+		if (jumpTopType[param1] == JumpType_LadderJump)
 		{
 			DisplayJumpTopTypeMenu(param1, jumpTopMode[param1]);
 		}

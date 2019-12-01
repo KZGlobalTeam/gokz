@@ -34,7 +34,7 @@ public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, flo
 	txn_noblock.AddQuery(query);
 	SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data_noblock, DBPrio_Low);
 	
-	if(block > 0)
+	if (block > 0)
 	{
 		DataPack data_block = new DataPack();
 		data_block.WriteCell(client);
@@ -88,7 +88,7 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 		int rec_distance = SQL_FetchInt(results[0], JumpstatDB_Lookup_Distance);
 		int rec_block = SQL_FetchInt(results[0], JumpstatDB_Lookup_Block);
 		
-		if(block < rec_block || block == rec_block && distance < rec_distance)
+		if (block < rec_block || block == rec_block && distance < rec_distance)
 		{
 			delete data;
 			return;
@@ -100,7 +100,7 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 		}
 		else
 		{
-			for(int i = 1; i < GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER; i++)
+			for (int i = 1; i < GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER; i++)
 			{
 				SQL_FetchRow(results[0]);
 			}
@@ -131,7 +131,7 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 		return;
 	}
 	
-	if(block == 0)
+	if (block == 0)
 	{
 		GOKZ_PrintToChat(client, true, "{yellow}%N got a new %s jump record with a %.4f units %s!", client, gC_ModeNamesShort[mode], float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, gC_JumpTypes[jumpType]);
 	}

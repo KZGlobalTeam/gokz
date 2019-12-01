@@ -8,7 +8,7 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 	
 	int steamid;
 	char alias[33];
-	if(StrEqual(jumper, ""))
+	if (StrEqual(jumper, ""))
 	{
 		steamid = GetSteamAccountID(client);
 		FormatEx(alias, sizeof(alias), "%N", client);
@@ -91,7 +91,7 @@ public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQ
 	float distance = float(SQL_FetchInt(results[0], JumpstatDB_Lookup_Distance)) / 10000;
 	int block = SQL_FetchInt(results[0], JumpstatDB_Lookup_Block);
 	
-	if(block == 0)
+	if (block == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, distance);
 	}
