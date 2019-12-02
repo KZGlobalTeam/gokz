@@ -12,7 +12,7 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 	{
 		steamid = GetSteamAccountID(client);
 		FormatEx(alias, sizeof(alias), "%N", client);
-		
+	
 		DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 0);
 		DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 1);
 	}
@@ -37,7 +37,7 @@ public void DB_JS_TxnSuccess_LookupPlayer(Handle db, DataPack data, int numQueri
 	
 	if (SQL_GetRowCount(results[0]) == 0)
 	{
-		GOKZ_PrintToChat(client, true, "Player not found.");
+		GOKZ_PrintToChat(client, true, "%t", "Player Not Found");
 		return;
 	}
 	
@@ -83,7 +83,7 @@ public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQ
 	
 	if (SQL_GetRowCount(results[0]) == 0)
 	{
-		GOKZ_PrintToChat(client, true, "Not record found.");
+		GOKZ_PrintToChat(client, true, "%t", "No Jumpstat Record Found");
 		return;
 	}
 	
@@ -93,10 +93,10 @@ public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQ
 	
 	if (block == 0)
 	{
-		GOKZ_PrintToChat(client, true, "%s %s record of %s: %.4f units", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, distance);
+		GOKZ_PrintToChat(client, true, "%t", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, distance);
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, true, "%s block %s record of %s: %d block (%.4f jump)", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, block, distance);
+		GOKZ_PrintToChat(client, true, "%t", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, block, distance);
 	}
 }

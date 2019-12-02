@@ -25,7 +25,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 	int rows = SQL_GetRowCount(results[0]);
 	if (rows == 0)
 	{
-		GOKZ_PrintToChat(client, true, "Not record found.");
+		GOKZ_PrintToChat(client, true, "%t", "Not record found.");
 		return;
 	}
 	
@@ -38,7 +38,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 	
 	if (jumpTopBlockType[client] == 0)
 	{
-		FormatEx(title, sizeof(title), "%s %s Top", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]]);
+		FormatEx(title, sizeof(title), "%s %s %T", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]], "Top", client);
 		strcopy(display, sizeof(display), "----------------------------------------------------------------");
 		display[strlen(title)] = '\0';
 		
@@ -59,13 +59,13 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
 			
-			PrintToConsole(client, "#%-2d   %.4f   %s   [%d Strafes | %.2f%% Sync | %.2f Pre | %.2f Max | %.4f Air]", 
-				i + 1, distance, alias, strafes, sync, pre, max, airtime);
+			PrintToConsole(client, "#%-2d   %.4f   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]",
+				i + 1, distance, alias, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
 		}
 	}
 	else
 	{
-		FormatEx(title, sizeof(title), "%s Block %s Top", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]]);
+		FormatEx(title, sizeof(title), "%s %T %s %T", gC_ModeNames[jumpTopMode[client]], "Block", client, gC_JumpTypes[jumpTopType[client]], "Top", client);
 		strcopy(display, sizeof(display), "----------------------------------------------------------------");
 		display[strlen(title)] = '\0';
 		
@@ -84,11 +84,11 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 			max = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Max)) / GOKZ_DB_JS_MAX_PRECISION;
 			airtime = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Air)) / GOKZ_DB_JS_AIRTIME_PRECISION;
 			
-			FormatEx(display, sizeof(display), "#%-2d   %d Block (%.4f)   %s", i + 1, block, distance, alias);
+			FormatEx(display, sizeof(display), "#%-2d   %d %T (%.4f)   %s", i + 1, block, "Block", client, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
 			
-			PrintToConsole(client, "#%-2d   %d Block (%.4f)   %s   [%d Strafes | %.2f%% Sync | %.2f Pre | %.2f Max | %.4f Air]", 
-				i + 1, block, distance, alias, strafes, sync, pre, max, airtime);
+			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]",
+				i + 1, block, "Block", distance, alias, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
 		}
 	}
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -100,7 +100,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 void DisplayJumpTopModeMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_JumpTopMode);
-	menu.SetTitle("Jumpstats Top");
+	menu.SetTitle("%T %T", "Jumpstats", client, "Top", client);
 	GOKZ_MenuAddModeItems(client, menu, false);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -110,7 +110,7 @@ void DisplayJumpTopTypeMenu(int client, int mode)
 	jumpTopMode[client] = mode;
 	
 	Menu menu = new Menu(MenuHandler_JumpTopType);
-	menu.SetTitle("%s Jumpstats Top", gC_ModeNames[jumpTopMode[client]]);
+	menu.SetTitle("%s %T %T", gC_ModeNames[jumpTopMode[client]], "Jumpstats", client, "Top", client);
 	JumpTopTypeMenuAddItems(menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -130,15 +130,18 @@ void DisplayJumpTopBlockTypeMenu(int client, int type)
 	jumpTopType[client] = type;
 	
 	Menu menu = new Menu(MenuHandler_JumpTopBlockType);
-	menu.SetTitle("%s %s Top", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]]);
-	JumpTopBlockTypeMenuAddItems(menu);
+	menu.SetTitle("%s %s %T", gC_ModeNames[jumpTopMode[client]], gC_JumpTypes[jumpTopType[client]], "Top", client);
+	JumpTopBlockTypeMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-static void JumpTopBlockTypeMenuAddItems(Menu menu)
+static void JumpTopBlockTypeMenuAddItems(int client, Menu menu)
 {
-	menu.AddItem("jump", "Jump Records");
-	menu.AddItem("blockjump", "Block Jump Records");
+	char str[64];
+	FormatEx(str, sizeof(str), "%T", "Jump Records", client);
+	menu.AddItem("jump", str);
+	FormatEx(str, sizeof(str), "%T %T", "Block", client, "Jump Records", client);
+	menu.AddItem("blockjump", str);
 }
 
 void DisplayJumpTopMenu(int client, int blockType)

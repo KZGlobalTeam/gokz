@@ -76,7 +76,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 			GetVectorAngles(measureNormal[param1][0], angles);
 			MeasureGetPosEx(param1, 1, measurePos[param1][0], angles);
 			AddVectors(measureNormal[param1][0], measureNormal[param1][1], angles);
-			if(GetVectorLength(angles, true) > EPSILON ||
+			if (GetVectorLength(angles, true) > EPSILON ||
 				FloatAbs(measureNormal[param1][0][2]) > EPSILON ||
 				FloatAbs(measureNormal[param1][1][2]) > EPSILON)
 			{

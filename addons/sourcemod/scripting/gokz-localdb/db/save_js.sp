@@ -104,7 +104,7 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 			{
 				SQL_FetchRow(results[0]);
 			}
-			int min_rec_id = SQL_FetchInt(results[0], JumpstatDB_Lookup_MinRecID);
+			int min_rec_id = SQL_FetchInt(results[0], JumpstatDB_Lookup_JumpID);
 			FormatEx(query, sizeof(query), sql_jumpstats_update, steamid, jumpType, mode, distance, block > 0, block, strafes, sync, pre, max, airtime, min_rec_id);
 		}
 		

@@ -326,6 +326,20 @@
 		"en"		"{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({lightred}{1}{grey})."
 		"chi"		"{grey}你比个人最佳{yellow}读点{grey}/{blue}裸跳记录{grey}慢了(个人记录:{lightred}{1}{grey})."
 	}
+	"No Jumpstat Record Found"
+	{
+		"en"		"No record found."
+	}
+	"Jump Record"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:.4f}"
+		"en"		"{1} {2} record of {3}: {4} units"
+	}
+	"Block Jump Record"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:d},{5:.4f}"
+		"en"		"{1} block {2} record of {3}: {4} block ({5} jump)"
+	}
 
 
 	// =====[ MAP TOP MENU ]=====
@@ -472,5 +486,47 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"Recently Broken {1} Server Records\n \nMode - {2}\n "
 		"chi"		"最近刷新记录玩家 {1} 服务器排行\n \n模式 - {2}\n "
+	}
+
+
+	// =====[ JUMPTOP MENU ]=====
+	"Top"
+	{
+		"en"		"Top"
+	}
+	"Jumpstats"
+	{
+		"en"		"Jumpstats"
+	}
+	"Jump Records"
+	{
+		"en"		"Jump Records"
+	}
+
+
+	// =====[ JUMPSTAT PHRASES ]=====
+	"Strafes"
+	{
+		"en"		"Strafes"
+	}
+	"Sync"
+	{
+		"en"		"Sync"
+	}
+	"Pre"
+	{
+		"en"		"Pre"
+	}
+	"Max"
+	{
+		"en"		"Max"
+	}
+	"Air"
+	{
+		"en"		"Air"
+	}
+	"Block"
+	{
+		"en"		"Block"
 	}
 }

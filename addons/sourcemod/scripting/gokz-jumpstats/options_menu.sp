@@ -80,7 +80,9 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 		switch (option)
 		{
 			case JSOption_JumpstatsMaster:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
-			case JSOption_Failstats:FormatFailstatsOptionDisplay(param, option, buffer, maxlength);
+			case JSOption_ExtendedChatReport:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+			case JSOption_FailstatsConsole:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+			case JSOption_FailstatsChat:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 			default:FormatDistanceTierOptionDisplay(param, option, buffer, maxlength);
 		}
 	}
@@ -97,7 +99,7 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 
 static void FormatToggleableOptionDisplay(int client, JSOption option, char[] buffer, int maxlength)
 {
-	if (GOKZ_JS_GetOption(client, option) == 0)
+	if (GOKZ_JS_GetOption(client, option) == JSToggleOption_Disabled)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
 			gI_JSOptionPhrases[option], client, 
@@ -108,31 +110,6 @@ static void FormatToggleableOptionDisplay(int client, JSOption option, char[] bu
 		FormatEx(buffer, maxlength, "%T - %T", 
 			gI_JSOptionPhrases[option], client, 
 			"Options Menu - Enabled", client);
-	}
-}
-
-static void FormatFailstatsOptionDisplay(int client, JSOption option, char[] buffer, int maxlength)
-{
-	switch (GOKZ_JS_GetOption(client, option))
-	{
-		case Failstats_Disabled:
-		{
-			FormatEx(buffer, maxlength, "%T - %T", 
-				gI_JSOptionPhrases[option], client, 
-				"Options Menu - Disabled", client);
-		}
-		case Failstats_Console:
-		{
-			FormatEx(buffer, maxlength, "%T - %s", 
-				gI_JSOptionPhrases[option], client, 
-				"Console");
-		}
-		case Failstats_ConsoleChat:
-		{
-			FormatEx(buffer, maxlength, "%T - %s", 
-				gI_JSOptionPhrases[option], client, 
-				"Console and chat");
-		}
 	}
 }
 

@@ -6,6 +6,10 @@
 		"en"		"Offset"
 		"chi"		"位移"
 	}
+	"Ladder Offset"
+	{
+		"en"		"Off"
+	}
 	"Height"
 	{
 		"en"		"Height"
@@ -74,9 +78,13 @@
 	{
 		"en"		"W"
 	}
-	"Failed"
+	"Width"
 	{
-		"en"		"Failed"
+		"en"		"Width"
+	}
+	"Speed"
+	{
+		"en"		"Speed"
 	}
 
 
@@ -204,8 +212,16 @@
 		"en"		"Sounds"
 		"chi"		"音效"
 	}
-	"Options Menu - Failstats"
+	"Options Menu - Extended Jump Chat Report"
 	{
-		"en"		"Failstats"
+		"en"		"Extended Chat Report"
+	}
+	"Options Menu - Failstats Console Report"
+	{
+		"en"		"Failstats Console Report"
+	}
+	"Options Menu - Failstats Chat Report"
+	{
+		"en"		"Failstats Chat Report"
 	}
 }
