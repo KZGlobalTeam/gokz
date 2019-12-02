@@ -120,7 +120,9 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	// If bhop was last tick, then record the pre bhop inputs.
 	// Require two times the button sample size since the last
 	// takeoff to avoid pre and post bhop input overlap.
-	if (HitBhop(client, cmdnum) && cmdnum >= gI_BhopLastTakeoffCmdnum[client] + AC_MAX_BUTTON_SAMPLES * 2)
+	if (HitBhop(client, cmdnum)
+		 && cmdnum >= gI_BhopLastTakeoffCmdnum[client] + AC_MAX_BUTTON_SAMPLES * 2
+		 && gB_LastLandingWasValid[client])
 	{
 		gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
 		gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client);
@@ -142,6 +144,11 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	if (JustJumped(client, cmdnum))
 	{
 		gI_BhopLastTakeoffCmdnum[client] = cmdnum;
+	}
+	
+	if (JustLanded(client, cmdnum))
+	{
+		gB_LastLandingWasValid[client] = GOKZ_GetValidJump(client);
 	}
 }
 
@@ -231,6 +238,7 @@ static void ResetBhopStats(int client)
 	gI_BhopLastTakeoffCmdnum[client] = 0;
 	gI_BhopLastRecordedBhopCmdnum[client] = 0;
 	gB_BhopPostJumpInputsPending[client] = false;
+	gB_LastLandingWasValid[client] = false;
 }
 
 // Returns true if ther was a jump last tick and was within a number of ticks after landing
@@ -242,6 +250,11 @@ static bool HitBhop(int client, int cmdnum)
 static bool JustJumped(int client, int cmdnum)
 {
 	return Movement_GetJumped(client) && Movement_GetTakeoffCmdNum(client) == cmdnum;
+}
+
+static bool JustLanded(int client, int cmdnum)
+{
+	return Movement_GetLandingCmdNum(client) == cmdnum;
 }
 
 // Records current button inputs
