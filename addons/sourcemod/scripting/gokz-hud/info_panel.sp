@@ -174,11 +174,11 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 	char takeoffString[96], duckString[32];
 	
 	// The last line disables the crouch indicator for bhops
-	if((infoPanelShowDuckString[targetPlayer.ID]
-		|| (infoPanelOnGroundLast[targetPlayer.ID]
-			&& (infoPanelDuckPressedLast[targetPlayer.ID] || (GOKZ_GetCoreOption(targetPlayer.ID, Option_Mode) == Mode_Vanilla && Movement_GetDucking(targetPlayer.ID)))))
-		&& Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
-		&& targetPlayer.Jumped)
+	if ((infoPanelShowDuckString[targetPlayer.ID]
+			 || (infoPanelOnGroundLast[targetPlayer.ID]
+				 && (infoPanelDuckPressedLast[targetPlayer.ID] || (GOKZ_GetCoreOption(targetPlayer.ID, Option_Mode) == Mode_Vanilla && Movement_GetDucking(targetPlayer.ID)))))
+		 && Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
+		 && targetPlayer.Jumped)
 	{
 		duckString = " <font color='#8080ff'>C</font>";
 		infoPanelShowDuckString[targetPlayer.ID] = true;
@@ -193,14 +193,14 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#40ff40'>%.0f</font>)%s", 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2),
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2), 
 			duckString);
 	}
 	else
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#ffffff'>%.0f</font>)%s", 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2),
+			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2), 
 			duckString);
 	}
 	return takeoffString;
@@ -231,4 +231,4 @@ static char[] GetKeysString(KZPlayer player, KZPlayer targetPlayer)
 			buttons & IN_JUMP ? 'J' : '_');
 	}
 	return keysString;
-} 
+}

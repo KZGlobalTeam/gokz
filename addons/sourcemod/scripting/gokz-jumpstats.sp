@@ -4,8 +4,8 @@
 #include <sdktools>
 
 #include <gokz/core>
-#include <gokz/localdb>
 #include <gokz/jumpstats>
+#include <gokz/localdb>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN

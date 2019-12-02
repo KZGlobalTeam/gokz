@@ -138,4 +138,4 @@ static void FormatDistanceTierOptionDisplay(int client, JSOption option, char[] 
 				gC_DistanceTiers[optionValue]);
 		}
 	}
-} 
+}

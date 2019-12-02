@@ -475,4 +475,17 @@ stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
 	GetCurrentMap(map, sizeof(map));
 	GetMapDisplayName(map, map, sizeof(map));
 	String_ToLower(map, buffer, maxlength);
+}
+
+/**
+ * Copies the elements of a source vector to a destination vector.
+ *
+ * @param src				Source vector.
+ * @param dest				Destination vector.
+ */
+stock void CopyVector(float src[3], float dest[3])
+{
+	dest[0] = src[0];
+	dest[1] = src[1];
+	dest[2] = src[2];
 } 

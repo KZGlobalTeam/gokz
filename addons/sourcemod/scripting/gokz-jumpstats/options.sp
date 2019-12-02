@@ -82,4 +82,4 @@ static void PrintOptionChangeMessage(int client, JSOption option, any newValue)
 			}
 		}
 	}
-} 
+}

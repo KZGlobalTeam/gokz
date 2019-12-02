@@ -59,7 +59,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
 			
-			PrintToConsole(client, "#%-2d   %.4f   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]",
+			PrintToConsole(client, "#%-2d   %.4f   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
 				i + 1, distance, alias, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
 		}
 	}
@@ -87,7 +87,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 			FormatEx(display, sizeof(display), "#%-2d   %d %T (%.4f)   %s", i + 1, block, "Block", client, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
 			
-			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]",
+			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
 				i + 1, block, "Block", distance, alias, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
 		}
 	}

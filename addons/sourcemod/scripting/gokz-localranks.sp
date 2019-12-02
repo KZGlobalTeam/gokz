@@ -4,8 +4,8 @@
 #include <sdktools>
 
 #include <gokz/core>
-#include <gokz/localdb>
 #include <gokz/jumpstats>
+#include <gokz/localdb>
 #include <gokz/localranks>
 
 #include <sourcemod-colors>
@@ -53,13 +53,13 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/db/cache_records.sp"
 #include "gokz-localranks/db/create_tables.sp"
 #include "gokz-localranks/db/get_completion.sp"
-#include "gokz-localranks/db/map_top.sp"
 #include "gokz-localranks/db/js_top.sp"
+#include "gokz-localranks/db/map_top.sp"
 #include "gokz-localranks/db/player_top.sp"
 #include "gokz-localranks/db/print_average.sp"
+#include "gokz-localranks/db/print_js.sp"
 #include "gokz-localranks/db/print_pbs.sp"
 #include "gokz-localranks/db/print_records.sp"
-#include "gokz-localranks/db/print_js.sp"
 #include "gokz-localranks/db/process_new_time.sp"
 #include "gokz-localranks/db/recent_records.sp"
 #include "gokz-localranks/db/update_ranked_map_pool.sp"

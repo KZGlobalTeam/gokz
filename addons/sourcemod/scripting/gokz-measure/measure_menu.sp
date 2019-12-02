@@ -76,8 +76,8 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 			GetVectorAngles(measureNormal[param1][0], angles);
 			MeasureGetPosEx(param1, 1, measurePos[param1][0], angles);
 			AddVectors(measureNormal[param1][0], measureNormal[param1][1], angles);
-			if (GetVectorLength(angles, true) > EPSILON ||
-				FloatAbs(measureNormal[param1][0][2]) > EPSILON ||
+			if (GetVectorLength(angles, true) > EPSILON || 
+				FloatAbs(measureNormal[param1][0][2]) > EPSILON || 
 				FloatAbs(measureNormal[param1][1][2]) > EPSILON)
 			{
 				GOKZ_PrintToChat(param1, true, "%t", "Measure Failure (Blocks not aligned)");
@@ -136,7 +136,7 @@ static void MeasureGetPosEx(int client, int arg, float origin[3], float angles[3
 	
 	if (!TR_DidHit(trace))
 	{
-		CloseHandle(trace);
+		delete trace;
 		GOKZ_PrintToChat(client, true, "%t", "Measure Failure (Not Aiming at Solid)");
 		GOKZ_PlayErrorSound(client);
 		return;
@@ -144,13 +144,13 @@ static void MeasureGetPosEx(int client, int arg, float origin[3], float angles[3
 	
 	TR_GetEndPosition(measurePos[client][arg], trace);
 	TR_GetPlaneNormal(trace, measureNormal[client][arg]);
-	CloseHandle(trace);
+	delete trace;
 	
 	if (arg == 0)
 	{
 		if (P2PRed[client] != null)
 		{
-			CloseHandle(P2PRed[client]);
+			delete P2PRed[client];
 			P2PRed[client] = null;
 		}
 		measurePosSet[client][0] = true;
@@ -161,7 +161,7 @@ static void MeasureGetPosEx(int client, int arg, float origin[3], float angles[3
 	{
 		if (P2PGreen[client] != null)
 		{
-			CloseHandle(P2PGreen[client]);
+			delete P2PGreen[client];
 			P2PGreen[client] = null;
 		}
 		measurePosSet[client][1] = true;
@@ -220,12 +220,12 @@ static void MeasureResetPos(int client)
 {
 	if (P2PRed[client] != null)
 	{
-		CloseHandle(P2PRed[client]);
+		delete P2PRed[client];
 		P2PRed[client] = null;
 	}
 	if (P2PGreen[client] != null)
 	{
-		CloseHandle(P2PGreen[client]);
+		delete P2PGreen[client];
 		P2PGreen[client] = null;
 	}
 	measurePosSet[client][0] = false;
@@ -303,4 +303,4 @@ static float CalcEffectiveDistance(const float pointA[3], const float pointB[3])
 	}
 	
 	return SquareRoot(Pow(Ax - Bx, 2.0) + Pow(Ay - By, 2.0)) + 32.0;
-} 
+}

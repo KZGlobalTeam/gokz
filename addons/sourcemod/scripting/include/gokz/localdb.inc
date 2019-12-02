@@ -32,26 +32,26 @@ enum DatabaseType
 
 enum
 {
-	JumpstatDB_Lookup_JumpID = 0,
-	JumpstatDB_Lookup_Distance,
+	JumpstatDB_Lookup_JumpID = 0, 
+	JumpstatDB_Lookup_Distance, 
 	JumpstatDB_Lookup_Block
 };
 
 enum
 {
-	JumpstatDB_FindPlayer_SteamID32 = 0,
+	JumpstatDB_FindPlayer_SteamID32 = 0, 
 	JumpstatDB_FindPlayer_Alias
 };
 
 enum
 {
-	JumpstatDB_Top20_Alias = 0,
-	JumpstatDB_Top20_Block,
-	JumpstatDB_Top20_Distance,
-	JumpstatDB_Top20_Strafes,
-	JumpstatDB_Top20_Sync,
-	JumpstatDB_Top20_Pre,
-	JumpstatDB_Top20_Max,
+	JumpstatDB_Top20_Alias = 0, 
+	JumpstatDB_Top20_Block, 
+	JumpstatDB_Top20_Distance, 
+	JumpstatDB_Top20_Strafes, 
+	JumpstatDB_Top20_Sync, 
+	JumpstatDB_Top20_Pre, 
+	JumpstatDB_Top20_Max, 
 	JumpstatDB_Top20_Air
 };
 

@@ -52,9 +52,9 @@ enum JSOption:
 	JSOption_MinChatTier, 
 	JSOption_MinConsoleTier, 
 	JSOption_MinSoundTier, 
-	JSOption_FailstatsConsole,
-	JSOption_FailstatsChat,
-	JSOption_ExtendedChatReport,
+	JSOption_FailstatsConsole, 
+	JSOption_FailstatsChat, 
+	JSOption_ExtendedChatReport, 
 	JSOPTION_COUNT
 };
 
@@ -152,9 +152,9 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 	"GOKZ JS - Master Switch", 
 	"GOKZ JS - Chat Report", 
 	"GOKZ JS - Console Report", 
-	"GOKZ JS - Sounds",
-	"GOKZ JS - Failstats Console",
-	"GOKZ JS - Failstats Chat",
+	"GOKZ JS - Sounds", 
+	"GOKZ JS - Failstats Console", 
+	"GOKZ JS - Failstats Chat", 
 	"GOKZ JS - Extended Chat Report"
 };
 
@@ -163,9 +163,9 @@ stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] =
 	"Master Switch for All Jumpstats Functionality - 0 = Disabled, 1 = Enabled", 
 	"Minimum Tier for Jumpstats Chat Report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
 	"Minimum Tier for Jumpstats Console report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
-	"Minimum Tier for Jumpstats Sounds - 0 = Disabled, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage",
-	"Print Failstats To Console - 0 = Disabled, 1 = Enabled",
-	"Print Failstats To Chat - 0 = Disabled, 1 = Enabled",
+	"Minimum Tier for Jumpstats Sounds - 0 = Disabled, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
+	"Print Failstats To Console - 0 = Disabled, 1 = Enabled", 
+	"Print Failstats To Chat - 0 = Disabled, 1 = Enabled", 
 	"Extended Chat Report - 0 = Disabled, 1 = Enabled"
 };
 
@@ -176,7 +176,7 @@ stock char gI_JSOptionPhrases[JSOPTION_COUNT][] =
 	"Options Menu - Jumpstats Console Report", 
 	"Options Menu - Jumpstats Sounds", 
 	"Options Menu - Failstats Console Report", 
-	"Options Menu - Failstats Chat Report",
+	"Options Menu - Failstats Chat Report", 
 	"Options Menu - Extended Jump Chat Report"
 };
 
@@ -185,9 +185,9 @@ stock int gI_JSOptionDefaults[JSOPTION_COUNT] =
 	JSToggleOption_Enabled, 
 	DistanceTier_Meh, 
 	DistanceTier_Meh, 
-	DistanceTier_Impressive,
-	JSToggleOption_Enabled,
-	JSToggleOption_Disabled,
+	DistanceTier_Impressive, 
+	JSToggleOption_Enabled, 
+	JSToggleOption_Disabled, 
 	JSToggleOption_Disabled
 };
 
@@ -196,9 +196,9 @@ stock int gI_JSOptionCounts[JSOPTION_COUNT] =
 	JSTOGGLEOPTION_COUNT, 
 	DISTANCETIER_COUNT, 
 	DISTANCETIER_COUNT, 
-	DISTANCETIER_COUNT,
-	JSTOGGLEOPTION_COUNT,
-	JSTOGGLEOPTION_COUNT,
+	DISTANCETIER_COUNT, 
+	JSTOGGLEOPTION_COUNT, 
+	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT
 };
 

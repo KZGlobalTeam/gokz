@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum HUDOption
+enum HUDOption:
 {
 	HUDOPTION_INVALID = -1, 
 	HUDOption_TPMenu, 
@@ -235,4 +235,4 @@ public SharedPlugin __pl_gokz_hud =
 	#else
 	required = 0, 
 	#endif
-}; 
+};

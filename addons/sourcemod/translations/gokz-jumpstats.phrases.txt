@@ -148,11 +148,12 @@
 	}
 	"Console Failstat Header"
 	{
-		// Bill failed a 268.3485 units Long Jump
+		// Bill failed a 268.3485 unit Long Jump
 		"#format"	"{1:N},{2:.4f},{3:s}"
-		"en"		"{1} failed a {2} units {3}"
+		"en"		"{1} failed a {2} unit {3}"
 	}
-	// NOTE: For table formatting in console, these 'headers' should be 10 characters long.
+	// NOTE: For table formatting in console, these 'headers' should
+	// be the same number of characters as the English translation.
 	"Sync (Table)"
 	{
 		"en"		"Sync      "

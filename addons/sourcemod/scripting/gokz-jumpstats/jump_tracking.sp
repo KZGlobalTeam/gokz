@@ -166,13 +166,6 @@ static void UpdateValidCmd(int client)
 	}
 }
 
-static void CopyVector(float src[3], float dest[3])
-{
-	dest[0] = src[0];
-	dest[1] = src[1];
-	dest[2] = src[2];
-}
-
 
 
 // =====[ CHECKS ]=====
@@ -545,21 +538,21 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	trace = TR_TraceHullFilterEx(middle, takeoffOrigin, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	if (!TR_DidHit(trace))
 	{
-		CloseHandle(trace);
+		delete trace;
 		return;
 	}
 	TR_GetEndPosition(startBlock, trace);
-	CloseHandle(trace);
+	delete trace;
 	
 	// Search for the ending block.
 	trace = TR_TraceHullFilterEx(middle, landingOrigin, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	if (!TR_DidHit(trace))
 	{
-		CloseHandle(trace);
+		delete trace;
 		return;
 	}
 	TR_GetEndPosition(endBlock, trace);
-	CloseHandle(trace);
+	delete trace;
 	
 	// Make sure the edges of the blocks are parallel.
 	if (!BlockAreEdgesParallel(startBlock, endBlock, blockDeviation[client] + 32.0, coordDist, coordDev))
@@ -617,18 +610,18 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	trace = TR_TraceHullFilterEx(takeoffOrigin, traceEnd, sweepBoxMin, sweepBoxMax, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	if (!TR_DidHit(trace))
 	{
-		CloseHandle(trace);
+		delete trace;
 		return;
 	}
 	TR_GetEndPosition(ladderPosition, trace);
-	CloseHandle(trace);
+	delete trace;
 	
 	// Find the block.
 	landingOrigin[coordDist] += distSign * 16.0;
 	trace = TR_TraceRayFilterEx(traceEnd, landingOrigin, MASK_SOLID, RayType_EndPoint, TraceEntityFilterPlayers);
 	if (!TR_DidHit(trace))
 	{
-		CloseHandle(trace);
+		delete trace;
 		return;
 	}
 	TR_GetEndPosition(blockPosition, trace);
@@ -637,10 +630,10 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	TR_GetPlaneNormal(trace, normalVector);
 	if (FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) > EPSILON)
 	{
-		CloseHandle(trace);
+		delete trace;
 		return;
 	}
-	CloseHandle(trace);
+	delete trace;
 	
 	// Calculate distance and edge.
 	blockDistance[client] = RoundFloat(FloatAbs(blockPosition[coordDist] - ladderPosition[coordDist]));
@@ -711,7 +704,7 @@ static bool BlockTraceAligned(const float origin[3], const float end[3], int coo
 	{
 		return false;
 	}
-	CloseHandle(trace);
+	delete trace;
 	return true;
 }
 
@@ -772,11 +765,11 @@ static void UpdateFailstat(int client)
 		{
 			// Mark the calculation as failed.
 			failstatDistance[client] = 0.0;
-			CloseHandle(trace);
+			delete trace;
 			return;
 		}
 		TR_GetEndPosition(landingOrigin, trace);
-		CloseHandle(trace);
+		delete trace;
 		failstatBlockHeight[client] = landingOrigin[2];
 		
 		// Calculate offset.
@@ -903,8 +896,8 @@ static void TraceLadderOffset(int client, float takeoffOrigin[3], float landingO
 {
 	float traceOrigin[3], traceEnd[3], ladderTop[3], ladderNormal[3];
 	
-	float mins[3] = { -16.0, -16.0, 0.0 };
-	float maxs[3] = { 16.0, 16.0, 0.0 };
+	float mins[3] =  { -16.0, -16.0, 0.0 };
+	float maxs[3] =  { 16.0, 16.0, 0.0 };
 	
 	// Get normal vector of the ladder.
 	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
@@ -924,7 +917,7 @@ static void TraceLadderOffset(int client, float takeoffOrigin[3], float landingO
 	{
 		InvalidateJumpstat(client);
 	}
-	CloseHandle(trace);
+	delete trace;
 }
 
 

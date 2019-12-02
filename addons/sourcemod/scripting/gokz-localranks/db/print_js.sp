@@ -12,7 +12,7 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 	{
 		steamid = GetSteamAccountID(client);
 		FormatEx(alias, sizeof(alias), "%N", client);
-	
+		
 		DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 0);
 		DB_JS_OpenPlayerRecord(client, steamid, alias, jumpType, mode, 1);
 	}
