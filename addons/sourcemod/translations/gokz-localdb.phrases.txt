@@ -1,0 +1,17 @@
+"Phrases"
+{
+	"Jump Record"
+	{
+		"#format"	"{1:N},{2:s},{3:.4f},{4:s}"
+		"en"		"{yellow}{1} got a new {2} jump record with a {3} units {4}!"
+	}
+	"Block Jump Record"
+	{
+		"#format"	"{1:N},{2:s},{3:.4f},{4:s},{5:d}"
+		"en"		"{yellow}{1} got a new {2} block jump record with a {3} units {4} on a {5} block!"
+	}
+	"Jump Deleted"
+	{
+		"en"		"{yellow}Jump successfully deleted!"
+	}
+}

@@ -1,3 +1,8 @@
+/*
+	Inserts or updates the player's jumpstat into the database.
+*/
+
+
 
 public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
 {
@@ -14,45 +19,51 @@ public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, flo
 	}
 	
 	char query[1024];
+	DataPack data;
 	int steamid = GetSteamAccountID(client);
+	int int_dist = RoundToNearest(distance * GOKZ_DB_JS_DISTANCE_PRECISION);
 	
-	DataPack data_noblock = new DataPack();
-	data_noblock.WriteCell(client);
-	data_noblock.WriteCell(steamid);
-	data_noblock.WriteCell(jumpType);
-	data_noblock.WriteCell(mode);
-	data_noblock.WriteCell(RoundToNearest(distance * GOKZ_DB_JS_DISTANCE_PRECISION));
-	data_noblock.WriteCell(0);
-	data_noblock.WriteCell(strafes);
-	data_noblock.WriteCell(RoundToNearest(sync * GOKZ_DB_JS_SYNC_PRECISION));
-	data_noblock.WriteCell(RoundToNearest(preSpeed * GOKZ_DB_JS_PRE_PRECISION));
-	data_noblock.WriteCell(RoundToNearest(maxSpeed * GOKZ_DB_JS_MAX_PRECISION));
-	data_noblock.WriteCell(RoundToNearest(duration * GOKZ_DB_JS_AIRTIME_PRECISION));
-	
-	Transaction txn_noblock = SQL_CreateTransaction();
-	FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 0);
-	txn_noblock.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data_noblock, DBPrio_Low);
-	
-	if (block > 0)
+	// Non-block
+	if (gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] == 0
+		 || int_dist > gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance])
 	{
-		DataPack data_block = new DataPack();
-		data_block.WriteCell(client);
-		data_block.WriteCell(steamid);
-		data_block.WriteCell(jumpType);
-		data_block.WriteCell(mode);
-		data_block.WriteCell(RoundToNearest(distance * GOKZ_DB_JS_DISTANCE_PRECISION));
-		data_block.WriteCell(block);
-		data_block.WriteCell(strafes);
-		data_block.WriteCell(RoundToNearest(sync * GOKZ_DB_JS_SYNC_PRECISION));
-		data_block.WriteCell(RoundToNearest(preSpeed * GOKZ_DB_JS_PRE_PRECISION));
-		data_block.WriteCell(RoundToNearest(maxSpeed * GOKZ_DB_JS_MAX_PRECISION));
-		data_block.WriteCell(RoundToNearest(duration * GOKZ_DB_JS_AIRTIME_PRECISION));
+		data = JSRecord_FillDataPack(client, steamid, jumpType, mode, distance, 0, strafes, sync, preSpeed, maxSpeed, duration);
+		Transaction txn_noblock = SQL_CreateTransaction();
+		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 0);
+		txn_noblock.AddQuery(query);
+		SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data, DBPrio_Low);
+	}
+	
+	// Block
+	if (block > 0
+		 && (gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block] == 0
+			 || (block > gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block]
+				 || block == gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block]
+				 && int_dist > gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_BlockDistance])))
+	{
+		data = JSRecord_FillDataPack(client, steamid, jumpType, mode, distance, block, strafes, sync, preSpeed, maxSpeed, duration);
 		Transaction txn_block = SQL_CreateTransaction();
 		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 1);
 		txn_block.AddQuery(query);
-		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data_block, DBPrio_Low);
+		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data, DBPrio_Low);
 	}
+}
+
+static DataPack JSRecord_FillDataPack(int client, int steamid, int jumpType, int mode, float distance, int block, int strafes, float sync, float preSpeed, float maxSpeed, float duration)
+{
+	DataPack data = new DataPack();
+	data.WriteCell(client);
+	data.WriteCell(steamid);
+	data.WriteCell(jumpType);
+	data.WriteCell(mode);
+	data.WriteCell(RoundToNearest(distance * GOKZ_DB_JS_DISTANCE_PRECISION));
+	data.WriteCell(block);
+	data.WriteCell(strafes);
+	data.WriteCell(RoundToNearest(sync * GOKZ_DB_JS_SYNC_PRECISION));
+	data.WriteCell(RoundToNearest(preSpeed * GOKZ_DB_JS_PRE_PRECISION));
+	data.WriteCell(RoundToNearest(maxSpeed * GOKZ_DB_JS_MAX_PRECISION));
+	data.WriteCell(RoundToNearest(duration * GOKZ_DB_JS_AIRTIME_PRECISION));
+	return data;
 }
 
 public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
@@ -87,6 +98,16 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 		SQL_FetchRow(results[0]);
 		int rec_distance = SQL_FetchInt(results[0], JumpstatDB_Lookup_Distance);
 		int rec_block = SQL_FetchInt(results[0], JumpstatDB_Lookup_Block);
+		
+		if (rec_block == 0)
+		{
+			gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] = rec_distance;
+		}
+		else
+		{
+			gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block] = rec_block;
+			gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_BlockDistance] = rec_distance;
+		}
 		
 		if (block < rec_block || block == rec_block && distance < rec_distance)
 		{
@@ -133,11 +154,14 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 	
 	if (block == 0)
 	{
-		GOKZ_PrintToChat(client, true, "{yellow}%N got a new %s jump record with a %.4f units %s!", client, gC_ModeNamesShort[mode], float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, gC_JumpTypes[jumpType]);
+		gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] = distance;
+		GOKZ_PrintToChat(client, true, "%t", "Jump Record", client, gC_ModeNamesShort[mode], float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, gC_JumpTypes[jumpType]);
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, true, "{yellow}%N got a new %s block jump record with a %.4f units %s on a %d block!", client, gC_ModeNamesShort[mode], float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, gC_JumpTypes[jumpType], block);
+		gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block] = block;
+		gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_BlockDistance] = distance;
+		GOKZ_PrintToChat(client, true, "%t", "Block Jump Record", client, gC_ModeNamesShort[mode], float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, gC_JumpTypes[jumpType], block);
 	}
 }
 
@@ -155,5 +179,5 @@ public void DB_DeleteJump(int client, int steamAccountID, int jumpType, int mode
 
 public void DB_TxnSuccess_JumpDeleted(Handle db, int client, int numQueries, Handle[] results, any[] queryData)
 {
-	GOKZ_PrintToChat(client, true, "{yellow}Jump successfully deleted!");
+	GOKZ_PrintToChat(client, true, "%t", "Jump Deleted");
 }
