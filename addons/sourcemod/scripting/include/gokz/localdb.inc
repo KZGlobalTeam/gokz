@@ -55,6 +55,14 @@ enum
 	JumpstatDB_Top20_Air
 };
 
+enum
+{
+	JumpstatDB_Cache_Distance = 0,
+	JumpstatDB_Cache_Block,
+	JumpstatDB_Cache_BlockDistance,
+	JUMPSTATDB_CACHE_COUNT
+}
+
 
 
 // =====[ FORWARDS ]=====

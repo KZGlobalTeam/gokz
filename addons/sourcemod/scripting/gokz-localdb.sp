@@ -30,6 +30,7 @@ Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
+int gI_PBJSCache[MAXPLAYERS + 1][MODE_COUNT][JUMPTYPE_COUNT][JUMPSTATDB_CACHE_COUNT];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
 
@@ -38,6 +39,7 @@ int gI_DBCurrentMapID;
 
 #include "gokz-localdb/db/sql.sp"
 #include "gokz-localdb/db/helpers.sp"
+#include "gokz-localdb/db/cache_js.sp"
 #include "gokz-localdb/db/create_tables.sp"
 #include "gokz-localdb/db/save_js.sp"
 #include "gokz-localdb/db/save_time.sp"
@@ -112,6 +114,11 @@ public void OnMapEnd()
 public void OnClientAuthorized(int client, const char[] auth)
 {
 	DB_SetupClient(client);
+}
+
+public void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater)
+{
+	DB_CacheJSPBs(client, steamID);
 }
 
 public void OnClientDisconnect(int client)

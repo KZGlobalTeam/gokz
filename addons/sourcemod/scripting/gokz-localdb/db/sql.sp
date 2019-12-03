@@ -221,29 +221,29 @@ INSERT INTO Jumpstats (SteamID32, JumpType, Mode, Distance, IsBlockJump, Block, 
 char sql_jumpstats_update[] = "\
 UPDATE Jumpstats \
     SET \
-        SteamID32 = %d, \
-        JumpType = %d, \
-        Mode = %d, \
-        Distance = %d, \
-        IsBlockJump = %d, \
-        Block = %d, \
-        Strafes = %d, \
-        Sync = %d, \
-        Pre = %d, \
-        Max = %d, \
-        Airtime = %d \
+        SteamID32=%d, \
+        JumpType=%d, \
+        Mode=%d, \
+        Distance=%d, \
+        IsBlockJump=%d, \
+        Block=%d, \
+        Strafes=%d, \
+        Sync=%d, \
+        Pre=%d, \
+        Max=%d, \
+        Airtime=%d \
     WHERE \
-        JumpID = %d";
+        JumpID=%d";
 
 char sql_jumpstats_getrecord[] = "\
 SELECT JumpID, Distance, Block \
     FROM \
         Jumpstats \
     WHERE \
-        SteamID32 = %d AND \
-        JumpType = %d AND \
-        Mode = %d AND \
-        IsBlockJump = %d \
+        SteamID32=%d AND \
+        JumpType=%d AND \
+        Mode=%d AND \
+        IsBlockJump=%d \
     ORDER BY Block DESC, Distance DESC";
 
 char sql_jumpstats_deleterecord[] = "\
@@ -257,10 +257,43 @@ DELETE \
                 FROM \
                     Jumpstats \
                 WHERE \
-                    SteamID32 = %d AND \
-                    JumpType = %d AND \
-                    Mode = %d AND \
-                    IsBlockJump = %d \
+                    SteamID32=%d AND \
+                    JumpType=%d AND \
+                    Mode=%d AND \
+                    IsBlockJump=%d \
                 ORDER BY Block DESC, Distance DESC \
                 LIMIT 1 \
         )";
+
+char sql_jumpstats_getpbs[] = "\
+SELECT MAX(Distance), Mode, JumpType \
+    FROM \
+        Jumpstats \
+    WHERE \
+        SteamID32=%d \
+    GROUP BY \
+    	Mode, JumpType";
+
+char sql_jumpstats_getblockpbs[] = "\
+SELECT MAX(js.Distance), js.Mode, js.JumpType, js.Block \
+	FROM \
+		Jumpstats js \
+	INNER JOIN \
+	( \
+		SELECT Mode, JumpType, MAX(BLOCK) Block \
+			FROM \
+				Jumpstats \
+			WHERE \
+				IsBlockJump=1 AND \
+				SteamID32=%d \
+			GROUP BY \ 
+				Mode, JumpType \
+	) pb \
+	ON \
+		js.Mode=pb.Mode AND \
+		js.JumpType=pb.JumpType AND \
+		js.Block=pb.Block \
+	WHERE \
+		js.SteamID32=%d \
+	GROUP BY \
+		js.Mode, js.JumpType, js.Block";
