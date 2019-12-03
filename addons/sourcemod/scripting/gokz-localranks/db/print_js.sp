@@ -2,6 +2,8 @@
 	Prints the player's personal best jumps.
 */
 
+
+
 void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 {
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
@@ -22,6 +24,7 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 		data.WriteCell(client);
 		data.WriteCell(jumpType);
 		data.WriteCell(mode);
+		data.WriteString(jumper);
 		
 		DB_FindPlayer(jumper, DB_JS_TxnSuccess_LookupPlayer, data);
 	}
@@ -29,15 +32,18 @@ void DisplayJumpstatRecord(int client, int jumpType, char[] jumper = "")
 
 public void DB_JS_TxnSuccess_LookupPlayer(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
+	char jumper[MAX_NAME_LENGTH];
+	
 	data.Reset();
 	int client = data.ReadCell();
 	int jumpType = data.ReadCell();
 	int mode = data.ReadCell();
+	data.ReadString(jumper, sizeof(jumper));
 	delete data;
 	
 	if (SQL_GetRowCount(results[0]) == 0)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Player Not Found");
+		GOKZ_PrintToChat(client, true, "%t", "Player Not Found", jumper);
 		return;
 	}
 	
@@ -93,10 +99,10 @@ public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQ
 	
 	if (block == 0)
 	{
-		GOKZ_PrintToChat(client, true, "%t", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, distance);
+		GOKZ_PrintToChat(client, true, "%t", "Jump Record", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, distance);
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, true, "%t", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, block, distance);
+		GOKZ_PrintToChat(client, true, "%t", "Block Jump Record", gC_ModeNamesShort[mode], gC_JumpTypes[jumpType], alias, block, distance);
 	}
 }
