@@ -80,6 +80,9 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 		switch (option)
 		{
 			case JSOption_JumpstatsMaster:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+			case JSOption_ExtendedChatReport:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+			case JSOption_FailstatsConsole:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+			case JSOption_FailstatsChat:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 			default:FormatDistanceTierOptionDisplay(param, option, buffer, maxlength);
 		}
 	}
@@ -96,7 +99,7 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 
 static void FormatToggleableOptionDisplay(int client, JSOption option, char[] buffer, int maxlength)
 {
-	if (GOKZ_JS_GetOption(client, option) == 0)
+	if (GOKZ_JS_GetOption(client, option) == JSToggleOption_Disabled)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
 			gI_JSOptionPhrases[option], client, 
@@ -135,4 +138,4 @@ static void FormatDistanceTierOptionDisplay(int client, JSOption option, char[] 
 				gC_DistanceTiers[optionValue]);
 		}
 	}
-} 
+}

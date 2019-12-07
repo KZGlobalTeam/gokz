@@ -41,6 +41,15 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 		return -1;
 	}
 	
+	if (bot == -1)
+	{
+		LogError(
+			"Unused bot could not be found even though only %d out of %d are known to be in use.", 
+			GetBotsInUse(), 
+			RP_MAX_BOTS);
+		return -1;
+	}
+	
 	if (!LoadPlayback(bot, course, mode, style, timeType))
 	{
 		return -1;
@@ -404,7 +413,7 @@ static int GetBotsInUse()
 // Returns a bot that isn't currently replaying, or -1 if unused bots found
 static int GetUnusedBot()
 {
-	for (int bot; bot < RP_MAX_BOTS; bot++)
+	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
 		if (botInGame[bot] && !botDataLoaded[bot])
 		{

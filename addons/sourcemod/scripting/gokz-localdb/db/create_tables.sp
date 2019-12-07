@@ -16,6 +16,7 @@ void DB_CreateTables()
 			txn.AddQuery(sqlite_maps_create);
 			txn.AddQuery(sqlite_mapcourses_create);
 			txn.AddQuery(sqlite_times_create);
+			txn.AddQuery(sqlite_jumpstats_create);
 		}
 		case DatabaseType_MySQL:
 		{
@@ -23,6 +24,7 @@ void DB_CreateTables()
 			txn.AddQuery(mysql_maps_create);
 			txn.AddQuery(mysql_mapcourses_create);
 			txn.AddQuery(mysql_times_create);
+			txn.AddQuery(mysql_jumpstats_create);
 		}
 	}
 	

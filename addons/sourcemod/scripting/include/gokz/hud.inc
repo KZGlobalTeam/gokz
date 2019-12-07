@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum HUDOption
+enum HUDOption:
 {
 	HUDOPTION_INVALID = -1, 
 	HUDOption_TPMenu, 
@@ -78,6 +78,7 @@ enum
 // =====[ CONSTANTS ]=====
 
 #define HUD_OPTION_CATEGORY "HUD"
+#define HUD_MAX_BHOP_GROUND_TICKS 5
 
 stock char gC_HUDOptionNames[HUDOPTION_COUNT][] = 
 {
@@ -234,4 +235,4 @@ public SharedPlugin __pl_gokz_hud =
 	#else
 	required = 0, 
 	#endif
-}; 
+};

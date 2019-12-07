@@ -22,6 +22,7 @@
  * `!kztimer`/`!kzt`/`!k` - Switch to the KZTimer mode.
  * `!nc` - Toggle noclip.
  * `+noclip` - Noclip (bind a key to it).
+ * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
 
 ### gokz-hud
 
@@ -68,10 +69,6 @@
 
  * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
 
-### gokz-anticheat
-
- * `!bhopcheck` - Show bunnyhop stats report including perf ratio and scroll pattern.
-
 ### gokz-replays
 
  * `!replay` - Open the replay loading menu.
@@ -100,6 +97,13 @@ Many of these commands return results for your currently selected mode.
  * `!bavg` - Show the average bonus run time in chat. Usage `!bavg <#bonus> <map>`
  * `!pc` - Show course completion in chat. Usage: `!pc <player>`
  * `!rr`/`!latest` - Open a menu showing recently broken records.
+ * `!jumptop`/`!jstop` - Open a menu showing the top jumpstats.
+ * `!ljpb` - Show your Long Jump personal best in chat.
+ * `!bhpb` - Show your Bunnyhop personal best in chat.
+ * `!mbhpb` - Show your Multi Bunnyhop personal best in chat.
+ * `!wjpb` - Show your Weird Jump personal best in chat.
+ * `!lajpb` - Show your Ladder Jump personal best in chat.
+ * `!lahpb` - Show your Ladderhop personal best in chat.
 
 ### gokz-global
 
@@ -112,10 +116,15 @@ Many of these commands return results for your currently selected mode.
 
 # Admin Commands
 
+### gokz-anticheat
+
+ * `!bhopcheck` - Show bunnyhop stats report including perf ratio and scroll pattern.
+
 ### gokz-localdb
 
  * `!setcheater` - Set a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
  * `!setnotcheater` - Set a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
+ * `!deletejump` - Remove the top jumpstat of a SteamID. Usage: `!deletejump <STEAM_1:X:X> <mode> <jump type> <block?>`
 
 ### gokz-localranks
 

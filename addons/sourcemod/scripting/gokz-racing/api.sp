@@ -1,10 +1,10 @@
-static Handle H_OnFinish;
-static Handle H_OnSurrender;
-static Handle H_OnRequestReceived;
-static Handle H_OnRequestAccepted;
-static Handle H_OnRequestDeclined;
-static Handle H_OnRaceRegistered;
-static Handle H_OnRaceInfoChanged;
+static GlobalForward H_OnFinish;
+static GlobalForward H_OnSurrender;
+static GlobalForward H_OnRequestReceived;
+static GlobalForward H_OnRequestAccepted;
+static GlobalForward H_OnRequestDeclined;
+static GlobalForward H_OnRaceRegistered;
+static GlobalForward H_OnRaceInfoChanged;
 
 
 
@@ -12,13 +12,13 @@ static Handle H_OnRaceInfoChanged;
 
 void CreateGlobalForwards()
 {
-	H_OnFinish = CreateGlobalForward("GOKZ_RC_OnFinish", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
-	H_OnSurrender = CreateGlobalForward("GOKZ_RC_OnSurrender", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnRequestReceived = CreateGlobalForward("GOKZ_RC_OnRequestReceived", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnRequestAccepted = CreateGlobalForward("GOKZ_RC_OnRequestAccepted", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnRequestDeclined = CreateGlobalForward("GOKZ_RC_OnRequestDeclined", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
-	H_OnRaceRegistered = CreateGlobalForward("GOKZ_RC_OnRaceRegistered", ET_Ignore, Param_Cell);
-	H_OnRaceInfoChanged = CreateGlobalForward("GOKZ_RC_OnRaceInfoChanged", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnFinish = new GlobalForward("GOKZ_RC_OnFinish", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+	H_OnSurrender = new GlobalForward("GOKZ_RC_OnSurrender", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnRequestReceived = new GlobalForward("GOKZ_RC_OnRequestReceived", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnRequestAccepted = new GlobalForward("GOKZ_RC_OnRequestAccepted", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnRequestDeclined = new GlobalForward("GOKZ_RC_OnRequestDeclined", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+	H_OnRaceRegistered = new GlobalForward("GOKZ_RC_OnRaceRegistered", ET_Ignore, Param_Cell);
+	H_OnRaceInfoChanged = new GlobalForward("GOKZ_RC_OnRaceInfoChanged", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
 
 void Call_OnFinish(int client, int raceID, int place)

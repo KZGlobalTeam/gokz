@@ -1,7 +1,7 @@
-static Handle H_OnTimeProcessed;
-static Handle H_OnNewRecord;
-static Handle H_OnRecordMissed;
-static Handle H_OnPBMissed;
+static GlobalForward H_OnTimeProcessed;
+static GlobalForward H_OnNewRecord;
+static GlobalForward H_OnRecordMissed;
+static GlobalForward H_OnPBMissed;
 
 
 
@@ -9,10 +9,10 @@ static Handle H_OnPBMissed;
 
 void CreateGlobalForwards()
 {
-	H_OnTimeProcessed = CreateGlobalForward("GOKZ_LR_OnTimeProcessed", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell);
-	H_OnNewRecord = CreateGlobalForward("GOKZ_LR_OnNewRecord", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	H_OnRecordMissed = CreateGlobalForward("GOKZ_LR_OnRecordMissed", ET_Ignore, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	H_OnPBMissed = CreateGlobalForward("GOKZ_LR_OnPBMissed", ET_Ignore, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnTimeProcessed = new GlobalForward("GOKZ_LR_OnTimeProcessed", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell);
+	H_OnNewRecord = new GlobalForward("GOKZ_LR_OnNewRecord", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnRecordMissed = new GlobalForward("GOKZ_LR_OnRecordMissed", ET_Ignore, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnPBMissed = new GlobalForward("GOKZ_LR_OnPBMissed", ET_Ignore, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
 
 void Call_OnTimeProcessed(

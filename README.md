@@ -23,10 +23,9 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
 ### Server Requirements
 
  * 128 Tick (`-tickrate 128`)
- * [SourceMod ^1.9](https://www.sourcemod.net/downloads.php?branch=stable)
- * clientprefs Extension (comes packaged with SourceMod)
+ * [SourceMod ^1.10](https://www.sourcemod.net/downloads.php?branch=stable)
  * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showthread.php?t=180114)
- * [MovementAPI Plugin ^2.0.1](https://github.com/danzayau/MovementAPI)
+ * [MovementAPI Plugin ^2.1.0](https://github.com/danzayau/MovementAPI)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-globals plugin)
  * Optional - A "console cleaner" extension to prevent `Datatable warning` server console spam
  * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (automatically install minor GOKZ updates)
@@ -65,8 +64,10 @@ GOKZ is an open-source, community-driven project. If you are interested in helpi
 
 ## Links
 
-[Official Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)
+[Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)
+
+[Forum](https://forum.gokz.org)
 
 [Steam Group](https://steamcommunity.com/groups/GOKZTimer)
 
-[CS:GO KZ Discord](https://www.discord.gg/csgokz)
+[Discord](https://www.discord.gg/csgokz)

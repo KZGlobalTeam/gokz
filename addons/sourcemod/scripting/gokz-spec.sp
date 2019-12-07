@@ -79,9 +79,30 @@ int DisplaySpecMenu(int client)
 	return menuItems;
 }
 
+bool Spectate(int client)
+{
+	if (!GOKZ_GetCanPause(client))
+	{
+		return false;
+	}
+	
+	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
+	{
+		return false;
+	}
+	
+	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
+	return true;
+}
+
 // Returns whether change to spectating the target was successful
 bool SpectatePlayer(int client, int target, bool printMessage = true)
 {
+	if (!GOKZ_GetCanPause(client))
+	{
+		return false;
+	}
+	
 	if (target == client)
 	{
 		if (printMessage)
@@ -181,10 +202,7 @@ public Action CommandSpec(int client, int args)
 		if (DisplaySpecMenu(client) == 0)
 		{
 			// No targets, so just join spec
-			if (GetClientTeam(client) != CS_TEAM_SPECTATOR)
-			{
-				GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-			}
+			Spectate(client);
 		}
 	}
 	// Otherwise try to spectate the player

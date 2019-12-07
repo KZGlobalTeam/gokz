@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum QTOption
+enum QTOption:
 {
 	QTOPTION_INVALID = -1, 
 	QTOption_ShowPlayers, 

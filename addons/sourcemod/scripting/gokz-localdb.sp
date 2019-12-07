@@ -3,6 +3,7 @@
 #include <geoip>
 
 #include <gokz/core>
+#include <gokz/jumpstats>
 #include <gokz/localdb>
 
 #undef REQUIRE_EXTENSIONS
@@ -29,6 +30,7 @@ Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
+int gI_PBJSCache[MAXPLAYERS + 1][MODE_COUNT][JUMPTYPE_COUNT][JUMPSTATDB_CACHE_COUNT];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
 
@@ -37,7 +39,9 @@ int gI_DBCurrentMapID;
 
 #include "gokz-localdb/db/sql.sp"
 #include "gokz-localdb/db/helpers.sp"
+#include "gokz-localdb/db/cache_js.sp"
 #include "gokz-localdb/db/create_tables.sp"
+#include "gokz-localdb/db/save_js.sp"
 #include "gokz-localdb/db/save_time.sp"
 #include "gokz-localdb/db/set_cheater.sp"
 #include "gokz-localdb/db/setup_client.sp"
@@ -58,8 +62,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-localdb.phrases");
+	
 	CreateGlobalForwards();
 	RegisterCommands();
+	DB_SetupDatabase();
 }
 
 public void OnAllPluginsLoaded()
@@ -68,8 +75,6 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	
-	DB_SetupDatabase();
 	
 	char auth[32];
 	for (int client = 1; client <= MaxClients; client++)
@@ -113,6 +118,11 @@ public void OnClientAuthorized(int client, const char[] auth)
 	DB_SetupClient(client);
 }
 
+public void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater)
+{
+	DB_CacheJSPBs(client, steamID);
+}
+
 public void OnClientDisconnect(int client)
 {
 	gB_ClientSetUp[client] = false;
@@ -131,4 +141,9 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
-} 
+}
+
+public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+{
+	OnLanding_SaveJumpstat(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+}

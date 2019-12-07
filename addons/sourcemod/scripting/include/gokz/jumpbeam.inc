@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum JBOption
+enum JBOption:
 {
 	JBOPTION_INVALID = -1, 
 	JBOption_Type, 

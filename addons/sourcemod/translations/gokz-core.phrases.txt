@@ -147,6 +147,14 @@
 		"en"		"{grey}Your timer will no longer restart upon teleporting to start buttons."
 		"chi"		"{grey}你的计时器直到传送到起点前不再重置."
 	}
+	"Locked Virtual Buttons"
+	{
+		"en"		"{grey}You have locked your virtual buttons."
+	}
+	"Unlocked Virtual Buttons"
+	{
+		"en"		"{grey}You have unlocked your virtual buttons."
+	}
 
 
 	// =====[ MODE MENU ]=====

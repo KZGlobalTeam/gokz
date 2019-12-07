@@ -32,7 +32,7 @@ enum
 	MAPPREFIX_COUNT
 };
 
-enum StartPositionType
+enum StartPositionType:
 {
 	StartPositionType_Spawn, 
 	StartPositionType_Custom, 
@@ -41,7 +41,7 @@ enum StartPositionType
 	STARTPOSITIONTYPE_COUNT
 };
 
-enum OptionProp
+enum OptionProp:
 {
 	OptionProp_Cookie = 0, 
 	OptionProp_Type, 
@@ -51,13 +51,13 @@ enum OptionProp
 	OPTIONPROP_COUNT
 };
 
-enum OptionType
+enum OptionType:
 {
 	OptionType_Int = 0, 
 	OptionType_Float
 };
 
-enum Option
+enum Option:
 {
 	OPTION_INVALID = -1, 
 	Option_Mode, 
@@ -162,7 +162,8 @@ enum
 #define GOKZ_PAUSE_COOLDOWN 1.0
 #define GOKZ_TIMER_START_NO_TELEPORT_TICKS 4
 #define GOKZ_TIMER_START_GROUND_TICKS 4
-#define GOKZ_TIMER_SOUND_COOLDOWN 0.1
+#define GOKZ_TIMER_SOUND_COOLDOWN 0.15
+#define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 0.6
 
 #define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
@@ -894,6 +895,14 @@ native bool GOKZ_GetCanUndoTeleport(int client);
  * @param client    	Client index.
  */
 native void GOKZ_Pause(int client);
+
+/**
+ * Gets whether a player can pause. Pausing is not allowed
+ * under some circumstance when the timer is running.
+ *
+ * @param client    	Client index.
+ */
+native bool GOKZ_GetCanPause(int client);
 
 /**
  * Resumes a player's timer and unfreezes them.

@@ -24,6 +24,7 @@ void CreateNatives()
 	CreateNative("GOKZ_UndoTeleport", Native_UndoTeleport);
 	CreateNative("GOKZ_GetCanUndoTeleport", Native_GetCanUndoTeleport);
 	CreateNative("GOKZ_Pause", Native_Pause);
+	CreateNative("GOKZ_GetCanPause", Native_GetCanPause);
 	CreateNative("GOKZ_Resume", Native_Resume);
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
@@ -185,6 +186,11 @@ public int Native_GetCanUndoTeleport(Handle plugin, int numParams)
 public int Native_Pause(Handle plugin, int numParams)
 {
 	Pause(GetNativeCell(1));
+}
+
+public int Native_GetCanPause(Handle plugin, int numParams)
+{
+	return CanPause(GetNativeCell(1));
 }
 
 public int Native_Resume(Handle plugin, int numParams)

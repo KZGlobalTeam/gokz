@@ -17,6 +17,15 @@ void RegisterCommands()
 	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 	
+	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show your Long Jump personal best in chat.");
+	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show your Bunnyhop personal best in chat.");
+	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show your Multi Bunnyhop personal best in chat.");
+	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show your Weird Jump personal best in chat.");
+	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show your Ladder Jump personal best in chat.");
+	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show your Ladderhop personal best in chat.");
+	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
+	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
+	
 	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
 }
 
@@ -353,6 +362,62 @@ public Action CommandRecentRecords(int client, int args)
 public Action CommandUpdateMapPool(int client, int args)
 {
 	DB_UpdateRankedMapPool(client);
+}
+
+public Action CommandLJPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, client, JumpType_LongJump);
+	return Plugin_Handled;
+}
+
+public Action CommandBHPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, client, JumpType_Bhop);
+	return Plugin_Handled;
+}
+
+public Action CommandMBHPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, client, JumpType_MultiBhop);
+	return Plugin_Handled;
+}
+
+public Action CommandWJPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, client, JumpType_WeirdJump);
+	return Plugin_Handled;
+}
+
+public Action CommandLAJPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, client, JumpType_LadderJump);
+	return Plugin_Handled;
+}
+
+public Action CommandLAHPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, client, JumpType_Ladderhop);
+	return Plugin_Handled;
+}
+
+public Action CommandJSTop(int client, int args)
+{
+	DisplayJumpTopModeMenu(client);
+	return Plugin_Handled;
+}
+
+void DisplayJumpstatRecordCommand(int client, int args, int jumpType)
+{
+	if (args >= 1)
+	{
+		char argMap[33];
+		GetCmdArg(1, argMap, sizeof(argMap));
+		DisplayJumpstatRecord(client, jumpType, argMap);
+	}
+	else
+	{
+		DisplayJumpstatRecord(client, jumpType);
+	}
 }
 
 

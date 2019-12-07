@@ -35,6 +35,8 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
+	RegConsoleCmd("sm_virtualbuttons", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
+	RegConsoleCmd("sm_vb", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
 }
 
 void AddCommandsListeners()
@@ -243,6 +245,19 @@ public Action CommandDisableNoclip(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandToggleVirtualButtonsLock(int client, int args)
+{
+	if (ToggleVirtualButtonsLock(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Locked Virtual Buttons");
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Unlocked Virtual Buttons");
+	}
+	return Plugin_Handled;
+}
+
 
 
 // =====[ PRIVATE ]=====
@@ -257,4 +272,4 @@ static void SwitchToModeIfAvailable(int client, int mode)
 	{
 		GOKZ_SetCoreOption(client, Option_Mode, mode);
 	}
-} 
+}

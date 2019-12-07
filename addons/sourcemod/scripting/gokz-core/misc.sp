@@ -146,6 +146,10 @@ void JoinTeam(int client, int newTeam)
 		player.GetEyeAngles(savedAngles[client]);
 		savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
+		if (!player.CanPause)
+		{
+			player.StopTimer();
+		}
 		ChangeClientTeam(client, CS_TEAM_SPECTATOR);
 		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}

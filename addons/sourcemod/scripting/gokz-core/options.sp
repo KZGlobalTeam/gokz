@@ -26,7 +26,7 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 	}
 	
 	ArrayList data;
-	Handle cookie;
+	Cookie cookie;
 	if (IsRegisteredOption(name))
 	{
 		optionData.GetValue(name, data);
@@ -35,7 +35,7 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 	else
 	{
 		data = new ArrayList(1, view_as<int>(OPTIONPROP_COUNT));
-		cookie = RegClientCookie(name, description, CookieAccess_Private);
+		cookie = new Cookie(name, description, CookieAccess_Private);
 	}
 	
 	data.Set(view_as<int>(OptionProp_Cookie), cookie);
@@ -131,10 +131,10 @@ any GetOption(int client, const char[] option)
 		return -1;
 	}
 	
-	Handle cookie = GetOptionProp(option, OptionProp_Cookie);
+	Cookie cookie = GetOptionProp(option, OptionProp_Cookie);
 	OptionType type = GetOptionProp(option, OptionProp_Type);
 	char value[100];
-	GetClientCookie(client, cookie, value, sizeof(value));
+	cookie.Get(client, value, sizeof(value));
 	
 	if (type == OptionType_Float)
 	{
@@ -179,8 +179,8 @@ bool SetOption(int client, const char[] option, any newValue)
 		IntToString(newValue, newValueString, sizeof(newValueString));
 	}
 	
-	Handle cookie = GetOptionProp(option, OptionProp_Cookie);
-	SetClientCookie(client, cookie, newValueString);
+	Cookie cookie = GetOptionProp(option, OptionProp_Cookie);
+	cookie.Set(client, newValueString);
 	
 	if (IsClientInGame(client))
 	{
@@ -286,8 +286,8 @@ static bool IsValueInRange(OptionType type, any value, any minValue, any maxValu
 static bool LoadOption(int client, const char[] option)
 {
 	char valueString[100];
-	Handle cookie = GetOptionProp(option, OptionProp_Cookie);
-	GetClientCookie(client, cookie, valueString, sizeof(valueString));
+	Cookie cookie = GetOptionProp(option, OptionProp_Cookie);
+	cookie.Get(client, valueString, sizeof(valueString));
 	
 	// If there's no stored value for the option, set it to default
 	if (valueString[0] == '\0')

@@ -1,4 +1,4 @@
-static Handle H_OnPlayerSuspected;
+static GlobalForward H_OnPlayerSuspected;
 
 
 
@@ -6,7 +6,7 @@ static Handle H_OnPlayerSuspected;
 
 void CreateGlobalForwards()
 {
-	H_OnPlayerSuspected = CreateGlobalForward("GOKZ_AC_OnPlayerSuspected", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_String);
+	H_OnPlayerSuspected = new GlobalForward("GOKZ_AC_OnPlayerSuspected", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_String);
 }
 
 void Call_OnPlayerSuspected(int client, ACReason reason, const char[] notes, const char[] stats)

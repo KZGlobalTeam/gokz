@@ -13,7 +13,7 @@
 
 // =====[ ENUMS ]=====
 
-enum RaceInfo
+enum RaceInfo:
 {
 	RaceInfo_ID, 
 	RaceInfo_Status, 

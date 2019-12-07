@@ -11,6 +11,16 @@
 
 
 
+// =====[ CONSTANTS ]=====
+
+#define GOKZ_DB_JS_DISTANCE_PRECISION 10000
+#define GOKZ_DB_JS_SYNC_PRECISION 100
+#define GOKZ_DB_JS_PRE_PRECISION 100
+#define GOKZ_DB_JS_MAX_PRECISION 100
+#define GOKZ_DB_JS_AIRTIME_PRECISION 10000
+#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 5
+
+
 // =====[ ENUMS ]=====
 
 enum DatabaseType
@@ -19,6 +29,39 @@ enum DatabaseType
 	DatabaseType_MySQL, 
 	DatabaseType_SQLite
 };
+
+enum
+{
+	JumpstatDB_Lookup_JumpID = 0, 
+	JumpstatDB_Lookup_Distance, 
+	JumpstatDB_Lookup_Block
+};
+
+enum
+{
+	JumpstatDB_FindPlayer_SteamID32 = 0, 
+	JumpstatDB_FindPlayer_Alias
+};
+
+enum
+{
+	JumpstatDB_Top20_Alias = 0, 
+	JumpstatDB_Top20_Block, 
+	JumpstatDB_Top20_Distance, 
+	JumpstatDB_Top20_Strafes, 
+	JumpstatDB_Top20_Sync, 
+	JumpstatDB_Top20_Pre, 
+	JumpstatDB_Top20_Max, 
+	JumpstatDB_Top20_Air
+};
+
+enum
+{
+	JumpstatDB_Cache_Distance = 0,
+	JumpstatDB_Cache_Block,
+	JumpstatDB_Cache_BlockDistance,
+	JUMPSTATDB_CACHE_COUNT
+}
 
 
 

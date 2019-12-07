@@ -8,9 +8,11 @@
 #define ITEM_INFO_POINT_A "a"
 #define ITEM_INFO_POINT_B "b"
 #define ITEM_INFO_GET_DISTANCE "get"
+#define ITEM_INFO_GET_BLOCK_DISTANCE "block"
 
 static bool measurePosSet[MAXPLAYERS + 1][2];
 static float measurePos[MAXPLAYERS + 1][2][3];
+static float measureNormal[MAXPLAYERS + 1][2][3];
 static Handle P2PRed[MAXPLAYERS + 1];
 static Handle P2PGreen[MAXPLAYERS + 1];
 
@@ -67,6 +69,25 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 				GOKZ_PlayErrorSound(param1);
 			}
 		}
+		else if (StrEqual(info, ITEM_INFO_GET_BLOCK_DISTANCE, false))
+		{
+			float angles[3];
+			MeasureGetPos(param1, 0);
+			GetVectorAngles(measureNormal[param1][0], angles);
+			MeasureGetPosEx(param1, 1, measurePos[param1][0], angles);
+			AddVectors(measureNormal[param1][0], measureNormal[param1][1], angles);
+			if (GetVectorLength(angles, true) > EPSILON || 
+				FloatAbs(measureNormal[param1][0][2]) > EPSILON || 
+				FloatAbs(measureNormal[param1][1][2]) > EPSILON)
+			{
+				GOKZ_PrintToChat(param1, true, "%t", "Measure Failure (Blocks not aligned)");
+				GOKZ_PlayErrorSound(param1);
+				DisplayMeasureMenu(param1, false);
+				return;
+			}
+			GOKZ_PrintToChat(param1, true, "%t", "Block Measure Result", RoundFloat(GetVectorHorizontalDistance(measurePos[param1][0], measurePos[param1][1])));
+			MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
+		}
 		
 		DisplayMeasureMenu(param1, false);
 	}
@@ -92,8 +113,10 @@ static void MeasureMenuAddItems(int client, Menu menu)
 	menu.AddItem(ITEM_INFO_POINT_A, display);
 	FormatEx(display, sizeof(display), "%T", "Measure Menu - Point B", client);
 	menu.AddItem(ITEM_INFO_POINT_B, display);
-	FormatEx(display, sizeof(display), "%T", "Measure Menu - Get Distance", client);
+	FormatEx(display, sizeof(display), "%T\n ", "Measure Menu - Get Distance", client);
 	menu.AddItem(ITEM_INFO_GET_DISTANCE, display);
+	FormatEx(display, sizeof(display), "%T", "Measure Menu - Get Block Distance", client);
+	menu.AddItem(ITEM_INFO_GET_BLOCK_DISTANCE, display);
 }
 
 static void MeasureGetPos(int client, int arg)
@@ -104,28 +127,30 @@ static void MeasureGetPos(int client, int arg)
 	GetClientEyePosition(client, origin);
 	GetClientEyeAngles(client, angles);
 	
-	Handle trace = TR_TraceRayFilterEx(origin, angles, MASK_SHOT, RayType_Infinite, TraceFilterPlayers, client);
+	MeasureGetPosEx(client, arg, origin, angles);
+}
+
+static void MeasureGetPosEx(int client, int arg, float origin[3], float angles[3])
+{
+	Handle trace = TR_TraceRayFilterEx(origin, angles, MASK_PLAYERSOLID, RayType_Infinite, TraceFilterPlayers, client);
 	
 	if (!TR_DidHit(trace))
 	{
-		CloseHandle(trace);
+		delete trace;
 		GOKZ_PrintToChat(client, true, "%t", "Measure Failure (Not Aiming at Solid)");
 		GOKZ_PlayErrorSound(client);
 		return;
 	}
 	
-	TR_GetEndPosition(origin, trace);
-	CloseHandle(trace);
-	
-	measurePos[client][arg][0] = origin[0];
-	measurePos[client][arg][1] = origin[1];
-	measurePos[client][arg][2] = origin[2];
+	TR_GetEndPosition(measurePos[client][arg], trace);
+	TR_GetPlaneNormal(trace, measureNormal[client][arg]);
+	delete trace;
 	
 	if (arg == 0)
 	{
 		if (P2PRed[client] != null)
 		{
-			CloseHandle(P2PRed[client]);
+			delete P2PRed[client];
 			P2PRed[client] = null;
 		}
 		measurePosSet[client][0] = true;
@@ -136,7 +161,7 @@ static void MeasureGetPos(int client, int arg)
 	{
 		if (P2PGreen[client] != null)
 		{
-			CloseHandle(P2PGreen[client]);
+			delete P2PGreen[client];
 			P2PGreen[client] = null;
 		}
 		measurePosSet[client][1] = true;
@@ -195,12 +220,12 @@ static void MeasureResetPos(int client)
 {
 	if (P2PRed[client] != null)
 	{
-		CloseHandle(P2PRed[client]);
+		delete P2PRed[client];
 		P2PRed[client] = null;
 	}
 	if (P2PGreen[client] != null)
 	{
-		CloseHandle(P2PGreen[client]);
+		delete P2PGreen[client];
 		P2PGreen[client] = null;
 	}
 	measurePosSet[client][0] = false;
@@ -278,4 +303,4 @@ static float CalcEffectiveDistance(const float pointA[3], const float pointB[3])
 	}
 	
 	return SquareRoot(Pow(Ax - Bx, 2.0) + Pow(Ay - By, 2.0)) + 32.0;
-} 
+}

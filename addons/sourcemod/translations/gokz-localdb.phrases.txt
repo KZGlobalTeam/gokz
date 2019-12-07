@@ -1,0 +1,13 @@
+"Phrases"
+{
+	"Jump Record"
+	{
+		"#format"	"{1:N},{2:s},{3:.4f},{4:s}"
+		"en"		"{lime}{1} {grey}set a new {default}{2} {yellow}PB {grey}of {default}{3} {grey}[{purple}{4}{grey}]"
+	}
+	"Block Jump Record"
+	{
+		"#format"	"{1:N},{2:d},{3:s},{4:.4f},{5:s}"
+		"en"		"{lime}{1} {grey}set a new {lightgreen}{2} Block {default}{3} {yellow}PB {grey}of {default}{4} {grey}[{purple}{5}{grey}]"
+	}
+}

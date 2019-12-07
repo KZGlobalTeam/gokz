@@ -29,6 +29,13 @@
 	When the player is never seen as 'on ground' when bunnyhopping. This is achievable by 
 	uncrouching and jumping at the same time. A jumpbug results in unusual behaviour such
 	as maintaining horizontal speed and not receiving fall damage.
+
+	Distbug
+	A distbug can occur when a player lands close to the edge of a block. When calculating
+	the landing position, the source engine will only consider either the horizontal or
+	vertical speed on the very last tick, but not both. The GetNobugLandingOrigin native
+	calculates the correct landing position of the player based on his actual trajectory
+	using all components of the velocity instead.
 */
 
 
@@ -150,6 +157,14 @@ native int Movement_GetTakeoffTick(int client);
  * @return				Player's last takeoff 'cmdnum'.
  */
 native int Movement_GetTakeoffCmdNum(int client);
+
+/**
+ * Gets a player's origin at the time of their last landing with the distbug fixed.
+ *
+ * @param client		Client index.
+ * @param result		Resultant vector.
+ */
+native void Movement_GetNobugLandingOrigin(int client, float result[3]);
 
 /**
  * Gets a player's origin at the time of their last landing.

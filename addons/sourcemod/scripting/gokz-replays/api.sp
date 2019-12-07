@@ -1,6 +1,6 @@
-static Handle H_OnReplaySaved;
-static Handle H_OnReplayDiscarded;
-static Handle H_OnTimerEnd_Post;
+static GlobalForward H_OnReplaySaved;
+static GlobalForward H_OnReplayDiscarded;
+static GlobalForward H_OnTimerEnd_Post;
 
 
 
@@ -8,9 +8,9 @@ static Handle H_OnTimerEnd_Post;
 
 void CreateGlobalForwards()
 {
-	H_OnReplaySaved = CreateGlobalForward("GOKZ_RP_OnReplaySaved", ET_Ignore, Param_Cell, Param_String);
-	H_OnReplayDiscarded = CreateGlobalForward("GOKZ_RP_OnReplayDiscarded", ET_Ignore, Param_Cell);
-	H_OnTimerEnd_Post = CreateGlobalForward("GOKZ_RP_OnTimerEnd_Post", ET_Ignore, Param_Cell, Param_String, Param_Cell, Param_Float, Param_Cell);
+	H_OnReplaySaved = new GlobalForward("GOKZ_RP_OnReplaySaved", ET_Ignore, Param_Cell, Param_String);
+	H_OnReplayDiscarded = new GlobalForward("GOKZ_RP_OnReplayDiscarded", ET_Ignore, Param_Cell);
+	H_OnTimerEnd_Post = new GlobalForward("GOKZ_RP_OnTimerEnd_Post", ET_Ignore, Param_Cell, Param_String, Param_Cell, Param_Float, Param_Cell);
 }
 
 void Call_OnReplaySaved(int client, const char[] filePath)

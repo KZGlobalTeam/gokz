@@ -142,6 +142,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_Pause(this.ID);
 	}
 	
+	property bool CanPause {
+		public get() {
+			return GOKZ_GetCanPause(this.ID);
+		}
+	}
+	
 	public void Resume() {
 		GOKZ_Resume(this.ID);
 	}
