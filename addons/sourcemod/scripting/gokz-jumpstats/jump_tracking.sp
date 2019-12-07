@@ -937,10 +937,12 @@ float GetDurationCurrent(int client)
 	return durationTicksCurrent[client] * GetTickInterval();
 }
 
+/*
 int GetDurationTicks(int client)
 {
 	return durationTicksLast[client];
 }
+*/
 
 static void BeginDuration(int client)
 {
@@ -1064,7 +1066,7 @@ int GetStrafesCurrent(int client)
 
 float GetStrafeAirtime(int client, int strafe)
 {
-	return float(strafesTicks[client][strafe]) / float(GetDurationTicks(client)) * 100.0;
+	return float(strafesTicks[client][strafe]) / float(GetDurationTicksCurrent(client)) * 100.0;
 }
 
 float GetStrafeSync(int client, int strafe)
