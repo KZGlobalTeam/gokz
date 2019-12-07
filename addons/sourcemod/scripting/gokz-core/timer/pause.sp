@@ -21,23 +21,8 @@ void SetPausedOnLadder(int client, bool onLadder)
 
 void Pause(int client)
 {
-	if (paused[client])
+	if (!CanPause(client))
 	{
-		return;
-	}
-	if (GetTimerRunning(client) && hasResumedInThisRun[client]
-		 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
-		GOKZ_PlayErrorSound(client);
-		return;
-	}
-	if (GetTimerRunning(client)
-		 && !Movement_GetOnGround(client)
-		 && !(Movement_GetSpeed(client) == 0 && Movement_GetVerticalVelocity(client) == 0))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Midair)");
-		GOKZ_PlayErrorSound(client);
 		return;
 	}
 	
@@ -62,6 +47,33 @@ void Pause(int client)
 	
 	// Call Post Forward
 	Call_GOKZ_OnPause_Post(client);
+}
+
+bool CanPause(int client)
+{
+	if (paused[client])
+	{
+		return false;
+	}
+	
+	if (GetTimerRunning(client) && hasResumedInThisRun[client]
+		 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
+		GOKZ_PlayErrorSound(client);
+		return false;
+	}
+	
+	if (GetTimerRunning(client)
+		 && !Movement_GetOnGround(client)
+		 && !(Movement_GetSpeed(client) == 0 && Movement_GetVerticalVelocity(client) == 0))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Midair)");
+		GOKZ_PlayErrorSound(client);
+		return false;
+	}
+	
+	return true;
 }
 
 void Resume(int client)

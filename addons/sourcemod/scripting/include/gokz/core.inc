@@ -897,6 +897,14 @@ native bool GOKZ_GetCanUndoTeleport(int client);
 native void GOKZ_Pause(int client);
 
 /**
+ * Gets whether a player can pause. Pausing is not allowed
+ * under some circumstance when the timer is running.
+ *
+ * @param client    	Client index.
+ */
+native bool GOKZ_GetCanPause(int client);
+
+/**
  * Resumes a player's timer and unfreezes them.
  *
  * @param client    	Client index.
