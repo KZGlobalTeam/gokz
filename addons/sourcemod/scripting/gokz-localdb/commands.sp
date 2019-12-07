@@ -65,8 +65,7 @@ public Action CommandDeleteJump(int client, int args)
 {
 	if (args < 3)
 	{
-		LogMessage("Wrong number of arguments.");
-		return;
+		return; // TODO User-friendliness?
 	}
 	
 	int i, steamAccountID, isBlock, mode, jumpType;
@@ -81,7 +80,15 @@ public Action CommandDeleteJump(int client, int args)
 	steamAccountID = Steam2ToSteamAccountID(split[0]);
 	if (steamAccountID == -1)
 	{
-		LogMessage("The SteamID could not be parsed - use 'STEAM_1:X:X'.");
+		// TODO Translation phrases?
+		if (client == 0)
+		{
+			LogMessage("The SteamID could not be parsed - use 'STEAM_1:X:X'.");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "{grey}The SteamID could not be parsed - use '{default}STEAM_1:X:X{grey}'.");
+		}
 		return;
 	}
 	
@@ -96,7 +103,15 @@ public Action CommandDeleteJump(int client, int args)
 	}
 	if (i == MODE_COUNT)
 	{
-		LogMessage("Mode not found.");
+		// TODO Translation phrases?
+		if (client == 0)
+		{
+			LogMessage("The mode could not be parsed - use 'SKZ' or 'SimpleKZ'.");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "{grey}The mode could not be parsed - use '{purple}SKZ{grey}' or '{purple}SimpleKZ{grey}'.");
+		}
 		return;
 	}
 	
@@ -111,7 +126,15 @@ public Action CommandDeleteJump(int client, int args)
 	}
 	if (i == JUMPTYPE_COUNT)
 	{
-		LogMessage("Jump type not found.");
+		// TODO Translation phrases?
+		if (client == 0)
+		{
+			LogMessage("The jump type could not be parsed - use 'LJ'.");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "{grey}The jump type could not be parsed - use '{default}LJ{grey}'.");
+		}
 		return;
 	}
 	
@@ -119,4 +142,4 @@ public Action CommandDeleteJump(int client, int args)
 	isBlock = (split[3][0] != '0' && split[3][0] != '\0');
 	
 	DB_DeleteJump(client, steamAccountID, jumpType, mode, isBlock);
-} 
+}
