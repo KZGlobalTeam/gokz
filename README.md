@@ -24,7 +24,6 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
 
  * 128 Tick (`-tickrate 128`)
  * [SourceMod ^1.10](https://www.sourcemod.net/downloads.php?branch=stable)
- * clientprefs Extension (comes with SourceMod)
  * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showthread.php?t=180114)
  * [MovementAPI Plugin ^2.1.0](https://github.com/danzayau/MovementAPI)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-globals plugin)
