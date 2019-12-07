@@ -69,10 +69,6 @@
 
  * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
 
-### gokz-anticheat
-
- * `!bhopcheck` - Show bunnyhop stats report including perf ratio and scroll pattern.
-
 ### gokz-replays
 
  * `!replay` - Open the replay loading menu.
@@ -119,6 +115,10 @@ Many of these commands return results for your currently selected mode.
  * `!gbmaptop` - Open a menu showing the top global bonus times of a map. Usage: `!gbmaptop <#bonus> <map>`
 
 # Admin Commands
+
+### gokz-anticheat
+
+ * `!bhopcheck` - Show bunnyhop stats report including perf ratio and scroll pattern.
 
 ### gokz-localdb
 
