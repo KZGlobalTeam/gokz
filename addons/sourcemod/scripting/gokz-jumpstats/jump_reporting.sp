@@ -130,7 +130,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				RoundToPowerOfTen(maxSpeed, -2), "Max", 
 				overlap, "Overlap", 
 				deadair, "Dead Air", 
-				width / strafes, "Avg. Width", 
+				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
 				duration, "Airtime", 
 				offset, "Offset");
@@ -149,7 +149,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				releaseW, "W Release", 
 				overlap, "Overlap", 
 				deadair, "Dead Air", 
-				width / strafes, "Avg. Width", 
+				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
 				duration, "Airtime", 
 				offset, "Offset");
@@ -178,7 +178,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				overlap, "Overlap", 
 				deadair, "Dead Air", 
 				deviation, "Deviation", 
-				width / strafes, "Avg. Width", 
+				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
 				duration, "Airtime");
 		}
@@ -196,7 +196,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				overlap, "Overlap", 
 				deadair, "Dead Air", 
 				deviation, "Deviation", 
-				width / strafes, "Avg. Width", 
+				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
 				duration, "Airtime", 
 				offset);
@@ -254,7 +254,7 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 			overlap, "Overlap", 
 			deadair, "Dead Air", 
 			deviation, "Deviation", 
-			width / strafes, "Avg. Width", 
+			GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 			height, "Height", 
 			duration, "Airtime");
 	}
@@ -272,7 +272,7 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 			overlap, "Overlap", 
 			deadair, "Dead Air", 
 			deviation, "Deviation", 
-			width / strafes, "Avg. Width", 
+			GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 			height, "Height", 
 			duration, "Airtime", 
 			offset);
@@ -481,7 +481,7 @@ static char[] GetWidthString(int client, float width, int strafes)
 	char resultString[32];
 	FormatEx(resultString, sizeof(resultString), 
 		"{lime}%.1f°{grey} %T", 
-		width / strafes, "Width", client);
+		GetAverageStrafeWidth(strafes, width), "Width", client);
 	return resultString;
 }
 
@@ -492,6 +492,16 @@ static char[] GetHeightString(int client, float height)
 		"{lime}%.1f{grey} %T", 
 		height, "Height", client);
 	return resultString;
+}
+
+static float GetAverageStrafeWidth(int strafes, float totalWidth)
+{
+	if (strafes == 0)
+	{
+		return 0.0;
+	}
+	
+	return totalWidth / strafes;
 }
 
 
