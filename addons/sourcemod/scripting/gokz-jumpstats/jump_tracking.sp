@@ -1029,7 +1029,10 @@ static void EndMaxSpeed(int client)
 
 static void UpdateMaxSpeed(int client)
 {
-	maxSpeedCurrent[client] = FloatMax(maxSpeedCurrent[client], Movement_GetSpeed(client));
+	if (GetGameTickCount() != Movement_GetTakeoffTick(client))
+	{
+		maxSpeedCurrent[client] = FloatMax(maxSpeedCurrent[client], Movement_GetSpeed(client));
+	}
 }
 
 
