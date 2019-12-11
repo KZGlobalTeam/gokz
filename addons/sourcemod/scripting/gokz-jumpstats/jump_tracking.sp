@@ -697,15 +697,12 @@ static bool BlockTraceAligned(const float origin[3], const float end[3], int coo
 	Handle trace = TR_TraceRayFilterEx(origin, end, MASK_SOLID, RayType_EndPoint, TraceEntityFilterPlayers);
 	if (!TR_DidHit(trace))
 	{
+		delete trace;
 		return false;
 	}
 	TR_GetPlaneNormal(trace, normalVector);
-	if (FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) > EPSILON)
-	{
-		return false;
-	}
 	delete trace;
-	return true;
+	return FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) <= EPSILON;
 }
 
 
@@ -1032,7 +1029,10 @@ static void EndMaxSpeed(int client)
 
 static void UpdateMaxSpeed(int client)
 {
-	maxSpeedCurrent[client] = FloatMax(maxSpeedCurrent[client], Movement_GetSpeed(client));
+	if (GetGameTickCount() != Movement_GetTakeoffTick(client))
+	{
+		maxSpeedCurrent[client] = FloatMax(maxSpeedCurrent[client], Movement_GetSpeed(client));
+	}
 }
 
 
@@ -1144,8 +1144,8 @@ static void EndStrafes(int client)
 
 static void UpdateStrafes(int client)
 {
-	// Invalidate jump when using turnbinds
-	if (Movement_GetButtons(client) & (IN_LEFT | IN_RIGHT))
+	// Invalidate jump when using turnbinds or too many strafes
+	if (Movement_GetButtons(client) & (IN_LEFT | IN_RIGHT) || strafesCurrent[client] >= JS_MAX_TRACKED_STRAFES)
 	{
 		InvalidateJumpstat(client);
 		return;
