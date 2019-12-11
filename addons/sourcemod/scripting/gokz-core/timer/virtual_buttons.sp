@@ -6,6 +6,7 @@
 
 
 static float lastUsePressTime[MAXPLAYERS + 1];
+static bool hasStartedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasEndedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasTeleportedSincePressingUse[MAXPLAYERS + 1];
 static bool hasVirtualStartButton[MAXPLAYERS + 1];
@@ -42,6 +43,7 @@ bool ToggleVirtualButtonsLock(int client)
 
 void OnClientPutInServer_VirtualButtons(int client)
 {
+	hasStartedTimerSincePressingUse[client] = false;
 	hasVirtualEndButton[client] = false;
 	hasVirtualStartButton[client] = false;
 	virtualButtonsLocked[client] = false;
@@ -78,6 +80,7 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
 		lastUsePressTime[client] = GetGameTime();
+		hasStartedTimerSincePressingUse[client] = false;
 		hasEndedTimerSincePressingUse[client] = false;
 		hasTeleportedSincePressingUse[client] = false;
 	}
@@ -86,17 +89,19 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 	{
 		if (GetHasVirtualStartButton(client) && InRangeOfVirtualStart(client) && CanReachVirtualStart(client))
 		{
-			if (GOKZ_StartTimer(client, virtualStartCourse[client]))
+			if (TimerStart(
+					client, 
+					virtualStartCourse[client], 
+					.playSound = !hasStartedTimerSincePressingUse[client]))
 			{
+				hasStartedTimerSincePressingUse[client] = true;
 				OnVirtualStartButtonPress_Teleports(client);
 			}
 		}
 		else if (GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
 		{
-			if (GOKZ_EndTimer(client, virtualEndCourse[client]))
-			{
-				hasEndedTimerSincePressingUse[client] = true;
-			}
+			TimerEnd(client, virtualEndCourse[client]);
+			hasEndedTimerSincePressingUse[client] = true; // False end counts as well
 		}
 	}
 }

@@ -55,7 +55,7 @@ int GetCurrentTimeType(int client)
 	return TimeType_Nub;
 }
 
-bool TimerStart(int client, int course, bool allowMidair = false, bool autoRestart = false)
+bool TimerStart(int client, int course, bool allowMidair = false, bool autoRestart = false, bool playSound = true)
 {
 	if (!IsPlayerAlive(client)
 		 || JustStartedTimer(client)
@@ -80,7 +80,10 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool autoResta
 	timerRunning[client] = true;
 	currentCourse[client] = course;
 	hasStartedTimerThisMap[client] = true;
-	PlayTimerStartSound(client);
+	if (playSound)
+	{
+		PlayTimerStartSound(client);
+	}
 	
 	// Call Post Forward
 	Call_GOKZ_OnTimerStart_Post(client, course);
