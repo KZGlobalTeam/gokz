@@ -400,10 +400,9 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 {
 	Movement_SetOrigin(client, origin);
 	Movement_SetEyeAngles(client, angles);
-	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-	Movement_SetGravity(client, 1.0);
-	CreateTimer(0.1, Timer_RemoveBoosts, GetClientUserId(client)); // Prevent booster exploits
+	
+	// Intelligently hold player in MOVETYPE_NONE to prevent booster exploits
+	StartHoldStill(client, 3);
 	
 	// Duck the player if there is something blocking them from above
 	Handle trace = TR_TraceHullFilterEx(origin, 
@@ -420,16 +419,52 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 	delete trace;
 }
 
-public Action Timer_RemoveBoosts(Handle timer, int userid)
+static void StartHoldStill(int client, int ticks)
 {
-	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client))
+	DataPack data = new DataPack();
+	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(Movement_GetMovetype(client));
+	data.WriteCell(ticks);
+	ContinueHoldStill(data);
+}
+
+public void ContinueHoldStill(DataPack data)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	MoveType desiredMoveType = data.ReadCell();
+	int ticks = data.ReadCell();
+	delete data;
+	
+	if (!IsValidClient(client))
 	{
+		return;
+	}
+	
+	// Keep track of the move type that the player 'desires' to be in
+	if (Movement_GetMovetype(client) != MOVETYPE_NONE)
+	{
+		desiredMoveType = Movement_GetMovetype(client);
+	}
+	
+	if (ticks-- > 0 // Only hold still if the player desires certain 'valid' move types
+		 && (desiredMoveType == MOVETYPE_WALK || desiredMoveType == MOVETYPE_LADDER))
+	{
+		Movement_SetMovetype(client, MOVETYPE_NONE);
 		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetGravity(client, 1.0);
+		
+		data = new DataPack();
+		data.WriteCell(GetClientUserId(client));
+		data.WriteCell(desiredMoveType);
+		data.WriteCell(ticks);
+		RequestFrame(ContinueHoldStill, data);
 	}
-	return Plugin_Continue;
+	else
+	{
+		Movement_SetMovetype(client, desiredMoveType);
+	}
 }
 
 /**
