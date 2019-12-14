@@ -146,7 +146,7 @@ void JoinTeam(int client, int newTeam)
 		player.GetEyeAngles(savedAngles[client]);
 		savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
-		if (!player.CanPause)
+		if (!player.Paused && !player.CanPause)
 		{
 			player.StopTimer();
 		}
