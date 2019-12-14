@@ -5,6 +5,8 @@
 
 
 
+static int beamSprite;
+static int haloSprite;
 static float lastUsePressTime[MAXPLAYERS + 1];
 static bool hasStartedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasEndedTimerSincePressingUse[MAXPLAYERS + 1];
@@ -41,6 +43,12 @@ bool ToggleVirtualButtonsLock(int client)
 
 // =====[ EVENTS ]=====
 
+void OnMapStart_VirtualButtons()
+{
+	beamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
+	haloSprite = PrecacheModel("materials/sprites/glow01.vmt");
+}
+
 void OnClientPutInServer_VirtualButtons(int client)
 {
 	hasStartedTimerSincePressingUse[client] = false;
@@ -75,7 +83,22 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	}
 }
 
-void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
+void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons, int cmdnum)
+{
+	CheckForAndHandleUsage(client, buttons);
+	UpdateIndicators(client, cmdnum);
+}
+
+void OnCountedTeleport_VirtualButtons(int client)
+{
+	hasTeleportedSincePressingUse[client] = true;
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+static void CheckForAndHandleUsage(int client, int buttons)
 {
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
@@ -106,15 +129,6 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons)
 	}
 }
 
-void OnCountedTeleport_VirtualButtons(int client)
-{
-	hasTeleportedSincePressingUse[client] = true;
-}
-
-
-
-// =====[ PRIVATE ]=====
-
 static bool PassesUseCheck(int client)
 {
 	if (GetGameTime() - lastUsePressTime[client] < GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME + EPSILON
@@ -142,13 +156,7 @@ static bool InRangeOfButton(int client, const float buttonOrigin[3])
 	float origin[3];
 	Movement_GetOrigin(client, origin);
 	float distanceToButton = GetVectorDistance(origin, buttonOrigin);
-	
-	switch (GOKZ_GetCoreOption(client, Option_Mode))
-	{
-		case Mode_SimpleKZ:return distanceToButton <= GOKZ_SKZ_VIRTUAL_BUTTON_RADIUS;
-		case Mode_KZTimer:return distanceToButton <= GOKZ_KZT_VIRTUAL_BUTTON_RADIUS;
-	}
-	return false;
+	return distanceToButton <= gF_ModeVirtualButtonRanges[GOKZ_GetCoreOption(client, Option_Mode)];
 }
 
 static bool CanReachVirtualStart(int client)
@@ -169,4 +177,55 @@ static bool CanReachButton(int client, const float buttonOrigin[3])
 	bool didHit = TR_DidHit(trace);
 	delete trace;
 	return !didHit;
+}
+
+
+
+// ===== [ INDICATOR ] =====
+
+static void UpdateIndicators(int client, int cmdnum)
+{
+	if (cmdnum % 128 != 0)
+	{
+		return;
+	}
+	
+	if (hasVirtualStartButton[client])
+	{
+		SendCircle(client, virtualStartOrigin[client], { 0, 255, 0, 255 } );
+	}
+	
+	if (hasVirtualEndButton[client])
+	{
+		SendCircle(client, virtualEndOrigin[client], { 255, 0, 0, 255 } );
+	}
+}
+
+static void SendCircle(int client, const float origin[3], const int colour[4])
+{
+	float radius = gF_ModeVirtualButtonRanges[GOKZ_GetCoreOption(client, Option_Mode)];
+	if (radius <= EPSILON) // Don't draw circle of radius 0
+	{
+		return;
+	}
+	
+	float raisedOrigin[3];
+	CopyVector(origin, raisedOrigin);
+	raisedOrigin[2] += 0.5;
+	
+	TE_SetupBeamRingPoint(
+		raisedOrigin, 
+		radius * 2.0 - 0.05,  // Diameter
+		radius * 2.0,  // Diameter
+		beamSprite, 
+		haloSprite, 
+		0, 
+		10, 
+		1.0, 
+		0.1, 
+		0.0, 
+		colour, 
+		0, 
+		0);
+	TE_SendToClient(client);
 }

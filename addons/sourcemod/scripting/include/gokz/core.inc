@@ -155,8 +155,6 @@ enum
 #define GOKZ_MAX_CHECKPOINTS 32
 #define GOKZ_MAX_COURSES 100
 
-#define GOKZ_SKZ_VIRTUAL_BUTTON_RADIUS 32.0
-#define GOKZ_KZT_VIRTUAL_BUTTON_RADIUS 70.0
 #define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.11
 #define GOKZ_LADDER_NO_CHECKPOINT_TIME 1.5
 #define GOKZ_PAUSE_COOLDOWN 1.0
@@ -218,6 +216,13 @@ stock char gC_ModeKeys[MODE_COUNT][] =
 	"vanilla", 
 	"simplekz", 
 	"kztimer"
+};
+
+stock float gF_ModeVirtualButtonRanges[MODE_COUNT] = 
+{
+	0.0, 
+	32.0, 
+	70.0
 };
 
 stock char gC_ModeStartSounds[MODE_COUNT][] = 

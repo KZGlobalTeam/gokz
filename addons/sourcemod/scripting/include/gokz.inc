@@ -518,7 +518,7 @@ stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
  * @param src				Source vector.
  * @param dest				Destination vector.
  */
-stock void CopyVector(float src[3], float dest[3])
+stock void CopyVector(const any src[3], any dest[3])
 {
 	dest[0] = src[0];
 	dest[1] = src[1];

@@ -165,7 +165,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_VirtualButtons(client, buttons); // Emulate buttons first
+	OnPlayerRunCmdPost_VirtualButtons(client, buttons, cmdnum); // Emulate buttons first
 	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
 	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
@@ -285,6 +285,7 @@ public void OnMapStart()
 	OnMapStart_Prefix();
 	OnMapStart_CourseRegister();
 	OnMapStart_MapStarts();
+	OnMapStart_VirtualButtons();
 }
 
 public void OnConfigsExecuted()
