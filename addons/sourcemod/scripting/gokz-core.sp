@@ -148,7 +148,6 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_FirstSpawn(client);
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
-	OnClientPutInServer_ClanTag(client);
 	HookClientEvents(client);
 }
 
@@ -268,7 +267,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	OnOptionChanged_Options(client, coreOption, newValue);
 	OnOptionChanged_Timer(client, coreOption);
 	OnOptionChanged_Mode(client, coreOption);
-	OnOptionChanged_ClanTag(client, coreOption);
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)

@@ -272,31 +272,6 @@ void OnTeleport_ValidJump(int client)
 
 
 
-// =====[ CLAN TAG ]=====
-
-void OnClientPutInServer_ClanTag(int client)
-{
-	UpdateClanTag(client);
-}
-
-void OnOptionChanged_ClanTag(int client, Option option)
-{
-	if (option == Option_Mode)
-	{
-		UpdateClanTag(client);
-	}
-}
-
-static void UpdateClanTag(int client)
-{
-	if (!IsFakeClient(client))
-	{
-		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
-	}
-}
-
-
-
 // =====[ FIRST SPAWN ]=====
 
 static bool hasSpawned[MAXPLAYERS + 1];
