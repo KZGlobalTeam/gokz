@@ -185,23 +185,23 @@ static bool CanReachButton(int client, const float buttonOrigin[3])
 
 static void UpdateIndicators(int client, int cmdnum)
 {
-	if (cmdnum % 128 != 0)
+	if (cmdnum % 128 != 0 || !IsPlayerAlive(client))
 	{
 		return;
 	}
 	
 	if (hasVirtualStartButton[client])
 	{
-		SendCircle(client, virtualStartOrigin[client], { 0, 255, 0, 255 } );
+		DrawIndicator(client, virtualStartOrigin[client], { 0, 255, 0, 255 } );
 	}
 	
 	if (hasVirtualEndButton[client])
 	{
-		SendCircle(client, virtualEndOrigin[client], { 255, 0, 0, 255 } );
+		DrawIndicator(client, virtualEndOrigin[client], { 255, 0, 0, 255 } );
 	}
 }
 
-static void SendCircle(int client, const float origin[3], const int colour[4])
+static void DrawIndicator(int client, const float origin[3], const int colour[4])
 {
 	float radius = gF_ModeVirtualButtonRanges[GOKZ_GetCoreOption(client, Option_Mode)];
 	if (radius <= EPSILON) // Don't draw circle of radius 0
@@ -209,23 +209,28 @@ static void SendCircle(int client, const float origin[3], const int colour[4])
 		return;
 	}
 	
-	float raisedOrigin[3];
-	CopyVector(origin, raisedOrigin);
-	raisedOrigin[2] += 0.5;
+	float x, y, start[3], end[3];
 	
-	TE_SetupBeamRingPoint(
-		raisedOrigin, 
-		radius * 2.0 - 0.05,  // Diameter
-		radius * 2.0,  // Diameter
-		beamSprite, 
-		haloSprite, 
-		0, 
-		10, 
-		1.0, 
-		0.1, 
-		0.0, 
-		colour, 
-		0, 
-		0);
-	TE_SendToClient(client);
+	// Create the start position for the first part of the beam
+	start[0] = origin[0] + radius;
+	start[1] = origin[1];
+	start[2] = origin[2];
+	
+	for (int i = 1; i <= 32; i++) // Circle is broken into 32 segments
+	{
+		float angle = 2 * PI / 32 * i;
+		x = radius * Cosine(angle);
+		y = radius * Sine(angle);
+		
+		end[0] = origin[0] + x;
+		end[1] = origin[1] + y;
+		end[2] = origin[2];
+		
+		TE_SetupBeamPoints(start, end, beamSprite, haloSprite, 0, 0, 1.05, 0.2, 0.2, 0, 0.0, colour, 0);
+		TE_SendToClient(client);
+		
+		start[0] = end[0];
+		start[1] = end[1];
+		start[2] = end[2];
+	}
 }
