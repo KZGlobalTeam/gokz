@@ -81,7 +81,7 @@ int DisplaySpecMenu(int client)
 
 bool Spectate(int client)
 {
-	if (!GOKZ_GetCanPause(client))
+	if (!CanSpectate(client))
 	{
 		return false;
 	}
@@ -98,7 +98,7 @@ bool Spectate(int client)
 // Returns whether change to spectating the target was successful
 bool SpectatePlayer(int client, int target, bool printMessage = true)
 {
-	if (!GOKZ_GetCanPause(client))
+	if (!CanSpectate(client))
 	{
 		return false;
 	}
@@ -127,6 +127,11 @@ bool SpectatePlayer(int client, int target, bool printMessage = true)
 	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", target);
 	
 	return true;
+}
+
+bool CanSpectate(int client)
+{
+	return GOKZ_GetPaused(client) || GOKZ_GetCanPause(client);
 }
 
 public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2)

@@ -148,7 +148,20 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	
 	if (JustLanded(client, cmdnum))
 	{
-		gB_LastLandingWasValid[client] = GOKZ_GetValidJump(client);
+		// This condition exists to reduce false positives.
+		
+		// Telehopping is when the player bunnyhops out of a teleport. This will,
+		// more than usual, result in a perfect bunnyhop. This is alleviated by
+		// checking if it's a "GOKZ valid jump" (which detects teleports).
+		
+		// When a player is pressing up against a slope but not ascending it (e.g.
+		// palm trees on kz_adv_cursedjourney), they will switch between on ground
+		// and off ground frequently, which means that if they manage to jump, the
+		// jump will be recorded as a perfect bunnyhop. To ignore this, we check
+		// the jump is more than 1 tick duration.
+		
+		gB_LastLandingWasValid[client] = GOKZ_GetValidJump(client)
+		 && cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
 	}
 }
 

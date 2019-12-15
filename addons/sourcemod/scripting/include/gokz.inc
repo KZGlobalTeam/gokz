@@ -34,6 +34,7 @@ enum ObsMode
 
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
 #define EPSILON 0.000001
+#define PI 3.14159265359
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
 
@@ -518,7 +519,7 @@ stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
  * @param src				Source vector.
  * @param dest				Destination vector.
  */
-stock void CopyVector(float src[3], float dest[3])
+stock void CopyVector(const any src[3], any dest[3])
 {
 	dest[0] = src[0];
 	dest[1] = src[1];

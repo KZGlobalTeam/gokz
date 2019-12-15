@@ -146,7 +146,7 @@ void JoinTeam(int client, int newTeam)
 		player.GetEyeAngles(savedAngles[client]);
 		savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
 		hasSavedPosition[client] = true;
-		if (!player.CanPause)
+		if (!player.Paused && !player.CanPause)
 		{
 			player.StopTimer();
 		}
@@ -267,31 +267,6 @@ void OnTeleport_ValidJump(int client)
 	if (gB_OriginTeleported[client])
 	{
 		InvalidateJump(client);
-	}
-}
-
-
-
-// =====[ CLAN TAG ]=====
-
-void OnClientPutInServer_ClanTag(int client)
-{
-	UpdateClanTag(client);
-}
-
-void OnOptionChanged_ClanTag(int client, Option option)
-{
-	if (option == Option_Mode)
-	{
-		UpdateClanTag(client);
-	}
-}
-
-static void UpdateClanTag(int client)
-{
-	if (!IsFakeClient(client))
-	{
-		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 	}
 }
 
