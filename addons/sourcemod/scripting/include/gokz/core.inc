@@ -67,6 +67,7 @@ enum Option:
 	Option_CheckpointSounds, 
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
+	Option_VirtualButtonIndicators, 
 	OPTION_COUNT
 };
 
@@ -117,6 +118,13 @@ enum
 	ErrorSounds_Disabled = 0, 
 	ErrorSounds_Enabled, 
 	ERRORSOUNDS_COUNT
+};
+
+enum
+{
+	VirtualButtonIndicators_Disabled = 0, 
+	VirtualButtonIndicators_Enabled, 
+	VIRTUALBUTTONINDICATORS_COUNT
 };
 
 enum
@@ -264,7 +272,8 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Checkpoint Messages", 
 	"GOKZ - Checkpoint Sounds", 
 	"GOKZ - Teleport Sounds", 
-	"GOKZ - Error Sounds"
+	"GOKZ - Error Sounds", 
+	"GOKZ - VB Indicators"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
@@ -275,7 +284,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Checkpoint Messages - 0 = Disabled, 1 = Enabled", 
 	"Checkpoint Sounds - 0 = Disabled, 1 = Enabled", 
 	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
-	"Error Sounds - 0 = Disabled, 1 = Enabled"
+	"Error Sounds - 0 = Disabled, 1 = Enabled", 
+	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -286,7 +296,8 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Checkpoint Messages", 
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
-	"Options Menu - Error Sounds"
+	"Options Menu - Error Sounds", 
+	"Options Menu - Virtual Button Indicators"
 };
 
 stock int gI_CoreOptionCounts[OPTION_COUNT] = 
@@ -297,7 +308,8 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	CHECKPOINTMESSAGES_COUNT, 
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
-	ERRORSOUNDS_COUNT
+	ERRORSOUNDS_COUNT, 
+	VIRTUALBUTTONINDICATORS_COUNT
 };
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
@@ -308,7 +320,8 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	CheckpointMessages_Disabled, 
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 
-	ErrorSounds_Enabled
+	ErrorSounds_Enabled, 
+	VirtualButtonIndicators_Disabled
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 

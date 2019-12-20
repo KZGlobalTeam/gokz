@@ -185,7 +185,8 @@ static bool CanReachButton(int client, const float buttonOrigin[3])
 
 static void UpdateIndicators(int client, int cmdnum)
 {
-	if (cmdnum % 128 != 0 || !IsPlayerAlive(client))
+	if (cmdnum % 128 != 0 || !IsPlayerAlive(client)
+		 || GOKZ_GetCoreOption(client, Option_VirtualButtonIndicators) == VirtualButtonIndicators_Disabled)
 	{
 		return;
 	}
@@ -216,9 +217,9 @@ static void DrawIndicator(int client, const float origin[3], const int colour[4]
 	start[1] = origin[1];
 	start[2] = origin[2];
 	
-	for (int i = 1; i <= 32; i++) // Circle is broken into 32 segments
+	for (int i = 1; i <= 31; i++) // Circle is broken into 31 segments
 	{
-		float angle = 2 * PI / 32 * i;
+		float angle = 2 * PI / 31 * i;
 		x = radius * Cosine(angle);
 		y = radius * Sine(angle);
 		
@@ -226,7 +227,7 @@ static void DrawIndicator(int client, const float origin[3], const int colour[4]
 		end[1] = origin[1] + y;
 		end[2] = origin[2];
 		
-		TE_SetupBeamPoints(start, end, beamSprite, haloSprite, 0, 0, 1.05, 0.2, 0.2, 0, 0.0, colour, 0);
+		TE_SetupBeamPoints(start, end, beamSprite, haloSprite, 0, 0, 0.97, 0.2, 0.2, 0, 0.0, colour, 0);
 		TE_SendToClient(client);
 		
 		start[0] = end[0];

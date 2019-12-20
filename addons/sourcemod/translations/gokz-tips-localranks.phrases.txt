@@ -30,4 +30,8 @@
 		"en"		"{grey}Your MVP stars represent the percentage of maps and bonuses you've {blue}PRO{grey}'d on the server's default mode."
 		"chi"		"{grey}MVP星星数量是普通模式下以 {blue}裸跳{grey}完成地图的数量以及总地图数量的比例."
 	}
+	"!jumptop"
+	{
+		"en"		"{grey}Use the {default}!jumptop{grey} menu to see the server's longest recorded jumps."
+	}
 }
