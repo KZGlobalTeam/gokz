@@ -402,7 +402,7 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 	Movement_SetOrigin(client, origin);
 	Movement_SetEyeAngles(client, angles);
 	
-	// Intelligently hold player in MOVETYPE_NONE to prevent booster exploits
+	// Intelligently hold player still to prevent booster exploits
 	StartHoldStill(client, 3);
 	
 	// Duck the player if there is something blocking them from above
@@ -442,16 +442,8 @@ public void ContinueHoldStill(DataPack data)
 		return;
 	}
 	
-	// Keep track of the move type that the player 'desires' to be in
-	if (Movement_GetMovetype(client) != MOVETYPE_NONE)
+	if (ticks-- > 0)
 	{
-		desiredMoveType = Movement_GetMovetype(client);
-	}
-	
-	if (ticks-- > 0 // Only hold still if the player desires certain 'valid' move types
-		 && (desiredMoveType == MOVETYPE_WALK || desiredMoveType == MOVETYPE_LADDER))
-	{
-		Movement_SetMovetype(client, MOVETYPE_NONE);
 		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetGravity(client, 1.0);
@@ -461,10 +453,6 @@ public void ContinueHoldStill(DataPack data)
 		data.WriteCell(desiredMoveType);
 		data.WriteCell(ticks);
 		RequestFrame(ContinueHoldStill, data);
-	}
-	else
-	{
-		Movement_SetMovetype(client, desiredMoveType);
 	}
 }
 
