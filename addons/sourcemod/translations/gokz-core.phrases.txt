@@ -209,4 +209,8 @@
 		"en"		"Error sounds"
 		"chi"		"报错音效"
 	}
+	"Options Menu - Virtual Button Indicators"
+	{
+		"en"		"Virtual button indicators"
+	}
 }
