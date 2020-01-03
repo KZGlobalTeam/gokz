@@ -20,7 +20,7 @@ enum HUDOption:
 	HUDOption_InfoPanel, 
 	HUDOption_ShowKeys, 
 	HUDOption_TimerText, 
-	HUDOption_PreciseTimer, 
+	HUDOption_TimerStyle, 
 	HUDOption_SpeedText, 
 	HUDOption_ShowWeapon, 
 	HUDOPTION_COUNT
@@ -61,17 +61,17 @@ enum
 
 enum
 {
-	SpeedText_Disabled = 0, 
-	SpeedText_InfoPanel, 
-	SpeedText_Bottom, 
-	SPEEDTEXT_COUNT
+	TimerStyle_Standard = 0, 
+	TimerStyle_Precise, 
+	TIMERSTYLE_COUNT
 };
 
 enum
 {
-	PreciseTimer_Disabled = 0, 
-	PreciseTimer_Enabled, 
-	PRECISETIMER_COUNT
+	SpeedText_Disabled = 0, 
+	SpeedText_InfoPanel, 
+	SpeedText_Bottom, 
+	SPEEDTEXT_COUNT
 };
 
 enum
@@ -94,7 +94,7 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Centre Panel", 
 	"GOKZ HUD - Show Keys", 
 	"GOKZ HUD - Timer Text", 
-	"GOKZ HUD - Precise Timer", 
+	"GOKZ HUD - Timer Style", 
 	"GOKZ HUD - Speed Text", 
 	"GOKZ HUD - Show Weapon"
 };
@@ -105,7 +105,7 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Centre Information Panel - 0 = Disabled, 1 = Enabled", 
 	"Key Press Display - 0 = Spectating, 1 = Always, 2 = Disabled", 
 	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Teleport Menu, 3 = Bottom, 4 = Top", 
-	"Precise Timer - 0 = Disabled, 1 = Enabled", 
+	"Timer Style - 0 = Standard, 1 = Precise", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled"
 };
@@ -116,7 +116,7 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Info Panel", 
 	"Options Menu - Show Keys", 
 	"Options Menu - Timer Text", 
-	"Options Menu - Precise Timer", 
+	"Options Menu - Timer Style", 
 	"Options Menu - Speed Text", 
 	"Options Menu - Show Weapon"
 };
@@ -127,7 +127,7 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	INFOPANEL_COUNT, 
 	SHOWKEYS_COUNT, 
 	TIMERTEXT_COUNT, 
-	PRECISETIMER_COUNT, 
+	TIMERSTYLE_COUNT, 
 	SPEEDTEXT_COUNT, 
 	SHOWWEAPON_COUNT
 };
@@ -138,7 +138,7 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	InfoPanel_Enabled, 
 	ShowKeys_Spectating, 
 	TimerText_InfoPanel, 
-	PreciseTimer_Disabled, 
+	TimerStyle_Standard, 
 	SpeedText_InfoPanel, 
 	ShowWeapon_Enabled
 };
@@ -164,12 +164,6 @@ stock char gC_TimerTextPhrases[TIMERTEXT_COUNT][] =
 	"Options Menu - Teleport Menu", 
 	"Options Menu - Bottom", 
 	"Options Menu - Top"
-};
-
-stock char gC_PreciseTimerPhrases[PRECISETIMER_COUNT][] = 
-{
-	"Options Menu - Disabled", 
-	"Options Menu - Enabled"
 };
 
 stock char gC_SpeedTextPhrases[SPEEDTEXT_COUNT][] = 
@@ -239,6 +233,20 @@ stock bool GOKZ_HUD_SetOption(int client, HUDOption option, any value)
 stock bool GOKZ_HUD_CycleOption(int client, HUDOption option)
 {
 	return GOKZ_CycleOption(client, gC_HUDOptionNames[option]);
+}
+
+/**
+ * Represents a time float as a string e.g. 01:23.45
+ * and according to the client's HUD options.
+ *
+ * @param client		Client index.
+ * @param time			Time in seconds.
+ * @return				String representation of time.
+ */
+stock char[] GOKZ_HUD_FormatTime(int client, float time)
+{
+	bool precise = GOKZ_HUD_GetOption(client, HUDOption_TimerStyle) == TimerStyle_Precise;
+	return GOKZ_FormatTime(time, precise);
 }
 
 

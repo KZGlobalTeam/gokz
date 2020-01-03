@@ -26,15 +26,13 @@
 		"en"		"{grey}Your centre information panel has been disabled."
 		"chi"		"{grey}你的中心面板已关闭."
 	}
-	"Option - Precise Timer - Enable"
+	"Option - Timer Style - Standard"
 	{
-		"en"		"{grey}The precise timer has been enabled."
-		"chi"		"{grey}精确计时器已启用。"
+		"en"		"{grey}Your timer text style is now standard."
 	}
-	"Option - Precise Timer - Disable"
+	"Option - Timer Style - Precise"
 	{
-		"en"		"{grey}The precise timer has been disabled."
-		"chi"		"{grey}精确计时器已被禁用。"
+		"en"		"{grey}Your timer text style is now more precise."
 	}
 	"Option - Show Weapon - Enable"
 	{
@@ -154,10 +152,9 @@
 		"en"		"Timer text"
 		"chi"		"计时器音效"
 	}
-	"Options Menu - Precise Timer"
+	"Options Menu - Timer Style"
 	{
-		"en"		"Precise timer"
-		"chi"		"精密计时器"
+		"en"		"Timer style"
 	}
 	"Options Menu - Speed Text"
 	{

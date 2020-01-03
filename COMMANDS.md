@@ -29,6 +29,7 @@
  * `!menu`/`!cpmenu` - Toggle the visibility of the simple teleport menu.
  * `!adv` - Toggle the visibility of the advanced teleport menu.
  * `!panel` - Toggle visibility of the centre information panel.
+ * `!timerstyle` - Toggle the style of the timer text.
  * `!speed` - Toggle visibility of your speed and jump pre-speed.
  * `!hideweapon` - Toggle visibility of your weapon.
 

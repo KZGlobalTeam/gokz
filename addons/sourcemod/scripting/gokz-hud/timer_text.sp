@@ -13,14 +13,13 @@ static Handle timerHudSynchronizer;
 
 // =====[ PUBLIC ]=====
 
-char[] FormatTimerTextForMenu(KZPlayer targetPlayer)
+char[] FormatTimerTextForMenu(KZPlayer player, KZPlayer targetPlayer)
 {
 	char timerTextString[32];
-	bool precise = targetPlayer.PreciseTimer != PreciseTimer_Disabled;
 	FormatEx(timerTextString, sizeof(timerTextString), 
 		"%s %s", 
 		gC_TimeTypeNames[targetPlayer.TimeType], 
-		GOKZ_FormatTime(targetPlayer.Time, precise));
+		GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
 	return timerTextString;
 }
 
@@ -130,7 +129,7 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 			// Use a Panel if want to show ONLY timer text (not TP menu)
 			// as it doesn't seem to be possible to display a Menu with no items.
 			Panel panel = new Panel(null);
-			panel.SetTitle(FormatTimerTextForMenu(targetPlayer));
+			panel.SetTitle(FormatTimerTextForMenu(player, targetPlayer));
 			panel.Send(player.ID, PanelHandler_Menu, MENU_TIME_FOREVER);
 			delete panel;
 			gB_MenuShowing[player.ID] = true;
@@ -157,7 +156,6 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 			}
 		}
 		
-		bool precise = player.PreciseTimer != PreciseTimer_Disabled;
-		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.Time, precise));
+		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
 	}
 } 

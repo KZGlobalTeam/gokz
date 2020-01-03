@@ -113,7 +113,7 @@ static void TPMenuSetTitle(KZPlayer player, Menu menu)
 {
 	if (player.TimerRunning && player.TimerText == TimerText_TPMenu)
 	{
-		menu.SetTitle(FormatTimerTextForMenu(player));
+		menu.SetTitle(FormatTimerTextForMenu(player, player));
 	}
 }
 

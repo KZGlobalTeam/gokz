@@ -386,12 +386,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int PreciseTimer {
+	property int TimerStyle {
 		public get() {
-			return this.GetHUDOption(HUDOption_PreciseTimer);
+			return this.GetHUDOption(HUDOption_TimerStyle);
 		}
 		public set(int value) {
-			this.SetHUDOption(HUDOption_PreciseTimer, value);
+			this.SetHUDOption(HUDOption_TimerStyle, value);
 		}
 	}
 	
