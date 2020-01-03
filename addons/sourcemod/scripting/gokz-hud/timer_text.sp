@@ -16,10 +16,11 @@ static Handle timerHudSynchronizer;
 char[] FormatTimerTextForMenu(KZPlayer targetPlayer)
 {
 	char timerTextString[32];
+	bool precise = targetPlayer.PreciseTimer != PreciseTimer_Disabled;
 	FormatEx(timerTextString, sizeof(timerTextString), 
 		"%s %s", 
 		gC_TimeTypeNames[targetPlayer.TimeType], 
-		GOKZ_FormatTime(targetPlayer.Time));
+		GOKZ_FormatTime(targetPlayer.Time, precise));
 	return timerTextString;
 }
 
@@ -156,6 +157,7 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 			}
 		}
 		
-		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.Time));
+		bool precise = player.PreciseTimer != PreciseTimer_Disabled;
+		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_FormatTime(targetPlayer.Time, precise));
 	}
 } 

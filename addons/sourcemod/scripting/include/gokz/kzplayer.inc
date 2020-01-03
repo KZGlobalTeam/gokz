@@ -386,6 +386,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
+	property int PreciseTimer {
+		public get() {
+			return this.GetHUDOption(HUDOption_PreciseTimer);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_PreciseTimer, value);
+		}
+	}
+	
 	property int SpeedText {
 		public get() {
 			return this.GetHUDOption(HUDOption_SpeedText);

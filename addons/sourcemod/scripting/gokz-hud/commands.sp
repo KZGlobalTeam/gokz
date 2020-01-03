@@ -4,6 +4,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_cpmenu", CommandMenu, "[KZ] Toggle the simple teleport menu.");
 	RegConsoleCmd("sm_adv", CommandToggleAdvancedMenu, "[KZ] Toggle the advanced teleport menu.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
+	RegConsoleCmd("sm_precisetimer", CommandTogglePreciseTimer, "[KZ] Toggle the timer's precision.");
 	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 }
@@ -45,6 +46,18 @@ public Action CommandToggleInfoPanel(int client, int args)
 		GOKZ_HUD_SetOption(client, HUDOption_InfoPanel, InfoPanel_Disabled);
 	}
 	return Plugin_Handled;
+}
+
+public Action CommandTogglePreciseTimer(int client, int args)
+{
+	if (GOKZ_HUD_GetOption(client, HUDOption_PreciseTimer) == PreciseTimer_Disabled)
+	{
+		GOKZ_HUD_SetOption(client, HUDOption_PreciseTimer, PreciseTimer_Enabled);
+	}
+	else
+	{
+		GOKZ_HUD_SetOption(client, HUDOption_PreciseTimer, PreciseTimer_Disabled);
+	}
 }
 
 public Action CommandToggleSpeed(int client, int args)
