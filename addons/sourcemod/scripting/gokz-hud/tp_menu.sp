@@ -91,7 +91,8 @@ static void UpdateTPMenu(int client)
 	
 	// If there is no menu showing, or if the TP menu is currently showing with timer text
 	if (GetClientMenu(client) == MenuSource_None
-		 || gB_MenuShowing[player.ID] && player.TimerText == TimerText_TPMenu && player.Alive && player.TimerRunning && !player.Paused)
+		 || gB_MenuShowing[player.ID] && GetClientAvgLoss(player.ID, NetFlow_Both) > EPSILON
+		 || gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu)
 	{
 		ShowTPMenu(player);
 	}
