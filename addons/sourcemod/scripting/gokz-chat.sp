@@ -170,15 +170,15 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 	
 	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
 	{
-		GOKZ_PrintToChatAll(false, "{default}* {lime}%s{default}: %s", sanitisedName, sanitisedMessage);
-		PrintToConsoleAll("* %s: %s", sanitisedName, sanitisedMessage);
-		PrintToServer("* %s: %s", sanitisedName, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{default}* {lime}%s{default} : %s", sanitisedName, sanitisedMessage);
+		PrintToConsoleAll("* %s : %s", sanitisedName, sanitisedMessage);
+		PrintToServer("* %s : %s", sanitisedName, sanitisedMessage);
 	}
 	else
 	{
-		GOKZ_PrintToChatAll(false, "{lime}%s{default}: %s", sanitisedName, sanitisedMessage);
-		PrintToConsoleAll("%s: %s", sanitisedName, sanitisedMessage);
-		PrintToServer("%s: %s", sanitisedName, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{lime}%s{default} : %s", sanitisedName, sanitisedMessage);
+		PrintToConsoleAll("%s : %s", sanitisedName, sanitisedMessage);
+		PrintToServer("%s : %s", sanitisedName, sanitisedMessage);
 	}
 }
 
