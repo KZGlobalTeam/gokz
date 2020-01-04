@@ -149,6 +149,14 @@
 		"en"		"{grey}Your timer will no longer restart upon teleporting to start buttons."
 		"chi"		"{grey}你的计时器直到传送到起点前不再重置."
 	}
+	"Option - Virtual Button Indicators - Enable"
+	{
+		"en"		"{grey}Your virtual start and end buttons are now indicated by circles."
+	}
+	"Option - Virtual Button Indicators - Disable"
+	{
+		"en"		"{grey}Your virtual start and end buttons are no longer indicated."
+	}
 	"Locked Virtual Buttons"
 	{
 		"en"		"{grey}You have locked your virtual buttons."
