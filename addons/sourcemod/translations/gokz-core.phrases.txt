@@ -41,8 +41,10 @@
 	}
 	"Make Checkpoint"
 	{
-		"en"		"{grey}You have set a checkpoint."
-		"chi"		"{grey}你存储了一个存点."
+		// You have made a checkpoint (#3).
+		"#format"	"{1:d}"
+		"en"		"{grey}You have made a checkpoint (#{default}{1}{grey})."
+		"chi"		"{grey}你存储了一个存点 (#{default}{1}{grey})."
 	}
 	"Can't Checkpoint (Midair)"
 	{
