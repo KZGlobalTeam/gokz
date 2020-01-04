@@ -76,7 +76,7 @@ static char[] GetInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 {
 	char infoPanelText[320];
 	FormatEx(infoPanelText, sizeof(infoPanelText), 
-		"<font color='#626262'>%s%s%s", 
+		"<font color='#ffffff08'>%s%s%s", 
 		GetTimeString(player, targetPlayer), 
 		GetSpeedString(player, targetPlayer), 
 		GetKeysString(player, targetPlayer));
@@ -180,7 +180,7 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 		 && Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
 		 && targetPlayer.Jumped)
 	{
-		duckString = " <font color='#8080ff'>C</font>";
+		duckString = " <font color='#71eeb8'>C</font>";
 		infoPanelShowDuckString[targetPlayer.ID] = true;
 	}
 	else
