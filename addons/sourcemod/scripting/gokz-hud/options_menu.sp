@@ -88,6 +88,20 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 					gC_HUDOptionPhrases[option], param, 
 					gC_TimerTextPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
+			case HUDOption_TimerStyle:
+			{
+				int optionValue = GOKZ_HUD_GetOption(param, option);
+				if (optionValue == TimerStyle_Precise)
+				{
+					FormatEx(buffer, maxlength, "%T - 01:23.45", 
+						gC_HUDOptionPhrases[option], param);
+				}
+				else
+				{
+					FormatEx(buffer, maxlength, "%T - 1:23", 
+						gC_HUDOptionPhrases[option], param);
+				}
+			}
 			case HUDOption_SpeedText:
 			{
 				FormatEx(buffer, maxlength, "%T - %T", 

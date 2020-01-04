@@ -26,6 +26,14 @@
 		"en"		"{grey}Your centre information panel has been disabled."
 		"chi"		"{grey}你的中心面板已关闭."
 	}
+	"Option - Timer Style - Standard"
+	{
+		"en"		"{grey}Your timer text style is now standard."
+	}
+	"Option - Timer Style - Precise"
+	{
+		"en"		"{grey}Your timer text style is now more precise."
+	}
 	"Option - Show Weapon - Enable"
 	{
 		"en"		"{grey}You are now showing your weapon."
@@ -143,6 +151,10 @@
 	{
 		"en"		"Timer text"
 		"chi"		"计时器音效"
+	}
+	"Options Menu - Timer Style"
+	{
+		"en"		"Timer style"
 	}
 	"Options Menu - Speed Text"
 	{

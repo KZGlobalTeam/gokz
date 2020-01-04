@@ -76,7 +76,7 @@ static char[] GetInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 {
 	char infoPanelText[320];
 	FormatEx(infoPanelText, sizeof(infoPanelText), 
-		"<font color='#626262'>%s%s%s", 
+		"<font color='#ffffff08'>%s%s%s", 
 		GetTimeString(player, targetPlayer), 
 		GetSpeedString(player, targetPlayer), 
 		GetKeysString(player, targetPlayer));
@@ -100,7 +100,7 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 				FormatEx(timeString, sizeof(timeString), 
 					"%T: <font color='#ead18a'>%s</font> %s\n", 
 					"Info Panel Text - Time", player.ID, 
-					GOKZ_FormatTime(targetPlayer.Time, false), 
+					GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
 					GetPausedString(player, targetPlayer));
 			}
 			case TimeType_Pro:
@@ -108,7 +108,7 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 				FormatEx(timeString, sizeof(timeString), 
 					"%T: <font color='#b5d4ee'>%s</font> %s\n", 
 					"Info Panel Text - Time", player.ID, 
-					GOKZ_FormatTime(targetPlayer.Time, false), 
+					GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
 					GetPausedString(player, targetPlayer));
 			}
 		}
@@ -180,7 +180,7 @@ static char[] GetTakeoffString(KZPlayer targetPlayer)
 		 && Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
 		 && targetPlayer.Jumped)
 	{
-		duckString = " <font color='#8080ff'>C</font>";
+		duckString = " <font color='#71eeb8'>C</font>";
 		infoPanelShowDuckString[targetPlayer.ID] = true;
 	}
 	else

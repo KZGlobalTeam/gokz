@@ -16,19 +16,21 @@
  * `!pause`/`!resume` - Toggle pausing your timer and stopping you in your position.
  * `!stop` - Stop your timer.
  * `!autorestart` - Toggle auto restart upon teleporting to start.
+ * `!virtualbuttonindicators`/`!vbi` - Toggle virtual button indicators.
+ * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
  * `!mode` - Open the movement mode selection menu.
  * `!vanilla`/`!vnl`/`!v` - Switch to the Vanilla mode.
  * `!simplekz`/`!skz`/`!s` - Switch to the SimpleKZ mode.
  * `!kztimer`/`!kzt`/`!k` - Switch to the KZTimer mode.
  * `!nc` - Toggle noclip.
  * `+noclip` - Noclip (bind a key to it).
- * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
 
 ### gokz-hud
 
  * `!menu`/`!cpmenu` - Toggle the visibility of the simple teleport menu.
  * `!adv` - Toggle the visibility of the advanced teleport menu.
  * `!panel` - Toggle visibility of the centre information panel.
+ * `!timerstyle` - Toggle the style of the timer text.
  * `!speed` - Toggle visibility of your speed and jump pre-speed.
  * `!hideweapon` - Toggle visibility of your weapon.
 

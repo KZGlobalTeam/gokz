@@ -22,6 +22,10 @@ void RegisterCommands()
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
 	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
+	RegConsoleCmd("sm_virtualbuttonindicators", CommandToggleVirtualButtonIndicators, "[KZ] Toggle virtual button indicators.");
+	RegConsoleCmd("sm_vbi", CommandToggleVirtualButtonIndicators, "[KZ] Toggle virtual button indicators.");
+	RegConsoleCmd("sm_virtualbuttons", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
+	RegConsoleCmd("sm_vb", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
 	RegConsoleCmd("sm_mode", CommandMode, "[KZ] Open the movement mode selection menu.");
 	RegConsoleCmd("sm_vanilla", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
 	RegConsoleCmd("sm_vnl", CommandVanilla, "[KZ] Switch to the Vanilla mode.");
@@ -35,8 +39,6 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
-	RegConsoleCmd("sm_virtualbuttons", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
-	RegConsoleCmd("sm_vb", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
 }
 
 void AddCommandsListeners()
@@ -203,6 +205,32 @@ public Action CommandToggleAutoRestart(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandToggleVirtualButtonIndicators(int client, int args)
+{
+	if (GOKZ_GetCoreOption(client, Option_VirtualButtonIndicators) == VirtualButtonIndicators_Disabled)
+	{
+		GOKZ_SetCoreOption(client, Option_VirtualButtonIndicators, VirtualButtonIndicators_Enabled);
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_VirtualButtonIndicators, VirtualButtonIndicators_Disabled);
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandToggleVirtualButtonsLock(int client, int args)
+{
+	if (ToggleVirtualButtonsLock(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Locked Virtual Buttons");
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Unlocked Virtual Buttons");
+	}
+	return Plugin_Handled;
+}
+
 public Action CommandMode(int client, int args)
 {
 	DisplayModeMenu(client);
@@ -242,19 +270,6 @@ public Action CommandEnableNoclip(int client, int args)
 public Action CommandDisableNoclip(int client, int args)
 {
 	DisableNoclip(client);
-	return Plugin_Handled;
-}
-
-public Action CommandToggleVirtualButtonsLock(int client, int args)
-{
-	if (ToggleVirtualButtonsLock(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Locked Virtual Buttons");
-	}
-	else
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Unlocked Virtual Buttons");
-	}
 	return Plugin_Handled;
 }
 

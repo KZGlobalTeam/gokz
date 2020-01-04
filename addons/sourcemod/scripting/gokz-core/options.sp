@@ -414,5 +414,19 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 				}
 			}
 		}
+		case Option_VirtualButtonIndicators:
+		{
+			switch (newValue)
+			{
+				case VirtualButtonIndicators_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Virtual Button Indicators - Disable");
+				}
+				case VirtualButtonIndicators_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Virtual Button Indicators - Enable");
+				}
+			}
+		}
 	}
 } 

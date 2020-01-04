@@ -24,7 +24,7 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
 
  * 128 Tick (`-tickrate 128`)
  * [SourceMod ^1.10](https://www.sourcemod.net/downloads.php?branch=stable)
- * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showthread.php?t=180114)
+ * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
  * [MovementAPI Plugin ^2.1.0](https://github.com/danzayau/MovementAPI)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-globals plugin)
  * Optional - A "console cleaner" extension to prevent `Datatable warning` server console spam
@@ -38,7 +38,7 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
  * When the plugins first load, various configuration files will be auto-generated and can be found in `csgo/cfg/sourcemod/gokz`.
  * Use `sm_updatemappool` to populate the ranked map pool with those in `csgo/cfg/sourcemod/gokz/gokz-localranks-mappool.cfg`.
 
-Please refer to the wiki for a [more detailed installation guide](https://bitbucket.org/kztimerglobalteam/gokz/wiki/Installation%20Guide).
+Please refer to the forum for a [more detailed installation guide](https://forum.gokz.org/p/guide-gokz).
 
 ### Updating
 

@@ -386,6 +386,15 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
+	property int TimerStyle {
+		public get() {
+			return this.GetHUDOption(HUDOption_TimerStyle);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_TimerStyle, value);
+		}
+	}
+	
 	property int SpeedText {
 		public get() {
 			return this.GetHUDOption(HUDOption_SpeedText);

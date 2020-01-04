@@ -80,7 +80,7 @@ void MakeCheckpoint(int client)
 	}
 	if (GOKZ_GetCoreOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Make Checkpoint");
+		GOKZ_PrintToChat(client, true, "%t", "Make Checkpoint", checkpointCount[client]);
 	}
 	
 	// Call Post Forward

@@ -91,7 +91,8 @@ static void UpdateTPMenu(int client)
 	
 	// If there is no menu showing, or if the TP menu is currently showing with timer text
 	if (GetClientMenu(client) == MenuSource_None
-		 || gB_MenuShowing[player.ID] && player.TimerText == TimerText_TPMenu && player.Alive && player.TimerRunning && !player.Paused)
+		 || gB_MenuShowing[player.ID] && GetClientAvgLoss(player.ID, NetFlow_Both) > EPSILON
+		 || gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu)
 	{
 		ShowTPMenu(player);
 	}
@@ -113,7 +114,7 @@ static void TPMenuSetTitle(KZPlayer player, Menu menu)
 {
 	if (player.TimerRunning && player.TimerText == TimerText_TPMenu)
 	{
-		menu.SetTitle(FormatTimerTextForMenu(player));
+		menu.SetTitle(FormatTimerTextForMenu(player, player));
 	}
 }
 
@@ -143,15 +144,25 @@ static void TPMenuAddItems(KZPlayer player, Menu menu)
 
 static void TPMenuAddItemCheckpoint(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Checkpoint", player.ID);
+	if (player.TimerRunning)
+	{
+		Format(display, sizeof(display), "%s #%d", display, player.CheckpointCount);
+	}
+	
 	menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
 }
 
 static void TPMenuAddItemTeleport(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Teleport", player.ID);
+	if (player.TimerRunning)
+	{
+		Format(display, sizeof(display), "%s #%d", display, player.TeleportCount);
+	}
+	
 	if (player.CanTeleportToCheckpoint)
 	{
 		menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DEFAULT);
@@ -164,7 +175,7 @@ static void TPMenuAddItemTeleport(KZPlayer player, Menu menu)
 
 static void TPMenuAddItemPrevCheckpoint(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", player.ID);
 	if (player.CanPrevCheckpoint)
 	{
@@ -178,7 +189,7 @@ static void TPMenuAddItemPrevCheckpoint(KZPlayer player, Menu menu)
 
 static void TPMenuAddItemNextCheckpoint(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Next CP", player.ID);
 	if (player.CanNextCheckpoint)
 	{
@@ -192,7 +203,7 @@ static void TPMenuAddItemNextCheckpoint(KZPlayer player, Menu menu)
 
 static void TPMenuAddItemUndo(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Undo TP", player.ID);
 	if (player.CanUndoTeleport)
 	{
@@ -206,7 +217,7 @@ static void TPMenuAddItemUndo(KZPlayer player, Menu menu)
 
 static void TPMenuAddItemPause(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	if (player.Paused)
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", player.ID);
@@ -221,7 +232,7 @@ static void TPMenuAddItemPause(KZPlayer player, Menu menu)
 
 static void TPMenuAddItemStart(KZPlayer player, Menu menu)
 {
-	char display[16];
+	char display[24];
 	if (player.StartPositionType == StartPositionType_Spawn)
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Respawn", player.ID);

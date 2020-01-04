@@ -66,6 +66,20 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_TimerStyle:
+		{
+			switch (newValue)
+			{
+				case TimerStyle_Standard:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Timer Style - Standard");
+				}
+				case TimerStyle_Precise:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Timer Style - Precise");
+				}
+			}
+		}
 		case HUDOption_ShowWeapon:
 		{
 			switch (newValue)

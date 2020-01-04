@@ -30,13 +30,13 @@
 		"en"		"{grey}Tired of pressing E? Enable the {default}!autorestart {grey}option!"
 		"chi"		"{grey}不想对着起点按E? 聊天框中输入{default}!autorestart {grey}即可!"
 	}
+	"!vbi"
+	{
+		"en"		"{grey}Having trouble visualising virtual buttons? Use {default}!vbi{grey} to toggle indicators for them."
+	}
 	"!vb"
 	{
 		"en"		"{grey}Have you set up your virtual buttons perfectly? Use {default}!vb{grey} to lock them in place."
-	}
-	"Virtual button indicators"
-	{
-		"en"		"{grey}Having trouble visualising virtual buttons? Enable virtual button indicators in the {default}!options{grey} menu."
 	}
 	"Stretch"
 	{
