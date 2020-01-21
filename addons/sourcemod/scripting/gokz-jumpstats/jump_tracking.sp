@@ -1139,61 +1139,105 @@ static void BeginStrafes(int client)
 static void EndStrafes(int client)
 {
 	strafesLast[client] = strafesCurrent[client];
-	strafesTotalWidth[client] += strafesWidth[client][strafesCurrent[client]];
 }
 
 static void UpdateStrafes(int client)
 {
-	// Invalidate jump when using turnbinds or too many strafes
-	if (Movement_GetButtons(client) & (IN_LEFT | IN_RIGHT) || strafesCurrent[client] >= JS_MAX_TRACKED_STRAFES)
-	{
-		InvalidateJumpstat(client);
-		return;
-	}
-	
 	KZPlayer player = KZPlayer(client);
+	
 	if (player.TurningLeft && strafesDirection[player.ID] != StrafeDirection_Left)
 	{
 		strafesDirection[player.ID] = StrafeDirection_Left;
-		strafesTotalWidth[client] += strafesWidth[client][strafesCurrent[client]];
 		strafesCurrent[player.ID]++;
 	}
 	else if (player.TurningRight && strafesDirection[player.ID] != StrafeDirection_Right)
 	{
 		strafesDirection[player.ID] = StrafeDirection_Right;
-		strafesTotalWidth[client] += strafesWidth[client][strafesCurrent[client]];
 		strafesCurrent[player.ID]++;
 	}
 	
+	bool overlap = false;
+	bool deadair = false;
 	int buttons = Movement_GetButtons(client);
 	if (buttons & IN_MOVERIGHT && buttons & IN_MOVELEFT)
 	{
-		strafesTotalOverlap[client]++;
-		strafesOverlap[client][strafesCurrent[client]]++;
+		overlap = true;
 	}
 	else if (!(buttons & IN_MOVERIGHT) && !(buttons & IN_MOVELEFT))
 	{
+		deadair = true;
+	}
+	
+	bool gained = false;
+	bool lost = false;
+	float deltaSpeed = player.Speed - lastTickSpeed[client];
+	if (deltaSpeed > EPSILON)
+	{
+		gained = true;
+		
+	}
+	else if (deltaSpeed < -EPSILON)
+	{
+		lost = true;
+	}
+	
+	float angles[3];
+	player.GetEyeAngles(angles);
+	float deltaAngle = FloatAbs(CalcDeltaAngle(angles[1], strafesLastAngle[client]));
+	
+	UpdateStrafesTotal(client, overlap, deadair, deltaAngle);
+	UpdateStrafesCurrent(client, overlap, deadair, gained, lost, deltaSpeed, deltaAngle);
+	
+	strafesLastAngle[client] = angles[1];
+}
+
+static void UpdateStrafesTotal(int client, bool overlap, bool deadair, float deltaAngle)
+{
+	if (overlap)
+	{
+		strafesTotalOverlap[client]++;
+	}
+	
+	if (deadair)
+	{
 		strafesTotalDeadair[client]++;
+	}
+	
+	strafesTotalWidth[client] += deltaAngle;
+}
+
+static void UpdateStrafesCurrent(int client, bool overlap, bool deadair, bool gained, bool lost, float deltaSpeed, float deltaAngle)
+{
+	// Stop tracking individual strafes after the max number has been reached.
+	if (strafesCurrent[client] >= JS_MAX_TRACKED_STRAFES)
+	{
+		return;
+	}
+	
+	strafesTicks[client][strafesCurrent[client]]++;
+	
+	if (overlap)
+	{
+		strafesOverlap[client][strafesCurrent[client]]++;
+	}
+	
+	if (deadair)
+	{
 		strafesDeadair[client][strafesCurrent[client]]++;
 	}
 	
-	if (strafesCurrent[client] < JS_MAX_TRACKED_STRAFES)
+	if (gained)
 	{
-		strafesTicks[client][strafesCurrent[client]]++;
-		if (player.Speed > lastTickSpeed[client])
-		{
-			strafesGainTicks[client][strafesCurrent[client]]++;
-			strafesGain[client][strafesCurrent[client]] += player.Speed - lastTickSpeed[client];
-		}
-		else
-		{
-			strafesLoss[client][strafesCurrent[client]] += lastTickSpeed[client] - player.Speed;
-		}
-		float angles[3];
-		Movement_GetEyeAngles(client, angles);
-		strafesWidth[client][strafesCurrent[client]] += FloatAbs(CalcDeltaAngle(angles[1], strafesLastAngle[client]));
-		strafesLastAngle[client] = angles[1];
+		strafesGainTicks[client][strafesCurrent[client]]++;
+		strafesGain[client][strafesCurrent[client]] += deltaSpeed;
 	}
+	
+	if (lost)
+	{
+		strafesLoss[client][strafesCurrent[client]] += -1 * deltaSpeed;
+	}
+	
+	strafesTotalWidth[client] += deltaAngle;
 }
 
 
