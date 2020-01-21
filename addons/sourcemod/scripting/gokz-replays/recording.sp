@@ -312,7 +312,8 @@ static void DiscardRecording(int client)
 		return;
 	}
 	
-	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
+	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client)
+		 && recordedTickData[client].Length >= RP_MIN_CHEATER_REPLAY_LENGTH)
 	{
 		SaveRecordingOfCheater(client);
 	}
