@@ -28,6 +28,26 @@ public Plugin myinfo =
 
 // =====[ PLUGIN EVENTS ]=====
 
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+}
+
+
+
+// =====[ CLIENT EVENTS ]=====
+
 public void OnClientPutInServer(int client)
 {
 	UpdateClanTag(client);

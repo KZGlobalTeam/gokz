@@ -3,6 +3,10 @@
 #include <gokz/core>
 #include <gokz/racing>
 
+#undef REQUIRE_EXTENSIONS
+#undef REQUIRE_PLUGIN
+#include <updater>
+
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -16,6 +20,8 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-racing.txt"
 
 #include "gokz-racing/announce.sp"
 #include "gokz-racing/api.sp"
@@ -45,6 +51,22 @@ public void OnPluginStart()
 	RegisterCommands();
 	
 	OnPluginStart_Race();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
 }
 
 
