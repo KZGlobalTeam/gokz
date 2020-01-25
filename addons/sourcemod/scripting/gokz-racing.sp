@@ -85,11 +85,18 @@ public void OnClientDisconnect(int client)
 
 public Action GOKZ_OnTimerStart(int client, int course)
 {
-	if (InCountdown(client) || (InStartedRace(client) && !(InRaceMode(client) && IsRaceCourse(client, course))))
+	Action action = OnTimerStart_Racer(client, course);
+	if (action != Plugin_Continue)
 	{
-		return Plugin_Stop;
+		return action;
 	}
+	
 	return Plugin_Continue;
+}
+
+public void GOKZ_OnTimerStart_Post(int client, int course)
+{
+	OnTimerStart_Post_Racer(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
@@ -99,23 +106,28 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 
 public Action GOKZ_OnMakeCheckpoint(int client)
 {
-	if (!IsAllowedToTeleport(client))
+	Action action = OnMakeCheckpoint_Racer(client);
+	if (action != Plugin_Continue)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Checkpoints Not Allowed During Race");
-		GOKZ_PlayErrorSound(client);
-		return Plugin_Handled;
+		return action;
 	}
+	
 	return Plugin_Continue;
+}
+
+public void GOKZ_OnMakeCheckpoint_Post(int client)
+{
+	OnMakeCheckpoint_Post_Racer(client);
 }
 
 public Action GOKZ_OnUndoTeleport(int client)
 {
-	if (!IsAllowedToTeleport(client))
+	Action action = OnUndoTeleport_Racer(client);
+	if (action != Plugin_Continue)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Undo TP Not Allowed During Race");
-		GOKZ_PlayErrorSound(client);
-		return Plugin_Handled;
+		return action;
 	}
+	
 	return Plugin_Continue;
 }
 

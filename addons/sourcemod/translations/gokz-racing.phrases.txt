@@ -1,13 +1,21 @@
 "Phrases"
 {
 	// =====[ GENERAL ]=====
-	"Teleport Rule - None"
+	"Checkpoint Rule - None"
 	{
-		"en"		"No teleports"
+		"en"		"No checkpoints"
 	}
-	"Teleport Rule - Unlimited"
+	"Checkpoint Rule - 1 Minute Checkpoint Cooldown"
 	{
-		"en"		"Unlimited teleports"
+		"en"		"1 minute checkpoint cooldown"
+	}
+	"Checkpoint Rule - 10 Checkpoint Limit"
+	{
+		"en"		"10 checkpoint limit"
+	}
+	"Checkpoint Rule - Unlimited"
+	{
+		"en"		"Unlimited"
 	}
 
 
@@ -15,6 +23,15 @@
 	"Checkpoints Not Allowed During Race"
 	{
 		"en"		"{darkred}You aren't allowed to checkpoint during this race."
+	}
+	"Checkpoint On Cooldown"
+	{
+		"#format"	"{1:.1f}"
+		"en"		"{darkred}You must wait another {default}{1} {darkred}seconds before checkpointing."
+	}
+	"No Checkpoints Left"
+	{
+		"en"		"{darkred}You have already used all your checkpoints in this race."
 	}
 	"Undo TP Not Allowed During Race"
 	{
@@ -40,7 +57,7 @@
 	}
 	"Race Countdown Started"
 	{
-		"en"		"{grey}The countdown has started! {default}Get ready!"
+		"en"		"{grey}The countdown has started! {green}Get ready!"
 	}
 	"Race Has Been Aborted"
 	{
@@ -62,7 +79,7 @@
 	{
 		// Rules [SimpleKZ | No teleports]
 		"#format"	"{1:s},{2:t}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {default}{2}{grey}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2}{grey}"
 	}
 	"You Have Seconds To Accept"
 	{
@@ -211,8 +228,8 @@
 	{
 		"en"		"Set Rule - Mode"
 	}
-	"Teleport Rule Menu - Title"
+	"Checkpoint Rule Menu - Title"
 	{
-		"en"		"Set Rule - Teleporting"
+		"en"		"Set Rule - Checkpoints"
 	}
 }
