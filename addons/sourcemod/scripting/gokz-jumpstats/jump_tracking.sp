@@ -28,7 +28,7 @@ void OnStartTouchGround_JumpTracking(int client)
 	EndJumpstat(client);
 }
 
-void OnPlayerRunCmd_JumpTracking(int client)
+void OnPlayerRunCmd_JumpTracking(int client, int buttons)
 {
 	if (!IsPlayerAlive(client))
 	{
@@ -38,7 +38,7 @@ void OnPlayerRunCmd_JumpTracking(int client)
 	// Don't bother checking if player is already in air and jumpstat is already invalid
 	if (Movement_GetOnGround(client) || GetValidJumpstat(client))
 	{
-		UpdateValidCmd(client);
+		UpdateValidCmd(client, buttons);
 	}
 }
 
@@ -153,9 +153,12 @@ static void UpdateJumpstat(int client)
 	UpdateFailstat(client);
 }
 
-static void UpdateValidCmd(int client)
+static void UpdateValidCmd(int client, int buttons)
 {
-	if (!CheckGravity(client) || !CheckBaseVelocity(client) || !CheckInWater(client))
+	if (!CheckGravity(client)
+		 || !CheckBaseVelocity(client)
+		 || !CheckInWater(client)
+		 || !CheckTurnButtons(buttons))
 	{
 		InvalidateJumpstat(client);
 		validCmd[client] = false;
@@ -196,6 +199,12 @@ static bool CheckInWater(int client)
 {
 	int waterLevel = GetEntProp(client, Prop_Data, "m_nWaterLevel");
 	return waterLevel == 0;
+}
+
+static bool CheckTurnButtons(int buttons)
+{
+	// Don't allow +left or +right turns binds
+	return !(buttons & (IN_LEFT | IN_RIGHT));
 }
 
 
