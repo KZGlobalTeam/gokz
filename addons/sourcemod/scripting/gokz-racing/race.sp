@@ -104,7 +104,7 @@ int GetAcceptedRacersCount(int raceID)
 
 // =====[ REGISTRATION ]=====
 
-int RegisterRace(int host, int type, int course, int mode, int teleportRule)
+int RegisterRace(int host, int type, int course, int mode, int checkpointRule)
 {
 	int raceID = ++lastRaceID;
 	
@@ -116,7 +116,7 @@ int RegisterRace(int host, int type, int course, int mode, int teleportRule)
 	info.Set(view_as<int>(RaceInfo_Type), type);
 	info.Set(view_as<int>(RaceInfo_Course), course);
 	info.Set(view_as<int>(RaceInfo_Mode), mode);
-	info.Set(view_as<int>(RaceInfo_TeleportRule), teleportRule);
+	info.Set(view_as<int>(RaceInfo_CheckpointRule), checkpointRule);
 	
 	raceInfo.SetValue(IntToStringEx(raceID), info);
 	

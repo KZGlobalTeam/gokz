@@ -7,6 +7,87 @@
 
 static int racerStatus[MAXPLAYERS + 1];
 static int racerRaceID[MAXPLAYERS + 1];
+static float lastTimerStartTime[MAXPLAYERS + 1];
+static float lastCheckpointTime[MAXPLAYERS + 1];
+
+
+
+// =====[ EVENTS ]=====
+
+Action OnTimerStart_Racer(int client, int course)
+{
+	if (InCountdown(client)
+		 || InStartedRace(client) && (!InRaceMode(client) || !IsRaceCourse(client, course)))
+	{
+		return Plugin_Stop;
+	}
+	
+	return Plugin_Continue;
+}
+
+Action OnTimerStart_Post_Racer(int client)
+{
+	lastTimerStartTime[client] = GetGameTime();
+}
+
+Action OnMakeCheckpoint_Racer(int client)
+{
+	if (GOKZ_GetTimerRunning(client) && InStartedRace(client))
+	{
+		switch (GetRaceInfo(GetRaceID(client), RaceInfo_CheckpointRule))
+		{
+			case CheckpointRule_None:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Checkpoints Not Allowed During Race");
+				GOKZ_PlayErrorSound(client);
+				return Plugin_Handled;
+			}
+			case CheckpointRule_OneMinuteCooldown:
+			{
+				float timeSinceLastCheckpoint = FloatMin(
+					GetGameTime() - lastTimerStartTime[client], 
+					GetGameTime() - lastCheckpointTime[client]);
+				
+				if (timeSinceLastCheckpoint < 10.0)
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Checkpoint On Cooldown", 10.0 - timeSinceLastCheckpoint);
+					GOKZ_PlayErrorSound(client);
+					return Plugin_Handled;
+				}
+			}
+			case CheckpointRule_TenLimit:
+			{
+				if (GOKZ_GetCheckpointCount(client) >= 10)
+				{
+					GOKZ_PrintToChat(client, true, "%t", "No Checkpoints Left");
+					GOKZ_PlayErrorSound(client);
+					return Plugin_Handled;
+				}
+			}
+		}
+	}
+	
+	return Plugin_Continue;
+}
+
+void OnMakeCheckpoint_Post_Racer(int client)
+{
+	lastCheckpointTime[client] = GetGameTime();
+}
+
+Action OnUndoTeleport_Racer(int client)
+{
+	if (GOKZ_GetTimerRunning(client)
+		 && InStartedRace(client)
+		 && GetRaceInfo(GetRaceID(client), RaceInfo_CheckpointRule) != CheckpointRule_Unlimited)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Undo TP Not Allowed During Race");
+		GOKZ_PlayErrorSound(client);
+		return Plugin_Handled;
+	}
+	
+	return Plugin_Continue;
+}
 
 
 
@@ -56,11 +137,6 @@ bool IsFinished(int client)
 bool IsAccepted(int client)
 {
 	return GetStatus(client) == RacerStatus_Accepted;
-}
-
-bool IsAllowedToTeleport(int client)
-{
-	return !(InStartedRace(client) && GetRaceInfo(GetRaceID(client), RaceInfo_TeleportRule) == TeleportRule_None);
 }
 
 bool IsRaceHost(int client)
@@ -180,14 +256,14 @@ bool AbortRacer(int client)
 
 // =====[ HOSTING ]=====
 
-int HostRace(int client, int type, int course, int mode, int teleportRule)
+int HostRace(int client, int type, int course, int mode, int checkpointRule)
 {
 	if (InRace(client))
 	{
 		return -1;
 	}
 	
-	int raceID = RegisterRace(client, type, course, mode, teleportRule);
+	int raceID = RegisterRace(client, type, course, mode, checkpointRule);
 	racerRaceID[client] = raceID;
 	racerStatus[client] = RacerStatus_Accepted;
 	

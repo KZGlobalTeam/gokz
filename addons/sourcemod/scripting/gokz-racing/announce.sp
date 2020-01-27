@@ -124,7 +124,7 @@ void OnRequestReceived_Announce(int client, int raceID)
 	
 	GOKZ_PrintToChat(client, false, "%t", "Race Rules", 
 		gC_ModeNames[GetRaceInfo(raceID, RaceInfo_Mode)], 
-		gC_TeleportRulePhrases[GetRaceInfo(raceID, RaceInfo_TeleportRule)]);
+		gC_CheckpointRulePhrases[GetRaceInfo(raceID, RaceInfo_CheckpointRule)]);
 	GOKZ_PrintToChat(client, false, "%t", "You Have Seconds To Accept", RoundFloat(RC_REQUEST_TIMEOUT_TIME));
 }
 

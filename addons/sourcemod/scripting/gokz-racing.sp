@@ -3,6 +3,10 @@
 #include <gokz/core>
 #include <gokz/racing>
 
+#undef REQUIRE_EXTENSIONS
+#undef REQUIRE_PLUGIN
+#include <updater>
+
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -16,6 +20,8 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
+
+#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-racing.txt"
 
 #include "gokz-racing/announce.sp"
 #include "gokz-racing/api.sp"
@@ -47,6 +53,22 @@ public void OnPluginStart()
 	OnPluginStart_Race();
 }
 
+public void OnAllPluginsLoaded()
+{
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATER_URL);
+	}
+}
+
 
 
 // =====[ CLIENT EVENTS ]=====
@@ -63,11 +85,18 @@ public void OnClientDisconnect(int client)
 
 public Action GOKZ_OnTimerStart(int client, int course)
 {
-	if (InCountdown(client) || (InStartedRace(client) && !(InRaceMode(client) && IsRaceCourse(client, course))))
+	Action action = OnTimerStart_Racer(client, course);
+	if (action != Plugin_Continue)
 	{
-		return Plugin_Stop;
+		return action;
 	}
+	
 	return Plugin_Continue;
+}
+
+public void GOKZ_OnTimerStart_Post(int client, int course)
+{
+	OnTimerStart_Post_Racer(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
@@ -77,23 +106,28 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 
 public Action GOKZ_OnMakeCheckpoint(int client)
 {
-	if (!IsAllowedToTeleport(client))
+	Action action = OnMakeCheckpoint_Racer(client);
+	if (action != Plugin_Continue)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Checkpoints Not Allowed During Race");
-		GOKZ_PlayErrorSound(client);
-		return Plugin_Handled;
+		return action;
 	}
+	
 	return Plugin_Continue;
+}
+
+public void GOKZ_OnMakeCheckpoint_Post(int client)
+{
+	OnMakeCheckpoint_Post_Racer(client);
 }
 
 public Action GOKZ_OnUndoTeleport(int client)
 {
-	if (!IsAllowedToTeleport(client))
+	Action action = OnUndoTeleport_Racer(client);
+	if (action != Plugin_Continue)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Undo TP Not Allowed During Race");
-		GOKZ_PlayErrorSound(client);
-		return Plugin_Handled;
+		return action;
 	}
+	
 	return Plugin_Continue;
 }
 

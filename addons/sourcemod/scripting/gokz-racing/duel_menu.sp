@@ -10,7 +10,7 @@
 #define ITEM_INFO_TELEPORT "tp"
 
 static int duelMenuMode[MAXPLAYERS + 1];
-static int duelMenuTeleport[MAXPLAYERS + 1];
+static int duelMenuCheckpoint[MAXPLAYERS + 1];
 
 
 
@@ -61,7 +61,7 @@ public int MenuHandler_Duel(Menu menu, MenuAction action, int param1, int param2
 		}
 		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
 		{
-			DisplayRaceTeleportMenu(param1);
+			DisplayRaceCheckpointMenu(param1);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -85,7 +85,7 @@ void DuelMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[duelMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%T", gC_TeleportRulePhrases[duelMenuTeleport[client]], client);
+	FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[duelMenuCheckpoint[client]], client);
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -124,21 +124,21 @@ public int MenuHandler_DuelMode(Menu menu, MenuAction action, int param1, int pa
 
 // =====[ TELEPORT MENU ]=====
 
-static void DisplayRaceTeleportMenu(int client)
+static void DisplayRaceCheckpointMenu(int client)
 {
-	Menu menu = new Menu(MenuHandler_DuelTeleport);
+	Menu menu = new Menu(MenuHandler_DuelCheckpoint);
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
-	menu.SetTitle("%T", "Teleport Rule Menu - Title", client);
-	GOKZ_RC_MenuAddTeleportRuleItems(client, menu);
+	menu.SetTitle("%T", "Checkpoint Rule Menu - Title", client);
+	GOKZ_RC_MenuAddCheckpointRuleItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-public int MenuHandler_DuelTeleport(Menu menu, MenuAction action, int param1, int param2)
+public int MenuHandler_DuelCheckpoint(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
-		duelMenuTeleport[param1] = param2;
+		duelMenuCheckpoint[param1] = param2;
 		DisplayDuelMenu(param1, false);
 	}
 	else if (action == MenuAction_Cancel)
@@ -233,6 +233,6 @@ static bool SendDuelRequest(int host, int target)
 		return false;
 	}
 	
-	HostRace(host, RaceType_Duel, 0, duelMenuMode[host], duelMenuTeleport[host]);
+	HostRace(host, RaceType_Duel, 0, duelMenuMode[host], duelMenuCheckpoint[host]);
 	return SendRequest(host, target);
 } 

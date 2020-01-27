@@ -11,7 +11,7 @@
 #define ITEM_INFO_TELEPORT "tp"
 
 static int raceMenuMode[MAXPLAYERS + 1];
-static int raceMenuTeleport[MAXPLAYERS + 1];
+static int raceMenuCheckpoint[MAXPLAYERS + 1];
 
 
 
@@ -60,7 +60,7 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 		{
 			if (!InRace(param1))
 			{
-				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuTeleport[param1]);
+				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuCheckpoint[param1]);
 			}
 			
 			SendRequestAll(param1);
@@ -73,7 +73,7 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 		}
 		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
 		{
-			DisplayRaceTeleportMenu(param1);
+			DisplayRaceCheckpointMenu(param1);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -101,7 +101,7 @@ void RaceMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[raceMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%T", gC_TeleportRulePhrases[raceMenuTeleport[client]], client);
+	FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[raceMenuCheckpoint[client]], client);
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -140,21 +140,21 @@ public int MenuHandler_RaceMode(Menu menu, MenuAction action, int param1, int pa
 
 // =====[ TELEPORT MENU ]=====
 
-static void DisplayRaceTeleportMenu(int client)
+static void DisplayRaceCheckpointMenu(int client)
 {
-	Menu menu = new Menu(MenuHandler_RaceTeleport);
+	Menu menu = new Menu(MenuHandler_RaceCheckpoint);
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
-	menu.SetTitle("%T", "Teleport Rule Menu - Title", client);
-	GOKZ_RC_MenuAddTeleportRuleItems(client, menu);
+	menu.SetTitle("%T", "Checkpoint Rule Menu - Title", client);
+	GOKZ_RC_MenuAddCheckpointRuleItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-public int MenuHandler_RaceTeleport(Menu menu, MenuAction action, int param1, int param2)
+public int MenuHandler_RaceCheckpoint(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
-		raceMenuTeleport[param1] = param2;
+		raceMenuCheckpoint[param1] = param2;
 		DisplayRaceMenu(param1, false);
 	}
 	else if (action == MenuAction_Cancel)
