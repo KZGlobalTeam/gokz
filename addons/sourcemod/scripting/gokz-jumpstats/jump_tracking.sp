@@ -497,7 +497,7 @@ static void EndBlockDistance(int client)
 	}
 }
 
-static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrigin[3])
+static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrigin[3], bool checkOffset = false)
 {
 	Handle trace;
 	int coordDist, coordDev;
@@ -569,6 +569,15 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 		return;
 	}
 	
+	// Needed for failstats, but you need the endBlock position for that, so we do it here.
+	if (checkOffset)
+	{
+		if (FloatAbs(BlockTraceHeight(middle, endBlock) - landingOrigin[2] - 1.031250) > EPSILON)
+		{
+			return;
+		}
+	}
+	
 	// Calculate distance and edge.
 	blockDistance[client] = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
 	blockEdge[client] = FloatAbs(startBlock[coordDist] - takeoffOrigin[coordDist]);
@@ -579,7 +588,7 @@ static void CalcBlockStats(int client, float takeoffOrigin[3], float landingOrig
 	}
 }
 
-static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landingOrigin[3])
+static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landingOrigin[3], bool checkOffset = false)
 {
 	Handle trace;
 	int coordDist, coordDev, distSign;
@@ -644,6 +653,15 @@ static void CalcLadderBlockStats(int client, float takeoffOrigin[3], float landi
 	}
 	delete trace;
 	
+	// Needed for failstats, but you need the blockPosition for that, so we do it here.
+	if (checkOffset)
+	{
+		if (!TraceLadderOffset(client, takeoffOrigin, BlockTraceHeight(traceEnd, blockPosition)))
+		{
+			return;
+		}
+	}
+	
 	// Calculate distance and edge.
 	blockDistance[client] = RoundFloat(FloatAbs(blockPosition[coordDist] - ladderPosition[coordDist]));
 	blockEdge[client] = FloatAbs(takeoffOrigin[coordDist] - ladderPosition[coordDist]) - 16.0;
@@ -700,6 +718,7 @@ static bool BlockAreEdgesParallel(const float startBlock[3], const float endBloc
 	return false;
 }
 
+// Check if the blocks are aligned to the coordinate system.
 static bool BlockTraceAligned(const float origin[3], const float end[3], int coordDist)
 {
 	float normalVector[3];
@@ -712,6 +731,29 @@ static bool BlockTraceAligned(const float origin[3], const float end[3], int coo
 	TR_GetPlaneNormal(trace, normalVector);
 	delete trace;
 	return FloatAbs(FloatAbs(normalVector[coordDist]) - 1.0) <= EPSILON;
+}
+
+static float BlockTraceHeight(const float jumpoffOrigin[3], const float endBlock[3])
+{
+	float direction[3], traceStart[3], traceEnd[3];
+	
+	SubtractVectors(endBlock, jumpoffOrigin, direction);
+	NormalizeVector(direction, direction);
+	AddVectors(endBlock, direction, traceStart);
+	traceStart[2] += 5.0;
+	CopyVector(traceStart, traceEnd);
+	traceEnd[2] -= 10.0;
+	
+	Handle trace = TR_TraceHullFilterEx(traceStart, traceEnd, view_as<float>({-16.0, -16.0, 0.0}), view_as<float>({16.0, 16.0, 0.0}),
+										MASK_SOLID, TraceEntityFilterPlayers);
+	if (!TR_DidHit(trace))
+	{
+		delete trace;
+		return -999999999999999.0;
+	}
+	TR_GetEndPosition(traceEnd, trace);
+	delete trace;
+	return traceEnd[2];
 }
 
 
@@ -797,12 +839,6 @@ static void UpdateFailstat(int client)
 	// Mark the calculation as done.
 	failstatDistance[client] = 0.0;
 	
-	// Make sure the player didn't TP.
-	if (FloatAbs(GetVectorDistance(landingOrigin, failstatLastPos[client], true)) > 25.0)
-	{
-		return;
-	}
-	
 	// Calculate the true origin where the player would have hit the ground.
 	FailstatGetFailOrigin(client, takeoffOrigin[2], landingOrigin);
 	
@@ -826,11 +862,11 @@ static void UpdateFailstat(int client)
 		// Add the player model to the distance.
 		failstatDistance[client] += 32.0;
 		
-		CalcBlockStats(client, takeoffOrigin, landingOrigin);
+		CalcBlockStats(client, takeoffOrigin, landingOrigin, true);
 	}
 	else if (failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] >= JS_MIN_LAJ_BLOCK_DISTANCE)
 	{
-		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin);
+		CalcLadderBlockStats(client, takeoffOrigin, landingOrigin, true);
 	}
 	else
 	{
@@ -903,11 +939,11 @@ static void EndOffset(int client)
 	offsetLast[client] = landingOrigin[2] - takeoffOrigin[2];
 	if (GetType(client) == JumpType_LadderJump)
 	{
-		TraceLadderOffset(client, takeoffOrigin, landingOrigin);
+		TraceLadderOffset(client, takeoffOrigin, landingOrigin[2]);
 	}
 }
 
-static void TraceLadderOffset(int client, float takeoffOrigin[3], float landingOrigin[3])
+static bool TraceLadderOffset(int client, float takeoffOrigin[3], float landingHeight)
 {
 	float traceOrigin[3], traceEnd[3], ladderTop[3], ladderNormal[3];
 	
@@ -928,11 +964,13 @@ static void TraceLadderOffset(int client, float takeoffOrigin[3], float landingO
 	Handle trace = TR_TraceHullFilterEx(traceOrigin, traceEnd, mins, maxs, CONTENTS_LADDER, TraceEntityFilterPlayers);
 	
 	TR_GetEndPosition(ladderTop, trace);
-	if (!TR_DidHit(trace) || FloatAbs(ladderTop[2] - landingOrigin[2]) > EPSILON + 0.031250)
+	if (!TR_DidHit(trace) || FloatAbs(ladderTop[2] - landingHeight) > EPSILON + 0.031250)
 	{
 		InvalidateJumpstat(client);
+		return false;
 	}
 	delete trace;
+	return true;
 }
 
 
