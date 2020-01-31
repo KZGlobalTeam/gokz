@@ -733,6 +733,7 @@ static void BeginFailstat(int client)
 	Movement_GetTakeoffOrigin(client, failstatLastPos[client]);
 	failstatDistance[client] = -2.0;
 	failstatLastType[client] = GetTypeCurrent(client);
+	failstatBlockHeight[client] = failstatLastPos[client][2];
 }
 
 static void UpdateFailstat(int client)
@@ -795,6 +796,12 @@ static void UpdateFailstat(int client)
 	
 	// Mark the calculation as done.
 	failstatDistance[client] = 0.0;
+	
+	// Make sure the player didn't TP.
+	if (FloatAbs(GetVectorDistance(landingOrigin, failstatLastPos[client], true)) > 25.0)
+	{
+		return;
+	}
 	
 	// Calculate the true origin where the player would have hit the ground.
 	FailstatGetFailOrigin(client, takeoffOrigin[2], landingOrigin);
