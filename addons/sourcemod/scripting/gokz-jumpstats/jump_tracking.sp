@@ -733,7 +733,6 @@ static void BeginFailstat(int client)
 	Movement_GetTakeoffOrigin(client, failstatLastPos[client]);
 	failstatDistance[client] = -2.0;
 	failstatLastType[client] = GetTypeCurrent(client);
-	failstatBlockHeight[client] = failstatLastPos[client][2];
 }
 
 static void UpdateFailstat(int client)
@@ -745,9 +744,12 @@ static void UpdateFailstat(int client)
 	Movement_GetOrigin(client, landingOrigin);
 	
 	// For ladderjumps we have to find the landing block early so we know at which point the jump failed.
-	// For this, we search for the block at the highest point of the jump, assuming the player already
+	// For this, we search for the block 10 units above the takeoff origin, assuming the player already
 	// traveled a significant enough distance in the direction of the block at this time.
-	if (failstatLastType[client] == JumpType_LadderJump && failstatDistance[client] < -1.0 && landingOrigin[2] < failstatLastPos[client][2])
+	if (failstatLastType[client] == JumpType_LadderJump &&
+		failstatDistance[client] < -1.0 &&
+		landingOrigin[2] - takeoffOrigin[2] < 10.0 &&
+		GetHeightCurrent(client) > 10.0)
 	{
 		float traceStart[3], traceEnd[3];
 		
@@ -762,8 +764,8 @@ static void UpdateFailstat(int client)
 		CopyVector(takeoffOrigin, traceStart);
 		traceStart[coordDist] += distSign * JS_MAX_LAJ_FAILSTAT_DISTANCE;
 		CopyVector(traceStart, traceEnd);
-		traceStart[2] += 20.0;
-		traceEnd[2] -= 20.0;
+		traceStart[2] += 10.0;
+		traceEnd[2] -= 10.0;
 		
 		// Find the block height.
 		Handle trace = TR_TraceRayFilterEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint, TraceEntityFilterPlayers);
