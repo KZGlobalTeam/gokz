@@ -961,10 +961,10 @@ static bool TraceLadderOffset(int client, float takeoffOrigin[3], float landingH
 	// 10 units is the furthest away from the ladder surface you can get while still being on the ladder.
 	traceOrigin[0] = takeoffOrigin[0] - 10.0 * ladderNormal[0];
 	traceOrigin[1] = takeoffOrigin[1] - 10.0 * ladderNormal[1];
-	traceOrigin[2] = takeoffOrigin[2] + 400.0 * GetTickInterval(); // ~400 ups is the fastest vertical speed on ladders
+	traceOrigin[2] = takeoffOrigin[2] + 5;
 	
 	CopyVector(traceOrigin, traceEnd);
-	traceEnd[2] = takeoffOrigin[2] - 400.0 * GetTickInterval();
+	traceEnd[2] = takeoffOrigin[2] - 10;
 	
 	Handle trace = TR_TraceHullFilterEx(traceOrigin, traceEnd, mins, maxs, CONTENTS_LADDER, TraceEntityFilterPlayers);
 	
