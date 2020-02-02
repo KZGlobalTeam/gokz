@@ -135,14 +135,14 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	OnOptionChanged_Options(client, option, newValue);
 }
 
-public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
-	OnLanding_JumpReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	OnLanding_JumpReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 }
 
-public void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+public void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
-	OnFailstat_FailstatReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	OnFailstat_FailstatReporting(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 }
 
 public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost

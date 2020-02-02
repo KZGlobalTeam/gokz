@@ -33,7 +33,7 @@ void OnMapStart_JumpReporting()
 	}
 }
 
-void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+void OnLanding_JumpReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	int tier = GetDistanceTier(jumpType, GOKZ_GetCoreOption(client, Option_Mode), distance, offset);
 	if (tier == DistanceTier_None)
@@ -42,18 +42,18 @@ void OnLanding_JumpReporting(int client, int jumpType, float distance, float off
 	}
 	
 	// Report the jumpstat to the client and their spectators
-	DoJumpstatsReport(client, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	DoJumpstatsReport(client, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 	
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsValidClient(i) && GetObserverTarget(i) == client)
 		{
-			DoJumpstatsReport(i, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+			DoJumpstatsReport(i, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 		}
 	}
 }
 
-void OnFailstat_FailstatReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+void OnFailstat_FailstatReporting(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	int tier = GetDistanceTier(jumpType, GOKZ_GetCoreOption(client, Option_Mode), distance);
 	if (tier == DistanceTier_None)
@@ -62,13 +62,13 @@ void OnFailstat_FailstatReporting(int client, int jumpType, float distance, floa
 	}
 	
 	// Report the jumpstat to the client and their spectators
-	DoFailstatReport(client, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	DoFailstatReport(client, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 	
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsValidClient(i) && GetObserverTarget(i) == client)
 		{
-			DoFailstatReport(i, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+			DoFailstatReport(i, client, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 		}
 	}
 }
@@ -77,7 +77,7 @@ void OnFailstat_FailstatReporting(int client, int jumpType, float distance, floa
 
 // =====[ PRIVATE ]=====
 
-static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
 	{
@@ -85,11 +85,11 @@ static void DoJumpstatsReport(int client, int jumper, int jumpType, int tier, fl
 	}
 	
 	DoChatReport(client, false, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, block, width, overlap, deadair, deviation, edge, releaseW);
-	DoConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	DoConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 	PlayJumpstatSound(client, tier);
 }
 
-static void DoFailstatReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+static void DoFailstatReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
 	{
@@ -97,14 +97,14 @@ static void DoFailstatReport(int client, int jumper, int jumpType, int tier, flo
 	}
 	
 	DoChatReport(client, true, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, block, width, overlap, deadair, deviation, edge, releaseW);
-	DoFailstatConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	DoFailstatConsoleReport(client, jumper, jumpType, tier, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW, crouchTicks);
 }
 
 
 
 // CONSOLE REPORT
 
-static void DoConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+static void DoConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	int minConsoleTier = GOKZ_JS_GetOption(client, JSOption_MinConsoleTier);
 	if (minConsoleTier == 0 || minConsoleTier > tier) // 0 means disabled
@@ -133,7 +133,8 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
 				duration, "Airtime", 
-				offset, "Offset");
+				offset, "Offset",
+				crouchTicks, "Crouch Ticks");
 		}
 		else
 		{
@@ -152,7 +153,8 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
 				duration, "Airtime", 
-				offset, "Offset");
+				offset, "Offset",
+				crouchTicks, "Crouch Ticks");
 		}
 	}
 	else
@@ -180,7 +182,8 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				deviation, "Deviation", 
 				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
-				duration, "Airtime");
+				duration, "Airtime",
+				crouchTicks, "Crouch Ticks");
 		}
 		else
 		{
@@ -198,8 +201,10 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 				deviation, "Deviation", 
 				GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 				height, "Height", 
-				duration, "Airtime", 
-				offset);
+				duration, "Airtime");
+			PrintToConsole(client, "%t", "Second Console Block Jump Report", 
+				offset, "Offset",
+				crouchTicks, "Crouch Ticks");
 		}
 	}
 	
@@ -224,7 +229,7 @@ static void DoConsoleReport(int client, int jumper, int jumpType, int tier, floa
 	PrintToConsole(client, ""); // New line
 }
 
-static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int tier, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	int minConsoleTier = GOKZ_JS_GetOption(client, JSOption_MinConsoleTier);
 	if (minConsoleTier == 0 || minConsoleTier > tier // 0 means disabled
@@ -256,7 +261,8 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 			deviation, "Deviation", 
 			GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 			height, "Height", 
-			duration, "Airtime");
+			duration, "Airtime",
+			crouchTicks, "Crouch Ticks");
 	}
 	else
 	{
@@ -274,8 +280,10 @@ static void DoFailstatConsoleReport(int client, int jumper, int jumpType, int ti
 			deviation, "Deviation", 
 			GetAverageStrafeWidth(strafes, width), "Avg. Width", 
 			height, "Height", 
-			duration, "Airtime", 
-			offset);
+			duration, "Airtime");
+		PrintToConsole(client, "%t", "Second Console Block Jump Report", 
+			offset, "Offset",
+			crouchTicks, "Crouch Ticks");
 	}
 	PrintToConsole(client, "  #.  %12t%12t%12t%12t%12t%9t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)", "Width (Table)", "Overlap (Table)", "Dead Air (Table)");
 	if (GetStrafeAirtime(jumper, 0) > 0.001)

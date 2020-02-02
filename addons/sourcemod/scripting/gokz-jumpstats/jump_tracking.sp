@@ -116,6 +116,7 @@ static void BeginJumpstat(int client, bool jumped, bool ladderJump)
 	BeginSync(client);
 	BeginDuration(client);
 	BeginFailstat(client);
+	BeginCrouchTicks(client);
 	
 	Call_OnTakeoff(client, GetTypeCurrent(client));
 	
@@ -136,11 +137,13 @@ static void EndJumpstat(int client)
 	EndStrafes(client);
 	EndSync(client);
 	EndDuration(client);
+	EndCrouchTicks(client);
 	
 	Call_OnLanding(client, GetType(client), GetDistance(client), GetOffset(client), GetHeight(client), 
 		GOKZ_GetTakeoffSpeed(client), GetMaxSpeed(client), GetStrafes(client), GetSync(client), GetDuration(client), 
 		GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client), 
-		GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client));
+		GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client), 
+		GetCrouchTicks(client));
 }
 
 static void UpdateJumpstat(int client)
@@ -150,6 +153,7 @@ static void UpdateJumpstat(int client)
 	UpdateStrafes(client);
 	UpdateSync(client);
 	UpdateDuration(client);
+	UpdateCrouchTicks(client);
 	UpdateFailstat(client);
 }
 
@@ -744,12 +748,12 @@ static float BlockTraceHeight(const float jumpoffOrigin[3], const float endBlock
 	CopyVector(traceStart, traceEnd);
 	traceEnd[2] -= 10.0;
 	
-	Handle trace = TR_TraceHullFilterEx(traceStart, traceEnd, view_as<float>({-16.0, -16.0, 0.0}), view_as<float>({16.0, 16.0, 0.0}),
-										MASK_SOLID, TraceEntityFilterPlayers);
+	Handle trace = TR_TraceHullFilterEx(traceStart, traceEnd, view_as<float>( { -16.0, -16.0, 0.0 } ), view_as<float>( { 16.0, 16.0, 0.0 } ), 
+		MASK_SOLID, TraceEntityFilterPlayers);
 	if (!TR_DidHit(trace))
 	{
 		delete trace;
-		return -999999999999999.0;
+		return -999999999999999.0; // Let's just hope that's wrong enough
 	}
 	TR_GetEndPosition(traceEnd, trace);
 	delete trace;
@@ -789,9 +793,9 @@ static void UpdateFailstat(int client)
 	// For ladderjumps we have to find the landing block early so we know at which point the jump failed.
 	// For this, we search for the block 10 units above the takeoff origin, assuming the player already
 	// traveled a significant enough distance in the direction of the block at this time.
-	if (failstatLastType[client] == JumpType_LadderJump &&
-		failstatDistance[client] < -1.0 &&
-		landingOrigin[2] - takeoffOrigin[2] < 10.0 &&
+	if (failstatLastType[client] == JumpType_LadderJump && 
+		failstatDistance[client] < -1.0 && 
+		landingOrigin[2] - takeoffOrigin[2] < 10.0 && 
 		GetHeightCurrent(client) > 10.0)
 	{
 		float traceStart[3], traceEnd[3];
@@ -883,7 +887,8 @@ static void UpdateFailstat(int client)
 		Call_OnFailstat(client, GetTypeCurrent(client), GetFailstat(client), GetOffset(client), GetHeightCurrent(client), 
 			GOKZ_GetTakeoffSpeed(client), GetMaxSpeedCurrent(client), GetStrafesCurrent(client), GetSyncCurrent(client), 
 			GetDurationCurrent(client), GetBlockDistance(client), GetStrafeTotalWidth(client), GetStrafeTotalOverlap(client), 
-			GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client));
+			GetStrafeTotalDeadair(client), GetBlockDeviation(client), GetBlockEdge(client), GetWRelease(client), 
+			GetCrouchTicksCurrent(client));
 		
 		// Restore previous jump type so we don't mess with jump invalidation.
 		jumpTypeLast[client] = currentType;
@@ -1088,6 +1093,41 @@ static void UpdateMaxSpeed(int client)
 	if (GetGameTickCount() != Movement_GetTakeoffTick(client))
 	{
 		maxSpeedCurrent[client] = FloatMax(maxSpeedCurrent[client], Movement_GetSpeed(client));
+	}
+}
+
+
+
+// =====[ CROUCH TICKS ]=====
+
+static int crouchTicksLast[MAXPLAYERS + 1];
+static int crouchTicksCurrent[MAXPLAYERS + 1];
+
+int GetCrouchTicks(int client)
+{
+	return crouchTicksLast[client];
+}
+
+int GetCrouchTicksCurrent(int client)
+{
+	return crouchTicksCurrent[client];
+}
+
+static void BeginCrouchTicks(int client)
+{
+	crouchTicksCurrent[client] = 0;
+}
+
+static void EndCrouchTicks(int client)
+{
+	crouchTicksLast[client] = crouchTicksCurrent[client];
+}
+
+static void UpdateCrouchTicks(int client)
+{
+	if (Movement_GetDucking(client))
+	{
+		crouchTicksCurrent[client] += 1;
 	}
 }
 

@@ -10,8 +10,8 @@ static GlobalForward H_OnJumpInvalidated;
 void CreateGlobalForwards()
 {
 	H_OnTakeoff = new GlobalForward("GOKZ_JS_OnTakeoff", ET_Ignore, Param_Cell, Param_Cell);
-	H_OnLanding = new GlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Cell);
-	H_OnFailstat = new GlobalForward("GOKZ_JS_OnFailstat", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Cell);
+	H_OnLanding = new GlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Cell, Param_Cell);
+	H_OnFailstat = new GlobalForward("GOKZ_JS_OnFailstat", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Float, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Float, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Float, Param_Cell, Param_Cell);
 	H_OnJumpInvalidated = new GlobalForward("GOKZ_JS_OnJumpInvalidated", ET_Ignore, Param_Cell);
 }
 
@@ -23,7 +23,7 @@ void Call_OnTakeoff(int client, int jumpType)
 	Call_Finish();
 }
 
-void Call_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+void Call_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	Call_StartForward(H_OnLanding);
 	Call_PushCell(client);
@@ -43,6 +43,7 @@ void Call_OnLanding(int client, int jumpType, float distance, float offset, floa
 	Call_PushFloat(deviation);
 	Call_PushFloat(edge);
 	Call_PushCell(releaseW);
+	Call_PushCell(crouchTicks);
 	Call_Finish();
 }
 
@@ -53,7 +54,7 @@ void Call_OnJumpInvalidated(int client)
 	Call_Finish();
 }
 
-void Call_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+void Call_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW, int crouchTicks)
 {
 	Call_StartForward(H_OnFailstat);
 	Call_PushCell(client);
@@ -73,6 +74,7 @@ void Call_OnFailstat(int client, int jumpType, float distance, float offset, flo
 	Call_PushFloat(deviation);
 	Call_PushFloat(edge);
 	Call_PushCell(releaseW);
+	Call_PushCell(crouchTicks);
 	Call_Finish();
 }
 
