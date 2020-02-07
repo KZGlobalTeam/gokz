@@ -89,7 +89,7 @@ public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQ
 	
 	if (SQL_GetRowCount(results[0]) == 0)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "No Jumpstat Record Found");
+		GOKZ_PrintToChat(client, true, "%t", "No Jumpstats Found");
 		return;
 	}
 	

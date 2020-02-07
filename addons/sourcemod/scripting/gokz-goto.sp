@@ -93,7 +93,7 @@ bool GotoPlayer(int client, int target, bool printMessage = true)
 	Movement_GetEyeAngles(target, targetAngles);
 	
 	// Leave spectators if necessary
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
+	if (GetClientTeam(client) == CS_TEAM_SPECTATOR || GetClientTeam(client) == CS_TEAM_NONE)
 	{
 		CS_SwitchTeam(client, CS_TEAM_T);
 	}

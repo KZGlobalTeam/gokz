@@ -351,7 +351,7 @@ static void CreateConVars()
 	AutoExecConfig_SetFile("gokz-core", "sourcemod/gokz");
 	AutoExecConfig_SetCreateFile(true);
 	
-	gCV_gokz_chat_prefix = AutoExecConfig_CreateConVar("gokz_chat_prefix", "{grey}[{green}KZ{grey}] ", "Chat prefix used for GOKZ messages.");
+	gCV_gokz_chat_prefix = AutoExecConfig_CreateConVar("gokz_chat_prefix", "{green}KZ {grey}| ", "Chat prefix used for GOKZ messages.");
 	
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
