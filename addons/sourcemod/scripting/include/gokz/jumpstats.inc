@@ -54,6 +54,7 @@ enum JSOption:
 	JSOption_MinSoundTier, 
 	JSOption_FailstatsConsole, 
 	JSOption_FailstatsChat, 
+	JSOption_FailstatsAlways, 
 	JSOption_ExtendedChatReport, 
 	JSOPTION_COUNT
 };
@@ -82,6 +83,7 @@ enum
 #define JS_MAX_LAJ_FAILSTAT_DISTANCE 250
 #define JS_TOP_RECORD_COUNT 20
 #define JS_MAX_JUMP_DISTANCE 500
+#define JS_FAILSTATS_MAX_TRACKED_TICKS 128
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
@@ -155,6 +157,7 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 	"GOKZ JS - Sounds", 
 	"GOKZ JS - Failstats Console", 
 	"GOKZ JS - Failstats Chat", 
+	"GOKZ JS - Failstats Always", 
 	"GOKZ JS - Extended Chat Report"
 };
 
@@ -166,6 +169,7 @@ stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] =
 	"Minimum Tier for Jumpstats Sounds - 0 = Disabled, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
 	"Print Failstats To Console - 0 = Disabled, 1 = Enabled", 
 	"Print Failstats To Chat - 0 = Disabled, 1 = Enabled", 
+	"Always show Failstat after a Teleport - 0 = Disabled, 1 = Enabled", 
 	"Extended Chat Report - 0 = Disabled, 1 = Enabled"
 };
 
@@ -177,6 +181,7 @@ stock char gI_JSOptionPhrases[JSOPTION_COUNT][] =
 	"Options Menu - Jumpstats Sounds", 
 	"Options Menu - Failstats Console Report", 
 	"Options Menu - Failstats Chat Report", 
+	"Options Menu - Failstats Always", 
 	"Options Menu - Extended Jump Chat Report"
 };
 
@@ -187,6 +192,7 @@ stock int gI_JSOptionDefaults[JSOPTION_COUNT] =
 	DistanceTier_Meh, 
 	DistanceTier_Impressive, 
 	JSToggleOption_Enabled, 
+	JSToggleOption_Disabled, 
 	JSToggleOption_Disabled, 
 	JSToggleOption_Disabled
 };
@@ -199,8 +205,47 @@ stock int gI_JSOptionCounts[JSOPTION_COUNT] =
 	DISTANCETIER_COUNT, 
 	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT, 
+	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT
 };
+
+
+
+// =====[ STRUCTS ]=====
+
+enum struct Jump
+{
+	int jumper;
+	int block;
+	int crouchTicks;
+	int deadair;
+	int durationTicks;
+	int overlap;
+	int releaseW;
+	int strafes;
+	int type;
+	float deviation;
+	float distance;
+	float duration;
+	float edge;
+	float height;
+	float maxSpeed;
+	float offset;
+	float preSpeed;
+	float sync;
+	float width;
+	
+	// We can't make a separate enum struct for that cause it won't let us
+	// index an array of enum structs.
+	int strafes_gainTicks[JS_MAX_TRACKED_STRAFES];
+	int strafes_deadair[JS_MAX_TRACKED_STRAFES];
+	int strafes_overlap[JS_MAX_TRACKED_STRAFES];
+	int strafes_ticks[JS_MAX_TRACKED_STRAFES];
+	float strafes_gain[JS_MAX_TRACKED_STRAFES];
+	float strafes_loss[JS_MAX_TRACKED_STRAFES];
+	float strafes_sync[JS_MAX_TRACKED_STRAFES];
+	float strafes_width[JS_MAX_TRACKED_STRAFES];
+}
 
 
 
@@ -234,8 +279,9 @@ forward void GOKZ_JS_OnTakeoff(int client, int jumpType);
  * @param deviation     Deviation to the side when jumping across a block.
  * @param edge          Distance from the edge of the jumpoff block to the player jumpoff position.
  * @param releaseW      Tick relative to the jumpoff that the forward key was released.
+ * @param crouchTicks	Number of ticks the player was crouched during the jump.
  */
-forward void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW);
+forward void GOKZ_JS_OnLanding(Jump jump);
 
 /**
  * Called when player's current jump has been declared an invalid jumpstat.
@@ -264,8 +310,28 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
  * @param deviation     Deviation to the side when jumping across a block.
  * @param edge          Distance from the edge of the jumpoff block to the player jumpoff position.
  * @param releaseW      Tick relative to the jumpoff that the forward key was released.
+ * @param crouchTicks	Number of ticks the player was crouched during the jump.
  */
-forward void GOKZ_JS_OnFailstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW);
+forward void GOKZ_JS_OnFailstat(Jump jump);
+
+/**
+ * Called when a player fails a jump and has always-on failstats enabled.
+ *
+ * @param client		Client index.
+ * @param distanceX		X-axis distance of the jump.
+ * @param distanceY		Y-axis distance of the jump.
+ * @param edge          Distance from the edge of the jumpoff block to the player jumpoff position.
+ * @param strafes		Number of strafes.
+ * @param sync			Percentage of time that speed was gained.
+ * @param pre			Takeoff speed.
+ * @param max			Max horizontal speed reached.
+ * @param releaseW      Tick relative to the jumpoff that the forward key was released.
+ * @param crouchTicks	Number of ticks the player was crouched during the jump.
+ * @param width         Total angle turned during the jump.
+ * @param overlap       Amount of ticks where the player turned left and right at the same time.
+ * @param deadair       Amount of ticks where the player turned neither left nor right.
+ */
+forward void GOKZ_JS_OnFailstatAlways(Jump jump, float distanceX);
 
 
 
