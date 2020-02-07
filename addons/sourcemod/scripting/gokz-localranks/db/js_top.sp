@@ -25,7 +25,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] re
 	int rows = SQL_GetRowCount(results[0]);
 	if (rows == 0)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Not record found.");
+		GOKZ_PrintToChat(client, true, "%t", "No Jumpstats Found");
 		return;
 	}
 	
