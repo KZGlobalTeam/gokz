@@ -22,6 +22,7 @@ enum
 	JumpType_WeirdJump, 
 	JumpType_LadderJump, 
 	JumpType_Ladderhop, 
+	JumpType_Jumpbug,
 	JumpType_Fall, 
 	JumpType_Other, 
 	JUMPTYPE_COUNT
@@ -93,6 +94,7 @@ stock char gC_JumpTypes[JUMPTYPE_COUNT][] =
 	"Weird Jump", 
 	"Ladder Jump", 
 	"Ladderhop", 
+	"Jumpbug",
 	"Fall", 
 	"Unknown Jump"
 };
@@ -105,6 +107,7 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"WJ", 
 	"LAJ", 
 	"LAH", 
+	"JB", 
 	"FL", 
 	"??"
 };
@@ -116,7 +119,8 @@ stock char gC_JumpTypeKeys[JUMPTYPE_COUNT - 2][] =
 	"multibhop", 
 	"weirdjump", 
 	"ladderjump", 
-	"ladderhop"
+	"ladderhop",
+	"jumpbug"
 };
 
 stock char gC_DistanceTiers[DISTANCETIER_COUNT][] = 
@@ -217,6 +221,7 @@ enum struct Jump
 {
 	int jumper;
 	int block;
+	int crouchRelease;
 	int crouchTicks;
 	int deadair;
 	int durationTicks;

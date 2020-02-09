@@ -51,6 +51,7 @@ enum struct JumpTracker
 	int lastType;
 	int lastWPressedTick;
 	int syncTicks;
+	int crouchReleaseTick;
 	bool failstatBlockDetected;
 	bool failstatCalculcated;
 	float failstatBlockHeight;
@@ -63,7 +64,7 @@ enum struct JumpTracker
 		this.jump.jumper = jumper;
 	}
 	
-	void Reset(bool jumped, bool ladderJump)
+	void Reset(bool jumped, bool ladderJump, bool jumpbug)
 	{
 		// Reset all stats
 		this.jump = emptyJump;
@@ -71,20 +72,32 @@ enum struct JumpTracker
 		this.syncTicks = 0;
 		this.strafeDirection = StrafeDirection_None;
 		this.lastType = this.jump.type;
+		this.jump.crouchRelease = this.crouchReleaseTick - Movement_GetLandingTick(this.jumper) - 3;
+		this.crouchReleaseTick = 0;
 		
 		// Reset pose history
 		this.poseIndex = 0;
 		
 		// This is the only instance where we need jumped and ladderJump so we
 		// might as well do that here already.
-		this.jump.type = this.DetermineType(jumped, ladderJump);
+		this.jump.type = this.DetermineType(jumped, ladderJump, jumpbug);
 	}
 	
 	void Begin()
 	{
 		// Initialize stats
 		this.jump.releaseW = 100;
-		Movement_GetTakeoffOrigin(this.jumper, this.takeoffOrigin);
+		
+		if (this.jump.type == JumpType_Jumpbug)
+		{
+			float height = this.takeoffOrigin[2];
+			Movement_GetOrigin(this.jumper, this.takeoffOrigin);
+			this.takeoffOrigin[2] = height; 
+		}
+		else
+		{
+			Movement_GetTakeoffOrigin(this.jumper, this.takeoffOrigin);
+		}
 		
 		// Initialize failstats
 		this.failstatBlockDetected = this.jump.type != JumpType_LadderJump;
@@ -100,9 +113,6 @@ enum struct JumpTracker
 		
 		// Measure first tick of jumpstat
 		this.Update();
-		
-		// We don't need that until the next begin
-		this.lastJumpTick = GetGameTickCount();
 	}
 	
 	void Update()
@@ -117,6 +127,7 @@ enum struct JumpTracker
 		this.syncTicks += speed > pose(-1).speed ? 1 : 0;
 		this.jump.durationTicks++;
 		
+		this.UpdateCrouchRelease();
 		this.UpdateStrafes();
 		this.UpdateFailstat();
 		
@@ -669,7 +680,19 @@ enum struct JumpTracker
 		return distance;
 	}
 	
-	int DetermineType(bool jumped, bool ladderJump)
+	void UpdateCrouchRelease()
+	{
+		if (Movement_GetButtons(this.jumper) & IN_DUCK)
+		{
+			this.crouchReleaseTick = 0;
+		}
+		else if (this.crouchReleaseTick == 0)
+		{
+			this.crouchReleaseTick = GetGameTickCount();
+		}
+	}
+	
+	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
 		if (entityTouchCount[this.jumper] > 0)
 		{
@@ -690,9 +713,18 @@ enum struct JumpTracker
 		{
 			return JumpType_Fall;
 		}
+		else if (jumpbug)
+		{
+			// Check for no offset
+			if (this.takeoffOrigin[2] <= this.position[2] && this.jump.type == JumpType_LongJump)
+			{
+				return JumpType_Jumpbug;
+			}
+		}
 		else if (this.HitBhop())
 		{
-			if (FloatAbs(this.jump.offset) < EPSILON) // Check for no offset
+			// Check for no offset
+			if (FloatAbs(this.jump.offset) < EPSILON)
 			{
 				switch (this.jump.type)
 				{
@@ -772,7 +804,7 @@ void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump)
 	// ensure proper measurement of the first tick's sync, gain and loss, though.
 	// Both events happen during the same tick, so we do not lose any measurements.
 	beginJumpstat[client] = true;
-	jumpTrackers[client].Reset(jumped, ladderJump);
+	jumpTrackers[client].Reset(jumped, ladderJump, false);
 }
 
 void OnStartTouchGround_JumpTracking(int client)
@@ -844,14 +876,10 @@ void OnPlayerJump_JumpTracking(int client, bool jumpbug)
 {
 	if (jumpbug)
 	{
-		jumpTrackers[client].Invalidate();
+		jumpTrackers[client].Reset(true, false, true);
+		beginJumpstat[client] = true;
 	}
-}
-
-// TODO Why?
-void OnJumpInvalidated_JumpTracking(int client)
-{
-	jumpTrackers[client].Invalidate();
+	jumpTrackers[client].lastJumpTick = GetGameTickCount();
 }
 
 void OnOptionChanged_JumpTracking(int client, const char[] option)

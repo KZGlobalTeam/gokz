@@ -90,6 +90,10 @@
 	{
 		"en"		"Crouched"
 	}
+	"Crouch Release"
+	{
+		"en"		"C"
+	}
 
 
 	// =====[ CHAT MESSAGES ]=====

@@ -141,16 +141,14 @@ static void DoConsoleReport(int client, Jump jump, int tier, char[] header)
 	
 	char releaseWString[32], blockString[32], edgeString[32], deviationString[32];
 	
-	if (jump.type == JumpType_Bhop || 
-		jump.type == JumpType_MultiBhop || 
-		jump.type == JumpType_Ladderhop || 
-		jump.type == JumpType_WeirdJump)
-	{
-		strcopy(releaseWString, sizeof(releaseWString), "");
-	}
-	else
+	if (jump.type == JumpType_LongJump ||
+		jump.type == JumpType_LadderJump)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), " %s", GetIntConsoleString(client, "W Release", jump.releaseW));
+	}
+	else if (jump.crouchRelease < 50 && jump.crouchRelease > -50)
+	{
+		FormatEx(releaseWString, sizeof(releaseWString), " %s", GetIntConsoleString(client, "Crouch Release", jump.crouchRelease));
 	}
 	
 	if (jump.block > 0)
@@ -158,12 +156,6 @@ static void DoConsoleReport(int client, Jump jump, int tier, char[] header)
 		FormatEx(blockString, sizeof(blockString), " %s", GetIntConsoleString(client, "Block", jump.block));
 		FormatEx(edgeString, sizeof(edgeString), " %s", GetFloatConsoleString2(client, "Edge", jump.edge));
 		FormatEx(deviationString, sizeof(deviationString), " %s", GetFloatConsoleString1(client, "Deviation", jump.deviation));
-	}
-	else
-	{
-		strcopy(blockString, sizeof(blockString), "");
-		strcopy(edgeString, sizeof(edgeString), "");
-		strcopy(deviationString, sizeof(deviationString), "");
 	}
 	
 	PrintToConsole(client, "%t", header, jump.jumper, jump.distance, gC_JumpTypes[jump.type]);
@@ -306,7 +298,7 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 	}
 	
 	char typePostfix[3], color[16], blockStats[32], extBlockStats[32], 
-	releaseWStats[32], edgeOffset[32], offsetEdge[32];
+	releaseStats[32], edgeOffset[32], offsetEdge[32];
 	
 	if (isFailstat)
 	{
@@ -335,7 +327,11 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 	if (jump.type == JumpType_LongJump ||
 		jump.type == JumpType_LadderJump)
 	{
-		FormatEx(releaseWStats, sizeof(releaseWStats), " | %s", GetWReleaseChatString(client, jump.releaseW));
+		FormatEx(releaseStats, sizeof(releaseStats), " | %s", GetReleaseChatString(client, "W Release", jump.releaseW));
+	}
+	else if (jump.crouchRelease < 50 && jump.crouchRelease > -50)
+	{
+		FormatEx(releaseStats, sizeof(releaseStats), " | %s", GetReleaseChatString(client, "Crouch Release", jump.crouchRelease));
 	}
 	
 	if (jump.type == JumpType_LadderJump)
@@ -358,7 +354,7 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 		GetStrafesSyncChatString(client, jump.strafes, jump.sync), 
 		GetSpeedChatString(client, jump.preSpeed, jump.maxSpeed), 
 		edgeOffset, 
-		releaseWStats);
+		releaseStats);
 	
 	if (GOKZ_JS_GetOption(client, JSOption_ExtendedChatReport) == JSToggleOption_Enabled)
 	{
@@ -391,28 +387,28 @@ static char[] GetSpeedChatString(int client, float preSpeed, float maxSpeed)
 	return resultString;
 }
 
-static char[] GetWReleaseChatString(int client, int releaseW)
+static char[] GetReleaseChatString(int client, char[] releaseType, int release)
 {
 	char resultString[32];
-	if (releaseW == 0)
+	if (release == 0)
 	{
 		FormatEx(resultString, sizeof(resultString), 
 			"{green}✓{grey} %T", 
-			"W Release", client);
+			releaseType, client);
 	}
-	else if (releaseW > 0)
+	else if (release > 0)
 	{
 		FormatEx(resultString, sizeof(resultString), 
 			"{red}+%d{grey} %T", 
-			releaseW, 
-			"W Release", client);
+			release, 
+			releaseType, client);
 	}
 	else
 	{
 		FormatEx(resultString, sizeof(resultString), 
 			"{blue}%d{grey} %T", 
-			releaseW, 
-			"W Release", client);
+			release, 
+			releaseType, client);
 	}
 	return resultString;
 }

@@ -124,11 +124,6 @@ public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
 	OnJumpValidated_JumpTracking(client, jumped, ladderJump);
 }
 
-public void GOKZ_OnJumpInvalidated(int client)
-{
-	OnJumpInvalidated_JumpTracking(client);
-}
-
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	OnOptionChanged_JumpTracking(client, option);
