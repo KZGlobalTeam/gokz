@@ -9,6 +9,7 @@
 #endif
 #define _gokz_core_included_
 
+#include <cstrike>
 #include <regex>
 #include <topmenus>
 
@@ -1048,12 +1049,32 @@ native bool GOKZ_GetValidJump(int client);
  *
  * @param client		Client index.
  * @param team			Which team to switch to.
+ * @param restorePos	Whether to restore saved position if leaving spectators.
  */
-native void GOKZ_JoinTeam(int client, int team);
+native void GOKZ_JoinTeam(int client, int team, bool restorePos = true);
 
 
 
 // =====[ STOCKS ]=====
+
+/**
+ * Makes a player join a team if they aren't on one and respawns them.
+ *
+ * @param client		Client index.
+ * @param team			Which team to switch to if not on one.
+ * @param restorePos	Whether to restore saved position if leaving spectators.
+ */
+stock void GOKZ_RespawnPlayer(int client, int team = CS_TEAM_T, bool restorePos = true)
+{
+	if (IsSpectating(client))
+	{
+		GOKZ_JoinTeam(client, team, restorePos);
+	}
+	else
+	{
+		CS_RespawnPlayer(client);
+	}
+}
 
 /**
  * Prints a message to all client's chat, formatting colours and optionally 

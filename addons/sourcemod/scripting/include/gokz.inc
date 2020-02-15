@@ -512,4 +512,15 @@ stock void CopyVector(const any src[3], any dest[3])
 	dest[0] = src[0];
 	dest[1] = src[1];
 	dest[2] = src[2];
+}
+
+/**
+ * Returns whether the player is spectating.
+ *
+ * @param client		Client index.
+ */
+stock bool IsSpectating(int client)
+{
+	int team = GetClientTeam(client);
+	return team == CS_TEAM_SPECTATOR || team == CS_TEAM_NONE;
 } 
