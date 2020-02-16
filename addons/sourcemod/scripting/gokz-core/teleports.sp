@@ -145,15 +145,6 @@ void TeleportToCheckpoint(int client)
 
 bool CanTeleportToCheckpoint(int client, bool showError = false)
 {
-	if (!IsPlayerAlive(client))
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
 	{
 		if (showError)
@@ -204,15 +195,6 @@ void PrevCheckpoint(int client)
 
 bool CanPrevCheckpoint(int client, bool showError = false)
 {
-	if (!IsPlayerAlive(client))
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
 	{
 		if (showError)
@@ -263,15 +245,6 @@ void NextCheckpoint(int client)
 
 bool CanNextCheckpoint(int client, bool showError = false)
 {
-	if (!IsPlayerAlive(client))
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
 	{
 		if (showError)
@@ -307,11 +280,6 @@ void TeleportToStart(int client)
 	}
 	
 	// Teleport to Start
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
-	{
-		CS_SwitchTeam(client, CS_TEAM_CT);
-	}
-	
 	if (startType[client] != StartPositionType_MapButton)
 	{
 		GOKZ_StopTimer(client, false);
@@ -319,22 +287,14 @@ void TeleportToStart(int client)
 	
 	if (startType[client] == StartPositionType_Spawn)
 	{
-		CS_RespawnPlayer(client);
+		GOKZ_RespawnPlayer(client, .restorePos = false);
 	}
 	else if (startType[client] == StartPositionType_Custom)
 	{
-		if (!IsPlayerAlive(client))
-		{
-			CS_RespawnPlayer(client);
-		}
 		TeleportDo(client, customStartOrigin[client], customStartAngles[client]);
 	}
 	else
 	{
-		if (!IsPlayerAlive(client))
-		{
-			CS_RespawnPlayer(client);
-		}
 		TeleportDo(client, nonCustomStartOrigin[client], nonCustomStartAngles[client]);
 	}
 	
@@ -456,15 +416,6 @@ void UndoTeleport(int client)
 
 bool CanUndoTeleport(int client, bool showError = false)
 {
-	if (!IsPlayerAlive(client))
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
 	if (teleportCount[client] <= 0)
 	{
 		if (showError)
@@ -561,6 +512,11 @@ static int PrevIndex(int current, int maximum)
 
 static void TeleportDo(int client, const float destOrigin[3], const float destAngles[3])
 {
+	if (!IsPlayerAlive(client))
+	{
+		GOKZ_RespawnPlayer(client);
+	}
+	
 	// Store information about where player is teleporting from
 	float oldOrigin[3];
 	Movement_GetOrigin(client, oldOrigin);

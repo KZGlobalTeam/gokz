@@ -107,7 +107,7 @@ void OnClientPutInServer_BhopTracking(int client)
 
 void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 {
-	if (!IsPlayerAlive(client) || IsFakeClient(client) || gCV_sv_autobunnyhopping.BoolValue)
+	if (gCV_sv_autobunnyhopping.BoolValue)
 	{
 		return;
 	}
@@ -150,9 +150,10 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	{
 		// This condition exists to reduce false positives.
 		
-		// Telehopping is when the player bunnyhops out of a teleport. This will,
-		// more than usual, result in a perfect bunnyhop. This is alleviated by
-		// checking if it's a "GOKZ valid jump" (which detects teleports).
+		// Telehopping is when the player bunnyhops out of a teleport that has a
+		// destination very close to the ground. This will, more than usual,
+		// result in a perfect bunnyhop. This is alleviated by checking if the
+		// player's origin was affected by a teleport last tick.
 		
 		// When a player is pressing up against a slope but not ascending it (e.g.
 		// palm trees on kz_adv_cursedjourney), they will switch between on ground
@@ -160,7 +161,7 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 		// jump will be recorded as a perfect bunnyhop. To ignore this, we check
 		// the jump is more than 1 tick duration.
 		
-		gB_LastLandingWasValid[client] = GOKZ_GetValidJump(client)
+		gB_LastLandingWasValid[client] = cmdnum - gI_LastOriginTeleportCmdNum[client] > 1
 		 && cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
 	}
 }

@@ -57,7 +57,7 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	char teamString[4];
 	GetCmdArgString(teamString, sizeof(teamString));
 	int team = StringToInt(teamString);
-	JoinTeam(client, team);
+	GOKZ_JoinTeam(client, team);
 	return Plugin_Handled;
 }
 
@@ -172,9 +172,9 @@ public Action CommandBonus(int client, int args)
 
 public Action CommandTogglePause(int client, int args)
 {
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
+	if (!IsPlayerAlive(client))
 	{
-		JoinTeam(client, CS_TEAM_CT);
+		GOKZ_RespawnPlayer(client);
 	}
 	else
 	{

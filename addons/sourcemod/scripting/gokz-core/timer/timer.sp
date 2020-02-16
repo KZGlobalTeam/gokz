@@ -1,11 +1,10 @@
 static bool timerRunning[MAXPLAYERS + 1];
 static float currentTime[MAXPLAYERS + 1];
 static int currentCourse[MAXPLAYERS + 1];
-static bool hasStartedTimerThisMap[MAXPLAYERS + 1];
-static bool hasEndedTimerThisMap[MAXPLAYERS + 1];
 static float lastEndTime[MAXPLAYERS + 1];
 static float lastFalseEndTime[MAXPLAYERS + 1];
 static float lastStartSoundTime[MAXPLAYERS + 1];
+static int lastStartMode[MAXPLAYERS + 1];
 
 
 
@@ -34,16 +33,6 @@ int GetCurrentCourse(int client)
 void SetCurrentCourse(int client, int course)
 {
 	currentCourse[client] = course;
-}
-
-bool GetHasStartedTimerThisMap(int client)
-{
-	return hasStartedTimerThisMap[client];
-}
-
-bool GetHasEndedTimerThisMap(int client)
-{
-	return hasEndedTimerThisMap[client];
 }
 
 int GetCurrentTimeType(int client)
@@ -79,7 +68,7 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool autoResta
 	currentTime[client] = 0.0;
 	timerRunning[client] = true;
 	currentCourse[client] = course;
-	hasStartedTimerThisMap[client] = true;
+	lastStartMode[client] = GOKZ_GetCoreOption(client, Option_Mode);
 	if (playSound)
 	{
 		PlayTimerStartSound(client);
@@ -118,7 +107,6 @@ bool TimerEnd(int client, int course)
 	
 	// End Timer
 	timerRunning[client] = false;
-	hasEndedTimerThisMap[client] = true;
 	lastEndTime[client] = GetGameTime();
 	PlayTimerEndSound(client);
 	
@@ -176,11 +164,10 @@ void OnClientPutInServer_Timer(int client)
 	timerRunning[client] = false;
 	currentTime[client] = 0.0;
 	currentCourse[client] = 0;
-	hasStartedTimerThisMap[client] = false;
-	hasEndedTimerThisMap[client] = false;
 	lastEndTime[client] = 0.0;
 	lastFalseEndTime[client] = 0.0;
 	lastStartSoundTime[client] = 0.0;
+	lastStartMode[client] = MODE_COUNT; // So it won't equal any mode
 }
 
 void OnPlayerRunCmdPost_Timer(int client)
@@ -210,7 +197,7 @@ void OnTeleportToStart_Timer(int client)
 		TimerStop(client, false);
 	}
 	
-	if (GetHasStartedTimerThisMap(client)
+	if (lastStartMode[client] == GOKZ_GetCoreOption(client, Option_Mode)
 		 && GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Enabled
 		 && GOKZ_GetStartPositionType(client) == StartPositionType_MapButton)
 	{
@@ -279,13 +266,12 @@ static bool JustStartedTimer(int client)
 
 static bool JustEndedTimer(int client)
 {
-	return GetHasEndedTimerThisMap(client)
-	 && (GetGameTime() - lastEndTime[client]) < 1.0;
+	return GetGameTime() - lastEndTime[client] < 1.0;
 }
 
 static void PlayTimerStartSound(int client)
 {
-	if ((GetGameTime() - lastStartSoundTime[client]) > GOKZ_TIMER_SOUND_COOLDOWN)
+	if (GetGameTime() - lastStartSoundTime[client] > GOKZ_TIMER_SOUND_COOLDOWN)
 	{
 		EmitSoundToClient(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);

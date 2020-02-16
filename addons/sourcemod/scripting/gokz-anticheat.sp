@@ -1,9 +1,10 @@
 #include <sourcemod>
 
-#include <gokz/anticheat>
-#include <gokz/core>
+#include <dhooks>
 
 #include <movementapi>
+#include <gokz/anticheat>
+#include <gokz/core>
 
 #include <autoexecconfig>
 
@@ -32,6 +33,11 @@ public Plugin myinfo =
 bool gB_GOKZLocalDB;
 bool gB_SourceBansPP;
 bool gB_SourceBans;
+
+Handle gH_DHooks_OnTeleport;
+
+int gI_CmdNum[MAXPLAYERS + 1];
+int gI_LastOriginTeleportCmdNum[MAXPLAYERS + 1];
 
 int gI_ButtonCount[MAXPLAYERS + 1];
 int gI_ButtonsIndex[MAXPLAYERS + 1];
@@ -75,6 +81,7 @@ public void OnPluginStart()
 	
 	CreateConVars();
 	CreateGlobalForwards();
+	HookEvents();
 	RegisterCommands();
 }
 
@@ -122,11 +129,34 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	OnClientPutInServer_BhopTracking(client);
+	HookClientEvents(client);
+}
+
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	gI_CmdNum[client] = cmdnum;
+	return Plugin_Continue;
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
+	if (!IsPlayerAlive(client) || IsFakeClient(client))
+	{
+		return;
+	}
+	
 	OnPlayerRunCmdPost_BhopTracking(client, buttons, cmdnum);
+}
+
+public MRESReturn DHooks_OnTeleport(int client, Handle params)
+{
+	// Parameter 1 not null means origin affected
+	gI_LastOriginTeleportCmdNum[client] = !DHookIsNullParam(params, 1) ? gI_CmdNum[client] : gI_LastOriginTeleportCmdNum[client];
+	
+	// Parameter 3 not null means velocity affected
+	//gI_LastVelocityTeleportCmdNum[client] = !DHookIsNullParam(params, 3) ? gI_CmdNum[client] : gI_LastVelocityTeleportCmdNum[client];
+	
+	return MRES_Ignored;
 }
 
 public void GOKZ_OnFirstSpawn(int client)
@@ -197,6 +227,27 @@ static void CreateConVars()
 	AutoExecConfig_CleanFile();
 	
 	gCV_sv_autobunnyhopping = FindConVar("sv_autobunnyhopping");
+}
+
+static void HookEvents()
+{
+	GameData gameData = new GameData("sdktools.games");
+	int offset;
+	
+	// Setup DHooks OnTeleport for players
+	offset = gameData.GetOffset("Teleport");
+	gH_DHooks_OnTeleport = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnTeleport);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_ObjectPtr);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
+	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
+	
+	delete gameData;
+}
+
+static void HookClientEvents(int client)
+{
+	DHookEntity(gH_DHooks_OnTeleport, true, client);
 }
 
 static void LogSuspicion(int client, ACReason reason, const char[] notes, const char[] stats)
