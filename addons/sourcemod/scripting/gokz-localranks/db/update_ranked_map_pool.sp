@@ -18,11 +18,11 @@ void DB_UpdateRankedMapPool(int client)
 		}
 		return;
 	}
-	
+
 	char map[33];
 	ArrayList maps = new ArrayList(33, 0);
-	
-	// Insert/Update maps in mappool.cfg to be ranked
+
+	// Insert/Update maps in gokz-localranks-mappool.cfg to be ranked
 	while (ReadFileLine(file, map, sizeof(map)))
 	{
 		TrimString(map);
@@ -34,7 +34,7 @@ void DB_UpdateRankedMapPool(int client)
 		maps.PushString(map);
 	}
 	delete file;
-	
+
 	if (maps.Length == 0)
 	{
 		if (client == 0)
@@ -49,7 +49,7 @@ void DB_UpdateRankedMapPool(int client)
 		}
 		return;
 	}
-	
+
 	// Create VALUES e.g. (1,'kz_map1'),(1,'kz_map2')
 	int valuesSize = maps.Length * 40;
 	char[] values = new char[valuesSize];
@@ -60,15 +60,15 @@ void DB_UpdateRankedMapPool(int client)
 		maps.GetString(i, map, sizeof(map));
 		Format(values, valuesSize, "%s,(1,'%s')", values, map);
 	}
-	
+
 	// Create query
 	int querySize = valuesSize + 128;
 	char[] query = new char[querySize];
-	
+
 	Transaction txn = SQL_CreateTransaction();
 	// Reset all maps to be unranked
 	txn.AddQuery(sql_maps_reset_mappool);
-	
+
 	switch (g_DBType)
 	{
 		case DatabaseType_SQLite:
@@ -83,7 +83,7 @@ void DB_UpdateRankedMapPool(int client)
 				maps.GetString(i, map, sizeof(map));
 				Format(mapList, mapListSize, "%s,'%s'", mapList, map);
 			}
-			
+
 			// UPDATE OR IGNORE
 			FormatEx(query, querySize, sqlite_maps_updateranked, 1, mapList);
 			txn.AddQuery(query);
@@ -97,16 +97,16 @@ void DB_UpdateRankedMapPool(int client)
 			txn.AddQuery(query);
 		}
 	}
-	
+
 	// Pass client user ID (or -1) as data
 	int data = -1;
 	if (IsValidClient(client))
 	{
 		data = GetClientUserId(client);
 	}
-	
+
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_UpdateRankedMapPool, DB_TxnFailure_Generic, data, DBPrio_Low);
-	
+
 	delete maps;
 }
 
@@ -123,4 +123,4 @@ public void DB_TxnSuccess_UpdateRankedMapPool(Handle db, int userid, int numQuer
 	{
 		LogMessage("The ranked map pool was updated.");
 	}
-} 
+}
