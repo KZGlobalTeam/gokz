@@ -66,21 +66,21 @@ enum struct JumpTracker
 	
 	void Reset(bool jumped, bool ladderJump, bool jumpbug)
 	{
+		// We need to do that before we reset the jump cause we need the offset
+		// of the previous jump
+		this.lastType = this.DetermineType(jumped, ladderJump, jumpbug);
+	
 		// Reset all stats
 		this.jump = emptyJump;
+		this.jump.type = this.lastType;
 		this.jump.jumper = this.jumper;
 		this.syncTicks = 0;
 		this.strafeDirection = StrafeDirection_None;
-		this.lastType = this.jump.type;
 		this.jump.crouchRelease = this.crouchReleaseTick - Movement_GetLandingTick(this.jumper) - 3;
 		this.crouchReleaseTick = 0;
 		
 		// Reset pose history
 		this.poseIndex = 0;
-		
-		// This is the only instance where we need jumped and ladderJump so we
-		// might as well do that here already.
-		this.jump.type = this.DetermineType(jumped, ladderJump, jumpbug);
 	}
 	
 	void Begin()
@@ -88,6 +88,7 @@ enum struct JumpTracker
 		// Initialize stats
 		this.jump.releaseW = 100;
 		
+		// Update takeoff origin
 		if (this.jump.type == JumpType_Jumpbug)
 		{
 			float height = this.takeoffOrigin[2];
@@ -107,6 +108,19 @@ enum struct JumpTracker
 		// Update the takeoff speed with the correct value
 		this.jump.preSpeed = GOKZ_GetTakeoffSpeed(this.jumper);
 		poseHistory[this.jumper][0].speed = this.jump.preSpeed;
+		
+		// Adjust the jump type for lowpre jumps.
+		if (this.jump.preSpeed > 290.0)  // Exclude SKZ and VNL stats.
+		{
+			if (this.jump.type == JumpType_Bhop && this.jump.preSpeed < 360.0)
+			{
+				this.jump.type = JumpType_LowpreBhop;
+			}
+			else if (this.jump.type == JumpType_WeirdJump && this.jump.preSpeed < 300.0)
+			{
+				this.jump.type = JumpType_LowpreWeirdJump;
+			}
+		}
 		
 		// Notify everyone about the takeoff
 		Call_OnTakeoff(this.jumper, this.jump.type);
@@ -140,7 +154,7 @@ enum struct JumpTracker
 		this.Update();
 		
 		// Try to prevent a form of booster abuse
-		if (this.jump.type != JumpType_LadderJump && this.jump.durationTicks > 100)
+		if (this.jump.type != JumpType_LadderJump && this.jump.type != JumpType_WeirdJump && this.jump.durationTicks > 100)
 		{
 			this.Invalidate();
 			return;
@@ -154,7 +168,6 @@ enum struct JumpTracker
 		this.jump.sync = float(this.syncTicks) / float(this.jump.durationTicks) * 100.0;
 		this.jump.offset = this.position[2] - this.takeoffOrigin[2];
 		this.jump.duration = this.jump.durationTicks * GetTickInterval();
-		
 		// Make sure the ladder has no offset for ladder jumps
 		if (this.jump.type == JumpType_LadderJump)
 		{
@@ -716,7 +729,7 @@ enum struct JumpTracker
 		else if (jumpbug)
 		{
 			// Check for no offset
-			if (this.takeoffOrigin[2] <= this.position[2] && this.jump.type == JumpType_LongJump)
+			if (this.takeoffOrigin[2] <= this.position[2] && this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
 			}
@@ -726,16 +739,17 @@ enum struct JumpTracker
 			// Check for no offset
 			if (FloatAbs(this.jump.offset) < EPSILON)
 			{
-				switch (this.jump.type)
+				switch (this.lastType)
 				{
 					case JumpType_LongJump:return JumpType_Bhop;
 					case JumpType_Bhop:return JumpType_MultiBhop;
+					case JumpType_LowpreBhop:return JumpType_MultiBhop;
 					case JumpType_MultiBhop:return JumpType_MultiBhop;
 					default:return JumpType_Other;
 				}
 			}
 			// Check for weird jump
-			else if (this.jump.type == JumpType_Fall && this.ValidWeirdJumpDropDistance())
+			else if (this.lastType == JumpType_Fall && this.ValidWeirdJumpDropDistance())
 			{
 				return JumpType_WeirdJump;
 			}

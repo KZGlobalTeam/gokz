@@ -327,9 +327,16 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 	if (jump.type == JumpType_LongJump ||
 		jump.type == JumpType_LadderJump)
 	{
-		FormatEx(releaseStats, sizeof(releaseStats), " | %s", GetReleaseChatString(client, "W Release", jump.releaseW));
+		if (jump.releaseW >= 100)
+		{
+			FormatEx(releaseStats, sizeof(releaseStats), " | {red}✗ {grey}W", GetReleaseChatString(client, "W Release", jump.releaseW));
+		}
+		else
+		{
+			FormatEx(releaseStats, sizeof(releaseStats), " | %s", GetReleaseChatString(client, "W Release", jump.releaseW));
+		}
 	}
-	else if (jump.crouchRelease < 50 && jump.crouchRelease > -50)
+	else if (jump.crouchRelease < 20 && jump.crouchRelease > -20)
 	{
 		FormatEx(releaseStats, sizeof(releaseStats), " | %s", GetReleaseChatString(client, "Crouch Release", jump.crouchRelease));
 	}

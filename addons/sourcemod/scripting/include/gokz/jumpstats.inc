@@ -23,6 +23,8 @@ enum
 	JumpType_LadderJump, 
 	JumpType_Ladderhop, 
 	JumpType_Jumpbug,
+	JumpType_LowpreBhop,
+	JumpType_LowpreWeirdJump,
 	JumpType_Fall, 
 	JumpType_Other, 
 	JUMPTYPE_COUNT
@@ -95,6 +97,8 @@ stock char gC_JumpTypes[JUMPTYPE_COUNT][] =
 	"Ladder Jump", 
 	"Ladderhop", 
 	"Jumpbug",
+	"Lowpre Bunnyhop",
+	"Lowpre Weird Jump",
 	"Fall", 
 	"Unknown Jump"
 };
@@ -108,6 +112,8 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"LAJ", 
 	"LAH", 
 	"JB", 
+	"LBH",
+	"LWJ",
 	"FL", 
 	"??"
 };
@@ -120,7 +126,9 @@ stock char gC_JumpTypeKeys[JUMPTYPE_COUNT - 2][] =
 	"weirdjump", 
 	"ladderjump", 
 	"ladderhop",
-	"jumpbug"
+	"jumpbug",
+	"lowprebhop",
+	"lowpreweirdjump"
 };
 
 stock char gC_DistanceTiers[DISTANCETIER_COUNT][] = 
@@ -298,45 +306,16 @@ forward void GOKZ_JS_OnJumpInvalidated(int client);
 /**
  * Called when a player fails a blockjump.
  *
- * @param client		Client index.
- * @param jumpType		Type of jump they landed.
- * @param distance		Horizontal distance of the jump.
- * @param offset		Vertical distance of the jump.
- * @param height		Max height of the player relative to their takeoff origin.
- * @param preSpeed		Takeoff speed.
- * @param maxSpeed		Max horizontal speed reached.
- * @param strafes		Number of strafes.
- * @param sync			Percentage of time that speed was gained.
- * @param duration		Duration of the jump in seconds.
- * @param block         Size of the block jumped.
- * @param width         Total angle turned during the jump.
- * @param overlap       Amount of ticks where the player turned left and right at the same time.
- * @param deadair       Amount of ticks where the player turned neither left nor right.
- * @param deviation     Deviation to the side when jumping across a block.
- * @param edge          Distance from the edge of the jumpoff block to the player jumpoff position.
- * @param releaseW      Tick relative to the jumpoff that the forward key was released.
- * @param crouchTicks	Number of ticks the player was crouched during the jump.
+ * @param jump			The jumpstats.
  */
 forward void GOKZ_JS_OnFailstat(Jump jump);
 
 /**
  * Called when a player fails a jump and has always-on failstats enabled.
  *
- * @param client		Client index.
- * @param distanceX		X-axis distance of the jump.
- * @param distanceY		Y-axis distance of the jump.
- * @param edge          Distance from the edge of the jumpoff block to the player jumpoff position.
- * @param strafes		Number of strafes.
- * @param sync			Percentage of time that speed was gained.
- * @param pre			Takeoff speed.
- * @param max			Max horizontal speed reached.
- * @param releaseW      Tick relative to the jumpoff that the forward key was released.
- * @param crouchTicks	Number of ticks the player was crouched during the jump.
- * @param width         Total angle turned during the jump.
- * @param overlap       Amount of ticks where the player turned left and right at the same time.
- * @param deadair       Amount of ticks where the player turned neither left nor right.
+ * @param jump			The failstats.
  */
-forward void GOKZ_JS_OnFailstatAlways(Jump jump, float distanceX);
+forward void GOKZ_JS_OnFailstatAlways(Jump jump, float distanceX, float distanceY);
 
 
 
