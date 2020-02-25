@@ -59,6 +59,8 @@ enum JSOption:
 	JSOption_FailstatsChat, 
 	JSOption_FailstatsAlways, 
 	JSOption_ExtendedChatReport, 
+	JSOption_MinChatBroadcastTier,
+	JSOption_MinSoundBroadcastTier,
 	JSOPTION_COUNT
 };
 
@@ -170,7 +172,9 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 	"GOKZ JS - Failstats Console", 
 	"GOKZ JS - Failstats Chat", 
 	"GOKZ JS - Failstats Always", 
-	"GOKZ JS - Extended Chat Report"
+	"GOKZ JS - Extended Chat Report",
+	"GOKZ JS - Minimal Chat Broadcast Tier",
+	"GOKZ JS - Minimal Sound Broadcast Tier"
 };
 
 stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 
@@ -182,7 +186,9 @@ stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] =
 	"Print Failstats To Console - 0 = Disabled, 1 = Enabled", 
 	"Print Failstats To Chat - 0 = Disabled, 1 = Enabled", 
 	"Always show Failstat after a Teleport - 0 = Disabled, 1 = Enabled", 
-	"Extended Chat Report - 0 = Disabled, 1 = Enabled"
+	"Extended Chat Report - 0 = Disabled, 1 = Enabled",
+	"Minimum Jump Tier for Jumpstat Chat Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage",
+	"Minimum Jump Tier for Jumpstat Sound Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage"
 };
 
 stock char gI_JSOptionPhrases[JSOPTION_COUNT][] = 
@@ -194,7 +200,9 @@ stock char gI_JSOptionPhrases[JSOPTION_COUNT][] =
 	"Options Menu - Failstats Console Report", 
 	"Options Menu - Failstats Chat Report", 
 	"Options Menu - Failstats Always", 
-	"Options Menu - Extended Jump Chat Report"
+	"Options Menu - Extended Jump Chat Report",
+	"Options Menu - Minimal Jump Chat Broadcast Tier",
+	"Options Menu - Minimal Jump Sound Broadcast Tier"
 };
 
 stock int gI_JSOptionDefaults[JSOPTION_COUNT] = 
@@ -206,7 +214,9 @@ stock int gI_JSOptionDefaults[JSOPTION_COUNT] =
 	JSToggleOption_Enabled, 
 	JSToggleOption_Disabled, 
 	JSToggleOption_Disabled, 
-	JSToggleOption_Disabled
+	JSToggleOption_Disabled,
+	DistanceTier_Ownage,
+	DistanceTier_None
 };
 
 stock int gI_JSOptionCounts[JSOPTION_COUNT] = 
@@ -218,7 +228,9 @@ stock int gI_JSOptionCounts[JSOPTION_COUNT] =
 	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT, 
-	JSTOGGLEOPTION_COUNT
+	JSTOGGLEOPTION_COUNT,
+	DISTANCETIER_COUNT, 
+	DISTANCETIER_COUNT
 };
 
 

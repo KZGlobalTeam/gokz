@@ -77,13 +77,17 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 	
 	if (action == TopMenuAction_DisplayOption)
 	{
-		switch (option)
+		if (option == JSOption_JumpstatsMaster ||
+			option == JSOption_ExtendedChatReport ||
+			option == JSOption_FailstatsConsole ||
+			option == JSOption_FailstatsChat ||
+			option == JSOption_FailstatsAlways)
 		{
-			case JSOption_JumpstatsMaster:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
-			case JSOption_ExtendedChatReport:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
-			case JSOption_FailstatsConsole:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
-			case JSOption_FailstatsChat:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
-			default:FormatDistanceTierOptionDisplay(param, option, buffer, maxlength);
+			FormatToggleableOptionDisplay(param, option, buffer, maxlength);
+		}
+		else
+		{
+			FormatDistanceTierOptionDisplay(param, option, buffer, maxlength);
 		}
 	}
 	else if (action == TopMenuAction_SelectOption)

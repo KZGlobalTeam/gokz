@@ -207,4 +207,12 @@
 	{
 		"en"		"Always Print Failstats"
 	}
+	"Options Menu - Minimal Jump Chat Broadcast Tier"
+	{
+		"en"		"Min Chat Broadcast Tier"
+	}
+	"Options Menu - Minimal Jump Sound Broadcast Tier"
+	{
+		"en"		"Min Sound Broadcast Tier"
+	}
 }

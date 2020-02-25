@@ -44,9 +44,23 @@ void OnLanding_JumpReporting(Jump jump)
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (IsValidClient(client) && GetObserverTarget(client) == jump.jumper)
+		if (IsValidClient(client) && client != jump.jumper)
 		{
-			DoJumpstatsReport(client, jump, tier);
+			if (GetObserverTarget(client) == jump.jumper)
+			{
+				DoJumpstatsReport(client, jump, tier);
+			}
+			else 
+			{
+				if (tier >= GOKZ_JS_GetOption(client, JSOption_MinChatBroadcastTier))
+				{
+					DoChatReport(client, false, jump, tier);
+				}
+				if (tier >= GOKZ_JS_GetOption(client, JSOption_MinSoundBroadcastTier))
+				{
+					PlayJumpstatSound(client, tier);
+				}
+			}
 		}
 	}
 }
