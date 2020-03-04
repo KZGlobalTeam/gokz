@@ -82,6 +82,9 @@ enum struct JumpTracker
 		// We need to do that before we reset the jump cause we need the
 		// offset and type of the previous jump
 		this.lastType = this.DetermineType(jumped, ladderJump, jumpbug);
+		
+		// We need this for weirdjump w-release
+		int releaseWTemp = this.jump.releaseW;
 	
 		// Reset all stats
 		this.jump = emptyJump;
@@ -89,7 +92,14 @@ enum struct JumpTracker
 		this.jump.jumper = this.jumper;
 		this.syncTicks = 0;
 		this.strafeDirection = StrafeDirection_None;
+		this.jump.releaseW = 100;
 		this.crouchReleaseTick = 0;
+		
+		// Handle weirdjump w-release
+		if (this.jump.type == JumpType_WeirdJump)
+		{
+			this.jump.releaseW = releaseWTemp;
+		}
 		
 		// You have to release crouch 3 ticks before landing
 		this.jump.crouchRelease = this.crouchReleaseTick - Movement_GetLandingTick(this.jumper) - 3;
@@ -101,7 +111,6 @@ enum struct JumpTracker
 	void Begin()
 	{
 		// Initialize stats
-		this.jump.releaseW = 100;
 		this.failstatBlockDetected = this.jump.type != JumpType_LadderJump;
 		this.failstatCalculcated = false;
 		this.failstatBlockHeight = this.takeoffOrigin[2];
