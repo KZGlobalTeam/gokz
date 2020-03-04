@@ -85,20 +85,32 @@ void OnFailstat_FailstatReporting(Jump jump)
 	}
 }
 
-/*
-void OnFailstatAlways_FailstatAlwaysReporting(Jump jump, float distanceX, float distanceY)
+void OnJumpstatAlways_JumpstatAlwaysReporting(Jump jump)
 {
-	DoFailstatAlwaysReport(jump.jumper, jump, distanceX, distanceY);
+	DoJumpstatAlwaysReport(jump.jumper, jump);
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && GetObserverTarget(client) == jump.jumper)
 		{
-			DoFailstatAlwaysReport(client, jump, distanceX, distanceY);
+			DoJumpstatAlwaysReport(client, jump);
 		}
 	}
 }
-*/
+
+
+void OnFailstatAlways_FailstatAlwaysReporting(Jump jump)
+{
+	DoFailstatAlwaysReport(jump.jumper, jump);
+	
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && GetObserverTarget(client) == jump.jumper)
+		{
+			DoFailstatAlwaysReport(client, jump);
+		}
+	}
+}
 
 
 
@@ -127,18 +139,30 @@ static void DoFailstatReport(int client, Jump jump, int tier)
 	DoConsoleReport(client, jump, tier, "Console Failstat Header");
 }
 
-/*
-static void DoFailstatAlwaysReport(int client, Jump jump, float distanceX, float distanceY)
+static void DoJumpstatAlwaysReport(int client, Jump jump)
 {
-	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
+	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled ||
+		GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled)
 	{
 		return;
 	}
 	
-	DoFailstatAlwaysChatReport(client, jump, distanceX, distanceY);
-	DoFailstatAlwaysConsoleReport(client, jump, distanceX, distanceY);
+	DoChatReport(client, false, jump, 1);
+	DoConsoleReport(client, jump, 1, "Console Jump Header");
 }
-*/
+
+static void DoFailstatAlwaysReport(int client, Jump jump)
+{
+	if (GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled ||
+		GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled)
+	{
+		return;
+	}
+	
+	DoChatReport(client, true, jump, 1);
+	DoConsoleReport(client, jump, 1, "Console Failstat Header");
+}
+
 
 
 
@@ -147,37 +171,48 @@ static void DoFailstatAlwaysReport(int client, Jump jump, float distanceX, float
 static void DoConsoleReport(int client, Jump jump, int tier, char[] header)
 {
 	int minConsoleTier = GOKZ_JS_GetOption(client, JSOption_MinConsoleTier);
-	if (minConsoleTier == 0 || minConsoleTier > tier // 0 means disabled
+	if ((minConsoleTier == 0 || minConsoleTier > tier // 0 means disabled
 		 || GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled)
+		 && GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled)
 	{
 		return;
 	}
 	
-	char releaseWString[32], blockString[32], edgeString[32], deviationString[32];
+	char releaseWString[32], blockString[32], edgeString[32], deviationString[32], missString[32];
 	
-	if (jump.type == JumpType_LongJump ||
-		jump.type == JumpType_LadderJump)
+	if (jump.originalType == JumpType_LongJump ||
+		jump.originalType == JumpType_LadderJump)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), " %s", GetIntConsoleString(client, "W Release", jump.releaseW));
 	}
-	else if (jump.crouchRelease < 50 && jump.crouchRelease > -50)
+	else if (jump.crouchRelease < 20 && jump.crouchRelease > -20)
 	{
 		FormatEx(releaseWString, sizeof(releaseWString), " %s", GetIntConsoleString(client, "Crouch Release", jump.crouchRelease));
+	}
+	
+	if (jump.miss > 0.0)
+	{
+		FormatEx(missString, sizeof(missString), " %s", GetFloatConsoleString2(client, "Miss", jump.miss));
 	}
 	
 	if (jump.block > 0)
 	{
 		FormatEx(blockString, sizeof(blockString), " %s", GetIntConsoleString(client, "Block", jump.block));
-		FormatEx(edgeString, sizeof(edgeString), " %s", GetFloatConsoleString2(client, "Edge", jump.edge));
 		FormatEx(deviationString, sizeof(deviationString), " %s", GetFloatConsoleString1(client, "Deviation", jump.deviation));
 	}
 	
-	PrintToConsole(client, "%t", header, jump.jumper, jump.distance, gC_JumpTypes[jump.type]);
+	if (jump.edge > 0.0)
+	{
+		FormatEx(edgeString, sizeof(edgeString), " %s", GetFloatConsoleString2(client, "Edge", jump.edge));
+	}
 	
-	PrintToConsole(client, "%s%s%s %s %s %s %s%s %s %s%s %s %s %s %s %s",
+	PrintToConsole(client, "%t", header, jump.jumper, jump.distance, gC_JumpTypes[jump.originalType]);
+	
+	PrintToConsole(client, "%s%s%s%s %s %s %s %s%s %s %s%s %s %s %s %s %s",
 		gC_ModeNamesShort[GOKZ_GetCoreOption(jump.jumper, Option_Mode)],
 		blockString,
 		edgeString,
+		missString,
 		GetIntConsoleString(client, jump.strafes == 1 ? "Strafe" : "Strafes", jump.strafes),
 		GetSyncConsoleString(client, jump.sync),
 		GetFloatConsoleString2(client, "Pre", jump.preSpeed),
@@ -256,49 +291,6 @@ static char[] GetIntConsoleString(int client, const char[] stat, int value)
 	return resultString;
 }
 
-/*
-static void DoFailstatAlwaysConsoleReport(int client, int jumper, float distanceX, float distanceY, float edge, int strafes, float sync, float pre, float max, int releaseW, int crouchTicks, float width, int overlap, int deadair)
-{
-	if (GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled)
-	{
-		return;
-	}
-	
-	PrintToConsole(client, "%t", "Console Failstat Always Report", 
-		distanceX, "Distance X", 
-		distanceY, "Distance Y", 
-		edge, "Edge", 
-		strafes, strafes == 1 ? "Strafe" : "Strafes", 
-		sync, "Sync", 
-		RoundToPowerOfTen(pre, -2), "Pre", 
-		RoundToPowerOfTen(max, -2), "Max", 
-		releaseW, "W Release",
-		crouchTicks, "Crouch Ticks",
-		GetAverageStrafeWidth(strafes, width), "Avg. Width", 
-		overlap, "Overlap", 
-		deadair, "Dead Air");
-	PrintToConsole(client, "  #.  %12t%12t%12t%12t%12t%9t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)", "Width (Table)", "Overlap (Table)", "Dead Air (Table)");
-	if (GetStrafeAirtime(jumper, 0) > 0.001)
-	{
-		PrintToConsole(client, "  0.  ----      -----     -----     %3.0f%%      -----     --     --", GetStrafeAirtime(jumper, 0));
-	}
-	for (int strafe = 1; strafe <= strafes && strafe < JS_MAX_TRACKED_STRAFES; strafe++)
-	{
-		PrintToConsole(client, 
-			" %2d.  %3.0f%%      %5.2f     %5.2f     %3.0f%%      %5.1f°    %2d     %2d", 
-			strafe, 
-			GetStrafeSync(jumper, strafe), 
-			GetStrafeGain(jumper, strafe), 
-			GetStrafeLoss(jumper, strafe), 
-			GetStrafeAirtime(jumper, strafe), 
-			FloatAbs(GetStrafeWidth(jumper, strafe)), 
-			GetStrafeOverlap(jumper, strafe), 
-			GetStrafeDeadair(jumper, strafe));
-	}
-	PrintToConsole(client, ""); // New line
-}
-*/
-
 
 
 // CHAT REPORT
@@ -306,17 +298,19 @@ static void DoFailstatAlwaysConsoleReport(int client, int jumper, float distance
 static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 {
 	int minChatTier = GOKZ_JS_GetOption(client, JSOption_MinChatTier);
-	if (minChatTier == 0 || minChatTier > tier) // 0 means disabled
+	if ((minChatTier == 0 || minChatTier > tier) // 0 means disabled
+		 && GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled)
 	{
 		return;
 	}
 	
-	char typePostfix[3], color[16], blockStats[32], extBlockStats[32], 
-	releaseStats[32], edgeOffset[32], offsetEdge[32];
+	char typePostfix[3], color[16], blockStats[32], extBlockStats[32];
+	char releaseStats[32], edgeOffset[64], offsetEdge[32], missString[32];
 	
 	if (isFailstat)
 	{
-		if (GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled)
+		if (GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled
+			&& GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled)
 		{
 			return;
 		}
@@ -330,18 +324,31 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 	
 	if (jump.block > 0)
 	{
-		if (jump.type != JumpType_LadderJump)
-		{
-			FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetFloatChatString(client, "Edge", jump.edge));
-		}
 		FormatEx(blockStats, sizeof(blockStats), " | %s", GetFloatChatString(client, "Edge", jump.edge));
 		FormatEx(extBlockStats, sizeof(extBlockStats), " | %s", GetFloatChatString(client, "Deviation", jump.deviation));
 	}
 	
-	if (jump.type == JumpType_LongJump ||
-		jump.type == JumpType_LadderJump)
+	if (jump.miss > 0.0)
 	{
-		if (jump.releaseW >= 100)
+		FormatEx(missString, sizeof(missString), " | %s", GetFloatChatString(client, "Miss", jump.miss));
+	}
+	
+	if (jump.edge > 0.0)
+	{
+		if (jump.originalType == JumpType_LadderJump)
+		{
+			FormatEx(offsetEdge, sizeof(offsetEdge), " | %s", GetFloatChatString(client, "Edge", jump.edge));
+		}
+		else
+		{
+			FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetFloatChatString(client, "Edge", jump.edge));
+		}
+	}
+	
+	if (jump.originalType == JumpType_LongJump ||
+		jump.originalType == JumpType_LadderJump)
+	{
+		if (jump.releaseW >= 20 || jump.releaseW <= -20)
 		{
 			FormatEx(releaseStats, sizeof(releaseStats), " | {red}✗ {grey}W", GetReleaseChatString(client, "W Release", jump.releaseW));
 		}
@@ -355,10 +362,9 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 		FormatEx(releaseStats, sizeof(releaseStats), " | %s", GetReleaseChatString(client, "Crouch Release", jump.crouchRelease));
 	}
 	
-	if (jump.type == JumpType_LadderJump)
+	if (jump.originalType == JumpType_LadderJump)
 	{
-		FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetFloatChatString(client, "Ladder Offset", jump.offset));
-		FormatEx(offsetEdge, sizeof(offsetEdge), " | %s", GetFloatChatString(client, "Edge", jump.edge));
+		FormatEx(edgeOffset, sizeof(edgeOffset), " | %s", GetFloatChatString(client, "Offset Short", jump.offset));
 	}
 	else
 	{
@@ -368,7 +374,7 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 	GOKZ_PrintToChat(client, true, 
 		"%s%s%s{grey}: %s%.1f{grey} | %s | %s%s%s", 
 		color, 
-		gC_JumpTypesShort[jump.type], 
+		gC_JumpTypesShort[jump.originalType], 
 		typePostfix, 
 		color, 
 		jump.distance, 
@@ -380,13 +386,14 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 	if (GOKZ_JS_GetOption(client, JSOption_ExtendedChatReport) == JSToggleOption_Enabled)
 	{
 		GOKZ_PrintToChat(client, false, 
-			"%s | %s%s%s | %s | %s", 
+			"%s | %s%s%s | %s | %s%s", 
 			GetIntChatString(client, "Overlap", jump.overlap), 
 			GetIntChatString(client, "Dead Air", jump.deadair), 
 			offsetEdge, 
 			extBlockStats, 
 			GetWidthChatString(client, jump.width, jump.strafes), 
-			GetFloatChatString(client, "Height", jump.height));
+			GetFloatChatString(client, "Height", jump.height),
+			missString);
 	}
 }
 
@@ -470,27 +477,6 @@ static char[] GetIntChatString(int client, const char[] stat, int value)
 		value, stat, client);
 	return resultString;
 }
-
-/*
-static void DoFailstatAlwaysChatReport(int client, float distanceX, float distanceY, float edge, int strafes, float sync, float pre, float max, int releaseW, int crouchTicks, float width, int overlap, int deadair)
-{
-	if (GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled)
-	{
-		return;
-	}
-	
-	GOKZ_PrintToChat(client, true,
-		"{grey}FAIL: {lime}%.1f {grey}/ {lime}%.1f {grey}| {lime}%.1f {grey}Edge | {lime}%d {grey}Strafes ({lime}%.0f%%{grey}) | {lime}%.0f {grey}/ {lime}%.0f {grey}Speed | %s",
-		distanceX, distanceY, edge, strafes, sync, pre, max, GetWReleaseString(client, releaseW));
-	
-	if (GOKZ_JS_GetOption(client, JSOption_ExtendedChatReport) == JSToggleOption_Enabled)
-	{
-		GOKZ_PrintToChat(client, true,
-			"{lime}%d {grey}OL | {lime}%d {grey}DA | {lime}%d {grey}Crouched | {lime}%.1° {grey}Avg. Width",
-			overlap, deadair, crouchTicks, width);
-	}
-}
-*/
 
 
 

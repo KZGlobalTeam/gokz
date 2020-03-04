@@ -140,12 +140,15 @@ public void GOKZ_JS_OnFailstat(Jump jump)
 	OnFailstat_FailstatReporting(jump);
 }
 
-/*
-public void GOKZ_JS_OnFailstatAlways(Jump jump, float distanceX, float distanceY)
+public void GOKZ_JS_OnJumpstatAlways(Jump jump)
 {
-	OnFailstatAlways_FailstatAlwaysReporting(jump, distanceX, distanceY);
+	OnJumpstatAlways_JumpstatAlwaysReporting(jump);
 }
-*/
+
+public void GOKZ_JS_OnFailstatAlways(Jump jump)
+{
+	OnFailstatAlways_FailstatAlwaysReporting(jump);
+}
 
 public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost
 {
@@ -159,7 +162,7 @@ public void SDKHook_EndTouch_Callback(int client, int touched) // SDKHook_EndTou
 
 public void GOKZ_OnTeleport(int client)
 {
-	//OnTeleport_FailstatAlways(client);
+	OnTeleport_FailstatAlways(client);
 }
 
 

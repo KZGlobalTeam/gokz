@@ -62,7 +62,8 @@ static bool LoadDistanceTiers()
 		return false;
 	}
 	
-	for (int jumpType = 0; jumpType < sizeof(gC_JumpTypeKeys); jumpType++)
+	// It's a bit of a hack to exclude non-tiered jumptypes
+	for (int jumpType = 1; jumpType < sizeof(gC_JumpTypeKeys) - 2; jumpType++)
 	{
 		if (!kv.JumpToKey(gC_JumpTypeKeys[jumpType]))
 		{

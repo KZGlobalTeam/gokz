@@ -267,6 +267,7 @@ void OnTeleport_ValidJump(int client)
 	if (gB_OriginTeleported[client])
 	{
 		InvalidateJump(client);
+		Call_GOKZ_OnTeleport(client);
 	}
 }
 

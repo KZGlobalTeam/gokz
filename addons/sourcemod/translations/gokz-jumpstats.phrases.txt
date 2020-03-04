@@ -6,7 +6,7 @@
 		"en"		"Offset"
 		"chi"		"位移"
 	}
-	"Ladder Offset"
+	"Offset Short"
 	{
 		"en"		"Off"
 	}
@@ -70,6 +70,10 @@
 	{
 		"en"		"Edge"
 	}
+	"Edge Short"
+	{
+		"en"		"E"
+	}
 	"Deviation"
 	{
 		"en"		"Deviation"
@@ -94,6 +98,10 @@
 	{
 		"en"		"C"
 	}
+	"Miss"
+	{
+		"en"		"Miss"
+	}
 
 
 	// =====[ CHAT MESSAGES ]=====
@@ -113,6 +121,14 @@
 	{
 		"en"		"{grey}You have disabled all jumpstats reporting."
 		"chi"		"{grey}已关闭起跳数据."
+	}
+	"Jumpstats Option - Jumpstats Always - Enable"
+	{
+		"en"		"{grey}You have enabled the always-on jumpstats."
+	}
+	"Jumpstats Option - Jumpstats Always - Disable"
+	{
+		"en"		"{grey}You have disabled the always-on jumpstats."
 	}
 
 
@@ -203,9 +219,9 @@
 	{
 		"en"		"Failstats Chat Report"
 	}
-	"Options Menu - Failstats Always"
+	"Options Menu - Jumpstats Always"
 	{
-		"en"		"Always Print Failstats"
+		"en"		"Always Print Jumpstats"
 	}
 	"Options Menu - Minimal Jump Chat Broadcast Tier"
 	{

@@ -81,7 +81,7 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 			option == JSOption_ExtendedChatReport ||
 			option == JSOption_FailstatsConsole ||
 			option == JSOption_FailstatsChat ||
-			option == JSOption_FailstatsAlways)
+			option == JSOption_JumpstatsAlways)
 		{
 			FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}

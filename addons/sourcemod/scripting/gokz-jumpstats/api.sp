@@ -1,7 +1,8 @@
 static GlobalForward H_OnTakeoff;
 static GlobalForward H_OnLanding;
 static GlobalForward H_OnFailstat;
-//static GlobalForward H_OnFailstatAlways;
+static GlobalForward H_OnJumpstatAlways;
+static GlobalForward H_OnFailstatAlways;
 static GlobalForward H_OnJumpInvalidated;
 
 
@@ -13,7 +14,8 @@ void CreateGlobalForwards()
 	H_OnTakeoff = new GlobalForward("GOKZ_JS_OnTakeoff", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnLanding = new GlobalForward("GOKZ_JS_OnLanding", ET_Ignore, Param_Array);
 	H_OnFailstat = new GlobalForward("GOKZ_JS_OnFailstat", ET_Ignore, Param_Array);
-	//H_OnFailstatAlways = new GlobalForward("GOKZ_JS_OnFailstatAlways", ET_Ignore, Param_Array, Param_Float, Param_Float);
+	H_OnJumpstatAlways = new GlobalForward("GOKZ_JS_OnJumpstatAlways", ET_Ignore, Param_Array);
+	H_OnFailstatAlways = new GlobalForward("GOKZ_JS_OnFailstatAlways", ET_Ignore, Param_Array);
 	H_OnJumpInvalidated = new GlobalForward("GOKZ_JS_OnJumpInvalidated", ET_Ignore, Param_Cell);
 }
 
@@ -46,16 +48,19 @@ void Call_OnFailstat(Jump jump)
 	Call_Finish();
 }
 
-/*
-void Call_OnFailstatAlways(Jump jump, float distanceX, float distanceY)
+void Call_OnJumpstatAlways(Jump jump)
+{
+	Call_StartForward(H_OnJumpstatAlways);
+	Call_PushArray(jump, sizeof(jump));
+	Call_Finish();
+}
+
+void Call_OnFailstatAlways(Jump jump)
 {
 	Call_StartForward(H_OnFailstatAlways);
 	Call_PushArray(jump, sizeof(jump));
-	Call_PushFloat(distanceX);
-	Call_PushFloat(distanceY);
 	Call_Finish();
 }
-*/
 
 
 
