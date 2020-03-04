@@ -92,15 +92,9 @@ bool GotoPlayer(int client, int target, bool printMessage = true)
 	Movement_GetOrigin(target, targetOrigin);
 	Movement_GetEyeAngles(target, targetAngles);
 	
-	// Leave spectators if necessary
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
-	{
-		CS_SwitchTeam(client, CS_TEAM_T);
-	}
-	// Respawn the player if necessary
 	if (!IsPlayerAlive(client))
 	{
-		CS_RespawnPlayer(client);
+		GOKZ_RespawnPlayer(client);
 	}
 	
 	TeleportPlayer(client, targetOrigin, targetAngles);

@@ -135,10 +135,16 @@ void OnTimerStart_JoinTeam(int client)
 	hasSavedPosition[client] = false;
 }
 
-void JoinTeam(int client, int newTeam)
+void JoinTeam(int client, int newTeam, bool restorePos)
 {
 	KZPlayer player = KZPlayer(client);
 	int currentTeam = GetClientTeam(client);
+
+	// Don't use CS_TEAM_NONE
+	if (newTeam == CS_TEAM_NONE)
+	{
+		newTeam = CS_TEAM_SPECTATOR;
+	}
 	
 	if (newTeam == CS_TEAM_SPECTATOR && currentTeam != CS_TEAM_SPECTATOR)
 	{
@@ -159,7 +165,7 @@ void JoinTeam(int client, int newTeam)
 		ForcePlayerSuicide(client);
 		CS_SwitchTeam(client, newTeam);
 		CS_RespawnPlayer(client);
-		if (hasSavedPosition[client])
+		if (restorePos && hasSavedPosition[client])
 		{
 			player.SetOrigin(savedOrigin[client]);
 			player.SetEyeAngles(savedAngles[client]);
@@ -167,12 +173,12 @@ void JoinTeam(int client, int newTeam)
 			{
 				player.Movetype = MOVETYPE_LADDER;
 			}
-			hasSavedPosition[client] = false;
 		}
 		else
 		{
 			player.StopTimer();
 		}
+		hasSavedPosition[client] = false;
 		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
 }

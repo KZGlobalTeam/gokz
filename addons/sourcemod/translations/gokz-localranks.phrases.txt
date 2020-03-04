@@ -326,9 +326,9 @@
 		"en"		"{grey}You missed your best {yellow}NUB{grey}/{blue}PRO {grey}time ({lightred}{1}{grey})."
 		"chi"		"{grey}你比个人最佳{yellow}读点{grey}/{blue}裸跳记录{grey}慢了(个人记录:{lightred}{1}{grey})."
 	}
-	"No Jumpstat Record Found"
+	"No Jumpstats Found"
 	{
-		"en"		"No record found."
+		"en"		"{grey}No jumpstats were found!"
 	}
 	"Jump Record"
 	{

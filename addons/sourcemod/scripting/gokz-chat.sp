@@ -168,7 +168,7 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 		return;
 	}
 	
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
+	if (IsSpectating(client))
 	{
 		GOKZ_PrintToChatAll(false, "{default}* {lime}%s{default} : %s", sanitisedName, sanitisedMessage);
 		PrintToConsoleAll("* %s : %s", sanitisedName, sanitisedMessage);

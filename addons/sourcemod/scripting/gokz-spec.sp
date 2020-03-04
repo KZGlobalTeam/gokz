@@ -86,11 +86,6 @@ bool Spectate(int client)
 		return false;
 	}
 	
-	if (GetClientTeam(client) == CS_TEAM_SPECTATOR)
-	{
-		return false;
-	}
-	
 	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
 	return true;
 }
@@ -236,7 +231,7 @@ public Action CommandSpecs(int client, int args)
 	
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (IsClientInGame(i) && !IsFakeClient(i) && GetClientTeam(i) == CS_TEAM_SPECTATOR)
+		if (IsClientInGame(i) && !IsFakeClient(i) && IsSpectating(i))
 		{
 			specs++;
 			if (specs == 1)

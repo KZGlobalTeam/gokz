@@ -130,4 +130,4 @@ Many of these commands return results for your currently selected mode.
 
 ### gokz-localranks
 
- * `!updatemappool` - Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.
+ * `!updatemappool` - Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/gokz-localranks-mappool.cfg.
