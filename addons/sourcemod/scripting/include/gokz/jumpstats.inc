@@ -46,6 +46,7 @@ enum
 	DistanceTier_Perfect, 
 	DistanceTier_Godlike, 
 	DistanceTier_Ownage, 
+	DistanceTier_Wrecker,
 	DISTANCETIER_COUNT
 };
 
@@ -146,7 +147,8 @@ stock char gC_DistanceTiers[DISTANCETIER_COUNT][] =
 	"Impressive", 
 	"Perfect", 
 	"Godlike", 
-	"Ownage"
+	"Ownage",
+	"Wrecker"
 };
 
 stock char gC_DistanceTierKeys[DISTANCETIER_COUNT][] = 
@@ -156,7 +158,8 @@ stock char gC_DistanceTierKeys[DISTANCETIER_COUNT][] =
 	"impressive", 
 	"perfect", 
 	"godlike", 
-	"ownage"
+	"ownage",
+	"wrecker"
 };
 
 stock char gC_DistanceTierChatColours[DISTANCETIER_COUNT][] = 
@@ -166,7 +169,8 @@ stock char gC_DistanceTierChatColours[DISTANCETIER_COUNT][] =
 	"{blue}", 
 	"{green}", 
 	"{darkred}", 
-	"{gold}"
+	"{gold}",
+	"{orchid}"
 };
 
 stock char gC_JSOptionNames[JSOPTION_COUNT][] = 
@@ -186,15 +190,15 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 
 {
 	"Master Switch for All Jumpstats Functionality - 0 = Disabled, 1 = Enabled", 
-	"Minimum Tier for Jumpstats Chat Report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
-	"Minimum Tier for Jumpstats Console report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
-	"Minimum Tier for Jumpstats Sounds - 0 = Disabled, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage", 
+	"Minimum Tier for Jumpstats Chat Report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker", 
+	"Minimum Tier for Jumpstats Console report - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker", 
+	"Minimum Tier for Jumpstats Sounds - 0 = Disabled, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker", 
 	"Print Failstats To Console - 0 = Disabled, 1 = Enabled", 
 	"Print Failstats To Chat - 0 = Disabled, 1 = Enabled", 
 	"Always show jumpstats, even for invalid jumps - 0 = Disabled, 1 = Enabled", 
 	"Extended Chat Report - 0 = Disabled, 1 = Enabled",
-	"Minimum Jump Tier for Jumpstat Chat Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage",
-	"Minimum Jump Tier for Jumpstat Sound Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage"
+	"Minimum Jump Tier for Jumpstat Chat Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker",
+	"Minimum Jump Tier for Jumpstat Sound Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker"
 };
 
 stock char gI_JSOptionPhrases[JSOPTION_COUNT][] = 
