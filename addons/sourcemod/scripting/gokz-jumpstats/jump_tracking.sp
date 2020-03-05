@@ -112,13 +112,13 @@ enum struct JumpTracker
 	void Begin()
 	{
 		// Initialize stats
+		this.CalcTakeoff();
+		this.AdjustLowpreJumptypes();
+		
 		this.failstatBlockDetected = this.jump.type != JumpType_LadderJump;
 		this.failstatFailed = false;
 		this.failstatValid = false;
 		this.failstatBlockHeight = this.takeoffOrigin[2];
-		
-		this.CalcTakeoff();
-		this.AdjustLowpreJumptypes();
 		
 		// Store the original type for the always stats
 		this.jump.originalType = this.jump.type;
