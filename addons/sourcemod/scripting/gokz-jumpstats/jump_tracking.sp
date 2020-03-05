@@ -61,7 +61,8 @@ enum struct JumpTracker
 	int syncTicks;
 	int crouchReleaseTick;
 	bool failstatBlockDetected;
-	bool failstatCalculcated;
+	bool failstatFailed;
+	bool failstatValid;
 	float failstatBlockHeight;
 	float takeoffOrigin[3];
 	float takeoffVelocity[3];
@@ -112,7 +113,8 @@ enum struct JumpTracker
 	{
 		// Initialize stats
 		this.failstatBlockDetected = this.jump.type != JumpType_LadderJump;
-		this.failstatCalculcated = false;
+		this.failstatFailed = false;
+		this.failstatValid = false;
 		this.failstatBlockHeight = this.takeoffOrigin[2];
 		
 		this.CalcTakeoff();
@@ -460,6 +462,12 @@ enum struct JumpTracker
 		int coordDist, distSign;
 		float failstatPosition[3], block[3], traceStart[3];
 		
+		// There's no point in going further if we're already done
+		if (this.failstatValid || this.failstatFailed)
+		{
+			return;
+		}
+		
 		// Get the coordinate system orientation.
 		GetCoordOrientation(this.position, this.takeoffOrigin, coordDist, distSign);
 		
@@ -483,7 +491,7 @@ enum struct JumpTracker
 			if (!TraceHullPosition(traceStart, block, playerMins, playerMaxs, block))
 			{
 				// Mark the calculation as failed
-				this.failstatCalculcated = true;
+				this.failstatFailed = true;
 				return;
 			}
 			
@@ -492,14 +500,14 @@ enum struct JumpTracker
 			this.failstatBlockHeight = this.FindBlockHeight(block, float(distSign) * 17.0, coordDist, 10.0) - 0.031250;
 		}
 		
-		// Only do that calculation once.
-		if (this.position[2] >= this.failstatBlockHeight || this.failstatCalculcated)
+		// Only do the calculation once we're below the block level
+		if (this.position[2] >= this.failstatBlockHeight)
 		{
+			// We need that cause we can duck after getting lower than the failstat
+			// height and still make the block.
+			this.failstatValid = false;
 			return;
 		}
-		
-		// Mark the calculation as done.
-		this.failstatCalculcated = true;
 		
 		// Calculate the true origin where the player would have hit the ground.
 		this.GetFailOrigin(this.failstatBlockHeight, failstatPosition, -1);
@@ -534,6 +542,7 @@ enum struct JumpTracker
 		}
 		else
 		{
+			this.failstatFailed = true;
 			return;
 		}
 		
@@ -546,9 +555,13 @@ enum struct JumpTracker
 			
 			// Call the callback for the reporting.
 			Call_OnFailstat(this.jump);
-			
-			// Fully invalidate the jump so the always failstats don't trigger.
-			this.jump.type = JumpType_FullInvalid;
+		
+			// Mark the calculation as successful
+			this.failstatValid = true;
+		}
+		else
+		{
+			this.failstatFailed = true;
 		}
 	}
 	
@@ -640,7 +653,7 @@ enum struct JumpTracker
 		float traceStart[3], traceEnd[3], tracePos[3], landingPos[3], orientation[3], failOrigin[3];
 		
 		// Check whether the jump was already handled
-		if (this.jump.type == JumpType_FullInvalid)
+		if (this.jump.type == JumpType_FullInvalid || this.failstatValid)
 		{
 			return;
 		}
