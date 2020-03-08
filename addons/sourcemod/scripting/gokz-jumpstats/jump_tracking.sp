@@ -157,7 +157,7 @@ enum struct JumpTracker
 		{
 			return;
 		}
-	
+
 		// Measure last tick of jumpstat
 		this.Update();
 		
@@ -218,17 +218,18 @@ enum struct JumpTracker
 			// construct a takeoff origin
 			float height = this.takeoffOrigin[2];
 			Movement_GetOrigin(this.jumper, this.takeoffOrigin);
-			this.takeoffOrigin[2] = height; 
+			Movement_GetVelocity(this.jumper, this.takeoffVelocity);
+			this.takeoffOrigin[2] = height;
 		}
 		else
 		{
 			Movement_GetTakeoffOrigin(this.jumper, this.takeoffOrigin);
+			Movement_GetTakeoffVelocity(this.jumper, this.takeoffVelocity);
 		}
 		
 		// Correct the takeoff speed and velocity
 		this.jump.preSpeed = GOKZ_GetTakeoffSpeed(this.jumper);
 		poseHistory[this.jumper][0].speed = this.jump.preSpeed;
-		Movement_GetVelocity(this.jumper, this.takeoffVelocity);
 	}
 	
 	void AdjustLowpreJumptypes()

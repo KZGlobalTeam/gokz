@@ -196,7 +196,9 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	if (jumpbug)
 	{
 		player.GOKZHitPerf = true;
-		player.GOKZTakeoffSpeed = player.Speed;
+		
+		// That's an awful hack, but I couldn't reasonably get it to work otherwise
+		player.GOKZTakeoffSpeed = FloatMin(player.Speed, 286.0);
 	}
 }
 
