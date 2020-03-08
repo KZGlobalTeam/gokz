@@ -53,6 +53,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-jumpstats.phrases");
 	
+	LoadBroadcastTiers();
 	CreateGlobalForwards();
 	RegisterCommands();
 }

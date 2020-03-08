@@ -38,6 +38,35 @@ float GetDistanceTierDistance(int jumpType, int mode, int tier)
 	return distanceTiers[jumpType][mode][tier];
 }
 
+bool LoadBroadcastTiers()
+{
+	char chatTier[16], soundTier[16];
+
+	KeyValues kv = new KeyValues("broadcast");
+	if (!kv.ImportFromFile(JS_CFG_BROADCAST))
+	{
+		return false;
+	}
+	
+	kv.GetString("chat", chatTier, sizeof(chatTier), "ownage");
+	kv.GetString("sound", soundTier, sizeof(chatTier), "");
+	
+	for (int tier = 0; tier < sizeof(gC_DistanceTierKeys); tier++)
+	{
+		if (StrEqual(chatTier, gC_DistanceTierKeys[tier]))
+		{
+			gI_JSOptionDefaults[JSOption_MinChatBroadcastTier] = tier;
+		}
+		if (StrEqual(soundTier, gC_DistanceTierKeys[tier]))
+		{
+			gI_JSOptionDefaults[JSOption_MinSoundBroadcastTier] = tier;
+		}
+	}
+	
+	delete kv;
+	return true;
+}
+
 
 
 // =====[ EVENTS ]=====
