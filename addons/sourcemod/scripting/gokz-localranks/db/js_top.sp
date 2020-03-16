@@ -10,18 +10,21 @@ void DB_GetJumpTop(int client)
 	char query[1024];
 	
 	Transaction txn = SQL_CreateTransaction();
+
 	FormatEx(query, sizeof(query), sql_jumpstats_gettop, jumpTopType[client], jumpTopMode[client], jumpTopBlockType[client], jumpTopType[client], jumpTopMode[client], jumpTopBlockType[client], JS_TOP_RECORD_COUNT);
 	txn.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_GetJumpTop, DB_TxnFailure_Generic, client, DBPrio_Low);
+
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_GetJumpTop, DB_TxnFailure_Generic, GetClientUserId(client), DBPrio_Low);
 }
 
-void DB_TxnSuccess_GetJumpTop(Handle db, int client, int numQueries, Handle[] results, any[] queryData)
+void DB_TxnSuccess_GetJumpTop(Handle db, int userID, int numQueries, Handle[] results, any[] queryData)
 {
+	int client = GetClientOfUserId(userID);
 	if (!IsValidClient(client))
 	{
 		return;
 	}
-	
+
 	int rows = SQL_GetRowCount(results[0]);
 	if (rows == 0)
 	{
