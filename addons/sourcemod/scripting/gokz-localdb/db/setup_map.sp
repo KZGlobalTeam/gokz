@@ -13,7 +13,10 @@ void DB_SetupMap()
 	
 	char map[PLATFORM_MAX_PATH];
 	GetCurrentMapDisplayName(map, sizeof(map));
-	
+
+	char escapedMap[PLATFORM_MAX_PATH * 2 + 1];
+	SQL_EscapeString(gH_DB, map, escapedMap, sizeof(escapedMap));
+
 	Transaction txn = SQL_CreateTransaction();
 	
 	// Insert/Update map into database
@@ -22,23 +25,23 @@ void DB_SetupMap()
 		case DatabaseType_SQLite:
 		{
 			// UPDATE OR IGNORE
-			FormatEx(query, sizeof(query), sqlite_maps_update, map);
+			FormatEx(query, sizeof(query), sqlite_maps_update, escapedMap);
 			txn.AddQuery(query);
 			// INSERT OR IGNORE
-			FormatEx(query, sizeof(query), sqlite_maps_insert, map);
+			FormatEx(query, sizeof(query), sqlite_maps_insert, escapedMap);
 			txn.AddQuery(query);
 		}
 		case DatabaseType_MySQL:
 		{
 			// INSERT ... ON DUPLICATE KEY ...
-			FormatEx(query, sizeof(query), mysql_maps_upsert, map);
+			FormatEx(query, sizeof(query), mysql_maps_upsert, escapedMap);
 			txn.AddQuery(query);
 		}
 	}
 	// Retrieve mapID of map name
-	FormatEx(query, sizeof(query), sql_maps_findid, map, map);
+	FormatEx(query, sizeof(query), sql_maps_findid, escapedMap, escapedMap);
 	txn.AddQuery(query);
-	
+
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetupMap, DB_TxnFailure_Generic, 0, DBPrio_High);
 }
 
