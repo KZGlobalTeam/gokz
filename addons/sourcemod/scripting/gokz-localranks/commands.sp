@@ -366,37 +366,37 @@ public Action CommandUpdateMapPool(int client, int args)
 
 public Action CommandLJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_LongJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_LongJump);
 	return Plugin_Handled;
 }
 
 public Action CommandBHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_Bhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_Bhop);
 	return Plugin_Handled;
 }
 
 public Action CommandMBHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_MultiBhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_MultiBhop);
 	return Plugin_Handled;
 }
 
 public Action CommandWJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_WeirdJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_WeirdJump);
 	return Plugin_Handled;
 }
 
 public Action CommandLAJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_LadderJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_LadderJump);
 	return Plugin_Handled;
 }
 
 public Action CommandLAHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_Ladderhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_Ladderhop);
 	return Plugin_Handled;
 }
 
@@ -410,9 +410,9 @@ void DisplayJumpstatRecordCommand(int client, int args, int jumpType)
 {
 	if (args >= 1)
 	{
-		char argMap[33];
-		GetCmdArg(1, argMap, sizeof(argMap));
-		DisplayJumpstatRecord(client, jumpType, argMap);
+		char argAlias[33];
+		GetCmdArg(1, argAlias, sizeof(argAlias));
+		DisplayJumpstatRecord(client, jumpType, argAlias);
 	}
 	else
 	{
