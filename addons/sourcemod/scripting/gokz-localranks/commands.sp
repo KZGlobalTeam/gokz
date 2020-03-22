@@ -17,12 +17,12 @@ void RegisterCommands()
 	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 
-	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show your Long Jump personal best in chat.");
-	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show your Bunnyhop personal best in chat.");
-	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show your Multi Bunnyhop personal best in chat.");
-	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show your Weird Jump personal best in chat.");
-	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show your Ladder Jump personal best in chat.");
-	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show your Ladderhop personal best in chat.");
+	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show PB Long Jump in chat. Usage: !ljpb <jumper>");
+	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show PB Bunnyhop in chat. Usage: !bhpb <jumper>");
+	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show PB Multi Bunnyhop in chat. Usage: !mbhpb <jumper>");
+	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show PB Weird Jump in chat. Usage: !wjpb <jumper>");
+	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show PB Ladder Jump in chat. Usage: !lajpb <jumper>");
+	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show PB Ladderhop in chat. Usage: !lahpb <jumper>");
 	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 
@@ -410,9 +410,9 @@ void DisplayJumpstatRecordCommand(int client, int args, int jumpType)
 {
 	if (args >= 1)
 	{
-		char argAlias[33];
-		GetCmdArg(1, argAlias, sizeof(argAlias));
-		DisplayJumpstatRecord(client, jumpType, argAlias);
+		char argJumper[33];
+		GetCmdArg(1, argJumper, sizeof(argJumper));
+		DisplayJumpstatRecord(client, jumpType, argJumper);
 	}
 	else
 	{
