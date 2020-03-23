@@ -100,12 +100,12 @@ Many of these commands return results for your currently selected mode.
  * `!pc` - Show course completion in chat. Usage: `!pc <player>`
  * `!rr`/`!latest` - Open a menu showing recently broken records.
  * `!jumptop`/`!jstop` - Open a menu showing the top jumpstats.
- * `!ljpb` - Show your Long Jump personal best in chat.
- * `!bhpb` - Show your Bunnyhop personal best in chat.
- * `!mbhpb` - Show your Multi Bunnyhop personal best in chat.
- * `!wjpb` - Show your Weird Jump personal best in chat.
- * `!lajpb` - Show your Ladder Jump personal best in chat.
- * `!lahpb` - Show your Ladderhop personal best in chat.
+ * `!ljpb` - Show PB Long Jump in chat. Usage: `!ljpb <jumper>`
+ * `!bhpb` - Show PB Bunnyhop in chat. Usage: `!bhpb <jumper>`
+ * `!mbhpb` - Show PB Multi Bunnyhop in chat. Usage: `!mbhpb <jumper>`
+ * `!wjpb` - Show PB Weird Jump in chat. Usage: `!wjpb <jumper>`
+ * `!lajpb` - Show PB Ladder Jump in chat. Usage: `!lajpb <jumper>`
+ * `!lahpb` - Show PB Ladderhop in chat. Usage: `!lahpb <jumper>`
 
 ### gokz-global
 
@@ -130,4 +130,4 @@ Many of these commands return results for your currently selected mode.
 
 ### gokz-localranks
 
- * `!updatemappool` - Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.
+ * `!updatemappool` - Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/gokz-localranks-mappool.cfg.

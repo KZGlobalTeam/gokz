@@ -16,17 +16,17 @@ void RegisterCommands()
 	RegConsoleCmd("sm_pc", CommandPC, "[KZ] Show course completion in chat. Usage: !pc <player>");
 	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
-	
-	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show your Long Jump personal best in chat.");
-	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show your Bunnyhop personal best in chat.");
-	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show your Multi Bunnyhop personal best in chat.");
-	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show your Weird Jump personal best in chat.");
-	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show your Ladder Jump personal best in chat.");
-	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show your Ladderhop personal best in chat.");
+
+	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show PB Long Jump in chat. Usage: !ljpb <jumper>");
+	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show PB Bunnyhop in chat. Usage: !bhpb <jumper>");
+	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show PB Multi Bunnyhop in chat. Usage: !mbhpb <jumper>");
+	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show PB Weird Jump in chat. Usage: !wjpb <jumper>");
+	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show PB Ladder Jump in chat. Usage: !lajpb <jumper>");
+	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show PB Ladderhop in chat. Usage: !lahpb <jumper>");
 	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
-	
-	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/mappool.cfg.");
+
+	RegAdminCmd("sm_updatemappool", CommandUpdateMapPool, ADMFLAG_ROOT, "[KZ] Update the ranked map pool with the list of maps in cfg/sourcemod/gokz/gokz-localranks-mappool.cfg.");
 }
 
 public Action CommandTop(int client, int args)
@@ -35,7 +35,7 @@ public Action CommandTop(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	DisplayPlayerTopModeMenu(client);
 	return Plugin_Handled;
 }
@@ -46,7 +46,7 @@ public Action CommandMapTop(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Open map top for current map
 		DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), 0);
@@ -66,9 +66,9 @@ public Action CommandBMapTop(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
-	{  // Open Bonus 1 top for current map	
+	{  // Open Bonus 1 top for current map
 		DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), 1);
 	}
 	else if (args == 1)
@@ -109,7 +109,7 @@ public Action CommandPB(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Print their PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetCoreOption(client, Option_Mode));
@@ -136,7 +136,7 @@ public Action CommandBPB(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Print their Bonus 1 PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetCoreOption(client, Option_Mode));
@@ -195,7 +195,7 @@ public Action CommandWR(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Print record times for current map and their current mode
 		DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetCoreOption(client, Option_Mode));
@@ -219,7 +219,7 @@ public Action CommandBWR(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Print Bonus 1 record times for current map and their current mode
 		DB_PrintRecords(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetCoreOption(client, Option_Mode));
@@ -270,7 +270,7 @@ public Action CommandAVG(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Print average times for current map and their current mode
 		DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetCoreOption(client, Option_Mode));
@@ -290,7 +290,7 @@ public Action CommandBAVG(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args == 0)
 	{  // Print Bonus 1 average times for current map and their current mode
 		DB_PrintAverage(client, GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetCoreOption(client, Option_Mode));
@@ -333,7 +333,7 @@ public Action CommandPC(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	if (args < 1)
 	{
 		DB_GetCompletion(client, GetSteamAccountID(client), GOKZ_GetCoreOption(client, Option_Mode), true);
@@ -353,7 +353,7 @@ public Action CommandRecentRecords(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	
+
 	// Open recent records for the player's selected mode
 	DisplayRecentRecordsMenu(client, GOKZ_GetCoreOption(client, Option_Mode));
 	return Plugin_Handled;
@@ -366,37 +366,37 @@ public Action CommandUpdateMapPool(int client, int args)
 
 public Action CommandLJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_LongJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_LongJump);
 	return Plugin_Handled;
 }
 
 public Action CommandBHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_Bhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_Bhop);
 	return Plugin_Handled;
 }
 
 public Action CommandMBHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_MultiBhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_MultiBhop);
 	return Plugin_Handled;
 }
 
 public Action CommandWJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_WeirdJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_WeirdJump);
 	return Plugin_Handled;
 }
 
 public Action CommandLAJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_LadderJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_LadderJump);
 	return Plugin_Handled;
 }
 
 public Action CommandLAHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_Ladderhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_Ladderhop);
 	return Plugin_Handled;
 }
 
@@ -410,9 +410,9 @@ void DisplayJumpstatRecordCommand(int client, int args, int jumpType)
 {
 	if (args >= 1)
 	{
-		char argMap[33];
-		GetCmdArg(1, argMap, sizeof(argMap));
-		DisplayJumpstatRecord(client, jumpType, argMap);
+		char argJumper[33];
+		GetCmdArg(1, argJumper, sizeof(argJumper));
+		DisplayJumpstatRecord(client, jumpType, argJumper);
 	}
 	else
 	{
@@ -436,8 +436,8 @@ bool IsSpammingCommands(int client, bool printMessage = true)
 		}
 		return true;
 	}
-	
+
 	// Not spamming commands - all good!
 	lastCommandTime[client] = currentTime;
 	return false;
-} 
+}
