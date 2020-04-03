@@ -1186,7 +1186,7 @@ void OnOptionChanged_JumpTracking(int client, const char[] option)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]))
 	{
-		jumpTrackers[client].Invalidate();
+		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
 }
 
@@ -1252,7 +1252,7 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons)
 	
 	// Don't bother checking if player is already in air and jumpstat is already invalid
 	if (Movement_GetOnGround(client) ||
-		jumpTrackers[client].jump.type != JumpType_Invalid)
+		jumpTrackers[client].jump.type != JumpType_FullInvalid)
 	{
 		UpdateValidCmd(client, buttons);
 	}
@@ -1324,6 +1324,11 @@ static void UpdateValidCmd(int client, int buttons)
 	{
 		validCmd[client] = true;
 	}
+	
+	if (CheckNoclip(client))
+	{
+		jumpTrackers[client].jump.type = JumpType_FullInvalid;
+	}
 }
 
 static bool CheckGravity(int client)
@@ -1360,6 +1365,11 @@ static bool CheckTurnButtons(int buttons)
 {
 	// Don't allow +left or +right turns binds
 	return !(buttons & (IN_LEFT | IN_RIGHT));
+}
+
+static bool CheckNoclip(int client)
+{
+	return Movement_GetMovetype(client) == MOVETYPE_NOCLIP;
 }
 
 
