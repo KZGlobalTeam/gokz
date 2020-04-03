@@ -60,8 +60,9 @@ enum struct JumpTracker
 	int lastJumpTick;
 	int lastType;
 	int lastWPressedTick;
+	int nextCrouchRelease;
 	int syncTicks;
-	int crouchReleaseTick;
+	int lastCrouchPressedTick;
 	bool failstatBlockDetected;
 	bool failstatFailed;
 	bool failstatValid;
@@ -74,6 +75,7 @@ enum struct JumpTracker
 	{
 		this.jumper = jumper;
 		this.jump.jumper = jumper;
+		this.nextCrouchRelease = 100;
 	}
 	
 	
@@ -88,7 +90,7 @@ enum struct JumpTracker
 		
 		// We need this for weirdjump w-release
 		int releaseWTemp = this.jump.releaseW;
-	
+		
 		// Reset all stats
 		this.jump = emptyJump;
 		this.jump.type = this.lastType;
@@ -96,16 +98,16 @@ enum struct JumpTracker
 		this.syncTicks = 0;
 		this.strafeDirection = StrafeDirection_None;
 		this.jump.releaseW = 100;
-		this.crouchReleaseTick = 0;
+		
+		// We have to show this on the jumpbug stat, not the lj stat
+		this.jump.crouchRelease = this.nextCrouchRelease;
+		this.nextCrouchRelease = 100;
 		
 		// Handle weirdjump w-release
 		if (this.jump.type == JumpType_WeirdJump)
 		{
 			this.jump.releaseW = releaseWTemp;
 		}
-		
-		// You have to release crouch 3 ticks before landing
-		this.jump.crouchRelease = this.crouchReleaseTick - Movement_GetLandingTick(this.jumper) - 3;
 		
 		// Reset pose history
 		this.poseIndex = 0;
@@ -144,7 +146,6 @@ enum struct JumpTracker
 		this.syncTicks += speed > pose(-1).speed ? 1 : 0;
 		this.jump.durationTicks++;
 		
-		this.UpdateCrouchRelease();
 		this.UpdateStrafes();
 		this.UpdateFailstat();
 		this.UpdatePoseStats();
@@ -379,7 +380,7 @@ enum struct JumpTracker
 		this.UpdatePose(poseHistory[this.jumper][0]);
 	}
 	
-	void UpdateWRelease()
+	void UpdateRelease()
 	{
 		// We also check IN_BACK cause that happens for backwards ladderjumps
 		if (Movement_GetButtons(this.jumper) & IN_FORWARD ||
@@ -391,17 +392,15 @@ enum struct JumpTracker
 		{
 			this.jump.releaseW = this.lastWPressedTick - this.jumpoffTick;
 		}
-	}
-	
-	void UpdateCrouchRelease()
-	{
+		
 		if (Movement_GetButtons(this.jumper) & IN_DUCK)
 		{
-			this.crouchReleaseTick = 0;
+			this.lastCrouchPressedTick = GetGameTickCount();
+			this.nextCrouchRelease = 100;
 		}
-		else if (this.crouchReleaseTick == 0)
+		else if (this.nextCrouchRelease > 99)
 		{
-			this.crouchReleaseTick = GetGameTickCount();
+			this.nextCrouchRelease = this.lastCrouchPressedTick - this.jumpoffTick - 95;
 		}
 	}
 	
@@ -1305,7 +1304,7 @@ public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 	}
 	
 	// We always have to track this, no matter if in the air or not
-	jumpTrackers[client].UpdateWRelease();
+	jumpTrackers[client].UpdateRelease();
 }
 
 
