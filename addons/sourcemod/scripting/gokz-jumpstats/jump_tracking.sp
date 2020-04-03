@@ -26,6 +26,8 @@ static int entityTouchCount[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
+static const float playerMinsEx[3] = { -20.0, -20.0, 0.0 };
+static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
 static bool beginJumpstat[MAXPLAYERS + 1];
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
@@ -1009,7 +1011,7 @@ enum struct JumpTracker
 		traceEnd[2] = this.takeoffOrigin[2] - 10;
 		
 		// Search for the ladder
-		if (!TraceHullPosition(traceOrigin, traceEnd, playerMins, playerMaxs, ladderTop)
+		if (!TraceHullPosition(traceOrigin, traceEnd, playerMinsEx, playerMaxsEx, ladderTop)
 			|| FloatAbs(ladderTop[2] - landingHeight - 0.031250) > EPSILON)
 		{
 			this.Invalidate();
@@ -1138,7 +1140,7 @@ bool TraceRayPosition(const float traceStart[3], const float traceEnd[3], float 
 	return false;
 }
 
-bool TraceRayNormal(const float traceStart[3], const float traceEnd[3], float rayNormal[3])
+static bool TraceRayNormal(const float traceStart[3], const float traceEnd[3], float rayNormal[3])
 {
 	Handle trace = TR_TraceRayFilterEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint, TraceEntityFilterPlayers);
 	if (TR_DidHit(trace))
@@ -1151,7 +1153,7 @@ bool TraceRayNormal(const float traceStart[3], const float traceEnd[3], float ra
 	return false;
 }
 
-bool TraceRayPositionNormal(const float traceStart[3], const float traceEnd[3], float position[3], float rayNormal[3])
+static bool TraceRayPositionNormal(const float traceStart[3], const float traceEnd[3], float position[3], float rayNormal[3])
 {
 	Handle trace = TR_TraceRayFilterEx(traceStart, traceEnd, MASK_PLAYERSOLID, RayType_EndPoint, TraceEntityFilterPlayers);
 	if (TR_DidHit(trace))
@@ -1165,7 +1167,7 @@ bool TraceRayPositionNormal(const float traceStart[3], const float traceEnd[3], 
 	return false;
 }
 
-bool TraceHullPosition(const float traceStart[3], const float traceEnd[3], const float mins[3], const float maxs[3], float position[3])
+static bool TraceHullPosition(const float traceStart[3], const float traceEnd[3], const float mins[3], const float maxs[3], float position[3])
 {
 	Handle trace = TR_TraceHullFilterEx(traceStart, traceEnd, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	if (TR_DidHit(trace))
