@@ -17,12 +17,12 @@ void RegisterCommands()
 	RegConsoleCmd("sm_rr", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 	RegConsoleCmd("sm_latest", CommandRecentRecords, "[KZ] Open a menu showing recently broken records.");
 
-	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show your Long Jump personal best in chat.");
-	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show your Bunnyhop personal best in chat.");
-	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show your Multi Bunnyhop personal best in chat.");
-	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show your Weird Jump personal best in chat.");
-	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show your Ladder Jump personal best in chat.");
-	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show your Ladderhop personal best in chat.");
+	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show PB Long Jump in chat. Usage: !ljpb <jumper>");
+	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show PB Bunnyhop in chat. Usage: !bhpb <jumper>");
+	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show PB Multi Bunnyhop in chat. Usage: !mbhpb <jumper>");
+	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show PB Weird Jump in chat. Usage: !wjpb <jumper>");
+	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show PB Ladder Jump in chat. Usage: !lajpb <jumper>");
+	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show PB Ladderhop in chat. Usage: !lahpb <jumper>");
 	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 
@@ -366,37 +366,37 @@ public Action CommandUpdateMapPool(int client, int args)
 
 public Action CommandLJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_LongJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_LongJump);
 	return Plugin_Handled;
 }
 
 public Action CommandBHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_Bhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_Bhop);
 	return Plugin_Handled;
 }
 
 public Action CommandMBHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_MultiBhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_MultiBhop);
 	return Plugin_Handled;
 }
 
 public Action CommandWJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_WeirdJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_WeirdJump);
 	return Plugin_Handled;
 }
 
 public Action CommandLAJPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_LadderJump);
+	DisplayJumpstatRecordCommand(client, args, JumpType_LadderJump);
 	return Plugin_Handled;
 }
 
 public Action CommandLAHPB(int client, int args)
 {
-	DisplayJumpstatRecordCommand(client, client, JumpType_Ladderhop);
+	DisplayJumpstatRecordCommand(client, args, JumpType_Ladderhop);
 	return Plugin_Handled;
 }
 
@@ -410,9 +410,9 @@ void DisplayJumpstatRecordCommand(int client, int args, int jumpType)
 {
 	if (args >= 1)
 	{
-		char argMap[33];
-		GetCmdArg(1, argMap, sizeof(argMap));
-		DisplayJumpstatRecord(client, jumpType, argMap);
+		char argJumper[33];
+		GetCmdArg(1, argJumper, sizeof(argJumper));
+		DisplayJumpstatRecord(client, jumpType, argJumper);
 	}
 	else
 	{
