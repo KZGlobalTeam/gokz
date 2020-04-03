@@ -14,7 +14,8 @@ static float distanceTiers[JUMPTYPE_COUNT - 2][MODE_COUNT][DISTANCETIER_COUNT];
 int GetDistanceTier(int jumpType, int mode, float distance, float offset = 0.0)
 {
 	// No tiers given for 'Invalid' jumps.
-	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
+	if (jumpType == JumpType_Invalid || jumpType == JumpType_FullInvalid
+		 || jumpType == JumpType_Fall || jumpType == JumpType_Other
 		 || jumpType != JumpType_LadderJump && offset < -EPSILON
 		 || distance > JS_MAX_JUMP_DISTANCE)
 	{
