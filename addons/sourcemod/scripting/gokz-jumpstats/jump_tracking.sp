@@ -917,6 +917,7 @@ enum struct JumpTracker
 		if (this.jump.block < JS_MIN_BLOCK_DISTANCE)
 		{
 			this.jump.block = 0;
+			this.jump.edge = 0.0;
 		}
 	}
 	
@@ -988,6 +989,7 @@ enum struct JumpTracker
 		if (this.jump.block < JS_MIN_LAJ_BLOCK_DISTANCE)
 		{
 			this.jump.block = 0;
+			this.jump.edge = 0.0;
 		}
 	}
 	
