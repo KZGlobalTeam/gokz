@@ -70,6 +70,7 @@
 ### gokz-jumpstats
 
  * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
+ * `!jsalways` - Toggle the 'Always-on' jumpstat mode.
 
 ### gokz-replays
 

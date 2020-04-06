@@ -143,7 +143,7 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
 }
 
-public void GOKZ_JS_OnLanding(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+public void GOKZ_JS_OnLanding(Jump jump)
 {
-	OnLanding_SaveJumpstat(client, jumpType, distance, offset, height, preSpeed, maxSpeed, strafes, sync, duration, block, width, overlap, deadair, deviation, edge, releaseW);
+	OnLanding_SaveJumpstat(jump);
 }

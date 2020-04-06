@@ -13,7 +13,8 @@ bool GetJumpstatsDisabled(int client)
 		 && GOKZ_JS_GetOption(client, JSOption_MinConsoleTier) == DistanceTier_None
 		 && GOKZ_JS_GetOption(client, JSOption_MinSoundTier) == DistanceTier_None
 		 && GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled
-		 && GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled);
+		 && GOKZ_JS_GetOption(client, JSOption_FailstatsChat) == JSToggleOption_Disabled
+		 && GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled);
 }
 
 
