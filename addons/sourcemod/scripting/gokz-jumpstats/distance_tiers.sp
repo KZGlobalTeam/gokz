@@ -5,7 +5,7 @@
 
 
 
-static float distanceTiers[JUMPTYPE_COUNT - 2][MODE_COUNT][DISTANCETIER_COUNT];
+static float distanceTiers[JUMPTYPE_COUNT - 3][MODE_COUNT][DISTANCETIER_COUNT];
 
 
 
@@ -93,7 +93,7 @@ static bool LoadDistanceTiers()
 	}
 	
 	// It's a bit of a hack to exclude non-tiered jumptypes
-	for (int jumpType = 1; jumpType < sizeof(gC_JumpTypeKeys) - 2; jumpType++)
+	for (int jumpType = 0; jumpType < sizeof(gC_JumpTypeKeys) - 3; jumpType++)
 	{
 		if (!kv.JumpToKey(gC_JumpTypeKeys[jumpType]))
 		{
