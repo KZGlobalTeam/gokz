@@ -16,7 +16,6 @@
 enum
 {
 	JumpType_FullInvalid = -1,
-	JumpType_Invalid, 
 	JumpType_LongJump, 
 	JumpType_Bhop, 
 	JumpType_MultiBhop, 
@@ -28,6 +27,7 @@ enum
 	JumpType_LowpreWeirdJump,
 	JumpType_Fall, 
 	JumpType_Other, 
+	JumpType_Invalid, 
 	JUMPTYPE_COUNT
 };
 
@@ -94,7 +94,6 @@ enum
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
-	"Invalid Jump",
 	"Long Jump", 
 	"Bunnyhop", 
 	"Multi Bunnyhop", 
@@ -105,12 +104,12 @@ stock char gC_JumpTypes[JUMPTYPE_COUNT][] =
 	"Lowpre Bunnyhop",
 	"Lowpre Weird Jump",
 	"Fall", 
-	"Unknown Jump"
+	"Unknown Jump",
+	"Invalid Jump"
 };
 
 stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] = 
 {
-	"INV",
 	"LJ", 
 	"BH", 
 	"MBH", 
@@ -121,12 +120,12 @@ stock char gC_JumpTypesShort[JUMPTYPE_COUNT][] =
 	"LBH",
 	"LWJ",
 	"FL", 
-	"UNK"
+	"UNK",
+	"INV"
 };
 
 stock char gC_JumpTypeKeys[JUMPTYPE_COUNT][] = 
 {
-	"invalid",
 	"longjump", 
 	"bhop", 
 	"multibhop", 
@@ -137,7 +136,8 @@ stock char gC_JumpTypeKeys[JUMPTYPE_COUNT][] =
 	"lowprebhop",
 	"lowpreweirdjump",
 	"fall",
-	"unknown"
+	"unknown",
+	"invalid"
 };
 
 stock char gC_DistanceTiers[DISTANCETIER_COUNT][] = 
