@@ -4,65 +4,66 @@
 
 
 
-public void OnLanding_SaveJumpstat(int client, int jumpType, float distance, float offset, float height, float preSpeed, float maxSpeed, int strafes, float sync, float duration, int block, float width, int overlap, int deadair, float deviation, float edge, int releaseW)
+public void OnLanding_SaveJumpstat(Jump jump)
 {
-	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int mode = GOKZ_GetCoreOption(jump.jumper, Option_Mode);
 	
 	// No tiers given for 'Invalid' jumps.
-	if (jumpType == JumpType_Invalid || jumpType == JumpType_Fall || jumpType == JumpType_Other
-		 || jumpType != JumpType_LadderJump && offset < -JS_MAX_NORMAL_OFFSET
-		 || distance > JS_MAX_JUMP_DISTANCE
-		 || jumpType == JumpType_LadderJump && distance < JS_MIN_LAJ_BLOCK_DISTANCE
-		 || jumpType != JumpType_LadderJump && distance < JS_MIN_BLOCK_DISTANCE)
+	if (jump.type == JumpType_Invalid || jump.type == JumpType_FullInvalid
+		 || jump.type == JumpType_Fall || jump.type == JumpType_Other
+		 || jump.type != JumpType_LadderJump && jump.offset < -EPSILON
+		 || jump.distance > JS_MAX_JUMP_DISTANCE
+		 || jump.type == JumpType_LadderJump && jump.distance < JS_MIN_LAJ_BLOCK_DISTANCE
+		 || jump.type != JumpType_LadderJump && jump.distance < JS_MIN_BLOCK_DISTANCE)
 	{
 		return;
 	}
 	
 	char query[1024];
 	DataPack data;
-	int steamid = GetSteamAccountID(client);
-	int int_dist = RoundToNearest(distance * GOKZ_DB_JS_DISTANCE_PRECISION);
+	int steamid = GetSteamAccountID(jump.jumper);
+	int int_dist = RoundToNearest(jump.distance * GOKZ_DB_JS_DISTANCE_PRECISION);
 	
 	// Non-block
-	if (gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] == 0
-		 || int_dist > gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance])
+	if (gI_PBJSCache[jump.jumper][mode][jump.type][JumpstatDB_Cache_Distance] == 0
+		 || int_dist > gI_PBJSCache[jump.jumper][mode][jump.type][JumpstatDB_Cache_Distance])
 	{
-		data = JSRecord_FillDataPack(client, steamid, jumpType, mode, distance, 0, strafes, sync, preSpeed, maxSpeed, duration);
+		data = JSRecord_FillDataPack(jump, steamid, mode, false);
 		Transaction txn_noblock = SQL_CreateTransaction();
-		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 0);
+		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jump.type, mode, 0);
 		txn_noblock.AddQuery(query);
 		SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data, DBPrio_Low);
 	}
 	
 	// Block
-	if (block > 0
-		 && (gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block] == 0
-			 || (block > gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block]
-				 || block == gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Block]
-				 && int_dist > gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_BlockDistance])))
+	if (jump.block > 0
+		 && (gI_PBJSCache[jump.jumper][mode][jump.type][JumpstatDB_Cache_Block] == 0
+			 || (jump.block > gI_PBJSCache[jump.jumper][mode][jump.type][JumpstatDB_Cache_Block]
+				 || jump.block == gI_PBJSCache[jump.jumper][mode][jump.type][JumpstatDB_Cache_Block]
+				 && int_dist > gI_PBJSCache[jump.jumper][mode][jump.type][JumpstatDB_Cache_BlockDistance])))
 	{
-		data = JSRecord_FillDataPack(client, steamid, jumpType, mode, distance, block, strafes, sync, preSpeed, maxSpeed, duration);
+		data = JSRecord_FillDataPack(jump, steamid, mode, true);
 		Transaction txn_block = SQL_CreateTransaction();
-		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, 1);
+		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jump.type, mode, 1);
 		txn_block.AddQuery(query);
 		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data, DBPrio_Low);
 	}
 }
 
-static DataPack JSRecord_FillDataPack(int client, int steamid, int jumpType, int mode, float distance, int block, int strafes, float sync, float preSpeed, float maxSpeed, float duration)
+static DataPack JSRecord_FillDataPack(Jump jump, int steamid, int mode, bool blockJump)
 {
 	DataPack data = new DataPack();
-	data.WriteCell(client);
+	data.WriteCell(jump.jumper);
 	data.WriteCell(steamid);
-	data.WriteCell(jumpType);
+	data.WriteCell(jump.type);
 	data.WriteCell(mode);
-	data.WriteCell(RoundToNearest(distance * GOKZ_DB_JS_DISTANCE_PRECISION));
-	data.WriteCell(block);
-	data.WriteCell(strafes);
-	data.WriteCell(RoundToNearest(sync * GOKZ_DB_JS_SYNC_PRECISION));
-	data.WriteCell(RoundToNearest(preSpeed * GOKZ_DB_JS_PRE_PRECISION));
-	data.WriteCell(RoundToNearest(maxSpeed * GOKZ_DB_JS_MAX_PRECISION));
-	data.WriteCell(RoundToNearest(duration * GOKZ_DB_JS_AIRTIME_PRECISION));
+	data.WriteCell(RoundToNearest(jump.distance * GOKZ_DB_JS_DISTANCE_PRECISION));
+	data.WriteCell(blockJump ? jump.block : 0);
+	data.WriteCell(jump.strafes);
+	data.WriteCell(RoundToNearest(jump.sync * GOKZ_DB_JS_SYNC_PRECISION));
+	data.WriteCell(RoundToNearest(jump.preSpeed * GOKZ_DB_JS_PRE_PRECISION));
+	data.WriteCell(RoundToNearest(jump.maxSpeed * GOKZ_DB_JS_MAX_PRECISION));
+	data.WriteCell(RoundToNearest(jump.duration * GOKZ_DB_JS_AIRTIME_PRECISION));
 	return data;
 }
 

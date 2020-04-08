@@ -23,6 +23,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show PB Weird Jump in chat. Usage: !wjpb <jumper>");
 	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show PB Ladder Jump in chat. Usage: !lajpb <jumper>");
 	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show PB Ladderhop in chat. Usage: !lahpb <jumper>");
+	RegConsoleCmd("sm_jbpb", CommandJBPB, "[KZ] Show PB Jumpbug in chat. Usage: !jbpb <jumper>");
 	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 
@@ -397,6 +398,12 @@ public Action CommandLAJPB(int client, int args)
 public Action CommandLAHPB(int client, int args)
 {
 	DisplayJumpstatRecordCommand(client, args, JumpType_Ladderhop);
+	return Plugin_Handled;
+}
+
+public Action CommandJBPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, args, JumpType_Jumpbug);
 	return Plugin_Handled;
 }
 

@@ -70,6 +70,7 @@
 ### gokz-jumpstats
 
  * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
+ * `!jsalways` - Toggle the 'Always-on' jumpstat mode.
 
 ### gokz-replays
 
@@ -106,6 +107,7 @@ Many of these commands return results for your currently selected mode.
  * `!wjpb` - Show PB Weird Jump in chat. Usage: `!wjpb <jumper>`
  * `!lajpb` - Show PB Ladder Jump in chat. Usage: `!lajpb <jumper>`
  * `!lahpb` - Show PB Ladderhop in chat. Usage: `!lahpb <jumper>`
+ * `!jbpb` - Show PB Jumpbug in chat. Usage: `!jbpb <jumper>`
 
 ### gokz-global
 

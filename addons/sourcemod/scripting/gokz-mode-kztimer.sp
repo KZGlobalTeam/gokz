@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-kztimer.txt"
 
-#define MODE_VERSION 202
+#define MODE_VERSION 203
 #define DUCK_SPEED_MINIMUM 7.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0

@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-vanilla.txt"
 
-#define MODE_VERSION 2
+#define MODE_VERSION 3
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {
@@ -196,7 +196,9 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	if (jumpbug)
 	{
 		player.GOKZHitPerf = true;
-		player.GOKZTakeoffSpeed = player.Speed;
+		
+		// That's an awful hack, but I couldn't reasonably get it to work otherwise
+		player.GOKZTakeoffSpeed = FloatMin(player.Speed, 286.0);
 	}
 }
 
