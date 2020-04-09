@@ -9,6 +9,10 @@
 
 static Handle speedHudSynchronizer;
 
+static bool speedTextDuckPressedLast[MAXPLAYERS + 1];
+static bool speedTextOnGroundLast[MAXPLAYERS + 1];
+static bool speedTextShowDuckString[MAXPLAYERS + 1];
+
 
 
 // =====[ EVENTS ]=====
@@ -24,6 +28,8 @@ void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum)
 	{
 		UpdateSpeedText(client);
 	}
+	speedTextOnGroundLast[client] = Movement_GetOnGround(client);
+	speedTextDuckPressedLast[client] = Movement_GetDucking(client);
 }
 
 void OnOptionChanged_SpeedText(int client, HUDOption option)
@@ -106,12 +112,28 @@ static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 		ShowSyncHudText(player.ID, speedHudSynchronizer, 
 			"%.0f", 
 			RoundFloat(targetPlayer.Speed * 10) / 10.0);
+		speedTextShowDuckString[targetPlayer.ID] = false;
 	}
 	else
 	{
-		ShowSyncHudText(player.ID, speedHudSynchronizer, 
-			"%.0f\n(%.0f)", 
-			RoundToPowerOfTen(targetPlayer.Speed, -2), 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
+		if ((speedTextShowDuckString[targetPlayer.ID]
+			 || (speedTextOnGroundLast[targetPlayer.ID]
+				 && (speedTextDuckPressedLast[targetPlayer.ID] || (GOKZ_GetCoreOption(targetPlayer.ID, Option_Mode) == Mode_Vanilla && Movement_GetDucking(targetPlayer.ID)))))
+		 && Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
+		 && targetPlayer.Jumped)
+		{
+			ShowSyncHudText(player.ID, speedHudSynchronizer, 
+				"%.0f\n(%.0f)(C)", 
+				RoundToPowerOfTen(targetPlayer.Speed, -2), 
+				RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));	
+			speedTextShowDuckString[targetPlayer.ID] = true;
+		}
+		else {
+			ShowSyncHudText(player.ID, speedHudSynchronizer, 
+				"%.0f\n(%.0f)", 
+				RoundToPowerOfTen(targetPlayer.Speed, -2), 
+				RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
+			speedTextShowDuckString[targetPlayer.ID] = false;
+		}
 	}
 } 
