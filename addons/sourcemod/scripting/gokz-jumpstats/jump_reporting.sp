@@ -56,9 +56,9 @@ void OnLanding_JumpReporting(Jump jump)
 				minTier = GOKZ_JS_GetOption(client, JSOption_MinChatBroadcastTier);
 				if (minTier != 0 && tier >= minTier)
 				{
-					PrintToChat(client, "%t", "Broadcast Jumpstat Chat Report",
+					GOKZ_PrintToChat(client, true, "%t", "Broadcast Jumpstat Chat Report",
 						gC_DistanceTierChatColours[tier],
-						client,
+						jump.jumper,
 						jump.distance,
 						gC_JumpTypes[jump.originalType]);
 					DoConsoleReport(client, jump, tier, "Console Jump Header");
