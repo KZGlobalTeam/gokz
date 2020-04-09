@@ -1414,4 +1414,7 @@ void OnTeleport_FailstatAlways(int client)
 {
 	// We want to synchronize all of that
 	doFailstatAlways[client] = true;
+	
+	// gokz-core does that too, but for some reason we have to do it again
+	InvalidateJumpstat(client);
 }
