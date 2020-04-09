@@ -121,7 +121,7 @@ void DisplayJumpTopTypeMenu(int client, int mode)
 static void JumpTopTypeMenuAddItems(Menu menu)
 {
 	char display[32];
-	for (int i = 0; i < JUMPTYPE_COUNT - 2; i++)
+	for (int i = 0; i < JUMPTYPE_COUNT - 3; i++)
 	{
 		FormatEx(display, sizeof(display), "%s", gC_JumpTypes[i]);
 		menu.AddItem(IntToStringEx(i), display);
