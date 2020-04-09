@@ -166,14 +166,29 @@ enum struct JumpTracker
 		
 		// Try to prevent a form of booster abuse
 		if (this.jump.type != JumpType_LadderJump &&
-			this.jump.type != JumpType_WeirdJump &&
 			this.jump.durationTicks > 100)
+		{
+			this.Invalidate();
+		}
+		
+		// Prevent a form of bugged jumpbugs
+		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_Vanilla &&
+			(this.jump.type == JumpType_Bhop ||
+			this.jump.type == JumpType_MultiBhop ||
+			this.jump.type == JumpType_WeirdJump) &&
+			this.jump.durationTicks> 90)
 		{
 			this.Invalidate();
 		}
 		
 		// Fix the edgebug for the current position
 		Movement_GetNobugLandingOrigin(this.jumper, this.position);
+		
+		// It's possible that the landing origin can't be traced.
+		if (this.position[0] != this.position[0])
+		{
+			this.Invalidate();
+		}
 		
 		// Calculate the last stats
 		this.jump.distance = this.CalcDistance();
@@ -278,6 +293,7 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			if (this.takeoffOrigin[2] <= this.position[2] &&
+				this.takeoffOrigin[2] > this.position[2] - 11.0 &&
 				this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
