@@ -33,6 +33,7 @@ void OnMapStart_JumpReporting()
 
 void OnLanding_JumpReporting(Jump jump)
 {
+	int minTier;
 	int tier = GetDistanceTier(jump.type, GOKZ_GetCoreOption(jump.jumper, Option_Mode), jump.distance, jump.offset);
 	if (tier == DistanceTier_None)
 	{
@@ -52,11 +53,14 @@ void OnLanding_JumpReporting(Jump jump)
 			}
 			else 
 			{
-				if (tier >= GOKZ_JS_GetOption(client, JSOption_MinChatBroadcastTier))
+				minTier = GOKZ_JS_GetOption(client, JSOption_MinChatBroadcastTier);
+				if (minTier != 0 && tier >= minTier)
 				{
 					DoChatReport(client, false, jump, tier);
 				}
-				if (tier >= GOKZ_JS_GetOption(client, JSOption_MinSoundBroadcastTier))
+				
+				minTier = GOKZ_JS_GetOption(client, JSOption_MinSoundBroadcastTier);
+				if (minTier != 0 && tier >= minTier)
 				{
 					PlayJumpstatSound(client, tier);
 				}
