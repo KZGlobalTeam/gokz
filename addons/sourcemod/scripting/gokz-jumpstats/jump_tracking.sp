@@ -602,7 +602,10 @@ enum struct JumpTracker
 				this.jump.type == JumpType_Bhop || 
 				this.jump.type == JumpType_MultiBhop || 
 				this.jump.type == JumpType_Ladderhop || 
-				this.jump.type == JumpType_WeirdJump)
+				this.jump.type == JumpType_WeirdJump ||
+				this.jump.type == JumpType_Jumpbug ||
+				this.jump.type == JumpType_LowpreBhop ||
+				this.jump.type == JumpType_LowpreWeirdJump)
 			 && this.jump.distance >= JS_MIN_BLOCK_DISTANCE)
 		{
 			this.CalcBlockStats(this.position);
