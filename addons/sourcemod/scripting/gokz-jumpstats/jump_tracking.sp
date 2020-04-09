@@ -282,6 +282,10 @@ enum struct JumpTracker
 			{
 				return JumpType_Jumpbug;
 			}
+			else
+			{
+				return JumpType_Invalid;
+			}
 		}
 		else if (this.HitBhop())
 		{
