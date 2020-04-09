@@ -176,7 +176,7 @@ enum struct JumpTracker
 			(this.jump.type == JumpType_Bhop ||
 			this.jump.type == JumpType_MultiBhop ||
 			this.jump.type == JumpType_WeirdJump) &&
-			this.jump.durationTicks> 90)
+			this.jump.height > 51.0)
 		{
 			this.Invalidate();
 		}
