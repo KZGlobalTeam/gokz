@@ -166,14 +166,29 @@ enum struct JumpTracker
 		
 		// Try to prevent a form of booster abuse
 		if (this.jump.type != JumpType_LadderJump &&
-			this.jump.type != JumpType_WeirdJump &&
 			this.jump.durationTicks > 100)
+		{
+			this.Invalidate();
+		}
+		
+		// Prevent a form of bugged jumpbugs
+		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_Vanilla &&
+			(this.jump.type == JumpType_Bhop ||
+			this.jump.type == JumpType_MultiBhop ||
+			this.jump.type == JumpType_WeirdJump) &&
+			this.jump.height > 51.0)
 		{
 			this.Invalidate();
 		}
 		
 		// Fix the edgebug for the current position
 		Movement_GetNobugLandingOrigin(this.jumper, this.position);
+		
+		// It's possible that the landing origin can't be traced.
+		if (this.position[0] != this.position[0])
+		{
+			this.Invalidate();
+		}
 		
 		// Calculate the last stats
 		this.jump.distance = this.CalcDistance();
@@ -217,11 +232,16 @@ enum struct JumpTracker
 	{
 		if (this.jump.type == JumpType_Jumpbug)
 		{
-			// The player never really touches the gound, so we have to
-			// construct a takeoff origin
 			float height = this.takeoffOrigin[2];
-			Movement_GetOrigin(this.jumper, this.takeoffOrigin);
+			
+			// The MovementAPI doesn't calculate the takeoff origin correctly
+			// for jumpbugs. It should be the position during the last tick.
+			CopyVector(this.position, this.takeoffOrigin);
 			Movement_GetVelocity(this.jumper, this.takeoffVelocity);
+			
+			// We'll copy the previous height as the player never really
+			// reaches the ground. Whether that is correct will be implicitly
+			// validated by the height check in DetermineType()
 			this.takeoffOrigin[2] = height;
 		}
 		else
@@ -278,9 +298,14 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			if (this.takeoffOrigin[2] <= this.position[2] &&
+				this.takeoffOrigin[2] > this.position[2] - 10.6 &&
 				this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
+			}
+			else
+			{
+				return JumpType_Invalid;
 			}
 		}
 		else if (this.HitBhop())
@@ -529,7 +554,10 @@ enum struct JumpTracker
 				this.lastType == JumpType_Bhop || 
 				this.lastType == JumpType_MultiBhop || 
 				this.lastType == JumpType_Ladderhop || 
-				this.lastType == JumpType_WeirdJump)
+				this.lastType == JumpType_WeirdJump ||
+				this.lastType == JumpType_Jumpbug ||
+				this.lastType == JumpType_LowpreBhop ||
+				this.lastType == JumpType_LowpreWeirdJump)
 			 && this.jump.distance >= JS_MIN_BLOCK_DISTANCE)
 		{
 			// Add the player model to the distance.
@@ -602,7 +630,10 @@ enum struct JumpTracker
 				this.jump.type == JumpType_Bhop || 
 				this.jump.type == JumpType_MultiBhop || 
 				this.jump.type == JumpType_Ladderhop || 
-				this.jump.type == JumpType_WeirdJump)
+				this.jump.type == JumpType_WeirdJump ||
+				this.jump.type == JumpType_Jumpbug ||
+				this.jump.type == JumpType_LowpreBhop ||
+				this.jump.type == JumpType_LowpreWeirdJump)
 			 && this.jump.distance >= JS_MIN_BLOCK_DISTANCE)
 		{
 			this.CalcBlockStats(this.position);
@@ -1414,4 +1445,7 @@ void OnTeleport_FailstatAlways(int client)
 {
 	// We want to synchronize all of that
 	doFailstatAlways[client] = true;
+	
+	// gokz-core does that too, but for some reason we have to do it again
+	InvalidateJumpstat(client);
 }

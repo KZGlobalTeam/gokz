@@ -130,6 +130,11 @@
 	{
 		"en"		"{grey}You have disabled the always-on jumpstats."
 	}
+	"Broadcast Jumpstat Chat Report"
+	{
+		"#format"	"{1:s},{2:N},{3:.2f},{4:s}"
+		"en"		"{1}{2} jumped {3} units with a {4}"
+	}
 
 
 	// =====[ CONSOLE MESSAGES ]===== 
