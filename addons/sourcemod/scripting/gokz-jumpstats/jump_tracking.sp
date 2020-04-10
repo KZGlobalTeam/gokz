@@ -554,7 +554,10 @@ enum struct JumpTracker
 				this.lastType == JumpType_Bhop || 
 				this.lastType == JumpType_MultiBhop || 
 				this.lastType == JumpType_Ladderhop || 
-				this.lastType == JumpType_WeirdJump)
+				this.lastType == JumpType_WeirdJump ||
+				this.lastType == JumpType_Jumpbug ||
+				this.lastType == JumpType_LowpreBhop ||
+				this.lastType == JumpType_LowpreWeirdJump)
 			 && this.jump.distance >= JS_MIN_BLOCK_DISTANCE)
 		{
 			// Add the player model to the distance.
