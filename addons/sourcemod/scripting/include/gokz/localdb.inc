@@ -18,7 +18,7 @@
 #define GOKZ_DB_JS_PRE_PRECISION 100
 #define GOKZ_DB_JS_MAX_PRECISION 100
 #define GOKZ_DB_JS_AIRTIME_PRECISION 10000
-#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 5
+#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 20
 
 
 // =====[ ENUMS ]=====
@@ -45,7 +45,8 @@ enum
 
 enum
 {
-	JumpstatDB_Top20_Alias = 0, 
+	JumpstatDB_Top20_SteamID = 0,
+	JumpstatDB_Top20_Alias, 
 	JumpstatDB_Top20_Block, 
 	JumpstatDB_Top20_Distance, 
 	JumpstatDB_Top20_Strafes, 

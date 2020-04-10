@@ -330,7 +330,7 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
 // =====[ JUMPSTATS ]=====
 
 char sql_jumpstats_gettop[] = "\
-SELECT p.Alias, j.Block, j.Distance, j.Strafes, j.Sync, j.Pre, j.Max, j.Airtime \
+SELECT p.SteamID32, p.Alias, j.Block, j.Distance, j.Strafes, j.Sync, j.Pre, j.Max, j.Airtime \
 	FROM \
 		Jumpstats j \
     INNER JOIN \

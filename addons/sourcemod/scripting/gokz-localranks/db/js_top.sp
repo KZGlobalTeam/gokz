@@ -33,7 +33,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int userID, int numQueries, Handle[] re
 	}
 	
 	char display[128], alias[33], title[65];
-	int block, strafes;
+	int steamid, block, strafes;
 	float distance, sync, pre, max, airtime;
 	
 	Menu menu = new Menu(MenuHandler_JumpTopList);
@@ -51,6 +51,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int userID, int numQueries, Handle[] re
 		for (int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
+			steamid = SQL_FetchInt(results[0], JumpstatDB_Top20_SteamID);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
 			distance = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Distance)) / GOKZ_DB_JS_DISTANCE_PRECISION;
 			strafes = SQL_FetchInt(results[0], JumpstatDB_Top20_Strafes);
@@ -62,8 +63,8 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int userID, int numQueries, Handle[] re
 			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
 			
-			PrintToConsole(client, "#%-2d   %.4f   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
-				i + 1, distance, alias, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+			PrintToConsole(client, "#%-2d   %.4f   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
+				i + 1, distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
 		}
 	}
 	else
@@ -90,8 +91,8 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int userID, int numQueries, Handle[] re
 			FormatEx(display, sizeof(display), "#%-2d   %d %T (%.4f)   %s", i + 1, block, "Block", client, distance, alias);
 			menu.AddItem(IntToStringEx(i), display);
 			
-			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
-				i + 1, block, "Block", distance, alias, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
+				i + 1, block, "Block", distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
 		}
 	}
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -121,7 +122,7 @@ void DisplayJumpTopTypeMenu(int client, int mode)
 static void JumpTopTypeMenuAddItems(Menu menu)
 {
 	char display[32];
-	for (int i = 0; i < JUMPTYPE_COUNT - 2; i++)
+	for (int i = 0; i < JUMPTYPE_COUNT - 3; i++)
 	{
 		FormatEx(display, sizeof(display), "%s", gC_JumpTypes[i]);
 		menu.AddItem(IntToStringEx(i), display);
