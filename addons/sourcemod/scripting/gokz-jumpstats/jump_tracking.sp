@@ -232,11 +232,16 @@ enum struct JumpTracker
 	{
 		if (this.jump.type == JumpType_Jumpbug)
 		{
-			// The player never really touches the gound, so we have to
-			// construct a takeoff origin
 			float height = this.takeoffOrigin[2];
-			Movement_GetOrigin(this.jumper, this.takeoffOrigin);
+			
+			// The MovementAPI doesn't calculate the takeoff origin correctly
+			// for jumpbugs. It should be the position during the last tick.
+			CopyVector(this.position, this.takeoffOrigin);
 			Movement_GetVelocity(this.jumper, this.takeoffVelocity);
+			
+			// We'll copy the previous height as the player never really
+			// reaches the ground. Whether that is correct will be implicitly
+			// validated by the height check in DetermineType()
 			this.takeoffOrigin[2] = height;
 		}
 		else
@@ -293,7 +298,7 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			if (this.takeoffOrigin[2] <= this.position[2] &&
-				this.takeoffOrigin[2] > this.position[2] - 11.0 &&
+				this.takeoffOrigin[2] > this.position[2] - 10.6 &&
 				this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
