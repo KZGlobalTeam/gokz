@@ -208,23 +208,26 @@ public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, 
 	// TODO Translation phrases?
 	if (IsValidClient(client))
 	{
-		LogMessage("SteamID32 '%d' %s%s %s was deleted by %L.", 
-			steamAccountID, 
+		LogMessage("SteamID32 'STEAM_1:%d:%d' %s%s %s was deleted by %L.", 
+			steamAccountID & 1,
+			steamAccountID >> 1, 
 			isBlock ? "Block " : "", 
 			gC_JumpTypes[jumpType], 
 			gC_ModeNames[mode], 
 			client);
 		
-		GOKZ_PrintToChat(client, true, "{grey}SteamID32 '{default}%d{grey}' {lightgreen}%s{default}%s {purple}%s {grey}was deleted.", 
-			steamAccountID, 
+		GOKZ_PrintToChat(client, true, "{grey}SteamID32 '{default}STEAM_1:%d:%d{grey}' {lightgreen}%s{default}%s {purple}%s {grey}was deleted.", 
+			steamAccountID & 1,
+			steamAccountID >> 1, 
 			isBlock ? "Block " : "", 
 			gC_JumpTypes[jumpType], 
 			gC_ModeNames[mode]);
 	}
 	else
 	{
-		LogMessage("SteamID32 '%d' %s%s %s was deleted.", 
-			steamAccountID, 
+		LogMessage("SteamID32 'STEAM_1:%d:%d' %s%s %s was deleted.", 
+			steamAccountID & 1,
+			steamAccountID >> 1, 
 			isBlock ? "Block " : "", 
 			gC_JumpTypes[jumpType], 
 			gC_ModeNames[mode]);
