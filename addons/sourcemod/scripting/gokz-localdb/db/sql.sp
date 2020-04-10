@@ -252,7 +252,7 @@ DELETE \
         Jumpstats \
     WHERE \
         JumpID = \
-        ( \
+        ( SELECT * FROM ( \
             SELECT JumpID \
                 FROM \
                     Jumpstats \
@@ -263,6 +263,7 @@ DELETE \
                     IsBlockJump=%d \
                 ORDER BY Block DESC, Distance DESC \
                 LIMIT 1 \
+			) AS tmp \
         )";
 
 char sql_jumpstats_getpbs[] = "\
