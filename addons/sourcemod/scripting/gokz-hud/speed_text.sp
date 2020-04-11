@@ -123,7 +123,7 @@ static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 		 && targetPlayer.Jumped)
 		{
 			ShowSyncHudText(player.ID, speedHudSynchronizer, 
-				"%.0f\n(%.0f)(C)", 
+				"%.0f\n  (%.0f)C", 
 				RoundToPowerOfTen(targetPlayer.Speed, -2), 
 				RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));	
 			speedTextShowDuckString[targetPlayer.ID] = true;
