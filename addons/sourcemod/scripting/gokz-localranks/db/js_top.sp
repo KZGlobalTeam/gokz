@@ -79,6 +79,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, int userID, int numQueries, Handle[] re
 		for (int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
+			steamid = SQL_FetchInt(results[0], JumpstatDB_Top20_SteamID);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
 			block = SQL_FetchInt(results[0], JumpstatDB_Top20_Block);
 			distance = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Distance)) / GOKZ_DB_JS_DISTANCE_PRECISION;
