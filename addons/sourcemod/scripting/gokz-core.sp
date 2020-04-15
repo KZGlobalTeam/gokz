@@ -217,6 +217,7 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	gB_OriginTeleported[client] = !DHookIsNullParam(params, 1); // Origin affected
 	gB_VelocityTeleported[client] = !DHookIsNullParam(params, 3); // Velocity affected
 	OnTeleport_ValidJump(client);
+	OnTeleport_DelayVirtualButtons(client);
 	return MRES_Ignored;
 }
 
