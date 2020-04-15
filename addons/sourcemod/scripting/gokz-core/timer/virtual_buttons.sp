@@ -8,6 +8,7 @@
 static int beamSprite;
 static int haloSprite;
 static float lastUsePressTime[MAXPLAYERS + 1];
+static int lastTeleportTick[MAXPLAYERS + 1];
 static bool hasStartedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasEndedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasTeleportedSincePressingUse[MAXPLAYERS + 1];
@@ -59,7 +60,8 @@ void OnClientPutInServer_VirtualButtons(int client)
 
 void OnStartButtonPress_VirtualButtons(int client, int course)
 {
-	if (!virtualButtonsLocked[client])
+	if (!virtualButtonsLocked[client] &&
+		lastTeleportTick[client] + GOKZ_TIMER_START_NO_TELEPORT_TICKS < GetGameTickCount())
 	{
 		Movement_GetOrigin(client, virtualStartOrigin[client]);
 		virtualStartCourse[client] = course;
@@ -75,7 +77,8 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 		return;
 	}
 	
-	if (!virtualButtonsLocked[client])
+	if (!virtualButtonsLocked[client] &&
+		lastTeleportTick[client] + GOKZ_TIMER_START_NO_TELEPORT_TICKS < GetGameTickCount())
 	{
 		Movement_GetOrigin(client, virtualEndOrigin[client]);
 		virtualEndCourse[client] = course;
@@ -92,6 +95,11 @@ void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons, int cmdnum)
 void OnCountedTeleport_VirtualButtons(int client)
 {
 	hasTeleportedSincePressingUse[client] = true;
+}
+
+void OnTeleport_DelayVirtualButtons(int client)
+{
+	lastTeleportTick[client] = GetGameTickCount();
 }
 
 
