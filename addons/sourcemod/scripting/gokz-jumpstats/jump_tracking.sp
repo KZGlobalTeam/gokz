@@ -164,31 +164,11 @@ enum struct JumpTracker
 		// Measure last tick of jumpstat
 		this.Update();
 		
-		// Try to prevent a form of booster abuse
-		if (this.jump.type != JumpType_LadderJump &&
-			this.jump.durationTicks > 100)
-		{
-			this.Invalidate();
-		}
-		
-		// Prevent a form of bugged jumpbugs
-		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_Vanilla &&
-			(this.jump.type == JumpType_Bhop ||
-			this.jump.type == JumpType_MultiBhop ||
-			this.jump.type == JumpType_WeirdJump) &&
-			this.jump.height > 51.0)
-		{
-			this.Invalidate();
-		}
-		
 		// Fix the edgebug for the current position
 		Movement_GetNobugLandingOrigin(this.jumper, this.position);
 		
-		// It's possible that the landing origin can't be traced.
-		if (this.position[0] != this.position[0])
-		{
-			this.Invalidate();
-		}
+		// There are a couple bugs and exploits we have to check for
+		this.EndBugfixExploits();
 		
 		// Calculate the last stats
 		this.jump.distance = this.CalcDistance();
@@ -204,7 +184,7 @@ enum struct JumpTracker
 			this.TraceLadderOffset(this.position[2]);
 		}
 		
-		// Calculate always-only stats
+		// Calculate always-on stats
 		if (GOKZ_JS_GetOption(this.jumper, JSOption_JumpstatsAlways) == JSToggleOption_Enabled)
 		{
 			this.EndAlwaysJumpstats();
@@ -660,6 +640,43 @@ enum struct JumpTracker
 		{
 			Movement_GetOrigin(this.jumper, this.position);
 			this.jump.offset = this.position[2] - this.takeoffOrigin[2];
+		}
+	}
+	
+	void EndBugfixExploits()
+	{
+		// Try to prevent a form of booster abuse
+		if (this.jump.type != JumpType_LadderJump &&
+			this.jump.durationTicks > 100)
+		{
+			this.Invalidate();
+		}
+		
+		// Prevent a form of bugged jumpbugs
+		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_Vanilla &&
+			(this.jump.type == JumpType_Bhop ||
+			this.jump.type == JumpType_MultiBhop ||
+			this.jump.type == JumpType_WeirdJump) &&
+			this.jump.height > 51.0)
+		{
+			this.Invalidate();
+		}
+		
+		// Fix last tick ducking
+		float regularLandingOrigin[3];
+		Movement_GetLandingOrigin(this.jumper, regularLandingOrigin);
+		
+		if (this.position[2] < regularLandingOrigin[2] &&
+			GetVectorHorizontalDistance(this.takeoffOrigin, this.position) <
+			GetVectorHorizontalDistance(this.takeoffOrigin, regularLandingOrigin))
+		{
+			this.position[2] = regularLandingOrigin[2];
+		}
+		
+		// It's possible that the landing origin can't be traced.
+		if (this.position[0] != this.position[0])
+		{
+			this.Invalidate();
 		}
 	}
 	
