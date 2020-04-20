@@ -1378,6 +1378,11 @@ static void UpdateValidCmd(int client, int buttons)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
+	
+	if (!CheckLadder(client))
+	{
+		InvalidateJumpstat(client);
+	}
 }
 
 static bool CheckGravity(int client)
@@ -1419,6 +1424,11 @@ static bool CheckTurnButtons(int buttons)
 static bool CheckNoclip(int client)
 {
 	return Movement_GetMovetype(client) == MOVETYPE_NOCLIP;
+}
+
+static bool CheckLadder(int client)
+{
+	return Movement_GetMovetype(client) != MOVETYPE_LADDER;
 }
 
 
