@@ -238,7 +238,7 @@ enum struct JumpTracker
 	void AdjustLowpreJumptypes()
 	{
 		// Exclude SKZ and VNL stats.
-		if (this.jump.preSpeed > 290.0)
+		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_KZTimer)
 		{
 			if (this.jump.type == JumpType_Bhop &&
 				this.jump.preSpeed < 360.0)
