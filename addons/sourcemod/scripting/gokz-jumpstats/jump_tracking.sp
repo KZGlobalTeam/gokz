@@ -278,7 +278,7 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			if (this.takeoffOrigin[2] <= this.position[2] &&
-				this.takeoffOrigin[2] > this.position[2] - 10.6 &&
+				this.takeoffOrigin[2] > this.position[2] - 10.7 &&
 				this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
