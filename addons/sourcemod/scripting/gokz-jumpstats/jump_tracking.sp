@@ -58,6 +58,7 @@ enum struct JumpTracker
 	int poseIndex;
 	int strafeDirection;
 	int lastJumpTick;
+	int lastTeleportTick;
 	int lastType;
 	int lastWPressedTick;
 	int nextCrouchRelease;
@@ -155,8 +156,10 @@ enum struct JumpTracker
 	
 	void End()
 	{
-		// The jump is so invalid we don't even have to bother
-		if (this.jump.type == JumpType_FullInvalid)
+		// The jump is so invalid we don't even have to bother.
+		// Also check if the player just teleported.
+		if (this.jump.type == JumpType_FullInvalid ||
+			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return;
 		}
@@ -255,7 +258,10 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		if (entityTouchCount[this.jumper] > 0)
+		// Check whether the player touches more than just the ground or if
+		// he just teleported.
+		if (entityTouchCount[this.jumper] > 0 ||
+			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
 		}
@@ -1475,4 +1481,6 @@ void OnTeleport_FailstatAlways(int client)
 	
 	// gokz-core does that too, but for some reason we have to do it again
 	InvalidateJumpstat(client);
+	
+	jumpTrackers[client].lastTeleportTick = GetGameTickCount();
 }

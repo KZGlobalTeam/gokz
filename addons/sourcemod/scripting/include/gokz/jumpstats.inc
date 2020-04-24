@@ -91,6 +91,7 @@ enum
 #define JS_TOP_RECORD_COUNT 20
 #define JS_MAX_JUMP_DISTANCE 500
 #define JS_FAILSTATS_MAX_TRACKED_TICKS 128
+#define JS_MIN_TELEPORT_DELAY 5
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
