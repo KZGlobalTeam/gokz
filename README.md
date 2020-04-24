@@ -1,6 +1,6 @@
 # GOKZ SourceMod Plugins (CS:GO)
 
-GOKZ a set of [SourceMod](https://www.sourcemod.net/about.php) plugins exclusively for Counter-Strike: Global Offensive servers. It implements the KZ (Kreedz) game mode, which involves [speedrunning](https://en.wikipedia.org/wiki/Speedrun) through custom maps.
+GOKZ is a package of [SourceMod](https://www.sourcemod.net/about.php) plugins for CS:GO Kreedz (KZ) servers. The KZ game mode involves [speedrunning](https://en.wikipedia.org/wiki/Speedrun) through custom maps.
 
 ## Features
 
@@ -8,12 +8,13 @@ GOKZ a set of [SourceMod](https://www.sourcemod.net/about.php) plugins exclusive
  * **Movement Modes** - Custom movement mechanics. Includes Vanilla, SimpleKZ, and KZTimer modes.
     * Mode plugins can be used alone (with only MovementAPI) to apply their mechanics at all times.
  * **Jumpstats** - Detailed statistics of your jumps and each individual air strafe.
- * **Customisable Experience** - Tonnes of options to provide the best possible experience for players. 
+ * **In-game Options** - Tonnes of options for players, providing them the best possible experience.
+ * **Replays** - Record replays of the server's fastest times and use bots to play them back.
+ * **Anti-Cheat** - Detect and auto-ban blatant users of bhop macros and cheats (SourceBans++ supported).
  * **Database Support** - Store run times and more using either a MySQL or SQLite database. 
     * Player options are stored using the clientprefs extension.
  * **GlobalAPI Support** - Submit run times to the GlobalAPI so that players may compete across servers.
- * **Replays** - Record replays of the server's fastest times and use bots to play them back.
- * **Anti-Macro** - Detect and auto-ban blatant users of bhop macros and cheats (SourceBans++ supported).
+ * **Extensive Plugin API** - With forwards, natives, and modularity at its core, GOKZ is highly extensible.
  * Map bonus support, HUD, teleport menu, noclip, !goto, !measure, !race and much, much more.
 
 For more information about what each plugin does, please see [PLUGINS.md](PLUGINS.md).
@@ -59,15 +60,16 @@ GOKZ is an open-source, community-driven project. If you are interested in helpi
 
 ## Authors
 
- * **DanZay** - *Lead Developer* - [Steam](https://steamcommunity.com/id/DanZay/)
- * **KZTimerGlobal Team** - [BitBucket](https://bitbucket.org/kztimerglobalteam/profile/members)
+ * **DanZay** - danzayau@gmail.com - [*Steam*](https://steamcommunity.com/id/DanZay)
+ * **zealain**
+ * **KZTimerGlobal Team** - [*BitBucket*](https://bitbucket.org/kztimerglobalteam/profile/members)
 
 ## Links
 
-[Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)
-
 [Forum](https://forum.gokz.org)
+
+[Discord](https://www.discord.gg/csgokz)
 
 [Steam Group](https://steamcommunity.com/groups/GOKZTimer)
 
-[Discord](https://www.discord.gg/csgokz)
+[Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)
