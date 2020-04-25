@@ -34,6 +34,14 @@
 	{
 		"en"		"{grey}Your timer text style is now more precise."
 	}
+	"Option - Timer Type - Enabled"
+	{
+		"en"		"{grey}Your timer now displays the type of run."
+	}
+	"Option - Timer Type - Disabled"
+	{
+		"en"		"{grey}Your timer now hides the type of run."
+	}
 	"Option - Show Weapon - Enable"
 	{
 		"en"		"{grey}You are now showing your weapon."
@@ -155,6 +163,10 @@
 	"Options Menu - Timer Style"
 	{
 		"en"		"Timer style"
+	}
+	"Options Menu - Timer Type"
+	{
+		"en"		"Show run type"
 	}
 	"Options Menu - Speed Text"
 	{

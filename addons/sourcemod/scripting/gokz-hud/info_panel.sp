@@ -93,24 +93,35 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 	}
 	else if (targetPlayer.TimerRunning)
 	{
-		switch (targetPlayer.TimeType)
+		if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
 		{
-			case TimeType_Nub:
+			switch (targetPlayer.TimeType)
 			{
-				FormatEx(timeString, sizeof(timeString), 
-					"%T: <font color='#ead18a'>%s</font> %s\n", 
-					"Info Panel Text - Time", player.ID, 
-					GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
-					GetPausedString(player, targetPlayer));
+				case TimeType_Nub:
+				{
+					FormatEx(timeString, sizeof(timeString), 
+						"%T: <font color='#ead18a'>%s</font> %s\n", 
+						"Info Panel Text - Time", player.ID, 
+						GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
+						GetPausedString(player, targetPlayer));
+				}
+				case TimeType_Pro:
+				{
+					FormatEx(timeString, sizeof(timeString), 
+						"%T: <font color='#b5d4ee'>%s</font> %s\n", 
+						"Info Panel Text - Time", player.ID, 
+						GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
+						GetPausedString(player, targetPlayer));
+				}
 			}
-			case TimeType_Pro:
-			{
-				FormatEx(timeString, sizeof(timeString), 
-					"%T: <font color='#b5d4ee'>%s</font> %s\n", 
-					"Info Panel Text - Time", player.ID, 
-					GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
-					GetPausedString(player, targetPlayer));
-			}
+		}
+		else 
+		{
+			FormatEx(timeString, sizeof(timeString), 
+				"%T: <font color='#ffffff'>%s</font> %s\n", 
+				"Info Panel Text - Time", player.ID, 
+				GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
+				GetPausedString(player, targetPlayer));
 		}
 	}
 	else

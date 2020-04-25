@@ -102,11 +102,11 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 						gC_HUDOptionPhrases[option], param);
 				}
 			}
-			case HUDoption_TimerMode:
+			case HUDOption_TimerType:
 			{
 				FormatEx(buffer, maxlength, "%T - %T",
 					gC_HUDOptionPhrases[option], param,
-					gC_TimerModePhrases[GOKZ_HUD_GetOption(param, option)], param);
+					gC_TimerTypePhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			case HUDOption_SpeedText:
 			{
