@@ -16,10 +16,19 @@ static Handle timerHudSynchronizer;
 char[] FormatTimerTextForMenu(KZPlayer player, KZPlayer targetPlayer)
 {
 	char timerTextString[32];
-	FormatEx(timerTextString, sizeof(timerTextString), 
-		"%s %s", 
-		gC_TimeTypeNames[targetPlayer.TimeType], 
-		GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
+	if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
+	{
+		FormatEx(timerTextString, sizeof(timerTextString), 
+			"%s %s", 
+			gC_TimeTypeNames[targetPlayer.TimeType], 
+			GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
+	}
+	else
+	{
+		FormatEx(timerTextString, sizeof(timerTextString), 
+			"%s", 
+			GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
+	}
 	return timerTextString;
 }
 
@@ -138,11 +147,15 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 	else if (player.TimerText == TimerText_Top || player.TimerText == TimerText_Bottom)
 	{
 		int colour[4]; // RGBA
-		switch (targetPlayer.TimeType)
+		if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
 		{
-			case TimeType_Nub:colour =  { 234, 209, 138, 0 };
-			case TimeType_Pro:colour =  { 181, 212, 238, 0 };
+			switch (targetPlayer.TimeType)
+			{
+				case TimeType_Nub:colour =  { 234, 209, 138, 0 };
+				case TimeType_Pro:colour =  { 181, 212, 238, 0 };
+			}
 		}
+		else colour = { 255, 255, 255, 0};
 		
 		switch (player.TimerText)
 		{
