@@ -228,8 +228,7 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 
 void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
 {
-	if (gB_VelocityTeleported[client] && !JustHitPerfBhop(client, cmdnum)
-		|| gB_OriginTeleported[client])
+	if (gB_VelocityTeleported[client] && !JustHitPerfBhop(client, cmdnum))
 	{
 		InvalidateJump(client);
 	}
@@ -275,11 +274,6 @@ void OnTeleport_ValidJump(int client)
 	{
 		InvalidateJump(client);
 		Call_GOKZ_OnTeleport(client);
-	}
-	
-	if (gB_VelocityTeleported[client])
-	{
-		InvalidateJump(client);
 	}
 }
 

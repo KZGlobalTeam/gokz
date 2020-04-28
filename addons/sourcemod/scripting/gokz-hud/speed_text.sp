@@ -22,14 +22,14 @@ void OnPluginStart_SpeedText()
 	speedHudSynchronizer = CreateHudSynchronizer();
 }
 
-void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum)
+void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum)
+	if (cmdnum % 6 == 0 || info.IsTakeoff)
 	{
-		UpdateSpeedText(client);
+		UpdateSpeedText(client, info);
 	}
-	speedTextOnGroundLast[client] = Movement_GetOnGround(client);
-	speedTextDuckPressedLast[client] = Movement_GetDucking(client);
+	speedTextOnGroundLast[info.ID] = info.OnGround;
+	speedTextDuckPressedLast[info.ID] = info.Ducking;
 }
 
 void OnOptionChanged_SpeedText(int client, HUDOption option)
@@ -37,7 +37,6 @@ void OnOptionChanged_SpeedText(int client, HUDOption option)
 	if (option == HUDOption_SpeedText)
 	{
 		ClearSpeedText(client);
-		UpdateSpeedText(client);
 	}
 }
 
@@ -45,7 +44,7 @@ void OnOptionChanged_SpeedText(int client, HUDOption option)
 
 // =====[ PRIVATE ]=====
 
-static void UpdateSpeedText(int client)
+static void UpdateSpeedText(int client, HUDInfo info)
 {
 	KZPlayer player = KZPlayer(client);
 	
@@ -57,14 +56,14 @@ static void UpdateSpeedText(int client)
 	
 	if (player.Alive)
 	{
-		ShowSpeedText(player, player);
+		ShowSpeedText(player, info);
 	}
 	else
 	{
 		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
-		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
+		if (targetPlayer.ID != -1)
 		{
-			ShowSpeedText(player, targetPlayer);
+			ShowSpeedText(player, info);
 		}
 	}
 }
@@ -74,15 +73,15 @@ static void ClearSpeedText(int client)
 	ClearSyncHud(client, speedHudSynchronizer);
 }
 
-static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
+static void ShowSpeedText(KZPlayer player, HUDInfo info)
 {
-	if (targetPlayer.Paused)
+	if (info.Paused)
 	{
 		return;
 	}
 	
 	int colour[4]; // RGBA
-	if (targetPlayer.GOKZHitPerf && !targetPlayer.OnGround && !targetPlayer.OnLadder && !targetPlayer.Noclipping)
+	if (info.HitPerf && !info.OnGround && !info.OnLadder && !info.Noclipping)
 	{
 		colour =  { 64, 255, 64, 0 };
 	}
@@ -107,33 +106,35 @@ static void ShowSpeedText(KZPlayer player, KZPlayer targetPlayer)
 		}
 	}
 	
-	if (targetPlayer.OnGround || targetPlayer.OnLadder || targetPlayer.Noclipping)
+	if (info.OnGround || info.OnLadder || info.Noclipping)
 	{
 		ShowSyncHudText(player.ID, speedHudSynchronizer, 
 			"%.0f", 
-			RoundFloat(targetPlayer.Speed * 10) / 10.0);
-		speedTextShowDuckString[targetPlayer.ID] = false;
+			RoundFloat(info.Speed * 10) / 10.0);
+		speedTextShowDuckString[info.ID] = false;
 	}
 	else
 	{
-		if ((speedTextShowDuckString[targetPlayer.ID]
-			 || (speedTextOnGroundLast[targetPlayer.ID]
-				 && (speedTextDuckPressedLast[targetPlayer.ID] || (GOKZ_GetCoreOption(targetPlayer.ID, Option_Mode) == Mode_Vanilla && Movement_GetDucking(targetPlayer.ID)))))
-		 && Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
-		 && targetPlayer.Jumped)
+		if (speedTextShowDuckString[info.ID]
+		|| (speedTextOnGroundLast[info.ID]
+			&& !info.HitBhop 
+			&& info.IsTakeoff
+			&& info.Jumped
+			&& info.Ducking
+			&& (speedTextDuckPressedLast[info.ID] || GOKZ_GetCoreOption(info.ID, Option_Mode) == Mode_Vanilla)))
 		{
 			ShowSyncHudText(player.ID, speedHudSynchronizer, 
 				"%.0f\n  (%.0f)C", 
-				RoundToPowerOfTen(targetPlayer.Speed, -2), 
-				RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));	
-			speedTextShowDuckString[targetPlayer.ID] = true;
+				RoundToPowerOfTen(info.Speed, -2), 
+				RoundToPowerOfTen(info.TakeoffSpeed, -2));	
+			speedTextShowDuckString[info.ID] = true;
 		}
 		else {
 			ShowSyncHudText(player.ID, speedHudSynchronizer, 
 				"%.0f\n(%.0f)", 
-				RoundToPowerOfTen(targetPlayer.Speed, -2), 
-				RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2));
-			speedTextShowDuckString[targetPlayer.ID] = false;
+				RoundToPowerOfTen(info.Speed, -2), 
+				RoundToPowerOfTen(info.TakeoffSpeed, -2));
+			speedTextShowDuckString[info.ID] = false;
 		}
 	}
 } 

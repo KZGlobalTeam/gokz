@@ -5,6 +5,7 @@
 #include <GlobalAPI-Core>
 #include <gokz/anticheat>
 #include <gokz/core>
+#include <gokz/hud>
 #include <gokz/global>
 #include <gokz/replays>
 

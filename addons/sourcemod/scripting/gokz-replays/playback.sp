@@ -21,8 +21,20 @@ static int botCourse[RP_MAX_BOTS];
 static int botMode[RP_MAX_BOTS];
 static int botStyle[RP_MAX_BOTS];
 static float botTime[RP_MAX_BOTS];
-static int botTeleportsUsed[RP_MAX_BOTS];
 static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
+
+static int timeOnGround[RP_MAX_BOTS];
+static int timeInAir[RP_MAX_BOTS];
+static int botTeleportsUsed[RP_MAX_BOTS];
+static int botButtons[RP_MAX_BOTS];
+static float botTakeoffSpeed[RP_MAX_BOTS];
+static float botSpeed[RP_MAX_BOTS];
+static float botLastOrigin[RP_MAX_BOTS][3];
+static bool hitBhop[RP_MAX_BOTS];
+static bool hitPerf[RP_MAX_BOTS];
+static bool botJumped[RP_MAX_BOTS];
+static bool botIsTakeoff[RP_MAX_BOTS];
+static float botLandingSpeed[RP_MAX_BOTS];
 
 
 
@@ -58,6 +70,34 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 	SetBotStuff(bot);
 	
 	return botClient[bot];
+}
+
+// Passes the current state of the replay into the HUDInfo struct
+void GetPlaybackState(int client, HUDInfo info)
+{
+	int bot, i;
+	for(i = 0; i < RP_MAX_BOTS; i++)
+	{
+		bot = botClient[i] == client ? i : bot;
+	}
+	if (i == RP_MAX_BOTS + 1) return;
+
+	info.TimerRunning = true;
+	info.Time = float(playbackTick[bot]) * GetTickInterval();
+	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
+	info.Speed = botSpeed[bot];
+	info.Paused = false;
+	info.OnLadder = false;
+	info.Noclipping = false;
+	info.OnGround = Movement_GetOnGround(client);
+	info.Ducking = botButtons[bot] & IN_DUCK > 0;
+	info.ID = botClient[bot];
+	info.Jumped = botJumped[bot];
+	info.HitBhop = hitBhop[bot];
+	info.HitPerf = hitPerf[bot];
+	info.Buttons = botButtons[bot];
+	info.TakeoffSpeed = botTakeoffSpeed[bot];
+	info.IsTakeoff = botIsTakeoff[bot] && !Movement_GetOnGround(client);
 }
 
 
@@ -169,7 +209,16 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			MakeVectorFromPoints(currentOrigin, repOrigin, velocity);
 			ScaleVector(velocity, 128.0); // Hard-coded 128 tickrate
 			TeleportEntity(client, NULL_VECTOR, repAngles, velocity);
-			
+
+			// We need the velocity directly from the replay to calculate the speeds
+			// for the HUD.
+			MakeVectorFromPoints(botLastOrigin[bot], repOrigin, velocity);
+			ScaleVector(velocity, 128.0); // Hard-coded 128 tickrate
+			CopyVector(repOrigin, botLastOrigin[bot]);
+            
+			botSpeed[bot] = GetVectorHorizontalLength(velocity);
+			botButtons[bot] = repButtons;
+
 			// Should the bot be ducking?!
 			if (repButtons & IN_DUCK || repFlags & FL_DUCKING)
 			{
@@ -180,14 +229,69 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			// Note that we don't mind if replay file says bot isn't on ground but the bot is.
 			if (repFlags & FL_ONGROUND && Movement_GetSpeed(client) < SPEED_NORMAL * 2)
 			{
+				if (timeInAir[bot] > 0)
+				{
+					botLandingSpeed[bot] = botSpeed[bot];
+					timeInAir[bot] = 0;
+					botIsTakeoff[bot] = false;
+					botJumped[bot] = false;
+					hitBhop[bot] = false;
+					hitPerf[bot] = false;
+					if (!Movement_GetOnGround(client))
+					{
+						timeOnGround[bot] = 0;
+					}
+				}
+				
 				SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
 				Movement_SetMovetype(client, MOVETYPE_WALK);
+				
+				timeOnGround[bot]++;
+				botTakeoffSpeed[bot] = botSpeed[bot];
 			}
 			else
 			{
+				if (timeInAir[bot] == 0)
+				{
+					botIsTakeoff[bot] = true;
+					botJumped[bot] = botButtons[bot] & IN_JUMP > 0;
+					hitBhop[bot] = (timeOnGround[bot] <= RP_MAX_BHOP_GROUND_TICKS) && botJumped[bot];
+					
+					if (botMode[bot] == Mode_SimpleKZ)
+					{
+						hitPerf[bot] = timeOnGround[bot] < 3 && botJumped[bot];
+					}
+					else
+					{
+						hitPerf[bot] = timeOnGround[bot] < 2 && botJumped[bot];
+					}
+					
+					if (hitPerf[bot])
+					{
+						if (botMode[bot] == Mode_SimpleKZ)
+						{
+							botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], (0.2 * botLandingSpeed[bot] + 200));
+						}
+						else if (botMode[bot] == Mode_KZTimer)
+						{
+							botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], 380.0);
+						}
+						else
+						{
+							botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], 286.0);
+						}
+					}
+				}
+				else
+				{
+					botJumped[bot] = false;
+					botIsTakeoff[bot] = false;
+				}
+				
+				timeInAir[bot]++;
 				Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 			}
-			
+
 			playbackTick[bot]++;
 		}
 		
@@ -336,7 +440,7 @@ static void SetBotStuff(int bot)
 	
 	int client = botClient[bot];
 	
-	// Set it's movement options just in case it could negatively affect the playback
+	// Set its movement options just in case it could negatively affect the playback
 	GOKZ_SetCoreOption(client, Option_Mode, botMode[bot]);
 	GOKZ_SetCoreOption(client, Option_Style, botStyle[bot]);
 	
@@ -369,6 +473,9 @@ static void SetBotStuff(int bot)
 	{
 		GOKZ_JoinTeam(client, CS_TEAM_T);
 	}
+
+	// Set the bot's teleports according to if its time type was NUB or PRO
+	GOKZ_SetTeleportCount(client, botTeleportsUsed[bot]);
 	
 	// Set bot weapon according to mode of the replay
 	// Always start by removing the pistol
