@@ -61,7 +61,7 @@ GOKZ is an open-source, community-driven project. If you are interested in helpi
 ## Authors
 
  * **DanZay** - danzayau@gmail.com - [*Steam*](https://steamcommunity.com/id/DanZay)
- * **zealain**
+ * **zealain** - zealained@gmail.com - [*Steam*](https://steamcommunity.com/id/zealain)
  * **KZTimerGlobal Team** - [*BitBucket*](https://bitbucket.org/kztimerglobalteam/profile/members)
 
 ## Links
