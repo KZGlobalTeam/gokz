@@ -51,7 +51,8 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 	}
 	else
 	{
-		recordingIndex[client] = recordingIndex[client] == RP_MIN_CHEATER_REPLAY_LENGTH ? 0 : recordingIndex[client] + 1;
+		recordedTickData[client].Resize(RP_MIN_CHEATER_REPLAY_LENGTH);
+		recordingIndex[client] = recordingIndex[client] == RP_MIN_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
 		tick = recordingIndex[client];
 	}
 		
