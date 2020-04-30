@@ -1384,7 +1384,7 @@ static void UpdateValidCmd(int client, int buttons)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
-	
+
 	if (!CheckLadder(client))
 	{
 		InvalidateJumpstat(client);
@@ -1481,6 +1481,6 @@ void OnTeleport_FailstatAlways(int client)
 	
 	// gokz-core does that too, but for some reason we have to do it again
 	InvalidateJumpstat(client);
-	
+
 	jumpTrackers[client].lastTeleportTick = GetGameTickCount();
 }

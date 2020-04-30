@@ -4,6 +4,7 @@
 #include <sdkhooks>
 #include <sdktools>
 
+#include <gokz/hud>
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
@@ -36,13 +37,13 @@ bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
 ConVar gCV_bot_quota;
 
-#include "gokz-replays/api.sp"
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
 #include "gokz-replays/playback.sp"
 #include "gokz-replays/recording.sp"
 #include "gokz-replays/replay_cache.sp"
 #include "gokz-replays/replay_menu.sp"
+#include "gokz-replays/api.sp"
 
 
 
@@ -50,6 +51,7 @@ ConVar gCV_bot_quota;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-replays");
 	return APLRes_Success;
 }

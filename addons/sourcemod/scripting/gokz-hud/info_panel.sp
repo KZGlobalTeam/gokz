@@ -26,21 +26,21 @@ bool IsDrawingInfoPanel(int client)
 
 // =====[ EVENTS ]=====
 
-void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum)
+void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 12 == 0 || Movement_GetTakeoffCmdNum(client) == cmdnum)
+	if (cmdnum % 12 == 0 || info.IsTakeoff)
 	{
-		UpdateInfoPanel(client);
+		UpdateInfoPanel(client, info);
 	}
-	infoPanelOnGroundLast[client] = Movement_GetOnGround(client);
-	infoPanelDuckPressedLast[client] = Movement_GetDucking(client);
+	infoPanelOnGroundLast[info.ID] = info.OnGround;
+	infoPanelDuckPressedLast[info.ID] = info.Ducking;
 }
 
 
 
 // =====[ PRIVATE ]=====
 
-static void UpdateInfoPanel(int client)
+static void UpdateInfoPanel(int client, HUDInfo info)
 {
 	KZPlayer player = KZPlayer(client);
 	
@@ -49,18 +49,7 @@ static void UpdateInfoPanel(int client)
 		return;
 	}
 	
-	if (player.Alive)
-	{
-		PrintHintText(player.ID, "%s", GetInfoPanel(player, player));
-	}
-	else
-	{
-		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
-		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
-		{
-			PrintHintText(player.ID, "%s", GetInfoPanel(player, targetPlayer));
-		}
-	}
+	PrintHintText(player.ID, "%s", GetInfoPanel(player, info));
 }
 
 static bool NothingEnabledInInfoPanel(KZPlayer player)
@@ -72,46 +61,46 @@ static bool NothingEnabledInInfoPanel(KZPlayer player)
 	return noTimerText && noSpeedText && noKeys;
 }
 
-static char[] GetInfoPanel(KZPlayer player, KZPlayer targetPlayer)
+static char[] GetInfoPanel(KZPlayer player, HUDInfo info)
 {
 	char infoPanelText[320];
 	FormatEx(infoPanelText, sizeof(infoPanelText), 
 		"<font color='#ffffff08'>%s%s%s", 
-		GetTimeString(player, targetPlayer), 
-		GetSpeedString(player, targetPlayer), 
-		GetKeysString(player, targetPlayer));
+		GetTimeString(player, info), 
+		GetSpeedString(player, info), 
+		GetKeysString(player, info));
 	TrimString(infoPanelText);
 	return infoPanelText;
 }
 
-static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
+static char[] GetTimeString(KZPlayer player, HUDInfo info)
 {
 	char timeString[128];
 	if (player.TimerText != TimerText_InfoPanel)
 	{
 		timeString = "";
 	}
-	else if (targetPlayer.TimerRunning)
+	else if (info.TimerRunning)
 	{
 		if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
 		{
-			switch (targetPlayer.TimeType)
+			switch (info.TimeType)
 			{
 				case TimeType_Nub:
 				{
 					FormatEx(timeString, sizeof(timeString), 
 						"%T: <font color='#ead18a'>%s</font> %s\n", 
 						"Info Panel Text - Time", player.ID, 
-						GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
-						GetPausedString(player, targetPlayer));
+						GOKZ_HUD_FormatTime(player.ID, info.Time), 
+						GetPausedString(player, info));
 				}
 				case TimeType_Pro:
 				{
 					FormatEx(timeString, sizeof(timeString), 
 						"%T: <font color='#b5d4ee'>%s</font> %s\n", 
 						"Info Panel Text - Time", player.ID, 
-						GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
-						GetPausedString(player, targetPlayer));
+						GOKZ_HUD_FormatTime(player.ID, info.Time), 
+						GetPausedString(player, info));
 				}
 			}
 		}
@@ -120,8 +109,8 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 			FormatEx(timeString, sizeof(timeString), 
 				"%T: <font color='#ffffff'>%s</font> %s\n", 
 				"Info Panel Text - Time", player.ID, 
-				GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time), 
-				GetPausedString(player, targetPlayer));
+				GOKZ_HUD_FormatTime(player.ID, info.Time), 
+				GetPausedString(player, info));
 		}
 	}
 	else
@@ -130,15 +119,15 @@ static char[] GetTimeString(KZPlayer player, KZPlayer targetPlayer)
 			"%T: <font color='#ea4141'>%T</font> %s\n", 
 			"Info Panel Text - Time", player.ID, 
 			"Info Panel Text - Stopped", player.ID, 
-			GetPausedString(player, targetPlayer));
+			GetPausedString(player, info));
 	}
 	return timeString;
 }
 
-static char[] GetPausedString(KZPlayer player, KZPlayer targetPlayer)
+static char[] GetPausedString(KZPlayer player, HUDInfo info)
 {
 	char pausedString[64];
-	if (targetPlayer.Paused)
+	if (info.Paused)
 	{
 		FormatEx(pausedString, sizeof(pausedString), 
 			"(<font color='#ffffff'>%T</font>)", 
@@ -151,73 +140,74 @@ static char[] GetPausedString(KZPlayer player, KZPlayer targetPlayer)
 	return pausedString;
 }
 
-static char[] GetSpeedString(KZPlayer player, KZPlayer targetPlayer)
+static char[] GetSpeedString(KZPlayer player, HUDInfo info)
 {
 	char speedString[128];
-	if (player.SpeedText != SpeedText_InfoPanel || targetPlayer.Paused)
+	if (player.SpeedText != SpeedText_InfoPanel || info.Paused)
 	{
 		speedString = "";
 	}
 	else
 	{
-		if (targetPlayer.OnGround || targetPlayer.OnLadder || targetPlayer.Noclipping)
+		if (info.OnGround || info.OnLadder || info.Noclipping)
 		{
 			FormatEx(speedString, sizeof(speedString), 
 				"%T: <font color='#ffffff'>%.0f</font> u/s\n", 
 				"Info Panel Text - Speed", player.ID, 
-				RoundToPowerOfTen(targetPlayer.Speed, -2));
-			infoPanelShowDuckString[targetPlayer.ID] = false;
+				RoundToPowerOfTen(info.Speed, -2));
+			infoPanelShowDuckString[info.ID] = false;
 		}
 		else
 		{
 			FormatEx(speedString, sizeof(speedString), 
 				"%T: <font color='#ffffff'>%.0f</font> %s\n", 
 				"Info Panel Text - Speed", player.ID, 
-				RoundToPowerOfTen(targetPlayer.Speed, -2), 
-				GetTakeoffString(targetPlayer));
+				RoundToPowerOfTen(info.Speed, -2), 
+				GetTakeoffString(info));
 		}
 	}
 	return speedString;
 }
 
-static char[] GetTakeoffString(KZPlayer targetPlayer)
+static char[] GetTakeoffString(HUDInfo info)
 {
 	char takeoffString[96], duckString[32];
 	
-	// The last line disables the crouch indicator for bhops
-	if ((infoPanelShowDuckString[targetPlayer.ID]
-			 || (infoPanelOnGroundLast[targetPlayer.ID]
-				 && (infoPanelDuckPressedLast[targetPlayer.ID] || (GOKZ_GetCoreOption(targetPlayer.ID, Option_Mode) == Mode_Vanilla && Movement_GetDucking(targetPlayer.ID)))))
-		 && Movement_GetTakeoffCmdNum(targetPlayer.ID) - Movement_GetLandingCmdNum(targetPlayer.ID) > HUD_MAX_BHOP_GROUND_TICKS
-		 && targetPlayer.Jumped)
+	if (infoPanelShowDuckString[info.ID]
+		|| (infoPanelOnGroundLast[info.ID]
+			&& !info.HitBhop 
+			&& info.IsTakeoff
+			&& info.Jumped
+			&& info.Ducking
+			&& (infoPanelDuckPressedLast[info.ID] || GOKZ_GetCoreOption(info.ID, Option_Mode) == Mode_Vanilla)))
 	{
 		duckString = " <font color='#71eeb8'>C</font>";
-		infoPanelShowDuckString[targetPlayer.ID] = true;
+		infoPanelShowDuckString[info.ID] = true;
 	}
 	else
 	{
 		duckString = "";
-		infoPanelShowDuckString[targetPlayer.ID] = false;
+		infoPanelShowDuckString[info.ID] = false;
 	}
 	
-	if (targetPlayer.GOKZHitPerf)
+	if (info.HitPerf)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#40ff40'>%.0f</font>)%s", 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2), 
+			RoundToPowerOfTen(info.TakeoffSpeed, -2), 
 			duckString);
 	}
 	else
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#ffffff'>%.0f</font>)%s", 
-			RoundToPowerOfTen(targetPlayer.GOKZTakeoffSpeed, -2), 
+			RoundToPowerOfTen(info.TakeoffSpeed, -2), 
 			duckString);
 	}
 	return takeoffString;
 }
 
-static char[] GetKeysString(KZPlayer player, KZPlayer targetPlayer)
+static char[] GetKeysString(KZPlayer player, HUDInfo info)
 {
 	char keysString[64];
 	if (player.ShowKeys == ShowKeys_Disabled)
@@ -230,7 +220,7 @@ static char[] GetKeysString(KZPlayer player, KZPlayer targetPlayer)
 	}
 	else
 	{
-		int buttons = targetPlayer.Buttons;
+		int buttons = info.Buttons;
 		FormatEx(keysString, sizeof(keysString), 
 			"%T: <font color='#ffffff'>%c %c %c %c %c %c</font>\n", 
 			"Info Panel Text - Keys", player.ID, 

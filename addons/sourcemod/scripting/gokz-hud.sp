@@ -6,6 +6,7 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/racing>
+#include <gokz/replays>
 #include <updater>
 
 #include <gokz/kzplayer>
@@ -97,11 +98,34 @@ public void OnLibraryRemoved(const char[] name)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_InfoPanel(client, cmdnum);
+	HUDInfo info;
+	KZPlayer player = KZPlayer(client);
+	KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
+	
+	// Bots don't need to have their HUD drawn
+	if (player.Fake) 
+	{
+		return;
+	}
+
+	if (player.Alive)
+	{
+		SetHUDInfo(player, info, cmdnum);
+	}
+	else if (targetPlayer.ID != -1 && !targetPlayer.Fake)
+	{
+		SetHUDInfo(targetPlayer, info, cmdnum);
+	}
+	else if (targetPlayer.ID != -1)
+	{
+		GOKZ_RP_GetPlaybackInfo(targetPlayer.ID, info);
+	}
+
+	OnPlayerRunCmdPost_InfoPanel(client, cmdnum, info);
 	OnPlayerRunCmdPost_RacingText(client, cmdnum);
-	OnPlayerRunCmdPost_SpeedText(client, cmdnum);
-	OnPlayerRunCmdPost_TimerText(client, cmdnum);
-	OnPlayerRunCmdPost_TPMenu(client, cmdnum);
+	OnPlayerRunCmdPost_SpeedText(client, cmdnum, info);
+	OnPlayerRunCmdPost_TimerText(client, cmdnum, info);
+	OnPlayerRunCmdPost_TPMenu(client, cmdnum, info);
 }
 
 public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) // player_spawn post hook 
@@ -126,7 +150,6 @@ public void GOKZ_OnJoinTeam(int client, int team)
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
-	OnTimerStart_TimerText(client);
 	OnTimerStart_Menu(client);
 }
 
@@ -208,4 +231,24 @@ static void HookEvents()
 {
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
-} 
+}
+
+static void SetHUDInfo(KZPlayer player, HUDInfo info, int cmdnum)
+{
+	info.TimerRunning = player.TimerRunning;
+	info.TimeType = player.TimeType;
+	info.Time = player.Time;
+	info.Paused = player.Paused;
+	info.OnGround = player.OnGround;
+	info.OnLadder = player.OnLadder;
+	info.Noclipping = player.Noclipping;
+	info.Ducking = Movement_GetDucking(player.ID);
+	info.HitBhop = (Movement_GetJumped(player.ID) && Movement_GetTakeoffCmdNum(player.ID) == cmdnum) && Movement_GetTakeoffCmdNum(player.ID) - Movement_GetLandingCmdNum(player.ID) <= HUD_MAX_BHOP_GROUND_TICKS;
+	info.Speed = player.Speed;
+	info.ID = player.ID;
+	info.Jumped = player.Jumped;
+	info.HitPerf = player.GOKZHitPerf;
+	info.TakeoffSpeed = player.GOKZTakeoffSpeed;
+	info.IsTakeoff = Movement_GetTakeoffCmdNum(player.ID) == cmdnum;
+	info.Buttons = player.Buttons;
+}
