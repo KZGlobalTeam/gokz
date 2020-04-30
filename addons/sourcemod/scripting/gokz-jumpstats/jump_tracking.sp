@@ -58,6 +58,7 @@ enum struct JumpTracker
 	int poseIndex;
 	int strafeDirection;
 	int lastJumpTick;
+	int lastTeleportTick;
 	int lastType;
 	int lastWPressedTick;
 	int nextCrouchRelease;
@@ -155,8 +156,10 @@ enum struct JumpTracker
 	
 	void End()
 	{
-		// The jump is so invalid we don't even have to bother
-		if (this.jump.type == JumpType_FullInvalid)
+		// The jump is so invalid we don't even have to bother.
+		// Also check if the player just teleported.
+		if (this.jump.type == JumpType_FullInvalid ||
+			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return;
 		}
@@ -238,7 +241,7 @@ enum struct JumpTracker
 	void AdjustLowpreJumptypes()
 	{
 		// Exclude SKZ and VNL stats.
-		if (this.jump.preSpeed > 290.0)
+		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_KZTimer)
 		{
 			if (this.jump.type == JumpType_Bhop &&
 				this.jump.preSpeed < 360.0)
@@ -255,7 +258,10 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		if (entityTouchCount[this.jumper] > 0)
+		// Check whether the player touches more than just the ground or if
+		// he just teleported.
+		if (entityTouchCount[this.jumper] > 0 ||
+		GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
 		}
@@ -278,7 +284,7 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			if (this.takeoffOrigin[2] <= this.position[2] &&
-				this.takeoffOrigin[2] > this.position[2] - 10.6 &&
+				this.takeoffOrigin[2] > this.position[2] - 10.7 &&
 				this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
@@ -1378,6 +1384,11 @@ static void UpdateValidCmd(int client, int buttons)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
+
+	if (!CheckLadder(client))
+	{
+		InvalidateJumpstat(client);
+	}
 }
 
 static bool CheckGravity(int client)
@@ -1419,6 +1430,11 @@ static bool CheckTurnButtons(int buttons)
 static bool CheckNoclip(int client)
 {
 	return Movement_GetMovetype(client) == MOVETYPE_NOCLIP;
+}
+
+static bool CheckLadder(int client)
+{
+-	return Movement_GetMovetype(client) != MOVETYPE_LADDER;
 }
 
 
@@ -1465,4 +1481,6 @@ void OnTeleport_FailstatAlways(int client)
 	
 	// gokz-core does that too, but for some reason we have to do it again
 	InvalidateJumpstat(client);
+
+	jumpTrackers[client].lastTeleportTick = GetGameTickCount();
 }
