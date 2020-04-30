@@ -9,9 +9,8 @@
 	from OnPlayerRunCmdPost.
 */
 
-
-
-static bool recording[MAXPLAYERS + 1];
+static int recordingIndex[MAXPLAYERS + 1];
+static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
 static ArrayList recordedTickData[MAXPLAYERS + 1];
 
@@ -34,6 +33,7 @@ void OnClientPutInServer_Recording(int client)
 	{  // Just in case it isn't cleared when the client disconnects via GOKZ_OnTimerStopped
 		recordedTickData[client].Clear();
 	}
+	StartRecording(client);
 }
 
 void OnPlayerRunCmdPost_Recording(int client, int buttons)
@@ -42,30 +42,37 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 	{
 		return;
 	}
-	
-	if (recording[client] && !recordingPaused[client])
+
+	int tick;
+	if (timerRunning[client] && !recordingPaused[client])
 	{
-		int tick = GetArraySize(recordedTickData[client]);
+		tick = GetArraySize(recordedTickData[client]);
 		recordedTickData[client].Resize(tick + 1);
-		
-		float origin[3], angles[3];
-		Movement_GetOrigin(client, origin);
-		Movement_GetEyeAngles(client, angles);
-		int flags = GetEntityFlags(client);
-		
-		recordedTickData[client].Set(tick, origin[0], 0);
-		recordedTickData[client].Set(tick, origin[1], 1);
-		recordedTickData[client].Set(tick, origin[2], 2);
-		recordedTickData[client].Set(tick, angles[0], 3);
-		recordedTickData[client].Set(tick, angles[1], 4);
-		// Don't bother tracking eye angle roll (angles[2]) - not used
-		recordedTickData[client].Set(tick, buttons, 5);
-		recordedTickData[client].Set(tick, flags, 6);
 	}
+	else
+	{
+		recordingIndex[client] = recordingIndex[client] == RP_MIN_CHEATER_REPLAY_LENGTH ? 0 : recordingIndex[client] + 1;
+		tick = recordingIndex[client];
+	}
+		
+	float origin[3], angles[3];
+	Movement_GetOrigin(client, origin);
+	Movement_GetEyeAngles(client, angles);
+	int flags = GetEntityFlags(client);
+		
+	recordedTickData[client].Set(tick, origin[0], 0);
+	recordedTickData[client].Set(tick, origin[1], 1);
+	recordedTickData[client].Set(tick, origin[2], 2);
+	recordedTickData[client].Set(tick, angles[0], 3);
+	recordedTickData[client].Set(tick, angles[1], 4);
+	// Don't bother tracking eye angle roll (angles[2]) - not used
+	recordedTickData[client].Set(tick, buttons, 5);
+	recordedTickData[client].Set(tick, flags, 6);
 }
 
 void GOKZ_OnTimerStart_Recording(int client)
 {
+	timerRunning[client] = true;
 	StartRecording(client);
 }
 
@@ -94,6 +101,8 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 			Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
 		}
 	}
+
+	timerRunning[client] = false;
 }
 
 void GOKZ_OnPause_Recording(int client)
@@ -108,14 +117,16 @@ void GOKZ_OnResume_Recording(int client)
 
 void GOKZ_OnTimerStopped_Recording(int client)
 {
-	DiscardRecording(client);
+	timerRunning[client] = false;
+	StartRecording(client);
 }
 
 void GOKZ_OnCountedTeleport_Recording(int client)
 {
 	if (gB_NubRecordMissed[client])
 	{
-		DiscardRecording(client);
+		timerRunning[client] = false;
+		StartRecording(client);
 	}
 }
 
@@ -124,7 +135,8 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 	// If missed PRO record or both records, then can no longer beat a server record
 	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
 	{
-		DiscardRecording(client);
+		timerRunning[client] = false;
+		StartRecording(client);
 	}
 	// If on a NUB run and missed NUB record, then can no longer beat a server record
 	// Otherwise wait to see if they teleport before stopping the recording
@@ -132,7 +144,8 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 	{
 		if (GOKZ_GetTeleportCount(client) > 0)
 		{
-			DiscardRecording(client);
+			timerRunning[client] = false;
+			StartRecording(client);
 		}
 	}
 }
@@ -149,17 +162,11 @@ static void StartRecording(int client)
 	}
 	
 	DiscardRecording(client);
-	recording[client] = true;
 	ResumeRecording(client);
 }
 
 static bool SaveRecordingOfRun(const char[] path, int client, int course, float time, int teleportsUsed)
 {
-	if (!recording[client])
-	{
-		return false;
-	}
-	
 	// Prepare data
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
@@ -224,18 +231,12 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
 	
 	// Discard recorded data
 	recordedTickData[client].Clear();
-	recording[client] = false;
 	
 	return true;
 }
 
 static bool SaveRecordingOfCheater(int client)
-{
-	if (!recording[client])
-	{
-		return false;
-	}
-	
+{	
 	// Prepare data
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
@@ -300,18 +301,12 @@ static bool SaveRecordingOfCheater(int client)
 	
 	// Discard recorded data
 	recordedTickData[client].Clear();
-	recording[client] = false;
 	
 	return true;
 }
 
 static void DiscardRecording(int client)
-{
-	if (!recording[client])
-	{
-		return;
-	}
-	
+{	
 	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client)
 		 && recordedTickData[client].Length >= RP_MIN_CHEATER_REPLAY_LENGTH)
 	{
@@ -319,7 +314,6 @@ static void DiscardRecording(int client)
 	}
 	else
 	{
-		recording[client] = false;
 		recordedTickData[client].Clear();
 		Call_OnReplayDiscarded(client);
 	}
