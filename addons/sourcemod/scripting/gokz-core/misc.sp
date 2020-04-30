@@ -278,9 +278,9 @@ void OnTeleport_ValidJump(int client)
 	}
 
 	if (gB_VelocityTeleported[client])
--	{
--		InvalidateJump(client);
--	}
+	{
+		InvalidateJump(client);
+	}
 }
 
 
