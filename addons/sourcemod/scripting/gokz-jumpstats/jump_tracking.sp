@@ -1434,7 +1434,7 @@ static bool CheckNoclip(int client)
 
 static bool CheckLadder(int client)
 {
--	return Movement_GetMovetype(client) != MOVETYPE_LADDER;
+	return Movement_GetMovetype(client) != MOVETYPE_LADDER;
 }
 
 
