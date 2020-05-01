@@ -74,6 +74,12 @@ forward void GOKZ_RP_OnTimerEnd_Post(int client, const char[] filePath, int cour
  */
 native int GOKZ_RP_GetPlaybackInfo(int client, any info[sizeof(HUDInfo)]);
 
+/**
+ * Called to save last 2 minutes of a suspected cheater's gameplay when they get banned.
+ *
+ * @param client			Client index.
+ */
+native int GOKZ_RP_SaveRecordingOfCheater(int client);
 
 
 // =====[ DEPENDENCY ]=====

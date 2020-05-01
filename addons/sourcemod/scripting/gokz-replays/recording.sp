@@ -16,6 +16,13 @@ static ArrayList recordedTickData[MAXPLAYERS + 1];
 
 
 
+// =====[ PUBLIC ]=====
+
+void SaveCheater(int client)
+{
+	SaveRecordingOfCheater(client);
+}
+
 // =====[ EVENTS ]=====
 
 void OnMapStart_Recording()
@@ -153,6 +160,7 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 
 void GOKZ_Suspected_Recording(int client)
 {
+	PrintToServer("%d", client);
 	SaveRecordingOfCheater(client);
 }
 

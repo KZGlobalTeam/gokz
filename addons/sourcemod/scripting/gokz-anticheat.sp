@@ -5,6 +5,7 @@
 #include <movementapi>
 #include <gokz/anticheat>
 #include <gokz/core>
+#include <gokz/hud>
 #include <gokz/replays>
 
 #include <autoexecconfig>
@@ -178,7 +179,7 @@ void SuspectPlayer(int client, ACReason reason, const char[] notes, const char[]
 {
 	Call_OnPlayerSuspected(client, reason, notes, stats);
 
-	GOKZ_Suspected(client);
+	GOKZ_RP_SaveRecordingOfCheater(client);
 	
 	if (gB_GOKZLocalDB)
 	{
