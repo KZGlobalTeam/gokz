@@ -19,11 +19,11 @@
 
 // =====[ EVENTS ]=====
 
-void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum)
+void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum, HUDInfo info)
 {
 	if (cmdnum % 6 == 3)
 	{
-		UpdateTPMenu(client);
+		UpdateTPMenu(client, info);
 	}
 }
 
@@ -80,7 +80,7 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 
 // =====[ PRIVATE ]=====
 
-static void UpdateTPMenu(int client)
+static void UpdateTPMenu(int client, HUDInfo info)
 {
 	KZPlayer player = KZPlayer(client);
 	
@@ -94,27 +94,27 @@ static void UpdateTPMenu(int client)
 		 || gB_MenuShowing[player.ID] && GetClientAvgLoss(player.ID, NetFlow_Both) > EPSILON
 		 || gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu)
 	{
-		ShowTPMenu(player);
+		ShowTPMenu(player, info);
 	}
 }
 
-static void ShowTPMenu(KZPlayer player)
+static void ShowTPMenu(KZPlayer player, HUDInfo info)
 {
 	Menu menu = new Menu(MenuHandler_TPMenu);
 	menu.OptionFlags = MENUFLAG_NO_SOUND;
 	menu.ExitButton = false;
 	menu.Pagination = MENU_NO_PAGINATION;
-	TPMenuSetTitle(player, menu);
+	TPMenuSetTitle(player, menu, info);
 	TPMenuAddItems(player, menu);
 	menu.Display(player.ID, MENU_TIME_FOREVER);
 	gB_MenuShowing[player.ID] = true;
 }
 
-static void TPMenuSetTitle(KZPlayer player, Menu menu)
+static void TPMenuSetTitle(KZPlayer player, Menu menu, HUDInfo info)
 {
 	if (player.TimerRunning && player.TimerText == TimerText_TPMenu)
 	{
-		menu.SetTitle(FormatTimerTextForMenu(player, player));
+		menu.SetTitle(FormatTimerTextForMenu(player, info));
 	}
 }
 

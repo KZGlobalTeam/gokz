@@ -91,6 +91,30 @@ enum
 
 
 
+// =====[ STRUCTS ]======
+
+enum struct HUDInfo
+{
+	bool TimerRunning;
+	int TimeType;
+	float Time;
+	bool Paused;
+	bool OnGround;
+	bool OnLadder;
+	bool Noclipping;
+	bool Ducking;
+	bool HitBhop;
+	bool IsTakeoff;
+	float Speed;
+	int ID;
+	bool Jumped;
+	bool HitPerf;
+	float TakeoffSpeed;
+	int Buttons;
+}
+
+
+
 // =====[ CONSTANTS ]=====
 
 #define HUD_OPTION_CATEGORY "HUD"

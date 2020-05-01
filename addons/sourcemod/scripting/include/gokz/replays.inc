@@ -25,6 +25,7 @@
 #define RP_PLAYBACK_BREATHER_TIME 2.0
 #define RP_MIN_CHEATER_REPLAY_LENGTH 3840 // 30 seconds
 #define RP_MAX_CHEATER_REPLAY_LENGTH 15360 // 120 seconds
+#define RP_MAX_BHOP_GROUND_TICKS 5
 
 
 
@@ -59,6 +60,19 @@ forward void GOKZ_RP_OnReplayDiscarded(int client);
  * @param teleportsUsed		Number of teleports used by player.
  */
 forward void GOKZ_RP_OnTimerEnd_Post(int client, const char[] filePath, int course, float time, int teleportsUsed);
+
+
+
+// =====[ NATIVES ]====
+
+/**
+ * Called by the HUD to get the state of the current replay.
+ *
+ * @param client			Client index.
+ * @param info				Struct to pass the values into.
+ * @return					If successful
+ */
+native int GOKZ_RP_GetPlaybackInfo(int client, any info[sizeof(HUDInfo)]);
 
 
 

@@ -2,7 +2,20 @@ static GlobalForward H_OnReplaySaved;
 static GlobalForward H_OnReplayDiscarded;
 static GlobalForward H_OnTimerEnd_Post;
 
+// =====[ NATIVES ]=====
 
+void CreateNatives()
+{
+        CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
+}
+
+public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
+{
+	HUDInfo info;
+	GetPlaybackState(GetNativeCell(1), info);
+	SetNativeArray(2, info, sizeof(HUDInfo));
+	return 1;
+}
 
 // =====[ FORWARDS ]=====
 
