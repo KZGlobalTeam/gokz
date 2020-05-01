@@ -59,6 +59,7 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 			data.WriteCell(GetClientUserId(param1));
 			data.WriteCell(GetClientUserId(botClient));
 			CreateTimer(1.0, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
+			EnableReplayControls(param1);
 		}
 		else
 		{

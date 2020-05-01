@@ -43,4 +43,35 @@
 		"en"		"Load a Replay\n \nMap - {1}\n \nSelect a Mode"
 		"chi"		"加载录像\n \nMap - {1}\n \n选择模式"
 	}
+
+
+	// =====[ REPLAY CONTROL MENU ]=====
+	"Replay Controls - Title"
+	{
+		"en"		"Replay Controls"
+	}
+	"Replay Controls - Pause"
+	{
+		"en"		"Pause"
+	}
+	"Replay Controls - Resume"
+	{
+		"en"		"Resume"
+	}
+	"Replay Controls - Skip"
+	{
+		"en"		"Skip 10s"
+	}
+	"Replay Controls - Rewind"
+	{
+		"en"		"Rewind 10s"
+	}
+	"Replay Controls - Freecam"
+	{
+		"en"		"Freecam"
+	}
+	"Replay Controls - Invalid Time"
+	{
+		"en"		"{red}Invalid Time."
+	}
 }
