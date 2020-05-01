@@ -5,6 +5,7 @@
 #include <movementapi>
 #include <gokz/anticheat>
 #include <gokz/core>
+#include <gokz/replays>
 
 #include <autoexecconfig>
 
@@ -176,6 +177,8 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] 
 void SuspectPlayer(int client, ACReason reason, const char[] notes, const char[] stats)
 {
 	Call_OnPlayerSuspected(client, reason, notes, stats);
+
+	GOKZ_Suspected(client);
 	
 	if (gB_GOKZLocalDB)
 	{

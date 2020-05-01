@@ -246,6 +246,11 @@ public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int
 	GOKZ_LR_OnRecordMissed_Recording(client, recordType);
 }
 
+public void GOKZ_Suspected(int client)
+{
+	GOKZ_Suspected_Recording(client);
+}
+
 
 
 // =====[ PRIVATE ]=====

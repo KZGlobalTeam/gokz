@@ -151,6 +151,11 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 	}
 }
 
+void GOKZ_Suspected_Recording(int client)
+{
+	SaveRecordingOfCheater(client);
+}
+
 
 
 // =====[ PRIVATE ]=====
@@ -291,8 +296,14 @@ static bool SaveRecordingOfCheater(int client)
 	
 	// Write tick data
 	any tickData[RP_TICK_DATA_BLOCKSIZE];
-	for (int i = 0; i < tickCount; i++)
+	for (int i = recordingIndex[client] + 1; i != recordingIndex[client]; i++)
 	{
+		// Recording is done on a rolling basis.
+		// So if we reach the end of the array, that's not necessarily the end of the replay.
+		if (i == recordedTickData[client].Length)
+		{
+			i = 0;
+		}
 		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
 		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 	}
