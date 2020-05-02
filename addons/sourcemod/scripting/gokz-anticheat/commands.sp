@@ -1,8 +1,6 @@
 void RegisterCommands()
 {
 	RegAdminCmd("sm_bhopcheck", CommandBhopCheck, ADMFLAG_ROOT, "[KZ] Show bunnyhop stats report including perf ratio and scroll pattern.");
-	RegConsoleCmd("sm_simulate_cheater", CommandCheatSim, "[KZ] Pretend you're a cheater.");
-	RegConsoleCmd("sm_remove_cheater", CommandRemoveCheat, "yes");
 }
 
 public Action CommandBhopCheck(int client, int args)
@@ -74,17 +72,5 @@ public Action CommandBhopCheck(int client, int args)
 		}
 	}
 	
-	return Plugin_Handled;
-}
-
-public Action CommandCheatSim(int client, int args)
-{
-	GOKZ_DB_SetCheater(client, true);
-	return Plugin_Handled;
-}
-
-public Action CommandRemoveCheat(int client, int args)
-{
-	GOKZ_DB_SetCheater(client, false);
 	return Plugin_Handled;
 }
