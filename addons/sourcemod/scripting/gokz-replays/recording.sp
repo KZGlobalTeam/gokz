@@ -2,11 +2,15 @@
 	Bot replay recording logic and processes.
 	
 	Records data every time OnPlayerRunCmdPost is called.
-	If the player misses the server record, then the recording will 
-	immediately stop and be discarded. Upon beating the server record, 
-	a binary file will be written with a 'header' containing 
-	information	about the run, followed by the recorded tick data 
-	from OnPlayerRunCmdPost.
+	If the player doesn't have their timer running, it keeps track
+	of the last 2 minutes of their actions. If a player is banned
+	while their timer isn't running, those 2 minutes are saved.
+	If the player has their timer running, the recording is done from
+	the beginning of the run. If the player misses the server record,
+	then the recording goes back to only keeping track of the last
+	two minutes. Upon beating the server record, a binary file will be 
+	written with a 'header' containing information	about the run,
+	followed by the recorded tick data from OnPlayerRunCmdPost.
 */
 
 static int recordingIndex[MAXPLAYERS + 1];
@@ -50,13 +54,12 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 		return;
 	}
 
-	int tick;
-	tick = GetArraySize(recordedTickData[client]);
+	int tick = GetArraySize(recordedTickData[client]);
 	if (timerRunning[client] && !recordingPaused[client])
 	{
 		recordedTickData[client].Resize(tick + 1);
 	}
-	else
+	else if (!recordingPaused[client])
 	{
 		if (tick < RP_MAX_CHEATER_REPLAY_LENGTH)
 		{
@@ -310,17 +313,25 @@ static bool SaveRecordingOfCheater(int client)
 	if (!timerRunning[client])
 	{
 		recordingIndex[client] -= 1;
-	}
-	for (int i = recordingIndex[client]; i != recordingIndex[client] - 1; i++)
-	{
-		// Recording is done on a rolling basis.
-		// So if we reach the end of the array, that's not necessarily the end of the replay.
-		if (i == recordedTickData[client].Length - 1)
+		for (int i = recordingIndex[client]; i != recordingIndex[client] - 1; i++)
 		{
-			i = 0;
+			// Recording is done on a rolling basis.
+			// So if we reach the end of the array, that's not necessarily the end of the replay.
+			if (i >= recordedTickData[client].Length - 1)
+			{
+				i = 0;
+			}
+			recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+			file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
 		}
-		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
-		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4) ? LogMessage("works %d", i) : LogMessage("fails %d", i);
+	}
+	else
+	{
+		for (int i = 0; i < tickCount; i++)
+		{
+			recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+			file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+		}
 	}
 	delete file;
 	
