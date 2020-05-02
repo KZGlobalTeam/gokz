@@ -172,9 +172,9 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 
 static void CheckForBhopMacro(int client)
 {
-	if (GOKZ_AC_GetPerfCount(client, 1) == 1)
+	if (GOKZ_AC_GetPerfCount(client, 19) == 19)
 	{
-		SuspectPlayer(client, ACReason_BhopHack, "High perf ratio", GenerateBhopBanStats(client, 1));
+		SuspectPlayer(client, ACReason_BhopHack, "High perf ratio", GenerateBhopBanStats(client, 19));
 	}
 	else if (GOKZ_AC_GetPerfCount(client, 30) >= 28)
 	{

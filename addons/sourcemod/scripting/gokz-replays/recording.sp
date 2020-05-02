@@ -51,16 +51,19 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 	}
 
 	int tick;
+	tick = GetArraySize(recordedTickData[client]);
 	if (timerRunning[client] && !recordingPaused[client])
 	{
-		tick = GetArraySize(recordedTickData[client]);
 		recordedTickData[client].Resize(tick + 1);
 	}
 	else
 	{
-		recordedTickData[client].Resize(RP_MAX_CHEATER_REPLAY_LENGTH);
-		recordingIndex[client] = recordingIndex[client] == RP_MAX_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
+		if (tick < RP_MAX_CHEATER_REPLAY_LENGTH)
+		{
+			recordedTickData[client].Resize(tick + 1);
+		}
 		tick = recordingIndex[client];
+		recordingIndex[client] = recordingIndex[client] == RP_MAX_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
 	}
 		
 	float origin[3], angles[3];
@@ -304,16 +307,17 @@ static bool SaveRecordingOfCheater(int client)
 	
 	// Write tick data
 	any tickData[RP_TICK_DATA_BLOCKSIZE];
-	for (int i = recordingIndex[client] + 1; i != recordingIndex[client]; i++)
+	recordingIndex[client] -= 1;
+	for (int i = recordingIndex[client]; i != recordingIndex[client] - 1; i++)
 	{
 		// Recording is done on a rolling basis.
 		// So if we reach the end of the array, that's not necessarily the end of the replay.
-		if (i == recordedTickData[client].Length)
+		if (i == recordedTickData[client].Length - 1)
 		{
 			i = 0;
 		}
 		recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
-		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+		file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4) ? LogMessage("works %d", i) : LogMessage("fails %d", i);
 	}
 	delete file;
 	
@@ -335,6 +339,7 @@ static void DiscardRecording(int client)
 	else
 	{
 		recordedTickData[client].Clear();
+		recordingIndex[client] = 0;
 		Call_OnReplayDiscarded(client);
 	}
 }
