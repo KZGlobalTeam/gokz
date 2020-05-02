@@ -307,7 +307,10 @@ static bool SaveRecordingOfCheater(int client)
 	
 	// Write tick data
 	any tickData[RP_TICK_DATA_BLOCKSIZE];
-	recordingIndex[client] -= 1;
+	if (!timerRunning[client])
+	{
+		recordingIndex[client] -= 1;
+	}
 	for (int i = recordingIndex[client]; i != recordingIndex[client] - 1; i++)
 	{
 		// Recording is done on a rolling basis.
