@@ -141,6 +141,13 @@ enum struct JumpTracker
 		
 		float speed = pose(0).speed;
 		
+		// Fix certain props that don't give you base velocity
+		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;
+		if (FloatAbs(speed - actualSpeed) > JS_SPEED_MODIFICATION_TOLERANCE && this.jump.durationTicks != 0)
+		{
+			this.Invalidate();
+		}
+		
 		this.jump.height = FloatMax(this.jump.height, this.position[2] - this.takeoffOrigin[2]);
 		this.jump.maxSpeed = FloatMax(this.jump.maxSpeed, speed);
 		this.jump.crouchTicks += Movement_GetDucking(this.jumper) ? 1 : 0;
