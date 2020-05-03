@@ -178,8 +178,6 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] 
 void SuspectPlayer(int client, ACReason reason, const char[] notes, const char[] stats)
 {
 	Call_OnPlayerSuspected(client, reason, notes, stats);
-
-	GOKZ_RP_SaveRecordingOfCheater(client);
 	
 	if (gB_GOKZLocalDB)
 	{

@@ -20,13 +20,6 @@ static ArrayList recordedTickData[MAXPLAYERS + 1];
 
 
 
-// =====[ PUBLIC ]=====
-
-void SaveCheater(int client)
-{
-	SaveRecordingOfCheater(client);
-}
-
 // =====[ EVENTS ]=====
 
 void OnMapStart_Recording()
@@ -49,7 +42,7 @@ void OnClientPutInServer_Recording(int client)
 
 void OnPlayerRunCmdPost_Recording(int client, int buttons)
 {
-	if (IsFakeClient(client))
+	if (!IsValidClient(client) || IsFakeClient(client))
 	{
 		return;
 	}
@@ -59,7 +52,7 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 	{
 		recordedTickData[client].Resize(tick + 1);
 	}
-	else if (!recordingPaused[client])
+	else if (!recordingPaused[client] && IsPlayerAlive(client))
 	{
 		if (tick < RP_MAX_CHEATER_REPLAY_LENGTH)
 		{
@@ -68,7 +61,11 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 		tick = recordingIndex[client];
 		recordingIndex[client] = recordingIndex[client] == RP_MAX_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
 	}
-		
+	else
+	{
+		return;
+	}
+	
 	float origin[3], angles[3];
 	Movement_GetOrigin(client, origin);
 	Movement_GetEyeAngles(client, angles);
@@ -144,6 +141,11 @@ void GOKZ_OnCountedTeleport_Recording(int client)
 	}
 }
 
+void GOKZ_OnPlayerSuspected_Recording(int client)
+{
+	SaveRecordingOfCheater(client);
+}
+
 void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 {
 	// If missed PRO record or both records, then can no longer beat a server record
@@ -162,12 +164,6 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 			StartRecording(client);
 		}
 	}
-}
-
-void GOKZ_Suspected_Recording(int client)
-{
-	PrintToServer("%d", client);
-	SaveRecordingOfCheater(client);
 }
 
 

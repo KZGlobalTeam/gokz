@@ -248,9 +248,9 @@ public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int
 	GOKZ_LR_OnRecordMissed_Recording(client, recordType);
 }
 
-public void GOKZ_Suspected(int client)
+public void GOKZ_AC_OnPlayerSuspected(int client)
 {
-	GOKZ_Suspected_Recording(client);
+	GOKZ_OnPlayerSuspected_Recording(client);
 }
 
 

@@ -7,7 +7,6 @@ static GlobalForward H_OnTimerEnd_Post;
 void CreateNatives()
 {
 	CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
-	CreateNative("GOKZ_RP_SaveRecordingOfCheater", Native_RP_SaveRecordingOfCheater);
 }
 
 public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
@@ -15,12 +14,6 @@ public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
 	HUDInfo info;
 	GetPlaybackState(GetNativeCell(1), info);
 	SetNativeArray(2, info, sizeof(HUDInfo));
-	return 1;
-}
-
-public int Native_RP_SaveRecordingOfCheater(Handle plugin, int numParams)
-{
-	SaveCheater(GetNativeCell(1));
 	return 1;
 }
 
