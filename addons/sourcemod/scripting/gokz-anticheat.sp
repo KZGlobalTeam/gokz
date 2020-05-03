@@ -5,8 +5,6 @@
 #include <movementapi>
 #include <gokz/anticheat>
 #include <gokz/core>
-#include <gokz/hud>
-#include <gokz/replays>
 
 #include <autoexecconfig>
 
