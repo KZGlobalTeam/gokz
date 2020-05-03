@@ -26,6 +26,7 @@
 #define RP_MIN_CHEATER_REPLAY_LENGTH 3840 // 30 seconds
 #define RP_MAX_CHEATER_REPLAY_LENGTH 15360 // 2 minutes
 #define RP_MAX_BHOP_GROUND_TICKS 5
+#define RP_SKIP_TICKS 1280 // 10 seconds
 
 
 

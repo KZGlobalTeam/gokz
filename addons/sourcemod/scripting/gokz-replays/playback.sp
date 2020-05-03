@@ -22,6 +22,7 @@ static int botMode[RP_MAX_BOTS];
 static int botStyle[RP_MAX_BOTS];
 static float botTime[RP_MAX_BOTS];
 static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
+static bool botPaused[RP_MAX_BOTS];
 
 static int timeOnGround[RP_MAX_BOTS];
 static int timeInAir[RP_MAX_BOTS];
@@ -98,6 +99,73 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.Buttons = botButtons[bot];
 	info.TakeoffSpeed = botTakeoffSpeed[bot];
 	info.IsTakeoff = botIsTakeoff[bot] && !Movement_GetOnGround(client);
+}
+
+int GetBotFromClient(int client)
+{
+	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
+	{
+		if (botClient[bot] == client)
+		{
+			return bot;
+		}
+	}
+	return -1;
+}
+
+bool PlaybackPaused(int bot)
+{
+	return botPaused[bot];
+}
+
+void PlaybackPause(int bot)
+{
+	botPaused[bot] = true;
+}
+
+void PlaybackResume(int bot)
+{
+	botPaused[bot] = false;
+}
+
+void PlaybackSkipForward(int bot)
+{
+	if (playbackTick[bot] + RP_SKIP_TICKS < playbackTickData[bot].Length)
+	{
+		PlaybackSkipToTick(bot, playbackTick[bot] + RP_SKIP_TICKS);
+	}
+}
+
+void PlaybackSkipBack(int bot)
+{
+	if (playbackTick[bot] < RP_SKIP_TICKS)
+	{
+		PlaybackSkipToTick(bot, 0);
+	}
+	else
+	{
+		PlaybackSkipToTick(bot, playbackTick[bot] - RP_SKIP_TICKS);
+	}
+}
+
+void TrySkipToTime(int client, int seconds)
+{
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
+	int tick = seconds * 128;
+	int bot = GetBotFromClient(GetObserverTarget(client));
+	
+	if (tick >= 0 && tick < playbackTickData[bot].Length)
+	{
+		PlaybackSkipToTick(bot, tick);
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Replay Controls - Invalid Time");
+	}
 }
 
 
@@ -182,6 +250,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			{
 				// End the breather period
 				inBreather[bot] = false;
+				botPaused[bot] = false;
 				// Start the bot if first tick. Clear bot if last tick.
 				playbackTick[bot]++;
 				if (playbackTick[bot] == size)
@@ -194,7 +263,24 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 		}
 		else
 		{
-			// Load in the next tick	
+			// Check whether somebody is actually spectating the bot
+			int spec;
+			for (spec = 1; spec < MAXPLAYERS + 1; spec++)
+			{
+				if (IsValidClient(spec) && GetObserverTarget(spec) == botClient[bot])
+				{
+					break;
+				}
+			}
+			if (spec == MAXPLAYERS + 1 && !IsReplayBotControlled(bot, botClient[bot]))
+			{
+				playbackTickData[bot].Clear();
+				botDataLoaded[bot] = false;
+				ResetBotStuff(bot);
+				return;
+			}
+			
+			// Load in the next tick
 			repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
 			repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
 			repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
@@ -202,6 +288,13 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
 			repButtons = playbackTickData[bot].Get(playbackTick[bot], 5);
 			repFlags = playbackTickData[bot].Get(playbackTick[bot], 6);
+			
+			// Check if the replay is paused
+			if (botPaused[bot])
+			{
+				TeleportEntity(client, repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+				return;
+			}
 			
 			// Set velocity to travel from current origin to recorded origin
 			float currentOrigin[3], velocity[3];
@@ -528,4 +621,19 @@ static int GetUnusedBot()
 		}
 	}
 	return -1;
-} 
+}
+
+static void PlaybackSkipToTick(int bot, int tick)
+{
+	// Load in the next tick	
+	float repOrigin[3], repAngles[3];
+	repOrigin[0] = playbackTickData[bot].Get(tick, 0);
+	repOrigin[1] = playbackTickData[bot].Get(tick, 1);
+	repOrigin[2] = playbackTickData[bot].Get(tick, 2);
+	repAngles[0] = playbackTickData[bot].Get(tick, 3);
+	repAngles[1] = playbackTickData[bot].Get(tick, 4);
+	
+	TeleportEntity(botClient[bot], repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetMovetype(botClient[bot], MOVETYPE_NOCLIP);
+	playbackTick[bot] = tick;
+}

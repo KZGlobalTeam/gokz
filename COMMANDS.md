@@ -75,6 +75,8 @@
 ### gokz-replays
 
  * `!replay` - Open the replay loading menu.
+ * `!replaycontrols`/`!rpcontrols` - Toggle the replay control menu (when in control of a replay bot).
+ * `!replaygoto`/`!rpgoto` - Skip to a specific time in the replay. Usage: `!rpgoto hh:mm:ss`
 
 ### gokz-racing
 
