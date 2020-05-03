@@ -25,6 +25,7 @@
 #define RP_PLAYBACK_BREATHER_TIME 2.0
 #define RP_MIN_CHEATER_REPLAY_LENGTH 3840 // 30 seconds
 #define RP_MAX_BHOP_GROUND_TICKS 5
+#define RP_SKIP_TICKS 1280 // 10 seconds
 
 
 
