@@ -272,7 +272,7 @@ static void BanSuspect(int client, ACReason reason)
 				client, 
 				gCV_gokz_autoban_duration_bhop_hack.IntValue, 
 				"gokz-anticheat - Bhop hacking", 
-				"You have been banned for using a bhop hack");
+				"You have been banned for using a bhop hack, view https://forum.gokz.org/p/player-rules for more info.");
 		}
 		case ACReason_BhopMacro:
 		{
@@ -280,7 +280,7 @@ static void BanSuspect(int client, ACReason reason)
 				client, 
 				gCV_gokz_autoban_duration_bhop_macro.IntValue, 
 				"gokz-anticheat - Bhop macroing", 
-				"You have been banned for using a bhop macro");
+				"You have been banned for using a bhop macro, view https://forum.gokz.org/p/player-rules for more info.");
 		}
 	}
 }
