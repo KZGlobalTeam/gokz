@@ -4,7 +4,6 @@
 
 
 static int controllingPlayer[RP_MAX_BOTS];
-static bool controllingPlayerFreecam[RP_MAX_BOTS];
 static bool showReplayControls[MAXPLAYERS + 1];
 
 
@@ -141,7 +140,6 @@ int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int par
 			else if (StrEqual(item, "rp_freecam"))
 			{
 				SetEntProp(param1, Prop_Send, "m_iObserverMode", 6);
-				controllingPlayerFreecam[bot] = true;
 			}
 		}
 		
