@@ -73,4 +73,4 @@ public Action CommandBhopCheck(int client, int args)
 	}
 	
 	return Plugin_Handled;
-} 
+}
