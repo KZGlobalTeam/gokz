@@ -1307,7 +1307,7 @@ void OnEndTouch_JumpTracking(int client)
 
 void OnPlayerRunCmd_JumpTracking(int client, int buttons)
 {
-	if (!IsPlayerAlive(client))
+	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
 		return;
 	}
@@ -1322,7 +1322,7 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons)
 
 public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 {
-	if (!IsPlayerAlive(client))
+	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
 		return;
 	}
