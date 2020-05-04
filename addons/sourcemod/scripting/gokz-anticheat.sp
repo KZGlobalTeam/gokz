@@ -33,6 +33,7 @@ public Plugin myinfo =
 bool gB_GOKZLocalDB;
 bool gB_SourceBansPP;
 bool gB_SourceBans;
+bool gB_GlobalAPI_Core;
 
 Handle gH_DHooks_OnTeleport;
 
@@ -94,6 +95,7 @@ public void OnAllPluginsLoaded()
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 	gB_SourceBansPP = LibraryExists("sourcebans++");
 	gB_SourceBans = LibraryExists("sourcebans");
+	gB_GlobalAPI_Core = LibraryExists("GlobalAPI-Core");
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -264,23 +266,33 @@ static void LogSuspicion(int client, ACReason reason, const char[] notes, const 
 
 static void BanSuspect(int client, ACReason reason)
 {
+	char banMessage[128];
+	char redirectString[64] = "Contact the server administrator for more info";
+	
+	if (gB_GlobalAPI_Core)
+	{
+		strcopy(redirectString, sizeof(redirectString), "Visit https://forum.gokz.org/p/player-rules for more info");
+	}
+	
 	switch (reason)
 	{
 		case ACReason_BhopHack:
 		{
+			FormatEx(banMessage, sizeof(banMessage), "You have been banned for using a %s.\n%s", "bhop hack", redirectString);
 			AutoBanClient(
 				client, 
 				gCV_gokz_autoban_duration_bhop_hack.IntValue, 
 				"gokz-anticheat - Bhop hacking", 
-				"You have been banned for using a bhop hack, view https://forum.gokz.org/p/player-rules for more info.");
+				banMessage);
 		}
 		case ACReason_BhopMacro:
 		{
+			FormatEx(banMessage, sizeof(banMessage), "You have been banned for using a %s.\n%s", "bhop macro", redirectString);
 			AutoBanClient(
 				client, 
 				gCV_gokz_autoban_duration_bhop_macro.IntValue, 
 				"gokz-anticheat - Bhop macroing", 
-				"You have been banned for using a bhop macro, view https://forum.gokz.org/p/player-rules for more info.");
+				banMessage);
 		}
 	}
 }
