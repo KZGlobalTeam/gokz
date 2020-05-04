@@ -4,6 +4,7 @@
 #include <sdkhooks>
 #include <sdktools>
 
+#include <gokz/hud>
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
@@ -36,13 +37,14 @@ bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
 ConVar gCV_bot_quota;
 
-#include "gokz-replays/api.sp"
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
 #include "gokz-replays/playback.sp"
 #include "gokz-replays/recording.sp"
 #include "gokz-replays/replay_cache.sp"
 #include "gokz-replays/replay_menu.sp"
+#include "gokz-replays/api.sp"
+#include "gokz-replays/controls.sp"
 
 
 
@@ -50,6 +52,7 @@ ConVar gCV_bot_quota;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-replays");
 	return APLRes_Success;
 }
@@ -204,6 +207,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
 	OnPlayerRunCmdPost_Recording(client, buttons);
+	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
@@ -244,6 +248,11 @@ public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int
 		gB_NubRecordMissed[client] = true;
 	}
 	GOKZ_LR_OnRecordMissed_Recording(client, recordType);
+}
+
+public void GOKZ_AC_OnPlayerSuspected(int client)
+{
+	GOKZ_OnPlayerSuspected_Recording(client);
 }
 
 

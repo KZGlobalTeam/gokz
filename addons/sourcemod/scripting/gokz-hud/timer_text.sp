@@ -13,13 +13,22 @@ static Handle timerHudSynchronizer;
 
 // =====[ PUBLIC ]=====
 
-char[] FormatTimerTextForMenu(KZPlayer player, KZPlayer targetPlayer)
+char[] FormatTimerTextForMenu(KZPlayer player, HUDInfo info)
 {
 	char timerTextString[32];
-	FormatEx(timerTextString, sizeof(timerTextString), 
-		"%s %s", 
-		gC_TimeTypeNames[targetPlayer.TimeType], 
-		GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
+	if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
+	{
+		FormatEx(timerTextString, sizeof(timerTextString), 
+			"%s %s", 
+			gC_TimeTypeNames[info.TimeType], 
+			GOKZ_HUD_FormatTime(player.ID, info.Time));
+	}
+	else
+	{
+		FormatEx(timerTextString, sizeof(timerTextString), 
+			"%s", 
+			GOKZ_HUD_FormatTime(player.ID, info.Time));
+	}
 	return timerTextString;
 }
 
@@ -32,11 +41,11 @@ void OnPluginStart_TimerText()
 	timerHudSynchronizer = CreateHudSynchronizer();
 }
 
-void OnPlayerRunCmdPost_TimerText(int client, int cmdnum)
+void OnPlayerRunCmdPost_TimerText(int client, int cmdnum, HUDInfo info)
 {
 	if (cmdnum % 6 == 3)
 	{
-		UpdateTimerText(client);
+		UpdateTimerText(client, info);
 	}
 }
 
@@ -45,13 +54,7 @@ void OnOptionChanged_TimerText(int client, HUDOption option)
 	if (option == HUDOption_TimerText)
 	{
 		ClearTimerText(client);
-		UpdateTimerText(client);
 	}
-}
-
-void OnTimerStart_TimerText(int client)
-{
-	UpdateTimerText(client);
 }
 
 void OnTimerEnd_TimerText(int client)
@@ -76,7 +79,7 @@ public int PanelHandler_Menu(Menu menu, MenuAction action, int param1, int param
 
 // =====[ PRIVATE ]=====
 
-static void UpdateTimerText(int client)
+static void UpdateTimerText(int client, HUDInfo info)
 {
 	KZPlayer player = KZPlayer(client);
 	
@@ -87,14 +90,14 @@ static void UpdateTimerText(int client)
 	
 	if (player.Alive)
 	{
-		ShowTimerText(player, player);
+		ShowTimerText(player, info);
 	}
 	else
 	{
 		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
-		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
+		if (targetPlayer.ID != -1)
 		{
-			ShowTimerText(player, targetPlayer);
+			ShowTimerText(player, info);
 		}
 	}
 }
@@ -104,11 +107,11 @@ static void ClearTimerText(int client)
 	ClearSyncHud(client, timerHudSynchronizer);
 }
 
-static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
+static void ShowTimerText(KZPlayer player, HUDInfo info)
 {
-	if (!targetPlayer.TimerRunning)
+	if (!info.TimerRunning)
 	{
-		if (player.ID != targetPlayer.ID)
+		if (player.ID != info.ID)
 		{
 			CancelGOKZHUDMenu(player.ID);
 		}
@@ -124,12 +127,12 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 		// many variables to track whether we need to update the timer text for the spectator.
 		
 		if ((gB_MenuShowing[player.ID] || GetClientMenu(player.ID) == MenuSource_None)
-			 && (player.ID != targetPlayer.ID || player.TPMenu == TPMenu_Disabled && !player.Paused))
+			 && (player.ID != info.ID || player.TPMenu == TPMenu_Disabled && !player.Paused))
 		{
 			// Use a Panel if want to show ONLY timer text (not TP menu)
 			// as it doesn't seem to be possible to display a Menu with no items.
 			Panel panel = new Panel(null);
-			panel.SetTitle(FormatTimerTextForMenu(player, targetPlayer));
+			panel.SetTitle(FormatTimerTextForMenu(player, info));
 			panel.Send(player.ID, PanelHandler_Menu, MENU_TIME_FOREVER);
 			delete panel;
 			gB_MenuShowing[player.ID] = true;
@@ -138,11 +141,15 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 	else if (player.TimerText == TimerText_Top || player.TimerText == TimerText_Bottom)
 	{
 		int colour[4]; // RGBA
-		switch (targetPlayer.TimeType)
+		if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
 		{
-			case TimeType_Nub:colour =  { 234, 209, 138, 0 };
-			case TimeType_Pro:colour =  { 181, 212, 238, 0 };
+			switch (info.TimeType)
+			{
+				case TimeType_Nub:colour =  { 234, 209, 138, 0 };
+				case TimeType_Pro:colour =  { 181, 212, 238, 0 };
+			}
 		}
+		else colour = { 255, 255, 255, 0};
 		
 		switch (player.TimerText)
 		{
@@ -156,6 +163,6 @@ static void ShowTimerText(KZPlayer player, KZPlayer targetPlayer)
 			}
 		}
 		
-		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_HUD_FormatTime(player.ID, targetPlayer.Time));
+		ShowSyncHudText(player.ID, timerHudSynchronizer, GOKZ_HUD_FormatTime(player.ID, info.Time));
 	}
 } 

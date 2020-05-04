@@ -5,6 +5,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_adv", CommandToggleAdvancedMenu, "[KZ] Toggle the advanced teleport menu.");
 	RegConsoleCmd("sm_panel", CommandToggleInfoPanel, "[KZ] Toggle visibility of the centre information panel.");
 	RegConsoleCmd("sm_timerstyle", CommandToggleTimerStyle, "[KZ] Toggle the style of the timer text.");
+	RegConsoleCmd("sm_timertype", CommandToggleTimerType, "[KZ] Toggle visibility of your time type.");
 	RegConsoleCmd("sm_speed", CommandToggleSpeed, "[KZ] Toggle visibility of your speed and jump pre-speed.");
 	RegConsoleCmd("sm_hideweapon", CommandToggleShowWeapon, "[KZ] Toggle visibility of your weapon.");
 }
@@ -58,6 +59,19 @@ public Action CommandToggleTimerStyle(int client, int args)
 	{
 		GOKZ_HUD_SetOption(client, HUDOption_TimerStyle, TimerStyle_Standard);
 	}
+}
+
+public Action CommandToggleTimerType(int client, int args)
+{
+	if (GOKZ_HUD_GetOption(client, HUDOption_TimerType) == TimerType_Disabled)
+	{
+		GOKZ_HUD_SetOption(client, HUDOption_TimerType, TimerType_Enabled);
+	}
+	else
+	{
+		GOKZ_HUD_SetOption(client, HUDOption_TimerType, TimerType_Disabled);
+	}
+	return Plugin_Handled;
 }
 
 public Action CommandToggleSpeed(int client, int args)

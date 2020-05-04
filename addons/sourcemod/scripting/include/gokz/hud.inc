@@ -20,7 +20,8 @@ enum HUDOption:
 	HUDOption_InfoPanel, 
 	HUDOption_ShowKeys, 
 	HUDOption_TimerText, 
-	HUDOption_TimerStyle, 
+	HUDOption_TimerStyle,
+	HUDOption_TimerType, 
 	HUDOption_SpeedText, 
 	HUDOption_ShowWeapon, 
 	HUDOPTION_COUNT
@@ -68,6 +69,13 @@ enum
 
 enum
 {
+	TimerType_Disabled = 0,
+	TimerType_Enabled,
+	TIMERTYPE_COUNT
+};
+
+enum
+{
 	SpeedText_Disabled = 0, 
 	SpeedText_InfoPanel, 
 	SpeedText_Bottom, 
@@ -83,6 +91,30 @@ enum
 
 
 
+// =====[ STRUCTS ]======
+
+enum struct HUDInfo
+{
+	bool TimerRunning;
+	int TimeType;
+	float Time;
+	bool Paused;
+	bool OnGround;
+	bool OnLadder;
+	bool Noclipping;
+	bool Ducking;
+	bool HitBhop;
+	bool IsTakeoff;
+	float Speed;
+	int ID;
+	bool Jumped;
+	bool HitPerf;
+	float TakeoffSpeed;
+	int Buttons;
+}
+
+
+
 // =====[ CONSTANTS ]=====
 
 #define HUD_OPTION_CATEGORY "HUD"
@@ -95,6 +127,7 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Show Keys", 
 	"GOKZ HUD - Timer Text", 
 	"GOKZ HUD - Timer Style", 
+	"GOKZ HUD - Show Time Type",
 	"GOKZ HUD - Speed Text", 
 	"GOKZ HUD - Show Weapon"
 };
@@ -105,7 +138,8 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Centre Information Panel - 0 = Disabled, 1 = Enabled", 
 	"Key Press Display - 0 = Spectating, 1 = Always, 2 = Disabled", 
 	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Teleport Menu, 3 = Bottom, 4 = Top", 
-	"Timer Style - 0 = Standard, 1 = Precise", 
+	"Timer Style - 0 = Standard, 1 = Precise",
+	"Timer Type - 0 = Disabled, 1 = Enabled", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled"
 };
@@ -117,6 +151,7 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Show Keys", 
 	"Options Menu - Timer Text", 
 	"Options Menu - Timer Style", 
+	"Options Menu - Timer Type",
 	"Options Menu - Speed Text", 
 	"Options Menu - Show Weapon"
 };
@@ -127,7 +162,8 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	INFOPANEL_COUNT, 
 	SHOWKEYS_COUNT, 
 	TIMERTEXT_COUNT, 
-	TIMERSTYLE_COUNT, 
+	TIMERSTYLE_COUNT,
+	TIMERTYPE_COUNT, 
 	SPEEDTEXT_COUNT, 
 	SHOWWEAPON_COUNT
 };
@@ -139,6 +175,7 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	ShowKeys_Spectating, 
 	TimerText_InfoPanel, 
 	TimerStyle_Standard, 
+	TimerType_Enabled,
 	SpeedText_InfoPanel, 
 	ShowWeapon_Enabled
 };
@@ -164,6 +201,12 @@ stock char gC_TimerTextPhrases[TIMERTEXT_COUNT][] =
 	"Options Menu - Teleport Menu", 
 	"Options Menu - Bottom", 
 	"Options Menu - Top"
+};
+
+stock char gC_TimerTypePhrases[TIMERTYPE_COUNT][] = 
+{
+	"Options Menu - Disabled",
+	"Options Menu - Enabled"
 };
 
 stock char gC_SpeedTextPhrases[SPEEDTEXT_COUNT][] = 

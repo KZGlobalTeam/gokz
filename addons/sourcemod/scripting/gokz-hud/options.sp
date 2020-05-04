@@ -80,6 +80,20 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_TimerType:
+		{
+			switch (newValue)
+			{
+				case TimerType_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Timer Type - Disabled");
+				}
+				case TimerType_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Timer Type - Enabled");
+				}
+			}
+		}
 		case HUDOption_ShowWeapon:
 		{
 			switch (newValue)
