@@ -31,9 +31,9 @@
  * `!adv` - Toggle the visibility of the advanced teleport menu.
  * `!panel` - Toggle visibility of the centre information panel.
  * `!timerstyle` - Toggle the style of the timer text.
+ * `!timertype` - Toggle the PRO/NUB indicator for the timer text.
  * `!speed` - Toggle visibility of your speed and jump pre-speed.
  * `!hideweapon` - Toggle visibility of your weapon.
- * `!timertype` - Toggle the PRO/NUB indicator for the timer text.
 
 ### gokz-tips
 
