@@ -33,7 +33,7 @@ public Plugin myinfo =
 bool gB_GOKZLocalDB;
 bool gB_SourceBansPP;
 bool gB_SourceBans;
-bool gB_GlobalAPI_Core;
+bool gB_GOKZGlobal;
 
 Handle gH_DHooks_OnTeleport;
 
@@ -95,7 +95,7 @@ public void OnAllPluginsLoaded()
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 	gB_SourceBansPP = LibraryExists("sourcebans++");
 	gB_SourceBans = LibraryExists("sourcebans");
-	gB_GlobalAPI_Core = LibraryExists("GlobalAPI-Core");
+	gB_GOKZGlobal = LibraryExists("gokz-global");
 	
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -269,7 +269,7 @@ static void BanSuspect(int client, ACReason reason)
 	char banMessage[128];
 	char redirectString[64] = "Contact the server administrator for more info";
 	
-	if (gB_GlobalAPI_Core)
+	if (gB_GOKZGlobal)
 	{
 		strcopy(redirectString, sizeof(redirectString), "Visit https://forum.gokz.org/p/player-rules for more info");
 	}
