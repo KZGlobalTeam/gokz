@@ -115,6 +115,7 @@ public void OnLibraryAdded(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB || StrEqual(name, "gokz-localdb");
 	gB_SourceBansPP = gB_SourceBansPP || StrEqual(name, "sourcebans++");
 	gB_SourceBans = gB_SourceBans || StrEqual(name, "sourcebans");
+	gB_GOKZGlobal = gB_GOKZGlobal || StrEqual(name, "gokz-global");
 }
 
 public void OnLibraryRemoved(const char[] name)
@@ -122,6 +123,7 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 	gB_SourceBansPP = gB_SourceBansPP && !StrEqual(name, "sourcebans++");
 	gB_SourceBans = gB_SourceBans && !StrEqual(name, "sourcebans");
+	gB_GOKZGlobal = gB_GOKZGlobal && !StrEqual(name, "gokz-global");
 }
 
 
@@ -271,7 +273,7 @@ static void BanSuspect(int client, ACReason reason)
 	
 	if (gB_GOKZGlobal)
 	{
-		strcopy(redirectString, sizeof(redirectString), "Visit https://forum.gokz.org/p/player-rules for more info");
+		redirectString = "Visit https://forum.gokz.org/p/player-rules for more info";
 	}
 	
 	switch (reason)
