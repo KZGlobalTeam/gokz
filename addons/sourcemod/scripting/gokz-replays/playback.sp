@@ -566,9 +566,6 @@ static void SetBotStuff(int bot)
 	{
 		GOKZ_JoinTeam(client, CS_TEAM_T);
 	}
-
-	// Set the bot's teleports according to if its time type was NUB or PRO
-	GOKZ_SetTeleportCount(client, botTeleportsUsed[bot]);
 	
 	// Set bot weapon according to mode of the replay
 	// Always start by removing the pistol

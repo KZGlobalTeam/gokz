@@ -114,6 +114,7 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 	}
 
 	timerRunning[client] = false;
+	StartRecording(client);
 }
 
 void GOKZ_OnPause_Recording(int client)
