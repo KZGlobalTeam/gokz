@@ -33,6 +33,7 @@
  * `!timerstyle` - Toggle the style of the timer text.
  * `!speed` - Toggle visibility of your speed and jump pre-speed.
  * `!hideweapon` - Toggle visibility of your weapon.
+ * `!timertype` - Toggle the PRO/NUB indicator for the timer text.
 
 ### gokz-tips
 
