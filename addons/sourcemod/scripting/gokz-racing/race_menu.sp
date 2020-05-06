@@ -60,7 +60,7 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 		{
 			if (!InRace(param1))
 			{
-				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuCheckpoint[param1]);
+				//HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuCheckpoint[param1]);
 			}
 			
 			SendRequestAll(param1);
@@ -101,7 +101,7 @@ void RaceMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[raceMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[raceMenuCheckpoint[client]], client);
+	//FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[raceMenuCheckpoint[client]], client);
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -146,7 +146,7 @@ static void DisplayRaceCheckpointMenu(int client)
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
 	menu.SetTitle("%T", "Checkpoint Rule Menu - Title", client);
-	GOKZ_RC_MenuAddCheckpointRuleItems(client, menu);
+	//GOKZ_RC_MenuAddCheckpointRuleItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 

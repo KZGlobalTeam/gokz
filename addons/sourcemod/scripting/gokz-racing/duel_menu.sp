@@ -10,7 +10,8 @@
 #define ITEM_INFO_TELEPORT "tp"
 
 static int duelMenuMode[MAXPLAYERS + 1];
-static int duelMenuCheckpoint[MAXPLAYERS + 1];
+static int duelMenuCheckpointLimit[MAXPLAYERS + 1];
+static int duelMenuCheckpointCooldown[MAXPLAYERS + 1];
 
 
 
@@ -85,7 +86,7 @@ void DuelMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[duelMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[duelMenuCheckpoint[client]], client);
+	FormatEx(display, sizeof(display), "%s", GetRaceMenuRules(duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]), client);
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -130,7 +131,7 @@ static void DisplayRaceCheckpointMenu(int client)
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
 	menu.SetTitle("%T", "Checkpoint Rule Menu - Title", client);
-	GOKZ_RC_MenuAddCheckpointRuleItems(client, menu);
+	RaceCheckpointMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -138,12 +139,196 @@ public int MenuHandler_DuelCheckpoint(Menu menu, MenuAction action, int param1, 
 {
 	if (action == MenuAction_Select)
 	{
-		duelMenuCheckpoint[param1] = param2;
-		DisplayDuelMenu(param1, false);
+		switch (param2)
+		{
+			case 0:
+			{
+				duelMenuCheckpointCooldown[param1] = 0;
+				duelMenuCheckpointLimit[param1] = 0;
+				DisplayDuelMenu(param1, false);
+			}
+			case 1:
+			{
+				DisplayCheckpointLimitMenu(param1);
+			}
+			case 2:
+			{
+				DisplayCheckpointCooldownMenu(param1);
+			}
+			case 3:
+			{
+				duelMenuCheckpointCooldown[param1] = -1;
+				duelMenuCheckpointLimit[param1] = -1;
+				DisplayDuelMenu(param1, false);
+			}
+		}
 	}
 	else if (action == MenuAction_Cancel)
 	{
 		DisplayDuelMenu(param1, false);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+void RaceCheckpointMenuAddItems(int client, Menu menu)
+{
+	char display[32];
+
+	menu.RemoveAllItems();
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - None", client);
+	menu.AddItem("", display);
+
+	if (duelMenuCheckpointLimit[client] == -1)
+	{
+		FormatEx(display, sizeof(display), "%T None", "Checkpoint Rule - Checkpoint Limit", client);
+		menu.AddItem("", display);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T %d", "Checkpoint Rule - Checkpoint Limit", client, duelMenuCheckpointLimit[client]);
+		menu.AddItem("", display);
+	}
+
+	if (duelMenuCheckpointCooldown[client] == -1)
+	{
+		FormatEx(display, sizeof(display), "%T None", "Checkpoint Rule - Checkpoint Cooldown", client);
+		menu.AddItem("", display);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T %ds", "Checkpoint Rule - Checkpoint Cooldown", client, duelMenuCheckpointCooldown[client]);
+		menu.AddItem("", display);
+	}
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Unlimited", client);
+	menu.AddItem("", display);
+}
+
+
+
+// =====[ CP LIMIT MENU ]=====
+
+static void DisplayCheckpointLimitMenu(int client)
+{
+	char display[32];
+
+	Menu menu = new Menu(MenuHandler_DuelCheckpointLimit);
+	menu.ExitButton = false;
+	menu.ExitBackButton = true;
+	menu.SetTitle("%T %d", "Checkpoint Limit Menu - Title", client, duelMenuCheckpointLimit[client], client);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Add One", client);
+	menu.AddItem("+1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Add Five", client);
+	menu.AddItem("+5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Remove One", client);
+	menu.AddItem("-1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Remove Five", client);
+	menu.AddItem("-5", display);
+
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char item[32];
+		menu.GetItem(param2, item, sizeof(item));
+		if (StrEqual(item, "+1"))
+		{
+			duelMenuCheckpointLimit[param1]++;
+		}
+		if (StrEqual(item, "+5"))
+		{
+			duelMenuCheckpointLimit[param1] += 5;
+		}
+		if (StrEqual(item, "-1"))
+		{
+			duelMenuCheckpointLimit[param1]--;
+		}
+		if (StrEqual(item, "-5"))
+		{
+			duelMenuCheckpointLimit[param1] -= 5;
+		}
+
+		duelMenuCheckpointLimit[param1] = duelMenuCheckpointLimit[param1] < 0 ? 0 : duelMenuCheckpointLimit[param1];
+		DisplayCheckpointLimitMenu(param1);
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		DisplayRaceCheckpointMenu(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+
+
+// =====[ CP COOLDOWN MENU ]=====
+
+static void DisplayCheckpointCooldownMenu(int client)
+{
+	char display[32];
+
+	Menu menu = new Menu(MenuHandler_DuelTPCooldown);
+	menu.ExitButton = false;
+	menu.ExitBackButton = true;
+	menu.SetTitle("%T %ds", "Checkpoint Cooldown Menu - Title", client, duelMenuCheckpointCooldown[client], client);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Add One Second", client);
+	menu.AddItem("+1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Add Five Seconds", client);
+	menu.AddItem("+5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Remove One Second", client);
+	menu.AddItem("-1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Remove Five Seconds", client);
+	menu.AddItem("-5", display);
+
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+public int MenuHandler_DuelTPCooldown(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char item[32];
+		menu.GetItem(param2, item, sizeof(item));
+		if (StrEqual(item, "+1"))
+		{
+			duelMenuCheckpointCooldown[param1]++;
+		}
+		if (StrEqual(item, "+5"))
+		{
+			duelMenuCheckpointCooldown[param1] += 5;
+		}
+		if (StrEqual(item, "-1"))
+		{
+			duelMenuCheckpointCooldown[param1]--;
+		}
+		if (StrEqual(item, "-5"))
+		{
+			duelMenuCheckpointCooldown[param1] -= 5;
+		}
+
+		duelMenuCheckpointCooldown[param1] = duelMenuCheckpointCooldown[param1] < 0 ? 0 : duelMenuCheckpointCooldown[param1];
+		DisplayCheckpointCooldownMenu(param1);
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		DisplayRaceCheckpointMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -233,6 +418,28 @@ static bool SendDuelRequest(int host, int target)
 		return false;
 	}
 	
-	HostRace(host, RaceType_Duel, 0, duelMenuMode[host], duelMenuCheckpoint[host]);
+	HostRace(host, RaceType_Duel, 0, duelMenuMode[host], duelMenuCheckpointLimit[host], duelMenuCheckpointCooldown[host]);
 	return SendRequest(host, target);
 } 
+
+
+
+// =====[ PRIVATE ]=====
+char[] GetRaceMenuRules(int checkpointLimit, int checkpointCooldown)
+{
+	char rulesString[64];
+	if (checkpointLimit == -1 && checkpointCooldown == -1)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "Unlimited");
+	}
+	else if (checkpointLimit == 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "No checkpoints");
+	}
+	else
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%d checkpoints, %ds cooldown", checkpointLimit, checkpointCooldown);
+	}
+
+	return rulesString;
+}

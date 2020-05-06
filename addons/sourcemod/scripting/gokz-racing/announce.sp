@@ -121,10 +121,22 @@ void OnRequestReceived_Announce(int client, int raceID)
 			GOKZ_PrintToChat(client, true, "%t", "Duel Request Received", host);
 		}
 	}
+
+	int cpRule = GetRaceInfo(raceID, RaceInfo_CheckpointRule);
+	int cdRule = GetRaceInfo(raceID, RaceInfo_CooldownRule);
+	if (cpRule == -1 && cdRule == -1)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - Unlimited", gC_ModeNames[GetRaceInfo(raceID, RaceInfo_Mode)]);
+	}
+	if (cpRule == 0)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - No Checkpoints", gC_ModeNames[GetRaceInfo(raceID, RaceInfo_Mode)]);
+	}
 	
-	GOKZ_PrintToChat(client, false, "%t", "Race Rules", 
+	GOKZ_PrintToChat(client, false, "%t", "Race Rules - Limited", 
 		gC_ModeNames[GetRaceInfo(raceID, RaceInfo_Mode)], 
-		gC_CheckpointRulePhrases[GetRaceInfo(raceID, RaceInfo_CheckpointRule)]);
+		GetRaceInfo(raceID, RaceInfo_CheckpointRule),
+		GetRaceInfo(raceID, RaceInfo_CooldownRule));
 	GOKZ_PrintToChat(client, false, "%t", "You Have Seconds To Accept", RoundFloat(RC_REQUEST_TIMEOUT_TIME));
 }
 

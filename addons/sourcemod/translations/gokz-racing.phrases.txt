@@ -5,13 +5,13 @@
 	{
 		"en"		"No checkpoints"
 	}
-	"Checkpoint Rule - 1 Minute Checkpoint Cooldown"
+	"Checkpoint Rule - Checkpoint Limit"
 	{
-		"en"		"1 minute checkpoint cooldown"
+		"en"		"Checkpoint Limit:"
 	}
-	"Checkpoint Rule - 10 Checkpoint Limit"
+	"Checkpoint Rule - Checkpoint Cooldown"
 	{
-		"en"		"10 checkpoint limit"
+		"en"		"Checkpoint Cooldown:"
 	}
 	"Checkpoint Rule - Unlimited"
 	{
@@ -26,7 +26,7 @@
 	}
 	"Checkpoint On Cooldown"
 	{
-		"#format"	"{1:.1f}"
+		"#format"	"{1:d}"
 		"en"		"{darkred}You must wait another {default}{1} {darkred}seconds before checkpointing."
 	}
 	"No Checkpoints Left"
@@ -75,11 +75,23 @@
 	{
 		"en"		"{darkred}No one is currently available to be challenged."
 	}
-	"Race Rules"
+	"Race Rules - No Checkpoints"
 	{
-		// Rules [SimpleKZ | No teleports]
-		"#format"	"{1:s},{2:t}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2}{grey}"
+		// Rules [SimpleKZ | No checkpoints]
+		"#format"	"{1:s}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow} No checkpoints"
+	}
+	"Race Rules - Unlimited"
+	{
+		// Rules [SimpleKZ | Unlimited]
+		"#format"	"{1:s}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}Unlimited"
+	}
+	"Race Rules - Limited"
+	{
+		// Rules [SimpleKZ | Num checkpoints | Cooldown time]
+		"#format"	"{1:s},{2:d},{3:d}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoints{grey} | {yellow}{3}s checkpoint cooldown{grey}"
 	}
 	"You Have Seconds To Accept"
 	{
@@ -221,6 +233,55 @@
 	{
 		"en"		"Choose Your Opponent"
 	}
+
+
+
+	// =====[ TP LIMIT MENU ]=====
+	"Checkpoint Limit Menu - Title"
+	{
+		"en"		"Max number of CPs:"
+	}
+	"Checkpoint Limit Menu - Add One"
+	{
+		"en"		"Add one"
+	}
+	"Checkpoint Limit Menu - Add Five"
+	{
+		"en"		"Add five"
+	}
+	"Checkpoint Limit Menu - Remove One"
+	{
+		"en"		"Remove one"
+	}
+	"Checkpoint Limit Menu - Remove Five"
+	{
+		"en"		"Remove five"
+	}
+
+
+
+	// =====[ CP COOLDOWN MENU ]=====
+	"Checkpoint Cooldown Menu - Title"
+	{
+		"en"		"Cooldown between CPs:"
+	}
+	"Checkpoint Cooldown Menu - Add One Second"
+	{
+		"en"		"Add 1s"
+	}
+	"Checkpoint Cooldown Menu - Add Five Seconds"
+	{
+		"en"		"Add 5s"
+	}
+	"Checkpoint Cooldown Menu - Remove One Second"
+	{
+		"en"		"Remove 1s"
+	}
+	"Checkpoint Cooldown Menu - Remove Five Seconds"
+	{
+		"en"		"Remove 5s"
+	}
+
 
 
 	// =====[ OTHER MENUS ]=====

@@ -7,8 +7,8 @@
 
 static int racerStatus[MAXPLAYERS + 1];
 static int racerRaceID[MAXPLAYERS + 1];
-static float lastTimerStartTime[MAXPLAYERS + 1];
-static float lastCheckpointTime[MAXPLAYERS + 1];
+static int lastTimerStartTime[MAXPLAYERS + 1];
+static int lastCheckpointTime[MAXPLAYERS + 1];
 
 
 
@@ -27,43 +27,36 @@ Action OnTimerStart_Racer(int client, int course)
 
 Action OnTimerStart_Post_Racer(int client)
 {
-	lastTimerStartTime[client] = GetGameTime();
+	lastTimerStartTime[client] = GetGameTickCount();
 }
 
 Action OnMakeCheckpoint_Racer(int client)
 {
 	if (GOKZ_GetTimerRunning(client) && InStartedRace(client))
 	{
-		switch (GetRaceInfo(GetRaceID(client), RaceInfo_CheckpointRule))
+		int checkpointRule = GetRaceInfo(GetRaceID(client), RaceInfo_CheckpointRule);
+		if (checkpointRule == 0)
 		{
-			case CheckpointRule_None:
-			{
-				GOKZ_PrintToChat(client, true, "%t", "Checkpoints Not Allowed During Race");
-				GOKZ_PlayErrorSound(client);
-				return Plugin_Handled;
-			}
-			case CheckpointRule_OneMinuteCooldown:
-			{
-				float timeSinceLastCheckpoint = FloatMin(
-					GetGameTime() - lastTimerStartTime[client], 
-					GetGameTime() - lastCheckpointTime[client]);
-				
-				if (timeSinceLastCheckpoint < 10.0)
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Checkpoint On Cooldown", 10.0 - timeSinceLastCheckpoint);
-					GOKZ_PlayErrorSound(client);
-					return Plugin_Handled;
-				}
-			}
-			case CheckpointRule_TenLimit:
-			{
-				if (GOKZ_GetCheckpointCount(client) >= 10)
-				{
-					GOKZ_PrintToChat(client, true, "%t", "No Checkpoints Left");
-					GOKZ_PlayErrorSound(client);
-					return Plugin_Handled;
-				}
-			}
+			GOKZ_PrintToChat(client, true, "%t", "Checkpoints Not Allowed During Race");
+			GOKZ_PlayErrorSound(client);
+			return Plugin_Handled;
+		}
+		else if (GOKZ_GetCheckpointCount(client) >= checkpointRule)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Checkpoints Left");
+			GOKZ_PlayErrorSound(client);
+			return Plugin_Handled;
+		}
+
+		int cooldownRule = view_as<int>(GetRaceInfo(GetRaceID(client), RaceInfo_CooldownRule));
+		int timeSinceLastCheckpoint = IntMin(
+			GetGameTickCount() - lastTimerStartTime[client], 
+			GetGameTickCount() - lastCheckpointTime[client]);		
+		if (timeSinceLastCheckpoint < cooldownRule * GetTickInterval())
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Checkpoint On Cooldown", view_as<int>(((cooldownRule * GetTickInterval()) - timeSinceLastCheckpoint) / GetTickInterval()));
+			GOKZ_PlayErrorSound(client);
+			return Plugin_Handled;
 		}
 	}
 	
@@ -72,14 +65,14 @@ Action OnMakeCheckpoint_Racer(int client)
 
 void OnMakeCheckpoint_Post_Racer(int client)
 {
-	lastCheckpointTime[client] = GetGameTime();
+	lastCheckpointTime[client] = GetGameTickCount();
 }
 
 Action OnUndoTeleport_Racer(int client)
 {
 	if (GOKZ_GetTimerRunning(client)
 		 && InStartedRace(client)
-		 && GetRaceInfo(GetRaceID(client), RaceInfo_CheckpointRule) != CheckpointRule_Unlimited)
+		 && GetRaceInfo(GetRaceID(client), RaceInfo_CheckpointRule) != -1)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Undo TP Not Allowed During Race");
 		GOKZ_PlayErrorSound(client);
@@ -256,14 +249,14 @@ bool AbortRacer(int client)
 
 // =====[ HOSTING ]=====
 
-int HostRace(int client, int type, int course, int mode, int checkpointRule)
+int HostRace(int client, int type, int course, int mode, int checkpointRule, int cooldownRule)
 {
 	if (InRace(client))
 	{
 		return -1;
 	}
 	
-	int raceID = RegisterRace(client, type, course, mode, checkpointRule);
+	int raceID = RegisterRace(client, type, course, mode, checkpointRule, cooldownRule);
 	racerRaceID[client] = raceID;
 	racerStatus[client] = RacerStatus_Accepted;
 	
