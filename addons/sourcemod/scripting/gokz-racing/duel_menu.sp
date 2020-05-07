@@ -73,7 +73,7 @@ public int MenuHandler_Duel(Menu menu, MenuAction action, int param1, int param2
 
 void DuelMenuAddItems(int client, Menu menu)
 {
-	char display[32];
+	char display[64];
 	
 	menu.RemoveAllItems();
 	
@@ -86,7 +86,7 @@ void DuelMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[duelMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%s", GetRaceMenuRules(duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]), client);
+	FormatEx(display, sizeof(display), "%s", GetRaceMenuRules(client, duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -123,7 +123,7 @@ public int MenuHandler_DuelMode(Menu menu, MenuAction action, int param1, int pa
 
 
 
-// =====[ TELEPORT MENU ]=====
+// =====[ CHECKPOINT MENU ]=====
 
 static void DisplayRaceCheckpointMenu(int client)
 {
@@ -157,7 +157,7 @@ public int MenuHandler_DuelCheckpoint(Menu menu, MenuAction action, int param1, 
 			}
 			case 3:
 			{
-				duelMenuCheckpointCooldown[param1] = -1;
+				duelMenuCheckpointCooldown[param1] = 0;
 				duelMenuCheckpointLimit[param1] = -1;
 				DisplayDuelMenu(param1, false);
 			}
@@ -184,25 +184,16 @@ void RaceCheckpointMenuAddItems(int client, Menu menu)
 
 	if (duelMenuCheckpointLimit[client] == -1)
 	{
-		FormatEx(display, sizeof(display), "%T None", "Checkpoint Rule - Checkpoint Limit", client);
-		menu.AddItem("", display);
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - No Checkpoint Limit", client);
 	}
 	else
 	{
-		FormatEx(display, sizeof(display), "%T %d", "Checkpoint Rule - Checkpoint Limit", client, duelMenuCheckpointLimit[client]);
-		menu.AddItem("", display);
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Checkpoint Limit", client, duelMenuCheckpointLimit[client]);
 	}
+	menu.AddItem("", display);
 
-	if (duelMenuCheckpointCooldown[client] == -1)
-	{
-		FormatEx(display, sizeof(display), "%T None", "Checkpoint Rule - Checkpoint Cooldown", client);
-		menu.AddItem("", display);
-	}
-	else
-	{
-		FormatEx(display, sizeof(display), "%T %ds", "Checkpoint Rule - Checkpoint Cooldown", client, duelMenuCheckpointCooldown[client]);
-		menu.AddItem("", display);
-	}
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Checkpoint Cooldown", client, duelMenuCheckpointCooldown[client]);
+	menu.AddItem("", display);
 
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Unlimited", client);
 	menu.AddItem("", display);
@@ -219,7 +210,15 @@ static void DisplayCheckpointLimitMenu(int client)
 	Menu menu = new Menu(MenuHandler_DuelCheckpointLimit);
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
-	menu.SetTitle("%T %d", "Checkpoint Limit Menu - Title", client, duelMenuCheckpointLimit[client], client);
+
+	if (duelMenuCheckpointLimit[client] == -1)
+	{
+		menu.SetTitle("%T", "Checkpoint Limit Menu - Title Unlimited", client);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Checkpoint Limit Menu - Title Limited", client, duelMenuCheckpointLimit[client]);
+	}
 
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Add One", client);
 	menu.AddItem("+1", display);
@@ -232,6 +231,9 @@ static void DisplayCheckpointLimitMenu(int client)
 
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Remove Five", client);
 	menu.AddItem("-5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Unlimited", client);
+	menu.AddItem("Unlimited", display);
 
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -258,6 +260,10 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 		{
 			duelMenuCheckpointLimit[param1] -= 5;
 		}
+		if (StrEqual(item, "Unlimited"))
+		{
+			duelMenuCheckpointLimit[param1] = -1;
+		}
 
 		duelMenuCheckpointLimit[param1] = duelMenuCheckpointLimit[param1] < 0 ? 0 : duelMenuCheckpointLimit[param1];
 		DisplayCheckpointLimitMenu(param1);
@@ -283,7 +289,15 @@ static void DisplayCheckpointCooldownMenu(int client)
 	Menu menu = new Menu(MenuHandler_DuelTPCooldown);
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
-	menu.SetTitle("%T %ds", "Checkpoint Cooldown Menu - Title", client, duelMenuCheckpointCooldown[client], client);
+
+	if (duelMenuCheckpointCooldown[client] == -1)
+	{
+		menu.SetTitle("%T", "Checkpoint Cooldown Menu - Title None", client);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Checkpoint Cooldown Menu - Title Limited", client, duelMenuCheckpointCooldown[client]);
+	}
 
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Add One Second", client);
 	menu.AddItem("+1", display);
@@ -296,6 +310,9 @@ static void DisplayCheckpointCooldownMenu(int client)
 
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Remove Five Seconds", client);
 	menu.AddItem("-5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - No cooldown", client);
+	menu.AddItem("None", display);
 
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -321,6 +338,10 @@ public int MenuHandler_DuelTPCooldown(Menu menu, MenuAction action, int param1, 
 		if (StrEqual(item, "-5"))
 		{
 			duelMenuCheckpointCooldown[param1] -= 5;
+		}
+		if (StrEqual(item, "None"))
+		{
+			duelMenuCheckpointCooldown[param1] = -1;
 		}
 
 		duelMenuCheckpointCooldown[param1] = duelMenuCheckpointCooldown[param1] < 0 ? 0 : duelMenuCheckpointCooldown[param1];
@@ -425,20 +446,32 @@ static bool SendDuelRequest(int host, int target)
 
 
 // =====[ PRIVATE ]=====
-char[] GetRaceMenuRules(int checkpointLimit, int checkpointCooldown)
+char[] GetRaceMenuRules(int client, int checkpointLimit, int checkpointCooldown)
 {
 	char rulesString[64];
-	if (checkpointLimit == -1 && checkpointCooldown == -1)
+	if (checkpointLimit == -1 && checkpointCooldown == 0)
 	{
-		FormatEx(rulesString, sizeof(rulesString), "Unlimited");
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Unlimited", client);
+	}
+	else if (checkpointLimit > 0 && checkpointCooldown == 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Limited Checkpoints", client, checkpointLimit);
+	}
+	else if (checkpointLimit == -1 && checkpointCooldown > 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rules Summary - Limited Cooldown", client, checkpointCooldown);
+	}
+	else if (checkpointLimit > 0 && checkpointCooldown > 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Limited Everything", client, checkpointLimit, checkpointCooldown);
 	}
 	else if (checkpointLimit == 0)
 	{
-		FormatEx(rulesString, sizeof(rulesString), "No checkpoints");
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - No Checkpoints", client);
 	}
 	else
 	{
-		FormatEx(rulesString, sizeof(rulesString), "%d checkpoints, %ds cooldown", checkpointLimit, checkpointCooldown);
+		FormatEx(rulesString, sizeof(rulesString), "%d %d", checkpointLimit, checkpointCooldown);
 	}
 
 	return rulesString;

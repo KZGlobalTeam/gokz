@@ -3,20 +3,55 @@
 	// =====[ GENERAL ]=====
 	"Checkpoint Rule - None"
 	{
-		"en"		"No checkpoints"
+		"en"		"No Checkpoints"
+	}
+	"Checkpoint Rule - No Checkpoint Limit"
+	{
+		"en"		"Checkpoint Limit: Unlimited"
 	}
 	"Checkpoint Rule - Checkpoint Limit"
 	{
-		"en"		"Checkpoint Limit:"
+		"#format"	"{1:d}"
+		"en"		"Checkpoint Limit: {1}"
+	}
+	"Checkpoint Rule - No Checkpoint Cooldown"
+	{
+		"en"		"No Checkpoint Cooldown"
 	}
 	"Checkpoint Rule - Checkpoint Cooldown"
 	{
-		"en"		"Checkpoint Cooldown:"
+		"#format"	"{1:d}"
+		"en"		"Checkpoint Cooldown: {1}s"
 	}
 	"Checkpoint Rule - Unlimited"
 	{
 		"en"		"Unlimited"
 	}
+
+	"Rule Summary - Unlimited"
+	{
+		"en"		"Unlimited"
+	}
+	"Rule Summary - Limited Checkpoints"
+	{
+		"#format"	"{1:d}"
+		"en"		"{1} checkpoints"
+	}
+	"Rule Summary - Limited Cooldown"
+	{
+		"#format"	"{1:d}"
+		"en"		"{1}s cooldown"
+	}
+	"Rule Summary - Limited Everything"
+	{
+		"#format"	"{1:d},{2:d}"
+		"en"		"{1} checkpoints, {2}s cooldown"
+	}
+	"Rule Summary - No Checkpoints"
+	{
+		"en"		"No checkpoints"
+	}
+
 
 
 	// =====[ CHAT MESSAGES ]=====
@@ -26,7 +61,7 @@
 	}
 	"Checkpoint On Cooldown"
 	{
-		"#format"	"{1:d}"
+		"#format"	"{1:.1f}"
 		"en"		"{darkred}You must wait another {default}{1} {darkred}seconds before checkpointing."
 	}
 	"No Checkpoints Left"
@@ -79,7 +114,7 @@
 	{
 		// Rules [SimpleKZ | No checkpoints]
 		"#format"	"{1:s}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow} No checkpoints"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}No checkpoints"
 	}
 	"Race Rules - Unlimited"
 	{
@@ -92,6 +127,16 @@
 		// Rules [SimpleKZ | Num checkpoints | Cooldown time]
 		"#format"	"{1:s},{2:d},{3:d}"
 		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoints{grey} | {yellow}{3}s checkpoint cooldown{grey}"
+	}
+	"Race Rules - Limited Checkpoints"
+	{
+		"#format"	"{1:s},{2:d}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoints{grey}"
+	}
+	"Race Rules - Limited Cooldown"
+	{
+		"#format"	"{1:s},{2:d}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoint cooldown{grey}"
 	}
 	"You Have Seconds To Accept"
 	{
@@ -236,10 +281,15 @@
 
 
 
-	// =====[ TP LIMIT MENU ]=====
-	"Checkpoint Limit Menu - Title"
+	// =====[ CP LIMIT MENU ]=====
+	"Checkpoint Limit Menu - Title Limited"
 	{
-		"en"		"Max number of CPs:"
+		"#format"	"{1:d}"
+		"en"		"Max number of CPs: {1}"
+	}
+	"Checkpoint Limit Menu - Title Unlimited"
+	{
+		"en"		"Max number of CPs: Unlimited"
 	}
 	"Checkpoint Limit Menu - Add One"
 	{
@@ -257,13 +307,22 @@
 	{
 		"en"		"Remove five"
 	}
+	"Checkpoint Limit Menu - Unlimited"
+	{
+		"en"		"Unlimited"
+	}
 
 
 
 	// =====[ CP COOLDOWN MENU ]=====
-	"Checkpoint Cooldown Menu - Title"
+	"Checkpoint Cooldown Menu - Title None"
 	{
-		"en"		"Cooldown between CPs:"
+		"en"		"Cooldown between CPs: None"
+	}
+	"Checkpoint Cooldown Menu - Title Limited"
+	{
+		"#format"	"{1:d}"
+		"en"		"Cooldown between CPs: {1}s"
 	}
 	"Checkpoint Cooldown Menu - Add One Second"
 	{
@@ -280,6 +339,10 @@
 	"Checkpoint Cooldown Menu - Remove Five Seconds"
 	{
 		"en"		"Remove 5s"
+	}
+	"Checkpoint Cooldown Menu - None"
+	{
+		"en"		"None"
 	}
 
 
