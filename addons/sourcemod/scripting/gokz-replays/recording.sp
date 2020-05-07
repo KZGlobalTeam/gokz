@@ -33,10 +33,7 @@ void OnClientPutInServer_Recording(int client)
 	{
 		recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
 	}
-	else
-	{  // Just in case it isn't cleared when the client disconnects via GOKZ_OnTimerStopped
-		recordedTickData[client].Clear();
-	}
+	
 	StartRecording(client);
 }
 
@@ -246,9 +243,6 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
 	
 	Call_OnReplaySaved(client, path);
 	
-	// Discard recorded data
-	recordedTickData[client].Clear();
-	
 	return true;
 }
 
@@ -334,9 +328,6 @@ static bool SaveRecordingOfCheater(int client)
 	
 	Call_OnReplaySaved(client, path);
 	
-	// Discard recorded data
-	recordedTickData[client].Clear();
-	
 	return true;
 }
 
@@ -347,12 +338,10 @@ static void DiscardRecording(int client)
 	{
 		SaveRecordingOfCheater(client);
 	}
-	else
-	{
-		recordedTickData[client].Clear();
-		recordingIndex[client] = 0;
-		Call_OnReplayDiscarded(client);
-	}
+
+	recordedTickData[client].Clear();
+	recordingIndex[client] = 0;
+	Call_OnReplayDiscarded(client);
 }
 
 static void PauseRecording(int client)
