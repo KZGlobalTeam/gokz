@@ -75,7 +75,7 @@ void DisableNoclip(int client)
 void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
-	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 10, 4, true);
 }
 
 
