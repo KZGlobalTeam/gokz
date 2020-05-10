@@ -136,7 +136,7 @@
 	"Race Rules - Limited Cooldown"
 	{
 		"#format"	"{1:s},{2:d}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoint cooldown{grey}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2}s checkpoint cooldown{grey}"
 	}
 	"You Have Seconds To Accept"
 	{

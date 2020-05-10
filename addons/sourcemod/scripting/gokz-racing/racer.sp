@@ -41,7 +41,7 @@ Action OnMakeCheckpoint_Racer(int client)
 			GOKZ_PlayErrorSound(client);
 			return Plugin_Handled;
 		}
-		else if (GOKZ_GetCheckpointCount(client) >= checkpointRule)
+		else if (checkpointRule != -1 && GOKZ_GetCheckpointCount(client) >= checkpointRule)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "No Checkpoints Left");
 			GOKZ_PlayErrorSound(client);

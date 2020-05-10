@@ -263,6 +263,8 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 		if (StrEqual(item, "Unlimited"))
 		{
 			duelMenuCheckpointLimit[param1] = -1;
+			DisplayRaceCheckpointMenu(param1);
+			return;
 		}
 
 		duelMenuCheckpointLimit[param1] = duelMenuCheckpointLimit[param1] < 0 ? 0 : duelMenuCheckpointLimit[param1];
@@ -311,7 +313,7 @@ static void DisplayCheckpointCooldownMenu(int client)
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Remove Five Seconds", client);
 	menu.AddItem("-5", display);
 
-	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - No cooldown", client);
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - None", client);
 	menu.AddItem("None", display);
 
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -341,7 +343,9 @@ public int MenuHandler_DuelTPCooldown(Menu menu, MenuAction action, int param1, 
 		}
 		if (StrEqual(item, "None"))
 		{
-			duelMenuCheckpointCooldown[param1] = -1;
+			duelMenuCheckpointCooldown[param1] = 0;
+			DisplayRaceCheckpointMenu(param1);
+			return;
 		}
 
 		duelMenuCheckpointCooldown[param1] = duelMenuCheckpointCooldown[param1] < 0 ? 0 : duelMenuCheckpointCooldown[param1];
@@ -459,7 +463,7 @@ char[] GetRaceMenuRules(int client, int checkpointLimit, int checkpointCooldown)
 	}
 	else if (checkpointLimit == -1 && checkpointCooldown > 0)
 	{
-		FormatEx(rulesString, sizeof(rulesString), "%T", "Rules Summary - Limited Cooldown", client, checkpointCooldown);
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Limited Cooldown", client, checkpointCooldown);
 	}
 	else if (checkpointLimit > 0 && checkpointCooldown > 0)
 	{
@@ -468,10 +472,6 @@ char[] GetRaceMenuRules(int client, int checkpointLimit, int checkpointCooldown)
 	else if (checkpointLimit == 0)
 	{
 		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - No Checkpoints", client);
-	}
-	else
-	{
-		FormatEx(rulesString, sizeof(rulesString), "%d %d", checkpointLimit, checkpointCooldown);
 	}
 
 	return rulesString;
