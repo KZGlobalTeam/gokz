@@ -87,7 +87,7 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 		SaveRecordingOfCheater(client);
 		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
 	}
-	else
+	else if (timerRunning[client])
 	{
 		char path[PLATFORM_MAX_PATH];
 		FormatReplayPath(path, sizeof(path), 
