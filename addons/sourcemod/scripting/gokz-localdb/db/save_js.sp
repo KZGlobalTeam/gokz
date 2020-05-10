@@ -148,7 +148,7 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 	int block = data.ReadCell();
 	delete data;
 	
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
 	{
 		return;
 	}
