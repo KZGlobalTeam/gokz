@@ -8,6 +8,7 @@
 static float lastTrigMultiTouchTime[MAXPLAYERS + 1];
 static float lastTouchGroundTime[MAXPLAYERS + 1];
 static float lastTouchLadderTime[MAXPLAYERS + 1];
+static int triggerTouchCount[MAXPLAYERS + 1];
 
 
 
@@ -15,7 +16,7 @@ static float lastTouchLadderTime[MAXPLAYERS + 1];
 
 bool BhopTriggersJustTouched(int client)
 {
-	if (Movement_GetMovetype(client) == MOVETYPE_LADDER)
+	if (Movement_GetMovetype(client) == MOVETYPE_LADDER && triggerTouchCount[client] > 0)
 	{
 		return GetEngineTime() - lastTouchLadderTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME
 		 && GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME;
@@ -31,6 +32,11 @@ bool BhopTriggersJustTouched(int client)
 
 // =====[ EVENTS ]=====
 
+void OnClientPutInServer_BhopTriggers(int client)
+{
+	triggerTouchCount[client] = 0;
+}
+
 void OnEntitySpawned_MapBhopTriggers(int entity)
 {
 	char tempString[32];
@@ -41,10 +47,11 @@ void OnEntitySpawned_MapBhopTriggers(int entity)
 		return;
 	}
 	
-	SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouch_MapBhopTriggers);
+	SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouchStart_MapBhopTriggers);
+	SDKHook(entity, SDKHook_EndTouchPost, OnTrigMultTouchEnd_MapBhopTriggers);
 }
 
-public void OnTrigMultTouch_MapBhopTriggers(int entity, int other)
+public void OnTrigMultTouchStart_MapBhopTriggers(int entity, int other)
 {
 	if (!IsValidClient(other))
 	{
@@ -52,6 +59,17 @@ public void OnTrigMultTouch_MapBhopTriggers(int entity, int other)
 	}
 	
 	lastTrigMultiTouchTime[other] = GetEngineTime();
+	triggerTouchCount[other]++;
+}
+
+public void OnTrigMultTouchEnd_MapBhopTriggers(int entity, int other)
+{
+	if (!IsValidClient(other))
+	{
+		return;
+	}
+	
+	triggerTouchCount[other]--;
 }
 
 void OnStartTouchGround_MapBhopTriggers(int client)

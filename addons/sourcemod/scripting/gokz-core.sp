@@ -148,6 +148,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_FirstSpawn(client);
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
+	OnClientPutInServer_BhopTriggers(client);
 	HookClientEvents(client);
 }
 
