@@ -4,6 +4,8 @@ static float lastPauseTime[MAXPLAYERS + 1];
 static bool hasPausedInThisRun[MAXPLAYERS + 1];
 static float lastResumeTime[MAXPLAYERS + 1];
 static bool hasResumedInThisRun[MAXPLAYERS + 1];
+static float lastDuckValue[MAXPLAYERS + 1];
+static float lastStaminaValue[MAXPLAYERS + 1];
 
 
 
@@ -37,6 +39,8 @@ void Pause(int client)
 	// Pause
 	paused[client] = true;
 	pausedOnLadder[client] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+	lastDuckValue[client] = Movement_GetDuckSpeed(client);
+	lastStaminaValue[client] = GetEntPropFloat(client, Prop_Send, "m_flStamina");
 	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 	Movement_SetMovetype(client, MOVETYPE_NONE);
 	if (GetTimerRunning(client))
@@ -113,6 +117,8 @@ void Resume(int client)
 		hasResumedInThisRun[client] = true;
 		lastResumeTime[client] = GetEngineTime();
 	}
+	Movement_SetDuckSpeed(client, lastDuckValue[client]);
+	SetEntPropFloat(client, Prop_Send, "m_flStamina", lastStaminaValue[client]);
 	
 	// Call Post Forward
 	Call_GOKZ_OnResume_Post(client);

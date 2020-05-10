@@ -27,6 +27,8 @@ public Plugin myinfo =
 ArrayList gA_Position;
 ArrayList gA_Angles;
 ArrayList gA_Velocity;
+ArrayList gF_DuckSpeed;
+ArrayList gF_Stamina;
 ArrayList gA_LocationName;
 ArrayList gA_LocationCreator;
 bool gB_LocMenuOpen[MAXPLAYERS + 1];
@@ -417,18 +419,24 @@ void SaveLocation(int client, char[] name)
 	float position[3];
 	float angles[3];
 	float velocity[3];
+	float duckSpeed;
+	float stamina;
 	char creator[MAX_NAME_LENGTH];
 	int id = gA_Position.Length;
 	
 	GetClientAbsOrigin(client, position);
 	GetClientEyeAngles(client, angles);
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
+	duckSpeed = Movement_GetDuckSpeed(client);
+	stamina = GetEntPropFloat(client, Prop_Send, "m_flStamina");
 	GetClientName(client, creator, sizeof(creator));
 	
 	gI_MostRecentLocation[client] = id;
 	gA_Position.PushArray(position);
 	gA_Angles.PushArray(angles);
 	gA_Velocity.PushArray(velocity);
+	gF_DuckSpeed.Push(duckSpeed);
+	gF_Stamina.Push(stamina);
 	gA_LocationName.PushString(name);
 	gA_LocationCreator.PushString(creator);
 	
@@ -461,6 +469,8 @@ bool LoadLocation(int client, int id)
 	float position[3];
 	float angles[3];
 	float velocity[3];
+	float duckSpeed;
+	float stamina;
 	char name[MAX_LOCATION_NAME_LENGTH];
 	char creator[MAX_NAME_LENGTH];
 	char clientName[MAX_NAME_LENGTH];
@@ -468,11 +478,15 @@ bool LoadLocation(int client, int id)
 	gA_Position.GetArray(id, position, sizeof(position));
 	gA_Angles.GetArray(id, angles, sizeof(angles));
 	gA_Velocity.GetArray(id, velocity, sizeof(velocity));
+	duckSpeed = gF_DuckSpeed.Get(id);
+	stamina = gF_Stamina.Get(id);
 	gA_LocationName.GetString(id, name, sizeof(name));
 	gA_LocationCreator.GetString(id, creator, sizeof(creator));
 	GetClientName(client, clientName, sizeof(clientName));
 	
 	TeleportEntity(client, position, angles, velocity);
+	Movement_SetDuckSpeed(client, duckSpeed);
+	SetEntPropFloat(client, Prop_Send, "m_flStamina", stamina);
 	
 	// print message if loading new location
 	if (gI_MostRecentLocation[client] != id)
@@ -526,6 +540,8 @@ void CreateArrays()
 	gA_Position = new ArrayList(3);
 	gA_Angles = new ArrayList(3);
 	gA_Velocity = new ArrayList(3);
+	gF_DuckSpeed = new ArrayList(1);
+	gF_Stamina = new ArrayList(1);
 	gA_LocationName = new ArrayList(ByteCountToCells(MAX_LOCATION_NAME_LENGTH));
 	gA_LocationCreator = new ArrayList(ByteCountToCells(MAX_NAME_LENGTH));
 }
@@ -535,6 +551,8 @@ void ClearLocations()
 	gA_Position.Clear();
 	gA_Angles.Clear();
 	gA_Velocity.Clear();
+	gF_DuckSpeed.Clear();
+	gF_Stamina.Clear();
 	gA_LocationName.Clear();
 	gA_LocationCreator.Clear();
 	
