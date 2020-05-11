@@ -73,7 +73,7 @@ forward void GOKZ_RP_OnTimerEnd_Post(int client, const char[] filePath, int cour
  * @param info				Struct to pass the values into.
  * @return					If successful
  */
-native int GOKZ_RP_GetPlaybackInfo(int client, any info[sizeof(HUDInfo)]);
+native int GOKZ_RP_GetPlaybackInfo(int client, any[] info);
 
 
 

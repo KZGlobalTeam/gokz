@@ -75,7 +75,7 @@ void DisableNoclip(int client)
 void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
-	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 10, 4, true);
 }
 
 
@@ -124,6 +124,7 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 static bool savedOnLadder[MAXPLAYERS + 1];
+static MoveType specMovetype[MAXPLAYERS + 1];
 
 void OnClientPutInServer_JoinTeam(int client)
 {
@@ -133,6 +134,35 @@ void OnClientPutInServer_JoinTeam(int client)
 void OnTimerStart_JoinTeam(int client)
 {
 	hasSavedPosition[client] = false;
+}
+
+void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
+{
+	if ((team == CS_TEAM_CT || team == CS_TEAM_T) &&
+		oldteam != CS_TEAM_NONE)
+	{
+		// The position is not correct before the next frame
+		DataPack data = new DataPack();
+		data.WriteCell(client);
+		RequestFrame(UnspecUnstuck, data);
+	}
+	else
+	{
+		specMovetype[client] = Movement_GetMovetype(client);
+	}
+}
+
+void UnspecUnstuck(DataPack data)
+{
+	data.Reset();
+	int client = data.ReadCell();
+	delete data;
+	
+	float origin[3], angles[3];
+	Movement_GetOrigin(client, origin);
+	Movement_GetEyeAngles(client, angles);
+	Movement_SetMovetype(client, specMovetype[client]);
+	TeleportPlayer(client, origin, angles);
 }
 
 void JoinTeam(int client, int newTeam, bool restorePos)

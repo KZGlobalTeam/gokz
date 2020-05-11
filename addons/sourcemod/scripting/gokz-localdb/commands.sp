@@ -9,7 +9,8 @@ public Action CommandSetCheater(int client, int args)
 {
 	if (args == 0)
 	{
-		return; // TODO User-friendliness?
+		GOKZ_PrintToChat(client, true, "%t", "No SteamID specified");
+		return;
 	}
 	
 	char steamID2[64];
@@ -17,15 +18,7 @@ public Action CommandSetCheater(int client, int args)
 	int steamAccountID = Steam2ToSteamAccountID(steamID2);
 	if (steamAccountID == -1)
 	{
-		// TODO Translation phrases?
-		if (client == 0)
-		{
-			LogMessage("The SteamID could not be parsed - use 'STEAM_1:X:X'.");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "{grey}The SteamID could not be parsed - use '{default}STEAM_1:X:X{grey}'.");
-		}
+		GOKZ_PrintToChat(client, true, "%t", "Invalid SteamID");
 	}
 	else
 	{
@@ -37,7 +30,7 @@ public Action CommandSetNotCheater(int client, int args)
 {
 	if (args == 0)
 	{
-		return; // TODO User-friendliness?
+		GOKZ_PrintToChat(client, true, "%t", "No SteamID specified");
 	}
 	
 	char steamID2[64];
@@ -45,15 +38,7 @@ public Action CommandSetNotCheater(int client, int args)
 	int steamAccountID = Steam2ToSteamAccountID(steamID2);
 	if (steamAccountID == -1)
 	{
-		// TODO Translation phrases?
-		if (client == 0)
-		{
-			LogMessage("The SteamID could not be parsed - use 'STEAM_1:X:X'.");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "{grey}The SteamID could not be parsed - use '{default}STEAM_1:X:X{grey}'.");
-		}
+		GOKZ_PrintToChat(client, true, "%t", "Invalid SteamID");
 	}
 	else
 	{
@@ -65,10 +50,11 @@ public Action CommandDeleteJump(int client, int args)
 {
 	if (args < 3)
 	{
-		return; // TODO User-friendliness?
+		GOKZ_PrintToChat(client, true, "%t", "Delete Jump Usage");
+		return;
 	}
 	
-	int i, steamAccountID, isBlock, mode, jumpType;
+	int steamAccountID, isBlock, mode, jumpType;
 	char query[1024], split[4][32];
 	
 	// Get arguments
@@ -80,66 +66,40 @@ public Action CommandDeleteJump(int client, int args)
 	steamAccountID = Steam2ToSteamAccountID(split[0]);
 	if (steamAccountID == -1)
 	{
-		// TODO Translation phrases?
-		if (client == 0)
-		{
-			LogMessage("The SteamID could not be parsed - use 'STEAM_1:X:X'.");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "{grey}The SteamID could not be parsed - use '{default}STEAM_1:X:X{grey}'.");
-		}
+		GOKZ_PrintToChat(client, true, "%t", "Invalid SteamID");
 		return;
 	}
 	
 	// Mode
-	for (i = 0; i < MODE_COUNT; i++)
+	for (mode = 0; mode < MODE_COUNT; mode++)
 	{
-		if (StrEqual(split[1], gC_ModeNames[i]) || StrEqual(split[1], gC_ModeNamesShort[i]))
+		if (StrEqual(split[1], gC_ModeNames[mode]) || StrEqual(split[1], gC_ModeNamesShort[mode], false))
 		{
-			mode = i;
 			break;
 		}
 	}
-	if (i == MODE_COUNT)
+	if (mode == MODE_COUNT)
 	{
-		// TODO Translation phrases?
-		if (client == 0)
-		{
-			LogMessage("The mode could not be parsed - use 'SKZ' or 'SimpleKZ'.");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "{grey}The mode could not be parsed - use '{purple}SKZ{grey}' or '{purple}SimpleKZ{grey}'.");
-		}
+		GOKZ_PrintToChat(client, true, "%t", "Invalid Mode");
 		return;
 	}
 	
 	// Jumptype
-	for (i = 0; i < JUMPTYPE_COUNT; i++)
+	for (jumpType = 0; jumpType < JUMPTYPE_COUNT; jumpType++)
 	{
-		if (StrEqual(split[2], gC_JumpTypes[i]) || StrEqual(split[2], gC_JumpTypesShort[i]))
+		if (StrEqual(split[2], gC_JumpTypes[jumpType]) || StrEqual(split[2], gC_JumpTypesShort[jumpType], false))
 		{
-			jumpType = i;
 			break;
 		}
 	}
-	if (i == JUMPTYPE_COUNT)
+	if (jumpType == JUMPTYPE_COUNT)
 	{
-		// TODO Translation phrases?
-		if (client == 0)
-		{
-			LogMessage("The jump type could not be parsed - use 'LJ'.");
-		}
-		else
-		{
-			GOKZ_PrintToChat(client, true, "{grey}The jump type could not be parsed - use '{default}LJ{grey}'.");
-		}
+		GOKZ_PrintToChat(client, true, "%t", "Invalid Jumptype");
 		return;
 	}
 	
 	// Is it a block jump?
-	isBlock = (split[3][0] != '0' && split[3][0] != '\0');
+	isBlock = StrEqual(split[3], "yes", false) || StrEqual(split[3], "true", false) || StrEqual(split[3], "1");
 	
 	DB_DeleteJump(client, steamAccountID, jumpType, mode, isBlock);
 }

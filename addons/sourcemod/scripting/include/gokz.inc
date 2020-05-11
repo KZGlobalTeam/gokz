@@ -399,11 +399,10 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
  */
 stock void TeleportPlayer(int client, const float origin[3], const float angles[3])
 {
+	bool ducking = false;
+	
 	Movement_SetOrigin(client, origin);
 	Movement_SetEyeAngles(client, angles);
-	
-	// Intelligently hold player still to prevent booster exploits
-	StartHoldStill(client, 3);
 	
 	// Duck the player if there is something blocking them from above
 	Handle trace = TR_TraceHullFilterEx(origin, 
@@ -415,17 +414,22 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 		client);
 	if (TR_DidHit(trace))
 	{
+		ducking = true;
 		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
 	}
 	delete trace;
+	
+	// Intelligently hold player still to prevent booster exploits
+	StartHoldStill(client, 3, ducking);
 }
 
-static void StartHoldStill(int client, int ticks)
+static void StartHoldStill(int client, int ticks, bool ducking)
 {
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(Movement_GetMovetype(client));
 	data.WriteCell(ticks);
+	data.WriteCell(ducking)
 	ContinueHoldStill(data);
 }
 
@@ -435,6 +439,7 @@ public void ContinueHoldStill(DataPack data)
 	int client = GetClientOfUserId(data.ReadCell());
 	MoveType desiredMoveType = data.ReadCell();
 	int ticks = data.ReadCell();
+	bool ducking = data.ReadCell();
 	delete data;
 	
 	if (!IsValidClient(client))
@@ -448,11 +453,27 @@ public void ContinueHoldStill(DataPack data)
 		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetGravity(client, 1.0);
 		
+		// This makes it so the player doesn't trigger triggers, player is still solid to the world
+		// See https://bitbucket.org/kztimerglobalteam/kztimerglobal/commits/8da6e2d4a7b679a656b849beb6d0020514160398
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", 1);
+		Movement_SetMovetype(client, MOVETYPE_NONE);
+		
+		if (ducking)
+		{
+			SetEntProp(client, Prop_Send, "m_bDucking", true);
+		}
+		
 		data = new DataPack();
 		data.WriteCell(GetClientUserId(client));
 		data.WriteCell(desiredMoveType);
 		data.WriteCell(ticks);
+		data.WriteCell(ducking);
 		RequestFrame(ContinueHoldStill, data);
+	}
+	else
+	{
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", 10);
+		Movement_SetMovetype(client, desiredMoveType);
 	}
 }
 

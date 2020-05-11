@@ -33,26 +33,23 @@ void OnClientPutInServer_Recording(int client)
 	{
 		recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
 	}
-	else
-	{  // Just in case it isn't cleared when the client disconnects via GOKZ_OnTimerStopped
-		recordedTickData[client].Clear();
-	}
+	
 	StartRecording(client);
 }
 
 void OnPlayerRunCmdPost_Recording(int client, int buttons)
 {
-	if (!IsValidClient(client) || IsFakeClient(client))
+	if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
 	{
 		return;
 	}
 
 	int tick = GetArraySize(recordedTickData[client]);
-	if (timerRunning[client] && !recordingPaused[client])
+	if (timerRunning[client])
 	{
 		recordedTickData[client].Resize(tick + 1);
 	}
-	else if (!recordingPaused[client] && IsPlayerAlive(client))
+	else
 	{
 		if (tick < RP_MAX_CHEATER_REPLAY_LENGTH)
 		{
@@ -60,10 +57,6 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 		}
 		tick = recordingIndex[client];
 		recordingIndex[client] = recordingIndex[client] == RP_MAX_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
-	}
-	else
-	{
-		return;
 	}
 	
 	float origin[3], angles[3];
@@ -94,7 +87,7 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 		SaveRecordingOfCheater(client);
 		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
 	}
-	else
+	else if (timerRunning[client])
 	{
 		char path[PLATFORM_MAX_PATH];
 		FormatReplayPath(path, sizeof(path), 
@@ -195,7 +188,8 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
 		DeleteFile(path);
 	}
 	else
-	{  // New replay so add it to replay info cache
+	{
+		// New replay so add it to replay info cache
 		AddToReplayInfoCache(course, mode, style, timeType);
 		SortReplayInfoCache();
 	}
@@ -246,14 +240,11 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
 	
 	Call_OnReplaySaved(client, path);
 	
-	// Discard recorded data
-	recordedTickData[client].Clear();
-	
 	return true;
 }
 
 static bool SaveRecordingOfCheater(int client)
-{	
+{
 	// Prepare data
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
@@ -334,25 +325,14 @@ static bool SaveRecordingOfCheater(int client)
 	
 	Call_OnReplaySaved(client, path);
 	
-	// Discard recorded data
-	recordedTickData[client].Clear();
-	
 	return true;
 }
 
 static void DiscardRecording(int client)
-{	
-	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client)
-		&& recordedTickData[client].Length >= RP_MIN_CHEATER_REPLAY_LENGTH)
-	{
-		SaveRecordingOfCheater(client);
-	}
-	else
-	{
-		recordedTickData[client].Clear();
-		recordingIndex[client] = 0;
-		Call_OnReplayDiscarded(client);
-	}
+{
+	recordedTickData[client].Clear();
+	recordingIndex[client] = 0;
+	Call_OnReplayDiscarded(client);
 }
 
 static void PauseRecording(int client)
