@@ -285,7 +285,8 @@ public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcas
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	int team = event.GetInt("team");
-	OnPlayerJoinTeam_JoinTeam(client, team);
+	int oldteam = event.GetInt("oldteam");
+	OnPlayerJoinTeam_JoinTeam(client, team, oldteam);
 }
 
 

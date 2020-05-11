@@ -136,9 +136,10 @@ void OnTimerStart_JoinTeam(int client)
 	hasSavedPosition[client] = false;
 }
 
-void OnPlayerJoinTeam_JoinTeam(int client, int team)
+void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
 {
-	if (team == CS_TEAM_CT || team == CS_TEAM_T)
+	if ((team == CS_TEAM_CT || team == CS_TEAM_T) &&
+		oldteam != CS_TEAM_NONE)
 	{
 		// The position is not correct before the next frame
 		DataPack data = new DataPack();
