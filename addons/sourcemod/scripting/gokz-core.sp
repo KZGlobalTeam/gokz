@@ -281,6 +281,13 @@ public void GOKZ_OnJoinTeam(int client, int team)
 	OnJoinTeam_Pause(client, team);
 }
 
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	int team = event.GetInt("team");
+	OnPlayerJoinTeam_JoinTeam(client, team);
+}
+
 
 
 // =====[ OTHER EVENTS ]=====
@@ -380,6 +387,7 @@ static void HookEvents()
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Post);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
 	GameData gameData = new GameData("sdktools.games");
