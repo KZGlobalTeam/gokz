@@ -86,7 +86,7 @@ void DuelMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[duelMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%s", GetRuleSummary(client, duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]));
+	FormatEx(display, sizeof(display), "%s", GetDuelRuleSummary(client, duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -253,10 +253,18 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 		menu.GetItem(param2, item, sizeof(item));
 		if (StrEqual(item, "+1"))
 		{
+			if (duelMenuCheckpointLimit[param1] == -1)
+			{
+				duelMenuCheckpointLimit[param1]++;
+			}
 			duelMenuCheckpointLimit[param1]++;
 		}
 		if (StrEqual(item, "+5"))
 		{
+			if (duelMenuCheckpointLimit[param1] == -1)
+			{
+				duelMenuCheckpointLimit[param1]++;
+			}
 			duelMenuCheckpointLimit[param1] += 5;
 		}
 		if (StrEqual(item, "-1"))
@@ -334,10 +342,18 @@ public int MenuHandler_DuelCPCooldown(Menu menu, MenuAction action, int param1, 
 		menu.GetItem(param2, item, sizeof(item));
 		if (StrEqual(item, "+1"))
 		{
+			if (duelMenuCheckpointCooldown[param1] == -1)
+			{
+				duelMenuCheckpointCooldown[param1]++;
+			}
 			duelMenuCheckpointCooldown[param1]++;
 		}
 		if (StrEqual(item, "+5"))
 		{
+			if (duelMenuCheckpointCooldown[param1] == -1)
+			{
+				duelMenuCheckpointCooldown[param1]++;
+			}
 			duelMenuCheckpointCooldown[param1] += 5;
 		}
 		if (StrEqual(item, "-1"))
@@ -458,7 +474,7 @@ static bool SendDuelRequest(int host, int target)
 
 // =====[ PRIVATE ]=====
 
-char[] GetRuleSummary(int client, int checkpointLimit, int checkpointCooldown)
+char[] GetDuelRuleSummary(int client, int checkpointLimit, int checkpointCooldown)
 {
 	char rulesString[64];
 	if (checkpointLimit == -1 && checkpointCooldown == 0)

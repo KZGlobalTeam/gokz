@@ -102,7 +102,7 @@ void RaceMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[raceMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%s", GetRuleSummary(client, raceMenuCheckpointLimit[client], raceMenuCheckpointCooldown[client]));
+	FormatEx(display, sizeof(display), "%s", GetRaceRuleSummary(client, raceMenuCheckpointLimit[client], raceMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -174,7 +174,7 @@ public int MenuHandler_RaceCheckpoint(Menu menu, MenuAction action, int param1, 
 			case CheckpointRule_Unlimited:
 			{
 				raceMenuCheckpointLimit[param1] = -1;
-				raceMenuCheckpointCooldown[param1] = -1;
+				raceMenuCheckpointCooldown[param1] = 0;
 				DisplayRaceMenu(param1, false);
 			}
 		}
@@ -269,10 +269,18 @@ public int MenuHandler_RaceCheckpointLimit(Menu menu, MenuAction action, int par
 		menu.GetItem(param2, item, sizeof(item));
 		if (StrEqual(item, "+1"))
 		{
+			if (raceMenuCheckpointLimit[param1] == -1)
+			{
+				raceMenuCheckpointLimit[param1]++;
+			}
 			raceMenuCheckpointLimit[param1]++;
 		}
 		if (StrEqual(item, "+5"))
 		{
+			if (raceMenuCheckpointLimit[param1] == -1)
+			{
+				raceMenuCheckpointLimit[param1]++;
+			}
 			raceMenuCheckpointLimit[param1] += 5;
 		}
 		if (StrEqual(item, "-1"))
@@ -350,10 +358,18 @@ public int MenuHandler_RaceCPCooldown(Menu menu, MenuAction action, int param1, 
 		menu.GetItem(param2, item, sizeof(item));
 		if (StrEqual(item, "+1"))
 		{
+			if (raceMenuCheckpointCooldown[param1] == -1)
+			{
+				raceMenuCheckpointCooldown[param1]++;
+			}
 			raceMenuCheckpointCooldown[param1]++;
 		}
 		if (StrEqual(item, "+5"))
 		{
+			if (raceMenuCheckpointCooldown[param1] == -1)
+			{
+				raceMenuCheckpointCooldown[param1]++;
+			}
 			raceMenuCheckpointCooldown[param1] += 5;
 		}
 		if (StrEqual(item, "-1"))
@@ -388,7 +404,7 @@ public int MenuHandler_RaceCPCooldown(Menu menu, MenuAction action, int param1, 
 
 // =====[ PRIVATE ]=====
 
-char[] GetRuleSummary(int client, int checkpointLimit, int checkpointCooldown)
+char[] GetRaceRuleSummary(int client, int checkpointLimit, int checkpointCooldown)
 {
 	char rulesString[64];
 	if (checkpointLimit == -1 && checkpointCooldown == 0)
