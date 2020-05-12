@@ -54,6 +54,15 @@ enum
 	RACERSTATUS_COUNT
 };
 
+enum
+{
+	CheckpointRule_None,
+	CheckpointRule_Limit,
+	CheckpointRule_Cooldown,
+	CheckpointRule_Unlimited,
+	CHECKPOINTRULE_COUNT
+};
+
 
 
 // =====[ CONSTANTS ]=====

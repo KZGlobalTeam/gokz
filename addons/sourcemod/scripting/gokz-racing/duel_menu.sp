@@ -58,11 +58,11 @@ public int MenuHandler_Duel(Menu menu, MenuAction action, int param1, int param2
 		}
 		else if (StrEqual(info, ITEM_INFO_MODE, false))
 		{
-			DisplayRaceModeMenu(param1);
+			DisplayDuelModeMenu(param1);
 		}
 		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
 		{
-			DisplayRaceCheckpointMenu(param1);
+			DisplayDuelCheckpointMenu(param1);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -86,7 +86,7 @@ void DuelMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[duelMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	FormatEx(display, sizeof(display), "%s", GetRaceMenuRules(client, duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]));
+	FormatEx(display, sizeof(display), "%s", GetRuleSummary(client, duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -94,7 +94,7 @@ void DuelMenuAddItems(int client, Menu menu)
 
 // =====[ MODE MENU ]=====
 
-static void DisplayRaceModeMenu(int client)
+static void DisplayDuelModeMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_DuelMode);
 	menu.ExitButton = false;
@@ -125,13 +125,13 @@ public int MenuHandler_DuelMode(Menu menu, MenuAction action, int param1, int pa
 
 // =====[ CHECKPOINT MENU ]=====
 
-static void DisplayRaceCheckpointMenu(int client)
+static void DisplayDuelCheckpointMenu(int client)
 {
 	Menu menu = new Menu(MenuHandler_DuelCheckpoint);
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
 	menu.SetTitle("%T", "Checkpoint Rule Menu - Title", client);
-	RaceCheckpointMenuAddItems(client, menu);
+	DuelCheckpointMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -141,21 +141,21 @@ public int MenuHandler_DuelCheckpoint(Menu menu, MenuAction action, int param1, 
 	{
 		switch (param2)
 		{
-			case 0:
+			case CheckpointRule_None:
 			{
 				duelMenuCheckpointCooldown[param1] = 0;
 				duelMenuCheckpointLimit[param1] = 0;
 				DisplayDuelMenu(param1, false);
 			}
-			case 1:
+			case CheckpointRule_Limit:
 			{
 				DisplayCheckpointLimitMenu(param1);
 			}
-			case 2:
+			case CheckpointRule_Cooldown:
 			{
 				DisplayCheckpointCooldownMenu(param1);
 			}
-			case 3:
+			case CheckpointRule_Unlimited:
 			{
 				duelMenuCheckpointCooldown[param1] = 0;
 				duelMenuCheckpointLimit[param1] = -1;
@@ -173,7 +173,7 @@ public int MenuHandler_DuelCheckpoint(Menu menu, MenuAction action, int param1, 
 	}
 }
 
-void RaceCheckpointMenuAddItems(int client, Menu menu)
+void DuelCheckpointMenuAddItems(int client, Menu menu)
 {
 	char display[32];
 
@@ -192,7 +192,14 @@ void RaceCheckpointMenuAddItems(int client, Menu menu)
 	}
 	menu.AddItem("", display);
 
-	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Checkpoint Cooldown", client, duelMenuCheckpointCooldown[client]);
+	if (duelMenuCheckpointCooldown[client] == 0)
+	{
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - No Checkpoint Cooldown", client);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Checkpoint Cooldown", client, duelMenuCheckpointCooldown[client]);
+	}
 	menu.AddItem("", display);
 
 	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Unlimited", client);
@@ -263,7 +270,7 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 		if (StrEqual(item, "Unlimited"))
 		{
 			duelMenuCheckpointLimit[param1] = -1;
-			DisplayRaceCheckpointMenu(param1);
+			DisplayDuelCheckpointMenu(param1);
 			return;
 		}
 
@@ -272,7 +279,7 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 	}
 	else if (action == MenuAction_Cancel)
 	{
-		DisplayRaceCheckpointMenu(param1);
+		DisplayDuelCheckpointMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -288,7 +295,7 @@ static void DisplayCheckpointCooldownMenu(int client)
 {
 	char display[32];
 
-	Menu menu = new Menu(MenuHandler_DuelTPCooldown);
+	Menu menu = new Menu(MenuHandler_DuelCPCooldown);
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
 
@@ -319,7 +326,7 @@ static void DisplayCheckpointCooldownMenu(int client)
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-public int MenuHandler_DuelTPCooldown(Menu menu, MenuAction action, int param1, int param2)
+public int MenuHandler_DuelCPCooldown(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
@@ -344,7 +351,7 @@ public int MenuHandler_DuelTPCooldown(Menu menu, MenuAction action, int param1, 
 		if (StrEqual(item, "None"))
 		{
 			duelMenuCheckpointCooldown[param1] = 0;
-			DisplayRaceCheckpointMenu(param1);
+			DisplayDuelCheckpointMenu(param1);
 			return;
 		}
 
@@ -353,7 +360,7 @@ public int MenuHandler_DuelTPCooldown(Menu menu, MenuAction action, int param1, 
 	}
 	else if (action == MenuAction_Cancel)
 	{
-		DisplayRaceCheckpointMenu(param1);
+		DisplayDuelCheckpointMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -450,7 +457,8 @@ static bool SendDuelRequest(int host, int target)
 
 
 // =====[ PRIVATE ]=====
-char[] GetRaceMenuRules(int client, int checkpointLimit, int checkpointCooldown)
+
+char[] GetRuleSummary(int client, int checkpointLimit, int checkpointCooldown)
 {
 	char rulesString[64];
 	if (checkpointLimit == -1 && checkpointCooldown == 0)

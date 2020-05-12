@@ -11,7 +11,8 @@
 #define ITEM_INFO_TELEPORT "tp"
 
 static int raceMenuMode[MAXPLAYERS + 1];
-static int raceMenuCheckpoint[MAXPLAYERS + 1];
+static int raceMenuCheckpointLimit[MAXPLAYERS + 1];
+static int raceMenuCheckpointCooldown[MAXPLAYERS + 1];
 
 
 
@@ -60,7 +61,7 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 		{
 			if (!InRace(param1))
 			{
-				//HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuCheckpoint[param1]);
+				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuCheckpointLimit[param1], raceMenuCheckpointCooldown[param1]);
 			}
 			
 			SendRequestAll(param1);
@@ -101,7 +102,7 @@ void RaceMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[raceMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
-	//FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[raceMenuCheckpoint[client]], client);
+	FormatEx(display, sizeof(display), "%s", GetRuleSummary(client, raceMenuCheckpointLimit[client], raceMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
@@ -138,7 +139,7 @@ public int MenuHandler_RaceMode(Menu menu, MenuAction action, int param1, int pa
 
 
 
-// =====[ TELEPORT MENU ]=====
+// =====[ CHECKPOINT MENU ]=====
 
 static void DisplayRaceCheckpointMenu(int client)
 {
@@ -146,7 +147,7 @@ static void DisplayRaceCheckpointMenu(int client)
 	menu.ExitButton = false;
 	menu.ExitBackButton = true;
 	menu.SetTitle("%T", "Checkpoint Rule Menu - Title", client);
-	//GOKZ_RC_MenuAddCheckpointRuleItems(client, menu);
+	RaceCheckpointMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -154,8 +155,29 @@ public int MenuHandler_RaceCheckpoint(Menu menu, MenuAction action, int param1, 
 {
 	if (action == MenuAction_Select)
 	{
-		raceMenuCheckpoint[param1] = param2;
-		DisplayRaceMenu(param1, false);
+		switch (param2)
+		{
+			case CheckpointRule_None:
+			{
+				raceMenuCheckpointLimit[param1] = 0;
+				raceMenuCheckpointCooldown[param1] = 0;
+				DisplayRaceMenu(param1, false); 
+			}
+			case CheckpointRule_Limit:
+			{
+				DisplayCheckpointLimitMenu(param1);
+			}
+			case CheckpointRule_Cooldown:
+			{
+				DisplayCheckpointCooldownMenu(param1);
+			}
+			case CheckpointRule_Unlimited:
+			{
+				raceMenuCheckpointLimit[param1] = -1;
+				raceMenuCheckpointCooldown[param1] = -1;
+				DisplayRaceMenu(param1, false);
+			}
+		}
 	}
 	else if (action == MenuAction_Cancel)
 	{
@@ -165,4 +187,230 @@ public int MenuHandler_RaceCheckpoint(Menu menu, MenuAction action, int param1, 
 	{
 		delete menu;
 	}
-} 
+}
+
+void RaceCheckpointMenuAddItems(int client, Menu menu)
+{
+	char display[32];
+
+	menu.RemoveAllItems();
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - None", client);
+	menu.AddItem("", display);
+
+	if (raceMenuCheckpointLimit[client] == -1)
+	{
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - No Checkpoint Limit", client);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Checkpoint Limit", client, raceMenuCheckpointLimit[client]);
+	}
+	menu.AddItem("", display);
+
+	if (raceMenuCheckpointCooldown[client] == 0)
+	{
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - No Checkpoint Cooldown", client);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Checkpoint Cooldown", client, raceMenuCheckpointCooldown[client]);
+	}
+	menu.AddItem("", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Rule - Unlimited", client);
+	menu.AddItem("", display);
+}
+
+
+
+// =====[ CP LIMIT MENU ]=====
+
+static void DisplayCheckpointLimitMenu(int client)
+{
+	char display[32];
+
+	Menu menu = new Menu(MenuHandler_RaceCheckpointLimit);
+	menu.ExitButton = false;
+	menu.ExitBackButton = true;
+
+	if (raceMenuCheckpointLimit[client] == -1)
+	{
+		menu.SetTitle("%T", "Checkpoint Limit Menu - Title Unlimited", client);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Checkpoint Limit Menu - Title Limited", client, raceMenuCheckpointLimit[client]);
+	}
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Add One", client);
+	menu.AddItem("+1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Add Five", client);
+	menu.AddItem("+5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Remove One", client);
+	menu.AddItem("-1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Remove Five", client);
+	menu.AddItem("-5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Limit Menu - Unlimited", client);
+	menu.AddItem("Unlimited", display);
+
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+public int MenuHandler_RaceCheckpointLimit(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char item[32];
+		menu.GetItem(param2, item, sizeof(item));
+		if (StrEqual(item, "+1"))
+		{
+			raceMenuCheckpointLimit[param1]++;
+		}
+		if (StrEqual(item, "+5"))
+		{
+			raceMenuCheckpointLimit[param1] += 5;
+		}
+		if (StrEqual(item, "-1"))
+		{
+			raceMenuCheckpointLimit[param1]--;
+		}
+		if (StrEqual(item, "-5"))
+		{
+			raceMenuCheckpointLimit[param1] -= 5;
+		}
+		if (StrEqual(item, "Unlimited"))
+		{
+			raceMenuCheckpointLimit[param1] = -1;
+			DisplayRaceCheckpointMenu(param1);
+			return;
+		}
+
+		raceMenuCheckpointLimit[param1] = raceMenuCheckpointLimit[param1] < 0 ? 0 : raceMenuCheckpointLimit[param1];
+		DisplayCheckpointLimitMenu(param1);
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		DisplayRaceCheckpointMenu(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+
+
+// =====[ CP COOLDOWN MENU ]=====
+
+static void DisplayCheckpointCooldownMenu(int client)
+{
+	char display[32];
+
+	Menu menu = new Menu(MenuHandler_RaceCPCooldown);
+	menu.ExitButton = false;
+	menu.ExitBackButton = true;
+
+	if (raceMenuCheckpointCooldown[client] == -1)
+	{
+		menu.SetTitle("%T", "Checkpoint Cooldown Menu - Title None", client);
+	}
+	else
+	{
+		menu.SetTitle("%T", "Checkpoint Cooldown Menu - Title Limited", client, raceMenuCheckpointCooldown[client]);
+	}
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Add One Second", client);
+	menu.AddItem("+1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Add Five Seconds", client);
+	menu.AddItem("+5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Remove One Second", client);
+	menu.AddItem("-1", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - Remove Five Seconds", client);
+	menu.AddItem("-5", display);
+
+	FormatEx(display, sizeof(display), "%T", "Checkpoint Cooldown Menu - None", client);
+	menu.AddItem("None", display);
+
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+public int MenuHandler_RaceCPCooldown(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char item[32];
+		menu.GetItem(param2, item, sizeof(item));
+		if (StrEqual(item, "+1"))
+		{
+			raceMenuCheckpointCooldown[param1]++;
+		}
+		if (StrEqual(item, "+5"))
+		{
+			raceMenuCheckpointCooldown[param1] += 5;
+		}
+		if (StrEqual(item, "-1"))
+		{
+			raceMenuCheckpointCooldown[param1]--;
+		}
+		if (StrEqual(item, "-5"))
+		{
+			raceMenuCheckpointCooldown[param1] -= 5;
+		}
+		if (StrEqual(item, "None"))
+		{
+			raceMenuCheckpointCooldown[param1] = 0;
+			DisplayRaceCheckpointMenu(param1);
+			return;
+		}
+
+		raceMenuCheckpointCooldown[param1] = raceMenuCheckpointCooldown[param1] < 0 ? 0 : raceMenuCheckpointCooldown[param1];
+		DisplayCheckpointCooldownMenu(param1);
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		DisplayRaceCheckpointMenu(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+
+
+// =====[ PRIVATE ]=====
+
+char[] GetRuleSummary(int client, int checkpointLimit, int checkpointCooldown)
+{
+	char rulesString[64];
+	if (checkpointLimit == -1 && checkpointCooldown == 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Unlimited", client);
+	}
+	else if (checkpointLimit > 0 && checkpointCooldown == 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Limited Checkpoints", client, checkpointLimit);
+	}
+	else if (checkpointLimit == -1 && checkpointCooldown > 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Limited Cooldown", client, checkpointCooldown);
+	}
+	else if (checkpointLimit > 0 && checkpointCooldown > 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - Limited Everything", client, checkpointLimit, checkpointCooldown);
+	}
+	else if (checkpointLimit == 0)
+	{
+		FormatEx(rulesString, sizeof(rulesString), "%T", "Rule Summary - No Checkpoints", client);
+	}
+
+	return rulesString;
+}

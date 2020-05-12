@@ -16,7 +16,7 @@
 	}
 	"Checkpoint Rule - No Checkpoint Cooldown"
 	{
-		"en"		"No Checkpoint Cooldown"
+		"en"		"Checkpoint Cooldown: None"
 	}
 	"Checkpoint Rule - Checkpoint Cooldown"
 	{
