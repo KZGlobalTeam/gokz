@@ -255,6 +255,15 @@ public void GOKZ_AC_OnPlayerSuspected(int client)
 	GOKZ_OnPlayerSuspected_Recording(client);
 }
 
+public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
+{
+	// It's a bit brute-force, but I didn't find a better solution
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		CancelReplayControls(client);
+	}
+}
+
 
 
 // =====[ PRIVATE ]=====

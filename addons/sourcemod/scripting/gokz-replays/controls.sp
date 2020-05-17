@@ -150,9 +150,19 @@ int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int par
 		
 		case MenuAction_End:
 		{
+			showReplayControls[param1] = false;
 			delete menu;
 		}
 	}
 	
 	return 0;
+}
+
+void CancelReplayControls(int client)
+{
+	if (showReplayControls[client])
+	{
+		CancelClientMenu(client);
+		showReplayControls[client] = false;
+	}
 }
