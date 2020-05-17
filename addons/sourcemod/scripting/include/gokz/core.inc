@@ -858,6 +858,14 @@ native void GOKZ_TeleportToStart(int client);
 native StartPositionType GOKZ_GetStartPositionType(int client);
 
 /**
+ * Set the start position of the player to the start of a course.
+ *
+ * @param client    	Client index.
+ * @param course        Course index.
+ */
+native StartPositionType GOKZ_SetStartPositionToMapStart(int client, int course);
+
+/**
  * Set a new checkpoint at a player's current position.
  *
  * @param client    	Client index.

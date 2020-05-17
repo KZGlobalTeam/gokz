@@ -7,9 +7,11 @@
 #define ITEM_INFO_CHALLENGE "ch"
 #define ITEM_INFO_ABORT "ab"
 #define ITEM_INFO_MODE "md"
+#define ITEM_INFO_COURSE "co"
 #define ITEM_INFO_TELEPORT "tp"
 
 static int duelMenuMode[MAXPLAYERS + 1];
+static int duelMenuCourse[MAXPLAYERS + 1];
 static int duelMenuCheckpointLimit[MAXPLAYERS + 1];
 static int duelMenuCheckpointCooldown[MAXPLAYERS + 1];
 
@@ -60,6 +62,20 @@ public int MenuHandler_Duel(Menu menu, MenuAction action, int param1, int param2
 		{
 			DisplayDuelModeMenu(param1);
 		}
+		else if (StrEqual(info, ITEM_INFO_COURSE, false))
+		{
+			int course = duelMenuCourse[param1];
+			do
+			{
+				course++;
+				if (!GOKZ_IsValidCourse(course))
+				{
+					course = 0;
+				}
+			} while (!GOKZ_GetCourseRegistered(course) && course != duelMenuCourse[param1]);
+			duelMenuCourse[param1] = course;
+			DisplayDuelMenu(param1, false);
+		}
 		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
 		{
 			DisplayDuelCheckpointMenu(param1);
@@ -85,6 +101,16 @@ void DuelMenuAddItems(int client, Menu menu)
 	
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[duelMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+	
+	if (duelMenuCourse[client] == 0)
+	{
+		FormatEx(display, sizeof(display), "%T", "Race Rules - Main Course", client);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T %d", "Race Rules - Bonus Course", client, duelMenuCourse[client]);
+	}
+	menu.AddItem(ITEM_INFO_COURSE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
 	FormatEx(display, sizeof(display), "%s", GetDuelRuleSummary(client, duelMenuCheckpointLimit[client], duelMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
@@ -466,7 +492,7 @@ static bool SendDuelRequest(int host, int target)
 		return false;
 	}
 	
-	HostRace(host, RaceType_Duel, 0, duelMenuMode[host], duelMenuCheckpointLimit[host], duelMenuCheckpointCooldown[host]);
+	HostRace(host, RaceType_Duel, duelMenuCourse[host], duelMenuMode[host], duelMenuCheckpointLimit[host], duelMenuCheckpointCooldown[host]);
 	return SendRequest(host, target);
 } 
 

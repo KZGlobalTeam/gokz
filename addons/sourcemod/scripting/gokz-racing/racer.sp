@@ -176,12 +176,22 @@ void StartRacer(int client)
 	// Prepare the racer
 	GOKZ_StopTimer(client);
 	GOKZ_SetCoreOption(client, Option_Mode, GetRaceInfo(racerRaceID[client], RaceInfo_Mode));
-	GOKZ_TeleportToStart(client);
+	
+	int course = GetRaceInfo(racerRaceID[client], RaceInfo_Course);
+	if (GOKZ_SetStartPositionToMapStart(client, course))
+	{
+		GOKZ_TeleportToStart(client);
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", course);
+	}
 }
 
-bool FinishRacer(int client)
+bool FinishRacer(int client, int course)
 {
-	if (racerStatus[client] != RacerStatus_Racing)
+	if (racerStatus[client] != RacerStatus_Racing ||
+		course != GetRaceInfo(racerRaceID[client], RaceInfo_Course))
 	{
 		return false;
 	}
@@ -224,7 +234,7 @@ static void CheckRaceFinished(int raceID)
 	if (remainingRacers.Length == 1)
 	{
 		int lastRacer = remainingRacers.Get(0);
-		FinishRacer(lastRacer);
+		FinishRacer(lastRacer, GetRaceInfo(racerRaceID[lastRacer], RaceInfo_Course));
 	}
 	else if (remainingRacers.Length == 0)
 	{
