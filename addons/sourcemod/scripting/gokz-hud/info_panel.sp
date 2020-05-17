@@ -49,7 +49,7 @@ static void UpdateInfoPanel(int client, HUDInfo info)
 		return;
 	}
 	
-	PrintHintText(player.ID, "%s", GetInfoPanel(player, info));
+	PrintCSGOHUDText(player.ID, GetInfoPanel(player, info));
 }
 
 static bool NothingEnabledInInfoPanel(KZPlayer player)
@@ -232,4 +232,29 @@ static char[] GetKeysString(KZPlayer player, HUDInfo info)
 			buttons & IN_JUMP ? 'J' : '_');
 	}
 	return keysString;
+}
+
+void PrintCSGOHUDText(int client, const char[] format)
+{
+	char buff[HUD_MAX_HINT_SIZE];
+	VFormat(buff, sizeof(buff), format, 3);
+	Format(buff, sizeof(buff), "</font>%s", buff);
+
+	for (int i = strlen(buff); i < sizeof(buff) - 1; i++)
+	{
+		buff[i] = ' ';
+	}
+
+	buff[sizeof(buff) - 1] = '\0';
+
+	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE | USERMSG_BLOCKHOOKS));
+	pb.SetInt("msg_dst", 4);
+	pb.AddString("params", "#SFUI_ContractKillStart");
+	pb.AddString("params", buff);
+	pb.AddString("params", NULL_STRING);
+	pb.AddString("params", NULL_STRING);
+	pb.AddString("params", NULL_STRING);
+	pb.AddString("params", NULL_STRING);
+
+	EndMessage();
 }
