@@ -168,6 +168,11 @@ void TrySkipToTime(int client, int seconds)
 	}
 }
 
+float GetPlaybackTime(int bot)
+{
+	return playbackTick[bot] / 128.0;
+}
+
 
 
 // =====[ EVENTS ]=====

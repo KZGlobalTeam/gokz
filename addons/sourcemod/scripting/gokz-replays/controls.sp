@@ -42,7 +42,9 @@ void UpdateReplayControlMenu(int client)
 	}
 	
 	if (showReplayControls[client] &&
-		(GetClientMenu(client) == MenuSource_None || GetClientAvgLoss(client, NetFlow_Both) > EPSILON))
+		(GetClientMenu(client) == MenuSource_None ||
+		 GetClientAvgLoss(client, NetFlow_Both) > EPSILON ||
+		 GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu))
 	{
 		ShowReplayControlMenu(client, bot);
 	}
@@ -56,7 +58,16 @@ void ShowReplayControlMenu(int client, int bot)
 	menu.OptionFlags = MENUFLAG_NO_SOUND;
 	menu.Pagination = MENU_NO_PAGINATION;
 	menu.ExitButton = true;
-	menu.SetTitle("%T", "Replay Controls - Title", client);
+	
+	if (GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	{
+		menu.SetTitle("%T - %s", "Replay Controls - Title", client,
+			GOKZ_FormatTime(GetPlaybackTime(bot), GOKZ_HUD_GetOption(client, HUDOption_TimerStyle) == TimerStyle_Precise));
+	}
+	else
+	{
+		menu.SetTitle("%T", "Replay Controls - Title", client);
+	}
 	
 	if (PlaybackPaused(bot))
 	{
