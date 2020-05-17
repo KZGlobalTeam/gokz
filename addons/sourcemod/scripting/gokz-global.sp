@@ -44,6 +44,8 @@ bool gB_InValidRun[MAXPLAYERS + 1];
 bool gB_GloballyVerified[MAXPLAYERS + 1];
 bool gB_EnforcerOnFreshMap;
 bool gB_JustLateLoaded;
+int gI_FPSMax[MAXPLAYERS + 1];
+bool gB_waitingForFPSKick[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_settings_enforcer;
 ConVar gCV_EnforcedCVar[ENFORCEDCVAR_COUNT];
@@ -113,12 +115,65 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 }
 
+Action MonitorFPSMax(Handle timer)
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && !IsFakeClient(client))
+		{
+			QueryClientConVar(client, "fps_max", FPSCheck, client);
+		}
+	}
+	
+	return Plugin_Handled;
+}
+
+public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		gI_FPSMax[client] = StringToInt(cvarValue);
+		if (gI_FPSMax[client] > 0 && gI_FPSMax[client] < GL_FPS_MAX_MIN_VALUE)
+		{
+			if (!gB_waitingForFPSKick[client])
+			{
+				gB_waitingForFPSKick[client] = true;
+				CreateTimer(GL_FPS_MAX_KICK_TIMEOUT, FPSKickPlayer, client, TIMER_FLAG_NO_MAPCHANGE);
+				GOKZ_PrintToChat(client, true, "%t", "Warn Player fps_max");
+				if (GOKZ_GetTimerRunning(client))
+				{
+					GOKZ_StopTimer(client, true);
+				}
+				else
+				{
+					EmitSoundToClient(client, GOKZ_SOUND_TIMER_STOP);
+				}
+			}
+		}
+		else
+		{
+			gB_waitingForFPSKick[client] = false;
+		}
+	}
+}
+
+Action FPSKickPlayer(Handle timer, int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client) && gB_waitingForFPSKick[client])
+	{
+		KickClient(client, "%T", "Kick Player fps_max", client);
+	}
+	
+	return Plugin_Handled;
+}
+
 
 
 // =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
+	gB_waitingForFPSKick[client] = false;
 	OnClientPutInServer_PrintRecords(client);
 }
 
@@ -180,6 +235,9 @@ public void OnMapStart()
 	{
 		gB_EnforcerOnFreshMap = true;
 	}
+	
+	// Setup a timer to monitor fps_max
+	CreateTimer(1.0, MonitorFPSMax, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
 public void OnConfigsExecuted()

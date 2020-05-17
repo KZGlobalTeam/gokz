@@ -29,6 +29,9 @@ enum
 // =====[ CONSTANTS ]=====
 
 #define GL_SOUND_NEW_RECORD "gokz/holyshit.mp3"
+#define GL_FPS_MAX_CHECK_INTERVAL 1.0
+#define GL_FPS_MAX_KICK_TIMEOUT 10.0
+#define GL_FPS_MAX_MIN_VALUE 120
 
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {
