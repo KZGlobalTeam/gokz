@@ -264,6 +264,11 @@ public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)
 	return Plugin_Stop;
 }
 
+public void GOKZ_OnSlap(int client)
+{
+	GOKZ_StopTimer(client);
+}
+
 
 
 // =====[ PUBLIC ]=====

@@ -187,6 +187,11 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
+public void GOKZ_OnSlap(int client)
+{
+	InvalidateJumpstat(client);
+}
+
 
 
 // =====[ PRIVATE ]=====
