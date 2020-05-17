@@ -8,6 +8,7 @@
 #endinput
 #endif
 #define _gokz_hud_included_
+#define MAX_HINT_SIZE 227
 
 
 

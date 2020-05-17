@@ -7,10 +7,6 @@
 
 
 
-#define MAX_HINT_SIZE 227
-
-
-
 static bool infoPanelDuckPressedLast[MAXPLAYERS + 1];
 static bool infoPanelOnGroundLast[MAXPLAYERS + 1];
 static bool infoPanelShowDuckString[MAXPLAYERS + 1];
