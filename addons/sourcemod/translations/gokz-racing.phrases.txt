@@ -51,7 +51,10 @@
 	{
 		"en"		"No checkpoints"
 	}
-
+	"No Start Found"
+	{
+		"en"		"Unable to find the start of the course, cannot teleport you there"
+	}
 
 
 	// =====[ CHAT MESSAGES ]=====
@@ -113,30 +116,38 @@
 	"Race Rules - No Checkpoints"
 	{
 		// Rules [SimpleKZ | No checkpoints]
-		"#format"	"{1:s}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}No checkpoints"
+		"#format"	"{1:s},{2:s}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}No checkpoints"
 	}
 	"Race Rules - Unlimited"
 	{
 		// Rules [SimpleKZ | Unlimited]
-		"#format"	"{1:s}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}Unlimited"
+		"#format"	"{1:s},{2:s}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}Unlimited"
 	}
 	"Race Rules - Limited"
 	{
 		// Rules [SimpleKZ | Num checkpoints | Cooldown time]
-		"#format"	"{1:s},{2:d},{3:d}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoints{grey} | {yellow}{3}s checkpoint cooldown{grey}"
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}{3} checkpoints{grey} | {yellow}{4}s checkpoint cooldown{grey}"
 	}
 	"Race Rules - Limited Checkpoints"
 	{
-		"#format"	"{1:s},{2:d}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2} checkpoints{grey}"
+		"#format"	"{1:s},{2:s},{3:d}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}{3} checkpoints{grey}"
 	}
 	"Race Rules - Limited Cooldown"
 	{
-		"#format"	"{1:s},{2:d}"
-		"en"		"{grey}Rules - {purple}{1}{grey} | {yellow}{2}s checkpoint cooldown{grey}"
+		"#format"	"{1:s},{2:s},{3:d}"
+		"en"		"{grey}Rules - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}{3}s checkpoint cooldown{grey}"
+	}
+	"Race Rules - Main Course"
+	{
+		"en"		"Main Course"
+	}
+	"Race Rules - Bonus Course"
+	{
+		"en"		"Bonus"
 	}
 	"You Have Seconds To Accept"
 	{
@@ -262,6 +273,14 @@
 	"Race Menu - Rules"
 	{
 		"en"		"Rules"
+	}
+	"Race Menu - Course Main"
+	{
+		"en"		"Main"
+	}
+	"Race Menu - Course Bonus"
+	{
+		"en"		"Bonus"
 	}
 
 

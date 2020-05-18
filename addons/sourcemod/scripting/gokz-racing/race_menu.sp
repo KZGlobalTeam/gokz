@@ -8,9 +8,11 @@
 #define ITEM_INFO_ABORT "ab"
 #define ITEM_INFO_INVITE "iv"
 #define ITEM_INFO_MODE "md"
+#define ITEM_INFO_COURSE "co"
 #define ITEM_INFO_TELEPORT "tp"
 
 static int raceMenuMode[MAXPLAYERS + 1];
+static int raceMenuCourse[MAXPLAYERS + 1];
 static int raceMenuCheckpointLimit[MAXPLAYERS + 1];
 static int raceMenuCheckpointCooldown[MAXPLAYERS + 1];
 
@@ -30,6 +32,7 @@ void DisplayRaceMenu(int client, bool reset = true)
 	if (reset)
 	{
 		raceMenuMode[client] = GOKZ_GetCoreOption(client, Option_Mode);
+		raceMenuCourse[client] = 0;
 	}
 	
 	Menu menu = new Menu(MenuHandler_Race);
@@ -61,7 +64,7 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 		{
 			if (!InRace(param1))
 			{
-				HostRace(param1, RaceType_Normal, 0, raceMenuMode[param1], raceMenuCheckpointLimit[param1], raceMenuCheckpointCooldown[param1]);
+				HostRace(param1, RaceType_Normal, raceMenuCourse[param1], raceMenuMode[param1], raceMenuCheckpointLimit[param1], raceMenuCheckpointCooldown[param1]);
 			}
 			
 			SendRequestAll(param1);
@@ -71,6 +74,20 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 		else if (StrEqual(info, ITEM_INFO_MODE, false))
 		{
 			DisplayRaceModeMenu(param1);
+		}
+		else if (StrEqual(info, ITEM_INFO_COURSE, false))
+		{
+			int course = raceMenuCourse[param1];
+			do
+			{
+				course++;
+				if (!GOKZ_IsValidCourse(course))
+				{
+					course = 0;
+				}
+			} while (!GOKZ_GetCourseRegistered(course) && course != raceMenuCourse[param1]);
+			raceMenuCourse[param1] = course;
+			DisplayRaceMenu(param1, false);
 		}
 		else if (StrEqual(info, ITEM_INFO_TELEPORT, false))
 		{
@@ -101,6 +118,16 @@ void RaceMenuAddItems(int client, Menu menu)
 	
 	FormatEx(display, sizeof(display), "%s", gC_ModeNames[raceMenuMode[client]]);
 	menu.AddItem(ITEM_INFO_MODE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+	
+	if (raceMenuCourse[client] == 0)
+	{
+		FormatEx(display, sizeof(display), "%T", "Race Rules - Main Course", client);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T %d", "Race Rules - Bonus Course", client, raceMenuCourse[client]);
+	}
+	menu.AddItem(ITEM_INFO_COURSE, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	
 	FormatEx(display, sizeof(display), "%s", GetRaceRuleSummary(client, raceMenuCheckpointLimit[client], raceMenuCheckpointCooldown[client]));
 	menu.AddItem(ITEM_INFO_TELEPORT, display, InRace(client) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
