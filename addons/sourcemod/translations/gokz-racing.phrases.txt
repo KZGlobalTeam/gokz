@@ -51,7 +51,10 @@
 	{
 		"en"		"No checkpoints"
 	}
-
+	"No Start Found"
+	{
+		"en"		"Unable to find the start of the course, cannot teleport you there"
+	}
 
 
 	// =====[ CHAT MESSAGES ]=====

@@ -185,7 +185,7 @@ public int Native_GetStartPositionType(Handle plugin, int numParams)
 
 public int Native_SetStartPositionToMapStart(Handle plugin, int numParams)
 {
-	SetStartPositionToMapStart(GetNativeCell(1), GetNativeCell(2));
+	return SetStartPositionToMapStart(GetNativeCell(1), GetNativeCell(2));
 }
 
 public int Native_MakeCheckpoint(Handle plugin, int numParams)

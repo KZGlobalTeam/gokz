@@ -184,7 +184,7 @@ void StartRacer(int client)
 	}
 	else
 	{
-		GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", course);
+		GOKZ_PrintToChat(client, true, "%t", "No Start Found", course);
 	}
 }
 
