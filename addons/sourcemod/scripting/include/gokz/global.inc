@@ -21,6 +21,11 @@ enum
 	EnforcedCVar_ClampUnsafeVelocities, 
 	EnforcedCVar_DropKnifeEnable, 
 	EnforcedCVar_AutoBunnyhopping, 
+	EnforcedCVar_MinUpdateRate,
+	EnforcedCVar_MaxUpdateRate,
+	EnforcedCVar_MinCmdRate,
+	EnforcedCVar_MaxCmdRate,
+	EnforcedCVar_ClientCmdrateDifference,
 	ENFORCEDCVAR_COUNT
 };
 
@@ -38,7 +43,12 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 	"sv_cheats", 
 	"sv_clamp_unsafe_velocities", 
 	"mp_drop_knife_enable", 
-	"sv_autobunnyhopping"
+	"sv_autobunnyhopping",
+	"sv_minupdaterate",
+	"sv_maxupdaterate",
+	"sv_mincmdrate",
+	"sv_maxcmdrate",
+	"sv_client_cmdrate_difference"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
@@ -46,6 +56,11 @@ stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =
 	0.0, 
 	0.0, 
 	0.0, 
+	0.0,
+	128.0,
+	128.0,
+	128.0,
+	128.0,
 	0.0
 };
 
