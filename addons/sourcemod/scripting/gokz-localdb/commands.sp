@@ -10,7 +10,7 @@ public Action CommandSetCheater(int client, int args)
 	if (args == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No SteamID specified");
-		return;
+		return Plugin_Handled;
 	}
 	
 	char steamID2[64];
@@ -24,6 +24,8 @@ public Action CommandSetCheater(int client, int args)
 	{
 		DB_SetCheaterSteamID(client, steamAccountID, true);
 	}
+	
+	return Plugin_Handled;
 }
 
 public Action CommandSetNotCheater(int client, int args)
@@ -44,6 +46,8 @@ public Action CommandSetNotCheater(int client, int args)
 	{
 		DB_SetCheaterSteamID(client, steamAccountID, false);
 	}
+	
+	return Plugin_Handled;
 }
 
 public Action CommandDeleteJump(int client, int args)
@@ -51,7 +55,7 @@ public Action CommandDeleteJump(int client, int args)
 	if (args < 3)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Delete Jump Usage");
-		return;
+		return Plugin_Handled;
 	}
 	
 	int steamAccountID, isBlock, mode, jumpType;
@@ -67,7 +71,7 @@ public Action CommandDeleteJump(int client, int args)
 	if (steamAccountID == -1)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Invalid SteamID");
-		return;
+		return Plugin_Handled;
 	}
 	
 	// Mode
@@ -81,7 +85,7 @@ public Action CommandDeleteJump(int client, int args)
 	if (mode == MODE_COUNT)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Invalid Mode");
-		return;
+		return Plugin_Handled;
 	}
 	
 	// Jumptype
@@ -95,11 +99,13 @@ public Action CommandDeleteJump(int client, int args)
 	if (jumpType == JUMPTYPE_COUNT)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Invalid Jumptype");
-		return;
+		return Plugin_Handled;
 	}
 	
 	// Is it a block jump?
 	isBlock = StrEqual(split[3], "yes", false) || StrEqual(split[3], "true", false) || StrEqual(split[3], "1");
 	
 	DB_DeleteJump(client, steamAccountID, jumpType, mode, isBlock);
+	
+	return Plugin_Handled;
 }
