@@ -129,6 +129,7 @@ static MoveType specMovetype[MAXPLAYERS + 1];
 void OnClientPutInServer_JoinTeam(int client)
 {
 	hasSavedPosition[client] = false;
+	specMovetype[client] = MOVETYPE_WALK;
 }
 
 void OnTimerStart_JoinTeam(int client)
