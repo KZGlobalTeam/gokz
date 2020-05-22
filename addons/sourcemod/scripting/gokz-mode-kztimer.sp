@@ -140,6 +140,7 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
