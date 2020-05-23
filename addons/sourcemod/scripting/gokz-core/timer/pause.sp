@@ -60,21 +60,28 @@ bool CanPause(int client)
 		return false;
 	}
 	
-	if (GetTimerRunning(client) && hasResumedInThisRun[client]
-		 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
+	if (GetTimerRunning(client))
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
-		GOKZ_PlayErrorSound(client);
-		return false;
-	}
-	
-	if (GetTimerRunning(client)
-		 && !Movement_GetOnGround(client)
-		 && !(Movement_GetSpeed(client) == 0 && Movement_GetVerticalVelocity(client) == 0))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Midair)");
-		GOKZ_PlayErrorSound(client);
-		return false;
+		if (hasResumedInThisRun[client]
+			 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
+			GOKZ_PlayErrorSound(client);
+			return false;
+		}
+		else if (!Movement_GetOnGround(client)
+			 && !(Movement_GetSpeed(client) == 0 && Movement_GetVerticalVelocity(client) == 0))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Midair)");
+			GOKZ_PlayErrorSound(client);
+			return false;
+		}
+		else if (BhopTriggersJustTouched(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Landed)");
+			GOKZ_PlayErrorSound(client);
+			return false;
+		}
 	}
 	
 	return true;

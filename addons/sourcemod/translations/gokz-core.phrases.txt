@@ -101,6 +101,10 @@
 		"en"		"{darkred}You can't pause in mid-air."
 		"chi"		"{darkred}空中不能暂停."
 	}
+	"Can't Pause (Just Landed)"
+	{
+		"en"		"{darkred}You can't pause because you just landed."
+	}
 	"Can't Resume (Just Paused)"
 	{
 		"en"		"{darkred}You can't resume because you just paused."
