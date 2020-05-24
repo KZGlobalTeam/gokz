@@ -20,6 +20,8 @@ static GlobalForward H_OnNextCheckpoint;
 static GlobalForward H_OnNextCheckpoint_Post;
 static GlobalForward H_OnTeleportToStart;
 static GlobalForward H_OnTeleportToStart_Post;
+static GlobalForward H_OnTeleportToEnd;
+static GlobalForward H_OnTeleportToEnd_Post;
 static GlobalForward H_OnUndoTeleport;
 static GlobalForward H_OnUndoTeleport_Post;
 static GlobalForward H_OnCountedTeleport_Post;
@@ -62,6 +64,8 @@ void CreateGlobalForwards()
 	H_OnNextCheckpoint_Post = new GlobalForward("GOKZ_OnNextCheckpoint_Post", ET_Ignore, Param_Cell);
 	H_OnTeleportToStart = new GlobalForward("GOKZ_OnTeleportToStart", ET_Hook, Param_Cell);
 	H_OnTeleportToStart_Post = new GlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell);
+	H_OnTeleportToEnd = new GlobalForward("GOKZ_OnTeleportToEnd", ET_Hook, Param_Cell);
+	H_OnTeleportToEnd_Post = new GlobalForward("GOKZ_OnTeleportToEnd_Post", ET_Ignore, Param_Cell);
 	H_OnUndoTeleport = new GlobalForward("GOKZ_OnUndoTeleport", ET_Hook, Param_Cell);
 	H_OnUndoTeleport_Post = new GlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
 	H_OnStartPositionSet_Post = new GlobalForward("GOKZ_OnStartPositionSet_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Array, Param_Array);
@@ -242,6 +246,20 @@ void Call_GOKZ_OnTeleportToStart(int client, Action &result)
 void Call_GOKZ_OnTeleportToStart_Post(int client)
 {
 	Call_StartForward(H_OnTeleportToStart_Post);
+	Call_PushCell(client);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnTeleportToEnd(int client, Action &result)
+{
+	Call_StartForward(H_OnTeleportToEnd);
+	Call_PushCell(client);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnTeleportToEnd_Post(int client)
+{
+	Call_StartForward(H_OnTeleportToEnd_Post);
 	Call_PushCell(client);
 	Call_Finish();
 }

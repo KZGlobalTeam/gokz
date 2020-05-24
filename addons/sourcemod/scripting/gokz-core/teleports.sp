@@ -390,6 +390,14 @@ bool ClearCustomStartPosition(int client)
 }
 
 
+// TELEPORT TO START
+
+void TeleportToStart(int client)
+{
+	
+}
+
+
 // UNDO TP
 
 void UndoTeleport(int client)

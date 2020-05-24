@@ -529,6 +529,21 @@ forward Action GOKZ_OnTeleportToStart(int client);
 forward void GOKZ_OnTeleportToStart_Post(int client);
 
 /**
+ * Called when a player teleports to end.
+ *
+ * @param client		Client index.
+ * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
+ */
+forward Action GOKZ_OnTeleportToEnd(int client);
+
+/**
+ * Called when a player has teleported to end.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnTeleportToEnd_Post(int client);
+
+/**
  * Called when a player undoes a teleport.
  *
  * @param client		Client index.

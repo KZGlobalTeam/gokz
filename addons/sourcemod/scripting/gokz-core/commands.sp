@@ -8,6 +8,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
+	RegConsoleCmd("sm_end", CommandTeleportToEnd, "[KZ] Teleport to the end.");
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your custom start position to your current position.");
@@ -94,6 +95,12 @@ public Action CommandUndoTeleport(int client, int args)
 public Action CommandTeleportToStart(int client, int args)
 {
 	GOKZ_TeleportToStart(client);
+	return Plugin_Handled;
+}
+
+public Action CommandTeleportToEnd(int client, int args)
+{
+	GOKZ_TeleportToEnd(client);
 	return Plugin_Handled;
 }
 
