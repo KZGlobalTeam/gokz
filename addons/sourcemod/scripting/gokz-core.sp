@@ -61,6 +61,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/map/prefix.sp"
 #include "gokz-core/map/starts.sp"
 #include "gokz-core/map/zones.sp"
+#include "gokz-core/map/end.sp"
 
 #include "gokz-core/menus/mode_menu.sp"
 #include "gokz-core/menus/options_menu.sp"
@@ -100,6 +101,7 @@ public void OnPluginStart()
 	
 	OnPluginStart_MapButtons();
 	OnPluginStart_MapStarts();
+	OnPluginStart_MapEnd();
 	OnPluginStart_MapZones();
 	OnPluginStart_Options();
 }
@@ -300,6 +302,7 @@ public void OnMapStart()
 	OnMapStart_Prefix();
 	OnMapStart_CourseRegister();
 	OnMapStart_MapStarts();
+	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
 }
 
@@ -328,6 +331,7 @@ public void OnEntitySpawned(int entity)
 	OnEntitySpawned_MapBhopTriggers(entity);
 	OnEntitySpawned_MapButtons(entity);
 	OnEntitySpawned_MapStarts(entity);
+	OnEntitySpawned_MapEnd(entity);
 	OnEntitySpawned_MapZones(entity);
 }
 

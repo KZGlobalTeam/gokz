@@ -4,6 +4,7 @@
 
 
 
+static Regex RE_BonusEnd;
 static bool endExists[GOKZ_MAX_COURSES];
 static float endOrigin[GOKZ_MAX_COURSES];
 static float endAngles[GOKZ_MAX_COURSES];
@@ -12,12 +13,17 @@ static float endAngles[GOKZ_MAX_COURSES];
 
 // =====[ EVENTS ]=====
 
+void OnPluginStart_MapEnd()
+{
+	RE_BonusEnd = CompileRegex(GOKZ_BONUS_END_NAME_REGEX);
+}
+
 void OnEntitySpawned_MapEnd(int entity)
 {
     char buffer[32];
 
     GetEntityClassname(entity, buffer, sizeof(buffer));
-	if (!StrEqual("info_teleport_destination", buffer, false))
+	if (!StrEqual("func_button", buffer, false))
 	{
 		return;
 	}
@@ -27,7 +33,7 @@ void OnEntitySpawned_MapEnd(int entity)
 		return;
 	}
 	
-	if (StrEqual(GOKZ_END_NAME, buffer, false))
+	if (StrEqual(GOKZ_END_NAME_BUTTON, buffer, false))
 	{
 		StoreEnd(0, entity);
 	}
@@ -47,6 +53,19 @@ void OnMapStart_MapEnd()
 	{
 		endExists[course] = false;
 	}
+}
+
+bool GetMapEndPosition(int course, float origin[3], float angles[3])
+{
+	if (!endExists[couse])
+	{
+		return false
+	}
+
+	origin = endOrigin[course];
+	angles = endAngles[course];
+
+	return true;
 }
 
 

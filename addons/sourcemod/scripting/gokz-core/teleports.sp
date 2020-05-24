@@ -16,6 +16,8 @@ static float nonCustomStartOrigin[MAXPLAYERS + 1][3];
 static float nonCustomStartAngles[MAXPLAYERS + 1][3];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
+static float endOrigin[MAXPLAYERS + 1][3];
+static float endAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
@@ -390,10 +392,36 @@ bool ClearCustomStartPosition(int client)
 }
 
 
-// TELEPORT TO START
+// TELEPORT TO END
 
-void TeleportToStart(int client)
+void TeleportToEnd(int client)
 {
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToEnd(client, result);
+	if (result != Plugin_Continue)
+	{
+		return;
+	}
+
+	GOKZ_StopTimer(client, false);
+
+	// Teleport to End
+	TeleportDo(client, endOrigin[client], endAngles[client]);
+
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToEnd_Post(client);
+}
+
+bool SetEndPositionToMapEnd(int client, int course)
+{
+	float origin[3], angles[3];
+
+	if (!GetMapEndPosition(course, origin, angles))
+	{
+		return false;
+	}
+
 	
 }
 
