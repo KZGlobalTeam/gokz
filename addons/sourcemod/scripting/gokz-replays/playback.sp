@@ -113,6 +113,11 @@ int GetBotFromClient(int client)
 	return -1;
 }
 
+bool InBreather(int bot)
+{
+	return inBreather[bot];
+}
+
 bool PlaybackPaused(int bot)
 {
 	return botPaused[bot];
@@ -262,6 +267,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 				{
 					playbackTickData[bot].Clear(); // Clear it all out
 					botDataLoaded[bot] = false;
+					CancelReplayControlsForBot(bot);
 					ResetBotStuff(bot);
 				}
 			}
@@ -281,6 +287,7 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 			{
 				playbackTickData[bot].Clear();
 				botDataLoaded[bot] = false;
+				CancelReplayControlsForBot(bot);
 				ResetBotStuff(bot);
 				return;
 			}
