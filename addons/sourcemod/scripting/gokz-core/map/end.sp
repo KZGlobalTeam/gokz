@@ -82,6 +82,8 @@ static void StoreEnd(int course, int entity)
     endExists[course] = true;
     endOrigin[course] = origin;
     endAngles[course] = angles;
+
+	endOrigin[course][2] += 32.0;
 }
 
 static int GetEndBonusNumber(int entity)
