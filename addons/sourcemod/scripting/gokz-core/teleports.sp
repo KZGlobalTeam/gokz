@@ -413,6 +413,18 @@ void TeleportToEnd(int client)
 	Call_GOKZ_OnTeleportToEnd_Post(client);
 }
 
+void SetEndPosition(int client, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR)
+{
+	if (!IsNullVector(origin))
+	{
+		endOrigin[client] = origin;
+	}
+	if (!IsNullVector(angles))
+	{
+		endAngles[client] = angles;
+	}
+}
+
 bool SetEndPositionToMapEnd(int client, int course)
 {
 	float origin[3], angles[3];
@@ -422,7 +434,9 @@ bool SetEndPositionToMapEnd(int client, int course)
 		return false;
 	}
 
-	
+	SetEndPosition(client, origin, angles);
+
+	return true;
 }
 
 
@@ -495,8 +509,10 @@ void OnClientPutInServer_Teleports(int client)
 	startType[client] = StartPositionType_Spawn;
 	nonCustomStartType[client] = StartPositionType_Spawn;
 	
-	// Set start position to main course if we know of it
+	// Set start and end position to main course if we know of it
 	SetStartPositionToMapStart(client, 0);
+	SetEndPositionToMapEnd(client, 0);
+
 }
 
 void OnTimerStart_Teleports(int client)

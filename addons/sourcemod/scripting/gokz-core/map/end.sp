@@ -6,8 +6,8 @@
 
 static Regex RE_BonusEnd;
 static bool endExists[GOKZ_MAX_COURSES];
-static float endOrigin[GOKZ_MAX_COURSES];
-static float endAngles[GOKZ_MAX_COURSES];
+static float endOrigin[GOKZ_MAX_COURSES][3];
+static float endAngles[GOKZ_MAX_COURSES][3];
 
 
 
@@ -33,7 +33,7 @@ void OnEntitySpawned_MapEnd(int entity)
 		return;
 	}
 	
-	if (StrEqual(GOKZ_END_NAME_BUTTON, buffer, false))
+	if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
 	{
 		StoreEnd(0, entity);
 	}
@@ -57,9 +57,9 @@ void OnMapStart_MapEnd()
 
 bool GetMapEndPosition(int course, float origin[3], float angles[3])
 {
-	if (!endExists[couse])
+	if (!endExists[course])
 	{
-		return false
+		return false;
 	}
 
 	origin = endOrigin[course];
