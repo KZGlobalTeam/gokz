@@ -67,7 +67,7 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool autoResta
 	// Unpause the player, if they're paused
 	if (GOKZ_GetPaused(client))
 	{
-    	GOKZ_Resume(client);
+		GOKZ_Resume(client);
 	}
 	
 	// Start Timer
