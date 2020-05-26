@@ -32,8 +32,9 @@ void UpdateReplayControlMenu(int client)
 		return;
 	}
 	
-	if (!IsReplayBotControlled(bot, botClient))
+	if (!IsReplayBotControlled(bot, botClient) && !InBreather(bot))
 	{
+		CancelReplayControlsForBot(bot);
 		controllingPlayer[bot] = client;
 	}
 	else if (controllingPlayer[bot] != client)
@@ -96,7 +97,14 @@ void ShowReplayControlMenu(int client, int bot)
 
 void ToggleReplayControls(int client)
 {
-	showReplayControls[client] = !showReplayControls[client];
+	if (showReplayControls[client])
+	{
+		CancelReplayControls(client);
+	}
+	else
+	{
+		showReplayControls[client] = true;
+	}
 }
 
 void EnableReplayControls(int client)
@@ -171,9 +179,14 @@ int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int par
 
 void CancelReplayControls(int client)
 {
-	if (showReplayControls[client])
+	if (IsValidClient(client) && showReplayControls[client])
 	{
 		CancelClientMenu(client);
 		showReplayControls[client] = false;
 	}
+}
+
+void CancelReplayControlsForBot(int bot)
+{
+	CancelReplayControls(controllingPlayer[bot]);
 }

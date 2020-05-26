@@ -26,6 +26,7 @@ enum
 	EnforcedCVar_MinCmdRate,
 	EnforcedCVar_MaxCmdRate,
 	EnforcedCVar_ClientCmdrateDifference,
+	EnforcedCVar_Turbophysics,
 	ENFORCEDCVAR_COUNT
 };
 
@@ -48,7 +49,8 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 	"sv_maxupdaterate",
 	"sv_mincmdrate",
 	"sv_maxcmdrate",
-	"sv_client_cmdrate_difference"
+	"sv_client_cmdrate_difference",
+	"sv_turbophysics"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
@@ -61,6 +63,7 @@ stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =
 	128.0,
 	128.0,
 	128.0,
+	0.0,
 	0.0
 };
 

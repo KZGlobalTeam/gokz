@@ -139,15 +139,14 @@ void OnTimerStart_JoinTeam(int client)
 
 void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
 {
-	if ((team == CS_TEAM_CT || team == CS_TEAM_T) &&
-		oldteam != CS_TEAM_NONE)
+	if (team == CS_TEAM_CT || team == CS_TEAM_T)
 	{
 		// The position is not correct before the next frame
 		DataPack data = new DataPack();
 		data.WriteCell(client);
 		RequestFrame(UnspecUnstuck, data);
 	}
-	else
+	else if (oldteam == CS_TEAM_CT || oldteam == CS_TEAM_T)
 	{
 		specMovetype[client] = Movement_GetMovetype(client);
 	}
