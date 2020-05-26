@@ -238,8 +238,7 @@ static char[] GetKeysString(KZPlayer player, HUDInfo info)
 void PrintCSGOHUDText(int client, const char[] format)
 {
 	char buff[HUD_MAX_HINT_SIZE];
-	VFormat(buff, sizeof(buff), format, 3);
-	Format(buff, sizeof(buff), "</font>%s", buff);
+	Format(buff, sizeof(buff), "</font>%s", format);
 
 	for (int i = strlen(buff); i < sizeof(buff) - 1; i++)
 	{
