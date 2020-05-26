@@ -523,9 +523,10 @@ void OnTimerStart_Teleports(int client)
 	teleportCount[client] = 0;
 }
 
-void OnStartButtonPress_Teleports(int client)
+void OnStartButtonPress_Teleports(int client, int course)
 {
 	SetStartPositionToCurrent(client, StartPositionType_MapButton);
+	SetEndPositionToMapEnd(client, course);
 }
 
 void OnVirtualStartButtonPress_Teleports(int client)
@@ -536,6 +537,7 @@ void OnVirtualStartButtonPress_Teleports(int client)
 void OnStartZoneStartTouch_Teleports(int client, int course)
 {
 	SetStartPositionToMapStart(client, course);
+	SetEndPositionToMapEnd(client, course);
 }
 
 

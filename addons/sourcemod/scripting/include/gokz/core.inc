@@ -178,7 +178,7 @@ enum
 
 #define GOKZ_START_NAME "climb_start"
 #define GOKZ_BONUS_START_NAME_REGEX "^climb_bonus(\\d+)_start$"
-#define GOKZ_BONUS_END_NAME_REGEX "^climb_bonus(\\d+)_start$"
+#define GOKZ_BONUS_END_NAME_REGEX "^climb_bonus(\\d+)_end$"
 
 #define GOKZ_START_BUTTON_NAME "climb_startbutton"
 #define GOKZ_END_BUTTON_NAME "climb_endbutton"

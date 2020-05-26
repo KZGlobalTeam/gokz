@@ -15,7 +15,7 @@ static float endAngles[GOKZ_MAX_COURSES][3];
 
 void OnPluginStart_MapEnd()
 {
-	RE_BonusEnd = CompileRegex(GOKZ_BONUS_END_NAME_REGEX);
+	RE_BonusEnd = CompileRegex(GOKZ_BONUS_END_BUTTON_NAME_REGEX);
 }
 
 void OnEntitySpawned_MapEnd(int entity)
