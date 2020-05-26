@@ -49,6 +49,7 @@ void ToggleNoclip(int client)
 	else
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
 	}
 }
 
@@ -65,6 +66,44 @@ void DisableNoclip(int client)
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+	}
+}
+
+void ToggleNoclipNotrigger(int client)
+{
+	if (!IsPlayerAlive(client))
+	{
+		return;
+	}
+	
+	if (Movement_GetMovetype(client) != MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_NOTRIGGER, 4, true);
+	}
+	else
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+	}
+}
+
+void EnableNoclipNotrigger(int client)
+{
+	if (IsPlayerAlive(client))
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_NOTRIGGER, 4, true);
+	}
+}
+
+void DisableNoclipNotrigger(int client)
+{
+	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
 	}
 }
 
@@ -75,7 +114,7 @@ void DisableNoclip(int client)
 void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
-	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
 }
 
 
