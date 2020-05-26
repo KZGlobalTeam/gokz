@@ -234,6 +234,7 @@ static char[] GetKeysString(KZPlayer player, HUDInfo info)
 	return keysString;
 }
 
+// Credits to Franc1sco (https://github.com/Franc1sco/FixHintColorMessages)
 void PrintCSGOHUDText(int client, const char[] format)
 {
 	char buff[HUD_MAX_HINT_SIZE];
