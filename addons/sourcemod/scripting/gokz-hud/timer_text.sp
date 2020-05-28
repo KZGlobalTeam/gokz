@@ -95,7 +95,7 @@ static void UpdateTimerText(int client, HUDInfo info)
 	else
 	{
 		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
-		if (targetPlayer.ID != -1)
+		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
 		{
 			ShowTimerText(player, info);
 		}

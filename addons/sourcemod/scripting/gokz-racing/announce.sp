@@ -121,10 +121,43 @@ void OnRequestReceived_Announce(int client, int raceID)
 			GOKZ_PrintToChat(client, true, "%t", "Duel Request Received", host);
 		}
 	}
+
+	int cpRule = GetRaceInfo(raceID, RaceInfo_CheckpointRule);
+	int cdRule = GetRaceInfo(raceID, RaceInfo_CooldownRule);
+	int mode = GetRaceInfo(raceID, RaceInfo_Mode);
+	int course = GetRaceInfo(raceID, RaceInfo_Course);
 	
-	GOKZ_PrintToChat(client, false, "%t", "Race Rules", 
-		gC_ModeNames[GetRaceInfo(raceID, RaceInfo_Mode)], 
-		gC_CheckpointRulePhrases[GetRaceInfo(raceID, RaceInfo_CheckpointRule)]);
+	char courseStr[32];
+	if (course == 0)
+	{
+		FormatEx(courseStr, sizeof(courseStr), "%T", "Race Rules - Main Course", client);
+	}
+	else
+	{
+		FormatEx(courseStr, sizeof(courseStr), "%T %d", "Race Rules - Bonus Course", client, course);
+	}
+	
+	if (cpRule == -1 && cdRule == 0)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - Unlimited", gC_ModeNames[mode], courseStr);
+	}
+	if (cpRule == -1 && cdRule > 0)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - Limited Cooldown", gC_ModeNames[mode], courseStr, cdRule);
+	}
+	if (cpRule == 0)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - No Checkpoints", gC_ModeNames[mode], courseStr);
+	}
+	if (cpRule > 0 && cdRule == 0)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - Limited Checkpoints", gC_ModeNames[mode], courseStr, cpRule);
+	}
+	if (cpRule > 0 && cdRule > 0)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Race Rules - Limited", gC_ModeNames[mode], courseStr, cpRule, cdRule);
+	}
+	
 	GOKZ_PrintToChat(client, false, "%t", "You Have Seconds To Accept", RoundFloat(RC_REQUEST_TIMEOUT_TIME));
 }
 

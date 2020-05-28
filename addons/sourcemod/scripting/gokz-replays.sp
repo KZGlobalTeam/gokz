@@ -4,7 +4,6 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#include <gokz/hud>
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
@@ -12,6 +11,7 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
+#include <gokz/hud>
 #include <updater>
 
 #pragma newdecls required

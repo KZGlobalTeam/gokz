@@ -21,6 +21,12 @@ enum
 	EnforcedCVar_ClampUnsafeVelocities, 
 	EnforcedCVar_DropKnifeEnable, 
 	EnforcedCVar_AutoBunnyhopping, 
+	EnforcedCVar_MinUpdateRate,
+	EnforcedCVar_MaxUpdateRate,
+	EnforcedCVar_MinCmdRate,
+	EnforcedCVar_MaxCmdRate,
+	EnforcedCVar_ClientCmdrateDifference,
+	EnforcedCVar_Turbophysics,
 	ENFORCEDCVAR_COUNT
 };
 
@@ -29,13 +35,22 @@ enum
 // =====[ CONSTANTS ]=====
 
 #define GL_SOUND_NEW_RECORD "gokz/holyshit.mp3"
+#define GL_FPS_MAX_CHECK_INTERVAL 1.0
+#define GL_FPS_MAX_KICK_TIMEOUT 10.0
+#define GL_FPS_MAX_MIN_VALUE 120
 
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {
 	"sv_cheats", 
 	"sv_clamp_unsafe_velocities", 
 	"mp_drop_knife_enable", 
-	"sv_autobunnyhopping"
+	"sv_autobunnyhopping",
+	"sv_minupdaterate",
+	"sv_maxupdaterate",
+	"sv_mincmdrate",
+	"sv_maxcmdrate",
+	"sv_client_cmdrate_difference",
+	"sv_turbophysics"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
@@ -43,6 +58,12 @@ stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =
 	0.0, 
 	0.0, 
 	0.0, 
+	0.0,
+	128.0,
+	128.0,
+	128.0,
+	128.0,
+	0.0,
 	0.0
 };
 

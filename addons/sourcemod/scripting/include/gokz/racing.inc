@@ -23,6 +23,7 @@ enum RaceInfo:
 	RaceInfo_Course, 
 	RaceInfo_Mode, 
 	RaceInfo_CheckpointRule, 
+	RaceInfo_CooldownRule,
 	RACEINFO_COUNT
 };
 
@@ -55,10 +56,10 @@ enum
 
 enum
 {
-	CheckpointRule_None, 
-	CheckpointRule_OneMinuteCooldown, 
-	CheckpointRule_TenLimit, 
-	CheckpointRule_Unlimited, 
+	CheckpointRule_None,
+	CheckpointRule_Limit,
+	CheckpointRule_Cooldown,
+	CheckpointRule_Unlimited,
 	CHECKPOINTRULE_COUNT
 };
 
@@ -68,15 +69,6 @@ enum
 
 #define RC_COUNTDOWN_TIME 10.0
 #define RC_REQUEST_TIMEOUT_TIME 15.0
-
-// Translation phrases for the teleport rules
-stock char gC_CheckpointRulePhrases[CHECKPOINTRULE_COUNT][] = 
-{
-	"Checkpoint Rule - None", 
-	"Checkpoint Rule - 1 Minute Checkpoint Cooldown", 
-	"Checkpoint Rule - 10 Checkpoint Limit", 
-	"Checkpoint Rule - Unlimited"
-};
 
 
 
@@ -171,30 +163,6 @@ native int GOKZ_RC_GetStatus(int client);
  * @return				ID of the race the player is in, or -1 if not in a race.
  */
 native int GOKZ_RC_GetRaceID(int client);
-
-
-
-// =====[ STOCKS ]=====
-
-/**
- * Clears and populates a menu with an item for checkpoint rule
- * in order of the checkpoint rule enumeration.
- *
- * @param client				Client index for translations.
- * @param menu					Menu to populate items with.
- */
-stock void GOKZ_RC_MenuAddCheckpointRuleItems(int client, Menu menu)
-{
-	char display[32];
-	
-	menu.RemoveAllItems();
-	
-	for (int i = 0; i < CHECKPOINTRULE_COUNT; i++)
-	{
-		FormatEx(display, sizeof(display), "%T", gC_CheckpointRulePhrases[i], client);
-		menu.AddItem("", display);
-	}
-}
 
 
 

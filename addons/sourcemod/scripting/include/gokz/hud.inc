@@ -119,6 +119,7 @@ enum struct HUDInfo
 
 #define HUD_OPTION_CATEGORY "HUD"
 #define HUD_MAX_BHOP_GROUND_TICKS 5
+#define HUD_MAX_HINT_SIZE 227
 
 stock char gC_HUDOptionNames[HUDOPTION_COUNT][] = 
 {

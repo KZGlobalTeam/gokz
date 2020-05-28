@@ -188,7 +188,8 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
 		DeleteFile(path);
 	}
 	else
-	{  // New replay so add it to replay info cache
+	{
+		// New replay so add it to replay info cache
 		AddToReplayInfoCache(course, mode, style, timeType);
 		SortReplayInfoCache();
 	}

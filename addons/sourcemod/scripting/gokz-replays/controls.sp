@@ -32,8 +32,9 @@ void UpdateReplayControlMenu(int client)
 		return;
 	}
 	
-	if (!IsReplayBotControlled(bot, botClient))
+	if (!IsReplayBotControlled(bot, botClient) && !InBreather(bot))
 	{
+		CancelReplayControlsForBot(bot);
 		controllingPlayer[bot] = client;
 	}
 	else if (controllingPlayer[bot] != client)
@@ -42,7 +43,9 @@ void UpdateReplayControlMenu(int client)
 	}
 	
 	if (showReplayControls[client] &&
-		(GetClientMenu(client) == MenuSource_None || GetClientAvgLoss(client, NetFlow_Both) > EPSILON))
+		(GetClientMenu(client) == MenuSource_None ||
+		 GetClientAvgLoss(client, NetFlow_Both) > EPSILON ||
+		 GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu))
 	{
 		ShowReplayControlMenu(client, bot);
 	}
@@ -56,7 +59,16 @@ void ShowReplayControlMenu(int client, int bot)
 	menu.OptionFlags = MENUFLAG_NO_SOUND;
 	menu.Pagination = MENU_NO_PAGINATION;
 	menu.ExitButton = true;
-	menu.SetTitle("%T", "Replay Controls - Title", client);
+	
+	if (GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	{
+		menu.SetTitle("%T - %s", "Replay Controls - Title", client,
+			GOKZ_FormatTime(GetPlaybackTime(bot), GOKZ_HUD_GetOption(client, HUDOption_TimerStyle) == TimerStyle_Precise));
+	}
+	else
+	{
+		menu.SetTitle("%T", "Replay Controls - Title", client);
+	}
 	
 	if (PlaybackPaused(bot))
 	{
@@ -85,7 +97,14 @@ void ShowReplayControlMenu(int client, int bot)
 
 void ToggleReplayControls(int client)
 {
-	showReplayControls[client] = !showReplayControls[client];
+	if (showReplayControls[client])
+	{
+		CancelReplayControls(client);
+	}
+	else
+	{
+		showReplayControls[client] = true;
+	}
 }
 
 void EnableReplayControls(int client)
@@ -150,9 +169,24 @@ int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int par
 		
 		case MenuAction_End:
 		{
+			showReplayControls[param1] = false;
 			delete menu;
 		}
 	}
 	
 	return 0;
+}
+
+void CancelReplayControls(int client)
+{
+	if (IsValidClient(client) && showReplayControls[client])
+	{
+		CancelClientMenu(client);
+		showReplayControls[client] = false;
+	}
+}
+
+void CancelReplayControlsForBot(int bot)
+{
+	CancelReplayControls(controllingPlayer[bot]);
 }

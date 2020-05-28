@@ -197,6 +197,8 @@ public void DB_DeleteJump(int client, int steamAccountID, int jumpType, int mode
 
 public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
+	char blockString[16] = "";
+	
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int steamAccountID = data.ReadCell();
@@ -205,31 +207,15 @@ public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, 
 	bool isBlock = data.ReadCell() == 1;
 	delete data;
 	
-	// TODO Translation phrases?
-	if (IsValidClient(client))
+	if (isBlock)
 	{
-		LogMessage("SteamID32 'STEAM_1:%d:%d' %s%s %s was deleted by %L.", 
-			steamAccountID & 1,
-			steamAccountID >> 1, 
-			isBlock ? "Block " : "", 
-			gC_JumpTypes[jumpType], 
-			gC_ModeNames[mode], 
-			client);
-		
-		GOKZ_PrintToChat(client, true, "{grey}SteamID32 '{default}STEAM_1:%d:%d{grey}' {lightgreen}%s{default}%s {purple}%s {grey}was deleted.", 
-			steamAccountID & 1,
-			steamAccountID >> 1, 
-			isBlock ? "Block " : "", 
-			gC_JumpTypes[jumpType], 
-			gC_ModeNames[mode]);
+		FormatEx(blockString, sizeof(blockString), "%T ", "Block", client);
 	}
-	else
-	{
-		LogMessage("SteamID32 'STEAM_1:%d:%d' %s%s %s was deleted.", 
-			steamAccountID & 1,
-			steamAccountID >> 1, 
-			isBlock ? "Block " : "", 
-			gC_JumpTypes[jumpType], 
-			gC_ModeNames[mode]);
-	}
+	
+	GOKZ_PrintToChatAndLog(client, true, "%t", "Jump Deleted", 
+		gC_ModeNames[mode], 
+		blockString, 
+		gC_JumpTypes[jumpType],
+		steamAccountID & 1,
+		steamAccountID >> 1);
 }

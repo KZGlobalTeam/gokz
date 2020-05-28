@@ -5,7 +5,6 @@
 #include <GlobalAPI-Core>
 #include <gokz/anticheat>
 #include <gokz/core>
-#include <gokz/hud>
 #include <gokz/global>
 #include <gokz/replays>
 
@@ -43,6 +42,10 @@ char gC_CurrentMap[64];
 char gC_CurrentMapPath[PLATFORM_MAX_PATH];
 bool gB_InValidRun[MAXPLAYERS + 1];
 bool gB_GloballyVerified[MAXPLAYERS + 1];
+bool gB_EnforcerOnFreshMap;
+bool gB_JustLateLoaded;
+int gI_FPSMax[MAXPLAYERS + 1];
+bool gB_waitingForFPSKick[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_settings_enforcer;
 ConVar gCV_EnforcedCVar[ENFORCEDCVAR_COUNT];
@@ -62,6 +65,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
 	CreateNatives();
 	RegPluginLibrary("gokz-global");
+	gB_JustLateLoaded = late;
 	return APLRes_Success;
 }
 
@@ -111,12 +115,65 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 }
 
+Action MonitorFPSMax(Handle timer)
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && !IsFakeClient(client))
+		{
+			QueryClientConVar(client, "fps_max", FPSCheck, client);
+		}
+	}
+	
+	return Plugin_Handled;
+}
+
+public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		gI_FPSMax[client] = StringToInt(cvarValue);
+		if (gI_FPSMax[client] > 0 && gI_FPSMax[client] < GL_FPS_MAX_MIN_VALUE)
+		{
+			if (!gB_waitingForFPSKick[client])
+			{
+				gB_waitingForFPSKick[client] = true;
+				CreateTimer(GL_FPS_MAX_KICK_TIMEOUT, FPSKickPlayer, client, TIMER_FLAG_NO_MAPCHANGE);
+				GOKZ_PrintToChat(client, true, "%t", "Warn Player fps_max");
+				if (GOKZ_GetTimerRunning(client))
+				{
+					GOKZ_StopTimer(client, true);
+				}
+				else
+				{
+					EmitSoundToClient(client, GOKZ_SOUND_TIMER_STOP);
+				}
+			}
+		}
+		else
+		{
+			gB_waitingForFPSKick[client] = false;
+		}
+	}
+}
+
+Action FPSKickPlayer(Handle timer, int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client) && gB_waitingForFPSKick[client])
+	{
+		KickClient(client, "%T", "Kick Player fps_max", client);
+	}
+	
+	return Plugin_Handled;
+}
+
 
 
 // =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
+	gB_waitingForFPSKick[client] = false;
 	OnClientPutInServer_PrintRecords(client);
 }
 
@@ -168,6 +225,19 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] 
 public void OnMapStart()
 {
 	LoadSounds();
+	
+	// Prevent just reloading the plugin after messing with the map
+	if (gB_JustLateLoaded)
+	{
+		gB_JustLateLoaded = false;
+	}
+	else
+	{
+		gB_EnforcerOnFreshMap = true;
+	}
+	
+	// Setup a timer to monitor fps_max
+	CreateTimer(1.0, MonitorFPSMax, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
 public void OnConfigsExecuted()
@@ -194,13 +264,18 @@ public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)
 	return Plugin_Stop;
 }
 
+public void GOKZ_OnSlap(int client)
+{
+	GOKZ_StopTimer(client);
+}
+
 
 
 // =====[ PUBLIC ]=====
 
 bool GlobalsEnabled(int mode)
 {
-	return gB_APIKeyCheck && gCV_gokz_settings_enforcer.BoolValue && MapCheck() && gB_ModeCheck[mode];
+	return gB_APIKeyCheck && gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap && MapCheck() && gB_ModeCheck[mode];
 }
 
 bool MapCheck()
@@ -215,7 +290,7 @@ void PrintGlobalCheckToChat(int client)
 	GOKZ_PrintToChat(client, true, "%t", "Global Check Header");
 	GOKZ_PrintToChat(client, false, "%t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
-		gCV_gokz_settings_enforcer.BoolValue ? "{green}✓" : "{darkred}X", 
+		gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X", 
 		gB_GloballyVerified[client] ? "{green}✓" : "{darkred}X");
 	
@@ -368,6 +443,9 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] n
 			{
 				InvalidateRun(i);
 			}
+			
+			// You have to change map before you can re-activate that
+			gB_EnforcerOnFreshMap = false;
 		}
 	}
 }

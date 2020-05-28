@@ -4,7 +4,6 @@
 #include <sdktools>
 
 #include <gokz/core>
-#include <gokz/jumpstats>
 #include <gokz/localdb>
 #include <gokz/localranks>
 
@@ -13,6 +12,7 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/global>
+#include <gokz/jumpstats>
 #include <updater>
 
 #pragma newdecls required

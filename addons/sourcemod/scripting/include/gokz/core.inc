@@ -641,6 +641,13 @@ forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
  */
 forward void GOKZ_OnCourseRegistered(int course);
 
+/**
+ * Called when a player got slapped by an admin.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnSlap(int client);
+
 
 
 // =====[ NATIVES ]=====
@@ -705,6 +712,19 @@ native bool GOKZ_GetCourseRegistered(int course);
  * @param any			Variable number of format parameters.
  */
 native void GOKZ_PrintToChat(int client, bool addPrefix, const char[] format, any...);
+
+/**
+ * Prints a message to a client's chat, formatting colours and optionally 
+ * adding the chat prefix. If using the chat prefix, specify a colour at 
+ * the beginning of the message e.g. "{default}Hello!". Also prints the
+ * message to the server log.
+ *
+ * @param client		Client index.
+ * @param addPrefix		Whether to add the chat prefix.
+ * @param format		Formatting rules.
+ * @param any			Variable number of format parameters.
+ */
+native void GOKZ_PrintToChatAndLog(int client, bool addPrefix, const char[] format, any...);
 
 /**
  * Starts a player's timer for a course on the current map.
@@ -836,6 +856,16 @@ native void GOKZ_TeleportToStart(int client);
  * @return				Player's current start position type.
  */
 native StartPositionType GOKZ_GetStartPositionType(int client);
+
+/**
+ * Set the start position of the player to the start of a course.
+ *
+ * @param client    	Client index.
+ * @param course        Course index.
+ * 
+ * @return              False if the course start was not found.
+ */
+native bool GOKZ_SetStartPositionToMapStart(int client, int course);
 
 /**
  * Set a new checkpoint at a player's current position.

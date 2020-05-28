@@ -3,11 +3,11 @@
 #include <geoip>
 
 #include <gokz/core>
-#include <gokz/jumpstats>
 #include <gokz/localdb>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
+#include <gokz/jumpstats>
 #include <updater>
 
 #pragma newdecls required

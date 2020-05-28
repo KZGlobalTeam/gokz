@@ -28,6 +28,7 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-hud.txt"
 
 bool gB_GOKZRacing;
+bool gB_GOKZReplays;
 bool gB_MenuShowing[MAXPLAYERS + 1];
 
 #include "gokz-hud/commands.sp"
@@ -48,6 +49,7 @@ bool gB_MenuShowing[MAXPLAYERS + 1];
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("gokz-hud");
+	MarkNativeAsOptional("GOKZ_RP_GetPlaybackInfo");
 	return APLRes_Success;
 }
 
@@ -76,6 +78,9 @@ public void OnAllPluginsLoaded()
 	{
 		GOKZ_OnOptionsMenuReady(topMenu);
 	}
+	
+	gB_GOKZRacing = LibraryExists("gokz-racing");
+	gB_GOKZReplays = LibraryExists("gokz-replays");
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -84,12 +89,15 @@ public void OnLibraryAdded(const char[] name)
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
+	
 	gB_GOKZRacing = gB_GOKZRacing || StrEqual(name, "gokz-racing");
+	gB_GOKZReplays = gB_GOKZReplays || StrEqual(name, "gokz-replays");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
 	gB_GOKZRacing = gB_GOKZRacing && !StrEqual(name, "gokz-racing");
+	gB_GOKZReplays = gB_GOKZReplays && !StrEqual(name, "gokz-replays");
 }
 
 
@@ -121,9 +129,13 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	{
 		SetHUDInfo(targetPlayer, info, cmdnum);
 	}
-	else if (targetPlayer.ID != -1)
+	else if (targetPlayer.ID != -1 && gB_GOKZReplays)
 	{
 		GOKZ_RP_GetPlaybackInfo(targetPlayer.ID, info);
+	}
+	else
+	{
+		return;
 	}
 
 	OnPlayerRunCmdPost_InfoPanel(client, cmdnum, info);

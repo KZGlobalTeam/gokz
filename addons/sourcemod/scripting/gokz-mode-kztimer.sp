@@ -28,8 +28,8 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-kztimer.txt"
 
-#define MODE_VERSION 204
-#define DUCK_SPEED_MINIMUM 7.0
+#define MODE_VERSION 205
+#define DUCK_SPEED_NORMAL 8.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
 
@@ -140,6 +140,7 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
@@ -156,6 +157,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player);
+	ReduceDuckSlowdown(player);
 	if (gB_Jumpbugged[player.ID])
 	{
 		TweakJumpbug(player);
@@ -182,17 +184,6 @@ public void SDKHook_OnClientPreThink_Post(int client)
 	{
 		TweakConVars();
 	}
-}
-
-public void Movement_OnStartTouchGround(int client)
-{
-	if (!IsUsingMode(client))
-	{
-		return;
-	}
-	
-	KZPlayer player = KZPlayer(client);
-	ReduceDuckSlowdown(player);
 }
 
 public void Movement_OnStopTouchGround(int client, bool jumped)
@@ -225,6 +216,24 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	{
 		gB_Jumpbugged[client] = true;
 	}
+}
+
+public void SDKHook_OnClientPostThink(int client)
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	
+	/*
+		Why are we using PostThink for slope boost fix?
+		
+		MovementAPI measures landing speed, calls forwards etc. during 
+		PostThink_Post. We want the slope fix to apply it's speed before 
+		MovementAPI does this, so that we can apply tweaks based on the 
+		'fixed' landing speed.
+	*/
+	SlopeFix(client);
 }
 
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -443,6 +452,91 @@ float CalcWeaponVelMod(KZPlayer player)
 
 
 
+// =====[ SLOPEFIX ]=====
+
+// ORIGINAL AUTHORS : Mev & Blacky
+// URL : https://forums.alliedmods.net/showthread.php?p=2322788
+// NOTE : Modified by DanZay for this plugin
+
+void SlopeFix(int client)
+{
+	// Check if player landed on the ground
+	if (Movement_GetOnGround(client) && !gB_OldOnGround[client])
+	{
+		// Set up and do tracehull to find out if the player landed on a slope
+		float vPos[3];
+		GetEntPropVector(client, Prop_Data, "m_vecOrigin", vPos);
+		
+		float vMins[3];
+		GetEntPropVector(client, Prop_Send, "m_vecMins", vMins);
+		
+		float vMaxs[3];
+		GetEntPropVector(client, Prop_Send, "m_vecMaxs", vMaxs);
+		
+		float vEndPos[3];
+		vEndPos[0] = vPos[0];
+		vEndPos[1] = vPos[1];
+		vEndPos[2] = vPos[2] - gF_ModeCVarValues[ModeCVar_MaxVelocity];
+		
+		TR_TraceHullFilter(vPos, vEndPos, vMins, vMaxs, MASK_PLAYERSOLID_BRUSHONLY, TraceRayDontHitSelf, client);
+		
+		if (TR_DidHit())
+		{
+			// Gets the normal vector of the surface under the player
+			float vPlane[3], vLast[3];
+			TR_GetPlaneNormal(null, vPlane);
+			
+			// Make sure it's not flat ground and not a surf ramp (1.0 = flat ground, < 0.7 = surf ramp)
+			if (0.7 <= vPlane[2] < 1.0)
+			{
+				/*
+					Copy the ClipVelocity function from sdk2013 
+					(https://mxr.alliedmods.net/hl2sdk-sdk2013/source/game/shared/gamemovement.cpp#3145)
+					With some minor changes to make it actually work
+				*/
+				vLast[0] = gF_OldVelocity[client][0];
+				vLast[1] = gF_OldVelocity[client][1];
+				vLast[2] = gF_OldVelocity[client][2];
+				vLast[2] -= (gF_ModeCVarValues[ModeCVar_Gravity] * GetTickInterval() * 0.5);
+				
+				float fBackOff = GetVectorDotProduct(vLast, vPlane);
+				
+				float change, vVel[3];
+				for (int i; i < 2; i++)
+				{
+					change = vPlane[i] * fBackOff;
+					vVel[i] = vLast[i] - change;
+				}
+				
+				float fAdjust = GetVectorDotProduct(vVel, vPlane);
+				if (fAdjust < 0.0)
+				{
+					for (int i; i < 2; i++)
+					{
+						vVel[i] -= (vPlane[i] * fAdjust);
+					}
+				}
+				
+				vVel[2] = 0.0;
+				vLast[2] = 0.0;
+				
+				// Make sure the player is going down a ramp by checking if they actually will gain speed from the boost
+				if (GetVectorLength(vVel) > GetVectorLength(vLast))
+				{
+					TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, vVel);
+				}
+			}
+		}
+	}
+}
+
+public bool TraceRayDontHitSelf(int entity, int mask, any data)
+{
+	return entity != data && !(0 < entity <= MaxClients);
+}
+
+
+
 // =====[ JUMPING ]=====
 
 void TweakJump(KZPlayer player)
@@ -506,8 +600,8 @@ void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 
 void ReduceDuckSlowdown(KZPlayer player)
 {
-	if (player.DuckSpeed < DUCK_SPEED_MINIMUM)
+	if (GetEntProp(player.ID, Prop_Data, "m_afButtonReleased") & IN_DUCK)
 	{
-		player.DuckSpeed = DUCK_SPEED_MINIMUM;
+		Movement_SetDuckSpeed(player.ID, DUCK_SPEED_NORMAL);
 	}
 } 

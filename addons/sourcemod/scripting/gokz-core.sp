@@ -148,6 +148,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_FirstSpawn(client);
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
+	OnClientPutInServer_BhopTriggers(client);
 	HookClientEvents(client);
 }
 
@@ -280,6 +281,14 @@ public void GOKZ_OnJoinTeam(int client, int team)
 	OnJoinTeam_Pause(client, team);
 }
 
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	int team = event.GetInt("team");
+	int oldteam = event.GetInt("oldteam");
+	OnPlayerJoinTeam_JoinTeam(client, team, oldteam);
+}
+
 
 
 // =====[ OTHER EVENTS ]=====
@@ -326,6 +335,35 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 {
 	OnRoundStart_Timer();
 	OnRoundStart_ForceAllTalk();
+}
+
+// Detect slap: https://forums.alliedmods.net/showpost.php?p=2089883&postcount=3
+public Action OnLogAction(Handle source, Identity ident, int client, int target, const char[] message)
+{
+    if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client))
+    {
+        return Plugin_Continue;
+    }
+    
+    char logtag[PLATFORM_MAX_PATH];
+    if (ident == Identity_Plugin)
+    {
+        GetPluginFilename(source, logtag, sizeof(logtag));
+    }
+    else
+    {
+        Format(logtag, sizeof(logtag), "OTHER");
+    }
+    
+    if ((StrEqual("slap.smx", logtag, false) ||
+    	 StrEqual("playercommands.smx", logtag, false) ||
+    	 StrEqual("funcommands.smx", logtag, false))
+    	&& StrContains(message, "slap", false))
+    {
+        Call_GOKZ_OnSlap(client);
+    }
+    
+    return Plugin_Continue;
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
@@ -379,6 +417,7 @@ static void HookEvents()
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Post);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
 	GameData gameData = new GameData("sdktools.games");

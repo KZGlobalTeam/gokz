@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 8
+#define MODE_VERSION 9
 #define PERF_TICKS 2
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
@@ -573,7 +573,7 @@ void SlopeFix(int client)
 		float vEndPos[3];
 		vEndPos[0] = vPos[0];
 		vEndPos[1] = vPos[1];
-		vEndPos[2] = vPos[2] - FindConVar("sv_maxvelocity").FloatValue;
+		vEndPos[2] = vPos[2] - gF_ModeCVarValues[ModeCVar_MaxVelocity];
 		
 		TR_TraceHullFilter(vPos, vEndPos, vMins, vMaxs, MASK_PLAYERSOLID_BRUSHONLY, TraceRayDontHitSelf, client);
 		
@@ -594,7 +594,7 @@ void SlopeFix(int client)
 				vLast[0] = gF_OldVelocity[client][0];
 				vLast[1] = gF_OldVelocity[client][1];
 				vLast[2] = gF_OldVelocity[client][2];
-				vLast[2] -= (FindConVar("sv_gravity").FloatValue * GetTickInterval() * 0.5);
+				vLast[2] -= (gF_ModeCVarValues[ModeCVar_Gravity] * GetTickInterval() * 0.5);
 				
 				float fBackOff = GetVectorDotProduct(vLast, vPlane);
 				

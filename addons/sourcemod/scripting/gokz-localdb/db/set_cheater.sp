@@ -53,29 +53,12 @@ public void DB_TxnSuccess_SetCheater(Handle db, DataPack data, int numQueries, H
 	bool cheater = view_as<bool>(data.ReadCell());
 	delete data;
 	
-	// TODO Translation phrases?
-	if (IsValidClient(client))
+	if (cheater)
 	{
-		if (cheater)
-		{
-			LogMessage("SteamID32 '%d' was set as a cheater by %L.", steamID, client);
-			GOKZ_PrintToChat(client, true, "{grey}SteamID32 '{default}%d{grey}' was set as a cheater.", steamID);
-		}
-		else
-		{
-			LogMessage("SteamID32 '%d' was set as not a cheater by %L.", steamID, client);
-			GOKZ_PrintToChat(client, true, "{grey}SteamID32 '{default}%d{grey}' was set as not a cheater.", steamID);
-		}
+		GOKZ_PrintToChatAndLog(client, true, "%t", "Set Cheater", steamID & 1, steamID >> 1);
 	}
 	else
 	{
-		if (cheater)
-		{
-			LogMessage("SteamID32 '%d' was set as a cheater.", steamID);
-		}
-		else
-		{
-			LogMessage("SteamID32 '%d' was set as not a cheater.", steamID);
-		}
+		GOKZ_PrintToChatAndLog(client, true, "%t", "Set Not Cheater", steamID & 1, steamID >> 1);
 	}
 } 

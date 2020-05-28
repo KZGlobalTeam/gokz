@@ -5,6 +5,7 @@ void CreateNatives()
 	CreateNative("GOKZ_SetModeLoaded", Native_SetModeLoaded);
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
+	CreateNative("GOKZ_PrintToChatAndLog", Native_PrintToChatAndLog);
 	CreateNative("GOKZ_GetOptionsTopMenu", Native_GetOptionsTopMenu);
 	CreateNative("GOKZ_GetCourseRegistered", Native_GetCourseRegistered);
 	
@@ -14,6 +15,7 @@ void CreateNatives()
 	CreateNative("GOKZ_StopTimerAll", Native_StopTimerAll);
 	CreateNative("GOKZ_TeleportToStart", Native_TeleportToStart);
 	CreateNative("GOKZ_GetStartPositionType", Native_GetStartPositionType);
+	CreateNative("GOKZ_SetStartPositionToMapStart", Native_SetStartPositionToMapStart);
 	CreateNative("GOKZ_MakeCheckpoint", Native_MakeCheckpoint);
 	CreateNative("GOKZ_TeleportToCheckpoint", Native_TeleportToCheckpoint);
 	CreateNative("GOKZ_GetCanTeleportToCheckpoint", Native_GetCanTeleportToCheckpoint);
@@ -71,7 +73,17 @@ public int Native_GetLoadedModeCount(Handle plugin, int numParams)
 	return GetLoadedModeCount();
 }
 
+public int Native_PrintToChatAndLog(Handle plugin, int numParams)
+{
+	NativeHelper_PrintToChatOrLog(true);
+}
+
 public int Native_PrintToChat(Handle plugin, int numParams)
+{
+	NativeHelper_PrintToChatOrLog(false);
+}
+
+static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 {
 	int client = GetNativeCell(1);
 	bool addPrefix = GetNativeCell(2);
@@ -79,13 +91,50 @@ public int Native_PrintToChat(Handle plugin, int numParams)
 	char buffer[1024];
 	SetGlobalTransTarget(client);
 	FormatNativeString(0, 3, 4, sizeof(buffer), _, buffer);
-	if (addPrefix)
+	
+	// The console (client 0) gets a special treatment
+	if (client == 0 || !IsValidClient(client) || alwaysLog)
 	{
-		char prefix[64];
-		gCV_gokz_chat_prefix.GetString(prefix, sizeof(prefix));
-		Format(buffer, sizeof(buffer), "%s%s", prefix, buffer);
+		// Strip colors
+		// We can't regex-replace, so I'm quite sure that's the most efficient way.
+		// It's also not perfectly safe, we will just assume you never have curly
+		// braces without a color in beween.
+		char colorlessBuffer[1024];
+		FormatEx(colorlessBuffer, sizeof(colorlessBuffer), "%L: ", client);
+		int iIn = 0, iOut = strlen(colorlessBuffer);
+		do
+		{
+			if (buffer[iIn] == '{')
+			{
+				for (; buffer[iIn] != '}' && iIn < sizeof(buffer) - 2; iIn++){}
+				if (iIn >= sizeof(buffer) - 2)
+				{
+					break;
+				}
+				iIn++;
+				continue;
+			}
+			
+			colorlessBuffer[iOut] = buffer[iIn];
+			iIn++;
+			iOut++;
+		} while (buffer[iIn] != '\0' && iIn < sizeof(buffer) - 1 && iOut < sizeof(colorlessBuffer) - 1);
+		colorlessBuffer[iOut] = '\0';
+		
+		LogMessage(colorlessBuffer);
 	}
-	CPrintToChat(client, "%s", buffer);
+	
+	if (client != 0)
+	{
+		if (addPrefix)
+		{
+			char prefix[64];
+			gCV_gokz_chat_prefix.GetString(prefix, sizeof(prefix));
+			Format(buffer, sizeof(buffer), "%s%s", prefix, buffer);
+		}
+		
+		CPrintToChat(client, "%s", buffer);
+	}
 }
 
 public int Native_GetOptionsTopMenu(Handle plugin, int numParams)
@@ -136,6 +185,11 @@ public int Native_TeleportToStart(Handle plugin, int numParams)
 public int Native_GetStartPositionType(Handle plugin, int numParams)
 {
 	return view_as<int>(GetStartPositionType(GetNativeCell(1)));
+}
+
+public int Native_SetStartPositionToMapStart(Handle plugin, int numParams)
+{
+	return SetStartPositionToMapStart(GetNativeCell(1), GetNativeCell(2));
 }
 
 public int Native_MakeCheckpoint(Handle plugin, int numParams)

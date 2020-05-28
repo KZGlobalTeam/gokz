@@ -101,7 +101,7 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
-	FinishRacer(client);
+	FinishRacer(client, course);
 }
 
 public Action GOKZ_OnMakeCheckpoint(int client)

@@ -59,6 +59,7 @@ public Action CommandToggleTimerStyle(int client, int args)
 	{
 		GOKZ_HUD_SetOption(client, HUDOption_TimerStyle, TimerStyle_Standard);
 	}
+	return Plugin_Handled;
 }
 
 public Action CommandToggleTimerType(int client, int args)

@@ -5,10 +5,10 @@
 
 #include <gokz/core>
 #include <gokz/jumpstats>
-#include <gokz/localdb>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
+#include <gokz/localdb>
 #include <updater>
 
 #include <gokz/kzplayer>
@@ -185,6 +185,11 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
 	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnSlap(int client)
+{
+	InvalidateJumpstat(client);
 }
 
 
