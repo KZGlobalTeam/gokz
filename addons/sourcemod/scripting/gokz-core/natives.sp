@@ -107,7 +107,11 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 		{
 			if (buffer[iIn] == '{')
 			{
-				for (; buffer[iIn] != '}'; iIn++){}
+				for (; buffer[iIn] != '}' && iIn < sizeof(buffer) - 2; iIn++){}
+				if (iIn >= sizeof(buffer) - 2)
+				{
+					break;
+				}
 				iIn++;
 				continue;
 			}
