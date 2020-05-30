@@ -187,7 +187,14 @@ void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
 	}
 	else if (oldteam == CS_TEAM_CT || oldteam == CS_TEAM_T)
 	{
-		specMovetype[client] = Movement_GetMovetype(client);
+		if (GOKZ_GetPaused(client))
+		{
+			specMovetype[client] = GetPausedOnLadder(client) ? MOVETYPE_LADDER : MOVETYPE_WALK;
+		}
+		else
+		{
+			specMovetype[client] = Movement_GetMovetype(client);
+		}
 	}
 }
 
