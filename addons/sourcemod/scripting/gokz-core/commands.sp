@@ -40,6 +40,9 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
+	RegConsoleCmd("sm_ncnt", CommandToggleNoclipNotrigger, "[KZ] Toggle noclip-notrigger.");
+	RegConsoleCmd("+noclipnotrig", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
+	RegConsoleCmd("-noclipnotrig", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
 }
 
 void AddCommandsListeners()
@@ -277,6 +280,24 @@ public Action CommandEnableNoclip(int client, int args)
 public Action CommandDisableNoclip(int client, int args)
 {
 	DisableNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleNoclipNotrigger(int client, int args)
+{
+	ToggleNoclipNotrigger(client);
+	return Plugin_Handled;
+}
+
+public Action CommandEnableNoclipNotrigger(int client, int args)
+{
+	EnableNoclipNotrigger(client);
+	return Plugin_Handled;
+}
+
+public Action CommandDisableNoclipNotrigger(int client, int args)
+{
+	DisableNoclipNotrigger(client);
 	return Plugin_Handled;
 }
 
