@@ -9,6 +9,7 @@
  * `!next` - Go forward a checkpoint.
  * `!undo` - Undo teleport.
  * `!start`/`!restart`/`!r` - Teleport to your start position.
+ * `!end` - Teleport to the endtimer.
  * `!setstartpos`/`!ssp` - Set your custom start position to your current position.
  * `!clearstartpos`/`!csp` - Clear your custom start position.
  * `!main`/`!m` - Teleport to the start of the main course.

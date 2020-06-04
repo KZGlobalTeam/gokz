@@ -16,6 +16,8 @@ static float nonCustomStartOrigin[MAXPLAYERS + 1][3];
 static float nonCustomStartAngles[MAXPLAYERS + 1][3];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
+static float endOrigin[MAXPLAYERS + 1][3];
+static float endAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
@@ -390,6 +392,54 @@ bool ClearCustomStartPosition(int client)
 }
 
 
+// TELEPORT TO END
+
+void TeleportToEnd(int client)
+{
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToEnd(client, result);
+	if (result != Plugin_Continue)
+	{
+		return;
+	}
+
+	GOKZ_StopTimer(client, false);
+
+	// Teleport to End
+	TeleportDo(client, endOrigin[client], endAngles[client]);
+
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToEnd_Post(client);
+}
+
+void SetEndPosition(int client, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR)
+{
+	if (!IsNullVector(origin))
+	{
+		endOrigin[client] = origin;
+	}
+	if (!IsNullVector(angles))
+	{
+		endAngles[client] = angles;
+	}
+}
+
+bool SetEndPositionToMapEnd(int client, int course)
+{
+	float origin[3], angles[3];
+
+	if (!GetMapEndPosition(course, origin, angles))
+	{
+		return false;
+	}
+
+	SetEndPosition(client, origin, angles);
+
+	return true;
+}
+
+
 // UNDO TP
 
 void UndoTeleport(int client)
@@ -459,8 +509,10 @@ void OnClientPutInServer_Teleports(int client)
 	startType[client] = StartPositionType_Spawn;
 	nonCustomStartType[client] = StartPositionType_Spawn;
 	
-	// Set start position to main course if we know of it
+	// Set start and end position to main course if we know of it
 	SetStartPositionToMapStart(client, 0);
+	SetEndPositionToMapEnd(client, 0);
+
 }
 
 void OnTimerStart_Teleports(int client)
@@ -471,9 +523,10 @@ void OnTimerStart_Teleports(int client)
 	teleportCount[client] = 0;
 }
 
-void OnStartButtonPress_Teleports(int client)
+void OnStartButtonPress_Teleports(int client, int course)
 {
 	SetStartPositionToCurrent(client, StartPositionType_MapButton);
+	SetEndPositionToMapEnd(client, course);
 }
 
 void OnVirtualStartButtonPress_Teleports(int client)
@@ -484,6 +537,7 @@ void OnVirtualStartButtonPress_Teleports(int client)
 void OnStartZoneStartTouch_Teleports(int client, int course)
 {
 	SetStartPositionToMapStart(client, course);
+	SetEndPositionToMapEnd(client, course);
 }
 
 
