@@ -74,14 +74,14 @@ bool GetMapEndPosition(int course, float origin[3], float angles[3])
 
 static void StoreEnd(int course, int entity)
 {
-    float origin[3], angles[3];
-    GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
-    GetEntPropVector(entity, Prop_Data, "m_angRotation", angles);
-    angles[2] = 0.0; // Roll should always be 0.0
+	float origin[3], angles[3];
+	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
+	GetEntPropVector(entity, Prop_Data, "m_angRotation", angles);
+	angles[2] = 0.0; // Roll should always be 0.0
 
-    endExists[course] = true;
-    endOrigin[course] = origin;
-    endAngles[course] = angles;
+	endExists[course] = true;
+	endOrigin[course] = origin;
+	endAngles[course] = angles;
 
 	endOrigin[course][2] += 32.0;
 }
