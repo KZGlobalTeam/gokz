@@ -20,24 +20,24 @@ void OnPluginStart_MapEnd()
 
 void OnEntitySpawned_MapEnd(int entity)
 {
-    char buffer[32];
+	char buffer[32];
 
-    GetEntityClassname(entity, buffer, sizeof(buffer));
+	GetEntityClassname(entity, buffer, sizeof(buffer));
 	if (!StrEqual("func_button", buffer, false))
 	{
 		return;
 	}
-	
+
 	if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
 	{
 		return;
 	}
-	
+
 	if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
 	{
 		StoreEnd(0, entity);
 	}
-    else
+	else
 	{
 		int course = GetEndBonusNumber(entity);
 		if (GOKZ_IsValidCourse(course, true))

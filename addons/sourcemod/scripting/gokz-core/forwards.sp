@@ -254,7 +254,7 @@ void Call_GOKZ_OnTeleportToEnd(int client, Action &result)
 {
 	Call_StartForward(H_OnTeleportToEnd);
 	Call_PushCell(client);
-	Call_Finish();
+	Call_Finish(result);
 }
 
 void Call_GOKZ_OnTeleportToEnd_Post(int client)
