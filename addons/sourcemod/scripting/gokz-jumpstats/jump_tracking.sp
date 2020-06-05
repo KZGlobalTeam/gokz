@@ -57,6 +57,7 @@ enum struct JumpTracker
 	int jumpoffTick;
 	int poseIndex;
 	int strafeDirection;
+	int ladderGrabTick;
 	int lastJumpTick;
 	int lastTeleportTick;
 	int lastType;
@@ -276,7 +277,7 @@ enum struct JumpTracker
 		{
 			if (GetGameTickCount() - this.lastJumpTick <= JS_MAX_BHOP_GROUND_TICKS)
 			{
-				return JumpType_Ladderhop;
+				return GetGameTickCount() - this.ladderGrabTick > JS_MAX_BHOP_GROUND_TICKS ? JumpType_Ladderhop : JumpType_Invalid;
 			}
 			else
 			{
@@ -1366,6 +1367,14 @@ public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 	
 	// We always have to track this, no matter if in the air or not
 	jumpTrackers[client].UpdateRelease();
+}
+
+public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, MoveType newMovetype)
+{
+	if (newMovetype == MOVETYPE_LADDER)
+	{
+		jumpTrackers[client].ladderGrabTick = GetGameTickCount();
+	}
 }
 
 
