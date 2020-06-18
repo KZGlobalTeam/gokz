@@ -198,10 +198,10 @@ bool GetPlayerEyeViewPoint(int client, float position[3])
 	if (TR_DidHit(trace))
 	{
 		TR_GetEndPosition(position, trace);
-		CloseHandle(trace);
+		delete trace;
 		return true;
 	}
-	CloseHandle(trace);
+	delete trace;
 	return false;
 }
 
@@ -344,11 +344,6 @@ void DisplayColorMenu(int client)
 
 int MenuHandler_PaintColor(Menu menu, MenuAction action, int param1, int param2)
 {
-	if (!IsValidClient(param1))
-	{
-		return 0;
-	}
-	
 	switch (action)
 	{
 		case MenuAction_Select:

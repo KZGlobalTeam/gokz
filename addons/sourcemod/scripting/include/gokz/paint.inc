@@ -76,13 +76,13 @@ stock char gC_PaintOptionPhrases[PAINTOPTION_COUNT][] =
 stock int gI_PaintOptionCounts[PAINTOPTION_COUNT] = 
 {
 	PAINTCOLOR_COUNT,
-	PAINTSIZE_COUNT,
+	PAINTSIZE_COUNT
 };
 
 stock int gI_PaintOptionDefaults[PAINTOPTION_COUNT] = 
 {
 	PaintColor_Red,
-	PaintSize_Medium,
+	PaintSize_Medium
 };
 
 stock char gC_PaintColorPhrases[PAINTCOLOR_COUNT][] = 

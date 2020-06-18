@@ -1,4 +1,5 @@
-"Phrases"{
+"Phrases"
+{
 	//=====[ MENU ]=====
 	"Options Menu - Paint"
 	{
