@@ -29,7 +29,7 @@
 	}
 	"Options Menu - Black"
 	{
-		"en"		"Balck"
+		"en"		"Black"
 	}
 	"Options Menu - Blue"
 	{
