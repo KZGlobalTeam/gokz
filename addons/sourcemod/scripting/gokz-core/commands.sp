@@ -8,6 +8,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
+	RegConsoleCmd("sm_end", CommandTeleportToEnd, "[KZ] Teleport to the end.");
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your custom start position to your current position.");
@@ -39,6 +40,9 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
+	RegConsoleCmd("sm_ncnt", CommandToggleNoclipNotrigger, "[KZ] Toggle noclip-notrigger.");
+	RegConsoleCmd("+noclipnotrig", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
+	RegConsoleCmd("-noclipnotrig", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
 }
 
 void AddCommandsListeners()
@@ -94,6 +98,12 @@ public Action CommandUndoTeleport(int client, int args)
 public Action CommandTeleportToStart(int client, int args)
 {
 	GOKZ_TeleportToStart(client);
+	return Plugin_Handled;
+}
+
+public Action CommandTeleportToEnd(int client, int args)
+{
+	GOKZ_TeleportToEnd(client);
 	return Plugin_Handled;
 }
 
@@ -270,6 +280,24 @@ public Action CommandEnableNoclip(int client, int args)
 public Action CommandDisableNoclip(int client, int args)
 {
 	DisableNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleNoclipNotrigger(int client, int args)
+{
+	ToggleNoclipNotrigger(client);
+	return Plugin_Handled;
+}
+
+public Action CommandEnableNoclipNotrigger(int client, int args)
+{
+	EnableNoclipNotrigger(client);
+	return Plugin_Handled;
+}
+
+public Action CommandDisableNoclipNotrigger(int client, int args)
+{
+	DisableNoclipNotrigger(client);
 	return Plugin_Handled;
 }
 

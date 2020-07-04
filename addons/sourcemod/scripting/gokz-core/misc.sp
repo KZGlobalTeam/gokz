@@ -49,6 +49,7 @@ void ToggleNoclip(int client)
 	else
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
 	}
 }
 
@@ -65,6 +66,44 @@ void DisableNoclip(int client)
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+	}
+}
+
+void ToggleNoclipNotrigger(int client)
+{
+	if (!IsPlayerAlive(client))
+	{
+		return;
+	}
+	
+	if (Movement_GetMovetype(client) != MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_NOTRIGGER, 4, true);
+	}
+	else
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+	}
+}
+
+void EnableNoclipNotrigger(int client)
+{
+	if (IsPlayerAlive(client))
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_NOTRIGGER, 4, true);
+	}
+}
+
+void DisableNoclipNotrigger(int client)
+{
+	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
 	}
 }
 
@@ -75,7 +114,7 @@ void DisableNoclip(int client)
 void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
-	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
 }
 
 
@@ -139,17 +178,23 @@ void OnTimerStart_JoinTeam(int client)
 
 void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
 {
-	if ((team == CS_TEAM_CT || team == CS_TEAM_T) &&
-		oldteam != CS_TEAM_NONE)
+	if (team == CS_TEAM_CT || team == CS_TEAM_T)
 	{
 		// The position is not correct before the next frame
 		DataPack data = new DataPack();
 		data.WriteCell(client);
 		RequestFrame(UnspecUnstuck, data);
 	}
-	else
+	else if (oldteam == CS_TEAM_CT || oldteam == CS_TEAM_T)
 	{
-		specMovetype[client] = Movement_GetMovetype(client);
+		if (GOKZ_GetPaused(client))
+		{
+			specMovetype[client] = GetPausedOnLadder(client) ? MOVETYPE_LADDER : MOVETYPE_WALK;
+		}
+		else
+		{
+			specMovetype[client] = Movement_GetMovetype(client);
+		}
 	}
 }
 

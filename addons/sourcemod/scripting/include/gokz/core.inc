@@ -171,6 +171,8 @@ enum
 #define GOKZ_TIMER_START_GROUND_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 0.6
+#define GOKZ_COLLISION_GROUP_STANDARD 2
+#define GOKZ_COLLISION_GROUP_NOTRIGGER 1
 
 #define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
@@ -178,6 +180,7 @@ enum
 
 #define GOKZ_START_NAME "climb_start"
 #define GOKZ_BONUS_START_NAME_REGEX "^climb_bonus(\\d+)_start$"
+#define GOKZ_BONUS_END_NAME_REGEX "^climb_bonus(\\d+)_end$"
 
 #define GOKZ_START_BUTTON_NAME "climb_startbutton"
 #define GOKZ_END_BUTTON_NAME "climb_endbutton"
@@ -529,6 +532,21 @@ forward Action GOKZ_OnTeleportToStart(int client);
 forward void GOKZ_OnTeleportToStart_Post(int client);
 
 /**
+ * Called when a player teleports to end.
+ *
+ * @param client		Client index.
+ * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
+ */
+forward Action GOKZ_OnTeleportToEnd(int client);
+
+/**
+ * Called when a player has teleported to end.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnTeleportToEnd_Post(int client);
+
+/**
  * Called when a player undoes a teleport.
  *
  * @param client		Client index.
@@ -866,6 +884,13 @@ native StartPositionType GOKZ_GetStartPositionType(int client);
  * @return              False if the course start was not found.
  */
 native bool GOKZ_SetStartPositionToMapStart(int client, int course);
+
+/**
+ * Teleports a player to end.
+ *
+ * @param client		Client index.
+ */
+native void GOKZ_TeleportToEnd(int client);
 
 /**
  * Set a new checkpoint at a player's current position.
