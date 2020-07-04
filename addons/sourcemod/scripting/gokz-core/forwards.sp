@@ -1,3 +1,4 @@
+static GlobalForward H_OnOptionsLoaded;
 static GlobalForward H_OnOptionChanged;
 static GlobalForward H_OnTimerStart;
 static GlobalForward H_OnTimerStart_Post;
@@ -42,6 +43,7 @@ static GlobalForward H_OnSlap;
 
 void CreateGlobalForwards()
 {
+	H_OnOptionsLoaded = new GlobalForward("GOKZ_OnOptionsLoaded", ET_Ignore, Param_Cell);
 	H_OnOptionChanged = new GlobalForward("GOKZ_OnOptionChanged", ET_Ignore, Param_Cell, Param_String, Param_Cell);
 	H_OnTimerStart = new GlobalForward("GOKZ_OnTimerStart", ET_Hook, Param_Cell, Param_Cell);
 	H_OnTimerStart_Post = new GlobalForward("GOKZ_OnTimerStart_Post", ET_Ignore, Param_Cell, Param_Cell);
@@ -81,6 +83,13 @@ void CreateGlobalForwards()
 	H_OnOptionsMenuReady = new GlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
 	H_OnCourseRegistered = new GlobalForward("GOKZ_OnCourseRegistered", ET_Ignore, Param_Cell);
 	H_OnSlap = new GlobalForward("GOKZ_OnSlap", ET_Ignore, Param_Cell);
+}
+
+void Call_GOKZ_OnOptionsLoaded(int client)
+{
+	Call_StartForward(H_OnOptionsLoaded);
+	Call_PushCell(client);
+	Call_Finish();
 }
 
 void Call_GOKZ_OnOptionChanged(int client, const char[] option, int optionValue)

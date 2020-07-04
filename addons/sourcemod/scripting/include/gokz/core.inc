@@ -361,6 +361,13 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 // =====[ FORWARDS ]=====
 
 /**
+ * Called when a player's option's values are loaded from clientprefs.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnOptionsLoaded(int client);
+
+/**
  * Called when a player's option's value is changed.
  * Only called if client is in game.
  *
@@ -865,6 +872,46 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
  * @param client    	Client index.
  */
 native void GOKZ_TeleportToStart(int client);
+
+/**
+ * Gets the virtual button position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param position		Returns the client's virtual button position.
+ * @param isStart		True to get the start button position, false for the end button.
+ * @return				The course the button belongs to.
+ */
+native int GOKZ_GetVirtualButtonPosition(int client, float position[3], bool isStart);
+
+/**
+ * Sets the virtual button position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param position		The client's virtual button position.
+ * @param course		The course the virtual button belongs to.
+ * @param isStart		True to get the start button position, false for the end button.
+ */
+native void GOKZ_SetVirtualButtonPosition(int client, const float position[3], int course, bool isStart);
+
+/**
+ * Gets the start position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param position		Returns the client's start position.
+ * @param angles		Returns the client's start angles.
+ * @return				Player's current start position type.
+ */
+native StartPositionType GOKZ_GetStartPosition(int client, float position[3], float angles[3]);
+
+/**
+ * Sets the start position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param type			The start position type.
+ * @param position		The client's start position.
+ * @param angles		The client's start angles.
+ */
+native void GOKZ_SetStartPosition(int client, StartPositionType type, const float position[3], const float angles[3]);
 
 /**
  * Gets the type of start position the player currently has.
