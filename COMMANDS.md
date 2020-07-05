@@ -114,8 +114,10 @@ Many of these commands return results for your currently selected mode.
  * `!jumptop`/`!jstop` - Open a menu showing the top jumpstats.
  * `!ljpb` - Show PB Long Jump in chat. Usage: `!ljpb <jumper>`
  * `!bhpb` - Show PB Bunnyhop in chat. Usage: `!bhpb <jumper>`
+ * `!lbhpb` - Show PB Lowpre Bunnyhop in chat. Usage: `!lbhpb <jumper>`
  * `!mbhpb` - Show PB Multi Bunnyhop in chat. Usage: `!mbhpb <jumper>`
  * `!wjpb` - Show PB Weird Jump in chat. Usage: `!wjpb <jumper>`
+ * `!lwjpb` - Show PB Lowpre Weird Jump in chat. Usage: `!lwjpb <jumper>`
  * `!lajpb` - Show PB Ladder Jump in chat. Usage: `!lajpb <jumper>`
  * `!lahpb` - Show PB Ladderhop in chat. Usage: `!lahpb <jumper>`
  * `!jbpb` - Show PB Jumpbug in chat. Usage: `!jbpb <jumper>`
