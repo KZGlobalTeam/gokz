@@ -64,6 +64,13 @@
  * `!locmenu` - Open location menu.
  * `!nameloc` - Name location. Usage: `!nameloc <#id> <name>`
 
+### gokz-paint
+
+ * `!paint` - Place a single paint (colored circle)
+ * `+paint` - Start painting (bind to a key)
+ * `!paintoptions` - Open paint options
+ * `r_cleardecals` - Console command to clear all decals (including paints)
+
 ### gokz-spec
 
  * `!spec` - Spectate another player. Usage `!spec <player>`
