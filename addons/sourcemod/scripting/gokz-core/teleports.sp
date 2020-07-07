@@ -20,6 +20,7 @@ static float endOrigin[MAXPLAYERS + 1][3];
 static float endAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
+static float checkpointLadderNormal[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
 static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
@@ -75,6 +76,7 @@ void MakeCheckpoint(int client)
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
+	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", checkpointLadderNormal[client][checkpointIndex[client]]);
 	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
@@ -601,6 +603,7 @@ static void CheckpointTeleportDo(int client)
 	// Handle ladder stuff
 	if (checkpointOnLadder[client][checkpointIndex[client]])
 	{
+		SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", checkpointLadderNormal[client][checkpointIndex[client]]);
 		if (!GOKZ_GetPaused(client))
 		{
 			Movement_SetMovetype(client, MOVETYPE_LADDER);
