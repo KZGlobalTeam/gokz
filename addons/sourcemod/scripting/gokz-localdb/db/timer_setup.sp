@@ -48,6 +48,11 @@ void DB_SaveTimerSetup(int client)
 	{
 		SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveTimerSetup, DB_TxnFailure_Generic, data, DBPrio_Low);
 	}
+	else
+	{
+		delete data;
+		delete txn;
+	}
 }
 
 public void DB_TxnSuccess_SaveTimerSetup(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
@@ -97,7 +102,7 @@ void DB_LoadTimerSetup(int client, bool doChatMessage = false)
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_LoadTimerSetup, DB_TxnFailure_Generic, data, DBPrio_Normal);
 }
 
-public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQueries, DBResultSet[] results, any[] queryData)
 {
 	data.Reset();
 	int client = data.ReadCell();
@@ -114,35 +119,35 @@ public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQuerie
 	bool isStart;
 	float position[3], angles[3];
 	
-	if (SQL_GetRowCount(results[0]) > 0 && SQL_FetchRow(results[0]))
+	if (results[0].RowCount > 0 && results[0].FetchRow())
 	{
-		position[0] = SQL_FetchFloat(results[0], TimerSetupDB_GetVBPos_PositionX);
-		position[1] = SQL_FetchFloat(results[0], TimerSetupDB_GetVBPos_PositionY);
-		position[2] = SQL_FetchFloat(results[0], TimerSetupDB_GetVBPos_PositionZ);
-		course = SQL_FetchInt(results[0], TimerSetupDB_GetVBPos_Course);
-		isStart = SQL_FetchInt(results[0], TimerSetupDB_GetVBPos_IsStart) == 1 ? true : false;
+		position[0] = results[0].FetchFloat(TimerSetupDB_GetVBPos_PositionX);
+		position[1] = results[0].FetchFloat(TimerSetupDB_GetVBPos_PositionY);
+		position[2] = results[0].FetchFloat(TimerSetupDB_GetVBPos_PositionZ);
+		course = results[0].FetchInt(TimerSetupDB_GetVBPos_Course);
+		isStart = results[0].FetchInt(TimerSetupDB_GetVBPos_IsStart) == 1;
 		
 		GOKZ_SetVirtualButtonPosition(client, position, course, isStart);
 	}
 	
-	if (SQL_GetRowCount(results[0]) > 1 && SQL_FetchRow(results[0]))
+	if (results[0].RowCount > 1 && results[0].FetchRow())
 	{
-		position[0] = SQL_FetchFloat(results[0], TimerSetupDB_GetVBPos_PositionX);
-		position[1] = SQL_FetchFloat(results[0], TimerSetupDB_GetVBPos_PositionY);
-		position[2] = SQL_FetchFloat(results[0], TimerSetupDB_GetVBPos_PositionZ);
-		course = SQL_FetchInt(results[0], TimerSetupDB_GetVBPos_Course);
-		isStart = SQL_FetchInt(results[0], TimerSetupDB_GetVBPos_IsStart) == 1 ? true : false;
+		position[0] = results[0].FetchFloat(TimerSetupDB_GetVBPos_PositionX);
+		position[1] = results[0].FetchFloat(TimerSetupDB_GetVBPos_PositionY);
+		position[2] = results[0].FetchFloat(TimerSetupDB_GetVBPos_PositionZ);
+		course = results[0].FetchInt(TimerSetupDB_GetVBPos_Course);
+		isStart = results[0].FetchInt(TimerSetupDB_GetVBPos_IsStart) == 1;
 		
 		GOKZ_SetVirtualButtonPosition(client, position, course, isStart);
 	}
 	
-	if (SQL_GetRowCount(results[1]) > 0 && SQL_FetchRow(results[1]))
+	if (results[1].RowCount > 0 && results[1].FetchRow())
 	{
-		position[0] = SQL_FetchFloat(results[1], TimerSetupDB_GetStartPos_PositionX);
-		position[1] = SQL_FetchFloat(results[1], TimerSetupDB_GetStartPos_PositionY);
-		position[2] = SQL_FetchFloat(results[1], TimerSetupDB_GetStartPos_PositionZ);
-		angles[0] = SQL_FetchFloat(results[1], TimerSetupDB_GetStartPos_Angle0);
-		angles[1] = SQL_FetchFloat(results[1], TimerSetupDB_GetStartPos_Angle1);
+		position[0] = results[1].FetchFloat(TimerSetupDB_GetStartPos_PositionX);
+		position[1] = results[1].FetchFloat(TimerSetupDB_GetStartPos_PositionY);
+		position[2] = results[1].FetchFloat(TimerSetupDB_GetStartPos_PositionZ);
+		angles[0] = results[1].FetchFloat(TimerSetupDB_GetStartPos_Angle0);
+		angles[1] = results[1].FetchFloat(TimerSetupDB_GetStartPos_Angle1);
 		angles[2] = 0.0;
 		
 		GOKZ_SetStartPosition(client, StartPositionType_Custom, position, angles);

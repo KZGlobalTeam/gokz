@@ -361,7 +361,7 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 // =====[ FORWARDS ]=====
 
 /**
- * Called when a player's option's values are loaded from clientprefs.
+ * Called when a player's options values are loaded from clientprefs.
  *
  * @param client		Client index.
  */
