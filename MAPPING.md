@@ -38,11 +38,16 @@ To avoid usability issues, ensure it is impossible for the player to be in multi
 
 ## Course Starts
 
-Course starts mark where players will be placed when they are teleported to a course e.g. using the `!b` command.
+Course starts mark where players will be teleported when using the following commands:
 
-To add a course start, use an `info_teleport_destination` with a specific name.
+* `!m` command to teleport to the **main course**.
+* `!b <number>` command to teleport to the specified **bonus course**.
 
- * Main course start is named `climb_start`.
- * Bonus course starts are named `climb_bonusX_start` where X is the bonus number.
+To implement course starts, the following are required:
 
-Set the angles to an appropriate direction as that is where the player will face.
+* Use `info_teleport_destination` entity.
+* Name the entity as either:
+  * `climb_start` for the **main course**.
+  * `climb_bonusX_start` for a **bonus course** where X is the bonus number.
+
+Set the angles to an appropriate direction, as that is where the player will face when teleported.
