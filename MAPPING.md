@@ -47,7 +47,7 @@ To implement course starts, the following are required:
 
 * Use `info_teleport_destination` entity.
 * Name the entity as either:
-  * `climb_start` for the **main course**.
-  * `climb_bonusX_start` for a **bonus course** where X is the bonus number.
+    * `climb_start` for the **main course**.
+    * `climb_bonusX_start` for a **bonus course** where X is the bonus number.
 
 Set the angles to an appropriate direction, as that is where the player will face when teleported.
