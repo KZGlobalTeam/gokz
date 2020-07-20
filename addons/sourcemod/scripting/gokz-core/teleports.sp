@@ -306,6 +306,20 @@ void TeleportToStart(int client)
 	Call_GOKZ_OnTeleportToStart_Post(client);
 }
 
+bool TeleportToCourseStart(int client, int course)
+{
+	float origin[3], angles[3];
+	
+	if (!GetMapStartPosition(course, origin, angles))
+	{
+		return false;
+	}
+	
+	TeleportDo(client, origin, angles);
+	
+	return true;
+}
+
 StartPositionType GetStartPositionType(int client)
 {
 	return startType[client];
