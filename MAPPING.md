@@ -8,7 +8,7 @@
 
 #### To implement timer buttons, the following are required:
 
-- Create an [func_button](https://developer.valvesoftware.com/wiki/Func_button "Valve Developer Wiki reference") entity.
+- Create a [func_button](https://developer.valvesoftware.com/wiki/Func_button "Valve Developer Community Wiki reference") entity.
 - Name the entity as either:
 	- `climb_startbutton` for the **start** of the **main course**.
 	- `climb_endbutton` for the **end** of the **main course**.
@@ -26,7 +26,7 @@
 
 #### To implement timer zones, the following are required:
 
-- Create an [trigger_multiple](https://developer.valvesoftware.com/wiki/Trigger_multiple "Valve Developer Wiki reference") entity.
+- Create a [trigger_multiple](https://developer.valvesoftware.com/wiki/Trigger_multiple "Valve Developer Community Wiki reference") entity.
 - Name the entity as either:
 	- `climb_startzone` for the **start** of the **main course**.
 	- `climb_endzone` for the **end** of the **main course**.
