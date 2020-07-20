@@ -1,8 +1,0 @@
-"UnlitGeneric"
-{
-    "$basetexture" "gokz/paint/paint_decal"
-    "$decal" 1
-    "$decalscale" 0.05
-    "$translucent" 1
-	"$color" "{135 206 250}"
-}

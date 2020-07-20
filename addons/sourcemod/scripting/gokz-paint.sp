@@ -32,15 +32,9 @@ char gC_PaintColors[][16] =
 	{ "paint_white" },
 	{ "paint_black" },
 	{ "paint_blue" },
-	{ "paint_lightblue" },
 	{ "paint_brown" },
-	{ "paint_cyan" },
 	{ "paint_green" },
-	{ "paint_darkgreen" },
-	{ "paint_orange" },
 	{ "paint_yellow" },
-	{ "paint_pink" },
-	{ "paint_lightpink" },
 	{ "paint_purple" }
 };
 

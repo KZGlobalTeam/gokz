@@ -27,15 +27,9 @@ enum
 	PaintColor_White,
 	PaintColor_Black,
 	PaintColor_Blue,
-	PaintColor_LightBlue,
 	PaintColor_Brown,
-	PaintColor_Cyan,
 	PaintColor_Green,
-	PaintColor_DarkGreen,
-	PaintColor_Orange,
 	PaintColor_Yellow,
-	PaintColor_Pink,
-	PaintColor_LightPink,
 	PaintColor_Purple,
 	PAINTCOLOR_COUNT
 };
@@ -91,15 +85,9 @@ stock char gC_PaintColorPhrases[PAINTCOLOR_COUNT][] =
 	"Options Menu - White",
 	"Options Menu - Black",
 	"Options Menu - Blue",
-	"Options Menu - Light Blue",
 	"Options Menu - Brown",
-	"Options Menu - Cyan",
 	"Options Menu - Green",
-	"Options Menu - Dark Green",
-	"Options Menu - Orange",
 	"Options Menu - Yellow",
-	"Options Menu - Pink",
-	"Options Menu - Light Pink",
 	"Options Menu - Purple"
 };
 

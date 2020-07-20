@@ -36,41 +36,17 @@
 	{
 		"en"		"Blue"
 	}
-	"Options Menu - Light Blue"
-	{
-		"en"		"Light Blue"
-	}
 	"Options Menu - Brown"
 	{
 		"en"		"Brown"
-	}
-	"Options Menu - Cyan"
-	{
-		"en"		"Cyan"
 	}
 	"Options Menu - Green"
 	{
 		"en"		"Green"
 	}
-	"Options Menu - Dark Green"
-	{
-		"en"		"Dark Green"
-	}
-	"Options Menu - Orange"
-	{
-		"en"		"Orange"
-	}
 	"Options Menu - Yellow"
 	{
 		"en"		"Yellow"
-	}
-	"Options Menu - Pink"
-	{
-		"en"		"Pink"
-	}
-	"Options Menu - Light Pink"
-	{
-		"en"		"Light Pink"
 	}
 	"Options Menu - Purple"
 	{
