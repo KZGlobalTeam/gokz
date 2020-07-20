@@ -115,13 +115,14 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 }
 
-Action MonitorFPSMax(Handle timer)
+Action MonitorClientConvars(Handle timer)
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && !IsFakeClient(client))
 		{
 			QueryClientConVar(client, "fps_max", FPSCheck, client);
+			QueryClientConVar(client, "m_yaw", MYAWCheck, client);
 		}
 	}
 	
@@ -154,6 +155,14 @@ public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, c
 		{
 			gB_waitingForFPSKick[client] = false;
 		}
+	}
+}
+
+public void MYAWCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (IsValidClient(client) && !IsFakeClient(client) && StringToFloat(cvarValue) > 1.0)
+	{
+		KickClient(client, "%T", "Kick Player m_yaw", client);
 	}
 }
 
@@ -236,8 +245,8 @@ public void OnMapStart()
 		gB_EnforcerOnFreshMap = true;
 	}
 	
-	// Setup a timer to monitor fps_max
-	CreateTimer(1.0, MonitorFPSMax, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	// Setup a timer to monitor client convars
+	CreateTimer(1.0, MonitorClientConvars, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
 public void OnConfigsExecuted()

@@ -132,11 +132,7 @@ public Action CommandClearStartPos(int client, int args)
 
 public Action CommandMain(int client, int args)
 {
-	if (SetStartPositionToMapStart(client, 0))
-	{
-		GOKZ_TeleportToStart(client);
-	}
-	else
+	if (!TeleportToCourseStart(client, 0))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No Start Found");
 	}
@@ -147,11 +143,7 @@ public Action CommandBonus(int client, int args)
 {
 	if (args == 0)
 	{  // Go to Bonus 1
-		if (SetStartPositionToMapStart(client, 1))
-		{
-			GOKZ_TeleportToStart(client);
-		}
-		else
+		if (!TeleportToCourseStart(client, 1))
 		{
 			GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", 1);
 		}
@@ -163,11 +155,7 @@ public Action CommandBonus(int client, int args)
 		int bonus = StringToInt(argBonus);
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
-			if (SetStartPositionToMapStart(client, bonus))
-			{
-				GOKZ_TeleportToStart(client);
-			}
-			else
+			if (!TeleportToCourseStart(client, bonus))
 			{
 				GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", bonus);
 			}

@@ -31,6 +31,8 @@ ArrayList gF_DuckSpeed;
 ArrayList gF_Stamina;
 ArrayList gA_LocationName;
 ArrayList gA_LocationCreator;
+ArrayList gA_MoveType;
+ArrayList gA_LadderNormal;
 bool gB_LocMenuOpen[MAXPLAYERS + 1];
 int gI_MostRecentLocation[MAXPLAYERS + 1];
 
@@ -419,10 +421,12 @@ void SaveLocation(int client, char[] name)
 	float position[3];
 	float angles[3];
 	float velocity[3];
+	float ladderNormal[3];
 	float duckSpeed;
 	float stamina;
 	char creator[MAX_NAME_LENGTH];
 	int id = gA_Position.Length;
+	MoveType movetype;
 	
 	GetClientAbsOrigin(client, position);
 	GetClientEyeAngles(client, angles);
@@ -430,6 +434,8 @@ void SaveLocation(int client, char[] name)
 	duckSpeed = Movement_GetDuckSpeed(client);
 	stamina = GetEntPropFloat(client, Prop_Send, "m_flStamina");
 	GetClientName(client, creator, sizeof(creator));
+	movetype = Movement_GetMovetype(client);
+	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
 	
 	gI_MostRecentLocation[client] = id;
 	gA_Position.PushArray(position);
@@ -439,6 +445,8 @@ void SaveLocation(int client, char[] name)
 	gF_Stamina.Push(stamina);
 	gA_LocationName.PushString(name);
 	gA_LocationCreator.PushString(creator);
+	gA_MoveType.Push(movetype);
+	gA_LadderNormal.PushArray(ladderNormal);
 	
 	GOKZ_PrintToChat(client, true, "%t", "SaveLoc - ID Name", id, name);
 	
@@ -469,11 +477,13 @@ bool LoadLocation(int client, int id)
 	float position[3];
 	float angles[3];
 	float velocity[3];
+	float ladderNormal[3];
 	float duckSpeed;
 	float stamina;
 	char name[MAX_LOCATION_NAME_LENGTH];
 	char creator[MAX_NAME_LENGTH];
 	char clientName[MAX_NAME_LENGTH];
+	MoveType movetype;
 	
 	gA_Position.GetArray(id, position, sizeof(position));
 	gA_Angles.GetArray(id, angles, sizeof(angles));
@@ -483,10 +493,14 @@ bool LoadLocation(int client, int id)
 	gA_LocationName.GetString(id, name, sizeof(name));
 	gA_LocationCreator.GetString(id, creator, sizeof(creator));
 	GetClientName(client, clientName, sizeof(clientName));
+	movetype = gA_MoveType.Get(id);
+	gA_LadderNormal.GetArray(id, ladderNormal, sizeof(ladderNormal));
 	
 	TeleportEntity(client, position, angles, velocity);
 	Movement_SetDuckSpeed(client, duckSpeed);
 	SetEntPropFloat(client, Prop_Send, "m_flStamina", stamina);
+	Movement_SetMovetype(client, movetype);
+	SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
 	
 	// print message if loading new location
 	if (gI_MostRecentLocation[client] != id)
@@ -544,6 +558,8 @@ void CreateArrays()
 	gF_Stamina = new ArrayList(1);
 	gA_LocationName = new ArrayList(ByteCountToCells(MAX_LOCATION_NAME_LENGTH));
 	gA_LocationCreator = new ArrayList(ByteCountToCells(MAX_NAME_LENGTH));
+	gA_MoveType = new ArrayList(1);
+	gA_LadderNormal = new ArrayList(3);
 }
 
 void ClearLocations()
@@ -555,6 +571,8 @@ void ClearLocations()
 	gF_Stamina.Clear();
 	gA_LocationName.Clear();
 	gA_LocationCreator.Clear();
+	gA_MoveType.Clear();
+	gA_LadderNormal.Clear();
 	
 	for (int i = 1; i <= MaxClients; i++)
 	{
