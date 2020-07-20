@@ -35,7 +35,7 @@
 
 #### Things to keep in mind:
 
-- Timer zones can act as [Course starts](#Course-starts)
+- Timer zones can act as [Course starts](#markdown-header-course-starts)
 	- Entering a **start** timer zone will stop the player's current timer.
 	- Entering a **start** timer zone will set the player's start position to the zone.
 - Start zones can be left midair as long as a perfect bunnyhop is **not** hit.
