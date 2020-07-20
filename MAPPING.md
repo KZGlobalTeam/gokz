@@ -23,7 +23,6 @@
 - Time starts when the player leaves the zone.
 - Time ends when the player enters the zone.
 - Timer zones **do not** create virtual buttons (timer tech).
-- Start zones can be left midair as long as a perfect bunnyhop is **not** hit.
 
 #### To implement timer zones, the following are required:
 
@@ -41,6 +40,7 @@
   - Entering a timer zone will stop the player's current timer.
   - Entering a **start** timer zone will set the player's start position to the zone.
 
+- Start zones can be left midair as long as a perfect bunnyhop is **not** hit.
 - Multiple start timer zones should not be possible to be activated at once to avoid usability issues.
 
 ---
