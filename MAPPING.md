@@ -10,10 +10,10 @@
 
 - Create an [func_button](https://developer.valvesoftware.com/wiki/Func_button "Valve Developer Wiki reference") entity.
 - Name the entity as either:
-  - `climb_startbutton` for the **start** of the **main course**.
-  - `climb_endbutton` for the **end** of the **main course**.
-  - `climb_bonusX_startbutton` for the **start** of a **bonus course** where X is the bonus number.
-  - `climb_bonusX_endbutton` for the **end** of a **bonus course** where X is the bonus number.
+		- `climb_startbutton` for the **start** of the **main course**.
+		- `climb_endbutton` for the **end** of the **main course**.
+		- `climb_bonusX_startbutton` for the **start** of a **bonus course** where X is the bonus number.
+		- `climb_bonusX_endbutton` for the **end** of a **bonus course** where X is the bonus number.
 - Enable both the `Don't move` and `Toggle` flags to avoid usability issues.
 
 ---
@@ -29,10 +29,10 @@
 
 - Create an [trigger_multiple](https://developer.valvesoftware.com/wiki/Trigger_multiple "Valve Developer Wiki reference") entity.
 - Name the entity as either:
-  - `climb_startzone` for the **start** of the **main course**.
-  - `climb_endzone` for the **end** of the **main course**.
-  - `climb_bonusX_startzone` for the **start** of a **bonus course** where X is the bonus number.
-  - `climb_bonusX_endzone` for the **end** of a **bonus course** where X is the bonus number.
+		- `climb_startzone` for the **start** of the **main course**.
+		- `climb_endzone` for the **end** of the **main course**.
+		- `climb_bonusX_startzone` for the **start** of a **bonus course** where X is the bonus number.
+		- `climb_bonusX_endzone` for the **end** of a **bonus course** where X is the bonus number.
 
 #### Things to keep in mind:
 
