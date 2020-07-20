@@ -11,16 +11,6 @@
 
 
 
-// =====[ CONSTANTS ]=====
-
-#define GOKZ_DB_JS_DISTANCE_PRECISION 10000
-#define GOKZ_DB_JS_SYNC_PRECISION 100
-#define GOKZ_DB_JS_PRE_PRECISION 100
-#define GOKZ_DB_JS_MAX_PRECISION 100
-#define GOKZ_DB_JS_AIRTIME_PRECISION 10000
-#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 20
-
-
 // =====[ ENUMS ]=====
 
 enum DatabaseType
@@ -45,7 +35,7 @@ enum
 
 enum
 {
-	JumpstatDB_Top20_SteamID = 0,
+	JumpstatDB_Top20_SteamID = 0, 
 	JumpstatDB_Top20_Alias, 
 	JumpstatDB_Top20_Block, 
 	JumpstatDB_Top20_Distance, 
@@ -58,11 +48,96 @@ enum
 
 enum
 {
-	JumpstatDB_Cache_Distance = 0,
-	JumpstatDB_Cache_Block,
-	JumpstatDB_Cache_BlockDistance,
+	JumpstatDB_Cache_Distance = 0, 
+	JumpstatDB_Cache_Block, 
+	JumpstatDB_Cache_BlockDistance, 
 	JUMPSTATDB_CACHE_COUNT
+};
+
+enum
+{
+	TimerSetupDB_GetVBPos_SteamID = 0, 
+	TimerSetupDB_GetVBPos_MapID, 
+	TimerSetupDB_GetVBPos_Course, 
+	TimerSetupDB_GetVBPos_IsStart, 
+	TimerSetupDB_GetVBPos_PositionX, 
+	TimerSetupDB_GetVBPos_PositionY, 
+	TimerSetupDB_GetVBPos_PositionZ
+};
+
+enum
+{
+	TimerSetupDB_GetStartPos_SteamID = 0, 
+	TimerSetupDB_GetStartPos_MapID, 
+	TimerSetupDB_GetStartPos_PositionX, 
+	TimerSetupDB_GetStartPos_PositionY, 
+	TimerSetupDB_GetStartPos_PositionZ, 
+	TimerSetupDB_GetStartPos_Angle0, 
+	TimerSetupDB_GetStartPos_Angle1
+};
+
+enum DBOption:
+{
+	DBOption_AutoLoadTimerSetup = 0, 
+	DBOPTION_COUNT
+};
+
+enum
+{
+	DBOption_Disabled = 0, 
+	DBOption_Enabled, 
+	DBOPTIONBOOL_COUNT
+};
+
+
+
+// =====[ CONSTANTS ]=====
+
+#define GOKZ_DB_JS_DISTANCE_PRECISION 10000
+#define GOKZ_DB_JS_SYNC_PRECISION 100
+#define GOKZ_DB_JS_PRE_PRECISION 100
+#define GOKZ_DB_JS_MAX_PRECISION 100
+#define GOKZ_DB_JS_AIRTIME_PRECISION 10000
+#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 20
+
+stock char gC_DBOptionNames[DBOPTION_COUNT][] = 
+{
+	"GOKZ DB - Auto Load Timer Setup"
+};
+
+stock char gC_DBOptionDescriptions[DBOPTION_COUNT][] = 
+{
+	"Automatically load timer setup on map start - 0 = Disabled, 1 = Enabled"
 }
+
+stock int gI_DBOptionDefaultValues[DBOPTION_COUNT] = 
+{
+	DBOption_Disabled
+};
+
+stock int gI_DBOptionCounts[DBOPTION_COUNT] = 
+{
+	DBOPTIONBOOL_COUNT
+};
+
+stock char gC_DBOptionPhrases[DBOPTION_COUNT][] = 
+{
+	"Options Menu - Auto Load Timer Setup"
+};
+
+
+
+// =====[ TYPES ]=====
+
+typeset GetVBPositionCallback
+{
+	function Action(int client, const float position[3], int course, bool isStart);
+};
+
+typeset GetStartPositionCallback
+{
+	function Action(int client, const float position[3], const float angles[3]);
+};
 
 
 

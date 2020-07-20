@@ -29,6 +29,7 @@ public Plugin myinfo =
 Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
+bool gB_ClientPostAdminChecked[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
 int gI_PBJSCache[MAXPLAYERS + 1][MODE_COUNT][JUMPTYPE_COUNT][JUMPSTATDB_CACHE_COUNT];
 bool gB_MapSetUp;
@@ -36,6 +37,7 @@ int gI_DBCurrentMapID;
 
 #include "gokz-localdb/api.sp"
 #include "gokz-localdb/commands.sp"
+#include "gokz-localdb/options.sp"
 
 #include "gokz-localdb/db/sql.sp"
 #include "gokz-localdb/db/helpers.sp"
@@ -48,6 +50,7 @@ int gI_DBCurrentMapID;
 #include "gokz-localdb/db/setup_database.sp"
 #include "gokz-localdb/db/setup_map.sp"
 #include "gokz-localdb/db/setup_map_courses.sp"
+#include "gokz-localdb/db/timer_setup.sp"
 
 
 
@@ -106,6 +109,16 @@ public void OnConfigsExecuted()
 public void GOKZ_DB_OnMapSetup(int mapID)
 {
 	DB_SetupMapCourses();
+	
+	for (int client = 1; client < MAXPLAYERS + 1; client++)
+	{
+		if (IsValidClient(client) && !IsFakeClient(client) &&
+			gB_ClientPostAdminChecked[client] &&
+			GOKZ_GetOption(client, gC_DBOptionNames[DBOption_AutoLoadTimerSetup]) == DBOption_Enabled)
+		{
+			DB_LoadTimerSetup(client);
+		}
+	}
 }
 
 public void OnMapEnd()
@@ -118,14 +131,34 @@ public void OnClientAuthorized(int client, const char[] auth)
 	DB_SetupClient(client);
 }
 
+public void OnClientPostAdminCheck(int client)
+{
+	// We need this after OnClientPutInServer cause that's where the VBs get reset
+	gB_ClientPostAdminChecked[client] = true;
+	
+	if (gB_MapSetUp && GOKZ_GetOption(client, gC_DBOptionNames[DBOption_AutoLoadTimerSetup]) == DBOption_Enabled)
+	{
+		DB_LoadTimerSetup(client);
+	}
+}
+
 public void GOKZ_DB_OnClientSetup(int client, int steamID, bool cheater)
 {
 	DB_CacheJSPBs(client, steamID);
 }
 
+public void GOKZ_OnOptionsLoaded(int client)
+{
+	if (gB_MapSetUp && gB_ClientPostAdminChecked[client] && GOKZ_GetOption(client, gC_DBOptionNames[DBOption_AutoLoadTimerSetup]) == DBOption_Enabled)
+	{
+		DB_LoadTimerSetup(client);
+	}
+}
+
 public void OnClientDisconnect(int client)
 {
 	gB_ClientSetUp[client] = false;
+	gB_ClientPostAdminChecked[client] = false;
 }
 
 public void GOKZ_OnCourseRegistered(int course)
@@ -134,6 +167,12 @@ public void GOKZ_OnCourseRegistered(int course)
 	{
 		DB_SetupMapCourse(course);
 	}
+}
+
+public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
+{
+	OnOptionsMenuReady_Options();
+	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)

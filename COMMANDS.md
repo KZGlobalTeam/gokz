@@ -19,6 +19,8 @@
  * `!autorestart` - Toggle auto restart upon teleporting to start.
  * `!virtualbuttonindicators`/`!vbi` - Toggle virtual button indicators.
  * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
+ * `!savetimersetup`/`!sts` - Save the current timer setup (start position and virtual buttons) to the database.
+ * `!loadtimersetup`/`!lts` - Load the timer setup (start position and virtual buttons) from the database.
  * `!mode` - Open the movement mode selection menu.
  * `!vanilla`/`!vnl`/`!v` - Switch to the Vanilla mode.
  * `!simplekz`/`!skz`/`!s` - Switch to the SimpleKZ mode.
