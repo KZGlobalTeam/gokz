@@ -41,8 +41,8 @@ void RegisterCommands()
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
 	RegConsoleCmd("sm_ncnt", CommandToggleNoclipNotrigger, "[KZ] Toggle noclip-notrigger.");
-	RegConsoleCmd("+noclipnotrig", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
-	RegConsoleCmd("-noclipnotrig", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
+	RegConsoleCmd("+noclipnt", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
+	RegConsoleCmd("-noclipnt", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
 }
 
 void AddCommandsListeners()

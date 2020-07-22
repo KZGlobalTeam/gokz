@@ -26,7 +26,9 @@
  * `!simplekz`/`!skz`/`!s` - Switch to the SimpleKZ mode.
  * `!kztimer`/`!kzt`/`!k` - Switch to the KZTimer mode.
  * `!nc` - Toggle noclip.
+ * `!ncnt` - Toggle noclip-notrigger that ignores triggers.
  * `+noclip` - Noclip (bind a key to it).
+ * `+noclipnt` - Noclip-notrigger that ignores triggers (bind a key to it).
 
 ### gokz-hud
 
