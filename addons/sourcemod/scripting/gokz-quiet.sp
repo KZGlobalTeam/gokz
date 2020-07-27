@@ -177,7 +177,7 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 {
 	int type = TE_ReadNum("m_iSoundType");
 	if (type != 255)
-    {
+	{
 		float origin[3];
 		TE_ReadVector("m_vecOrigin", origin);
 
@@ -211,13 +211,13 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 		
 		int newClients[MAXPLAYERS], newTotal = 0;
 		for (int i = 0; i < numClients; i++)
-    	{
+		{
 			int client = players[i];
 			if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
 			{
 				newClients[newTotal++] = client;
 			}
-    	}
+		}
 		if (newTotal == numClients)
 		{
 			return Plugin_Continue;
