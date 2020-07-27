@@ -175,65 +175,68 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 
 public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay)
 {
-	int type = TE_ReadNum("m_iSoundType");
-	if (type != 255)
-	{
-		float origin[3];
-		TE_ReadVector("m_vecOrigin", origin);
-
-		float angles[2];
-		angles[0] = TE_ReadFloat("m_vecAngles[0]");
-		angles[1] = TE_ReadFloat("m_vecAngles[1]");
-
-		int weapon = TE_ReadNum("m_weapon");
-		int mode = TE_ReadNum("m_iMode");
-		int seed = TE_ReadNum("m_iSeed");
-		int player = TE_ReadNum("m_iPlayer");
-		float inaccuracy = TE_ReadFloat("m_fInaccuracy");
-		float recoilIndex = TE_ReadFloat("m_flRecoilIndex");
-		float spread = TE_ReadFloat("m_fSpread");
-		int itemIdx = TE_ReadNum("m_nItemDefIndex");
-		int soundType = TE_ReadNum("m_iSoundType");
-
-		TE_Start("Shotgun Shot");
-		TE_WriteVector("m_vecOrigin", origin);
-		TE_WriteFloat("m_vecAngles[0]", angles[0]);
-		TE_WriteFloat("m_vecAngles[1]", angles[1]);
-		TE_WriteNum("m_weapon", weapon);
-		TE_WriteNum("m_iMode", mode);
-		TE_WriteNum("m_iSeed", seed);
-		TE_WriteNum("m_iPlayer", player);
-		TE_WriteFloat("m_fInaccuracy", inaccuracy);
-		TE_WriteFloat("m_flRecoilIndex", recoilIndex);
-		TE_WriteFloat("m_fSpread", spread);
-		TE_WriteNum("m_nItemDefIndex", itemIdx);
-		TE_WriteNum("m_iSoundType", 255);
-		
-		int newClients[MAXPLAYERS], newTotal = 0;
-		for (int i = 0; i < numClients; i++)
-		{
-			int client = players[i];
-			if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
-			{
-				newClients[newTotal++] = client;
-			}
-		}
-		if (newTotal == numClients)
-		{
-			return Plugin_Continue;
-		}
-		else if (newTotal == 0)
-		{
-			return Plugin_Stop;
-		}
-
-		TE_Send(newClients, newTotal, delay);
-		return Plugin_Stop;
-	}
-	else 
+	// If this did not originate from a player, we do not care.
+	if (entity > MAXPLAYERS)
 	{
 		return Plugin_Continue;
 	}
+
+	int newClients[MAXPLAYERS], newTotal = 0;
+	for (int i = 0; i < numClients; i++)
+	{
+		int client = players[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
+		{
+			newClients[newTotal++] = client;
+		}
+	}
+
+	// Noone wants the sound
+	if (newClients == 0)
+	{
+		return Plugin_Stop;
+	}
+
+	// Nothing's changed, let the engine handle it.
+	if (newClients == numClients)
+	{
+		return Plugin_Continue;
+	}
+
+	float origin[3];
+	TE_ReadVector("m_vecOrigin", origin);
+
+	float angles[2];
+	angles[0] = TE_ReadFloat("m_vecAngles[0]");
+	angles[1] = TE_ReadFloat("m_vecAngles[1]");
+
+	int weapon = TE_ReadNum("m_weapon");
+	int mode = TE_ReadNum("m_iMode");
+	int seed = TE_ReadNum("m_iSeed");
+	int player = TE_ReadNum("m_iPlayer");
+	float inaccuracy = TE_ReadFloat("m_fInaccuracy");
+	float recoilIndex = TE_ReadFloat("m_flRecoilIndex");
+	float spread = TE_ReadFloat("m_fSpread");
+	int itemIdx = TE_ReadNum("m_nItemDefIndex");
+	int soundType = TE_ReadNum("m_iSoundType");
+
+	TE_Start("Shotgun Shot");
+	TE_WriteVector("m_vecOrigin", origin);
+	TE_WriteFloat("m_vecAngles[0]", angles[0]);
+	TE_WriteFloat("m_vecAngles[1]", angles[1]);
+	TE_WriteNum("m_weapon", weapon);
+	TE_WriteNum("m_iMode", mode);
+	TE_WriteNum("m_iSeed", seed);
+	TE_WriteNum("m_iPlayer", player);
+	TE_WriteFloat("m_fInaccuracy", inaccuracy);
+	TE_WriteFloat("m_flRecoilIndex", recoilIndex);
+	TE_WriteFloat("m_fSpread", spread);
+	TE_WriteNum("m_nItemDefIndex", itemIdx);
+	TE_WriteNum("m_iSoundType", soundType);
+
+	// Send the TE and stop the engine from processing its own.
+	TE_Send(newClients, newTotal, delay);
+	return Plugin_Stop;
 }
 
 
