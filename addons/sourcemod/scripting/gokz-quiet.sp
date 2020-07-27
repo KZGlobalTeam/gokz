@@ -175,12 +175,6 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 
 public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay)
 {
-	// If this did not originate from a player, we do not care.
-	if (entity > MAXPLAYERS)
-	{
-		return Plugin_Continue;
-	}
-
 	int newClients[MAXPLAYERS], newTotal = 0;
 	for (int i = 0; i < numClients; i++)
 	{
@@ -192,13 +186,13 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 	}
 
 	// Noone wants the sound
-	if (newClients == 0)
+	if (newTotal == 0)
 	{
 		return Plugin_Stop;
 	}
 
 	// Nothing's changed, let the engine handle it.
-	if (newClients == numClients)
+	if (newTotal == numClients)
 	{
 		return Plugin_Continue;
 	}
