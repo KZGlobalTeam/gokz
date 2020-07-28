@@ -17,6 +17,7 @@ enum QTOption:
 {
 	QTOPTION_INVALID = -1, 
 	QTOption_ShowPlayers, 
+	QTOption_MapSounds, 
 	QTOPTION_COUNT
 };
 
@@ -27,33 +28,45 @@ enum
 	SHOWPLAYERS_COUNT
 };
 
+enum
+{
+	MapSounds_Enabled = 0,
+	MapSounds_Disabled,
+	MAPSOUNDS_COUNT
+};
+
 
 
 // =====[ CONSTANTS ]=====
 
 stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
-	"GOKZ QT - Show Players"
+	"GOKZ QT - Show Players",
+	"GOKZ QT - Map Sounds"
 };
 
 stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
 {
-	"Visibility of Other Players - 0 = Disabled, 1 = Enabled"
+	"Visibility of Other Players - 0 = Disabled, 1 = Enabled",
+	"Play Ambient Map Sounds/Music - 0 = Enabled, 1 = Disabled"
 };
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 
 {
-	ShowPlayers_Enabled
+	ShowPlayers_Enabled,
+	MapSounds_Enabled
 };
 
 stock int gI_QTOptionCounts[QTOPTION_COUNT] = 
 {
-	SHOWPLAYERS_COUNT
+	SHOWPLAYERS_COUNT,
+	MAPSOUNDS_COUNT
 };
 
 stock char gC_QTOptionPhrases[QTOPTION_COUNT][] = 
 {
-	"Options Menu - Show Players"
+	"Options Menu - Show Players",
+	"Options Menu - Map Sounds"
 };
 
 
