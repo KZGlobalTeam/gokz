@@ -160,7 +160,7 @@ public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, c
 
 public void MYAWCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
 {
-	if (IsValidClient(client) && !IsFakeClient(client) && StringToFloat(cvarValue) > 1.0)
+	if (IsValidClient(client) && !IsFakeClient(client) && StringToFloat(cvarValue) > GL_MYAW_MAX_VALUE)
 	{
 		KickClient(client, "%T", "Kick Player m_yaw", client);
 	}
