@@ -38,6 +38,7 @@ enum
 #define GL_FPS_MAX_CHECK_INTERVAL 1.0
 #define GL_FPS_MAX_KICK_TIMEOUT 10.0
 #define GL_FPS_MAX_MIN_VALUE 120
+#define GL_MYAW_MAX_VALUE 0.3
 
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {

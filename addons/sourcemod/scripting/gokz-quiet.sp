@@ -42,6 +42,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	AddNormalSoundHook(Hook_NormalSound);
+	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
+
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
 	
@@ -85,6 +88,19 @@ public void OnLibraryAdded(const char[] name)
 public void GOKZ_OnJoinTeam(int client, int team)
 {
 	OnJoinTeam_HidePlayers(client, team);
+}
+
+public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
+{
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+
+	if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_MapSounds]) == MapSounds_Disabled)
+	{
+		SetEntProp(client, Prop_Data, "soundscapeIndex", 0);
+	}
 }
 
 
@@ -132,6 +148,91 @@ public Action OnSetTransmitClient(int entity, int client)
 	return Plugin_Continue;
 }
 
+public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sample[PLATFORM_MAX_PATH], int& entity, int& channel, float& volume, int& level, int& pitch, int& flags, char soundEntry[PLATFORM_MAX_PATH], int& seed)
+{
+	if (entity > MAXPLAYERS)
+	{
+		return Plugin_Continue;
+	}
+
+	for (int i = 0; i < numClients; i++)
+	{
+		int client = clients[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Disabled && client != entity)
+		{
+			for (int j = i; j < numClients - 1; j++)
+			{
+				clients[j] = clients[j+1];
+			}
+
+			numClients--;
+			i--;
+		}
+	}
+
+	return (numClients > 0) ? Plugin_Changed : Plugin_Stop;
+}
+
+public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay)
+{
+	int newClients[MAXPLAYERS], newTotal = 0;
+	for (int i = 0; i < numClients; i++)
+	{
+		int client = players[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
+		{
+			newClients[newTotal++] = client;
+		}
+	}
+
+	// Noone wants the sound
+	if (newTotal == 0)
+	{
+		return Plugin_Stop;
+	}
+
+	// Nothing's changed, let the engine handle it.
+	if (newTotal == numClients)
+	{
+		return Plugin_Continue;
+	}
+
+	float origin[3];
+	TE_ReadVector("m_vecOrigin", origin);
+
+	float angles[2];
+	angles[0] = TE_ReadFloat("m_vecAngles[0]");
+	angles[1] = TE_ReadFloat("m_vecAngles[1]");
+
+	int weapon = TE_ReadNum("m_weapon");
+	int mode = TE_ReadNum("m_iMode");
+	int seed = TE_ReadNum("m_iSeed");
+	int player = TE_ReadNum("m_iPlayer");
+	float inaccuracy = TE_ReadFloat("m_fInaccuracy");
+	float recoilIndex = TE_ReadFloat("m_flRecoilIndex");
+	float spread = TE_ReadFloat("m_fSpread");
+	int itemIdx = TE_ReadNum("m_nItemDefIndex");
+	int soundType = TE_ReadNum("m_iSoundType");
+
+	TE_Start("Shotgun Shot");
+	TE_WriteVector("m_vecOrigin", origin);
+	TE_WriteFloat("m_vecAngles[0]", angles[0]);
+	TE_WriteFloat("m_vecAngles[1]", angles[1]);
+	TE_WriteNum("m_weapon", weapon);
+	TE_WriteNum("m_iMode", mode);
+	TE_WriteNum("m_iSeed", seed);
+	TE_WriteNum("m_iPlayer", player);
+	TE_WriteFloat("m_fInaccuracy", inaccuracy);
+	TE_WriteFloat("m_flRecoilIndex", recoilIndex);
+	TE_WriteFloat("m_fSpread", spread);
+	TE_WriteNum("m_nItemDefIndex", itemIdx);
+	TE_WriteNum("m_iSoundType", soundType);
+
+	// Send the TE and stop the engine from processing its own.
+	TE_Send(newClients, newTotal, delay);
+	return Plugin_Stop;
+}
+
 
 
 // =====[ STOP SOUNDS ]=====
@@ -171,6 +272,20 @@ void PrintOptionChangeMessage(int client, QTOption option, any newValue)
 				case ShowPlayers_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Show Players - Enable");
+				}
+			}
+		}
+		case QTOption_MapSounds:
+		{
+			switch (newValue)
+			{
+				case MapSounds_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Enable");
+				}
+				case MapSounds_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Disable");
 				}
 			}
 		}
@@ -232,6 +347,10 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 			case QTOption_ShowPlayers:
 			{
 				FormatToggleableOptionDisplay(param, QTOption_ShowPlayers, buffer, maxlength);
+			}
+			case QTOption_MapSounds:
+			{
+				FormatToggleableOptionDisplay(param, QTOption_MapSounds, buffer, maxlength);
 			}
 		}
 	}
