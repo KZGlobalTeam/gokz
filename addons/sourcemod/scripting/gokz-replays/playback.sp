@@ -265,10 +265,15 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 				playbackTick[bot]++;
 				if (playbackTick[bot] == size)
 				{
+					EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 					playbackTickData[bot].Clear(); // Clear it all out
 					botDataLoaded[bot] = false;
 					CancelReplayControlsForBot(bot);
 					ResetBotStuff(bot);
+				}
+				else
+				{
+					EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 				}
 			}
 		}
