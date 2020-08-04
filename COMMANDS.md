@@ -19,8 +19,6 @@
  * `!autorestart` - Toggle auto restart upon teleporting to start.
  * `!virtualbuttonindicators`/`!vbi` - Toggle virtual button indicators.
  * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
- * `!savetimersetup`/`!sts` - Save the current timer setup (start position and virtual buttons) to the database.
- * `!loadtimersetup`/`!lts` - Load the timer setup (start position and virtual buttons) from the database.
  * `!mode` - Open the movement mode selection menu.
  * `!vanilla`/`!vnl`/`!v` - Switch to the Vanilla mode.
  * `!simplekz`/`!skz`/`!s` - Switch to the SimpleKZ mode.
@@ -143,6 +141,8 @@ Many of these commands return results for your currently selected mode.
 
 ### gokz-localdb
 
+ * `!savetimersetup`/`!sts` - Save the current timer setup (start position and virtual buttons) to the database.
+ * `!loadtimersetup`/`!lts` - Load & lock the timer setup (start position and virtual buttons) from the database.
  * `!setcheater` - Set a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
  * `!setnotcheater` - Set a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
  * `!deletejump` - Remove the top jumpstat of a SteamID. Usage: `!deletejump <STEAM_1:X:X> <mode> <jump type> <block?>`

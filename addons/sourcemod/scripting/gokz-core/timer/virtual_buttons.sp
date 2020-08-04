@@ -40,6 +40,11 @@ bool ToggleVirtualButtonsLock(int client)
 	return virtualButtonsLocked[client];
 }
 
+bool LockVirtualButtons(int client)
+{
+	virtualButtonsLocked[client] = true;
+}
+
 int GetVirtualButtonPosition(int client, float position[3], bool isStart)
 {
 	if (isStart && hasVirtualStartButton[client])
