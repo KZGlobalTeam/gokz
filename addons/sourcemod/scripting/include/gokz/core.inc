@@ -894,6 +894,13 @@ native int GOKZ_GetVirtualButtonPosition(int client, float position[3], bool isS
 native void GOKZ_SetVirtualButtonPosition(int client, const float position[3], int course, bool isStart);
 
 /**
+ * Locks the virtual button position of a player.
+ *
+ * @param client    	Client index.
+ */
+native void GOKZ_LockVirtualButtons(int client);
+
+/**
  * Gets the start position the player currently has.
  *
  * @param client    	Client index.

@@ -116,7 +116,7 @@ public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQuerie
 	}
 	
 	int course;
-	bool isStart;
+	bool isStart, vbSetup = false;
 	float position[3], angles[3];
 	
 	if (results[0].RowCount > 0 && results[0].FetchRow())
@@ -128,6 +128,7 @@ public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQuerie
 		isStart = results[0].FetchInt(TimerSetupDB_GetVBPos_IsStart) == 1;
 		
 		GOKZ_SetVirtualButtonPosition(client, position, course, isStart);
+		vbSetup = true;
 	}
 	
 	if (results[0].RowCount > 1 && results[0].FetchRow())
@@ -139,6 +140,7 @@ public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQuerie
 		isStart = results[0].FetchInt(TimerSetupDB_GetVBPos_IsStart) == 1;
 		
 		GOKZ_SetVirtualButtonPosition(client, position, course, isStart);
+		vbSetup = true;
 	}
 	
 	if (results[1].RowCount > 0 && results[1].FetchRow())
@@ -151,6 +153,11 @@ public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQuerie
 		angles[2] = 0.0;
 		
 		GOKZ_SetStartPosition(client, StartPositionType_Custom, position, angles);
+	}
+	
+	if (vbSetup)
+	{
+		GOKZ_LockVirtualButtons(client);
 	}
 	
 	if (doChatMessage)

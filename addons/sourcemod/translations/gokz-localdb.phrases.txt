@@ -67,6 +67,6 @@
 	}
 	"Options Menu - Auto Load Timer Setup"
 	{
-		"en"		"Load timer setup at map start"
+		"en"		"Load & lock timer setup at map start"
 	}
 }
