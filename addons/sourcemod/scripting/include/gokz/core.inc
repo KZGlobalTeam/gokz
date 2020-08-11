@@ -1456,6 +1456,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
+	MarkNativeAsOptional("GOKZ_PrintToChatAndLog");
 	MarkNativeAsOptional("GOKZ_GetOptionsTopMenu");
 	
 	MarkNativeAsOptional("GOKZ_StartTimer");
@@ -1463,7 +1464,14 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_StopTimer");
 	MarkNativeAsOptional("GOKZ_StopTimerAll");
 	MarkNativeAsOptional("GOKZ_TeleportToStart");
-	MarkNativeAsOptional("GOKZ_GetHasStartPosition");
+	MarkNativeAsOptional("GOKZ_GetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_SetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_LockVirtualButtons");
+	MarkNativeAsOptional("GOKZ_GetStartPosition");
+	MarkNativeAsOptional("GOKZ_SetStartPosition");
+	MarkNativeAsOptional("GOKZ_GetStartPositionType");
+	MarkNativeAsOptional("GOKZ_SetStartPositionToMapStart");
+	MarkNativeAsOptional("GOKZ_TeleportToEnd");
 	MarkNativeAsOptional("GOKZ_MakeCheckpoint");
 	MarkNativeAsOptional("GOKZ_TeleportToCheckpoint");
 	MarkNativeAsOptional("GOKZ_GetCanTeleportToCheckpoint");
@@ -1474,6 +1482,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_UndoTeleport");
 	MarkNativeAsOptional("GOKZ_GetCanUndoTeleport");
 	MarkNativeAsOptional("GOKZ_Pause");
+	MarkNativeAsOptional("GOKZ_GetCanPause");
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
