@@ -31,6 +31,7 @@ static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
 static bool beginJumpstat[MAXPLAYERS + 1];
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
+static bool startedTouchingInAir[MAXPLAYERS + 1];
 static const Jump emptyJump;
 
 
@@ -1294,16 +1295,24 @@ void OnStartTouchGround_JumpTracking(int client)
 
 void OnStartTouch_JumpTracking(int client)
 {
-	entityTouchCount[client]++;
 	if (!Movement_GetOnGround(client))
 	{
+		entityTouchCount[client]++;
+		startedTouchingInAir[client] = true;
 		jumpTrackers[client].Invalidate();
+	}
+	else
+	{
+		startedTouchingInAir[client] = false;
 	}
 }
 
 void OnEndTouch_JumpTracking(int client)
 {
-	entityTouchCount[client]--;
+	if (startedTouchingInAir[client])
+	{
+		entityTouchCount[client]--;
+	}
 }
 
 void OnPlayerRunCmd_JumpTracking(int client, int buttons)
