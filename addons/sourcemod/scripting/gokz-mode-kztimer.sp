@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-kztimer.txt"
 
-#define MODE_VERSION 205
+#define MODE_VERSION 206
 #define DUCK_SPEED_NORMAL 8.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
@@ -158,6 +158,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	RemoveCrouchJumpBind(player, buttons);
 	TweakVelMod(player);
 	ReduceDuckSlowdown(player);
+	FixWaterBoost(player, buttons);
 	if (gB_Jumpbugged[player.ID])
 	{
 		TweakJumpbug(player);
@@ -589,6 +590,27 @@ void TweakJumpbug(KZPlayer player)
 
 
 // =====[ OTHER ]=====
+
+void FixWaterBoost(KZPlayer player, int buttons)
+{
+	if (GetEntProp(player.ID, Prop_Send, "m_nWaterLevel") >= 2) // WL_Waist = 2
+	{
+		// If duck is being pressed and we're not already ducking or on ground
+		if (GetEntityFlags(player.ID) & (FL_DUCKING | FL_ONGROUND) == 0
+			&& buttons & IN_DUCK && ~gI_OldButtons[player.ID] & IN_DUCK)
+		{
+			float newOrigin[3];
+			Movement_GetOrigin(player.ID, newOrigin);
+			newOrigin[2] += 9.0;
+			
+			TR_TraceHullFilter(newOrigin, newOrigin, view_as<float>({-16.0, -16.0, 0.0}), view_as<float>({16.0, 16.0, 54.0}), MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+			if (!TR_DidHit())
+			{
+				TeleportEntity(player.ID, newOrigin, NULL_VECTOR, NULL_VECTOR);
+			}
+		}
+	}
+}
 
 void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 {

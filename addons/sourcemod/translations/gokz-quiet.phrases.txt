@@ -16,6 +16,14 @@ Phrases
 		"en"		"{grey}You are now hiding other players."
 		"chi"		"{grey}已屏蔽其他玩家模型."
 	}
+	"Option - Map Sounds - Enable"
+	{
+		"en"		"{grey}Map sounds are now enabled."
+	}
+	"Option - Map Sounds - Disable"
+	{
+		"en"		"{grey}Map sounds are now disabled."
+	}
 
 
 	// =====[ OPTIONS MENU ]=====
@@ -23,5 +31,9 @@ Phrases
 	{
 		"en"		"Show players"
 		"chi"		"屏蔽其他玩家"
+	}
+	"Options Menu - Map Sounds"
+	{
+		"en"		"Play map sounds"
 	}
 }

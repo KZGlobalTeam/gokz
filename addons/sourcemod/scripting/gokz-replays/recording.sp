@@ -300,18 +300,13 @@ static bool SaveRecordingOfCheater(int client)
 	any tickData[RP_TICK_DATA_BLOCKSIZE];
 	if (!timerRunning[client])
 	{
-		recordingIndex[client] -= 1;
-		for (int i = recordingIndex[client]; i != recordingIndex[client] - 1; i++)
+		int i = recordingIndex[client];
+		do
 		{
-			// Recording is done on a rolling basis.
-			// So if we reach the end of the array, that's not necessarily the end of the replay.
-			if (i >= recordedTickData[client].Length - 1)
-			{
-				i = 0;
-			}
 			recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
 			file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
-		}
+			i = (i + 1) % recordedTickData[client].Length;
+		} while (i != recordingIndex[client]);
 	}
 	else
 	{

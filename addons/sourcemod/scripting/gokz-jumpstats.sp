@@ -120,6 +120,11 @@ public void Movement_OnPlayerJump(int client, bool jumpbug)
 	OnPlayerJump_JumpTracking(client, jumpbug);
 }
 
+public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
+{
+	OnChangeMovetype_JumpTracking(client, oldMovetype, newMovetype);
+}
+
 public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
 {
 	OnJumpValidated_JumpTracking(client, jumped, ladderJump);

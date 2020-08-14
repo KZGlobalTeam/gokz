@@ -1,0 +1,70 @@
+"Phrases"
+{
+	//=====[ MENU ]=====
+	"Options Menu - Paint"
+	{
+		"en"		"Paint"
+	}
+	"Options Menu - Paint Color"
+	{
+		"en"		"Color"
+	}
+	"Options Menu - Paint Size"
+	{
+		"en"		"Size"
+	}
+	"Paint Color Menu - Title"
+	{
+		"en"		"Paint Color"
+	}
+
+
+	//=====[ COLORS ]=====
+	"Options Menu - Red"
+	{
+		"en"		"Red"
+	}
+	"Options Menu - White"
+	{
+		"en"		"White"
+	}
+	"Options Menu - Black"
+	{
+		"en"		"Black"
+	}
+	"Options Menu - Blue"
+	{
+		"en"		"Blue"
+	}
+	"Options Menu - Brown"
+	{
+		"en"		"Brown"
+	}
+	"Options Menu - Green"
+	{
+		"en"		"Green"
+	}
+	"Options Menu - Yellow"
+	{
+		"en"		"Yellow"
+	}
+	"Options Menu - Purple"
+	{
+		"en"		"Purple"
+	}
+
+
+	//=====[ SIZES ]=====
+	"Options Menu - Small"
+	{
+		"en"		"Small"
+	}
+	"Options Menu - Medium"
+	{
+		"en"		"Medium"
+	}
+	"Options Menu - Big"
+	{
+		"en"		"Big"
+	}
+}

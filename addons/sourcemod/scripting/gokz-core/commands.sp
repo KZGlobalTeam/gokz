@@ -8,6 +8,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
+	RegConsoleCmd("sm_end", CommandTeleportToEnd, "[KZ] Teleport to the end.");
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_setstartpos", CommandSetStartPos, "[KZ] Set your custom start position to your current position.");
@@ -39,6 +40,9 @@ void RegisterCommands()
 	RegConsoleCmd("sm_nc", CommandToggleNoclip, "[KZ] Toggle noclip.");
 	RegConsoleCmd("+noclip", CommandEnableNoclip, "[KZ] Noclip on.");
 	RegConsoleCmd("-noclip", CommandDisableNoclip, "[KZ] Noclip off.");
+	RegConsoleCmd("sm_ncnt", CommandToggleNoclipNotrigger, "[KZ] Toggle noclip-notrigger.");
+	RegConsoleCmd("+noclipnt", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
+	RegConsoleCmd("-noclipnt", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
 }
 
 void AddCommandsListeners()
@@ -97,6 +101,12 @@ public Action CommandTeleportToStart(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandTeleportToEnd(int client, int args)
+{
+	GOKZ_TeleportToEnd(client);
+	return Plugin_Handled;
+}
+
 public Action CommandSetStartPos(int client, int args)
 {
 	SetStartPositionToCurrent(client, StartPositionType_Custom);
@@ -122,11 +132,7 @@ public Action CommandClearStartPos(int client, int args)
 
 public Action CommandMain(int client, int args)
 {
-	if (SetStartPositionToMapStart(client, 0))
-	{
-		GOKZ_TeleportToStart(client);
-	}
-	else
+	if (!TeleportToCourseStart(client, 0))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No Start Found");
 	}
@@ -137,11 +143,7 @@ public Action CommandBonus(int client, int args)
 {
 	if (args == 0)
 	{  // Go to Bonus 1
-		if (SetStartPositionToMapStart(client, 1))
-		{
-			GOKZ_TeleportToStart(client);
-		}
-		else
+		if (!TeleportToCourseStart(client, 1))
 		{
 			GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", 1);
 		}
@@ -153,11 +155,7 @@ public Action CommandBonus(int client, int args)
 		int bonus = StringToInt(argBonus);
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
-			if (SetStartPositionToMapStart(client, bonus))
-			{
-				GOKZ_TeleportToStart(client);
-			}
-			else
+			if (!TeleportToCourseStart(client, bonus))
 			{
 				GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", bonus);
 			}
@@ -270,6 +268,24 @@ public Action CommandEnableNoclip(int client, int args)
 public Action CommandDisableNoclip(int client, int args)
 {
 	DisableNoclip(client);
+	return Plugin_Handled;
+}
+
+public Action CommandToggleNoclipNotrigger(int client, int args)
+{
+	ToggleNoclipNotrigger(client);
+	return Plugin_Handled;
+}
+
+public Action CommandEnableNoclipNotrigger(int client, int args)
+{
+	EnableNoclipNotrigger(client);
+	return Plugin_Handled;
+}
+
+public Action CommandDisableNoclipNotrigger(int client, int args)
+{
+	DisableNoclipNotrigger(client);
 	return Plugin_Handled;
 }
 

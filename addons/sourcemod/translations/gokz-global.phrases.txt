@@ -134,6 +134,10 @@
 	{
 		"en"		"{darkred} Please set your fps_max above 120 to continue playing. You will be kicked unless you change it!"
 	}
+	"Kick Player m_yaw"
+	{
+		"en"		"Your m_yaw value must be less or equal to 0.3 to play on this server"
+	}
 
 
 	// =====[ GLOBAL TOP MENU ]=====

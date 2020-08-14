@@ -1,48 +1,59 @@
 # Mapping
 
-## Timer Buttons
+## Timer buttons
 
-Timer buttons start or end the player's timer when activated.
+- Time starts when the player activates the start timer.
+- Time ends when the player activates the end timer.
+- Timer buttons **do** create virtual buttons (timer tech).
 
-Timer buttons create a virtual button (for "timer tech") only when *use* activated.
+#### To implement timer buttons, the following are required:
 
-To add a timer button to a map, use a `func_button` with a specific name.
+- Create a [func_button](https://developer.valvesoftware.com/wiki/Func_button "Valve Developer Community Wiki reference") entity.
+- Name the entity as either:
+	- `climb_startbutton` for the **start** of the **main course**.
+	- `climb_endbutton` for the **end** of the **main course**.
+	- `climb_bonusX_startbutton` for the **start** of a **bonus course** where X is the bonus number.
+	- `climb_bonusX_endbutton` for the **end** of a **bonus course** where X is the bonus number.
+- Enable both the `Don't move` and `Toggle` flags to avoid usability issues.
 
- * Start buttons are named `climb_startbutton`.
- * End buttons are named `climb_endbutton`.
- * Bonus start buttons are named `climb_bonusX_startbutton` where X is the bonus number.
- * Bonus end buttons are named `climb_bonusX_endbutton` where X is the bonus number.
+---
 
-To avoid usability issues, enable both the `Don't move` and `Toggle` flags on the `func_button`.
+## Timer zones
 
-## Timer Zones
+- Time starts when the player leaves the zone.
+- Time ends when the player enters the zone.
+- Timer zones **do not** create virtual buttons (timer tech).
 
-Start zones start the player's timer when they leave them.
+#### To implement timer zones, the following are required:
 
-End zones end the player's timer when they enter them.
+- Create a [trigger_multiple](https://developer.valvesoftware.com/wiki/Trigger_multiple "Valve Developer Community Wiki reference") entity.
+- Name the entity as either:
+	- `climb_startzone` for the **start** of the **main course**.
+	- `climb_endzone` for the **end** of the **main course**.
+	- `climb_bonusX_startzone` for the **start** of a **bonus course** where X is the bonus number.
+	- `climb_bonusX_endzone` for the **end** of a **bonus course** where X is the bonus number.
 
-Start zones allow the timer to be started in midair, unless they have hit a perfect bunnyhop.
+#### Things to keep in mind:
 
-Timer zones do not create a virtual button (for "timer tech") when activated.
+- Timer zones can act as [Course starts](#markdown-header-course-starts)
+	- Entering a **start** timer zone will stop the player's current timer.
+	- Entering a **start** timer zone will set the player's start position to the zone.
+- Start zones can be left midair as long as a perfect bunnyhop is **not** hit.
+- Multiple start timer zones should not be possible to be activated at once to avoid usability issues.
 
-To add a timer zone to a map, use a `trigger_multiple` with a specific name.
+---
 
- * Start zones are named `climb_startzone`.
- * End zones are named `climb_endzone`.
- * Bonus start zones are named `climb_bonusX_startzone` where X is the bonus number.
- * Bonus end zones are named `climb_bonusX_endzone` where X is the bonus number.
+## Course starts
 
-Entering a start zone will stop the player's timer and set their start position to the start of that course (see Course Starts).
+Course starts mark where players will be teleported when using the following commands:
 
-To avoid usability issues, ensure it is impossible for the player to be in multiple start zones at once.
+- `!m` command to teleport to the **main course**.
+- `!b <number>` command to teleport to the specified **bonus course**.
 
-## Course Starts
+#### To implement course starts, the following are required:
 
-Course starts mark where players will be placed when they are teleported to a course e.g. using the `!b` command.
-
-To add a course start, use an `info_teleport_destination` with a specific name.
-
- * Main course start is named `climb_start`.
- * Bonus course starts are named `climb_bonusX_start` where X is the bonus number.
-
-Set the angles to an appropriate direction as that is where the player will face.
+- Create an [info_teleport_destination](https://developer.valvesoftware.com/wiki/Info_teleport_destination "Valve Developer Wiki reference") entity.
+- Name the entity as either:
+	- `climb_start` for the **main course**.
+	- `climb_bonusX_start` for a **bonus course** where X is the bonus number.
+- Set `Pitch Yaw Roll (Y Z X)` to the angles you wish to teleport the player into.

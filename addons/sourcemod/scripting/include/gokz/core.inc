@@ -171,6 +171,8 @@ enum
 #define GOKZ_TIMER_START_GROUND_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 0.6
+#define GOKZ_COLLISION_GROUP_STANDARD 2
+#define GOKZ_COLLISION_GROUP_NOTRIGGER 1
 
 #define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
@@ -178,6 +180,7 @@ enum
 
 #define GOKZ_START_NAME "climb_start"
 #define GOKZ_BONUS_START_NAME_REGEX "^climb_bonus(\\d+)_start$"
+#define GOKZ_BONUS_END_NAME_REGEX "^climb_bonus(\\d+)_end$"
 
 #define GOKZ_START_BUTTON_NAME "climb_startbutton"
 #define GOKZ_END_BUTTON_NAME "climb_endbutton"
@@ -358,6 +361,13 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 // =====[ FORWARDS ]=====
 
 /**
+ * Called when a player's options values are loaded from clientprefs.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnOptionsLoaded(int client);
+
+/**
  * Called when a player's option's value is changed.
  * Only called if client is in game.
  *
@@ -527,6 +537,21 @@ forward Action GOKZ_OnTeleportToStart(int client);
  * @param client		Client index.
  */
 forward void GOKZ_OnTeleportToStart_Post(int client);
+
+/**
+ * Called when a player teleports to end.
+ *
+ * @param client		Client index.
+ * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
+ */
+forward Action GOKZ_OnTeleportToEnd(int client);
+
+/**
+ * Called when a player has teleported to end.
+ *
+ * @param client		Client index.
+ */
+forward void GOKZ_OnTeleportToEnd_Post(int client);
 
 /**
  * Called when a player undoes a teleport.
@@ -849,6 +874,53 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
 native void GOKZ_TeleportToStart(int client);
 
 /**
+ * Gets the virtual button position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param position		Returns the client's virtual button position.
+ * @param isStart		True to get the start button position, false for the end button.
+ * @return				The course the button belongs to.
+ */
+native int GOKZ_GetVirtualButtonPosition(int client, float position[3], bool isStart);
+
+/**
+ * Sets the virtual button position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param position		The client's virtual button position.
+ * @param course		The course the virtual button belongs to.
+ * @param isStart		True to get the start button position, false for the end button.
+ */
+native void GOKZ_SetVirtualButtonPosition(int client, const float position[3], int course, bool isStart);
+
+/**
+ * Locks the virtual button position of a player.
+ *
+ * @param client    	Client index.
+ */
+native void GOKZ_LockVirtualButtons(int client);
+
+/**
+ * Gets the start position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param position		Returns the client's start position.
+ * @param angles		Returns the client's start angles.
+ * @return				Player's current start position type.
+ */
+native StartPositionType GOKZ_GetStartPosition(int client, float position[3], float angles[3]);
+
+/**
+ * Sets the start position the player currently has.
+ *
+ * @param client    	Client index.
+ * @param type			The start position type.
+ * @param position		The client's start position.
+ * @param angles		The client's start angles.
+ */
+native void GOKZ_SetStartPosition(int client, StartPositionType type, const float position[3], const float angles[3]);
+
+/**
  * Gets the type of start position the player currently has.
  * The "Spawn" type means teleport to start will respawn the player.
  *
@@ -866,6 +938,13 @@ native StartPositionType GOKZ_GetStartPositionType(int client);
  * @return              False if the course start was not found.
  */
 native bool GOKZ_SetStartPositionToMapStart(int client, int course);
+
+/**
+ * Teleports a player to end.
+ *
+ * @param client		Client index.
+ */
+native void GOKZ_TeleportToEnd(int client);
 
 /**
  * Set a new checkpoint at a player's current position.
@@ -1377,6 +1456,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
+	MarkNativeAsOptional("GOKZ_PrintToChatAndLog");
 	MarkNativeAsOptional("GOKZ_GetOptionsTopMenu");
 	
 	MarkNativeAsOptional("GOKZ_StartTimer");
@@ -1384,7 +1464,14 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_StopTimer");
 	MarkNativeAsOptional("GOKZ_StopTimerAll");
 	MarkNativeAsOptional("GOKZ_TeleportToStart");
-	MarkNativeAsOptional("GOKZ_GetHasStartPosition");
+	MarkNativeAsOptional("GOKZ_GetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_SetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_LockVirtualButtons");
+	MarkNativeAsOptional("GOKZ_GetStartPosition");
+	MarkNativeAsOptional("GOKZ_SetStartPosition");
+	MarkNativeAsOptional("GOKZ_GetStartPositionType");
+	MarkNativeAsOptional("GOKZ_SetStartPositionToMapStart");
+	MarkNativeAsOptional("GOKZ_TeleportToEnd");
 	MarkNativeAsOptional("GOKZ_MakeCheckpoint");
 	MarkNativeAsOptional("GOKZ_TeleportToCheckpoint");
 	MarkNativeAsOptional("GOKZ_GetCanTeleportToCheckpoint");
@@ -1395,6 +1482,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_UndoTeleport");
 	MarkNativeAsOptional("GOKZ_GetCanUndoTeleport");
 	MarkNativeAsOptional("GOKZ_Pause");
+	MarkNativeAsOptional("GOKZ_GetCanPause");
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");

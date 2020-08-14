@@ -298,3 +298,91 @@ SELECT MAX(js.Distance), js.Mode, js.JumpType, js.Block \
 		js.SteamID32=%d \
 	GROUP BY \
 		js.Mode, js.JumpType, js.Block";
+
+
+
+// =====[ VB POSITIONS ]=====
+
+char sqlite_vbpos_create[] = "\
+CREATE TABLE IF NOT EXISTS VBPosition ( \
+	SteamID32 INTEGER NOT NULL, \
+	MapID INTEGER NOT NULL, \
+	X REAL NOT NULL, \
+	Y REAL NOT NULL, \
+	Z REAL NOT NULL, \
+	Course INTEGER NOT NULL, \
+	IsStart INTEGER NOT NULL, \
+	CONSTRAINT PK_VBPosition PRIMARY KEY (SteamID32, MapID, IsStart), \
+    CONSTRAINT FK_VBPosition_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32), \
+    CONSTRAINT FK_VBPosition_MapID FOREIGN KEY (MapID) REFERENCES Maps(MapID) \
+    ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char mysql_vbpos_create[] = "\
+CREATE TABLE IF NOT EXISTS VBPosition ( \
+	SteamID32 INTEGER UNSIGNED NOT NULL, \
+	MapID INTEGER UNSIGNED NOT NULL, \
+	X REAL NOT NULL, \
+	Y REAL NOT NULL, \
+	Z REAL NOT NULL, \
+	Course INTEGER NOT NULL, \
+	IsStart INTEGER NOT NULL, \
+	CONSTRAINT PK_VBPosition PRIMARY KEY (SteamID32, MapID, IsStart), \
+    CONSTRAINT FK_VBPosition_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32), \
+    CONSTRAINT FK_VBPosition_MapID FOREIGN KEY (MapID) REFERENCES Maps(MapID) \
+    ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char sql_vbpos_upsert[] = "\
+REPLACE INTO VBPosition (SteamID32, MapID, X, Y, Z, Course, IsStart) \
+	VALUES (%d, %d, %f, %f, %f, %d, %d)";
+
+char sql_vbpos_get[] = "\
+SELECT SteamID32, MapID, Course, IsStart, X, Y, Z \
+	FROM \
+		VBPosition \
+	WHERE \
+		SteamID32 = %d AND \
+		MapID = %d";
+
+
+
+// =====[ START POSITIONS ]=====
+
+char sqlite_startpos_create[] = "\
+CREATE TABLE IF NOT EXISTS StartPosition ( \
+	SteamID32 INTEGER NOT NULL, \
+	MapID INTEGER NOT NULL, \
+	X REAL NOT NULL, \
+	Y REAL NOT NULL, \
+	Z REAL NOT NULL, \
+	Angle0 REAL NOT NULL, \
+	Angle1 REAL NOT NULL, \
+	CONSTRAINT PK_StartPosition PRIMARY KEY (SteamID32, MapID), \
+    CONSTRAINT FK_StartPosition_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32) \
+    CONSTRAINT FK_StartPosition_MapID FOREIGN KEY (MapID) REFERENCES Maps(MapID) \
+    ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char mysql_startpos_create[] = "\
+CREATE TABLE IF NOT EXISTS StartPosition ( \
+	SteamID32 INTEGER UNSIGNED NOT NULL, \
+	MapID INTEGER UNSIGNED NOT NULL, \
+	X REAL NOT NULL, \
+	Y REAL NOT NULL, \
+	Z REAL NOT NULL, \
+	Angle0 REAL NOT NULL, \
+	Angle1 REAL NOT NULL, \
+	CONSTRAINT PK_StartPosition PRIMARY KEY (SteamID32, MapID), \
+    CONSTRAINT FK_StartPosition_SteamID32 FOREIGN KEY (SteamID32) REFERENCES Players(SteamID32), \
+    CONSTRAINT FK_StartPosition_MapID FOREIGN KEY (MapID) REFERENCES Maps(MapID) \
+    ON UPDATE CASCADE ON DELETE CASCADE)";
+
+char sql_startpos_upsert[] = "\
+REPLACE INTO StartPosition (SteamID32, MapID, X, Y, Z, Angle0, Angle1) \
+	VALUES (%d, %d, %f, %f, %f, %f, %f)";
+
+char sql_startpos_get[] = "\
+SELECT SteamID32, MapID, X, Y, Z, Angle0, Angle1 \
+	FROM \
+		StartPosition \
+	WHERE \
+		SteamID32 = %d AND \
+		MapID = %d";

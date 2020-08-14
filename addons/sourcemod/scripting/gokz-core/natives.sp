@@ -14,6 +14,12 @@ void CreateNatives()
 	CreateNative("GOKZ_StopTimer", Native_StopTimer);
 	CreateNative("GOKZ_StopTimerAll", Native_StopTimerAll);
 	CreateNative("GOKZ_TeleportToStart", Native_TeleportToStart);
+	CreateNative("GOKZ_GetVirtualButtonPosition", Native_GetVirtualButtonPosition);
+	CreateNative("GOKZ_SetVirtualButtonPosition", Native_SetVirtualButtonPosition);
+	CreateNative("GOKZ_LockVirtualButtons", Native_LockVirtualButtons);
+	CreateNative("GOKZ_GetStartPosition", Native_GetStartPosition);
+	CreateNative("GOKZ_SetStartPosition", Native_SetStartPosition);
+	CreateNative("GOKZ_TeleportToEnd", Native_TeleportToEnd);
 	CreateNative("GOKZ_GetStartPositionType", Native_GetStartPositionType);
 	CreateNative("GOKZ_SetStartPositionToMapStart", Native_SetStartPositionToMapStart);
 	CreateNative("GOKZ_MakeCheckpoint", Native_MakeCheckpoint);
@@ -180,6 +186,56 @@ public int Native_StopTimerAll(Handle plugin, int numParams)
 public int Native_TeleportToStart(Handle plugin, int numParams)
 {
 	TeleportToStart(GetNativeCell(1));
+}
+
+public int Native_GetVirtualButtonPosition(Handle plugin, int numParams)
+{
+	int course;
+	float position[3];
+	
+	course = GetVirtualButtonPosition(GetNativeCell(1), position, GetNativeCell(3));
+	SetNativeArray(2, position, sizeof(position));
+	
+	return course;
+}
+
+public int Native_SetVirtualButtonPosition(Handle plugin, int numParams)
+{
+	float position[3];
+	
+	GetNativeArray(2, position, sizeof(position));
+	SetVirtualButtonPosition(GetNativeCell(1), position, GetNativeCell(3), view_as<bool>(GetNativeCell(4)));
+}
+
+public int Native_LockVirtualButtons(Handle plugin, int numParams)
+{
+	LockVirtualButtons(GetNativeCell(1));
+}
+
+public int Native_GetStartPosition(Handle plugin, int numParams)
+{
+	StartPositionType type;
+	float position[3], angles[3];
+	
+	type = GetStartPosition(GetNativeCell(1), position, angles);
+	SetNativeArray(2, position, sizeof(position));
+	SetNativeArray(3, angles, sizeof(angles));
+	
+	return view_as<int>(type);
+}
+
+public int Native_SetStartPosition(Handle plugin, int numParams)
+{
+	float position[3], angles[3];
+	
+	GetNativeArray(3, position, sizeof(position));
+	GetNativeArray(4, angles, sizeof(angles));
+	SetStartPosition(GetNativeCell(1), GetNativeCell(2), position, angles);
+}
+
+public int Native_TeleportToEnd(Handle plugin, int numParams)
+{
+	TeleportToEnd(GetNativeCell(1));
 }
 
 public int Native_GetStartPositionType(Handle plugin, int numParams)

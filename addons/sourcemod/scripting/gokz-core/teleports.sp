@@ -16,8 +16,11 @@ static float nonCustomStartOrigin[MAXPLAYERS + 1][3];
 static float nonCustomStartAngles[MAXPLAYERS + 1][3];
 static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
+static float endOrigin[MAXPLAYERS + 1][3];
+static float endAngles[MAXPLAYERS + 1][3];
 static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
+static float checkpointLadderNormal[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
 static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
 static bool lastTeleportOnGround[MAXPLAYERS + 1];
 static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
@@ -73,6 +76,7 @@ void MakeCheckpoint(int client)
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
 	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
+	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", checkpointLadderNormal[client][checkpointIndex[client]]);
 	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
@@ -302,6 +306,36 @@ void TeleportToStart(int client)
 	Call_GOKZ_OnTeleportToStart_Post(client);
 }
 
+StartPositionType GetStartPosition(int client, float position[3], float angles[3])
+{
+	if (startType[client] == StartPositionType_Custom)
+	{
+		position = customStartOrigin[client];
+		angles = customStartAngles[client];
+	}
+	else if (startType[client] != StartPositionType_Spawn)
+	{
+		position = nonCustomStartOrigin[client];
+		angles = nonCustomStartAngles[client];
+	}
+	
+	return startType[client];
+}
+
+bool TeleportToCourseStart(int client, int course)
+{
+	float origin[3], angles[3];
+	
+	if (!GetMapStartPosition(course, origin, angles))
+	{
+		return false;
+	}
+	
+	TeleportDo(client, origin, angles);
+	
+	return true;
+}
+
 StartPositionType GetStartPositionType(int client)
 {
 	return startType[client];
@@ -390,6 +424,54 @@ bool ClearCustomStartPosition(int client)
 }
 
 
+// TELEPORT TO END
+
+void TeleportToEnd(int client)
+{
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToEnd(client, result);
+	if (result != Plugin_Continue)
+	{
+		return;
+	}
+
+	GOKZ_StopTimer(client, false);
+
+	// Teleport to End
+	TeleportDo(client, endOrigin[client], endAngles[client]);
+
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToEnd_Post(client);
+}
+
+void SetEndPosition(int client, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR)
+{
+	if (!IsNullVector(origin))
+	{
+		endOrigin[client] = origin;
+	}
+	if (!IsNullVector(angles))
+	{
+		endAngles[client] = angles;
+	}
+}
+
+bool SetEndPositionToMapEnd(int client, int course)
+{
+	float origin[3], angles[3];
+
+	if (!GetMapEndPosition(course, origin, angles))
+	{
+		return false;
+	}
+
+	SetEndPosition(client, origin, angles);
+
+	return true;
+}
+
+
 // UNDO TP
 
 void UndoTeleport(int client)
@@ -459,8 +541,10 @@ void OnClientPutInServer_Teleports(int client)
 	startType[client] = StartPositionType_Spawn;
 	nonCustomStartType[client] = StartPositionType_Spawn;
 	
-	// Set start position to main course if we know of it
+	// Set start and end position to main course if we know of it
 	SetStartPositionToMapStart(client, 0);
+	SetEndPositionToMapEnd(client, 0);
+
 }
 
 void OnTimerStart_Teleports(int client)
@@ -471,9 +555,10 @@ void OnTimerStart_Teleports(int client)
 	teleportCount[client] = 0;
 }
 
-void OnStartButtonPress_Teleports(int client)
+void OnStartButtonPress_Teleports(int client, int course)
 {
 	SetStartPositionToCurrent(client, StartPositionType_MapButton);
+	SetEndPositionToMapEnd(client, course);
 }
 
 void OnVirtualStartButtonPress_Teleports(int client)
@@ -484,6 +569,7 @@ void OnVirtualStartButtonPress_Teleports(int client)
 void OnStartZoneStartTouch_Teleports(int client, int course)
 {
 	SetStartPositionToMapStart(client, course);
+	SetEndPositionToMapEnd(client, course);
 }
 
 
@@ -547,6 +633,7 @@ static void CheckpointTeleportDo(int client)
 	// Handle ladder stuff
 	if (checkpointOnLadder[client][checkpointIndex[client]])
 	{
+		SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", checkpointLadderNormal[client][checkpointIndex[client]]);
 		if (!GOKZ_GetPaused(client))
 		{
 			Movement_SetMovetype(client, MOVETYPE_LADDER);

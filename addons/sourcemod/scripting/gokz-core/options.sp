@@ -219,6 +219,8 @@ void OnClientCookiesCached_Options(int client)
 	}
 	
 	delete optionDataSnapshot;
+	
+	Call_GOKZ_OnOptionsLoaded(client);
 }
 
 void OnClientPutInServer_Options(int client)

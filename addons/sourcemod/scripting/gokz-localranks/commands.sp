@@ -19,8 +19,10 @@ void RegisterCommands()
 
 	RegConsoleCmd("sm_ljpb", CommandLJPB, "[KZ] Show PB Long Jump in chat. Usage: !ljpb <jumper>");
 	RegConsoleCmd("sm_bhpb", CommandBHPB, "[KZ] Show PB Bunnyhop in chat. Usage: !bhpb <jumper>");
+	RegConsoleCmd("sm_lbhpb", CommandLBHPB, "[KZ] Show PB Lowpre Bunnyhop in chat. Usage: !lbhpb <jumper>");
 	RegConsoleCmd("sm_mbhpb", CommandMBHPB, "[KZ] Show PB Multi Bunnyhop in chat. Usage: !mbhpb <jumper>");
 	RegConsoleCmd("sm_wjpb", CommandWJPB, "[KZ] Show PB Weird Jump in chat. Usage: !wjpb <jumper>");
+	RegConsoleCmd("sm_lwjpb", CommandLWJPB, "[KZ] Show PB Lowpre Weird Jump in chat. Usage: !lwjpb <jumper>");
 	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show PB Ladder Jump in chat. Usage: !lajpb <jumper>");
 	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show PB Ladderhop in chat. Usage: !lahpb <jumper>");
 	RegConsoleCmd("sm_jbpb", CommandJBPB, "[KZ] Show PB Jumpbug in chat. Usage: !jbpb <jumper>");
@@ -377,6 +379,12 @@ public Action CommandBHPB(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandLBHPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, args, JumpType_LowpreBhop);
+	return Plugin_Handled;
+}
+
 public Action CommandMBHPB(int client, int args)
 {
 	DisplayJumpstatRecordCommand(client, args, JumpType_MultiBhop);
@@ -386,6 +394,12 @@ public Action CommandMBHPB(int client, int args)
 public Action CommandWJPB(int client, int args)
 {
 	DisplayJumpstatRecordCommand(client, args, JumpType_WeirdJump);
+	return Plugin_Handled;
+}
+
+public Action CommandLWJPB(int client, int args)
+{
+	DisplayJumpstatRecordCommand(client, args, JumpType_LowpreWeirdJump);
 	return Plugin_Handled;
 }
 

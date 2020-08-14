@@ -37,18 +37,13 @@ void OnPlayerSpawn_GodMode(int client)
 
 void ToggleNoclip(int client)
 {
-	if (!IsPlayerAlive(client))
-	{
-		return;
-	}
-	
 	if (Movement_GetMovetype(client) != MOVETYPE_NOCLIP)
 	{
-		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		EnableNoclip(client);
 	}
 	else
 	{
-		Movement_SetMovetype(client, MOVETYPE_WALK);
+		DisableNoclip(client);
 	}
 }
 
@@ -65,7 +60,66 @@ void DisableNoclip(int client)
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+		
+		// Prevents an exploit that would let you noclip out of start zones
+		RemoveNoclipGroundFlag(client);
 	}
+}
+
+void ToggleNoclipNotrigger(int client)
+{
+	if (Movement_GetMovetype(client) != MOVETYPE_NOCLIP)
+	{
+		EnableNoclipNotrigger(client);
+	}
+	else
+	{
+		DisableNoclipNotrigger(client);
+	}
+}
+
+void EnableNoclipNotrigger(int client)
+{
+	if (IsPlayerAlive(client))
+	{
+		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
+	}
+}
+
+void DisableNoclipNotrigger(int client)
+{
+	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	{
+		Movement_SetMovetype(client, MOVETYPE_WALK);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+		
+		// Prevents an exploit that would let you noclip out of start zones
+		RemoveNoclipGroundFlag(client);
+	}
+}
+
+void RemoveNoclipGroundFlag(int client)
+{
+	float startPosition[3], endPosition[3];
+	GetClientAbsOrigin(client, startPosition);
+	endPosition = startPosition;
+	endPosition[2] = startPosition[2] - 2.0;
+	Handle trace = TR_TraceHullFilterEx(
+		startPosition, 
+		endPosition, 
+		view_as<float>( { -16.0, -16.0, 0.0 } ),
+		view_as<float>( { 16.0, 16.0, 72.0 } ), 
+		MASK_PLAYERSOLID, 
+		TraceEntityFilterPlayers, 
+		client);
+	
+	if (!TR_DidHit(trace))
+	{
+		SetEntityFlags(client, GetEntityFlags(client) & ~FL_ONGROUND);
+	}
+	delete trace;
 }
 
 
@@ -75,7 +129,7 @@ void DisableNoclip(int client)
 void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
-	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 }
 
 
@@ -148,7 +202,14 @@ void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
 	}
 	else if (oldteam == CS_TEAM_CT || oldteam == CS_TEAM_T)
 	{
-		specMovetype[client] = Movement_GetMovetype(client);
+		if (GOKZ_GetPaused(client))
+		{
+			specMovetype[client] = GetPausedOnLadder(client) ? MOVETYPE_LADDER : MOVETYPE_WALK;
+		}
+		else
+		{
+			specMovetype[client] = Movement_GetMovetype(client);
+		}
 	}
 }
 

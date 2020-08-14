@@ -273,7 +273,7 @@ static void BanSuspect(int client, ACReason reason)
 	
 	if (gB_GOKZGlobal)
 	{
-		redirectString = "Visit https://forum.gokz.org/p/player-rules for more info";
+		redirectString = "Visit http://rules.global-api.com/ for more info";
 	}
 	
 	switch (reason)

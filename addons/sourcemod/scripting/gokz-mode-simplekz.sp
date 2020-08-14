@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 9
+#define MODE_VERSION 10
 #define PERF_TICKS 2
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
@@ -169,6 +169,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	RemoveCrouchJumpBind(player, buttons);
 	ReduceDuckSlowdown(player);
 	TweakVelMod(player, angles);
+	FixWaterBoost(player, buttons);
 	if (gB_Jumpbugged[player.ID])
 	{
 		TweakJumpbug(player);
@@ -635,6 +636,27 @@ public bool TraceRayDontHitSelf(int entity, int mask, any data)
 
 
 // =====[ OTHER ]=====
+
+void FixWaterBoost(KZPlayer player, int buttons)
+{
+	if (GetEntProp(player.ID, Prop_Send, "m_nWaterLevel") >= 2) // WL_Waist = 2
+	{
+		// If duck is being pressed and we're not already ducking or on ground
+		if (GetEntityFlags(player.ID) & (FL_DUCKING | FL_ONGROUND) == 0
+			&& buttons & IN_DUCK && ~gI_OldButtons[player.ID] & IN_DUCK)
+		{
+			float newOrigin[3];
+			Movement_GetOrigin(player.ID, newOrigin);
+			newOrigin[2] += 9.0;
+			
+			TR_TraceHullFilter(newOrigin, newOrigin, view_as<float>({-16.0, -16.0, 0.0}), view_as<float>({16.0, 16.0, 54.0}), MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+			if (!TR_DidHit())
+			{
+				TeleportEntity(player.ID, newOrigin, NULL_VECTOR, NULL_VECTOR);
+			}
+		}
+	}
+}
 
 void RemoveCrouchJumpBind(KZPlayer player, int &buttons)
 {

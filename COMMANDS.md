@@ -9,6 +9,7 @@
  * `!next` - Go forward a checkpoint.
  * `!undo` - Undo teleport.
  * `!start`/`!restart`/`!r` - Teleport to your start position.
+ * `!end` - Teleport to the endtimer.
  * `!setstartpos`/`!ssp` - Set your custom start position to your current position.
  * `!clearstartpos`/`!csp` - Clear your custom start position.
  * `!main`/`!m` - Teleport to the start of the main course.
@@ -23,7 +24,9 @@
  * `!simplekz`/`!skz`/`!s` - Switch to the SimpleKZ mode.
  * `!kztimer`/`!kzt`/`!k` - Switch to the KZTimer mode.
  * `!nc` - Toggle noclip.
+ * `!ncnt` - Toggle noclip-notrigger that ignores triggers.
  * `+noclip` - Noclip (bind a key to it).
+ * `+noclipnt` - Noclip-notrigger that ignores triggers (bind a key to it).
 
 ### gokz-hud
 
@@ -62,6 +65,13 @@
  * `!loadloc` - Load location. Usage: `!loadloc <#id OR name>`
  * `!locmenu` - Open location menu.
  * `!nameloc` - Name location. Usage: `!nameloc <#id> <name>`
+
+### gokz-paint
+
+ * `!paint` - Place a single paint (colored circle)
+ * `+paint` - Start painting (bind to a key)
+ * `!paintoptions` - Open paint options
+ * `r_cleardecals` - Console command to clear all decals (including paints)
 
 ### gokz-spec
 
@@ -106,8 +116,10 @@ Many of these commands return results for your currently selected mode.
  * `!jumptop`/`!jstop` - Open a menu showing the top jumpstats.
  * `!ljpb` - Show PB Long Jump in chat. Usage: `!ljpb <jumper>`
  * `!bhpb` - Show PB Bunnyhop in chat. Usage: `!bhpb <jumper>`
+ * `!lbhpb` - Show PB Lowpre Bunnyhop in chat. Usage: `!lbhpb <jumper>`
  * `!mbhpb` - Show PB Multi Bunnyhop in chat. Usage: `!mbhpb <jumper>`
  * `!wjpb` - Show PB Weird Jump in chat. Usage: `!wjpb <jumper>`
+ * `!lwjpb` - Show PB Lowpre Weird Jump in chat. Usage: `!lwjpb <jumper>`
  * `!lajpb` - Show PB Ladder Jump in chat. Usage: `!lajpb <jumper>`
  * `!lahpb` - Show PB Ladderhop in chat. Usage: `!lahpb <jumper>`
  * `!jbpb` - Show PB Jumpbug in chat. Usage: `!jbpb <jumper>`
@@ -129,6 +141,8 @@ Many of these commands return results for your currently selected mode.
 
 ### gokz-localdb
 
+ * `!savetimersetup`/`!sts` - Save the current timer setup (start position and virtual buttons) to the database.
+ * `!loadtimersetup`/`!lts` - Load & lock the timer setup (start position and virtual buttons) from the database.
  * `!setcheater` - Set a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
  * `!setnotcheater` - Set a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
  * `!deletejump` - Remove the top jumpstat of a SteamID. Usage: `!deletejump <STEAM_1:X:X> <mode> <jump type> <block?>`
