@@ -49,7 +49,6 @@ bool gB_MenuShowing[MAXPLAYERS + 1];
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("gokz-hud");
-	MarkNativeAsOptional("GOKZ_RP_GetPlaybackInfo");
 	return APLRes_Success;
 }
 
