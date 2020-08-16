@@ -136,7 +136,7 @@
 	}
 	"Kick Player m_yaw"
 	{
-		"en"		"You may not have an m_yaw value greater than 1 to play on this server"
+		"en"		"Your m_yaw value must be less or equal to 0.3 to play on this server"
 	}
 
 

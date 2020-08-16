@@ -60,7 +60,7 @@ void DisableNoclip(int client)
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
-		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 		
 		// Prevents an exploit that would let you noclip out of start zones
 		RemoveNoclipGroundFlag(client);
@@ -84,7 +84,7 @@ void EnableNoclipNotrigger(int client)
 	if (IsPlayerAlive(client))
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
-		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_NOTRIGGER, 4, true);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
 	}
 }
 
@@ -93,7 +93,7 @@ void DisableNoclipNotrigger(int client)
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
-		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 		
 		// Prevents an exploit that would let you noclip out of start zones
 		RemoveNoclipGroundFlag(client);
@@ -129,7 +129,7 @@ void RemoveNoclipGroundFlag(int client)
 void OnPlayerSpawn_PlayerCollision(int client)
 {
 	// Let players go through other players
-	SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), GOKZ_COLLISION_GROUP_STANDARD, 4, true);
+	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 }
 
 

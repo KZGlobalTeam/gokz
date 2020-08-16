@@ -88,4 +88,11 @@ public SharedPlugin __pl_gokz_replays =
 	#else
 	required = 0, 
 	#endif
-}; 
+};
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_replays_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_RP_GetPlaybackInfo");
+}
+#endif
