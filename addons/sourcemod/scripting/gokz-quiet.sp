@@ -165,6 +165,7 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 			numNewClients++;
 		}
 	}
+	
 	if (numNewClients != numClients) 
 	{
 		numClients = numNewClients;
