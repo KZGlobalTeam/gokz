@@ -99,6 +99,13 @@ public void OnAllPluginsLoaded()
 			OnClientPutInServer(client);
 		}
 	}
+
+	// Unload funcommands, that plugin is too troublesome: https://forums.alliedmods.net/showthread.php?p=1682844
+	char enabledPath[256], disabledPath[256];
+	BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/funcommands.smx");
+	BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/funcommands.smx");
+	ServerCommand("sm plugins unload funcommands.smx");
+	RenameFile(disabledPath, enabledPath);
 }
 
 public void OnLibraryAdded(const char[] name)
