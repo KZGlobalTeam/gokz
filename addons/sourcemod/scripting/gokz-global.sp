@@ -100,12 +100,16 @@ public void OnAllPluginsLoaded()
 		}
 	}
 
-	// Unload funcommands, that plugin is too troublesome: https://forums.alliedmods.net/showthread.php?p=1682844
-	char enabledPath[256], disabledPath[256];
-	BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/funcommands.smx");
-	BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/funcommands.smx");
+	// Unload funcommands and playercommands, those plugins are too troublesome: https://forums.alliedmods.net/showthread.php?p=1682844
+	char funEnabledPath[256], funDisabledPath[256], playerEnabledPath[256], playerDisabledPath[256];
+	BuildPath(Path_SM, funDisabledPath, sizeof(funDisabledPath), "plugins/disabled/funcommands.smx");
+	BuildPath(Path_SM, funEnabledPath, sizeof(funEnabledPath), "plugins/funcommands.smx");
+	BuildPath(Path_SM, playerDisabledPath, sizeof(playerDisabledPath), "plugins/disabled/playercommands.smx");
+	BuildPath(Path_SM, playerEnabledPath, sizeof(playerEnabledPath), "plugins/playercommands.smx")
 	ServerCommand("sm plugins unload funcommands.smx");
-	RenameFile(disabledPath, enabledPath);
+	ServerCommand("sm plugins unload playercommands.smx");
+	RenameFile(funDisabledPath, funEnabledPath);
+	RenameFile(playerDisabledPath, playerEnabledPath);
 }
 
 public void OnLibraryAdded(const char[] name)
