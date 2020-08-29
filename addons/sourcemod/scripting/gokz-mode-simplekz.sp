@@ -551,20 +551,17 @@ void NerfRealPerf(KZPlayer player)
 		TraceEntityFilterPlayers, 
 		player.ID);
 	
+	// This is expected to always hit
 	if (TR_DidHit(trace))
 	{
 		TR_GetEndPosition(groundOrigin, trace);
+		
+		// Teleport player downwards so it's like they jumped from the ground
+		float newOrigin[3];
+		player.GetOrigin(newOrigin);
+		newOrigin[2] -= gF_OldOrigin[player.ID][2] - groundOrigin[2];
+		player.SetOrigin(newOrigin);
 	}
-	else
-	{
-		return; // This is completely unexpected
-	}
-	
-	// Teleport player downwards so it's like they jumped from the ground
-	float newOrigin[3];
-	player.GetOrigin(newOrigin);
-	newOrigin[2] -= gF_OldOrigin[player.ID][2] - groundOrigin[2];
-	player.SetOrigin(newOrigin);
 	
 	delete trace;
 }
