@@ -330,6 +330,8 @@ bool TeleportToCourseStart(int client, int course)
 	{
 		return false;
 	}
+
+	GOKZ_StopTimer(client);
 	
 	TeleportDo(client, origin, angles);
 	

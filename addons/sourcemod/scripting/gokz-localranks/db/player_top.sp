@@ -34,7 +34,7 @@ void DB_OpenPlayerTop(int client, int timeType, int mode)
 		}
 	}
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenPlayerTop, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenPlayerTop, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_OpenPlayerTop(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

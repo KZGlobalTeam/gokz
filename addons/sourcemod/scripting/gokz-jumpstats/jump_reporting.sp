@@ -61,7 +61,7 @@ void OnLanding_JumpReporting(Jump jump)
 						jump.jumper,
 						jump.distance,
 						gC_JumpTypes[jump.originalType]);
-					DoConsoleReport(client, jump, tier, "Console Jump Header");
+					DoConsoleReport(client, false, jump, tier, "Console Jump Header");
 				}
 				
 				minTier = GOKZ_JS_GetOption(client, JSOption_MinSoundBroadcastTier);
@@ -133,7 +133,7 @@ static void DoJumpstatsReport(int client, Jump jump, int tier)
 	}
 	
 	DoChatReport(client, false, jump, tier);
-	DoConsoleReport(client, jump, tier, "Console Jump Header");
+	DoConsoleReport(client, false, jump, tier, "Console Jump Header");
 	PlayJumpstatSound(client, tier);
 }
 
@@ -145,7 +145,7 @@ static void DoFailstatReport(int client, Jump jump, int tier)
 	}
 	
 	DoChatReport(client, true, jump, tier);
-	DoConsoleReport(client, jump, tier, "Console Failstat Header");
+	DoConsoleReport(client, true, jump, tier, "Console Failstat Header");
 }
 
 static void DoJumpstatAlwaysReport(int client, Jump jump)
@@ -157,7 +157,7 @@ static void DoJumpstatAlwaysReport(int client, Jump jump)
 	}
 	
 	DoChatReport(client, false, jump, 1);
-	DoConsoleReport(client, jump, 1, "Console Jump Header");
+	DoConsoleReport(client, false, jump, 1, "Console Jump Header");
 }
 
 static void DoFailstatAlwaysReport(int client, Jump jump)
@@ -169,7 +169,7 @@ static void DoFailstatAlwaysReport(int client, Jump jump)
 	}
 	
 	DoChatReport(client, true, jump, 1);
-	DoConsoleReport(client, jump, 1, "Console Failstat Header");
+	DoConsoleReport(client, true, jump, 1, "Console Failstat Header");
 }
 
 
@@ -177,12 +177,11 @@ static void DoFailstatAlwaysReport(int client, Jump jump)
 
 // CONSOLE REPORT
 
-static void DoConsoleReport(int client, Jump jump, int tier, char[] header)
+static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, char[] header)
 {
 	int minConsoleTier = GOKZ_JS_GetOption(client, JSOption_MinConsoleTier);
-	if ((minConsoleTier == 0 || minConsoleTier > tier // 0 means disabled
-		 || GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled)
-		 && GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled)
+	if ((minConsoleTier == 0 || minConsoleTier > tier) && GOKZ_JS_GetOption(client, JSOption_JumpstatsAlways) == JSToggleOption_Disabled
+		|| isFailstat && GOKZ_JS_GetOption(client, JSOption_FailstatsConsole) == JSToggleOption_Disabled)
 	{
 		return;
 	}

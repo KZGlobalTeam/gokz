@@ -88,18 +88,7 @@ static void UpdateTimerText(int client, HUDInfo info)
 		return;
 	}
 	
-	if (player.Alive)
-	{
-		ShowTimerText(player, info);
-	}
-	else
-	{
-		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
-		if (targetPlayer.ID != -1 && !targetPlayer.Fake)
-		{
-			ShowTimerText(player, info);
-		}
-	}
+	ShowTimerText(player, info);
 }
 
 static void ClearTimerText(int client)

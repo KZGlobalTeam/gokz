@@ -25,7 +25,7 @@ void DB_SetCheater(int cheaterClient, bool cheater)
 	FormatEx(query, sizeof(query), sql_players_set_cheater, cheater ? 1 : 0, GetSteamAccountID(cheaterClient));
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetCheater, DB_TxnFailure_Generic, data, DBPrio_High);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetCheater, DB_TxnFailure_Generic_DataPack, data, DBPrio_High);
 }
 
 void DB_SetCheaterSteamID(int client, int cheaterSteamID, bool cheater)
@@ -42,7 +42,7 @@ void DB_SetCheaterSteamID(int client, int cheaterSteamID, bool cheater)
 	FormatEx(query, sizeof(query), sql_players_set_cheater, cheater ? 1 : 0, cheaterSteamID);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetCheater, DB_TxnFailure_Generic, data, DBPrio_High);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetCheater, DB_TxnFailure_Generic_DataPack, data, DBPrio_High);
 }
 
 public void DB_TxnSuccess_SetCheater(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
