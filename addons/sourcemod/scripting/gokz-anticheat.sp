@@ -53,6 +53,8 @@ int gI_BhopPreJumpInputs[MAXPLAYERS + 1][AC_MAX_BHOP_SAMPLES];
 int gI_BhopPostJumpInputs[MAXPLAYERS + 1][AC_MAX_BHOP_SAMPLES];
 bool gB_BhopPostJumpInputsPending[MAXPLAYERS + 1];
 bool gB_LastLandingWasValid[MAXPLAYERS + 1];
+bool gB_BindExceptionPending[MAXPLAYERS + 1];
+bool gB_BindExceptionPostPending[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_autoban;
 ConVar gCV_gokz_autoban_duration_bhop_hack;
