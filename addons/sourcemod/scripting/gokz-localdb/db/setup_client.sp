@@ -61,7 +61,7 @@ void DB_SetupClient(int client)
 	FormatEx(query, sizeof(query), sql_players_get_cheater, steamID);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetupClient, DB_TxnFailure_Generic, data, DBPrio_High);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SetupClient, DB_TxnFailure_Generic_DataPack, data, DBPrio_High);
 }
 
 public void DB_TxnSuccess_SetupClient(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
