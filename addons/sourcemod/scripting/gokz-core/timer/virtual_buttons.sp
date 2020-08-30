@@ -9,7 +9,9 @@ static int beamSprite;
 static int haloSprite;
 static float lastUsePressTime[MAXPLAYERS + 1];
 static int lastTeleportTick[MAXPLAYERS + 1];
-static bool hasStartedTimerSincePressingUse[MAXPLAYERS + 1];
+static bool startedTimerLastTick[MAXPLAYERS + 1];
+static bool onlyNaturalButtonPressed[MAXPLAYERS + 1];
+static int startTimerButtonPressTick[MAXPLAYERS + 1];
 static bool hasEndedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasTeleportedSincePressingUse[MAXPLAYERS + 1];
 static bool hasVirtualStartButton[MAXPLAYERS + 1];
@@ -90,10 +92,12 @@ void OnMapStart_VirtualButtons()
 
 void OnClientPutInServer_VirtualButtons(int client)
 {
-	hasStartedTimerSincePressingUse[client] = false;
+	startedTimerLastTick[client] = false;
 	hasVirtualEndButton[client] = false;
 	hasVirtualStartButton[client] = false;
 	virtualButtonsLocked[client] = false;
+	onlyNaturalButtonPressed[client] = false;
+	startTimerButtonPressTick[client] = 0;
 }
 
 void OnStartButtonPress_VirtualButtons(int client, int course)
@@ -104,6 +108,7 @@ void OnStartButtonPress_VirtualButtons(int client, int course)
 		Movement_GetOrigin(client, virtualStartOrigin[client]);
 		virtualStartCourse[client] = course;
 		hasVirtualStartButton[client] = true;
+		startTimerButtonPressTick[client] = GetGameTickCount();
 	}
 }
 
@@ -149,29 +154,39 @@ static void CheckForAndHandleUsage(int client, int buttons)
 	if (buttons & IN_USE && !(gI_OldButtons[client] & IN_USE))
 	{
 		lastUsePressTime[client] = GetGameTime();
-		hasStartedTimerSincePressingUse[client] = false;
 		hasEndedTimerSincePressingUse[client] = false;
 		hasTeleportedSincePressingUse[client] = false;
+		onlyNaturalButtonPressed[client] = startTimerButtonPressTick[client] == GetGameTickCount();
 	}
 	
-	if (PassesUseCheck(client))
+	bool useCheck = PassesUseCheck(client);
+	
+	// Start button
+	if ((useCheck || GOKZ_GetCoreOption(client, Option_TimerButtonZoneType) == TimerButtonZoneType_BothZones)
+		&& GetHasVirtualStartButton(client) && InRangeOfVirtualStart(client) && CanReachVirtualStart(client))
 	{
-		if (GetHasVirtualStartButton(client) && InRangeOfVirtualStart(client) && CanReachVirtualStart(client))
+		if (TimerStart(client, virtualStartCourse[client], .playSound = false))
 		{
-			if (TimerStart(
-					client, 
-					virtualStartCourse[client], 
-					.playSound = !hasStartedTimerSincePressingUse[client]))
-			{
-				hasStartedTimerSincePressingUse[client] = true;
-				OnVirtualStartButtonPress_Teleports(client);
-			}
+			startedTimerLastTick[client] = true;
+			OnVirtualStartButtonPress_Teleports(client);
 		}
-		else if (GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
+	}
+	else if (startedTimerLastTick[client])
+	{
+		// Without that check you get two sounds when pressing the natural timer button
+		if (!onlyNaturalButtonPressed[client])
 		{
-			TimerEnd(client, virtualEndCourse[client]);
-			hasEndedTimerSincePressingUse[client] = true; // False end counts as well
+			PlayTimerStartSound(client);
 		}
+		startedTimerLastTick[client] = false;
+	}
+	
+	// End button
+	if ((useCheck || GOKZ_GetCoreOption(client, Option_TimerButtonZoneType) != TimerButtonZoneType_BothButtons)
+		&& GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
+	{
+		TimerEnd(client, virtualEndCourse[client]);
+		hasEndedTimerSincePressingUse[client] = true; // False end counts as well
 	}
 }
 

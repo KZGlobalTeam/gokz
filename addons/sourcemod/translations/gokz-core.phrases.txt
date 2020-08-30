@@ -227,4 +227,23 @@
 	{
 		"en"		"Virtual button indicators"
 	}
+	"Options Menu - Timer Button Zone Type"
+	{
+		"en"		"Timer button/zone type"
+	}
+
+
+	// =====[ OPTION PHRASES ]=====
+	"Timer Button Zone Type - Both Buttons"
+	{
+		"en"		"Both buttons"
+	}
+	"Timer Button Zone Type - Only End Zone"
+	{
+		"en"		"Only end zone"
+	}
+	"Timer Button Zone Type - Both Zones"
+	{
+		"en"		"Both zones"
+	}
 }

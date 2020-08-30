@@ -69,6 +69,7 @@ enum Option:
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
 	Option_VirtualButtonIndicators, 
+	Option_TimerButtonZoneType,
 	OPTION_COUNT
 };
 
@@ -126,6 +127,14 @@ enum
 	VirtualButtonIndicators_Disabled = 0, 
 	VirtualButtonIndicators_Enabled, 
 	VIRTUALBUTTONINDICATORS_COUNT
+};
+
+enum
+{
+	TimerButtonZoneType_BothButtons = 0,
+	TimerButtonZoneType_EndZone,
+	TimerButtonZoneType_BothZones,
+	TIMERBUTTONZONETYPE_COUNT
 };
 
 enum
@@ -277,7 +286,8 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Checkpoint Sounds", 
 	"GOKZ - Teleport Sounds", 
 	"GOKZ - Error Sounds", 
-	"GOKZ - VB Indicators"
+	"GOKZ - VB Indicators",
+	"GOKZ - Timer Button Zone Type"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
@@ -289,7 +299,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Checkpoint Sounds - 0 = Disabled, 1 = Enabled", 
 	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
 	"Error Sounds - 0 = Disabled, 1 = Enabled", 
-	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled"
+	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled",
+	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -301,8 +312,16 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
 	"Options Menu - Error Sounds", 
-	"Options Menu - Virtual Button Indicators"
+	"Options Menu - Virtual Button Indicators",
+	"Options Menu - Timer Button Zone Type"
 };
+
+stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] = 
+{
+	"Timer Button Zone Type - Both Buttons",
+	"Timer Button Zone Type - Only End Zone",
+	"Timer Button Zone Type - Both Zones"
+}
 
 stock int gI_CoreOptionCounts[OPTION_COUNT] = 
 {
@@ -313,7 +332,8 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
-	VIRTUALBUTTONINDICATORS_COUNT
+	VIRTUALBUTTONINDICATORS_COUNT,
+	TIMERBUTTONZONETYPE_COUNT
 };
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
@@ -325,7 +345,8 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 
 	ErrorSounds_Enabled, 
-	VirtualButtonIndicators_Disabled
+	VirtualButtonIndicators_Disabled,
+	TimerButtonZoneType_BothButtons
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
