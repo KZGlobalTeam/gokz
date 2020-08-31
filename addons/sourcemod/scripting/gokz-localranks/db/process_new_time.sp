@@ -44,7 +44,7 @@ void DB_ProcessNewTime(int client, int steamID, int mapID, int course, int mode,
 		txn.AddQuery(query);
 	}
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_ProcessTimerEnd, DB_TxnFailure_Generic, data, DBPrio_Normal);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_ProcessTimerEnd, DB_TxnFailure_Generic_DataPack, data, DBPrio_Normal);
 }
 
 public void DB_TxnSuccess_ProcessTimerEnd(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

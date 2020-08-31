@@ -29,7 +29,7 @@ void DB_PrintRecords(int client, int mapID, int course, int mode)
 	FormatEx(query, sizeof(query), sql_getmaptoppro, mapID, course, mode, 1);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_PrintRecords, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_PrintRecords, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_PrintRecords(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
