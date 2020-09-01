@@ -1496,6 +1496,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
+	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
 	
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
 	MarkNativeAsOptional("GOKZ_GetCourse");
