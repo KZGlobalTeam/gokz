@@ -289,6 +289,7 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 */
 
 static bool validJump[MAXPLAYERS + 1];
+static float validJumpTeleportOrigin[MAXPLAYERS + 1][3];
 
 bool GetValidJump(int client)
 {
@@ -317,19 +318,12 @@ void OnStopTouchGround_ValidJump(int client, bool jumped)
 	}
 }
 
-void OnPlayerRunCmdPost_ValidJump(int client, int cmdnum)
+void OnPlayerRunCmdPost_ValidJump(int client)
 {
-	if ((gB_VelocityTeleported[client] || gB_OriginTeleported[client])
-		 && !JustHitPerfBhop(client, cmdnum))
+	if (gB_VelocityTeleported[client] || gB_OriginTeleported[client])
 	{
 		InvalidateJump(client);
 	}
-}
-
-static bool JustHitPerfBhop(int client, int cmdnum)
-{
-	return Movement_GetJumped(client) && GOKZ_GetHitPerf(client)
-	 && cmdnum == Movement_GetTakeoffCmdNum(client);
 }
 
 void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -352,6 +346,8 @@ void OnClientDisconnect_ValidJump(int client)
 
 void OnPlayerSpawn_ValidJump(int client)
 {
+	// That should definitely be out of bounds
+	CopyVector({ 40000.0, 40000.0, 40000.0 }, validJumpTeleportOrigin[client]);
 	InvalidateJump(client);
 }
 
@@ -360,8 +356,22 @@ void OnPlayerDeath_ValidJump(int client)
 	InvalidateJump(client);
 }
 
+void OnValidOriginChange_ValidJump(int client, const float origin[3])
+{
+	CopyVector(origin, validJumpTeleportOrigin[client]);
+}
+
 void OnTeleport_ValidJump(int client)
 {
+	float origin[3];
+	Movement_GetOrigin(client, origin);
+	if (gB_OriginTeleported[client] && GetVectorDistance(validJumpTeleportOrigin[client], origin, true) <= EPSILON)
+	{
+		gB_OriginTeleported[client] = false;
+		CopyVector({ 40000.0, 40000.0, 40000.0 }, validJumpTeleportOrigin[client]);
+		return;
+	}
+	
 	if (gB_OriginTeleported[client])
 	{
 		InvalidateJump(client);

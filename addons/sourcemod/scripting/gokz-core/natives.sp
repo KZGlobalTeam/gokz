@@ -36,6 +36,7 @@ void CreateNatives()
 	CreateNative("GOKZ_Resume", Native_Resume);
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
+	CreateNative("GOKZ_SetValidJumpOrigin", Native_SetValidJumpOrigin);
 	
 	CreateNative("GOKZ_GetTimerRunning", Native_GetTimerRunning);
 	CreateNative("GOKZ_GetCourse", Native_GetCourse);
@@ -316,6 +317,17 @@ public int Native_TogglePause(Handle plugin, int numParams)
 public int Native_PlayErrorSound(Handle plugin, int numParams)
 {
 	PlayErrorSound(GetNativeCell(1));
+}
+
+public int Native_SetValidJumpOrigin(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	float origin[3];
+	GetNativeArray(2, origin, sizeof(origin));
+	
+	// The order is important here!
+	OnValidOriginChange_ValidJump(client, origin);
+	Movement_SetOrigin(client, origin);
 }
 
 public int Native_GetTimerRunning(Handle plugin, int numParams)

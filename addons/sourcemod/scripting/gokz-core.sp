@@ -175,7 +175,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	
 	OnPlayerRunCmdPost_VirtualButtons(client, buttons, cmdnum); // Emulate buttons first
 	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
-	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
+	OnPlayerRunCmdPost_ValidJump(client);
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
 }
 

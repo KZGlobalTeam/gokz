@@ -560,7 +560,7 @@ void NerfRealPerf(KZPlayer player)
 		float newOrigin[3];
 		player.GetOrigin(newOrigin);
 		newOrigin[2] -= gF_OldOrigin[player.ID][2] - groundOrigin[2];
-		player.SetOrigin(newOrigin);
+		GOKZ_SetValidJumpOrigin(player.ID, newOrigin);
 	}
 	
 	delete trace;
