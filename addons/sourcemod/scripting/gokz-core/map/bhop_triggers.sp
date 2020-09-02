@@ -6,6 +6,7 @@
 
 
 static float lastTrigMultiTouchTime[MAXPLAYERS + 1];
+static float lastTrigTeleTouchTime[MAXPLAYERS + 1];
 static float lastTouchGroundTime[MAXPLAYERS + 1];
 static int triggerTouchCount[MAXPLAYERS + 1];
 
@@ -15,16 +16,15 @@ static int triggerTouchCount[MAXPLAYERS + 1];
 
 bool BhopTriggersJustTouched(int client)
 {
-	if (Movement_GetMovetype(client) == MOVETYPE_LADDER && triggerTouchCount[client] > 0)
+	if (GetEngineTime() - lastTouchGroundTime[client] < GOKZ_BHOP_NO_CHECKPOINT_TIME
+		&& GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_BHOP_NO_CHECKPOINT_TIME)
 	{
-		return GetEngineTime() - lastTouchGroundTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME
-		 && GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME;
+		return true;
 	}
-	else
-	{
-		return GetEngineTime() - lastTouchGroundTime[client] < GOKZ_BHOP_NO_CHECKPOINT_TIME
-		 && GetEngineTime() - lastTrigMultiTouchTime[client] < GOKZ_BHOP_NO_CHECKPOINT_TIME;
-	}
+	
+	return Movement_GetMovetype(client) == MOVETYPE_LADDER
+		&& triggerTouchCount[client] > 0
+		&& GetEngineTime() - lastTrigTeleTouchTime[client] < GOKZ_LADDER_NO_CHECKPOINT_TIME;
 }
 
 
@@ -41,13 +41,16 @@ void OnEntitySpawned_MapBhopTriggers(int entity)
 	char tempString[32];
 	
 	GetEntityClassname(entity, tempString, sizeof(tempString));
-	if (!StrEqual("trigger_multiple", tempString))
+	if (StrEqual("trigger_multiple", tempString))
 	{
-		return;
+		SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouchStart_MapBhopTriggers);
+		SDKHook(entity, SDKHook_EndTouchPost, OnTrigMultTouchEnd_MapBhopTriggers);
 	}
-	
-	SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouchStart_MapBhopTriggers);
-	SDKHook(entity, SDKHook_EndTouchPost, OnTrigMultTouchEnd_MapBhopTriggers);
+	else if (StrEqual("trigger_teleport", tempString))
+	{
+		SDKHook(entity, SDKHook_StartTouchPost, OnTrigTeleTouchStart_MapBhopTriggers);
+		SDKHook(entity, SDKHook_EndTouchPost, OnTrigTeleTouchEnd_MapBhopTriggers);
+	}
 }
 
 public void OnTrigMultTouchStart_MapBhopTriggers(int entity, int other)
@@ -62,6 +65,27 @@ public void OnTrigMultTouchStart_MapBhopTriggers(int entity, int other)
 }
 
 public void OnTrigMultTouchEnd_MapBhopTriggers(int entity, int other)
+{
+	if (!IsValidClient(other))
+	{
+		return;
+	}
+	
+	triggerTouchCount[other]--;
+}
+
+public void OnTrigTeleTouchStart_MapBhopTriggers(int entity, int other)
+{
+	if (!IsValidClient(other))
+	{
+		return;
+	}
+	
+	lastTrigTeleTouchTime[other] = GetEngineTime();
+	triggerTouchCount[other]++;
+}
+
+public void OnTrigTeleTouchEnd_MapBhopTriggers(int entity, int other)
 {
 	if (!IsValidClient(other))
 	{
