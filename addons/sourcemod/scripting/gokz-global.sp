@@ -105,7 +105,7 @@ public void OnAllPluginsLoaded()
 	BuildPath(Path_SM, funDisabledPath, sizeof(funDisabledPath), "plugins/disabled/funcommands.smx");
 	BuildPath(Path_SM, funEnabledPath, sizeof(funEnabledPath), "plugins/funcommands.smx");
 	BuildPath(Path_SM, playerDisabledPath, sizeof(playerDisabledPath), "plugins/disabled/playercommands.smx");
-	BuildPath(Path_SM, playerEnabledPath, sizeof(playerEnabledPath), "plugins/playercommands.smx")
+	BuildPath(Path_SM, playerEnabledPath, sizeof(playerEnabledPath), "plugins/playercommands.smx");
 	ServerCommand("sm plugins unload funcommands.smx");
 	ServerCommand("sm plugins unload playercommands.smx");
 	RenameFile(funDisabledPath, funEnabledPath);
@@ -136,6 +136,28 @@ Action MonitorClientConvars(Handle timer)
 			QueryClientConVar(client, "m_yaw", MYAWCheck, client);
 		}
 	}
+
+	Handle exists = FindPluginByFile("funcommands.smx");
+	PluginStatus loaded;
+	if (exists != INVALID_HANDLE)
+	{
+		loaded = GetPluginStatus(exists);
+		if (loaded == Plugin_Running)
+		{
+			ServerCommand("sm plugins unload funcommands.smx");
+		}
+	}
+	CloseHandle(exists);
+	exists = FindPluginByFile("playercommands.smx");
+	if (exists != INVALID_HANDLE)
+	{
+		loaded = GetPluginStatus(exists);
+		if (loaded == Plugin_Running)
+		{
+			ServerCommand("sm plugins unload playercommands.smx");
+		}
+	}
+	CloseHandle(exists);
 	
 	return Plugin_Handled;
 }
