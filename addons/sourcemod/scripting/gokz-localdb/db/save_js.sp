@@ -32,7 +32,7 @@ public void OnLanding_SaveJumpstat(Jump jump)
 		Transaction txn_noblock = SQL_CreateTransaction();
 		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jump.type, mode, 0);
 		txn_noblock.AddQuery(query);
-		SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data, DBPrio_Low);
+		SQL_ExecuteTransaction(gH_DB, txn_noblock, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 	}
 	
 	// Block
@@ -46,7 +46,7 @@ public void OnLanding_SaveJumpstat(Jump jump)
 		Transaction txn_block = SQL_CreateTransaction();
 		FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jump.type, mode, 1);
 		txn_block.AddQuery(query);
-		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic, data, DBPrio_Low);
+		SQL_ExecuteTransaction(gH_DB, txn_block, DB_TxnSuccess_LookupJSRecordForSave, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 	}
 }
 
@@ -134,7 +134,7 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 	
 	Transaction txn = SQL_CreateTransaction();
 	txn.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveJSRecord, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveJSRecord, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
@@ -192,7 +192,7 @@ public void DB_DeleteJump(int client, int steamAccountID, int jumpType, int mode
 	Transaction txn = SQL_CreateTransaction();
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_JumpDeleted, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_JumpDeleted, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

@@ -54,18 +54,7 @@ static void UpdateSpeedText(int client, HUDInfo info)
 		return;
 	}
 	
-	if (player.Alive)
-	{
-		ShowSpeedText(player, info);
-	}
-	else
-	{
-		KZPlayer targetPlayer = KZPlayer(player.ObserverTarget);
-		if (targetPlayer.ID != -1)
-		{
-			ShowSpeedText(player, info);
-		}
-	}
+	ShowSpeedText(player, info);
 }
 
 static void ClearSpeedText(int client)

@@ -69,7 +69,7 @@ void DB_JS_OpenPlayerRecord(int client, int steamid, char[] alias, int jumpType,
 	Transaction txn = SQL_CreateTransaction();
 	FormatEx(query, sizeof(query), sql_jumpstats_getrecord, steamid, jumpType, mode, block);
 	txn.AddQuery(query);
-	SQL_ExecuteTransaction(gH_DB, txn, DB_JS_TxnSuccess_OpenPlayerRecord, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_JS_TxnSuccess_OpenPlayerRecord, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_JS_TxnSuccess_OpenPlayerRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

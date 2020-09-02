@@ -46,7 +46,7 @@ void DB_SaveTimerSetup(int client)
 	
 	if (txnHasQuery)
 	{
-		SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveTimerSetup, DB_TxnFailure_Generic, data, DBPrio_Low);
+		SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveTimerSetup, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 	}
 	else
 	{
@@ -99,7 +99,7 @@ void DB_LoadTimerSetup(int client, bool doChatMessage = false)
 	FormatEx(query, sizeof(query), sql_startpos_get, steamid, gI_DBCurrentMapID);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_LoadTimerSetup, DB_TxnFailure_Generic, data, DBPrio_Normal);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_LoadTimerSetup, DB_TxnFailure_Generic_DataPack, data, DBPrio_Normal);
 }
 
 public void DB_TxnSuccess_LoadTimerSetup(Handle db, DataPack data, int numQueries, DBResultSet[] results, any[] queryData)
