@@ -126,7 +126,7 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 }
 
-Action MonitorClientConvars(Handle timer)
+Action IntegrityChecks(Handle timer)
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -137,27 +137,24 @@ Action MonitorClientConvars(Handle timer)
 		}
 	}
 
-	Handle exists = FindPluginByFile("funcommands.smx");
-	PluginStatus loaded;
-	if (exists != INVALID_HANDLE)
+	for(int i = 0; i < BANNEDPLUGIN_COUNT; i++)
 	{
-		loaded = GetPluginStatus(exists);
-		if (loaded == Plugin_Running)
+		Handle bannedPlugin = FindPluginByFile(gC_BannedPlugins[i]);
+		if (bannedPlugin != INVALID_HANDLE)
 		{
-			ServerCommand("sm plugins unload funcommands.smx");
+			PluginStatus isLoaded = GetPluginStatus(bannedPlugin);
+			if (isLoaded == Plugin_Running)
+			{
+				ServerCommand("sm plugins unload %s", gC_BannedPlugins[i]);
+				char disabledPath[256], enabledPath[256];
+				BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", gC_BannedPlugins[i]);
+				BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/%s", gC_BannedPlugins[i]);
+				RenameFile(disabledPath, enabledPath);
+				PrintToServer("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", gC_BannedPlugins[i], gC_BannedPlugins[i]);
+			}
+			CloseHandle(bannedPlugin);
 		}
 	}
-	CloseHandle(exists);
-	exists = FindPluginByFile("playercommands.smx");
-	if (exists != INVALID_HANDLE)
-	{
-		loaded = GetPluginStatus(exists);
-		if (loaded == Plugin_Running)
-		{
-			ServerCommand("sm plugins unload playercommands.smx");
-		}
-	}
-	CloseHandle(exists);
 	
 	return Plugin_Handled;
 }
@@ -279,7 +276,7 @@ public void OnMapStart()
 	}
 	
 	// Setup a timer to monitor client convars
-	CreateTimer(1.0, MonitorClientConvars, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(1.0, IntegrityChecks, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
 public void OnConfigsExecuted()

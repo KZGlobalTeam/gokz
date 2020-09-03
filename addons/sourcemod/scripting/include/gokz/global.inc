@@ -30,6 +30,13 @@ enum
 	ENFORCEDCVAR_COUNT
 };
 
+enum
+{
+	BannedPlugin_Funcommands = 0,
+	BannedPlugin_Playercommands,
+	BANNEDPLUGIN_COUNT
+};
+
 
 
 // =====[ CONSTANTS ]=====
@@ -52,6 +59,12 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 	"sv_maxcmdrate",
 	"sv_client_cmdrate_difference",
 	"sv_turbophysics"
+};
+
+stock char gC_BannedPlugins[BANNEDPLUGIN_COUNT][] = 
+{
+	"funcommands.smx",
+	"playercommands.smx"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
