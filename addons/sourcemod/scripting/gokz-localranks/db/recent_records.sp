@@ -27,7 +27,7 @@ void DB_OpenRecentRecords(int client, int mode, int timeType)
 	}
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenRecentRecords, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenRecentRecords, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_OpenRecentRecords(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

@@ -155,22 +155,24 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 		return Plugin_Continue;
 	}
 
+	int numNewClients = 0;
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = clients[i];
-		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Disabled && client != entity)
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled || entity == client)
 		{
-			for (int j = i; j < numClients - 1; j++)
-			{
-				clients[j] = clients[j+1];
-			}
-
-			numClients--;
-			i--;
+			clients[numNewClients] = client;
+			numNewClients++;
 		}
 	}
+	
+	if (numNewClients != numClients) 
+	{
+		numClients = numNewClients;
+		return Plugin_Changed;
+	}
 
-	return (numClients > 0) ? Plugin_Changed : Plugin_Stop;
+	return Plugin_Continue;
 }
 
 public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay)

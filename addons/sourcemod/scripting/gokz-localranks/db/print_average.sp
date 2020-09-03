@@ -28,7 +28,7 @@ void DB_PrintAverage(int client, int mapID, int course, int mode)
 	FormatEx(query, sizeof(query), sql_getaverage_pro, mapID, course, mode);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_PrintAverage, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_PrintAverage, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_PrintAverage(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
