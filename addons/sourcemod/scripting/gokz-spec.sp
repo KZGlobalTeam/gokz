@@ -13,12 +13,12 @@
 
 
 
-public Plugin myinfo = 
+public Plugin myinfo =
 {
-	name = "GOKZ Spectate Menu", 
-	author = "DanZay", 
-	description = "Provides easy ways to spectate players", 
-	version = GOKZ_VERSION, 
+	name = "GOKZ Spectate Menu",
+	author = "DanZay",
+	description = "Provides easy ways to spectate players",
+	version = GOKZ_VERSION,
 	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
@@ -39,7 +39,7 @@ public void OnPluginStart()
 	LoadTranslations("common.phrases");
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-spec.phrases");
-	
+
 	RegisterCommands();
 }
 
@@ -85,7 +85,7 @@ bool Spectate(int client)
 	{
 		return false;
 	}
-	
+
 	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
 	return true;
 }
@@ -97,7 +97,7 @@ bool SpectatePlayer(int client, int target, bool printMessage = true)
 	{
 		return false;
 	}
-	
+
 	if (target == client)
 	{
 		if (printMessage)
@@ -116,11 +116,11 @@ bool SpectatePlayer(int client, int target, bool printMessage = true)
 		}
 		return false;
 	}
-	
+
 	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
 	SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
 	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", target);
-	
+
 	return true;
 }
 
@@ -136,7 +136,7 @@ public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2
 		char info[16];
 		menu.GetItem(param2, info, sizeof(info));
 		int target = GetClientOfUserId(StringToInt(info));
-		
+
 		if (!IsValidClient(target))
 		{
 			GOKZ_PrintToChat(param1, true, "%t", "Player No Longer Valid");
@@ -158,7 +158,7 @@ public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2
 int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 {
 	char display[MAX_NAME_LENGTH + 4];
-	int targetCount = 0;	
+	int targetCount = 0;
 	int latestResult;
 
 	for (int i = 1; i <= MaxClients; i++)
@@ -170,7 +170,7 @@ int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 		if (useFilter)
 		{
 			FormatEx(display, sizeof(display), "%N", i);
-			if (StrContains(display, filter, false) != -1) 
+			if (StrContains(display, filter, false) != -1)
 			{
 				if (IsFakeClient(i))
 				{
@@ -207,7 +207,7 @@ int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 		SpectatePlayer(client, latestResult);
 		return 0; // No menu needed
 	}
-	
+
 	return targetCount;
 }
 
@@ -246,9 +246,9 @@ public Action CommandSpec(int client, int args)
 
 		if ((targetCount = ProcessTargetString(
 			specifiedPlayer,
-			client, 
-			targetList, 
-			1, 
+			client,
+			targetList,
+			1,
 			flags,
 			targetName,
 			sizeof(targetName),
@@ -264,7 +264,7 @@ public Action CommandSpec(int client, int args)
 		{
 			ReplyToTargetError(client, targetCount);
 		}
-		
+
 	}
 	return Plugin_Handled;
 }
@@ -273,11 +273,11 @@ public Action CommandSpecs(int client, int args)
 {
 	int specs = 0;
 	char specNames[1024];
-	
+
 	int target = IsPlayerAlive(client) ? client : GetObserverTarget(client);
 	int targetSpecs = 0;
 	char targetSpecNames[1024];
-	
+
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsClientInGame(i) && !IsFakeClient(i) && IsSpectating(i))
@@ -291,7 +291,7 @@ public Action CommandSpecs(int client, int args)
 			{
 				Format(specNames, sizeof(specNames), "%s{grey}, {lime}%N", specNames, i);
 			}
-			
+
 			if (target != -1 && GetObserverTarget(i) == target)
 			{
 				targetSpecs++;
@@ -306,7 +306,7 @@ public Action CommandSpecs(int client, int args)
 			}
 		}
 	}
-	
+
 	if (specs == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Spectator List (None)");
@@ -323,4 +323,4 @@ public Action CommandSpecs(int client, int args)
 			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List", target, targetSpecs, targetSpecNames);
 		}
 	}
-} 
+}
