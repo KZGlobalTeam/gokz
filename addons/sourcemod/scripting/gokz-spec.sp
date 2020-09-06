@@ -242,7 +242,7 @@ public Action CommandSpec(int client, int args)
 		char targetName[MAX_TARGET_LENGTH];
 		int targetList[1], targetCount;
 		bool tnIsML;
-		int flags = COMMAND_FILTER_NO_MULTI || COMMAND_FILTER_NO_IMMUNITY || COMMAND_FILTER_ALIVE;
+		int flags = COMMAND_FILTER_NO_MULTI | COMMAND_FILTER_NO_IMMUNITY | COMMAND_FILTER_ALIVE;
 
 		if ((targetCount = ProcessTargetString(
 			specifiedPlayer,
