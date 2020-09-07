@@ -64,7 +64,9 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 			data.WriteCell(GetClientUserId(param1));
 			data.WriteCell(GetClientUserId(botClient));
 
-			CreateTimer(0.2, Timer_ResetSpectate, param1);
+			int clientUserID = GetClientUserId(param1);
+
+			CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
 			CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
 			EnableReplayControls(param1);
 		}
@@ -84,8 +86,9 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 	}
 }
 
-public Action Timer_ResetSpectate(Handle timer, int client)
+public Action Timer_ResetSpectate(Handle timer, int clientUID)
 {
+	int client = GetClientOfUserId(clientUID);
 	if (IsValidClient(client))
 	{
 		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
