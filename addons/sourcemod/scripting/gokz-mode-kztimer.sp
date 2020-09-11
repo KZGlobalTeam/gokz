@@ -67,6 +67,7 @@ float gF_PreVelMod[MAXPLAYERS + 1];
 float gF_PreVelModLastChange[MAXPLAYERS + 1];
 int gI_PreTickCounter[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
+int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
@@ -159,6 +160,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	TweakVelMod(player);
 	ReduceDuckSlowdown(player);
 	FixWaterBoost(player, buttons);
+	FixDisplacementStuck(player);
 	if (gB_Jumpbugged[player.ID])
 	{
 		TweakJumpbug(player);
@@ -166,6 +168,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	
 	gB_Jumpbugged[player.ID] = false;
 	gI_OldButtons[player.ID] = buttons;
+	gI_OldFlags[player.ID] = GetEntityFlags(client);
 	gB_OldOnGround[player.ID] = Movement_GetOnGround(client);
 	gF_OldAngles[player.ID] = angles;
 	Movement_GetVelocity(client, gF_OldVelocity[client]);
@@ -608,6 +611,28 @@ void FixWaterBoost(KZPlayer player, int buttons)
 			{
 				TeleportEntity(player.ID, newOrigin, NULL_VECTOR, NULL_VECTOR);
 			}
+		}
+	}
+}
+
+void FixDisplacementStuck(KZPlayer player)
+{
+	int flags = GetEntityFlags(player.ID);
+	bool unducked = ~flags & FL_DUCKING && gI_OldFlags[player.ID] & FL_DUCKING;
+	
+	float standingMins[] = {-16.0, -16.0, 72.0};
+	float standingMaxs[] = {16.0, 16.0, 72.0};
+	
+	if (unducked)
+	{
+		// check if we're stuck after unducking and if we're stuck then force duck
+		float origin[3];
+		Movement_GetOrigin(player.ID, origin);
+		TR_TraceHullFilter(origin, origin, standingMins, standingMaxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+		
+		if (TR_DidHit())
+		{
+			SetEntProp(player.ID, Prop_Send, "m_bDucking", true);
 		}
 	}
 }
