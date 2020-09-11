@@ -620,7 +620,7 @@ void FixDisplacementStuck(KZPlayer player)
 	int flags = GetEntityFlags(player.ID);
 	bool unducked = ~flags & FL_DUCKING && gI_OldFlags[player.ID] & FL_DUCKING;
 	
-	float standingMins[] = {-16.0, -16.0, 72.0};
+	float standingMins[] = {-16.0, -16.0, 0.0};
 	float standingMaxs[] = {16.0, 16.0, 72.0};
 	
 	if (unducked)
