@@ -678,6 +678,7 @@ void FixDisplacementStuck(KZPlayer player)
 		
 		if (TR_DidHit())
 		{
+			player.SetVelocity(gF_OldVelocity[player.ID]);
 			SetEntProp(player.ID, Prop_Send, "m_bDucking", true);
 		}
 	}
