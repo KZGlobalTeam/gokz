@@ -168,16 +168,13 @@ int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 			continue;
 		}
 		if (useFilter)
-		{			
+		{	
+			FormatEx(display, sizeof(display), "%N", i);		
 			if (StrContains(display, filter, false) != -1) 
 			{
 				if (IsFakeClient(i))
 				{
 					FormatEx(display, sizeof(display), "BOT %N", i);
-				}
-				else
-				{
-					FormatEx(display, sizeof(display), "%N", i);
 				}
 			}
 			else // If it doesn't fit the filter, move on
