@@ -4,17 +4,18 @@
 #include "dhooks"
 
 #include <gokz/core>
+#include <gokz/momsurffix>
 
 #define SNAME "[momsurffix2] "
-#define GAME_DATA_FILE "gokz.games"
+#define GAME_DATA_FILE "momsurffix2.games"
 //#define DEBUG_PROFILE
 //#define DEBUG_MEMTEST
 
 public Plugin myinfo = {
     name = "Momentum surf fix \'2",
     author = "GAMMA CASE",
-    description = "Ported surf fix from momentum mod. Modified for GOKZ by GameChaos.",
-    version = "1.0.0",
+    description = "Ported surf fix from momentum mod. Modified for GOKZ by GameChaos. Original source code: https://github.com/GAMMACASE/MomSurfFix",
+    version = GOKZ_VERSION,
     url = "http://steamcommunity.com/id/_GAMMACASE_/"
 };
 
@@ -71,6 +72,12 @@ float gProfTime;
 #define PROF_START%1;
 #define PROF_STOP%1;
 #endif
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	RegPluginLibrary("gokz-momsurffix");
+	return APLRes_Success;
+}
 
 public void OnPluginStart()
 {
