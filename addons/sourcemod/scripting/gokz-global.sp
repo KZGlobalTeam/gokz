@@ -211,7 +211,7 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	}
 }
 
-public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall)
+public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime)
 {
 	AnnounceNewTopTime(client, course, mode, timeType, rank, rankOverall);
 }
