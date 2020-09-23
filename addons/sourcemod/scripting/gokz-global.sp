@@ -137,22 +137,32 @@ Action IntegrityChecks(Handle timer)
 		}
 	}
 
-	for(int i = 0; i < BANNEDPLUGIN_COUNT; i++)
+	for (int i = 0; i < COMMAND_COUNT; i++)
 	{
-		Handle bannedPlugin = FindPluginByFile(gC_BannedPlugins[i]);
-		if (bannedPlugin != INVALID_HANDLE)
+		if (CommandExists(gC_CheckCommands[i]))
 		{
-			PluginStatus isLoaded = GetPluginStatus(bannedPlugin);
-			if (isLoaded == Plugin_Running)
+			Handle bannedIterator = GetPluginIterator();
+			char pluginName[128]; 
+			while (MorePlugins(bannedIterator))
 			{
-				ServerCommand("sm plugins unload %s", gC_BannedPlugins[i]);
-				char disabledPath[256], enabledPath[256];
-				BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", gC_BannedPlugins[i]);
-				BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/%s", gC_BannedPlugins[i]);
-				RenameFile(disabledPath, enabledPath);
-				PrintToServer("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", gC_BannedPlugins[i], gC_BannedPlugins[i]);
+				Handle bannedPlugin = ReadPlugin(bannedIterator);
+				GetPluginInfo(bannedPlugin, PlInfo_Name, pluginName, sizeof(pluginName));
+				if (StrEqual(pluginName, gC_BannedPlugins[i]))
+				{
+					char pluginPath[128];
+					GetPluginFilename(bannedPlugin, pluginPath, sizeof(pluginPath));
+					ServerCommand("sm plugins unload %s", pluginPath);
+					char disabledPath[256], enabledPath[256];
+					BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", pluginPath);
+					BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/%s", pluginPath);
+					RenameFile(disabledPath, enabledPath);
+					PrintToServer("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", pluginName, pluginName);
+					CloseHandle(bannedPlugin);
+					break;
+				}
+				CloseHandle(bannedPlugin);
 			}
-			CloseHandle(bannedPlugin);
+			CloseHandle(bannedIterator);
 		}
 	}
 	

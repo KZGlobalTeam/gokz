@@ -32,6 +32,13 @@ enum
 
 enum
 {
+	Command_Funcommands = 0,
+	Command_Playercommands,
+	COMMAND_COUNT
+};
+
+enum
+{
 	BannedPlugin_Funcommands = 0,
 	BannedPlugin_Playercommands,
 	BANNEDPLUGIN_COUNT
@@ -61,10 +68,16 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 	"sv_turbophysics"
 };
 
+stock char gC_CheckCommands[COMMAND_COUNT][] =
+{
+	"sm_beacon",
+	"sm_slap"
+};
+
 stock char gC_BannedPlugins[BANNEDPLUGIN_COUNT][] = 
 {
-	"funcommands.smx",
-	"playercommands.smx"
+	"Fun Commands",
+	"Player Commands"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
