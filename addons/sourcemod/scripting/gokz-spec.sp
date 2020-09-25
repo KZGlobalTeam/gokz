@@ -63,11 +63,11 @@ public void OnLibraryAdded(const char[] name)
 
 // =====[ SPEC MENU ]=====
 
-int DisplaySpecMenu(int client)
+int DisplaySpecMenu(int client, bool useFilter = false, char[] filter = "")
 {
 	Menu menu = new Menu(MenuHandler_Spec);
 	menu.SetTitle("%T", "Spec Menu - Title", client);
-	int menuItems = SpecMenuAddItems(client, menu);
+	int menuItems = SpecMenuAddItems(client, menu, useFilter, filter);
 	if (menuItems == 0)
 	{
 		delete menu;
@@ -155,29 +155,53 @@ public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2
 }
 
 // Returns number of items added to the menu
-int SpecMenuAddItems(int client, Menu menu)
+int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 {
 	char display[MAX_NAME_LENGTH + 4];
-	int targetCount = 0;
-	
+	int targetCount = 0;	
+	int latestResult;
+
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (!IsClientInGame(i) || !IsPlayerAlive(i) || i == client)
 		{
 			continue;
 		}
-		
-		if (IsFakeClient(i))
-		{
-			FormatEx(display, sizeof(display), "BOT %N", i);
+		if (useFilter)
+		{	
+			FormatEx(display, sizeof(display), "%N", i);		
+			if (StrContains(display, filter, false) != -1) 
+			{
+				if (IsFakeClient(i))
+				{
+					FormatEx(display, sizeof(display), "BOT %N", i);
+				}
+			}
+			else // If it doesn't fit the filter, move on
+			{
+				continue;
+			}
 		}
 		else
 		{
-			FormatEx(display, sizeof(display), "%N", i);
+			if (IsFakeClient(i))
+			{
+				FormatEx(display, sizeof(display), "BOT %N", i);
+			}
+			else
+			{
+				FormatEx(display, sizeof(display), "%N", i);
+			}
 		}
-		
+		latestResult = i;
 		menu.AddItem(IntToStringEx(GetClientUserId(i)), display, ITEMDRAW_DEFAULT);
 		targetCount++;
+	}
+	// The only spectate-able player is the latest result, this happens when the player issuing the command also fits in the filter
+	if (targetCount == 1)
+	{
+		SpectatePlayer(client, latestResult);
+		return 0; // No menu needed
 	}
 	
 	return targetCount;
@@ -210,12 +234,33 @@ public Action CommandSpec(int client, int args)
 	{
 		char specifiedPlayer[MAX_NAME_LENGTH];
 		GetCmdArg(1, specifiedPlayer, sizeof(specifiedPlayer));
-		
-		int target = FindTarget(client, specifiedPlayer, false, false);
-		if (target != -1)
+
+		char targetName[MAX_TARGET_LENGTH];
+		int targetList[1], targetCount;
+		bool tnIsML;
+		int flags = COMMAND_FILTER_NO_MULTI | COMMAND_FILTER_NO_IMMUNITY | COMMAND_FILTER_ALIVE;
+
+		if ((targetCount = ProcessTargetString(
+			specifiedPlayer,
+			client, 
+			targetList, 
+			1, 
+			flags,
+			targetName,
+			sizeof(targetName),
+			tnIsML)) == 1)
 		{
-			SpectatePlayer(client, target);
+			SpectatePlayer(client, targetList[0]);
 		}
+		else if (targetCount == COMMAND_TARGET_AMBIGUOUS)
+		{
+			DisplaySpecMenu(client, true, specifiedPlayer);
+		}
+		else
+		{
+			ReplyToTargetError(client, targetCount);
+		}
+		
 	}
 	return Plugin_Handled;
 }
