@@ -19,7 +19,6 @@ static bool jumpBugged[MAXPLAYERS + 1];
 
 static ConVar cvGravity;
 
-static Handle passesTriggerFilters;
 static Handle processMovementHookPre;
 static Address serverGameEnts;
 static Handle markEntitiesAsTouching;
@@ -36,18 +35,6 @@ public void OnPluginStart_Triggerfix()
 	
 	Handle gamedataConf = LoadGameConfigFile("rngfix.games");
 	if (gamedataConf == null) SetFailState("Failed to load rngfix gamedata");
-	
-	// PassesTriggerFilters
-	StartPrepSDKCall(SDKCall_Entity);
-	if (!PrepSDKCall_SetFromConf(gamedataConf, SDKConf_Virtual, "CBaseTrigger::PassesTriggerFilters"))
-	{
-		SetFailState("Failed to get CBaseTrigger::PassesTriggerFilters offset");
-	}
-	PrepSDKCall_SetReturnInfo(SDKType_Bool, SDKPass_Plain);
-	PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
-	passesTriggerFilters = EndPrepSDKCall();
-	
-	if (passesTriggerFilters == null) SetFailState("Unable to prepare SDKCall for CBaseTrigger::PassesTriggerFilters");
 	
 	// CreateInterface
 	// Thanks SlidyBat and ici
