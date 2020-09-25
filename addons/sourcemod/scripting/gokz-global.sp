@@ -156,13 +156,13 @@ Action IntegrityChecks(Handle timer)
 					BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", pluginPath);
 					BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/%s", pluginPath);
 					RenameFile(disabledPath, enabledPath);
-					PrintToServer("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", pluginName, pluginName);
-					CloseHandle(bannedPlugin);
+					LogError("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", pluginName, pluginName);
+					delete bannedPlugin;
 					break;
 				}
-				CloseHandle(bannedPlugin);
+				delete bannedPlugin;
 			}
-			CloseHandle(bannedIterator);
+			delete bannedIterator;
 		}
 	}
 	
