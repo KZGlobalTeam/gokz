@@ -6,10 +6,10 @@ static GlobalForward H_OnNewTopTime;
 
 void CreateGlobalForwards()
 {
-	H_OnNewTopTime = new GlobalForward("GOKZ_GL_OnNewTopTime", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnNewTopTime = new GlobalForward("GOKZ_GL_OnNewTopTime", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float);
 }
 
-void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall)
+void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float time)
 {
 	Call_StartForward(H_OnNewTopTime);
 	Call_PushCell(client);
@@ -18,6 +18,7 @@ void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank,
 	Call_PushCell(timeType);
 	Call_PushCell(rank);
 	Call_PushCell(rankOverall);
+	Call_PushFloat(time);
 	Call_Finish();
 }
 
