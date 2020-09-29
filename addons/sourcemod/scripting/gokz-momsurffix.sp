@@ -43,11 +43,8 @@ EngineVersion gEngineVersion;
 #include "momsurffix/gametrace.sp"
 #include "momsurffix/gamemovement.sp"
 
-ConVar gRampBumpCount,
-	gBounce,
-	gRampInitialRetraceLength,
-	gASMOptimizations,
-	gNoclipWorkAround;
+ConVar gBounce,
+	gASMOptimizations;
 
 float vec3_origin[3] = {0.0, 0.0, 0.0};
 bool gBasePlayerLoadedTooEarly;
@@ -88,10 +85,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_mom_prof", SM_Prof, ADMFLAG_ROOT, "Profiles performance of some expensive parts. Mainly for debugging.");
 #endif
 	
-	gRampBumpCount = CreateConVar("momsurffix_ramp_bumpcount", "8", "Helps with fixing surf/ramp bugs", .hasMin = true, .min = 4.0, .hasMax = true, .max = 16.0);
-	gRampInitialRetraceLength = CreateConVar("momsurffix_ramp_initial_retrace_length", "0.2", "Amount of units used in offset for retraces", .hasMin = true, .min = 0.2, .hasMax = true, .max = 5.0);
 	gASMOptimizations = CreateConVar("momsurffix_enable_asm_optimizations", "1", "Enables ASM optimizations, that may improve performance of the plugin", .hasMin = true, .min = 0.0, .hasMax = true, .max = 1.0);
-	gNoclipWorkAround = CreateConVar("momsurffix_enable_noclip_workaround", "1", "Enables workaround to prevent issue #1, can actually help if momsuffix_enable_asm_optimizations is 0", .hasMin = true, .min = 0.0, .hasMax = true, .max = 1.0);
 	gBounce = FindConVar("sv_bounce");
 	ASSERT_MSG(gBounce, "\"sv_bounce\" convar wasn't found!");
 	
@@ -274,7 +268,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 {
 	float original_velocity[3], primal_velocity[3], fixed_origin[3], valid_plane[3], new_velocity[3], end[3], dir[3];
 	float allFraction, d, time_left = GetGameFrameTime(), planes[MAX_CLIP_PLANES][3];
-	int bumpcount, blocked, numplanes, numbumps = gRampBumpCount.IntValue, i, j, h;
+	int bumpcount, blocked, numplanes, numbumps = 8, i, j, h;
 	bool stuck_on_ramp, has_valid_plane;
 	CGameTrace pm = CGameTrace();
 	
@@ -293,6 +287,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 	if(alloced_vector2.Address == Address_Null)
 		alloced_vector2 = Vector();
 	
+	float rampInitialRetraceLength = 0.2;
 	for(bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
 		if(vecVelocity.LengthSqr() == 0.0)
@@ -341,12 +336,12 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 				alloced_vector.ToArray(valid_plane);
 			}
 			//TODO: should be replaced with normal solution!! Currently hack to fix issue #1.
-			else if(!gNoclipWorkAround.BoolValue || (vecVelocity.z < -6.25 || vecVelocity.z > 0.0))
+			else if((vecVelocity.z < -6.25 || vecVelocity.z > 0.0))
 			{
 				//Quite heavy part of the code, should not be triggered much or else it'll impact performance by a lot!!!
 				float offsets[3];
-				offsets[0] = (float(bumpcount) * 2.0) * -gRampInitialRetraceLength.FloatValue;
-				offsets[2] = (float(bumpcount) * 2.0) * gRampInitialRetraceLength.FloatValue;
+				offsets[0] = (float(bumpcount) * 2.0) * -rampInitialRetraceLength;
+				offsets[2] = (float(bumpcount) * 2.0) * rampInitialRetraceLength;
 				int valid_planes = 0;
 				
 				VectorCopy(view_as<float>({0.0, 0.0, 0.0}), valid_plane);
@@ -364,9 +359,9 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 							offset[1] = offsets[j];
 							offset[2] = offsets[h];
 							
-							VectorCopy(offset, offset_mins);
+							offset_mins = offset;
 							ScaleVector(offset_mins, 0.5);
-							VectorCopy(offset, offset_maxs);
+							offset_maxs = offset;
 							ScaleVector(offset_maxs, 0.5);
 							
 							if(offset[0] > 0.0)
@@ -432,7 +427,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 			
 			if(has_valid_plane)
 			{
-				VectorMA(fixed_origin, gRampInitialRetraceLength.FloatValue, valid_plane, fixed_origin);
+				VectorMA(fixed_origin, rampInitialRetraceLength, valid_plane, fixed_origin);
 			}
 			else
 			{
