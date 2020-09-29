@@ -89,7 +89,7 @@ public void OnPluginStart()
 	gBounce = FindConVar("sv_bounce");
 	ASSERT_MSG(gBounce, "\"sv_bounce\" convar wasn't found!");
 	
-	AutoExecConfig();
+	AutoExecConfig(.name = "gokz/gokz-momsurffix");
 	
 	GameData gd = new GameData(GAME_DATA_FILE);
 	ASSERT_FINAL(gd);
