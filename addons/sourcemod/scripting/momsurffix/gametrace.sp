@@ -220,19 +220,19 @@ methodmap Ray_t < AllocatableBase
 	property Address m_pWorldAxisTransform
 	{
 		public get() { return view_as<Address>(LoadFromAddress(this.Address + offsets.rtoffsets.m_pWorldAxisTransform, NumberType_Int32)); }
-		public set(Address _worldaxistransform) { StoreToAddress(this.Address + offsets.rtoffsets.m_pWorldAxisTransform, view_as<int>(_worldaxistransform), NumberType_Int32); }
+		public set(Address _worldaxistransform) { StoreToAddressCustom(this.Address + offsets.rtoffsets.m_pWorldAxisTransform, view_as<int>(_worldaxistransform), NumberType_Int32); }
 	}
 	
 	property bool m_IsRay
 	{
 		public get() { return view_as<bool>(LoadFromAddress(this.Address + offsets.rtoffsets.m_IsRay, NumberType_Int8)); }
-		public set(bool _isray) { StoreToAddress(this.Address + offsets.rtoffsets.m_IsRay, _isray, NumberType_Int8); }
+		public set(bool _isray) { StoreToAddressCustom(this.Address + offsets.rtoffsets.m_IsRay, _isray, NumberType_Int8); }
 	}
 	
 	property bool m_IsSwept
 	{
 		public get() { return view_as<bool>(LoadFromAddress(this.Address + offsets.rtoffsets.m_IsSwept, NumberType_Int8)); }
-		public set(bool _isswept) { StoreToAddress(this.Address + offsets.rtoffsets.m_IsSwept, _isswept, NumberType_Int8); }
+		public set(bool _isswept) { StoreToAddressCustom(this.Address + offsets.rtoffsets.m_IsSwept, _isswept, NumberType_Int8); }
 	}
 	
 	public Ray_t()
