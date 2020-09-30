@@ -333,6 +333,7 @@ void PrintGlobalCheckToChat(int client)
 	GOKZ_PrintToChat(client, true, "%t", "Global Check Header");
 	GOKZ_PrintToChat(client, false, "%t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
+		gB_BannedCommandsCheck ? "{green}✓" : "{darkred}X",
 		gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X", 
 		gB_GloballyVerified[client] ? "{green}✓" : "{darkred}X");
