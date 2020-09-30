@@ -157,11 +157,7 @@ Action IntegrityChecks(Handle timer)
 			if (!foundPlugin && gB_BannedCommandsCheck)
 			{
 				gB_BannedCommandsCheck = false;
-				LogError("[gokz-global] You can't have a plugin which implements the %s command. Please disable it.", gC_BannedPluginCommands[i]);
-			}
-			else
-			{
-				gB_BannedCommandsCheck = true;
+				LogError("You can't have a plugin which implements the %s command. Please disable it and reload the map.", gC_BannedPluginCommands[i]);
 			}
 			delete bannedIterator;
 		}
@@ -275,6 +271,8 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] 
 public void OnMapStart()
 {
 	LoadSounds();
+
+	gB_BannedCommandsCheck = true;
 	
 	// Prevent just reloading the plugin after messing with the map
 	if (gB_JustLateLoaded)
