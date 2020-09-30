@@ -32,9 +32,9 @@ enum
 
 enum
 {
-	Command_Funcommands = 0,
-	Command_Playercommands,
-	COMMAND_COUNT
+	BannedPluginCommand_Funcommands = 0,
+	BannedPluginCommand_Playercommands,
+	BANNEDPLUGINCOMMAND_COUNT
 };
 
 enum
@@ -68,7 +68,7 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 	"sv_turbophysics"
 };
 
-stock char gC_CheckCommands[COMMAND_COUNT][] =
+stock char gC_BannedPluginCommands[BANNEDPLUGINCOMMAND_COUNT][] =
 {
 	"sm_beacon",
 	"sm_slap"

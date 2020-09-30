@@ -137,9 +137,9 @@ Action IntegrityChecks(Handle timer)
 		}
 	}
 
-	for (int i = 0; i < COMMAND_COUNT; i++)
+	for (int i = 0; i < BANNEDPLUGINCOMMAND_COUNT; i++)
 	{
-		if (CommandExists(gC_CheckCommands[i]))
+		if (CommandExists(gC_BannedPluginCommands[i]))
 		{
 			Handle bannedIterator = GetPluginIterator();
 			char pluginName[128]; 
