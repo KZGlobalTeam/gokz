@@ -38,6 +38,7 @@ bool gB_GOKZLocalDB;
 
 bool gB_APIKeyCheck;
 bool gB_ModeCheck[MODE_COUNT];
+bool gB_BannedCommandsCheck;
 char gC_CurrentMap[64];
 char gC_CurrentMapPath[PLATFORM_MAX_PATH];
 bool gB_InValidRun[MAXPLAYERS + 1];
@@ -132,6 +133,7 @@ Action IntegrityChecks(Handle timer)
 		{
 			Handle bannedIterator = GetPluginIterator();
 			char pluginName[128]; 
+			bool foundPlugin = false;
 			while (MorePlugins(bannedIterator))
 			{
 				Handle bannedPlugin = ReadPlugin(bannedIterator);
@@ -147,9 +149,19 @@ Action IntegrityChecks(Handle timer)
 					RenameFile(disabledPath, enabledPath);
 					LogError("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", pluginName, pluginName);
 					delete bannedPlugin;
+					foundPlugin = true;
 					break;
 				}
 				delete bannedPlugin;
+			}
+			if (!foundPlugin && gB_BannedCommandsCheck)
+			{
+				gB_BannedCommandsCheck = false;
+				LogError("[gokz-global] You can't have a plugin which implements the %s command. Please disable it.", gC_BannedPluginCommands[i]);
+			}
+			else
+			{
+				gB_BannedCommandsCheck = true;
 			}
 			delete bannedIterator;
 		}
@@ -274,7 +286,7 @@ public void OnMapStart()
 		gB_EnforcerOnFreshMap = true;
 	}
 	
-	// Setup a timer to monitor client convars
+	// Setup a timer to monitor server/client integrity
 	CreateTimer(1.0, IntegrityChecks, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
@@ -302,18 +314,13 @@ public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)
 	return Plugin_Stop;
 }
 
-public void GOKZ_OnSlap(int client)
-{
-	GOKZ_StopTimer(client);
-}
-
 
 
 // =====[ PUBLIC ]=====
 
 bool GlobalsEnabled(int mode)
 {
-	return gB_APIKeyCheck && gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap && MapCheck() && gB_ModeCheck[mode];
+	return gB_APIKeyCheck && gB_BannedCommandsCheck && gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap && MapCheck() && gB_ModeCheck[mode];
 }
 
 bool MapCheck()
