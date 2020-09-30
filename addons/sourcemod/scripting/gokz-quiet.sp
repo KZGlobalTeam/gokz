@@ -159,9 +159,8 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = clients[i];
-		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Disabled
-			 && client != entity
-			 && entity != GetObserverTarget(client))
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers])
+			|| entity == GetObserverTarget(client))
 		{
 			clients[numNewClients] = client;
 			numNewClients++;
