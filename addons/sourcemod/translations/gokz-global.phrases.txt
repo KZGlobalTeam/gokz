@@ -141,9 +141,9 @@
 	{
 		// API Key X | Settings Enforcer X | Map X | You X
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{grey}API Key {1}{grey} | Banned Commands {2}{grey} | Settings Enforcer {3}{grey} | Map {4}{grey} | You {5}"
-		"chi"		"{grey}API Key {1}{grey} | Banned Commands {2}{grey} | Settings Enforcer {3}{grey} | Map {4}{grey} | You {5}"
-		"ru"		"{grey}Ключ API {1}{grey} | Запрещенные команды {2}{grey} | Настройки Enforcer {3}{grey} | Карта {4}{grey} | Ты {5}"
+		"en"		"{grey}API Key {1}{grey} | Plugins {2}{grey} | Settings Enforcer {3}{grey} | Map {4}{grey} | You {5}"
+		"chi"		"{grey}API Key {1}{grey} | Plugins {2}{grey} | Settings Enforcer {3}{grey} | Map {4}{grey} | You {5}"
+		"ru"		"{grey}Ключ API {1}{grey} | Плагины {2}{grey} | Настройки Enforcer {3}{grey} | Карта {4}{grey} | Ты {5}"
 	}
 	"Kick Player fps_max"
 	{
