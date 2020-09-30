@@ -107,8 +107,9 @@ stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =
  * @param timeType		Time type i.e. NUB or PRO.
  * @param rank			Ranking within the same time type.
  * @param rankOverall	Overall (NUB and PRO) ranking (0 if not ranked high enough).
+ * @param runTime		Player's end time.
  */
-forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall);
+forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime);
 
 
 
