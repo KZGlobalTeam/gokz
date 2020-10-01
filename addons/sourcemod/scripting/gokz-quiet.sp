@@ -159,7 +159,9 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = clients[i];
-		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled || entity == client)
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
+			|| entity == client
+			|| entity == GetObserverTarget(client))
 		{
 			clients[numNewClients] = client;
 			numNewClients++;
@@ -181,9 +183,11 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = players[i];
-		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
+			 || TE_ReadNum("m_iPlayer") + 1 == GetObserverTarget(client))
 		{
-			newClients[newTotal++] = client;
+			newClients[newTotal] = client;
+			newTotal++;
 		}
 	}
 
