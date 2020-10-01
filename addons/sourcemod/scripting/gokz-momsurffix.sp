@@ -6,8 +6,8 @@
 #include <gokz/core>
 #include <gokz/momsurffix>
 
-#define SNAME "[momsurffix2] "
-#define GAME_DATA_FILE "momsurffix2.games"
+#define SNAME "[gokz-momsurffix] "
+#define GAME_DATA_FILE "gokz-momsurffix.games"
 //#define DEBUG_PROFILE
 //#define DEBUG_MEMTEST
 
