@@ -34,7 +34,7 @@ void DB_OpenMapTopModeMenu(int client, int mapID, int course)
 	FormatEx(query, sizeof(query), sql_mapcourses_findid, mapID, course);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTopModeMenu, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTopModeMenu, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_OpenMapTopModeMenu(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
@@ -140,7 +140,7 @@ void DB_OpenMapTop(int client, int mapID, int course, int mode, int timeType)
 	}
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTop, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTop, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

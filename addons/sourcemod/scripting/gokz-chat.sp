@@ -108,7 +108,7 @@ public Action OnPlayerDisconnect(Event event, const char[] name, bool dontBroadc
 
 public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast) // player_team pre hook
 {
-	event.BroadcastDisabled = true; // Block join team messages
+	event.SetBool("silent", true); // Block join team messages
 	return Plugin_Continue;
 }
 

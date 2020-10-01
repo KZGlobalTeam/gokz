@@ -56,9 +56,9 @@ static void ClearCache(int client)
 {
 	for (int mode = 0; mode < MODE_COUNT; mode += 1)
 	{
-		for (int type = 0; type < MODE_COUNT; type += 1)
+		for (int type = 0; type < JUMPTYPE_COUNT; type += 1)
 		{
-			for (int cache = 0; cache < MODE_COUNT; cache += 1)
+			for (int cache = 0; cache < JUMPSTATDB_CACHE_COUNT; cache += 1)
 			{
 				gI_PBJSCache[client][mode][type][cache] = 0;
 			}

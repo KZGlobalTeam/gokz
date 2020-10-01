@@ -28,7 +28,7 @@ bool IsDrawingInfoPanel(int client)
 
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 12 == 0 || info.IsTakeoff)
+	if (cmdnum % 10 == 0 || info.IsTakeoff)
 	{
 		UpdateInfoPanel(client, info);
 	}
