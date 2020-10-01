@@ -327,7 +327,9 @@ public int Native_SetValidJumpOrigin(Handle plugin, int numParams)
 	
 	// The order is important here!
 	OnValidOriginChange_ValidJump(client, origin);
-	Movement_SetOrigin(client, origin);
+	
+	// Using Movement_SetOrigin instead causes considerable lag for spectators
+	SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
 }
 
 public int Native_GetTimerRunning(Handle plugin, int numParams)
