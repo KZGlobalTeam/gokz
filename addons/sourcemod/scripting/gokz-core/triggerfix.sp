@@ -33,8 +33,11 @@ public void OnPluginStart_Triggerfix()
 		SetFailState("Could not find sv_gravity");
 	}
 	
-	Handle gamedataConf = LoadGameConfigFile("rngfix.games");
-	if (gamedataConf == null) SetFailState("Failed to load rngfix gamedata");
+	Handle gamedataConf = LoadGameConfigFile("gokz-core.games");
+	if (gamedataConf == null)
+	{
+		SetFailState("Failed to load gokz-core gamedata");
+	}
 	
 	// CreateInterface
 	// Thanks SlidyBat and ici
@@ -48,7 +51,10 @@ public void OnPluginStart_Triggerfix()
 	PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
 	Handle CreateInterface = EndPrepSDKCall();
 	
-	if (CreateInterface == null) SetFailState("Unable to prepare SDKCall for CreateInterface");
+	if (CreateInterface == null)
+	{
+		SetFailState("Unable to prepare SDKCall for CreateInterface");
+	}
 	
 	char interfaceName[64];
 	
@@ -64,7 +70,10 @@ public void OnPluginStart_Triggerfix()
 	}
 	
 	int offset = GameConfGetOffset(gamedataConf, "ProcessMovement");
-	if (offset == -1) SetFailState("Failed to get ProcessMovement offset");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get ProcessMovement offset");
+	}
 	
 	processMovementHookPre = DHookCreate(offset, HookType_Raw, ReturnType_Void, ThisPointer_Ignore, DHook_ProcessMovementPre);
 	DHookAddParam(processMovementHookPre, HookParamType_CBaseEntity);
@@ -91,7 +100,10 @@ public void OnPluginStart_Triggerfix()
 	PrepSDKCall_AddParameter(SDKType_Edict, SDKPass_Pointer);
 	markEntitiesAsTouching = EndPrepSDKCall();
 	
-	if (markEntitiesAsTouching == null) SetFailState("Unable to prepare SDKCall for IServerGameEnts::MarkEntitiesAsTouching");
+	if (markEntitiesAsTouching == null)
+	{
+		SetFailState("Unable to prepare SDKCall for IServerGameEnts::MarkEntitiesAsTouching");
+	}
 	
 	delete CreateInterface;
 	delete gamedataConf;
@@ -115,14 +127,20 @@ public void OnPluginStart_Triggerfix()
 
 public void OnEntityCreated_Triggerfix(int entity, const char[] classname)
 {
-	if (entity >= sizeof(touchingTrigger[])) return;
+	if (entity >= sizeof(touchingTrigger[]))
+	{
+		return;
+	}
 	HookTrigger(entity, classname);
 }
 
 public void OnClientConnected_Triggerfix(int client)
 {
 	processMovementTicks[client] = 0;
-	for (int i = 0; i < sizeof(touchingTrigger[]); i++) touchingTrigger[client][i] = false;
+	for (int i = 0; i < sizeof(touchingTrigger[]); i++)
+	{
+		touchingTrigger[client][i] = false;
+	}
 }
 
 public void OnClientPutInServer_Triggerfix(int client)
@@ -202,7 +220,10 @@ static bool DoTriggerjumpFix(int client, const float landingPoint[3], const floa
 		// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
 		// In case that could cause side-effects, manually keep track of triggers we are actually touching
 		// and don't re-touch them.
-		if (touchingTrigger[client][trigger]) continue;
+		if (touchingTrigger[client][trigger])
+		{
+			continue;
+		}
 		
 		SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
 		didSomething = true;
@@ -216,9 +237,12 @@ static bool DoTriggerjumpFix(int client, const float landingPoint[3], const floa
 // PostThink works a little better than a ProcessMovement post hook because we need to wait for ProcessImpacts (trigger activation)
 static void Hook_PlayerPostThink(int client)
 {
-	if (!IsPlayerAlive(client)) return;
-	if (GetEntityMoveType(client) != MOVETYPE_WALK) return;
-	if (CheckWater(client)) return;
+	if (!IsPlayerAlive(client)
+		|| GetEntityMoveType(client) != MOVETYPE_WALK
+		|| CheckWater(client))
+	{
+		return;
+	}
 	
 	bool landed = (GetEntPropEnt(client, Prop_Data, "m_hGroundEntity") != -1
 		&& lastGroundEnt[client] == -1)
@@ -288,7 +312,10 @@ static void Hook_PlayerPostThink(int client)
 	{
 		DoTriggerjumpFix(client, landingPoint, landingMins, landingMaxs);
 		// Check if a trigger we just touched put us in the air (probably due to a teleport).
-		if (GetEntityFlags(client) & FL_ONGROUND == 0) landed = false;
+		if (GetEntityFlags(client) & FL_ONGROUND == 0)
+		{
+			landed = false;
+		}
 	}
 }
 
@@ -328,7 +355,10 @@ static float GetAddedHalfGravityInATick(int client)
 public bool AddTrigger(int entity, ArrayList triggers)
 {
 	TR_ClipCurrentRayToEntity(MASK_ALL, entity);
-	if (TR_DidHit()) triggers.Push(entity);
+	if (TR_DidHit())
+	{
+		triggers.Push(entity);
+	}
 	
 	return true;
 }
@@ -355,7 +385,10 @@ static bool TracePlayerBBoxForGround(const float origin[3], const float originBe
 	if (TR_DidHit())
 	{
 		TR_GetPlaneNormal(null, nrm);
-		if (nrm[2] >= MIN_STANDABLE_ZNRM) return true;
+		if (nrm[2] >= MIN_STANDABLE_ZNRM)
+		{
+			return true;
+		}
 	}
 	
 	// +x +y
@@ -370,7 +403,10 @@ static bool TracePlayerBBoxForGround(const float origin[3], const float originBe
 	if (TR_DidHit())
 	{
 		TR_GetPlaneNormal(null, nrm);
-		if (nrm[2] >= MIN_STANDABLE_ZNRM) return true;
+		if (nrm[2] >= MIN_STANDABLE_ZNRM)
+		{
+			return true;
+		}
 	}
 	
 	// -x +y
@@ -387,7 +423,10 @@ static bool TracePlayerBBoxForGround(const float origin[3], const float originBe
 	if (TR_DidHit())
 	{
 		TR_GetPlaneNormal(null, nrm);
-		if (nrm[2] >= MIN_STANDABLE_ZNRM) return true;
+		if (nrm[2] >= MIN_STANDABLE_ZNRM)
+		{
+			return true;
+		}
 	}
 	
 	// +x -y
@@ -404,7 +443,10 @@ static bool TracePlayerBBoxForGround(const float origin[3], const float originBe
 	if (TR_DidHit())
 	{
 		TR_GetPlaneNormal(null, nrm);
-		if (nrm[2] >= MIN_STANDABLE_ZNRM) return true;
+		if (nrm[2] >= MIN_STANDABLE_ZNRM)
+		{
+			return true;
+		}
 	}
 
 	return false;
