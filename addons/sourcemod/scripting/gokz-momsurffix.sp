@@ -43,8 +43,7 @@ EngineVersion gEngineVersion;
 #include "momsurffix/gametrace.sp"
 #include "momsurffix/gamemovement.sp"
 
-ConVar gBounce,
-	gASMOptimizations;
+ConVar gBounce;
 
 float vec3_origin[3] = {0.0, 0.0, 0.0};
 bool gBasePlayerLoadedTooEarly;
@@ -85,11 +84,8 @@ public void OnPluginStart()
 	RegAdminCmd("sm_mom_prof", SM_Prof, ADMFLAG_ROOT, "Profiles performance of some expensive parts. Mainly for debugging.");
 #endif
 	
-	gASMOptimizations = CreateConVar("momsurffix_enable_asm_optimizations", "1", "Enables ASM optimizations, that may improve performance of the plugin", .hasMin = true, .min = 0.0, .hasMax = true, .max = 1.0);
 	gBounce = FindConVar("sv_bounce");
 	ASSERT_MSG(gBounce, "\"sv_bounce\" convar wasn't found!");
-	
-	AutoExecConfig(.name = "gokz/gokz-momsurffix");
 	
 	GameData gd = new GameData(GAME_DATA_FILE);
 	ASSERT_FINAL(gd);
@@ -741,8 +737,12 @@ stock void StoreToAddressFast(Address addr, any data)
 
 stock void StoreToAddressCustom(Address addr, any data, NumberType type)
 {
-	if(gASMOptimizations.BoolValue && gStoreToAddressFast)
+	if (gStoreToAddressFast)
+	{
 		StoreToAddressFast(addr, data);
+	}
 	else
+	{
 		StoreToAddress(addr, view_as<int>(data), type);
+	}
 }
