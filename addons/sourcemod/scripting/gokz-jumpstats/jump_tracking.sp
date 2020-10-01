@@ -23,6 +23,7 @@ enum struct Pose
 // =====[ GLOBAL VARIABLES ]===================================================
 
 static int entityTouchCount[MAXPLAYERS + 1];
+static int lastFlags[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -31,7 +32,6 @@ static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
 static bool beginJumpstat[MAXPLAYERS + 1];
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
-static bool startedTouchingInAir[MAXPLAYERS + 1];
 static const Jump emptyJump;
 
 
@@ -269,7 +269,7 @@ enum struct JumpTracker
 	{
 		// Check whether the player touches more than just the ground or if
 		// he just teleported.
-		if (entityTouchCount[this.jumper] > 0 ||
+		if ((!(lastFlags[this.jumper] & FL_ONGROUND) && entityTouchCount[this.jumper]) > 0 ||
 			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
@@ -1295,24 +1295,16 @@ void OnStartTouchGround_JumpTracking(int client)
 
 void OnStartTouch_JumpTracking(int client)
 {
+	entityTouchCount[client]++;
 	if (!Movement_GetOnGround(client))
 	{
-		entityTouchCount[client]++;
-		startedTouchingInAir[client] = true;
 		jumpTrackers[client].Invalidate();
-	}
-	else
-	{
-		startedTouchingInAir[client] = false;
 	}
 }
 
 void OnEndTouch_JumpTracking(int client)
 {
-	if (startedTouchingInAir[client])
-	{
-		entityTouchCount[client]--;
-	}
+	entityTouchCount[client]--;
 }
 
 void OnPlayerRunCmd_JumpTracking(int client, int buttons)
@@ -1376,6 +1368,8 @@ public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 	
 	// We always have to track this, no matter if in the air or not
 	jumpTrackers[client].UpdateRelease();
+	
+	lastFlags[client] = GetEntityFlags(client);
 }
 
 public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, MoveType newMovetype)
