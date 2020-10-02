@@ -269,7 +269,7 @@ enum struct JumpTracker
 	{
 		// Check whether the player touches more than just the ground or if
 		// he just teleported.
-		if ((!(lastFlags[this.jumper] & FL_ONGROUND) && entityTouchCount[this.jumper]) > 0 ||
+		if ((!(lastFlags[this.jumper] & FL_ONGROUND) && entityTouchCount[this.jumper] > 0) ||
 			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
