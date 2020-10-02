@@ -16,6 +16,7 @@ static bool hasEndedTimerSincePressingUse[MAXPLAYERS + 1];
 static bool hasTeleportedSincePressingUse[MAXPLAYERS + 1];
 static bool hasVirtualStartButton[MAXPLAYERS + 1];
 static bool hasVirtualEndButton[MAXPLAYERS + 1];
+static bool wasInEndZone[MAXPLAYERS + 1];
 static float virtualStartOrigin[MAXPLAYERS + 1][3];
 static float virtualEndOrigin[MAXPLAYERS + 1][3];
 static int virtualStartCourse[MAXPLAYERS + 1];
@@ -97,6 +98,7 @@ void OnClientPutInServer_VirtualButtons(int client)
 	hasVirtualStartButton[client] = false;
 	virtualButtonsLocked[client] = false;
 	onlyNaturalButtonPressed[client] = false;
+	wasInEndZone[client] = false;
 	startTimerButtonPressTick[client] = 0;
 }
 
@@ -185,8 +187,16 @@ static void CheckForAndHandleUsage(int client, int buttons)
 	if ((useCheck || GOKZ_GetCoreOption(client, Option_TimerButtonZoneType) != TimerButtonZoneType_BothButtons)
 		&& GetHasVirtualEndButton(client) && InRangeOfVirtualEnd(client) && CanReachVirtualEnd(client))
 	{
-		TimerEnd(client, virtualEndCourse[client]);
-		hasEndedTimerSincePressingUse[client] = true; // False end counts as well
+		if (!wasInEndZone[client])
+		{
+			TimerEnd(client, virtualEndCourse[client]);
+			hasEndedTimerSincePressingUse[client] = true; // False end counts as well
+			wasInEndZone[client] = true;
+		}
+	}
+	else
+	{
+		wasInEndZone[client] = false;
 	}
 }
 
