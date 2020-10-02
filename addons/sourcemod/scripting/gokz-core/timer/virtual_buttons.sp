@@ -180,6 +180,7 @@ static void CheckForAndHandleUsage(int client, int buttons)
 		{
 			PlayTimerStartSound(client);
 		}
+		onlyNaturalButtonPressed[client] = false;
 		startedTimerLastTick[client] = false;
 	}
 	
