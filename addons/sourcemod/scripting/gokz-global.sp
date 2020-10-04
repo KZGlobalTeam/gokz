@@ -143,8 +143,9 @@ Action IntegrityChecks(Handle timer)
 					char pluginPath[128];
 					GetPluginFilename(bannedPlugin, pluginPath, sizeof(pluginPath));
 					ServerCommand("sm plugins unload %s", pluginPath);
-					char disabledPath[256], enabledPath[256];
-					BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", pluginPath);
+					char disabledPath[256], enabledPath[256], pluginFile[4][128];
+					int subfolders = ExplodeString(pluginPath, "/", pluginFile, sizeof(pluginFile), sizeof(pluginFile[]));
+					BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", pluginFile[subfolders - 1]);
 					BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/%s", pluginPath);
 					RenameFile(disabledPath, enabledPath);
 					LogError("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", pluginName, pluginName);
