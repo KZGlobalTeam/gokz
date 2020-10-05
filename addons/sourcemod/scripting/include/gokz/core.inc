@@ -1054,6 +1054,16 @@ native void GOKZ_TogglePause(int client);
 native void GOKZ_PlayErrorSound(int client);
 
 /**
+ * Set the origin of a player without invalidating any jumpstats.
+ * 
+ * Only use this in plugins that create a new mode!
+ *
+ * @param client		Client index.
+ * @param origin		The new origin.
+ */
+native void GOKZ_SetValidJumpOrigin(int client, const float origin[3]);
+
+/**
  * Registers an option with gokz-core, which uses clientprefs to
  * keep track of the option's value and to save it to a database.
  * This also effectively provides natives and forwards for other 
@@ -1486,6 +1496,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
+	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
 	
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
 	MarkNativeAsOptional("GOKZ_GetCourse");
