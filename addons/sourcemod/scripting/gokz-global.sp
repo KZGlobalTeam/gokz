@@ -7,6 +7,7 @@
 #include <gokz/core>
 #include <gokz/global>
 #include <gokz/replays>
+#include <gokz/momsurffix>
 
 #include <autoexecconfig>
 
