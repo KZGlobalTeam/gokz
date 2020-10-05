@@ -140,10 +140,10 @@
 	"Global Check"
 	{
 		// API Key X | Settings Enforcer X | Map X | You X
-		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{grey}API Key {1}{grey} | Settings Enforcer {2}{grey} | Map {3}{grey} | You {4}"
-		"chi"		"{grey}API Key {1}{grey} | Settings Enforcer {2}{grey} | Map {3}{grey} | You {4}"
-		"ru"		"{grey}Ключ API {1}{grey} | Настройки Enforcer {2}{grey} | Карта {3}{grey} | Ты {4}"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
+		"en"		"{grey}API Key {1}{grey} | Plugins {2}{grey} | Settings Enforcer {3}{grey} | Map {4}{grey} | You {5}"
+		"chi"		"{grey}API Key {1}{grey} | Plugins {2}{grey} | Settings Enforcer {3}{grey} | Map {4}{grey} | You {5}"
+		"ru"		"{grey}Ключ API {1}{grey} | Плагины {2}{grey} | Настройки Enforcer {3}{grey} | Карта {4}{grey} | Ты {5}"
 	}
 	"Kick Player fps_max"
 	{
