@@ -161,6 +161,16 @@ void TimerStopAll(bool playSound = true)
 	}
 }
 
+void PlayTimerStartSound(int client)
+{
+	if (GetGameTime() - lastStartSoundTime[client] > GOKZ_TIMER_SOUND_COOLDOWN)
+	{
+		EmitSoundToClient(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		lastStartSoundTime[client] = GetGameTime();
+	}
+}
+
 
 
 // =====[ EVENTS ]=====
@@ -272,16 +282,6 @@ static bool JustStartedTimer(int client)
 static bool JustEndedTimer(int client)
 {
 	return GetGameTime() - lastEndTime[client] < 1.0;
-}
-
-static void PlayTimerStartSound(int client)
-{
-	if (GetGameTime() - lastStartSoundTime[client] > GOKZ_TIMER_SOUND_COOLDOWN)
-	{
-		EmitSoundToClient(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-		EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-		lastStartSoundTime[client] = GetGameTime();
-	}
 }
 
 static void PlayTimerEndSound(int client)
