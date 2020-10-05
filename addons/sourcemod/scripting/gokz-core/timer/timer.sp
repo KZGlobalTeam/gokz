@@ -197,8 +197,7 @@ void OnChangeMovetype_Timer(int client, MoveType newMovetype)
 
 void OnTeleportToStart_Timer(int client)
 {
-	if (GOKZ_GetStartPositionType(client) != StartPositionType_MapButton
-		 || GetCurrentMapPrefix() == MapPrefix_KZPro)
+	if (GetCurrentMapPrefix() == MapPrefix_KZPro)
 	{
 		TimerStop(client, false);
 	}

@@ -187,7 +187,7 @@ static bool PassesUseCheck(int client)
 	return false;
 }
 
-static bool InRangeOfVirtualStart(int client)
+bool InRangeOfVirtualStart(int client)
 {
 	return InRangeOfButton(client, virtualStartOrigin[client]);
 }
@@ -205,7 +205,7 @@ static bool InRangeOfButton(int client, const float buttonOrigin[3])
 	return distanceToButton <= gF_ModeVirtualButtonRanges[GOKZ_GetCoreOption(client, Option_Mode)];
 }
 
-static bool CanReachVirtualStart(int client)
+bool CanReachVirtualStart(int client)
 {
 	return CanReachButton(client, virtualStartOrigin[client]);
 }
