@@ -660,7 +660,7 @@ enum struct JumpTracker
 	void EndBugfixExploits()
 	{
 		// Try to prevent a form of booster abuse
-		if (!this.IsValidAirtime(this.jump.type, this.jump.durationTicks))
+		if (!this.IsValidAirtime())
 		{
 			this.Invalidate();
 		}
@@ -693,24 +693,24 @@ enum struct JumpTracker
 		}
 	}
 	
-	bool IsValidAirtime(int jumpType, int airtime)
+	bool IsValidAirtime()
 	{
 		// Ladderjumps can have pretty much any airtime.
-		if (jumpType == JumpType_LadderJump)
+		if (this.jump.type == JumpType_LadderJump)
 		{
 			return true;
 		}
 		
 		// Ladderhops can have a maximum airtime of 102.
-		if (jumpType == JumpType_Ladderhop
-			&& airtime <= 102)
+		if (this.jump.type == JumpType_Ladderhop
+			&& this.jump.durationTicks <= 102)
 		{
 			return true;
 		}
 		
 		// Crouchjumped or perfed longjumps/bhops can have a maximum of 101 airtime
 		// when the lj bug occurs. Since we've fixed that the airtime is valid.
-		if (airtime <= 101)
+		if (this.jump.durationTicks <= 101)
 		{
 			return true;
 		}
