@@ -6,7 +6,9 @@ void RegisterCommands()
 {
 	RegConsoleCmd("sm_top", CommandTop, "[KZ] Open a menu showing the top record holders.");
 	RegConsoleCmd("sm_maptop", CommandMapTop, "[KZ] Open a menu showing the top main course times of a map. Usage: !maptop <map>");
-	RegConsoleCmd("sm_bmaptop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !btop <#bonus> <map>");
+	RegConsoleCmd("sm_bmaptop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !bmaptop <#bonus> <map>");
+	RegConsoleCmd("sm_bonustop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !bonustop <#bonus> <map>");
+	RegConsoleCmd("sm_btop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !btop <#bonus> <map>");
 	RegConsoleCmd("sm_pb", CommandPB, "[KZ] Show PB main course times and ranks in chat. Usage: !pb <map> <player>");
 	RegConsoleCmd("sm_bpb", CommandBPB, "[KZ] Show PB bonus times and ranks in chat. Usage: !bpb <#bonus> <map> <player>");
 	RegConsoleCmd("sm_wr", CommandWR, "[KZ] Show main course record times in chat. Usage: !wr <map>");

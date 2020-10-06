@@ -69,6 +69,7 @@ enum Option:
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
 	Option_VirtualButtonIndicators, 
+	Option_TimerButtonZoneType,
 	OPTION_COUNT
 };
 
@@ -130,6 +131,14 @@ enum
 
 enum
 {
+	TimerButtonZoneType_BothButtons = 0,
+	TimerButtonZoneType_EndZone,
+	TimerButtonZoneType_BothZones,
+	TIMERBUTTONZONETYPE_COUNT
+};
+
+enum
+{
 	ModeCVar_Accelerate = 0, 
 	ModeCVar_AccelerateUseWeaponSpeed, 
 	ModeCVar_AirAccelerate, 
@@ -170,7 +179,7 @@ enum
 #define GOKZ_TIMER_START_NO_TELEPORT_TICKS 4
 #define GOKZ_TIMER_START_GROUND_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
-#define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 0.6
+#define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
 #define GOKZ_COLLISION_GROUP_STANDARD 2
 #define GOKZ_COLLISION_GROUP_NOTRIGGER 1
 
@@ -277,7 +286,8 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Checkpoint Sounds", 
 	"GOKZ - Teleport Sounds", 
 	"GOKZ - Error Sounds", 
-	"GOKZ - VB Indicators"
+	"GOKZ - VB Indicators",
+	"GOKZ - Timer Button Zone Type"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
@@ -289,7 +299,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Checkpoint Sounds - 0 = Disabled, 1 = Enabled", 
 	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
 	"Error Sounds - 0 = Disabled, 1 = Enabled", 
-	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled"
+	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled",
+	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -301,8 +312,16 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
 	"Options Menu - Error Sounds", 
-	"Options Menu - Virtual Button Indicators"
+	"Options Menu - Virtual Button Indicators",
+	"Options Menu - Timer Button Zone Type"
 };
+
+stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] = 
+{
+	"Timer Button Zone Type - Both Buttons",
+	"Timer Button Zone Type - Only End Zone",
+	"Timer Button Zone Type - Both Zones"
+}
 
 stock int gI_CoreOptionCounts[OPTION_COUNT] = 
 {
@@ -313,7 +332,8 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
-	VIRTUALBUTTONINDICATORS_COUNT
+	VIRTUALBUTTONINDICATORS_COUNT,
+	TIMERBUTTONZONETYPE_COUNT
 };
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
@@ -325,7 +345,8 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 
 	ErrorSounds_Enabled, 
-	VirtualButtonIndicators_Disabled
+	VirtualButtonIndicators_Disabled,
+	TimerButtonZoneType_BothButtons
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
@@ -1054,6 +1075,16 @@ native void GOKZ_TogglePause(int client);
 native void GOKZ_PlayErrorSound(int client);
 
 /**
+ * Set the origin of a player without invalidating any jumpstats.
+ * 
+ * Only use this in plugins that create a new mode!
+ *
+ * @param client		Client index.
+ * @param origin		The new origin.
+ */
+native void GOKZ_SetValidJumpOrigin(int client, const float origin[3]);
+
+/**
  * Registers an option with gokz-core, which uses clientprefs to
  * keep track of the option's value and to save it to a database.
  * This also effectively provides natives and forwards for other 
@@ -1486,6 +1517,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
+	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
 	
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
 	MarkNativeAsOptional("GOKZ_GetCourse");

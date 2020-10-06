@@ -28,7 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 10
+#define MODE_VERSION 11
 #define PERF_TICKS 2
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
@@ -76,7 +76,9 @@ bool gB_PSTurningLeft[MAXPLAYERS + 1];
 float gF_PSTurnRate[MAXPLAYERS + 1];
 int gI_PSTicksSinceIncrement[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
+int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
+float gF_OldOrigin[MAXPLAYERS + 1][3];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
 bool gB_Jumpbugged[MAXPLAYERS + 1];
@@ -170,6 +172,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	ReduceDuckSlowdown(player);
 	TweakVelMod(player, angles);
 	FixWaterBoost(player, buttons);
+	FixDisplacementStuck(player);
 	if (gB_Jumpbugged[player.ID])
 	{
 		TweakJumpbug(player);
@@ -177,9 +180,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	
 	gB_Jumpbugged[player.ID] = false;
 	gI_OldButtons[player.ID] = buttons;
-	gB_OldOnGround[player.ID] = Movement_GetOnGround(client);
-	Movement_GetEyeAngles(client, gF_OldAngles[player.ID]);
-	Movement_GetVelocity(client, gF_OldVelocity[client]);
+	gI_OldFlags[player.ID] = GetEntityFlags(player.ID);
+	gB_OldOnGround[player.ID] = player.OnGround;
+	player.GetOrigin(gF_OldOrigin[player.ID]);
+	player.GetEyeAngles(gF_OldAngles[player.ID]);
+	player.GetVelocity(gF_OldVelocity[player.ID]);
 	
 	return Plugin_Continue;
 }
@@ -486,21 +491,22 @@ float CalcWeaponVelMod(KZPlayer player)
 
 void TweakJump(KZPlayer player)
 {
-	if (player.TakeoffCmdNum - player.LandingCmdNum <= PERF_TICKS)
+	int cmdsSinceLanding = player.TakeoffCmdNum - player.LandingCmdNum;
+	
+	if (cmdsSinceLanding <= PERF_TICKS)
 	{
-		if (!player.HitPerf || player.TakeoffSpeed > SPEED_NORMAL)
+		if (cmdsSinceLanding == 1)
 		{
-			// Note that resulting velocity has same direction as landing velocity, not current velocity
-			float velocity[3], baseVelocity[3], newVelocity[3];
-			player.GetVelocity(velocity);
-			player.GetBaseVelocity(baseVelocity);
-			player.GetLandingVelocity(newVelocity);
-			newVelocity[2] = velocity[2];
-			SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
-			AddVectors(newVelocity, baseVelocity, newVelocity);
-			player.SetVelocity(newVelocity);
+			NerfRealPerf(player);
+		}
+		
+		if (cmdsSinceLanding > 1 || player.TakeoffSpeed > SPEED_NORMAL)
+		{
+			ApplyTweakedTakeoffSpeed(player);
+			
 			// Restore prestrafe lost due to briefly being on the ground
 			gF_PSVelMod[player.ID] = gF_PSVelModLanding[player.ID];
+			
 			if (gB_GOKZCore)
 			{
 				player.GOKZHitPerf = true;
@@ -518,6 +524,72 @@ void TweakJump(KZPlayer player)
 		player.GOKZHitPerf = false;
 		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
+}
+
+void NerfRealPerf(KZPlayer player)
+{
+	// Not worth worrying about if player is already falling
+	if (player.VerticalVelocity < EPSILON)
+	{
+		return;
+	}
+	
+	// Work out where the ground was when they bunnyhopped
+	float startPosition[3], endPosition[3], mins[3], maxs[3], groundOrigin[3];
+	
+	startPosition = gF_OldOrigin[player.ID];
+	
+	endPosition = startPosition;
+	endPosition[2] = endPosition[2] - 2.0; // Should be less than 2.0 units away
+	
+	GetEntPropVector(player.ID, Prop_Send, "m_vecMins", mins);
+	GetEntPropVector(player.ID, Prop_Send, "m_vecMaxs", maxs);
+	
+	Handle trace = TR_TraceHullFilterEx(
+		startPosition, 
+		endPosition, 
+		mins, 
+		maxs, 
+		MASK_PLAYERSOLID, 
+		TraceEntityFilterPlayers, 
+		player.ID);
+	
+	// This is expected to always hit
+	if (TR_DidHit(trace))
+	{
+		TR_GetEndPosition(groundOrigin, trace);
+		
+		// Teleport player downwards so it's like they jumped from the ground
+		float newOrigin[3];
+		player.GetOrigin(newOrigin);
+		newOrigin[2] -= gF_OldOrigin[player.ID][2] - groundOrigin[2];
+		
+		if (gB_GOKZCore)
+		{
+			GOKZ_SetValidJumpOrigin(player.ID, newOrigin);
+		}
+		else
+		{
+			SetEntPropVector(player.ID, Prop_Data, "m_vecAbsOrigin", newOrigin);
+		}
+	}
+	
+	delete trace;
+}
+
+void ApplyTweakedTakeoffSpeed(KZPlayer player)
+{
+	// Note that resulting velocity has same direction as landing velocity, not current velocity
+	float velocity[3], baseVelocity[3], newVelocity[3];
+	player.GetVelocity(velocity);
+	player.GetBaseVelocity(baseVelocity);
+	player.GetLandingVelocity(newVelocity);
+	
+	newVelocity[2] = velocity[2];
+	SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
+	AddVectors(newVelocity, baseVelocity, newVelocity);
+	
+	player.SetVelocity(newVelocity);
 }
 
 void TweakJumpbug(KZPlayer player)
@@ -643,17 +715,40 @@ void FixWaterBoost(KZPlayer player, int buttons)
 	{
 		// If duck is being pressed and we're not already ducking or on ground
 		if (GetEntityFlags(player.ID) & (FL_DUCKING | FL_ONGROUND) == 0
-			&& buttons & IN_DUCK && ~gI_OldButtons[player.ID] & IN_DUCK)
+			 && buttons & IN_DUCK && ~gI_OldButtons[player.ID] & IN_DUCK)
 		{
 			float newOrigin[3];
 			Movement_GetOrigin(player.ID, newOrigin);
 			newOrigin[2] += 9.0;
 			
-			TR_TraceHullFilter(newOrigin, newOrigin, view_as<float>({-16.0, -16.0, 0.0}), view_as<float>({16.0, 16.0, 54.0}), MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+			TR_TraceHullFilter(newOrigin, newOrigin, view_as<float>( { -16.0, -16.0, 0.0 } ), view_as<float>( { 16.0, 16.0, 54.0 } ), MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 			if (!TR_DidHit())
 			{
 				TeleportEntity(player.ID, newOrigin, NULL_VECTOR, NULL_VECTOR);
 			}
+		}
+	}
+}
+
+void FixDisplacementStuck(KZPlayer player)
+{
+	int flags = GetEntityFlags(player.ID);
+	bool unducked = ~flags & FL_DUCKING && gI_OldFlags[player.ID] & FL_DUCKING;
+	
+	float standingMins[] = {-16.0, -16.0, 0.0};
+	float standingMaxs[] = {16.0, 16.0, 72.0};
+	
+	if (unducked)
+	{
+		// check if we're stuck after unducking and if we're stuck then force duck
+		float origin[3];
+		Movement_GetOrigin(player.ID, origin);
+		TR_TraceHullFilter(origin, origin, standingMins, standingMaxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+		
+		if (TR_DidHit())
+		{
+			player.SetVelocity(gF_OldVelocity[player.ID]);
+			SetEntProp(player.ID, Prop_Send, "m_bDucking", true);
 		}
 	}
 }
