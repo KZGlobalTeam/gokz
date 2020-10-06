@@ -100,12 +100,8 @@ bool SpectatePlayer(int client, int target, bool printMessage = true)
 	
 	if (target == client)
 	{
-		if (printMessage)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Spectate Failure (Not Yourself)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
+		Spectate(client);
+		return true;
 	}
 	else if (!IsPlayerAlive(target))
 	{
