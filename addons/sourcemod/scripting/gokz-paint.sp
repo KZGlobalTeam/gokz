@@ -129,8 +129,7 @@ public void OnMapStart()
 
 void Paint(int client)
 {
-	if (!IsValidClient(client) ||
-		!IsPlayerAlive(client) ||
+	if (!IsValidClient(client) ||		
 		IsFakeClient(client))
 	{
 		return;
