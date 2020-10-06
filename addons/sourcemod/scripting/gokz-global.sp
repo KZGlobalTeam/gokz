@@ -7,6 +7,7 @@
 #include <gokz/core>
 #include <gokz/global>
 #include <gokz/replays>
+#include <gokz/momsurffix>
 
 #include <autoexecconfig>
 
@@ -38,6 +39,7 @@ bool gB_GOKZLocalDB;
 
 bool gB_APIKeyCheck;
 bool gB_ModeCheck[MODE_COUNT];
+bool gB_BannedCommandsCheck;
 char gC_CurrentMap[64];
 char gC_CurrentMapPath[PLATFORM_MAX_PATH];
 bool gB_InValidRun[MAXPLAYERS + 1];
@@ -115,7 +117,7 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 }
 
-Action MonitorClientConvars(Handle timer)
+Action IntegrityChecks(Handle timer)
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -123,6 +125,43 @@ Action MonitorClientConvars(Handle timer)
 		{
 			QueryClientConVar(client, "fps_max", FPSCheck, client);
 			QueryClientConVar(client, "m_yaw", MYAWCheck, client);
+		}
+	}
+
+	for (int i = 0; i < BANNEDPLUGINCOMMAND_COUNT; i++)
+	{
+		if (CommandExists(gC_BannedPluginCommands[i]))
+		{
+			Handle bannedIterator = GetPluginIterator();
+			char pluginName[128]; 
+			bool foundPlugin = false;
+			while (MorePlugins(bannedIterator))
+			{
+				Handle bannedPlugin = ReadPlugin(bannedIterator);
+				GetPluginInfo(bannedPlugin, PlInfo_Name, pluginName, sizeof(pluginName));
+				if (StrEqual(pluginName, gC_BannedPlugins[i]))
+				{
+					char pluginPath[128];
+					GetPluginFilename(bannedPlugin, pluginPath, sizeof(pluginPath));
+					ServerCommand("sm plugins unload %s", pluginPath);
+					char disabledPath[256], enabledPath[256], pluginFile[4][128];
+					int subfolders = ExplodeString(pluginPath, "/", pluginFile, sizeof(pluginFile), sizeof(pluginFile[]));
+					BuildPath(Path_SM, disabledPath, sizeof(disabledPath), "plugins/disabled/%s", pluginFile[subfolders - 1]);
+					BuildPath(Path_SM, enabledPath, sizeof(enabledPath), "plugins/%s", pluginPath);
+					RenameFile(disabledPath, enabledPath);
+					LogError("[KZ] %s cannot be loaded at the same time as gokz-global. %s has been disabled.", pluginName, pluginName);
+					delete bannedPlugin;
+					foundPlugin = true;
+					break;
+				}
+				delete bannedPlugin;
+			}
+			if (!foundPlugin && gB_BannedCommandsCheck)
+			{
+				gB_BannedCommandsCheck = false;
+				LogError("You can't have a plugin which implements the %s command. Please disable it and reload the map.", gC_BannedPluginCommands[i]);
+			}
+			delete bannedIterator;
 		}
 	}
 	
@@ -211,7 +250,7 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	}
 }
 
-public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall)
+public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime)
 {
 	AnnounceNewTopTime(client, course, mode, timeType, rank, rankOverall);
 }
@@ -234,6 +273,8 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] 
 public void OnMapStart()
 {
 	LoadSounds();
+
+	gB_BannedCommandsCheck = true;
 	
 	// Prevent just reloading the plugin after messing with the map
 	if (gB_JustLateLoaded)
@@ -245,8 +286,8 @@ public void OnMapStart()
 		gB_EnforcerOnFreshMap = true;
 	}
 	
-	// Setup a timer to monitor client convars
-	CreateTimer(1.0, MonitorClientConvars, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	// Setup a timer to monitor server/client integrity
+	CreateTimer(1.0, IntegrityChecks, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
 public void OnConfigsExecuted()
@@ -273,18 +314,13 @@ public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)
 	return Plugin_Stop;
 }
 
-public void GOKZ_OnSlap(int client)
-{
-	GOKZ_StopTimer(client);
-}
-
 
 
 // =====[ PUBLIC ]=====
 
 bool GlobalsEnabled(int mode)
 {
-	return gB_APIKeyCheck && gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap && MapCheck() && gB_ModeCheck[mode];
+	return gB_APIKeyCheck && gB_BannedCommandsCheck && gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap && MapCheck() && gB_ModeCheck[mode];
 }
 
 bool MapCheck()
@@ -299,6 +335,7 @@ void PrintGlobalCheckToChat(int client)
 	GOKZ_PrintToChat(client, true, "%t", "Global Check Header");
 	GOKZ_PrintToChat(client, false, "%t", "Global Check", 
 		gB_APIKeyCheck ? "{green}✓" : "{darkred}X", 
+		gB_BannedCommandsCheck ? "{green}✓" : "{darkred}X",
 		gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X", 
 		gB_GloballyVerified[client] ? "{green}✓" : "{darkred}X");

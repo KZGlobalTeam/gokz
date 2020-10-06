@@ -284,10 +284,6 @@ void TeleportToStart(int client)
 	}
 	
 	// Teleport to Start
-	if (startType[client] != StartPositionType_MapButton)
-	{
-		GOKZ_StopTimer(client, false);
-	}
 	
 	if (startType[client] == StartPositionType_Spawn)
 	{
@@ -300,6 +296,12 @@ void TeleportToStart(int client)
 	else
 	{
 		TeleportDo(client, nonCustomStartOrigin[client], nonCustomStartAngles[client]);
+	}
+	
+	if (startType[client] != StartPositionType_MapButton
+		&& (!InRangeOfVirtualStart(client) || !CanReachVirtualStart(client)))
+	{
+		GOKZ_StopTimer(client, false);
 	}
 	
 	// Call Post Forward
