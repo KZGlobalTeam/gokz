@@ -287,11 +287,11 @@ void PrintOptionChangeMessage(int client, QTOption option, any newValue)
 			{
 				case MapSounds_Disabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Enable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Disable");
 				}
 				case MapSounds_Enabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Disable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Enable");
 				}
 			}
 		}
@@ -369,7 +369,7 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 
 void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, int maxlength)
 {
-	if (GOKZ_GetOption(client, gC_QTOptionNames[option]) == 0)
+	if (GOKZ_GetOption(client, gC_QTOptionNames[option]) == MapSounds_Disabled)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
 			gC_QTOptionPhrases[option], client, 
