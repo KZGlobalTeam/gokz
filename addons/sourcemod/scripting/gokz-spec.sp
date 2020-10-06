@@ -87,6 +87,10 @@ bool Spectate(int client)
 	}
 	
 	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
+
+	// Put player in free look mode and apply according movetype
+	SetEntProp(client, Prop_Send, "m_iObserverMode", 6);
+	SetEntityMoveType(client, MOVETYPE_OBSERVER);	
 	return true;
 }
 
