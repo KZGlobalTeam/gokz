@@ -37,7 +37,6 @@ static GlobalForward H_OnTimerNativeCalledExternally;
 static GlobalForward H_OnOptionsMenuCreated;
 static GlobalForward H_OnOptionsMenuReady;
 static GlobalForward H_OnCourseRegistered;
-static GlobalForward H_OnSlap;
 
 
 
@@ -82,7 +81,6 @@ void CreateGlobalForwards()
 	H_OnOptionsMenuCreated = new GlobalForward("GOKZ_OnOptionsMenuCreated", ET_Ignore, Param_Cell);
 	H_OnOptionsMenuReady = new GlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
 	H_OnCourseRegistered = new GlobalForward("GOKZ_OnCourseRegistered", ET_Ignore, Param_Cell);
-	H_OnSlap = new GlobalForward("GOKZ_OnSlap", ET_Ignore, Param_Cell);
 }
 
 void Call_GOKZ_OnOptionsLoaded(int client)
@@ -374,12 +372,5 @@ void Call_GOKZ_OnCourseRegistered(int course)
 {
 	Call_StartForward(H_OnCourseRegistered);
 	Call_PushCell(course);
-	Call_Finish();
-}
-
-void Call_GOKZ_OnSlap(int client)
-{
-	Call_StartForward(H_OnSlap);
-	Call_PushCell(client);
 	Call_Finish();
 }
