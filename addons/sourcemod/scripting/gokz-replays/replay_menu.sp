@@ -54,11 +54,19 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 		int botClient = LoadReplayBot(replayInfo[0], replayInfo[1], replayInfo[2], replayInfo[3]);
 		if (botClient != -1)
 		{
+
 			// Join spectators and spec the bot
+			GOKZ_JoinTeam(param1, CS_TEAM_SPECTATOR);
+			SetEntProp(param1, Prop_Send, "m_iObserverMode", 4);
+			SetEntPropEnt(param1, Prop_Send, "m_hObserverTarget", botClient);
+			
+			int clientUserID = GetClientUserId(param1);
 			DataPack data = new DataPack();
-			data.WriteCell(GetClientUserId(param1));
+			data.WriteCell(clientUserID);
 			data.WriteCell(GetClientUserId(botClient));
-			CreateTimer(1.0, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
+
+			CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
+			CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
 			EnableReplayControls(param1);
 		}
 		else
@@ -77,6 +85,15 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 	}
 }
 
+public Action Timer_ResetSpectate(Handle timer, int clientUID)
+{
+	int client = GetClientOfUserId(clientUID);
+	if (IsValidClient(client))
+	{
+		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
+		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
+	}
+}
 public Action Timer_SpectateBot(Handle timer, DataPack data)
 {
 	data.Reset();

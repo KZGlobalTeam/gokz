@@ -128,6 +128,19 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 		gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client);
 		gI_BhopLastRecordedBhopCmdnum[client] = cmdnum;
 		gB_BhopPostJumpInputsPending[client] = true;
+		gB_BindExceptionPending[client] = false;
+		gB_BindExceptionPostPending[client] = false;
+	}
+	
+	// Bind exception
+	if (gB_BindExceptionPending[client] && cmdnum > Movement_GetLandingCmdNum(client) + AC_MAX_BHOP_GROUND_TICKS)
+	{
+		gB_BhopHitPerf[client][nextIndex] = false;
+		gI_BhopPreJumpInputs[client][nextIndex] = -1; // Special value for binded jumps
+		gI_BhopLastRecordedBhopCmdnum[client] = cmdnum;
+		gB_BhopPostJumpInputsPending[client] = true;
+		gB_BindExceptionPending[client] = false;
+		gB_BindExceptionPostPending[client] = true;
 	}
 	
 	// Record post bhop inputs once enough ticks have passed
@@ -135,9 +148,15 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	{
 		gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client);
 		gB_BhopPostJumpInputsPending[client] = false;
-		gI_BhopIndex[client] = nextIndex;
-		gI_BhopCount[client]++;
-		CheckForBhopMacro(client);
+		
+		// Only treat the bind exception as a jump if it has no post inputs
+		if (!gB_BindExceptionPostPending[client] || gI_BhopPostJumpInputs[client][nextIndex] == 0)
+		{
+			gI_BhopIndex[client] = nextIndex;
+			gI_BhopCount[client]++;
+			CheckForBhopMacro(client);
+		}
+		gB_BindExceptionPostPending[client] = false;
 	}
 	
 	// Record last jump takeoff time
@@ -148,7 +167,7 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	
 	if (JustLanded(client, cmdnum))
 	{
-		// This condition exists to reduce false positives.
+		// These conditions exist to reduce false positives.
 		
 		// Telehopping is when the player bunnyhops out of a teleport that has a
 		// destination very close to the ground. This will, more than usual,
@@ -163,6 +182,19 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 		
 		gB_LastLandingWasValid[client] = cmdnum - gI_LastOriginTeleportCmdNum[client] > 1
 		 && cmdnum - Movement_GetTakeoffCmdNum(client) > 1;
+		
+		// You can still crouch-bind VNL jumps and some people just don't know that
+		// it doesn't work with the other modes in GOKZ. This can cause false positives
+		// if the player uses the bind for bhops and mostly presses it too early or
+		// exactly on time rather than too late. This is supposed to reduce those by
+		// detecting jumps where you don't get a bhop and have exactly one jump input
+		// before landing and none after landing. We only look at a reduced pre
+		// sample size here to make it a lot harder to fake a binded jump when doing
+		// a regular longjump.
+		if (CountJumpInputs(client, AC_BINDEXCEPTION_SAMPLES) == 1)
+		{
+			gB_BindExceptionPending[client] = true;
+		}
 	}
 }
 
@@ -227,7 +259,11 @@ static int CheckForRepeatingJumpInputsCount(int client, int threshold, int sampl
 	// Count up all the in jump patterns
 	for (int i = 0; i < maxIndex; i++)
 	{
-		jumpInputsFrequency[jumpInputs[i]]++;
+		// -1 is a binded jump, those are excluded
+		if (jumpInputs[i] != -1)
+		{
+			jumpInputsFrequency[jumpInputs[i]]++;
+		}
 	}
 	
 	// Returns i if the given number of the sample size has the same jump input count
@@ -253,6 +289,8 @@ static void ResetBhopStats(int client)
 	gI_BhopLastRecordedBhopCmdnum[client] = 0;
 	gB_BhopPostJumpInputsPending[client] = false;
 	gB_LastLandingWasValid[client] = false;
+	gB_BindExceptionPending[client] = false;
+	gB_BindExceptionPostPending[client] = false;
 }
 
 // Returns true if ther was a jump last tick and was within a number of ticks after landing

@@ -255,12 +255,20 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 				// Start the breather period
 				inBreather[bot] = true;
 				breatherStartTime[bot] = GetEngineTime();
+				if (playbackTick[bot] == (size - 1)) 
+				{
+					EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+				}
 			}
 			else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
 			{
 				// End the breather period
 				inBreather[bot] = false;
 				botPaused[bot] = false;
+				if (playbackTick[bot] == 0)
+				{
+					EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+				}
 				// Start the bot if first tick. Clear bot if last tick.
 				playbackTick[bot]++;
 				if (playbackTick[bot] == size)

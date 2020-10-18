@@ -44,6 +44,7 @@ int gI_OldButtons[MAXPLAYERS + 1];
 int gI_TeleportCmdNum[MAXPLAYERS + 1];
 bool gB_OriginTeleported[MAXPLAYERS + 1];
 bool gB_VelocityTeleported[MAXPLAYERS + 1];
+bool gB_LateLoad;
 
 ConVar gCV_gokz_chat_prefix;
 ConVar gCV_sv_full_alltalk;
@@ -55,6 +56,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/misc.sp"
 #include "gokz-core/options.sp"
 #include "gokz-core/teleports.sp"
+#include "gokz-core/triggerfix.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/bhop_triggers.sp"
@@ -82,6 +84,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	}
 	
 	gH_ThisPlugin = myself;
+	gB_LateLoad = late;
 	
 	CreateNatives();
 	RegPluginLibrary("gokz-core");
@@ -104,6 +107,7 @@ public void OnPluginStart()
 	OnPluginStart_MapEnd();
 	OnPluginStart_MapZones();
 	OnPluginStart_Options();
+	OnPluginStart_Triggerfix();
 }
 
 public void OnAllPluginsLoaded()
@@ -151,6 +155,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
 	OnClientPutInServer_BhopTriggers(client);
+	OnClientPutInServer_Triggerfix(client);
 	HookClientEvents(client);
 }
 
@@ -175,7 +180,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	
 	OnPlayerRunCmdPost_VirtualButtons(client, buttons, cmdnum); // Emulate buttons first
 	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
-	OnPlayerRunCmdPost_ValidJump(client, cmdnum);
+	OnPlayerRunCmdPost_ValidJump(client);
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
 }
 
@@ -324,6 +329,7 @@ public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &
 public void OnEntityCreated(int entity, const char[] classname)
 {
 	SDKHook(entity, SDKHook_Spawn, OnEntitySpawned);
+	OnEntityCreated_Triggerfix(entity, classname);
 }
 
 public void OnEntitySpawned(int entity)
@@ -335,32 +341,15 @@ public void OnEntitySpawned(int entity)
 	OnEntitySpawned_MapZones(entity);
 }
 
+public void OnClientConnected(int client)
+{
+	OnClientConnected_Triggerfix(client);
+}
+
 public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start post no copy hook
 {
 	OnRoundStart_Timer();
 	OnRoundStart_ForceAllTalk();
-}
-
-// Detect slap: https://forums.alliedmods.net/showpost.php?p=2089883&postcount=3
-public Action OnLogAction(Handle source, Identity ident, int client, int target, const char[] message)
-{
-	if (!IsValidClient(target) || IsFakeClient(target) || !IsPlayerAlive(target) || ident != Identity_Plugin)
-	{
-		return Plugin_Continue;
-	}
-	
-	char logtag[PLATFORM_MAX_PATH];
-	GetPluginFilename(source, logtag, sizeof(logtag));
-	
-	if ((StrEqual("slap.smx", logtag, false) ||
-		 StrEqual("playercommands.smx", logtag, false) ||
-		 StrEqual("funcommands.smx", logtag, false))
-		&& StrContains(message, "slap", false) != -1)
-	{
-		Call_GOKZ_OnSlap(target);
-	}
-	
-	return Plugin_Continue;
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)

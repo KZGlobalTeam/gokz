@@ -37,7 +37,7 @@ void DB_GetCompletion(int client, int targetSteamID, int mode, bool print)
 	FormatEx(query, sizeof(query), sql_getcount_bonusescompletedpro, targetSteamID, mode);
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_GetCompletion, DB_TxnFailure_Generic, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_GetCompletion, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
 public void DB_TxnSuccess_GetCompletion(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)

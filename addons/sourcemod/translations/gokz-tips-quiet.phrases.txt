@@ -3,5 +3,6 @@
 	"!stopsound"
 	{
 		"en"		"{grey}Type {default}!stopsound {grey}to stop sounds such as map music."
+		"ru"		"{grey}Напишите {default}!stopsound {grey}для выключения всех звуков карты."
 	}
 }

@@ -30,6 +30,20 @@ enum
 	ENFORCEDCVAR_COUNT
 };
 
+enum
+{
+	BannedPluginCommand_Funcommands = 0,
+	BannedPluginCommand_Playercommands,
+	BANNEDPLUGINCOMMAND_COUNT
+};
+
+enum
+{
+	BannedPlugin_Funcommands = 0,
+	BannedPlugin_Playercommands,
+	BANNEDPLUGIN_COUNT
+};
+
 
 
 // =====[ CONSTANTS ]=====
@@ -52,6 +66,18 @@ stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] =
 	"sv_maxcmdrate",
 	"sv_client_cmdrate_difference",
 	"sv_turbophysics"
+};
+
+stock char gC_BannedPluginCommands[BANNEDPLUGINCOMMAND_COUNT][] =
+{
+	"sm_beacon",
+	"sm_slap"
+};
+
+stock char gC_BannedPlugins[BANNEDPLUGIN_COUNT][] = 
+{
+	"Fun Commands",
+	"Player Commands"
 };
 
 stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] = 
@@ -81,8 +107,9 @@ stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =
  * @param timeType		Time type i.e. NUB or PRO.
  * @param rank			Ranking within the same time type.
  * @param rankOverall	Overall (NUB and PRO) ranking (0 if not ranked high enough).
+ * @param runTime		Player's end time.
  */
-forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall);
+forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime);
 
 
 

@@ -155,22 +155,26 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 		return Plugin_Continue;
 	}
 
+	int numNewClients = 0;
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = clients[i];
-		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Disabled && client != entity)
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
+			|| entity == client
+			|| entity == GetObserverTarget(client))
 		{
-			for (int j = i; j < numClients - 1; j++)
-			{
-				clients[j] = clients[j+1];
-			}
-
-			numClients--;
-			i--;
+			clients[numNewClients] = client;
+			numNewClients++;
 		}
 	}
+	
+	if (numNewClients != numClients) 
+	{
+		numClients = numNewClients;
+		return Plugin_Changed;
+	}
 
-	return (numClients > 0) ? Plugin_Changed : Plugin_Stop;
+	return Plugin_Continue;
 }
 
 public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay)
@@ -179,9 +183,11 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = players[i];
-		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
+			 || TE_ReadNum("m_iPlayer") + 1 == GetObserverTarget(client))
 		{
-			newClients[newTotal++] = client;
+			newClients[newTotal] = client;
+			newTotal++;
 		}
 	}
 
@@ -281,11 +287,11 @@ void PrintOptionChangeMessage(int client, QTOption option, any newValue)
 			{
 				case MapSounds_Disabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Enable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Disable");
 				}
 				case MapSounds_Enabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Disable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Enable");
 				}
 			}
 		}
@@ -363,7 +369,7 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 
 void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, int maxlength)
 {
-	if (GOKZ_GetOption(client, gC_QTOptionNames[option]) == 0)
+	if (GOKZ_GetOption(client, gC_QTOptionNames[option]) == MapSounds_Disabled)
 	{
 		FormatEx(buffer, maxlength, "%T - %T", 
 			gC_QTOptionPhrases[option], client, 
