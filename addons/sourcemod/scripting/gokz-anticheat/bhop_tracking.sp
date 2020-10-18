@@ -167,7 +167,7 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	
 	if (JustLanded(client, cmdnum))
 	{
-		// This conditions exist to reduce false positives.
+		// These conditions exist to reduce false positives.
 		
 		// Telehopping is when the player bunnyhops out of a teleport that has a
 		// destination very close to the ground. This will, more than usual,
