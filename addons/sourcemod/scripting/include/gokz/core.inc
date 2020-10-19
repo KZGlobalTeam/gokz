@@ -687,13 +687,6 @@ forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
  */
 forward void GOKZ_OnCourseRegistered(int course);
 
-/**
- * Called when a player got slapped by an admin.
- *
- * @param client		Client index.
- */
-forward void GOKZ_OnSlap(int client);
-
 
 
 // =====[ NATIVES ]=====

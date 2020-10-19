@@ -31,12 +31,6 @@
 		"chi"		"{grey}正在观察{lime}{1}{grey}视角的玩家(共{default}{2}{grey}人) - {3}"
 		"ru"		"{grey}Наблюдатели {lime}{1}{grey} ({default}{2}{grey}) - {3}"
 	}
-	"Spectate Failure (Not Yourself)"
-	{
-		"en"		"{darkred}You can't spectate yourself."
-		"chi"		"{darkred}你无法观察你自己."
-		"ru"		"{darkred}Вы не можете наблюдать за собой."
-	}
 	"Spectate Failure (Dead)"
 	{
 		"en"		"{darkred}The player you specified is not alive."

@@ -352,28 +352,6 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 	OnRoundStart_ForceAllTalk();
 }
 
-// Detect slap: https://forums.alliedmods.net/showpost.php?p=2089883&postcount=3
-public Action OnLogAction(Handle source, Identity ident, int client, int target, const char[] message)
-{
-	if (!IsValidClient(target) || IsFakeClient(target) || !IsPlayerAlive(target) || ident != Identity_Plugin)
-	{
-		return Plugin_Continue;
-	}
-	
-	char logtag[PLATFORM_MAX_PATH];
-	GetPluginFilename(source, logtag, sizeof(logtag));
-	
-	if ((StrEqual("slap.smx", logtag, false) ||
-		 StrEqual("playercommands.smx", logtag, false) ||
-		 StrEqual("funcommands.smx", logtag, false))
-		&& StrContains(message, "slap", false) != -1)
-	{
-		Call_GOKZ_OnSlap(target);
-	}
-	
-	return Plugin_Continue;
-}
-
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 {
 	return Plugin_Handled;
