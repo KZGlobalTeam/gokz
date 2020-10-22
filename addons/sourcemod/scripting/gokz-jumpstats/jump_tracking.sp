@@ -23,7 +23,6 @@ enum struct Pose
 // =====[ GLOBAL VARIABLES ]===================================================
 
 static int entityTouchCount[MAXPLAYERS + 1];
-static int lastFlags[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -269,7 +268,7 @@ enum struct JumpTracker
 	{
 		// Check whether the player touches more than just the ground or if
 		// he just teleported.
-		if ((!(lastFlags[this.jumper] & FL_ONGROUND) && entityTouchCount[this.jumper] > 0) ||
+		if (entityTouchCount[this.jumper] > 0) ||
 			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
@@ -1392,8 +1391,6 @@ public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 	
 	// We always have to track this, no matter if in the air or not
 	jumpTrackers[client].UpdateRelease();
-	
-	lastFlags[client] = GetEntityFlags(client);
 }
 
 public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, MoveType newMovetype)
