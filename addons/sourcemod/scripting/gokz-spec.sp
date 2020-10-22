@@ -68,7 +68,7 @@ int DisplaySpecMenu(int client, bool useFilter = false, char[] filter = "")
 	Menu menu = new Menu(MenuHandler_Spec);
 	menu.SetTitle("%T", "Spec Menu - Title", client);
 	int menuItems = SpecMenuAddItems(client, menu, useFilter, filter);
-	if (menuItems == 0)
+	if (menuItems == 0 || menuItems == 1)
 	{
 		delete menu;
 	}
@@ -201,7 +201,6 @@ int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 	if (targetCount == 1)
 	{
 		SpectatePlayer(client, latestResult);
-		return 0; // No menu needed
 	}
 	
 	return targetCount;
