@@ -148,14 +148,9 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	{
 		gI_BhopPostJumpInputs[client][nextIndex] = CountJumpInputs(client);
 		gB_BhopPostJumpInputsPending[client] = false;
-		
-		// Only treat the bind exception as a jump if it has no post inputs
-		if (!gB_BindExceptionPostPending[client] || gI_BhopPostJumpInputs[client][nextIndex] == 0)
-		{
-			gI_BhopIndex[client] = nextIndex;
-			gI_BhopCount[client]++;
-			CheckForBhopMacro(client);
-		}
+		gI_BhopIndex[client] = nextIndex;
+		gI_BhopCount[client]++;
+		CheckForBhopMacro(client);
 		gB_BindExceptionPostPending[client] = false;
 	}
 	
@@ -163,6 +158,12 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	if (JustJumped(client, cmdnum))
 	{
 		gI_BhopLastTakeoffCmdnum[client] = cmdnum;
+		gB_BindExceptionPending[client] = false;
+		if (gB_BindExceptionPostPending[client])
+		{
+			gB_BhopPostJumpInputsPending[client] = false;
+			gB_BindExceptionPostPending[client] = false;
+		}
 	}
 	
 	if (JustLanded(client, cmdnum))
@@ -188,13 +189,11 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 		// if the player uses the bind for bhops and mostly presses it too early or
 		// exactly on time rather than too late. This is supposed to reduce those by
 		// detecting jumps where you don't get a bhop and have exactly one jump input
-		// before landing and none after landing. We only look at a reduced pre
-		// sample size here to make it a lot harder to fake a binded jump when doing
+		// before landing and none after landing. We require the one input to be right
+		// before the jump to make it a lot harder to fake a binded jump when doing
 		// a regular longjump.
-		if (CountJumpInputs(client, AC_BINDEXCEPTION_SAMPLES) == 1)
-		{
-			gB_BindExceptionPending[client] = true;
-		}
+		gB_BindExceptionPending[client] = (CountJumpInputs(client, AC_BINDEXCEPTION_SAMPLES) == 1 && CountJumpInputs(client, AC_MAX_BUTTON_SAMPLES) == 1);
+		gB_BindExceptionPostPending[client] = false;
 	}
 }
 
