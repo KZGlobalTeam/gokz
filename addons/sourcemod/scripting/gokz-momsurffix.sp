@@ -737,7 +737,7 @@ stock void StoreToAddressFast(Address addr, any data)
 
 stock void StoreToAddressCustom(Address addr, any data, NumberType type)
 {
-	if (gStoreToAddressFast)
+	if (gStoreToAddressFast && type == NumberType_Int32)
 	{
 		StoreToAddressFast(addr, data);
 	}
