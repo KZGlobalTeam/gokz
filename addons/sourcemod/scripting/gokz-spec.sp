@@ -200,7 +200,7 @@ int SpecMenuAddItems(int client, Menu menu, bool useFilter, char[] filter)
 	// The only spectate-able player is the latest result, this happens when the player issuing the command also fits in the filter
 	if (targetCount == 1)
 	{
-		SpectatePlayer(client, latestResult);		
+		SpectatePlayer(client, latestResult);
 	}
 	
 	return targetCount;
