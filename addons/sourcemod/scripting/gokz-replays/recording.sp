@@ -303,9 +303,10 @@ static bool SaveRecordingOfCheater(int client)
 		int i = recordingIndex[client];
 		do
 		{
+			i %= recordedTickData[client].Length;
 			recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
 			file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
-			i = (i + 1) % recordedTickData[client].Length;
+			i++;
 		} while (i != recordingIndex[client]);
 	}
 	else
