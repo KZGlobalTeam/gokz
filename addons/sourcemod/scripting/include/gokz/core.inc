@@ -13,8 +13,6 @@
 #include <regex>
 #include <topmenus>
 
-#include <gokz>
-
 
 
 // =====[ ENUMS ]=====
@@ -376,6 +374,11 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_weapon_encumbrance_per_item", 
 	"sv_weapon_encumbrance_scale"
 };
+
+
+
+// This include (TeleportPlayer) needs GOKZ_COLLISION_GROUP_STANDARD & GOKZ_COLLISION_GROUP_NOTRIGGER
+#include <gokz>
 
 
 

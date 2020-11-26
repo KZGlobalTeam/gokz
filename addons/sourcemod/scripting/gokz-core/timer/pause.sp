@@ -16,11 +16,6 @@ bool GetPaused(int client)
 	return paused[client];
 }
 
-bool GetPausedOnLadder(int client)
-{
-	return pausedOnLadder[client];
-}
-
 void SetPausedOnLadder(int client, bool onLadder)
 {
 	pausedOnLadder[client] = onLadder;
