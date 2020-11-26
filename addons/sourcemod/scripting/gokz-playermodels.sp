@@ -74,6 +74,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	if (IsValidClient(client))
 	{
 		// Can't use a timer here because it's not precise enough. We want exactly 2 ticks of delay!
+		// 2 ticks is the minimum amount of time after which gloves will work.
 		// The reason we need precision is because SetEntityModel momentarily resets the
 		// player hull to standing (or something along those lines), so when a player
 		// spawns/gets reset to a crouch tunnel where there's a trigger less than 18 units from the top
