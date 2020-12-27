@@ -32,6 +32,7 @@ public Plugin myinfo =
 
 bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
+int gC_CurrentMapPath;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
@@ -59,11 +60,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	if (FloatAbs(1.0 / GetTickInterval() - 128.0) > EPSILON)
-	{
-		SetFailState("gokz-replays only supports 128 tickrate servers.");
-	}
-	
 	LoadTranslations("gokz-replays.phrases");
 	
 	CreateGlobalForwards();
@@ -274,4 +270,7 @@ static void HookEvents()
 static void UpdateCurrentMap()
 {
 	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
+	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
+	Format(mapBuffer, sizeof(mapBuffer), "maps/%s", mapBuffer);
+	gC_CurrentMapFileSize = FileSize(mapBuffer);
 } 

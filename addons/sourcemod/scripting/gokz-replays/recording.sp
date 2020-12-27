@@ -370,7 +370,7 @@ static void CreateReplaysDirectory(const char[] map)
 static void FormatReplayPath(char[] buffer, int maxlength, int course, int mode, int style, int timeType)
 {
 	BuildPath(Path_SM, buffer, maxlength, 
-		"%s/%s/%d_%s_%s_%s.%s", 
+		"%s/%s/%d_%s_%s_%s.%s",
 		RP_DIRECTORY, 
 		gC_CurrentMap, 
 		course, 

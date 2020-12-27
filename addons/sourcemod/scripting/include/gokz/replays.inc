@@ -11,10 +11,68 @@
 
 
 
+// =====[ ENUMS ]=====
+enum
+{
+	ReplayType_Run = 0,
+	ReplayType_Cheater,
+	ReplayType_Jump,
+	REPLAYTYPE_COUNT
+};
+
+
+// =====[ STRUCTS ] =====
+
+enum struct GeneralReplayHeader
+{
+	int magicNumber;
+	int formatVersion;
+	int replayType;
+	char gokzVersion[32];
+	char mapName[64];
+	int mapFileSize;
+	int serverIP;
+	int timestamp;
+    char playerAlias[MAX_NAME_LENGTH];
+    int playerSteamID;
+    int mode;
+    int style;
+    float tickrate;
+    int tickCount;
+}
+
+enum struct JumpReplayHeader
+{
+	int jumpType;
+	float distance;
+	float blockDistance;
+	int strafeCount;
+}
+
+enum struct CheaterReplayHeader
+{
+	int ACReason;
+}
+
+enum struct RunReplayHeader
+{
+	float time;
+	int course;
+	int teleportsUsed;
+}
+
+enum struct ReplayTickData
+{
+	int moveType;
+}
+
+
+
 // =====[ CONSTANTS ]=====
 
-#define RP_DIRECTORY "data/gokz-replays" // In Path_SM
+#define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
+#define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM
 #define RP_FILE_EXTENSION "replay"
 #define RP_MAGIC_NUMBER 0x676F6B7A
 #define RP_FORMAT_VERSION 0x01
