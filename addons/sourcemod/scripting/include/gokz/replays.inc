@@ -63,13 +63,16 @@ enum struct RunReplayHeader
 
 enum struct ReplayTickData
 {
-	int moveType;
+	int playerFlags;
+	char currentWeapon[PLATFORM_MAX_PATH];
+	float takeoffSpeed;
 }
 
 
 
 // =====[ CONSTANTS ]=====
 
+#define RP_DIRECTORY "data/gokz-replays" // In Path_SM
 #define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
 #define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM

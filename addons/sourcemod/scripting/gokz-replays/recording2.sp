@@ -13,8 +13,12 @@
 	followed by the recorded tick data from OnPlayerRunCmdPost.
 */
 
+static float tickInterval;
 static int recordingIndex[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
+static int lastTeleportTick[MAXPLAYERS + 1];
+static bool timerRunning[MAXPLAYERS + 1];
+static bool recordingPaused[MAXPLAYERS + 1];
 static ArrayList recordedTickData[MAXPLAYERS + 1];
 static ArrayList recordedRunData[MAXPLAYERS + 1];
 
@@ -23,6 +27,7 @@ static ArrayList recordedRunData[MAXPLAYERS + 1];
 void OnMapStart_Recording()
 {
     CreateReplaysDirectory(gC_CurrentMap);
+    tickInterval = 1/GetTickInterval();
 }
 
 
@@ -34,6 +39,36 @@ void OnClientPutInServer_Recording(int client)
     }
 
     StartRecording(client);
+}
+
+void GOKZ_OnTeleportToCheckpoint_Post(int client)
+{
+    lastTeleportTick[client] = GetGameTickCount();
+}
+
+void OnPlayerRunCmdPost_Recording(int client, int buttons)
+{
+    if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
+	{
+		return;
+	}
+
+    int tick, runTick;
+    if (timerRunning[client])
+    {
+        runTick = GetArraySize(recordedRunData[client]);
+        recordedRunData[client].Resize(runTick + 1);
+    }
+    else
+    {
+        tick = GetArraySize(recordedTickData[client]);
+        if (tick < RP_MAX_CHEATER_REPLAY_LENGTH)
+        {
+            recordedTickData[client].Resize(tick + 1);
+        }
+        tick = recordingIndex[client];
+        recordingIndex[client] = recordingIndex[client] == RP_MAX_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
+    }
 }
 
 void SaveRecordingOfRun(const char[] path, int client, int course, float time, int teleportsUsed)
@@ -193,4 +228,82 @@ static void FormatJumpReplayPath(char[] buffer, int maxlength, int client, int j
         gC_ModeNamesShort[mode],
         gC_StyleNamesShort[style],
         RP_FILE_EXTENSION);
+}
+
+static int EncodePlayerFlags(int client)
+{
+    int flags = 0;
+    MoveType movetype = Movement_GetMovetype(client);
+    int buttons = GetClientButtons(client);
+    
+    SetKthBit(flags, 0, movetype == MOVETYPE_WALK);
+    SetKthBit(flags, 1, movetype == MOVETYPE_LADDER);
+    SetKthBit(flags, 2, movetype == MOVETYPE_NOCLIP);
+
+    SetKthBit(flags, 3, IsBitSet(buttons, IN_ATTACK));
+    SetKthBit(flags, 4, IsBitSet(buttons, IN_ATTACK2));
+    SetKthBit(flags, 5, IsBitSet(buttons, IN_JUMP));
+    SetKthBit(flags, 6, IsBitSet(buttons, IN_DUCK));
+    SetKthBit(flags, 7, IsBitSet(buttons, IN_FORWARD));
+    SetKthBit(flags, 8, IsBitSet(buttons, IN_BACK));
+    SetKthBit(flags, 9, IsBitSet(buttons, IN_LEFT));
+    SetKthBit(flags, 10, IsBitSet(buttons, IN_RIGHT));
+    SetKthBit(flags, 11, IsBitSet(buttons, IN_MOVELEFT));
+    SetKthBit(flags, 12, IsBitSet(buttons, IN_MOVERIGHT));
+    SetKthBit(flags, 13, IsBitSet(buttons, IN_RELOAD));
+    SetKthBit(flags, 14, IsBitSet(buttons, IN_SPEED));
+    SetKthBit(flags, 15, IsBitSet(buttons, FL_ONGROUND));
+    SetKthBit(flags, 16, IsBitSet(buttons, FL_DUCKING));
+    SetKthBit(flags, 17, IsBitSet(buttons, FL_SWIM));
+
+    SetKthBit(flags, 18, GetEntProp("m_nWaterLevel") == 0);
+
+    SetKthBit(flags, 19, lastTeleportTick[client] == GetGameTickCount());
+    SetKthBit(flags, 20, Movement_GetTakeoffTick(client) == GetGameTickCount());
+
+
+}
+
+// Function to set the bitNum bit in integer to value
+static void SetKthBit(int &number, int bitNum, bool value)
+{
+    number = ((1 << bitNum) | value);
+}
+
+static bool IsBitSet(int number, int checkBit)
+{
+    return (number & checkBit) == checkBit;
+}
+
+static void CreateReplaysDirectory(const char[] map)
+{
+	char path[PLATFORM_MAX_PATH];
+	
+	// Create parent replay directory
+	BuildPath(Path_SM, path, sizeof(path), RP_DIRECTORY);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+	
+	// Create maps replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS, map);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+	
+	// Create cheaters replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_CHEATERS);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+
+    // Create jumps replay directory
+    BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_JUMPS);
+    if (!DirExists(path))
+    {
+        CreateDirectory(path, 511);
+    }
 }
