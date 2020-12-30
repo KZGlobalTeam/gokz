@@ -35,6 +35,8 @@ void OnPlayerSpawn_GodMode(int client)
 
 // =====[ NOCLIP ]=====
 
+int noclipReleaseTime[MAXPLAYERS + 1];
+
 void ToggleNoclip(int client)
 {
 	if (Movement_GetMovetype(client) != MOVETYPE_NOCLIP)
@@ -59,6 +61,7 @@ void DisableNoclip(int client)
 {
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
+		noclipReleaseTime[client] = GetGameTickCount();
 		Movement_SetMovetype(client, MOVETYPE_WALK);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 		
@@ -92,6 +95,7 @@ void DisableNoclipNotrigger(int client)
 {
 	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
+		noclipReleaseTime[client] = GetGameTickCount();
 		Movement_SetMovetype(client, MOVETYPE_WALK);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 		
@@ -120,6 +124,11 @@ void RemoveNoclipGroundFlag(int client)
 		SetEntityFlags(client, GetEntityFlags(client) & ~FL_ONGROUND);
 	}
 	delete trace;
+}
+
+bool JustNoclipped(int client)
+{
+	return GetGameTickCount() - noclipReleaseTime[client] <= GOKZ_TIMER_START_NOCLIP_TICKS;
 }
 
 
