@@ -33,6 +33,8 @@ enum ObsMode
 // =====[ CONSTANTS ]=====
 
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
+#define GOKZ_COLLISION_GROUP_STANDARD 2
+#define GOKZ_COLLISION_GROUP_NOTRIGGER 1
 #define EPSILON 0.000001
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
@@ -456,12 +458,15 @@ public void ContinueHoldStill(DataPack data)
 		if (ducked)
 		{
 			ForcePlayerDuck(client);
-			// Don't trigger triggers
-			SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
 			
-			// Let the player move on the last tick
-			if (ticks == tickCount - 1)
+			if (ticks < tickCount - 1)
 			{
+				// Don't trigger triggers
+				SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
+			}
+			else
+			{
+				// Let the player trigger triggers on the last tick
 				SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 			}
 		}

@@ -13,6 +13,8 @@
 #include <regex>
 #include <topmenus>
 
+#include <gokz>
+
 
 
 // =====[ ENUMS ]=====
@@ -179,8 +181,6 @@ enum
 #define GOKZ_TIMER_START_NOCLIP_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
-#define GOKZ_COLLISION_GROUP_STANDARD 2
-#define GOKZ_COLLISION_GROUP_NOTRIGGER 1
 
 #define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
@@ -375,11 +375,6 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_weapon_encumbrance_per_item", 
 	"sv_weapon_encumbrance_scale"
 };
-
-
-
-// This include (TeleportPlayer) needs GOKZ_COLLISION_GROUP_STANDARD & GOKZ_COLLISION_GROUP_NOTRIGGER
-#include <gokz>
 
 
 
