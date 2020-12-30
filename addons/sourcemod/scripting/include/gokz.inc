@@ -415,6 +415,9 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 		client);
 	bool ducked = TR_DidHit(trace);
 	
+	// Prevent noclip exploit
+	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+
 	// Intelligently hold player still to prevent booster and trigger exploits
 	StartHoldStill(client, ducked);
 	
