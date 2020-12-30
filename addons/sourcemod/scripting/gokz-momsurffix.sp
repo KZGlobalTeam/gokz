@@ -681,7 +681,7 @@ stock bool IsValidMovementTrace(CGameMovement pThis, CGameTrace tr)
 	Vector plane_normal = tr.plane.normal;
 	if(CloseEnoughFloat(tr.fraction, 0.0)
 		&& tr.plane.type >= PLANE_Z // axially aligned vertical planes (not floors) can be pixelsurfs!
-		&& tr.plane.normal.z < WALKABLE_PLANE_NORMAL) // if plane isn't walkable
+		&& plane_normal.z < WALKABLE_PLANE_NORMAL) // if plane isn't walkable
 	{
 		return false;
 	}
