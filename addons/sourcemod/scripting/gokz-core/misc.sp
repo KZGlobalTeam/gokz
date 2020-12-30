@@ -200,41 +200,6 @@ void OnTimerStart_JoinTeam(int client)
 	hasSavedPosition[client] = false;
 }
 
-void OnPlayerJoinTeam_JoinTeam(int client, int team, int oldteam)
-{
-	if (team == CS_TEAM_CT || team == CS_TEAM_T)
-	{
-		// The position is not correct before the next frame
-		DataPack data = new DataPack();
-		data.WriteCell(client);
-		RequestFrame(UnspecUnstuck, data);
-	}
-	else if (oldteam == CS_TEAM_CT || oldteam == CS_TEAM_T)
-	{
-		if (GOKZ_GetPaused(client))
-		{
-			specMovetype[client] = GetPausedOnLadder(client) ? MOVETYPE_LADDER : MOVETYPE_WALK;
-		}
-		else
-		{
-			specMovetype[client] = Movement_GetMovetype(client);
-		}
-	}
-}
-
-void UnspecUnstuck(DataPack data)
-{
-	data.Reset();
-	int client = data.ReadCell();
-	delete data;
-	
-	float origin[3], angles[3];
-	Movement_GetOrigin(client, origin);
-	Movement_GetEyeAngles(client, angles);
-	Movement_SetMovetype(client, specMovetype[client]);
-	TeleportPlayer(client, origin, angles);
-}
-
 void JoinTeam(int client, int newTeam, bool restorePos)
 {
 	KZPlayer player = KZPlayer(client);
@@ -267,8 +232,7 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 		CS_RespawnPlayer(client);
 		if (restorePos && hasSavedPosition[client])
 		{
-			player.SetOrigin(savedOrigin[client]);
-			player.SetEyeAngles(savedAngles[client]);
+			TeleportPlayer(client, savedOrigin[client], savedAngles[client]);
 			if (savedOnLadder[client])
 			{
 				player.Movetype = MOVETYPE_LADDER;
