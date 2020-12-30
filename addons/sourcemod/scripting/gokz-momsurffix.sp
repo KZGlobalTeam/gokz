@@ -25,6 +25,8 @@ public Plugin myinfo = {
 #define ASM_PATCH_LEN 24
 #define ASM_START_OFFSET 100
 
+#define WALKABLE_PLANE_NORMAL 0.7
+
 enum OSType
 {
 	OSUnknown = -1,
@@ -319,7 +321,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 			if(has_valid_plane)
 			{
 				alloced_vector.FromArray(valid_plane);
-				if(valid_plane[2] >= 0.7 && valid_plane[2] <= 1.0)
+				if(valid_plane[2] >= WALKABLE_PLANE_NORMAL && valid_plane[2] <= 1.0)
 				{
 					ClipVelocity(pThis, vecVelocity, alloced_vector, vecVelocity, 1.0);
 					vecVelocity.ToArray(original_velocity);
@@ -503,7 +505,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 		
 		MoveHelper().AddToTouched(pm, vecVelocity);
 		
-		if(pm.plane.normal.z >= 0.7)
+		if(pm.plane.normal.z >= WALKABLE_PLANE_NORMAL)
 			blocked |= 1;
 		
 		if(CloseEnoughFloat(pm.plane.normal.z, 0.0))
@@ -524,7 +526,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 		{
 			Vector vec1 = Vector();
 			PROF_START();
-			if(planes[0][2] >= 0.7)
+			if(planes[0][2] >= WALKABLE_PLANE_NORMAL)
 			{
 				vec1.FromArray(original_velocity);
 				alloced_vector2.FromArray(planes[0]);
@@ -678,7 +680,8 @@ stock bool IsValidMovementTrace(CGameMovement pThis, CGameTrace tr)
 	// This fixes pixelsurfs in a kind of scuffed way
 	Vector plane_normal = tr.plane.normal;
 	if(CloseEnoughFloat(tr.fraction, 0.0)
-		&& tr.plane.type >= PLANE_Z) // axially aligned vertical planes (not floors) can be pixelsurfs!
+		&& tr.plane.type >= PLANE_Z // axially aligned vertical planes (not floors) can be pixelsurfs!
+		&& plane_normal.z < WALKABLE_PLANE_NORMAL) // if plane isn't walkable
 	{
 		return false;
 	}
