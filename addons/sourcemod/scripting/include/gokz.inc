@@ -35,6 +35,7 @@ enum ObsMode
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
 #define GOKZ_COLLISION_GROUP_STANDARD 2
 #define GOKZ_COLLISION_GROUP_NOTRIGGER 1
+#define GOKZ_TP_FREEZE_TICKS 5
 #define EPSILON 0.000001
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
@@ -425,7 +426,7 @@ static void StartHoldStill(int client, bool ducked)
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(0); // tick counter
-	data.WriteCell(5); // number of ticks to hold still
+	data.WriteCell(GOKZ_TP_FREEZE_TICKS); // number of ticks to hold still
 	data.WriteCell(ducked); 
 	ContinueHoldStill(data);
 }
