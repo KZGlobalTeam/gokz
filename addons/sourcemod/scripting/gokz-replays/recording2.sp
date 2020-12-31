@@ -13,7 +13,8 @@
 	followed by the recorded tick data from OnPlayerRunCmdPost.
 */
 
-static float tickInterval;
+static float tickrate;
+static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
 static int lastTeleportTick[MAXPLAYERS + 1];
@@ -27,7 +28,8 @@ static ArrayList recordedRunData[MAXPLAYERS + 1];
 void OnMapStart_Recording()
 {
     CreateReplaysDirectory(gC_CurrentMap);
-    tickInterval = 1/GetTickInterval();
+    tickrate = 1/GetTickInterval();
+    maxCheaterReplayTicks = RoundToCeil(RP_MAX_CHEATER_REPLAY_LENGTH * tickrate);
 }
 
 
@@ -36,6 +38,10 @@ void OnClientPutInServer_Recording(int client)
     if (recordedTickData[client] == null)
     {
         recordedTickData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
+    }
+    if (recordedRunData[client] == null)
+    {
+        recordedRunData[client] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, 0);
     }
 
     StartRecording(client);
@@ -53,32 +59,63 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 		return;
 	}
 
+    float origin[3], angles[3];
+    Movement_GetOrigin(client, origin);
+    Movement_GetEyeAngles(client, angles);
+    int flags = EncodePlayerFlags(client);
+
     int tick, runTick;
     if (timerRunning[client])
     {
         runTick = GetArraySize(recordedRunData[client]);
         recordedRunData[client].Resize(runTick + 1);
+
+        recordedRunData[client].Set(tick, origin[0], 0);
+	    recordedRunData[client].Set(tick, origin[1], 1);
+	    recordedRunData[client].Set(tick, origin[2], 2);
+	    recordedRunData[client].Set(tick, angles[0], 3);
+	    recordedRunData[client].Set(tick, angles[1], 4);
+	    // Don't bother tracking eye angle roll (angles[2]) - not used
+	    recordedRunData[client].Set(tick, buttons, 5);
+	    recordedRunData[client].Set(tick, flags, 6);
     }
-    else
+    if (!timerRunning[client] || recordedRunData[client].Length < maxCheaterReplayTicks)
     {
         tick = GetArraySize(recordedTickData[client]);
-        if (tick < RP_MAX_CHEATER_REPLAY_LENGTH)
+        if (tick < maxCheaterReplayTicks)
         {
             recordedTickData[client].Resize(tick + 1);
         }
         tick = recordingIndex[client];
-        recordingIndex[client] = recordingIndex[client] == RP_MAX_CHEATER_REPLAY_LENGTH - 1 ? 0 : recordingIndex[client] + 1;
+        recordingIndex[client] = recordingIndex[client] == maxCheaterReplayTicks - 1 ? 0 : recordingIndex[client] + 1;
+
+        recordedTickData[client].Set(tick, origin[0], 0);
+	    recordedTickData[client].Set(tick, origin[1], 1);
+	    recordedTickData[client].Set(tick, origin[2], 2);
+	    recordedTickData[client].Set(tick, angles[0], 3);
+	    recordedTickData[client].Set(tick, angles[1], 4);
+	    // Don't bother tracking eye angle roll (angles[2]) - not used
+	    recordedTickData[client].Set(tick, buttons, 5);
+	    recordedTickData[client].Set(tick, flags, 6);
     }
 }
 
-void SaveRecordingOfRun(const char[] path, int client, int course, float time, int teleportsUsed)
+void GOKZ_OnTimerStart_Recording(int client)
+{
+    timerRunning[client] = true;
+    StartRecording(client);
+}
+
+// =====[ PRIVATE ]=====
+
+static bool SaveRecordingOfRun(const char[] path, int client, int course, float time, int teleportsUsed)
 {
     // Prepare data
 	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
 
     // Create and fill General Header
     GeneralReplayHeader generalHeader;
-    FillGeneralHeader(generalHeader, client, ReplayType_Run, endTick - startTick);
+    FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedRunData[client].Length);
 
     // Create and fill Run Header
     RunReplayHeader runHeader;
@@ -116,6 +153,10 @@ void SaveRecordingOfRun(const char[] path, int client, int course, float time, i
 
     // Write tick data
     WriteTickData(file, client, replayType);
+
+    delete file;
+
+    return true;
 }
 
 void SaveRecordingOfCheater()
@@ -128,8 +169,6 @@ void SaveRecordingOfJump()
 
 }
 
-
-// =====[ PRIVATE ]=====
 
 static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int replayType, int tickCount)
 {
@@ -150,7 +189,7 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
     generalHeader.playerSteamID = GetSteamAccountID(client);
     generalHeader.mode = mode;
     generalHeader.style = style;
-    generalHeader.tickrate = 1/GetTickInterval();
+    generalHeader.tickrate = tickrate;
     generalHeader.tickCount = tickCount;
 }
 
@@ -177,15 +216,47 @@ static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
 
 static void WriteTickData(File file, int client, int replayType)
 {
+    any tickData[RP_TICK_DATA_BLOCKSIZE];
     switch(replayType)
     {
         case ReplayType_Run:
         {
-            any tickData[RP_TICK_DATA_BLOCKSIZE];
             for (int i = 0; i < recordedRunData[client].Length - 1; i ++)
             {
-                recordedRunData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE)
+                recordedRunData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
                 file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+            }
+        }
+        case ReplayType_Cheater:
+        {
+            int i = recordingIndex[client];
+		    do
+		    {
+			    i %= recordedTickData[client].Length;
+			    recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+			    file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+			    i++;
+		    } while (i != recordingIndex[client]);
+        }
+        case ReplayType_Jump:
+        {
+            if (timerRunning[client])
+            {
+                for (int i = lastTakeoffTick[client]; i <= recordingIndex[client]; i++)
+                {
+                    recordedRunData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+                }
+            }
+            else
+            {
+                int i = lastTakeoffTick[client]);
+                do
+                {
+                    i %= recordedTickData[client].Length;
+                    recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+                    file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+                    i++;
+                } while (i != recordingIndex[client]);
             }
         }
     }
@@ -261,7 +332,7 @@ static int EncodePlayerFlags(int client)
     SetKthBit(flags, 19, lastTeleportTick[client] == GetGameTickCount());
     SetKthBit(flags, 20, Movement_GetTakeoffTick(client) == GetGameTickCount());
 
-
+    return flags;
 }
 
 // Function to set the bitNum bit in integer to value
