@@ -156,6 +156,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_Options(client);
 	OnClientPutInServer_BhopTriggers(client);
 	OnClientPutInServer_Triggerfix(client);
+	OnClientPutInServer_Noclip(client);
 	HookClientEvents(client);
 }
 
