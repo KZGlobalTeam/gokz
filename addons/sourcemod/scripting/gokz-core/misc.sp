@@ -131,6 +131,11 @@ bool JustNoclipped(int client)
 	return GetGameTickCount() - noclipReleaseTime[client] <= GOKZ_TIMER_START_NOCLIP_TICKS;
 }
 
+void OnClientPutInServer_Noclip(int client)
+{
+	noclipReleaseTime[client] = 0;
+}
+
 
 
 // =====[ PLAYER COLLISION ]=====
