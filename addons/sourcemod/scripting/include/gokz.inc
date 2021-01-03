@@ -453,9 +453,14 @@ public void ContinueHoldStill(DataPack data)
 		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetGravity(client, 1.0);
+
 		// Don't drop the player off of ladders.
 		// The game will automatically change the movetype back to MOVETYPE_WALK if it can't find a ladder.
-		Movement_SetMovetype(client, MOVETYPE_LADDER);
+		// Don't change the movetype if it's currently MOVETYPE_NONE, as that means the player is paused.
+		if (Movement_GetMovetype(client) != MOVETYPE_NONE)
+		{
+			Movement_SetMovetype(client, MOVETYPE_LADDER);
+		}
 		
 		// Force duck on player and make sure that the player can't trigger triggers above them.
 		// they can still trigger triggers even when we force ducking.
