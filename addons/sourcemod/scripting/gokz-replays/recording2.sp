@@ -108,7 +108,7 @@ void GOKZ_OnTimerStart_Recording(int client)
 
 // =====[ PRIVATE ]=====
 
-static bool SaveRecordingOfRun(const char[] path, int client, int course, float time, int teleportsUsed)
+static bool SaveRecordingOfRun(int client, int course, float time, int teleportsUsed)
 {
     // Prepare data
 	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
@@ -136,10 +136,10 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
 		SortReplayInfoCache();
     }
 
-    File file = OpenFile(path, "wb");
+    File file = OpenFile(replayPath, "wb");
     if (file == null)
 	{
-		    LogError("Failed to create/open replay file to write to: \"%s\".", path);
+		    LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
 		    return false;
     }
 
@@ -152,19 +152,49 @@ static bool SaveRecordingOfRun(const char[] path, int client, int course, float 
     file.WriteInt32(runHeader.teleportsUsed);
 
     // Write tick data
-    WriteTickData(file, client, replayType);
+    WriteTickData(file, client, ReplayType_Run);
 
     delete file;
 
     return true;
 }
 
-void SaveRecordingOfCheater()
+static bool SaveRecordingOfCheater()
 {
+    // Create and fill general header
+    GeneralReplayHeader generalHeader;
+    FillGeneralHeader(generalHeader, client, ReplayType_Cheater, recordedTickData[client].Length);
 
+    // Create and fill cheater header
+    CheaterReplayHeader cheaterHeader;
+    cheaterHeader.ACReason = null;
+
+    //Build path and create/overwrite associated file
+    char replayPath[PLATFORM_MAX_PATH];
+    FormatCheaterReplayPath(replayPath, sizeof(replayPath), client, generalHeader.mode, generalHeader.style);
+
+    File file = OpenFile(replayPath, "wb");
+    if (file == null)
+    {
+        LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
+        return false;
+    }
+
+    // Write general header
+    WriteGeneralHeader(file, generalHeader);
+
+    // Write cheater header
+    file.WriteInt8(cheaterHeader.ACReason);
+
+    // Write tick data
+    WriteTickData(file, client, ReplayType_Cheater);
+
+    delete file;
+
+    return true;
 }
 
-void SaveRecordingOfJump()
+static bool SaveRecordingOfJump()
 {
 
 }
