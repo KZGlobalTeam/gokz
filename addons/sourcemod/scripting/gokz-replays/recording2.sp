@@ -106,9 +106,114 @@ void GOKZ_OnTimerStart_Recording(int client)
     StartRecording(client);
 }
 
+void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
+{
+    if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
+    {
+        SaveRecordingOfCheater(client, 0);
+        Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
+    }
+    else if (timerRunning[client])
+    {
+        char path[PLATFORM_MAX_PATH];
+        if (SaveRecordingOfRun(path, client, course, time, teleportsUsed))
+        {
+            Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed;)
+        }
+        else
+        {
+            Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
+        }
+    }
+
+    timerRunning[client] = false;
+    StartRecording(client);
+}
+
+void GOKZ_OnPause_Recording(int client)
+{
+    PauseRecording(client);
+}
+
+void GOKZ_OnResume_Recording(int client)
+{
+    ResumeRecording(client);
+}
+
+void GOKZ_OnTimerStopped_Recording(int client)
+{
+    timerRunning[client] = false;
+    StartRecording(client);
+}
+
+void GOKZ_OnCountedTeleport_Recording(int client)
+{
+    if (gB_NubRecordMissed[client])
+    {
+        timerRunning[client] = false;
+        StartRecording(client);
+    }
+}
+
+void GOKZ_OnPlayerSuspected_Recording(int client, int ACReason)
+{
+    SaveRecordingOfCheater(client, ACReason);
+}
+
+void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
+{
+	// If missed PRO record or both records, then can no longer beat a server record
+	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
+	{
+		timerRunning[client] = false;
+		StartRecording(client);
+	}
+	// If on a NUB run and missed NUB record, then can no longer beat a server record
+	// Otherwise wait to see if they teleport before stopping the recording
+	if (recordType == RecordType_Nub)
+	{
+		if (GOKZ_GetTeleportCount(client) > 0)
+		{
+			timerRunning[client] = false;
+			StartRecording(client);
+		}
+	}
+}
+
+
+
 // =====[ PRIVATE ]=====
 
-static bool SaveRecordingOfRun(int client, int course, float time, int teleportsUsed)
+static void StartRecording(int client)
+{
+    if (IsFakeClient(client))
+    {
+        return;
+    }
+
+    DiscardRecording(client);
+    ResumeRecording(client);
+}
+
+static void DiscardRecording(int client)
+{
+    // TODO: Make sure we still have 2 mins of footage.
+    recordedTickData[client].Clear();
+    recordedRunData[client].Clear();
+    recordingIndex[client] = 0;
+}
+
+static void PauseRecording(int client)
+{
+    recordingPaused[client] = true;
+}
+
+static void ResumeRecording(int client)
+{
+    recordingPaused[client] = false;
+}
+
+static bool SaveRecordingOfRun(const char replayPath[], int client, int course, float time, int teleportsUsed)
 {
     // Prepare data
 	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
@@ -124,7 +229,6 @@ static bool SaveRecordingOfRun(int client, int course, float time, int teleports
     runHeader.teleportsUsed = teleportsUsed;
 
     // Build path and create/overwrite associated file
-    char replayPath[PLATFORM_MAX_PATH];
     FormatRunReplayPath(replayPath, sizeof(replayPath), course, generalHeader.mode, generalHeader.style, timeType);
     if (FileExists(replayPath))
 	{
