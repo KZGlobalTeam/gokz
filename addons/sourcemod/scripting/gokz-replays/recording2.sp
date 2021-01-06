@@ -143,7 +143,6 @@ static bool SaveRecordingOfRun(int client, int course, float time, int teleports
 		    return false;
     }
 
-    // Write general header
     WriteGeneralHeader(file, generalHeader);
 
     // Write run header
@@ -151,7 +150,6 @@ static bool SaveRecordingOfRun(int client, int course, float time, int teleports
     file.WriteInt8(runHeader.course);
     file.WriteInt32(runHeader.teleportsUsed);
 
-    // Write tick data
     WriteTickData(file, client, ReplayType_Run);
 
     delete file;
@@ -159,7 +157,7 @@ static bool SaveRecordingOfRun(int client, int course, float time, int teleports
     return true;
 }
 
-static bool SaveRecordingOfCheater()
+static bool SaveRecordingOfCheater(int client, int ACReason)
 {
     // Create and fill general header
     GeneralReplayHeader generalHeader;
@@ -167,7 +165,7 @@ static bool SaveRecordingOfCheater()
 
     // Create and fill cheater header
     CheaterReplayHeader cheaterHeader;
-    cheaterHeader.ACReason = null;
+    cheaterHeader.ACReason = ACReason;
 
     //Build path and create/overwrite associated file
     char replayPath[PLATFORM_MAX_PATH];
@@ -180,13 +178,8 @@ static bool SaveRecordingOfCheater()
         return false;
     }
 
-    // Write general header
     WriteGeneralHeader(file, generalHeader);
-
-    // Write cheater header
     file.WriteInt8(cheaterHeader.ACReason);
-
-    // Write tick data
     WriteTickData(file, client, ReplayType_Cheater);
 
     delete file;
@@ -196,7 +189,32 @@ static bool SaveRecordingOfCheater()
 
 static bool SaveRecordingOfJump()
 {
+    // Create and fill general header
+    GeneralReplayHeader generalHeader;
+    FillGeneralHeader(generalHeader, client, ReplayType_Jump, GetGameTickCount() - lastTakeoffTick[client]);
 
+    // Create and fill jump header
+    JumpReplayHeader jumpHeader;
+    FillJumpHeader(jumpHeader, jump);
+
+    // Build path and create/overwrite associated file
+    char replayPath[PLATFORM_MAX_PATH];
+    FormatJumpReplayPath(replayPath, sizeof(replayPath), client, jumpHeader.jumpType, generalHeader.mode, generalHeader.style);
+
+    File file = OpenFile(replayPath, "wb");
+    if (file == null)
+    {
+        LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
+        return false;
+    }
+
+    WriteGeneralHeader(file, generalHeader);
+    WriteJumpHeader(file, jumpHeader);
+    WriteTickData(file, client, ReplayType_Jump);
+
+    delete file;
+
+    return true;
 }
 
 
@@ -223,6 +241,14 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
     generalHeader.tickCount = tickCount;
 }
 
+static void FillJumpHeader(JumpReplayHeader jumpHeader, Jump jump)
+{
+    jumpHeader.jumpType = jump.type;
+    jumpHeader.distance = jump.distance;
+    jumpHeader.blockDistance = jump.block;
+    jumpHeader.strafeCount = jump.strafes;
+}
+
 static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
 {
     file.WriteInt32(generalHeader.magicNumber);
@@ -242,6 +268,14 @@ static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
     file.WriteInt8(generalHeader.style);
     file.WriteInt32(view_as<int>(generalHeader.tickrate));
     file.WriteInt32(generalHeader.tickCount);
+}
+
+static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
+{
+    file.WriteInt8(jumpHeader.jumpType);
+    file.WriteInt32(jumpHeader.distance);
+    file.WriteInt32(jumpHeader.blockDistance);
+    file.WriteInt8(jumpHeader.strafeCount);
 }
 
 static void WriteTickData(File file, int client, int replayType)
