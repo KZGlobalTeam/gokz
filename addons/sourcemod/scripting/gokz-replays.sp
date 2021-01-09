@@ -4,14 +4,17 @@
 #include <sdkhooks>
 #include <sdktools>
 
+#include <movementapi>
+
 #include <gokz/core>
 #include <gokz/localranks>
 #include <gokz/replays>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <gokz/localdb>
 #include <gokz/hud>
+#include <gokz/jumpstats>
+#include <gokz/localdb>
 #include <updater>
 
 #pragma newdecls required
@@ -32,7 +35,7 @@ public Plugin myinfo =
 
 bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
-int gC_CurrentMapPath;
+int gC_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
@@ -206,6 +209,11 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
 }
 
+public void GOKZ_OnTeleportToCheckpoint_Post(int client)
+{
+	GOKZ_OnTeleportToCheckpoint_Post_Recording(client);
+}
+
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	gB_NubRecordMissed[client] = false;
@@ -246,9 +254,14 @@ public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int
 	GOKZ_LR_OnRecordMissed_Recording(client, recordType);
 }
 
-public void GOKZ_AC_OnPlayerSuspected(int client)
+public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason)
 {
-	GOKZ_OnPlayerSuspected_Recording(client);
+	GOKZ_AC_OnPlayerSuspected_Recording(client, reason);
+}
+
+public void GOKZ_JS_OnNewPersonalBest(int client, Jump jump)
+{
+	GOKZ_JS_OnNewPersonalBest_Recording(client, jump);
 }
 
 
@@ -270,6 +283,8 @@ static void HookEvents()
 static void UpdateCurrentMap()
 {
 	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
+
+	char mapBuffer[PLATFORM_MAX_PATH];
 	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
 	Format(mapBuffer, sizeof(mapBuffer), "maps/%s", mapBuffer);
 	gC_CurrentMapFileSize = FileSize(mapBuffer);

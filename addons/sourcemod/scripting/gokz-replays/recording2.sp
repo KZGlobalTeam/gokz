@@ -47,11 +47,6 @@ void OnClientPutInServer_Recording(int client)
     StartRecording(client);
 }
 
-void GOKZ_OnTeleportToCheckpoint_Post(int client)
-{
-    lastTeleportTick[client] = GetGameTickCount();
-}
-
 void OnPlayerRunCmdPost_Recording(int client, int buttons)
 {
     if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
@@ -71,13 +66,13 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
         recordedRunData[client].Resize(runTick + 1);
 
         recordedRunData[client].Set(tick, origin[0], 0);
-	    recordedRunData[client].Set(tick, origin[1], 1);
-	    recordedRunData[client].Set(tick, origin[2], 2);
-	    recordedRunData[client].Set(tick, angles[0], 3);
-	    recordedRunData[client].Set(tick, angles[1], 4);
-	    // Don't bother tracking eye angle roll (angles[2]) - not used
-	    recordedRunData[client].Set(tick, buttons, 5);
-	    recordedRunData[client].Set(tick, flags, 6);
+        recordedRunData[client].Set(tick, origin[1], 1);
+        recordedRunData[client].Set(tick, origin[2], 2);
+        recordedRunData[client].Set(tick, angles[0], 3);
+        recordedRunData[client].Set(tick, angles[1], 4);
+        // Don't bother tracking eye angle roll (angles[2]) - not used
+        recordedRunData[client].Set(tick, buttons, 5);
+        recordedRunData[client].Set(tick, flags, 6);
     }
     if (!timerRunning[client] || recordedRunData[client].Length < maxCheaterReplayTicks)
     {
@@ -90,14 +85,19 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
         recordingIndex[client] = recordingIndex[client] == maxCheaterReplayTicks - 1 ? 0 : recordingIndex[client] + 1;
 
         recordedTickData[client].Set(tick, origin[0], 0);
-	    recordedTickData[client].Set(tick, origin[1], 1);
-	    recordedTickData[client].Set(tick, origin[2], 2);
-	    recordedTickData[client].Set(tick, angles[0], 3);
-	    recordedTickData[client].Set(tick, angles[1], 4);
-	    // Don't bother tracking eye angle roll (angles[2]) - not used
-	    recordedTickData[client].Set(tick, buttons, 5);
-	    recordedTickData[client].Set(tick, flags, 6);
+        recordedTickData[client].Set(tick, origin[1], 1);
+        recordedTickData[client].Set(tick, origin[2], 2);
+        recordedTickData[client].Set(tick, angles[0], 3);
+        recordedTickData[client].Set(tick, angles[1], 4);
+        // Don't bother tracking eye angle roll (angles[2]) - not used
+        recordedTickData[client].Set(tick, buttons, 5);
+        recordedTickData[client].Set(tick, flags, 6);
     }
+}
+
+void GOKZ_OnTeleportToCheckpoint_Post_Recording(int client)
+{
+    lastTeleportTick[client] = GetGameTickCount();
 }
 
 void GOKZ_OnTimerStart_Recording(int client)
@@ -110,7 +110,7 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 {
     if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
     {
-        SaveRecordingOfCheater(client, 0);
+        SaveRecordingOfCheater(client, view_as<ACReason>(0));
         Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
     }
     else if (timerRunning[client])
@@ -118,7 +118,7 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
         char path[PLATFORM_MAX_PATH];
         if (SaveRecordingOfRun(path, client, course, time, teleportsUsed))
         {
-            Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed;)
+            Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed);
         }
         else
         {
@@ -155,11 +155,6 @@ void GOKZ_OnCountedTeleport_Recording(int client)
     }
 }
 
-void GOKZ_OnPlayerSuspected_Recording(int client, int ACReason)
-{
-    SaveRecordingOfCheater(client, ACReason);
-}
-
 void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 {
 	// If missed PRO record or both records, then can no longer beat a server record
@@ -180,6 +175,16 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 	}
 }
 
+void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
+{
+    SaveRecordingOfCheater(client, reason);
+}
+
+void GOKZ_JS_OnNewPersonalBest_Recording(int client, Jump jump)
+{
+    SaveRecordingOfJump(client, jump);
+}
+
 
 
 // =====[ PRIVATE ]=====
@@ -197,10 +202,20 @@ static void StartRecording(int client)
 
 static void DiscardRecording(int client)
 {
-    // TODO: Make sure we still have 2 mins of footage.
-    recordedTickData[client].Clear();
+    // Make sure we still have 2 mins of footage.
+    if(recordedRunData[client].Length >= maxCheaterReplayTicks)
+    {
+        recordedTickData[client].Clear();
+        any runData[RP_TICK_DATA_BLOCKSIZE];
+        for (int i = recordedRunData[client].Length - maxCheaterReplayTicks; i < recordedRunData[client].Length; i++)
+        {
+            recordedRunData[client].GetArray(i, runData, sizeof(runData));
+            recordedTickData[client].PushArray(runData, sizeof(runData));
+        }
+        recordingIndex[client] = 0;
+    }
     recordedRunData[client].Clear();
-    recordingIndex[client] = 0;
+    Call_OnReplayDiscarded(client);
 }
 
 static void PauseRecording(int client)
@@ -213,10 +228,10 @@ static void ResumeRecording(int client)
     recordingPaused[client] = false;
 }
 
-static bool SaveRecordingOfRun(const char replayPath[], int client, int course, float time, int teleportsUsed)
+static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, int course, float time, int teleportsUsed)
 {
     // Prepare data
-	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
+    int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
 
     // Create and fill General Header
     GeneralReplayHeader generalHeader;
@@ -237,7 +252,7 @@ static bool SaveRecordingOfRun(const char replayPath[], int client, int course, 
     else
     {
         AddToReplayInfoCache(course, generalHeader.mode, generalHeader.style, timeType);
-		SortReplayInfoCache();
+        SortReplayInfoCache();
     }
 
     File file = OpenFile(replayPath, "wb");
@@ -258,10 +273,12 @@ static bool SaveRecordingOfRun(const char replayPath[], int client, int course, 
 
     delete file;
 
+    Call_OnReplaySaved(client, replayPath);
+
     return true;
 }
 
-static bool SaveRecordingOfCheater(int client, int ACReason)
+static bool SaveRecordingOfCheater(int client, ACReason reason)
 {
     // Create and fill general header
     GeneralReplayHeader generalHeader;
@@ -269,7 +286,7 @@ static bool SaveRecordingOfCheater(int client, int ACReason)
 
     // Create and fill cheater header
     CheaterReplayHeader cheaterHeader;
-    cheaterHeader.ACReason = ACReason;
+    cheaterHeader.ACReason = reason;
 
     //Build path and create/overwrite associated file
     char replayPath[PLATFORM_MAX_PATH];
@@ -283,15 +300,17 @@ static bool SaveRecordingOfCheater(int client, int ACReason)
     }
 
     WriteGeneralHeader(file, generalHeader);
-    file.WriteInt8(cheaterHeader.ACReason);
+    file.WriteInt8(view_as<int>(cheaterHeader.ACReason));
     WriteTickData(file, client, ReplayType_Cheater);
 
     delete file;
 
+    Call_OnReplaySaved(client, replayPath);
+
     return true;
 }
 
-static bool SaveRecordingOfJump()
+static bool SaveRecordingOfJump(int client, Jump jump)
 {
     // Create and fill general header
     GeneralReplayHeader generalHeader;
@@ -318,6 +337,8 @@ static bool SaveRecordingOfJump()
 
     delete file;
 
+    Call_OnReplaySaved(client, replayPath);
+
     return true;
 }
 
@@ -326,7 +347,7 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
 {
     // Prepare data
     int mode = GOKZ_GetCoreOption(client, Option_Mode);
-	int style = GOKZ_GetCoreOption(client, Option_Style);
+    int style = GOKZ_GetCoreOption(client, Option_Style);
 
     // Fill general header
     generalHeader.magicNumber = RP_MAGIC_NUMBER;
@@ -357,7 +378,7 @@ static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
 {
     file.WriteInt32(generalHeader.magicNumber);
     file.WriteInt8(generalHeader.formatVersion);
-    file.WriteInt8(generalHeader.replayType)
+    file.WriteInt8(generalHeader.replayType);
     file.WriteInt8(strlen(generalHeader.gokzVersion));
     file.WriteString(generalHeader.gokzVersion, false);
     file.WriteInt8(strlen(generalHeader.mapName));
@@ -377,7 +398,7 @@ static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
 static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
 {
     file.WriteInt8(jumpHeader.jumpType);
-    file.WriteInt32(jumpHeader.distance);
+    file.WriteInt32(view_as<int>(jumpHeader.distance));
     file.WriteInt32(jumpHeader.blockDistance);
     file.WriteInt8(jumpHeader.strafeCount);
 }
@@ -398,13 +419,13 @@ static void WriteTickData(File file, int client, int replayType)
         case ReplayType_Cheater:
         {
             int i = recordingIndex[client];
-		    do
-		    {
-			    i %= recordedTickData[client].Length;
-			    recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
-			    file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
-			    i++;
-		    } while (i != recordingIndex[client]);
+            do
+            {
+                i %= recordedTickData[client].Length;
+                recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+                file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+                i++;
+            } while (i != recordingIndex[client]);
         }
         case ReplayType_Jump:
         {
@@ -417,7 +438,7 @@ static void WriteTickData(File file, int client, int replayType)
             }
             else
             {
-                int i = lastTakeoffTick[client]);
+                int i = lastTakeoffTick[client];
                 do
                 {
                     i %= recordedTickData[client].Length;
@@ -495,7 +516,7 @@ static int EncodePlayerFlags(int client)
     SetKthBit(flags, 16, IsBitSet(buttons, FL_DUCKING));
     SetKthBit(flags, 17, IsBitSet(buttons, FL_SWIM));
 
-    SetKthBit(flags, 18, GetEntProp("m_nWaterLevel") == 0);
+    SetKthBit(flags, 18, GetEntProp(client, Prop_Data, "m_nWaterLevel") == 0);
 
     SetKthBit(flags, 19, lastTeleportTick[client] == GetGameTickCount());
     SetKthBit(flags, 20, Movement_GetTakeoffTick(client) == GetGameTickCount());
@@ -506,7 +527,8 @@ static int EncodePlayerFlags(int client)
 // Function to set the bitNum bit in integer to value
 static void SetKthBit(int &number, int bitNum, bool value)
 {
-    number = ((1 << bitNum) | value);
+    int numValue = value ? 1 : 0;
+    number |= numValue << bitNum;
 }
 
 static bool IsBitSet(int number, int checkBit)
@@ -516,28 +538,36 @@ static bool IsBitSet(int number, int checkBit)
 
 static void CreateReplaysDirectory(const char[] map)
 {
-	char path[PLATFORM_MAX_PATH];
-	
-	// Create parent replay directory
-	BuildPath(Path_SM, path, sizeof(path), RP_DIRECTORY);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
-	
-	// Create maps replay directory
-	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS, map);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
-	
-	// Create cheaters replay directory
-	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_CHEATERS);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
+    char path[PLATFORM_MAX_PATH];
+
+    // Create parent replay directory
+    BuildPath(Path_SM, path, sizeof(path), RP_DIRECTORY);
+    if (!DirExists(path))
+    {
+        CreateDirectory(path, 511);
+    }
+
+    // Create maps parent replay directory
+    BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_RUNS);
+    if (!DirExists(path))
+    {
+        CreateDirectory(path, 511);
+    }
+
+
+    // Create maps replay directory
+    BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS, map);
+    if (!DirExists(path))
+    {
+        CreateDirectory(path, 511);
+    }
+
+    // Create cheaters replay directory
+    BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_CHEATERS);
+    if (!DirExists(path))
+    {
+        CreateDirectory(path, 511);
+    }
 
     // Create jumps replay directory
     BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_JUMPS);
