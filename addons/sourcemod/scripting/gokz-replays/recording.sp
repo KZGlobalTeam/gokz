@@ -414,6 +414,7 @@ static void WriteTickData(File file, int client, int replayType)
                 file.WriteInt32(view_as<int>(tickData.angles[0]));
                 file.WriteInt32(view_as<int>(tickData.angles[1]));
                 file.WriteInt32(tickData.playerFlags);
+                file.WriteInt32(tickData.takeoffSpeed);
             }
         }
         case ReplayType_Cheater:

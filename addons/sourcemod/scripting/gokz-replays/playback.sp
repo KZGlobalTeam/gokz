@@ -16,6 +16,7 @@ static float breatherStartTime[RP_MAX_BOTS];
 static bool botInGame[RP_MAX_BOTS];
 static int botClient[RP_MAX_BOTS];
 static bool botDataLoaded[RP_MAX_BOTS];
+static ReplayType botReplayType[RP_MAX_BOTS];
 static int botSteamAccountID[RP_MAX_BOTS];
 static int botCourse[RP_MAX_BOTS];
 static int botMode[RP_MAX_BOTS];
@@ -23,6 +24,9 @@ static int botStyle[RP_MAX_BOTS];
 static float botTime[RP_MAX_BOTS];
 static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
 static bool botPaused[RP_MAX_BOTS];
+static int botKnife[RP_MAX_BOTS];
+static int botWeapon[RP_MAX_BOTS];
+static int botCurrentWeapon[RP_MAX_BOTS];
 
 static int timeOnGround[RP_MAX_BOTS];
 static int timeInAir[RP_MAX_BOTS];
@@ -431,7 +435,6 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	}
 	
 	File file = OpenFile(path, "rb");
-	int length;
 	
 	// Check magic number in header
 	int magicNumber;
@@ -445,12 +448,26 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	// Check replay format version
 	int formatVersion;
 	file.ReadInt8(formatVersion);
-	if (formatVersion != RP_FORMAT_VERSION)
+	switch(formatVersion)
 	{
-		LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
-		return false;
+		case 1: LoadFormatVersion1Replay(file, bot);
+		case 2: LoadFormatVersion2Replay(file, bot);
+
+		default:
+		{
+			LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
+			return false;
+		}
 	}
-	
+}
+
+static void LoadFormatVersion1Replay(File file, int bot)
+{	
+	// Old replays only support runs, not jumps
+	botReplayType[bot] = ReplayType_Run;
+
+	int length;
+
 	// GOKZ version
 	file.ReadInt8(length);
 	char[] gokzVersion = new char[length + 1];
@@ -525,8 +542,151 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	botDataLoaded[bot] = true;
 	
 	delete file;
+}
+
+static void LoadFormatVersion2Replay(File file, int bot)
+{
+	int length;
+
+	// Replay type
+	int replayType;
+	file.ReadInt8(replayType);
+
+	// GOKZ version
+	file.ReadInt8(length);
+	char[] gokzVersion = new char[length + 1];
+	file.ReadString(gokzVersion, length, length);
+	gokzVersion[length] = '\0';
 	
-	return true;
+	// Map name 
+	file.ReadInt8(length);
+	char[] mapName = new char[length + 1];
+	file.ReadString(mapName, length, length);
+	mapName[length] = '\0'; 
+
+	// Map filesize
+	int mapFileSize;
+	file.ReadInt32(mapFileSize);
+
+	// Server IP
+	int serverIP;
+	file.ReadInt32(serverIP);
+
+	// Timestamp
+	int timestamp;
+	file.ReadInt32(timestamp);
+
+	// Player Alias
+	file.ReadInt8(length);
+	file.ReadString(botAlias[bot], sizeof(botAlias[]), length);
+	botAlias[bot][length] = '\0';
+
+	// Player Steam ID
+	int steamID;
+	file.ReadInt32(steamID);
+
+	// Mode
+	file.ReadInt8(botMode[bot]);
+
+	// Style
+	file.ReadInt8(botStyle[bot]);
+
+	// Tickrate
+	int tickrateAsInt;
+	file.ReadInt32(tickrateAsInt);
+	float tickrate = view_as<float>(tickrateAsInt);
+
+	// Tick Count
+	int tickCount;
+	file.ReadInt32(tickCount);
+
+	// Equipped Weapon
+	file.ReadInt32(botWeapon[bot]);
+	
+	// Equipped Knife
+	file.ReadInt32(botKnife[bot]);
+
+	switch(replayType)
+	{
+		case ReplayType_Run:
+		{
+			// Time
+			int timeAsInt;
+			file.ReadInt32(timeAsInt);
+			botTime[bot] = view_as<float>(timeAsInt);
+
+			// Course
+			file.ReadInt8(botCourse[bot]);
+
+			// Teleports Used
+			int teleportsUsed;
+			file.ReadInt32(teleportsUsed);
+
+			// Type
+			botReplayType[bot] = ReplayType_Run;
+		}
+		case ReplayType_Cheater:
+		{
+			// Reason
+			int ACReason;
+			file.ReadInt8(ACReason);
+			
+			// Type
+			botReplayType[bot] = ReplayType_Cheater;
+		}
+		case ReplayType_Jump:
+		{
+			// Jump Type
+			int jumpType;
+			file.ReadInt8(jumpType);
+
+			// Distance
+			float distance;
+			file.ReadInt32(view_as<int>(distance));
+
+			// Block Distance
+			float blockDistance;
+			file.ReadInt32(view_as<int>(blockDistance));
+
+			// Strafe Count
+			int strafeCount;
+			file.ReadInt8(strafeCount);
+
+			// Type
+			botReplayType[bot] = ReplayType_Jump;
+		}
+	}
+
+	// Tick Data
+	// Setup playback tick data array list
+	if (playbackTickData[bot] == null)
+	{
+		playbackTickData[bot] = new ArrayList(sizeof(ReplayTickData));
+	}
+	else
+	{  // Make sure it's all clear and the correct size
+		playbackTickData[bot].Clear();
+	}
+	
+	// Read tick data
+	for (int i = 0; i < tickCount; i++)
+	{
+		ReplayTickData tickData;
+		file.ReadInt32(view_as<int>(tickData.origin[0]));
+		file.ReadInt32(view_as<int>(tickData.origin[1]));
+		file.ReadInt32(view_as<int>(tickData.origin[2]));
+		file.ReadInt32(view_as<int>(tickData.angles[0]));
+		file.ReadInt32(view_as<int>(tickData.angles[1]));
+		file.ReadInt32(tickData.playerFlags);
+		file.ReadInt32(view_as<int>(tickData.takeoffSpeed));
+		
+		playbackTickData.PushArray(tickData);
+	}
+	
+	playbackTick[bot] = 0;
+	botDataLoaded[bot] = true;
+	
+	delete file;
 }
 
 // Reset the bot client's clan tag and named to the default, unused state
@@ -587,7 +747,7 @@ static void SetBotStuff(int bot)
 		GOKZ_JoinTeam(client, CS_TEAM_T);
 	}
 	
-	// Set bot weapon according to mode of the replay
+	// Set bot weapons
 	// Always start by removing the pistol
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
 	if (currentPistol != -1)
@@ -595,21 +755,29 @@ static void SetBotStuff(int bot)
 		RemovePlayerItem(client, currentPistol);
 	}
 	
-	if (botMode[bot] == Mode_Vanilla)
+	int currentKnife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
+	if (currentKnife != -1)
 	{
-		// If Vanilla replay, hold out a knife
-		int currentKnife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
-		if (currentKnife != -1)
-		{
-			RemovePlayerItem(client, currentKnife);
-		}
-		
-		GivePlayerItem(client, "weapon_knife");
+		RemovePlayerItem(client, currentKnife);
+	}
+
+	char weaponName[128];
+	// Give the bot the knife stored in the replay
+	if (botKnife[bot] != 0)
+	{
+		CS_WeaponIDToAlias(botKnife[bot], weaponName, sizeof(weaponName));	
+		GivePlayerItem(client, weaponName);
 	}
 	else
 	{
-		// For other modes, wield a USP-S
-		GivePlayerItem(client, "weapon_usp_silencer");
+		GivePlayerItem(client, "weapon_knife");
+	}
+	
+	// Give the bot the pistol stored in the replay
+	if (botWeapon[bot] != 0)
+	{
+		CS_WeaponIDToAlias(botWeapon[bot], wepaonName, sizeof(weaponname));
+		GivePlayerItem(client, weaponName);
 	}
 }
 
@@ -627,7 +795,7 @@ static int GetBotsInUse()
 	return botsInUse;
 }
 
-// Returns a bot that isn't currently replaying, or -1 if unused bots found
+// Returns a bot that isn't currently replaying, or -1 if no unused bots found
 static int GetUnusedBot()
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
