@@ -41,6 +41,8 @@ enum struct GeneralReplayHeader
     int style;
     float tickrate;
     int tickCount;
+	int equippedWeapon;
+	int equippedKnife;
 }
 
 enum struct JumpReplayHeader
@@ -65,8 +67,9 @@ enum struct RunReplayHeader
 
 enum struct ReplayTickData
 {
+	float origin[3];
+	float angles[2];
 	int playerFlags;
-	char currentWeapon[PLATFORM_MAX_PATH];
 	float takeoffSpeed;
 }
 

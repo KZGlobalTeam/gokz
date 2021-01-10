@@ -81,7 +81,7 @@ void OnMapStart_ReplayCache()
 	}
 	
 	char path[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY, gC_CurrentMap);
+	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS, gC_CurrentMap);
 	DirectoryListing dir = OpenDirectory(path);
 	
 	// We want to find files that look like "0_KZT_NRM_PRO.rec"
