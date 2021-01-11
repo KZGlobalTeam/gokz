@@ -51,6 +51,7 @@ public void OnPluginStart()
 	HookEvents();
 	
 	OnPluginStart_BlockRadio();
+	OnPluginStart_BlockChatWheel();
 }
 
 public void OnAllPluginsLoaded()
@@ -238,7 +239,7 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 
 
 
-// =====[ BLOCK RADIO ]=====
+// =====[ BLOCK RADIO AND CHATWHEEL]=====
 
 static char radioCommands[][] = 
 {
@@ -254,6 +255,12 @@ public void OnPluginStart_BlockRadio()
 	{
 		AddCommandListener(CommandBlock, radioCommands[i]);
 	}
+}
+
+public void OnPluginStart_BlockChatWheel()
+{
+	AddCommandListener(CommandBlock, "playerchatwheel");
+	AddCommandListener(CommandBlock, "chatwheel_ping");	
 }
 
 public Action CommandBlock(int client, const char[] command, int argc)
