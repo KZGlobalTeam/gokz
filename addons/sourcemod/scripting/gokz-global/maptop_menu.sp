@@ -36,6 +36,8 @@ void DisplayMapTopMenu(int client, const char[] map, int course, int mode)
 
 void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, int timeType, bool fromLocalRanks = false)
 {
+	char modeStr[32];
+	
 	cameFromLocalRanks[client] = fromLocalRanks;
 	
 	DataPack dp = new DataPack();
@@ -45,8 +47,16 @@ void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, in
 	FormatEx(mapTopMap[client], sizeof(mapTopMap[]), map);
 	mapTopCourse[client] = course;
 	mapTopMode[client] = mode;
+	GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
 	
-	GlobalAPI_GetRecordTopEx(map, course, GOKZ_GL_GetGlobalMode(mode), timeType == TimeType_Pro, 128, 20, DisplayMapTopSubmenuCallback, dp);
+	// TODO Hard coded 128 tick
+	// TODO Hard coded cap at top 20
+	// TODO Not true NUB yet
+	GlobalAPI_GetRecordsTop(DisplayMapTopSubmenuCallback,
+							dp, DEFAULT_STRING, DEFAULT_INT,
+							DEFAULT_INT, map, 128, course, modeStr,
+							timeType == TimeType_Nub ? DEFAULT_BOOL : false,
+							DEFAULT_STRING, 0, 20);
 }
 
 
@@ -142,16 +152,22 @@ static void MapTopMenuAddItems(int client, Menu menu)
 	}
 }
 
-public int DisplayMapTopSubmenuCallback(bool failure, const char[] top, DataPack dp)
+public int DisplayMapTopSubmenuCallback(JSON_Object top, GlobalAPIRequestData request, DataPack dp)
 {
 	dp.Reset();
 	int client = GetClientOfUserId(dp.ReadCell());
 	int timeType = dp.ReadCell();
 	delete dp;
 	
-	if (failure)
+	if (request.Failure)
 	{
-		LogError("Failed to retrieve map top from global API.");
+		LogError("Failed to get top records with Global API.");
+		return;
+	}
+	
+	if (!top.IsArray)
+	{
+		LogError("GlobalAPI returned a malformed response while looking up the top records.");
 		return;
 	}
 	
@@ -200,44 +216,33 @@ public int DisplayMapTopSubmenuCallback(bool failure, const char[] top, DataPack
 }
 
 // Returns number of record times added to the menu
-static int MapTopSubmenuAddItems(Menu menu, const char[] top, int timeType)
+static int MapTopSubmenuAddItems(Menu menu, JSON_Object records, int timeType)
 {
-	APIRecordList records = new APIRecordList(top);
-	
-	int recordCount = records.Count();
-	
-	if (recordCount <= 0)
-	{
-		return 0;
-	}
-	
-	char buffer[2048];
 	char playerName[MAX_NAME_LENGTH];
 	char display[128];
 	
-	for (int i = 0; i < recordCount; i++)
+	for (int i = 0; i < records.Length; i++)
 	{
-		records.GetByIndex(i, buffer, sizeof(buffer));
-		APIRecord record = new APIRecord(buffer);
+		APIRecord record = view_as<APIRecord>(records.GetObjectIndexed(i));
 		
-		record.PlayerName(playerName, sizeof(playerName));
+		record.GetPlayerName(playerName, sizeof(playerName));
 		
 		switch (timeType)
 		{
 			case TimeType_Nub:
 			{
 				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP      %s", 
-					i + 1, GOKZ_FormatTime(record.Time()), record.Teleports(), playerName);
+					i + 1, GOKZ_FormatTime(record.Time), record.Teleports, playerName);
 			}
 			case TimeType_Pro:
 			{
 				FormatEx(display, sizeof(display), "#%-2d   %11s   %s", 
-					i + 1, GOKZ_FormatTime(record.Time()), playerName);
+					i + 1, GOKZ_FormatTime(record.Time), playerName);
 			}
 		}
 		
 		menu.AddItem("", display, ITEMDRAW_DISABLED);
 	}
 	
-	return recordCount;
+	return records.Length;
 } 
