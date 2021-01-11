@@ -118,6 +118,12 @@ public Action CommandPB(int client, int args)
 	if (args == 0)
 	{  // Print their PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetCoreOption(client, Option_Mode));
+		if (gB_GOKZGlobal)
+		{
+			char steamid[32];
+			GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+			GOKZ_GL_PrintRecords(client, "", 0, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+		}
 	}
 	else if (args == 1)
 	{  // Print their PBs for specified map and their current mode
@@ -145,6 +151,12 @@ public Action CommandBPB(int client, int args)
 	if (args == 0)
 	{  // Print their Bonus 1 PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetCoreOption(client, Option_Mode));
+		if (gB_GOKZGlobal)
+		{
+			char steamid[32];
+			GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+			GOKZ_GL_PrintRecords(client, "", 1, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+		}
 	}
 	else if (args == 1)
 	{  // Print their specified Bonus # PBs for current map and their current mode
@@ -154,6 +166,12 @@ public Action CommandBPB(int client, int args)
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetCoreOption(client, Option_Mode));
+			if (gB_GOKZGlobal)
+			{
+				char steamid[32];
+				GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+				GOKZ_GL_PrintRecords(client, "", bonus, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+			}
 		}
 		else
 		{
