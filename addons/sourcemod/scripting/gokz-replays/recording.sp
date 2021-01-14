@@ -63,8 +63,8 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
     tickData.angles[0] = angles[0];
     tickData.angles[1] = angles[1];
     // Don't bother tracking eye angle roll (angles[2]) - not used
-    tickData.playerFlags = EncodePlayerFlags(client, buttons);
-    tickData.takeoffSpeed = GetEntityFlags(client) & FL_ONGROUND ? -1.0 : Movement_GetTakeoffSpeed(client);
+    tickData.flags = EncodePlayerFlags(client, buttons);
+    tickData.speed = GetEntityFlags(client) & FL_ONGROUND ? Movement_GetSpeed(client) : Movement_GetTakeoffSpeed(client);
     
     if (timerRunning[client])
     {
@@ -405,7 +405,7 @@ static void WriteTickData(File file, int client, int replayType)
     {
         case ReplayType_Run:
         {
-            for (int i = 0; i < recordedRunData[client].Length - 1; i++)
+            for (int i = 0; i < recordedRunData[client].Length; i++)
             {
                 recordedRunData[client].GetArray(i, tickData);
                 file.WriteInt32(view_as<int>(tickData.origin[0]));
@@ -413,8 +413,8 @@ static void WriteTickData(File file, int client, int replayType)
                 file.WriteInt32(view_as<int>(tickData.origin[2]));
                 file.WriteInt32(view_as<int>(tickData.angles[0]));
                 file.WriteInt32(view_as<int>(tickData.angles[1]));
-                file.WriteInt32(tickData.playerFlags);
-                file.WriteInt32(tickData.takeoffSpeed);
+                file.WriteInt32(tickData.flags);
+                file.WriteInt32(view_as<int>(tickData.speed));
             }
         }
         case ReplayType_Cheater:
@@ -423,8 +423,13 @@ static void WriteTickData(File file, int client, int replayType)
             do
             {
                 i %= recordedTickData[client].Length;
-                recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
-                file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+                file.WriteInt32(view_as<int>(tickData.origin[0]));
+                file.WriteInt32(view_as<int>(tickData.origin[1]));
+                file.WriteInt32(view_as<int>(tickData.origin[2]));
+                file.WriteInt32(view_as<int>(tickData.angles[0]));
+                file.WriteInt32(view_as<int>(tickData.angles[1]));
+                file.WriteInt32(tickData.flags);
+                file.WriteInt32(view_as<int>(tickData.speed));
                 i++;
             } while (i != recordingIndex[client]);
         }
@@ -434,7 +439,14 @@ static void WriteTickData(File file, int client, int replayType)
             {
                 for (int i = lastTakeoffTick[client]; i <= recordingIndex[client]; i++)
                 {
-                    recordedRunData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
+                    recordedRunData[client].GetArray(i, tickData);
+                    file.WriteInt32(view_as<int>(tickData.origin[0]));
+                    file.WriteInt32(view_as<int>(tickData.origin[1]));
+                    file.WriteInt32(view_as<int>(tickData.origin[2]));
+                    file.WriteInt32(view_as<int>(tickData.angles[0]));
+                    file.WriteInt32(view_as<int>(tickData.angles[1]));
+                    file.WriteInt32(tickData.flags);
+                    file.WriteInt32(view_as<int>(tickData.speed));
                 }
             }
             else
@@ -443,8 +455,14 @@ static void WriteTickData(File file, int client, int replayType)
                 do
                 {
                     i %= recordedTickData[client].Length;
-                    recordedTickData[client].GetArray(i, tickData, RP_TICK_DATA_BLOCKSIZE);
-                    file.Write(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+                    recordedTickData[client].GetArray(i, tickData);
+                    file.WriteInt32(view_as<int>(tickData.origin[0]));
+                    file.WriteInt32(view_as<int>(tickData.origin[1]));
+                    file.WriteInt32(view_as<int>(tickData.origin[2]));
+                    file.WriteInt32(view_as<int>(tickData.angles[0]));
+                    file.WriteInt32(view_as<int>(tickData.angles[1]));
+                    file.WriteInt32(tickData.flags);
+                    file.WriteInt32(view_as<int>(tickData.speed));
                     i++;
                 } while (i != recordingIndex[client]);
             }
@@ -518,11 +536,12 @@ static int EncodePlayerFlags(int client, int buttons)
     SetKthBit(flags, 17, IsBitSet(clientFlags, FL_DUCKING));
     SetKthBit(flags, 18, IsBitSet(clientFlags, FL_SWIM));
 
-    SetKthBit(flags, 19, GetEntProp(client, Prop_Data, "m_nWaterLevel") == 0);
+    SetKthBit(flags, 19, GetEntProp(client, Prop_Data, "m_nWaterLevel") != 0);
 
-    SetKthBit(flags, 20, lastTeleportTick[client] == GetGameTickCount());
+    SetKthBit(flags, 20, lastTeleportTick[client] - 1 == GetGameTickCount());
     SetKthBit(flags, 21, Movement_GetTakeoffTick(client) == GetGameTickCount());
-    SetKthBit(flags, 22, IsCurrentWeaponSecondary(client));
+    SetKthBit(flags, 22, GOKZ_GetHitPerf(client));
+    SetKthBit(flags, 23, IsCurrentWeaponSecondary(client));
 
     return flags;
 }

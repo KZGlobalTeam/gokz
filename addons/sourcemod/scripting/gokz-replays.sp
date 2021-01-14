@@ -286,6 +286,6 @@ static void UpdateCurrentMap()
 
 	char mapBuffer[PLATFORM_MAX_PATH];
 	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
-	Format(mapBuffer, sizeof(mapBuffer), "maps/%s", mapBuffer);
+	Format(mapBuffer, sizeof(mapBuffer), "maps/%s.bsp", mapBuffer);
 	gC_CurrentMapFileSize = FileSize(mapBuffer);
 } 

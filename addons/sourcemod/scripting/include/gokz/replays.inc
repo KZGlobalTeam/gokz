@@ -22,6 +22,34 @@ enum
 	REPLAYTYPE_COUNT
 };
 
+/*enum (<<= 1)
+{
+	RP_MOVETYPE_WALK = 1 << 0,
+	RP_MOVETYPE_LADDER,
+	RP_MOVETYPE_NOCLIP,
+	RP_MOVETYPE_NONE,
+	RP_IN_ATTACK,
+	RP_IN_ATTACK2,
+	RP_IN_JUMP,
+	RP_IN_DUCK,
+	RP_IN_FORWARD,
+	RP_IN_BACK,
+	RP_IN_LEFT,
+	RP_IN_RIGHT,
+	RP_IN_MOVELEFT,
+	RP_IN_MOVERIGHT,
+	RP_IN_RELOAD,
+	RP_IN_SPEED,
+	RP_FL_ONGROUND,
+	RP_FL_DUCKING,
+	RP_FL_SWIM,
+	RP_UNDER_WATER,
+	RP_TELEPORT_TICK,
+	RP_TAKEOFF_TICK,
+	RP_HIT_PERF,
+	RP_SECONDARY_EQUIPPED,
+};*/
+
 
 // =====[ STRUCTS ] =====
 
@@ -68,9 +96,9 @@ enum struct RunReplayHeader
 enum struct ReplayTickData
 {
 	float origin[3];
-	float angles[2];
-	int playerFlags;
-	float takeoffSpeed;
+	float angles[3];
+	int flags;
+	float speed;
 }
 
 
@@ -93,6 +121,33 @@ enum struct ReplayTickData
 #define RP_MAX_CHEATER_REPLAY_LENGTH 120 // 2 minutes
 #define RP_MAX_BHOP_GROUND_TICKS 5
 #define RP_SKIP_TICKS 10 // 10 seconds
+
+
+#define RP_MOVETYPE_WALK		(1 << 0)
+#define RP_MOVETYPE_LADDER		(1 << 1)
+#define RP_MOVETYPE_NOCLIP		(1 << 2)
+#define RP_MOVETYPE_NONE		(1 << 3)
+#define RP_IN_ATTACK			(1 << 4)
+#define RP_IN_ATTACK2			(1 << 5)
+#define RP_IN_JUMP				(1 << 6)
+#define RP_IN_DUCK				(1 << 7)
+#define RP_IN_FORWARD			(1 << 8)
+#define RP_IN_BACK				(1 << 9)
+#define RP_IN_LEFT				(1 << 10)
+#define RP_IN_RIGHT				(1 << 11)
+#define RP_IN_MOVELEFT			(1 << 12)
+#define RP_IN_MOVERIGHT			(1 << 13)
+#define RP_IN_RELOAD			(1 << 14)
+#define RP_IN_SPEED				(1 << 15)
+#define RP_FL_ONGROUND			(1 << 16)
+#define RP_FL_DUCKING			(1 << 17)
+#define RP_FL_SWIM				(1 << 18)
+#define RP_UNDER_WATER			(1 << 19)
+#define RP_TELEPORT_TICK		(1 << 20)
+#define RP_TAKEOFF_TICK			(1 << 21)
+#define RP_HIT_PERF				(1 << 22)
+#define RP_EQUIPPED_WEAPON		(1 << 23)
+
 
 
 

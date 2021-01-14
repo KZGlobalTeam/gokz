@@ -16,7 +16,8 @@ static float breatherStartTime[RP_MAX_BOTS];
 static bool botInGame[RP_MAX_BOTS];
 static int botClient[RP_MAX_BOTS];
 static bool botDataLoaded[RP_MAX_BOTS];
-static ReplayType botReplayType[RP_MAX_BOTS];
+static int botReplayType[RP_MAX_BOTS];
+static int botReplayVersion[RP_MAX_BOTS];
 static int botSteamAccountID[RP_MAX_BOTS];
 static int botCourse[RP_MAX_BOTS];
 static int botMode[RP_MAX_BOTS];
@@ -24,13 +25,14 @@ static int botStyle[RP_MAX_BOTS];
 static float botTime[RP_MAX_BOTS];
 static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
 static bool botPaused[RP_MAX_BOTS];
+static bool botPlaybackPaused[RP_MAX_BOTS];
 static int botKnife[RP_MAX_BOTS];
 static int botWeapon[RP_MAX_BOTS];
-static int botCurrentWeapon[RP_MAX_BOTS];
 
 static int timeOnGround[RP_MAX_BOTS];
 static int timeInAir[RP_MAX_BOTS];
 static int botTeleportsUsed[RP_MAX_BOTS];
+static int botCurrentTeleport[RP_MAX_BOTS];
 static int botButtons[RP_MAX_BOTS];
 static float botTakeoffSpeed[RP_MAX_BOTS];
 static float botSpeed[RP_MAX_BOTS];
@@ -124,17 +126,17 @@ bool InBreather(int bot)
 
 bool PlaybackPaused(int bot)
 {
-	return botPaused[bot];
+	return botPlaybackPaused[bot];
 }
 
 void PlaybackPause(int bot)
 {
-	botPaused[bot] = true;
+	botPlaybackPaused[bot] = true;
 }
 
 void PlaybackResume(int bot)
 {
-	botPaused[bot] = false;
+	botPlaybackPaused[bot] = false;
 }
 
 void PlaybackSkipForward(int bot)
@@ -238,180 +240,12 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 		{
 			continue;
 		}
-		
-		int size = playbackTickData[bot].Length;
-		float repOrigin[3], repAngles[3];
-		int repButtons, repFlags;
-		
-		// If first or last frame of the playback
-		if (playbackTick[bot] == 0 || playbackTick[bot] == (size - 1))
+
+		switch (botReplayVersion[bot])
 		{
-			// Move the bot and pause them at that tick
-			repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
-			repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
-			repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
-			repAngles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
-			repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
-			TeleportEntity(client, repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
-			
-			if (!inBreather[bot])
-			{
-				// Start the breather period
-				inBreather[bot] = true;
-				breatherStartTime[bot] = GetEngineTime();
-				if (playbackTick[bot] == (size - 1)) 
-				{
-					EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-				}
-			}
-			else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
-			{
-				// End the breather period
-				inBreather[bot] = false;
-				botPaused[bot] = false;
-				if (playbackTick[bot] == 0)
-				{
-					EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-				}
-				// Start the bot if first tick. Clear bot if last tick.
-				playbackTick[bot]++;
-				if (playbackTick[bot] == size)
-				{
-					playbackTickData[bot].Clear(); // Clear it all out
-					botDataLoaded[bot] = false;
-					CancelReplayControlsForBot(bot);
-					ResetBotStuff(bot);
-				}
-			}
+			case 1: PlaybackVersion1(client, bot, buttons);
+			case 2: PlaybackVersion2(client, bot, buttons);
 		}
-		else
-		{
-			// Check whether somebody is actually spectating the bot
-			int spec;
-			for (spec = 1; spec < MAXPLAYERS + 1; spec++)
-			{
-				if (IsValidClient(spec) && GetObserverTarget(spec) == botClient[bot])
-				{
-					break;
-				}
-			}
-			if (spec == MAXPLAYERS + 1 && !IsReplayBotControlled(bot, botClient[bot]))
-			{
-				playbackTickData[bot].Clear();
-				botDataLoaded[bot] = false;
-				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
-				return;
-			}
-			
-			// Load in the next tick
-			repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
-			repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
-			repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
-			repAngles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
-			repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
-			repButtons = playbackTickData[bot].Get(playbackTick[bot], 5);
-			repFlags = playbackTickData[bot].Get(playbackTick[bot], 6);
-			
-			// Check if the replay is paused
-			if (botPaused[bot])
-			{
-				TeleportEntity(client, repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
-				return;
-			}
-			
-			// Set velocity to travel from current origin to recorded origin
-			float currentOrigin[3], velocity[3];
-			Movement_GetOrigin(client, currentOrigin);
-			MakeVectorFromPoints(currentOrigin, repOrigin, velocity);
-			ScaleVector(velocity, 128.0); // Hard-coded 128 tickrate
-			TeleportEntity(client, NULL_VECTOR, repAngles, velocity);
-
-			// We need the velocity directly from the replay to calculate the speeds
-			// for the HUD.
-			MakeVectorFromPoints(botLastOrigin[bot], repOrigin, velocity);
-			ScaleVector(velocity, 128.0); // Hard-coded 128 tickrate
-			CopyVector(repOrigin, botLastOrigin[bot]);
-            
-			botSpeed[bot] = GetVectorHorizontalLength(velocity);
-			botButtons[bot] = repButtons;
-
-			// Should the bot be ducking?!
-			if (repButtons & IN_DUCK || repFlags & FL_DUCKING)
-			{
-				buttons |= IN_DUCK;
-			}
-			
-			// If the replay file says the bot's on the ground, then fine! Unless you're going too fast...
-			// Note that we don't mind if replay file says bot isn't on ground but the bot is.
-			if (repFlags & FL_ONGROUND && Movement_GetSpeed(client) < SPEED_NORMAL * 2)
-			{
-				if (timeInAir[bot] > 0)
-				{
-					botLandingSpeed[bot] = botSpeed[bot];
-					timeInAir[bot] = 0;
-					botIsTakeoff[bot] = false;
-					botJumped[bot] = false;
-					hitBhop[bot] = false;
-					hitPerf[bot] = false;
-					if (!Movement_GetOnGround(client))
-					{
-						timeOnGround[bot] = 0;
-					}
-				}
-				
-				SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
-				Movement_SetMovetype(client, MOVETYPE_WALK);
-				
-				timeOnGround[bot]++;
-				botTakeoffSpeed[bot] = botSpeed[bot];
-			}
-			else
-			{
-				if (timeInAir[bot] == 0)
-				{
-					botIsTakeoff[bot] = true;
-					botJumped[bot] = botButtons[bot] & IN_JUMP > 0;
-					hitBhop[bot] = (timeOnGround[bot] <= RP_MAX_BHOP_GROUND_TICKS) && botJumped[bot];
-					
-					if (botMode[bot] == Mode_SimpleKZ)
-					{
-						hitPerf[bot] = timeOnGround[bot] < 3 && botJumped[bot];
-					}
-					else
-					{
-						hitPerf[bot] = timeOnGround[bot] < 2 && botJumped[bot];
-					}
-					
-					if (hitPerf[bot])
-					{
-						if (botMode[bot] == Mode_SimpleKZ)
-						{
-							botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], (0.2 * botLandingSpeed[bot] + 200));
-						}
-						else if (botMode[bot] == Mode_KZTimer)
-						{
-							botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], 380.0);
-						}
-						else
-						{
-							botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], 286.0);
-						}
-					}
-				}
-				else
-				{
-					botJumped[bot] = false;
-					botIsTakeoff[bot] = false;
-				}
-				
-				timeInAir[bot]++;
-				Movement_SetMovetype(client, MOVETYPE_NOCLIP);
-			}
-
-			playbackTick[bot]++;
-		}
-		
 		break;
 	}
 }
@@ -427,11 +261,16 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	char path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), 
 		"%s/%s/%d_%s_%s_%s.%s", 
-		RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
+		RP_DIRECTORY_RUNS, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
 	if (!FileExists(path))
 	{
-		LogError("Failed to load file: \"%s\".", path);
-		return false;
+		BuildPath(Path_SM, path, sizeof(path),
+		"%s/%s/%d_%s_%s_%s.%s", RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
+		if (!FileExists(path))
+		{
+			LogError("Failed to load file: \"%s\".", path);
+			return false;
+		}
 	}
 	
 	File file = OpenFile(path, "rb");
@@ -450,8 +289,16 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	file.ReadInt8(formatVersion);
 	switch(formatVersion)
 	{
-		case 1: LoadFormatVersion1Replay(file, bot);
-		case 2: LoadFormatVersion2Replay(file, bot);
+		case 1:
+		{
+			botReplayVersion[bot] = 1;
+			LoadFormatVersion1Replay(file, bot);
+		}
+		case 2:
+		{
+			botReplayVersion[bot] = 2;
+			LoadFormatVersion2Replay(file, bot);
+		}
 
 		default:
 		{
@@ -459,6 +306,8 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 			return false;
 		}
 	}
+
+	return true;
 }
 
 static void LoadFormatVersion1Replay(File file, int bot)
@@ -606,6 +455,9 @@ static void LoadFormatVersion2Replay(File file, int bot)
 	// Equipped Knife
 	file.ReadInt32(botKnife[bot]);
 
+	// Big spit to console
+	PrintToServer("Replay Type: %d\nGOKZ Version: %s\nMap Name: %s\nMap Filesize: %d\nServer IP: %d\nTimestamp: %d\nPlayer Alias: %s\nPlayer Steam ID: %d\nMode: %d\nStyle: %d\nTickrate: %f\nTick Count: %d\nWeapon: %d\nKnife: %d", replayType, gokzVersion, mapName, mapFileSize, serverIP, timestamp, botAlias[bot], steamID, botMode[bot], botStyle[bot], tickrate, tickCount, botWeapon[bot], botKnife[bot]);
+
 	switch(replayType)
 	{
 		case ReplayType_Run:
@@ -624,6 +476,9 @@ static void LoadFormatVersion2Replay(File file, int bot)
 
 			// Type
 			botReplayType[bot] = ReplayType_Run;
+			
+			// Finish spit to console
+			PrintToServer("Time: %f\nCourse: %d\nTeleports Used: %d", botTime[bot], botCourse[bot], teleportsUsed);
 		}
 		case ReplayType_Cheater:
 		{
@@ -677,16 +532,391 @@ static void LoadFormatVersion2Replay(File file, int bot)
 		file.ReadInt32(view_as<int>(tickData.origin[2]));
 		file.ReadInt32(view_as<int>(tickData.angles[0]));
 		file.ReadInt32(view_as<int>(tickData.angles[1]));
-		file.ReadInt32(tickData.playerFlags);
-		file.ReadInt32(view_as<int>(tickData.takeoffSpeed));
+		file.ReadInt32(tickData.flags);
+		file.ReadInt32(view_as<int>(tickData.speed));
 		
-		playbackTickData.PushArray(tickData);
+		playbackTickData[bot].PushArray(tickData);
+
+		if (i < 5)
+		PrintToServer("Origin[2] = %f", tickData.origin[2]);
 	}
 	
 	playbackTick[bot] = 0;
 	botDataLoaded[bot] = true;
 	
 	delete file;
+}
+
+static void PlaybackVersion1(int client, int bot, int &buttons)
+{		
+	int size = playbackTickData[bot].Length;
+	float repOrigin[3], repAngles[3];
+	int repButtons, repFlags;
+	
+	// If first or last frame of the playback
+	if (playbackTick[bot] == 0 || playbackTick[bot] == (size - 1))
+	{
+		// Move the bot and pause them at that tick
+		repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
+		repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
+		repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
+		repAngles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
+		repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
+		TeleportEntity(client, repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+		
+		if (!inBreather[bot])
+		{
+			// Start the breather period
+			inBreather[bot] = true;
+			breatherStartTime[bot] = GetEngineTime();
+			if (playbackTick[bot] == (size - 1)) 
+			{
+				EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+		}
+		else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
+		{
+			// End the breather period
+			inBreather[bot] = false;
+			botPlaybackPaused[bot] = false;
+			if (playbackTick[bot] == 0)
+			{
+				EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+			// Start the bot if first tick. Clear bot if last tick.
+			playbackTick[bot]++;
+			if (playbackTick[bot] == size)
+			{
+				playbackTickData[bot].Clear(); // Clear it all out
+				botDataLoaded[bot] = false;
+				CancelReplayControlsForBot(bot);
+				ResetBotStuff(bot);
+			}
+		}
+	}
+	else
+	{
+		// Check whether somebody is actually spectating the bot
+		int spec;
+		for (spec = 1; spec < MAXPLAYERS + 1; spec++)
+		{
+			if (IsValidClient(spec) && GetObserverTarget(spec) == botClient[bot])
+			{
+				break;
+			}
+		}
+		if (spec == MAXPLAYERS + 1 && !IsReplayBotControlled(bot, botClient[bot]))
+		{
+			playbackTickData[bot].Clear();
+			botDataLoaded[bot] = false;
+			CancelReplayControlsForBot(bot);
+			ResetBotStuff(bot);
+			return;
+		}
+		
+		// Load in the next tick
+		repOrigin[0] = playbackTickData[bot].Get(playbackTick[bot], 0);
+		repOrigin[1] = playbackTickData[bot].Get(playbackTick[bot], 1);
+		repOrigin[2] = playbackTickData[bot].Get(playbackTick[bot], 2);
+		repAngles[0] = playbackTickData[bot].Get(playbackTick[bot], 3);
+		repAngles[1] = playbackTickData[bot].Get(playbackTick[bot], 4);
+		repButtons = playbackTickData[bot].Get(playbackTick[bot], 5);
+		repFlags = playbackTickData[bot].Get(playbackTick[bot], 6);
+		
+		// Check if the replay is paused
+		if (botPlaybackPaused[bot])
+		{
+			TeleportEntity(client, repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+			return;
+		}
+		
+		// Set velocity to travel from current origin to recorded origin
+		float currentOrigin[3], velocity[3];
+		Movement_GetOrigin(client, currentOrigin);
+		MakeVectorFromPoints(currentOrigin, repOrigin, velocity);
+		ScaleVector(velocity, 128.0); // Hard-coded 128 tickrate
+		TeleportEntity(client, NULL_VECTOR, repAngles, velocity);
+
+		// We need the velocity directly from the replay to calculate the speeds
+		// for the HUD.
+		MakeVectorFromPoints(botLastOrigin[bot], repOrigin, velocity);
+		ScaleVector(velocity, 128.0); // Hard-coded 128 tickrate
+		CopyVector(repOrigin, botLastOrigin[bot]);
+		
+		botSpeed[bot] = GetVectorHorizontalLength(velocity);
+		botButtons[bot] = repButtons;
+
+		// Should the bot be ducking?!
+		if (repButtons & IN_DUCK || repFlags & FL_DUCKING)
+		{
+			buttons |= IN_DUCK;
+		}
+		
+		// If the replay file says the bot's on the ground, then fine! Unless you're going too fast...
+		// Note that we don't mind if replay file says bot isn't on ground but the bot is.
+		if (repFlags & FL_ONGROUND && Movement_GetSpeed(client) < SPEED_NORMAL * 2)
+		{
+			if (timeInAir[bot] > 0)
+			{
+				botLandingSpeed[bot] = botSpeed[bot];
+				timeInAir[bot] = 0;
+				botIsTakeoff[bot] = false;
+				botJumped[bot] = false;
+				hitBhop[bot] = false;
+				hitPerf[bot] = false;
+				if (!Movement_GetOnGround(client))
+				{
+					timeOnGround[bot] = 0;
+				}
+			}
+			
+			SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
+			Movement_SetMovetype(client, MOVETYPE_WALK);
+			
+			timeOnGround[bot]++;
+			botTakeoffSpeed[bot] = botSpeed[bot];
+		}
+		else
+		{
+			if (timeInAir[bot] == 0)
+			{
+				botIsTakeoff[bot] = true;
+				botJumped[bot] = botButtons[bot] & IN_JUMP > 0;
+				hitBhop[bot] = (timeOnGround[bot] <= RP_MAX_BHOP_GROUND_TICKS) && botJumped[bot];
+				
+				if (botMode[bot] == Mode_SimpleKZ)
+				{
+					hitPerf[bot] = timeOnGround[bot] < 3 && botJumped[bot];
+				}
+				else
+				{
+					hitPerf[bot] = timeOnGround[bot] < 2 && botJumped[bot];
+				}
+				
+				if (hitPerf[bot])
+				{
+					if (botMode[bot] == Mode_SimpleKZ)
+					{
+						botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], (0.2 * botLandingSpeed[bot] + 200));
+					}
+					else if (botMode[bot] == Mode_KZTimer)
+					{
+						botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], 380.0);
+					}
+					else
+					{
+						botTakeoffSpeed[bot] = FloatMin(botLandingSpeed[bot], 286.0);
+					}
+				}
+			}
+			else
+			{
+				botJumped[bot] = false;
+				botIsTakeoff[bot] = false;
+			}
+			
+			timeInAir[bot]++;
+			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		}
+
+		playbackTick[bot]++;
+	}
+}
+
+void PlaybackVersion2(int client, int bot, int &buttons)
+{
+	int size = playbackTickData[bot].Length;
+	ReplayTickData currentTickData;
+	
+	// If first or last frame of the playback
+	if (playbackTick[bot] == 0 || playbackTick[bot] == (size - 1))
+	{
+		// Move the bot and pause them at that tick
+		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
+		TeleportEntity(client, currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+		
+		if (!inBreather[bot])
+		{
+			// Start the breather period
+			inBreather[bot] = true;
+			breatherStartTime[bot] = GetEngineTime();
+			if (playbackTick[bot] == (size - 1)) 
+			{
+				EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+		}
+		else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
+		{
+			// End the breather period
+			inBreather[bot] = false;
+			botPlaybackPaused[bot] = false;
+			if (playbackTick[bot] == 0)
+			{
+				EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+			// Start the bot if first tick. Clear bot if last tick.
+			playbackTick[bot]++;
+			if (playbackTick[bot] == size)
+			{
+				playbackTickData[bot].Clear(); // Clear it all out
+				botDataLoaded[bot] = false;
+				CancelReplayControlsForBot(bot);
+				ResetBotStuff(bot);
+			}
+		}
+	}
+	else
+	{
+		// Check whether somebody is actually spectating the bot
+		int spec;
+		for (spec = 1; spec < MAXPLAYERS + 1; spec++)
+		{
+			if (IsValidClient(spec) && GetObserverTarget(spec) == botClient[bot])
+			{
+				break;
+			}
+		}
+		if (spec == MAXPLAYERS + 1 && !IsReplayBotControlled(bot, botClient[bot]))
+		{
+			playbackTickData[bot].Clear();
+			botDataLoaded[bot] = false;
+			CancelReplayControlsForBot(bot);
+			ResetBotStuff(bot);
+			return;
+		}
+		
+		// Load in the next tick
+		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
+		
+		// Check if the replay is paused
+		if (botPlaybackPaused[bot])
+		{
+			TeleportEntity(client, currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+			return;
+		}
+
+		// Set velocity to travel from current origin to recorded origin
+		float currentOrigin[3], velocity[3];
+		Movement_GetOrigin(client, currentOrigin);
+		MakeVectorFromPoints(currentOrigin, currentTickData.origin, velocity);
+		ScaleVector(velocity, 128.0);
+		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, velocity);
+		
+		botSpeed[bot] = currentTickData.speed;
+
+		// Set buttons
+		if (currentTickData.flags & RP_IN_ATTACK)
+		{
+			buttons |= IN_ATTACK;
+		}
+		if (currentTickData.flags & RP_IN_ATTACK2)
+		{
+			buttons |= IN_ATTACK2;
+		}
+		if (currentTickData.flags & RP_IN_JUMP)
+		{
+			buttons |= IN_JUMP;
+		}
+		if (currentTickData.flags & RP_IN_DUCK || currentTickData.flags & RP_FL_DUCKING)
+		{
+			buttons |= IN_DUCK;
+		}
+		if (currentTickData.flags & RP_IN_FORWARD)
+		{
+			buttons |= IN_FORWARD;
+		}
+		if (currentTickData.flags & RP_IN_BACK)
+		{
+			buttons |= IN_BACK;
+		}
+		if (currentTickData.flags & RP_IN_LEFT)
+		{
+			buttons |= IN_LEFT;
+		}
+		if (currentTickData.flags & RP_IN_RIGHT)
+		{
+			buttons |= IN_RIGHT;
+		}
+		if (currentTickData.flags & RP_IN_MOVELEFT)
+		{
+			buttons |= IN_MOVELEFT;
+		}
+		if (currentTickData.flags & RP_IN_MOVERIGHT)
+		{
+			buttons |= IN_MOVERIGHT;
+		}
+		if (currentTickData.flags & RP_IN_RELOAD)
+		{
+			buttons |= IN_RELOAD;
+		}
+		if (currentTickData.flags & RP_IN_SPEED)
+		{
+			buttons |= IN_SPEED;
+		}
+		botButtons[bot] = buttons;
+
+		if (currentTickData.flags & RP_TELEPORT_TICK)
+		{
+			PrintToServer("%d", Movement_GetMovetype(client));
+		}
+		// Set the bot's MoveType
+		if (currentTickData.flags & RP_MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
+		{
+			botPaused[bot] = false;
+			SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
+			Movement_SetMovetype(client, MOVETYPE_WALK);
+		}
+		else if (currentTickData.flags & RP_MOVETYPE_LADDER)
+		{
+			botPaused[bot] = false;
+			Movement_SetMovetype(client, MOVETYPE_LADDER);
+		}
+		else if (currentTickData.flags & RP_MOVETYPE_NONE)
+		{
+			botPaused[bot] = true;
+			Movement_SetMovetype(client, MOVETYPE_NONE);
+		}
+		else if (currentTickData.flags & RP_UNDER_WATER)
+		{
+			SetEntityFlags(client, GetEntityFlags(client) | FL_INWATER);
+		}
+		else
+		{
+			botPaused[bot] = false;
+			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		}
+
+		// Set some variables
+		if (currentTickData.flags & RP_TELEPORT_TICK)
+		{
+			botCurrentTeleport[bot]++;
+			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		}
+
+		if (currentTickData.flags & RP_TAKEOFF_TICK)
+		{
+			hitPerf[bot] = currentTickData.flags & RP_HIT_PERF > 0;
+			botIsTakeoff[bot] = true;
+			botTakeoffSpeed[bot] = currentTickData.speed;
+		}
+
+		if (currentTickData.flags & RP_SECONDARY_EQUIPPED && !IsCurrentWeaponSecondary(client))
+		{
+			EquipPlayerWeapon(client, GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY));
+		}
+		else if (currentTickData.flags & RP_SECONDARY_EQUIPPED == 0 && IsCurrentWeaponSecondary(client))
+		{
+			EquipPlayerWeapon(client, GetPlayerWeaponSlot(client, CS_SLOT_KNIFE));
+		}
+
+		float testOrigin[3], testAngles[3];
+		Movement_GetOrigin(client, testOrigin);
+		Movement_GetEyeAngles(client, testAngles);
+		//PrintToServer("\nOrigin[0] = %f\nOrigin[1] = %f\nOrigin[2] = %f\nAngles[0] = %f\nAngles[1] = %f\nFlags = %d\nSpeed = %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1], currentTickData.flags, currentTickData.speed);
+		//PrintToServer("\nTest Origin[0] = %f\nTest Origin[1] = %f\nTest Origin[2] = %f\nTest Angles[0] = %f\nTest Angles[1] = %f", testOrigin[0], testOrigin[1], testOrigin[2], testAngles[0], testAngles[1]);
+
+		playbackTick[bot]++;
+	}
 }
 
 // Reset the bot client's clan tag and named to the default, unused state
@@ -748,7 +978,7 @@ static void SetBotStuff(int bot)
 	}
 	
 	// Set bot weapons
-	// Always start by removing the pistol
+	// Always start by removing the pistol and knife
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
 	if (currentPistol != -1)
 	{
@@ -765,7 +995,8 @@ static void SetBotStuff(int bot)
 	// Give the bot the knife stored in the replay
 	if (botKnife[bot] != 0)
 	{
-		CS_WeaponIDToAlias(botKnife[bot], weaponName, sizeof(weaponName));	
+		CS_WeaponIDToAlias(CS_ItemDefIndexToID(botKnife[bot]), weaponName, sizeof(weaponName));
+		Format(weaponName, sizeof(weaponName), "weapon_%s", weaponName);	
 		GivePlayerItem(client, weaponName);
 	}
 	else
@@ -776,7 +1007,8 @@ static void SetBotStuff(int bot)
 	// Give the bot the pistol stored in the replay
 	if (botWeapon[bot] != 0)
 	{
-		CS_WeaponIDToAlias(botWeapon[bot], wepaonName, sizeof(weaponname));
+		CS_WeaponIDToAlias(CS_ItemDefIndexToID(botWeapon[bot]), weaponName, sizeof(weaponName));
+		Format(weaponName, sizeof(weaponName), "weapon_%s", weaponName);
 		GivePlayerItem(client, weaponName);
 	}
 }
@@ -810,15 +1042,34 @@ static int GetUnusedBot()
 
 static void PlaybackSkipToTick(int bot, int tick)
 {
-	// Load in the next tick	
-	float repOrigin[3], repAngles[3];
-	repOrigin[0] = playbackTickData[bot].Get(tick, 0);
-	repOrigin[1] = playbackTickData[bot].Get(tick, 1);
-	repOrigin[2] = playbackTickData[bot].Get(tick, 2);
-	repAngles[0] = playbackTickData[bot].Get(tick, 3);
-	repAngles[1] = playbackTickData[bot].Get(tick, 4);
-	
-	TeleportEntity(botClient[bot], repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	if (botReplayVersion[bot] == 1)
+	{
+		// Load in the next tick	
+		float repOrigin[3], repAngles[3];
+		repOrigin[0] = playbackTickData[bot].Get(tick, 0);
+		repOrigin[1] = playbackTickData[bot].Get(tick, 1);
+		repOrigin[2] = playbackTickData[bot].Get(tick, 2);
+		repAngles[0] = playbackTickData[bot].Get(tick, 3);
+		repAngles[1] = playbackTickData[bot].Get(tick, 4);
+		
+		TeleportEntity(botClient[bot], repOrigin, repAngles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	}
+	else if (botReplayVersion[bot] == 2)
+	{
+		// Load in the next tick
+		ReplayTickData tickData;
+		playbackTickData[bot].GetArray(tick, tickData);
+
+		TeleportEntity(botClient[bot], tickData.origin, tickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	}
+
 	Movement_SetMovetype(botClient[bot], MOVETYPE_NOCLIP);
 	playbackTick[bot] = tick;
+}
+
+static bool IsCurrentWeaponSecondary(int client)
+{
+    int activeWeaponEnt = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+    int secondaryEnt = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
+    return activeWeaponEnt == secondaryEnt;
 }
