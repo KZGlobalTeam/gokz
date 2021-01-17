@@ -52,11 +52,8 @@ void DisplayMapTopSubmenu(int client, const char[] map, int course, int mode, in
 	// TODO Hard coded 128 tick
 	// TODO Hard coded cap at top 20
 	// TODO Not true NUB yet
-	GlobalAPI_GetRecordsTop(DisplayMapTopSubmenuCallback,
-							dp, DEFAULT_STRING, DEFAULT_INT,
-							DEFAULT_INT, map, 128, course, modeStr,
-							timeType == TimeType_Nub ? DEFAULT_BOOL : false,
-							DEFAULT_STRING, 0, 20);
+	GlobalAPI_GetRecordsTop(DisplayMapTopSubmenuCallback, dp, _, _, _, map, 128, course, modeStr,
+							timeType == TimeType_Nub ? DEFAULT_BOOL : false, _, 0, 20);
 }
 
 

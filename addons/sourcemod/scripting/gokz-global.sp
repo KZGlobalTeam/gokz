@@ -528,9 +528,9 @@ static void SetupAPI()
 	
 	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 	GlobalAPI_GetModes(GetModeInfoCallback);
-	GlobalAPI_GetMapByName(GetMapCallback, DEFAULT_DATA, gC_CurrentMap);
+	GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
 	
-	for (int client = 0; client < MAXPLAYERS + 1; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && !IsFakeClient(client))
 		{
