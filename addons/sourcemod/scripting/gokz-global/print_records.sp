@@ -32,12 +32,12 @@ void PrintRecords(int client, const char[] map, int course, int mode, const char
 	DataPack dpNUB = CreateDataPack();
 	dpNUB.WriteCell(GetClientUserId(client));
 	dpNUB.WriteCell(TimeType_Nub);
-	GlobalAPI_GetRecordsTop(PrintRecordsCallback, dpNUB, steamid, DEFAULT_INT, DEFAULT_INT, map, 128, course, mode_str, DEFAULT_BOOL, DEFAULT_STRING, 0, 1);
+	GlobalAPI_GetRecordsTop(PrintRecordsCallback, dpNUB, steamid, _, _, map, 128, course, mode_str, _, _, 0, 1);
 	
 	DataPack dpPRO = CreateDataPack();
 	dpPRO.WriteCell(GetClientUserId(client));
 	dpPRO.WriteCell(TimeType_Pro);
-	GlobalAPI_GetRecordsTop(PrintRecordsCallback, dpPRO, steamid, DEFAULT_INT, DEFAULT_INT, map, 128, course, mode_str, false, DEFAULT_STRING, 0, 1);
+	GlobalAPI_GetRecordsTop(PrintRecordsCallback, dpPRO, steamid, _, _, map, 128, course, mode_str, false, _, 0, 1);
 	
 	inProgress[client] = true;
 	waitingForOtherCallback[client] = true;
