@@ -48,7 +48,7 @@ public void OnLibraryAdded(const char[] name)
 
 // =====[ CLIENT EVENTS ]=====
 
-public void OnClientPutInServer(int client)
+public void GOKZ_OnOptionsLoaded(int client)
 {
 	UpdateClanTag(client);
 }
