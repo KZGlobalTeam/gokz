@@ -590,6 +590,9 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 					// and add the along the normal of the surf ramp they're currently riding down,
 					// essentially pushing them away from the ramp.
 					
+					// NOTE: the following comment is here for context:
+					// NOTE: Technically the 20.0 here can be 2.0, but that causes "jitters" sometimes, so I found
+					// 20 to be pretty safe and smooth. If it causes any unforeseen consequences, tweak it!
 					VectorMA(original_velocity, 2.0, planes[0], new_velocity);
 					vecVelocity.x = new_velocity[0];
 					vecVelocity.y = new_velocity[1];
