@@ -257,11 +257,11 @@ static void Hook_PlayerPostThink(int client)
 		GetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
 		
-		// prevent jumpbugging triggers
 		if (jumpBugged[client])
 		{
-			// need to apply half the gravity here to be accurate.
-			origin[2] -= (velocity[2] + GetAddedHalfGravityInATick(client)) * GetTickInterval();
+			// Subtract vertical velocity, because the jump tick
+			// for jumpbugs already has applied velocity to the origin.
+			origin[2] -= velocity[2] * playerFrameTime[client];
 		}
 		
 		GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
@@ -338,18 +338,6 @@ static bool CheckWater(int client)
 	// The cached water level is updated multiple times per tick, including after movement happens,
 	// so we can just check the cached value here.
 	return GetEntProp(client, Prop_Data, "m_nWaterLevel") > 1;
-}
-
-// returns only half the gravity that would get added to velocity in a tick.
-static float GetAddedHalfGravityInATick(int client)
-{
-	float localGravity = GetEntPropFloat(client, Prop_Data, "m_flGravity");
-	if (localGravity == 0.0)
-	{
-		localGravity = 1.0;
-	}
-	
-	return localGravity * cvGravity.FloatValue * 0.5 * playerFrameTime[client];
 }
 
 public bool AddTrigger(int entity, ArrayList triggers)
