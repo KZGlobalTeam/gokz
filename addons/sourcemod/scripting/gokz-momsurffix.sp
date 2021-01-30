@@ -590,7 +590,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 					// and add the along the normal of the surf ramp they're currently riding down,
 					// essentially pushing them away from the ramp.
 					
-					VectorMA(original_velocity, 20.0, planes[0], new_velocity);
+					VectorMA(original_velocity, 2.0, planes[0], new_velocity);
 					vecVelocity.x = new_velocity[0];
 					vecVelocity.y = new_velocity[1];
 					// Note: We don't want the player to gain any Z boost/reduce from this, gravity should be the
