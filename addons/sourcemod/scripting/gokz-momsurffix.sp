@@ -285,7 +285,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 	if(alloced_vector2.Address == Address_Null)
 		alloced_vector2 = Vector();
 	
-	float rampInitialRetraceLength = 0.2;
+	const float rampInitialRetraceLength = 0.03125;
 	for(bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
 		if(vecVelocity.LengthSqr() == 0.0)
