@@ -13,9 +13,11 @@ static float playerFrameTime[MAXPLAYERS+1];
 
 static bool touchingTrigger[MAXPLAYERS+1][2048];
 
-static int lastGroundEnt[MAXPLAYERS+1];
+static int lastGroundEnt[MAXPLAYERS + 1];
+static bool duckedLastTick[MAXPLAYERS + 1];
 static bool mapTeleportedSequentialTicks[MAXPLAYERS+1];
 static bool jumpBugged[MAXPLAYERS + 1];
+static float jumpBugOrigin[MAXPLAYERS + 1][3];
 
 static ConVar cvGravity;
 
@@ -153,6 +155,15 @@ static void Event_PlayerJump(Event event, const char[] name, bool dontBroadcast)
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	
 	jumpBugged[client] = !!lastGroundEnt[client];
+	if (jumpBugged[client])
+	{
+		GetClientAbsOrigin(client, jumpBugOrigin[client]);
+		// if player's origin is still in the ducking position then adjust for that.
+		if (duckedLastTick[client] && !Movement_GetDucking(client))
+		{
+			jumpBugOrigin[client][2] -= 9.0;
+		}
+	}
 }
 
 static Action Hook_TriggerStartTouch(int entity, int other)
@@ -182,11 +193,14 @@ static MRESReturn DHook_ProcessMovementPre(Handle hParams)
 	playerFrameTime[client] = GetTickInterval() * GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue");
 	mapTeleportedSequentialTicks[client] = false;
 	
-	if (IsPlayerAlive(client)
-		&& GetEntityMoveType(client) == MOVETYPE_WALK
-		&& !CheckWater(client))
+	if (IsPlayerAlive(client))
 	{
-		lastGroundEnt[client] = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
+		if (GetEntityMoveType(client) == MOVETYPE_WALK
+			&& !CheckWater(client))
+		{
+			lastGroundEnt[client] = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
+		}
+		duckedLastTick[client] = Movement_GetDucking(client);
 	}
 	
 	return MRES_Ignored;
@@ -259,9 +273,7 @@ static void Hook_PlayerPostThink(int client)
 		
 		if (jumpBugged[client])
 		{
-			// Subtract vertical velocity, because the jump tick
-			// for jumpbugs already has applied velocity to the origin.
-			origin[2] -= velocity[2] * playerFrameTime[client];
+			origin = jumpBugOrigin[client];
 		}
 		
 		GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
