@@ -285,7 +285,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 	if(alloced_vector2.Address == Address_Null)
 		alloced_vector2 = Vector();
 	
-	float rampInitialRetraceLength = 0.2;
+	const float rampInitialRetraceLength = 0.03125;
 	for(bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
 		if(vecVelocity.LengthSqr() == 0.0)
@@ -580,11 +580,26 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 					break;
 				}
 				
+				// Fun fact time: these next five lines of code fix (vertical) rampbug
 				if(CloseEnough(planes[0], planes[1]))
 				{
-					VectorMA(original_velocity, 20.0, planes[0], new_velocity);
+					// Why did the above return true? Well, when surfing, you can "clip" into the
+					// ramp, due to the ramp not pushing you away enough, and when that happens,
+					// a surfer cries. So the game thinks the surfer is clipping along two of the exact
+					// same planes. So what we do here is take the surfer's original velocity,
+					// and add the along the normal of the surf ramp they're currently riding down,
+					// essentially pushing them away from the ramp.
+					
+					// NOTE: the following comment is here for context:
+					// NOTE: Technically the 20.0 here can be 2.0, but that causes "jitters" sometimes, so I found
+					// 20 to be pretty safe and smooth. If it causes any unforeseen consequences, tweak it!
+					VectorMA(original_velocity, 2.0, planes[0], new_velocity);
 					vecVelocity.x = new_velocity[0];
 					vecVelocity.y = new_velocity[1];
+					// Note: We don't want the player to gain any Z boost/reduce from this, gravity should be the
+					// only force working in the Z direction!
+					
+					// Lastly, let's get out of here before the following lines of code make the surfer lose speed.
 					
 					break;
 				}
