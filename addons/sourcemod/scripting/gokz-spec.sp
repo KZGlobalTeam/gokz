@@ -318,4 +318,5 @@ public Action CommandSpecs(int client, int args)
 			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List", target, targetSpecs, targetSpecNames);
 		}
 	}
+	return Plugin_Handled;
 } 
