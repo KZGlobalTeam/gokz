@@ -202,6 +202,13 @@ public void DB_TxnSuccess_PrintPBs_FindMap(Handle db, DataPack data, int numQuer
 	else if (SQL_FetchRow(results[0]))
 	{  // Result is the MapID
 		DB_PrintPBs(client, targetSteamID, SQL_FetchInt(results[0], 0), course, mode);
+		if (gB_GOKZGlobal)
+		{
+			char map[33], steamid[32];
+			SQL_FetchString(results[0], 1, map, sizeof(map));
+			GetSteam2FromAccountId(steamid, sizeof(steamid), targetSteamID);
+			GOKZ_GL_PrintRecords(client, map, course, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+		}
 	}
 }
 
@@ -246,6 +253,14 @@ public void DB_TxnSuccess_PrintPBs_FindPlayerAndMap(Handle db, DataPack data, in
 	}
 	else if (SQL_FetchRow(results[0]) && SQL_FetchRow(results[1]))
 	{
-		DB_PrintPBs(client, SQL_FetchInt(results[0], 0), SQL_FetchInt(results[1], 0), course, mode);
+		int accountid = SQL_FetchInt(results[0], 0);
+		DB_PrintPBs(client, accountid, SQL_FetchInt(results[1], 0), course, mode);
+		if (gB_GOKZGlobal)
+		{
+			char map[33], steamid[32];
+			SQL_FetchString(results[1], 1, map, sizeof(map));
+			GetSteam2FromAccountId(steamid, sizeof(steamid), accountid);
+			GOKZ_GL_PrintRecords(client, map, course, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+		}
 	}
 }

@@ -8,6 +8,7 @@
 
 void SendTime(int client, int course, float time, int teleportsUsed)
 {
+	char steamid[32], modeStr[32];
 	KZPlayer player = KZPlayer(client);
 	int mode = player.Mode;
 	
@@ -20,11 +21,13 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 		dp.WriteCell(GOKZ_GetTimeTypeEx(teleportsUsed));
 		dp.WriteFloat(time);
 		
-		GlobalAPI_SendRecord(client, GOKZ_GL_GetGlobalMode(mode), course, teleportsUsed, time, SendTimeCallback, dp);
+		GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+		GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
+		GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, gI_MapID, modeStr, course, 128, teleportsUsed, time);
 	}
 }
 
-public int SendTimeCallback(bool failure, int place, int top_place, int top_overall_place, DataPack dp)
+public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, DataPack dp)
 {
 	dp.Reset();
 	int client = GetClientOfUserId(dp.ReadCell());
@@ -34,7 +37,10 @@ public int SendTimeCallback(bool failure, int place, int top_place, int top_over
 	float time = dp.ReadFloat();
 	delete dp;
 	
-	if (failure)
+	int top_place = response.GetInt("top_100");
+	int top_overall_place = response.GetInt("top_100_overall");
+	
+	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
 		return;
