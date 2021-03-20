@@ -302,6 +302,7 @@ public void OnMapStart()
 	OnMapStart_MapStarts();
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
+	OnMapStart_FixMissingSpawns();
 }
 
 public void OnConfigsExecuted()
