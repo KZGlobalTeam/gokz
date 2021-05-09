@@ -572,6 +572,30 @@
 		"en"		"Jump Records"
 		"ru"		"Рекорды прыжков"
 	}
+	"Jump Top Mode Menu - Title"
+	{
+		"en"		"Jumpstats Top\n \nSelect a Mode"
+	}
+	"Jump Top Type Menu - Title"
+	{
+		"#format"	"{1:s}"
+		"en"		"Jumpstats Top\n \nMode - {1}\n \nSelect a Type"
+	}
+	"Jump Top Block Type Menu - Title"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Jumpstats Top\n \nMode - {1}\nType - {2}\n \nSelect a Category"
+	}
+	"Jump Top Submenu - Title (Jump)"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Jumpstats Top\n \nMode - {1}\nType - {2}\n "
+	}
+	"Jump Top Submenu - Title (Block Jump)"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Block Jumpstats Top\n \nMode - {1}\nType - {2}\n "
+	}
 
 
 	// =====[ JUMPSTAT PHRASES ]=====
