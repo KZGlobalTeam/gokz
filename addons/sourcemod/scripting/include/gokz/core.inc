@@ -320,7 +320,7 @@ stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] =
 	"Timer Button Zone Type - Both Buttons",
 	"Timer Button Zone Type - Only End Zone",
 	"Timer Button Zone Type - Both Zones"
-}
+};
 
 stock int gI_CoreOptionCounts[OPTION_COUNT] = 
 {
