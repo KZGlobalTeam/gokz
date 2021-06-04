@@ -49,6 +49,7 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool autoResta
 	if (!IsPlayerAlive(client)
 		 || JustStartedTimer(client)
 		 || JustTeleported(client) && !autoRestart
+		 || JustNoclipped(client)
 		 || !IsPlayerValidMoveType(client)
 		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
 		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client)))

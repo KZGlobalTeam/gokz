@@ -24,7 +24,7 @@ void DB_CacheJSPBs(int client, int steamID)
 public void DB_TxnSuccess_CacheJSPBs(Handle db, int userID, int numQueries, Handle[] results, any[] queryData)
 {
 	int client = GetClientOfUserId(userID);
-	if (!IsValidClient(client))
+	if (client < 1 || client > MaxClients || !IsClientAuthorized(client) || IsFakeClient(client))
 	{
 		return;
 	}

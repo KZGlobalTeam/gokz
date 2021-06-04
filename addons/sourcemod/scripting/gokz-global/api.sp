@@ -34,16 +34,17 @@ void CreateNatives()
 
 public int Native_PrintRecords(Handle plugin, int numParams)
 {
-	char map[33];
+	char map[33], steamid[32];
 	GetNativeString(2, map, sizeof(map));
+	GetNativeString(5, steamid, sizeof(steamid));
 	
 	if (StrEqual(map, ""))
 	{
-		PrintRecords(GetNativeCell(1), gC_CurrentMap, GetNativeCell(3), GetNativeCell(4));
+		PrintRecords(GetNativeCell(1), gC_CurrentMap, GetNativeCell(3), GetNativeCell(4), steamid);
 	}
 	else
 	{
-		PrintRecords(GetNativeCell(1), map, GetNativeCell(3), GetNativeCell(4));
+		PrintRecords(GetNativeCell(1), map, GetNativeCell(3), GetNativeCell(4), steamid);
 	}
 }
 

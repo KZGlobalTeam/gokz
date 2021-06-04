@@ -25,6 +25,8 @@ public Plugin myinfo = {
 #define ASM_PATCH_LEN 24
 #define ASM_START_OFFSET 100
 
+#define WALKABLE_PLANE_NORMAL 0.7
+
 enum OSType
 {
 	OSUnknown = -1,
@@ -283,7 +285,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 	if(alloced_vector2.Address == Address_Null)
 		alloced_vector2 = Vector();
 	
-	float rampInitialRetraceLength = 0.2;
+	const float rampInitialRetraceLength = 0.03125;
 	for(bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
 		if(vecVelocity.LengthSqr() == 0.0)
@@ -319,7 +321,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 			if(has_valid_plane)
 			{
 				alloced_vector.FromArray(valid_plane);
-				if(valid_plane[2] >= 0.7 && valid_plane[2] <= 1.0)
+				if(valid_plane[2] >= WALKABLE_PLANE_NORMAL && valid_plane[2] <= 1.0)
 				{
 					ClipVelocity(pThis, vecVelocity, alloced_vector, vecVelocity, 1.0);
 					vecVelocity.ToArray(original_velocity);
@@ -503,7 +505,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 		
 		MoveHelper().AddToTouched(pm, vecVelocity);
 		
-		if(pm.plane.normal.z >= 0.7)
+		if(pm.plane.normal.z >= WALKABLE_PLANE_NORMAL)
 			blocked |= 1;
 		
 		if(CloseEnoughFloat(pm.plane.normal.z, 0.0))
@@ -524,7 +526,7 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 		{
 			Vector vec1 = Vector();
 			PROF_START();
-			if(planes[0][2] >= 0.7)
+			if(planes[0][2] >= WALKABLE_PLANE_NORMAL)
 			{
 				vec1.FromArray(original_velocity);
 				alloced_vector2.FromArray(planes[0]);
@@ -578,11 +580,26 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 					break;
 				}
 				
+				// Fun fact time: these next five lines of code fix (vertical) rampbug
 				if(CloseEnough(planes[0], planes[1]))
 				{
-					VectorMA(original_velocity, 20.0, planes[0], new_velocity);
+					// Why did the above return true? Well, when surfing, you can "clip" into the
+					// ramp, due to the ramp not pushing you away enough, and when that happens,
+					// a surfer cries. So the game thinks the surfer is clipping along two of the exact
+					// same planes. So what we do here is take the surfer's original velocity,
+					// and add the along the normal of the surf ramp they're currently riding down,
+					// essentially pushing them away from the ramp.
+					
+					// NOTE: the following comment is here for context:
+					// NOTE: Technically the 20.0 here can be 2.0, but that causes "jitters" sometimes, so I found
+					// 20 to be pretty safe and smooth. If it causes any unforeseen consequences, tweak it!
+					VectorMA(original_velocity, 2.0, planes[0], new_velocity);
 					vecVelocity.x = new_velocity[0];
 					vecVelocity.y = new_velocity[1];
+					// Note: We don't want the player to gain any Z boost/reduce from this, gravity should be the
+					// only force working in the Z direction!
+					
+					// Lastly, let's get out of here before the following lines of code make the surfer lose speed.
 					
 					break;
 				}
@@ -678,7 +695,8 @@ stock bool IsValidMovementTrace(CGameMovement pThis, CGameTrace tr)
 	// This fixes pixelsurfs in a kind of scuffed way
 	Vector plane_normal = tr.plane.normal;
 	if(CloseEnoughFloat(tr.fraction, 0.0)
-		&& tr.plane.type >= PLANE_Z) // axially aligned vertical planes (not floors) can be pixelsurfs!
+		&& tr.plane.type >= PLANE_Z // axially aligned vertical planes (not floors) can be pixelsurfs!
+		&& plane_normal.z < WALKABLE_PLANE_NORMAL) // if plane isn't walkable
 	{
 		return false;
 	}
