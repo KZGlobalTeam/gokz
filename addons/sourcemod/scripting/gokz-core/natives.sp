@@ -127,8 +127,11 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 			iOut++;
 		} while (buffer[iIn] != '\0' && iIn < sizeof(buffer) - 1 && iOut < sizeof(colorlessBuffer) - 1);
 		colorlessBuffer[iOut] = '\0';
-		
-		LogMessage(colorlessBuffer);
+		// Don't log stuff printed to GOTV (eg. gokz-tips)
+		if (!IsClientSourceTV(client))
+		{
+			LogMessage(colorlessBuffer);
+		}
 	}
 	
 	if (client != 0)
@@ -139,7 +142,7 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 			gCV_gokz_chat_prefix.GetString(prefix, sizeof(prefix));
 			Format(buffer, sizeof(buffer), "%s%s", prefix, buffer);
 		}
-		
+
 		CPrintToChat(client, "%s", buffer);
 	}
 }
