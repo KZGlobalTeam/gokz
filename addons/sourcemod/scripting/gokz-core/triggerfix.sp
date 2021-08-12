@@ -13,9 +13,11 @@ static float playerFrameTime[MAXPLAYERS+1];
 
 static bool touchingTrigger[MAXPLAYERS+1][2048];
 
-static int lastGroundEnt[MAXPLAYERS+1];
+static int lastGroundEnt[MAXPLAYERS + 1];
+static bool duckedLastTick[MAXPLAYERS + 1];
 static bool mapTeleportedSequentialTicks[MAXPLAYERS+1];
 static bool jumpBugged[MAXPLAYERS + 1];
+static float jumpBugOrigin[MAXPLAYERS + 1][3];
 
 static ConVar cvGravity;
 
@@ -153,6 +155,15 @@ static void Event_PlayerJump(Event event, const char[] name, bool dontBroadcast)
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	
 	jumpBugged[client] = !!lastGroundEnt[client];
+	if (jumpBugged[client])
+	{
+		GetClientAbsOrigin(client, jumpBugOrigin[client]);
+		// if player's origin is still in the ducking position then adjust for that.
+		if (duckedLastTick[client] && !Movement_GetDucking(client))
+		{
+			jumpBugOrigin[client][2] -= 9.0;
+		}
+	}
 }
 
 static Action Hook_TriggerStartTouch(int entity, int other)
@@ -182,11 +193,14 @@ static MRESReturn DHook_ProcessMovementPre(Handle hParams)
 	playerFrameTime[client] = GetTickInterval() * GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue");
 	mapTeleportedSequentialTicks[client] = false;
 	
-	if (IsPlayerAlive(client)
-		&& GetEntityMoveType(client) == MOVETYPE_WALK
-		&& !CheckWater(client))
+	if (IsPlayerAlive(client))
 	{
-		lastGroundEnt[client] = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
+		if (GetEntityMoveType(client) == MOVETYPE_WALK
+			&& !CheckWater(client))
+		{
+			lastGroundEnt[client] = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
+		}
+		duckedLastTick[client] = Movement_GetDucking(client);
 	}
 	
 	return MRES_Ignored;
@@ -257,11 +271,9 @@ static void Hook_PlayerPostThink(int client)
 		GetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
 		
-		// prevent jumpbugging triggers
 		if (jumpBugged[client])
 		{
-			// need to apply half the gravity here to be accurate.
-			origin[2] -= (velocity[2] + GetAddedHalfGravityInATick(client)) * GetTickInterval();
+			origin = jumpBugOrigin[client];
 		}
 		
 		GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
@@ -338,18 +350,6 @@ static bool CheckWater(int client)
 	// The cached water level is updated multiple times per tick, including after movement happens,
 	// so we can just check the cached value here.
 	return GetEntProp(client, Prop_Data, "m_nWaterLevel") > 1;
-}
-
-// returns only half the gravity that would get added to velocity in a tick.
-static float GetAddedHalfGravityInATick(int client)
-{
-	float localGravity = GetEntPropFloat(client, Prop_Data, "m_flGravity");
-	if (localGravity == 0.0)
-	{
-		localGravity = 1.0;
-	}
-	
-	return localGravity * cvGravity.FloatValue * 0.5 * playerFrameTime[client];
 }
 
 public bool AddTrigger(int entity, ArrayList triggers)
