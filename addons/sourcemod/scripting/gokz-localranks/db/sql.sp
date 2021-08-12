@@ -241,7 +241,7 @@ char sql_gettopplayers[] = "\
 SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     FROM Times \
     INNER JOIN \
-    (SELECT Times.MapCourseID, MIN(Times.RunTime) AS RecordTime \
+    (SELECT Times.MapCourseID, Times.Mode, MIN(Times.RunTime) AS RecordTime \
     FROM Times \
     INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID \
     INNER JOIN Maps ON Maps.MapID=MapCourses.MapID \
@@ -249,7 +249,7 @@ SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     WHERE Players.Cheater=0 AND Maps.InRankedPool=1 AND MapCourses.Course=0 \
     AND Times.Mode=%d \
     GROUP BY Times.MapCourseID) Records \
-    ON Times.MapCourseID=Records.MapCourseID AND Times.RunTime=Records.RecordTime \
+    ON Times.MapCourseID=Records.MapCourseID AND Times.Mode=Records.Mode AND Times.RunTime=Records.RecordTime \
     INNER JOIN Players ON Players.SteamID32=Times.SteamID32 \
     GROUP BY Players.SteamID32, Players.Alias \
     ORDER BY RecordCount DESC \
@@ -259,7 +259,7 @@ char sql_gettopplayerspro[] = "\
 SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     FROM Times \
     INNER JOIN \
-    (SELECT Times.MapCourseID, MIN(Times.RunTime) AS RecordTime \
+    (SELECT Times.MapCourseID, Times.Mode, MIN(Times.RunTime) AS RecordTime \
     FROM Times \
     INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID \
     INNER JOIN Maps ON Maps.MapID=MapCourses.MapID \
@@ -267,7 +267,7 @@ SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     WHERE Players.Cheater=0 AND Maps.InRankedPool=1 AND MapCourses.Course=0 \
     AND Times.Mode=%d AND Times.Teleports=0 \
     GROUP BY Times.MapCourseID) Records \
-    ON Times.MapCourseID=Records.MapCourseID AND Times.RunTime=Records.RecordTime \
+    ON Times.MapCourseID=Records.MapCourseID AND Times.Mode=Records.Mode AND Times.RunTime=Records.RecordTime AND Times.Teleports=0 \
     INNER JOIN Players ON Players.SteamID32=Times.SteamID32 \
     GROUP BY Players.SteamID32, Players.Alias \
     ORDER BY RecordCount DESC \
