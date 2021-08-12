@@ -377,8 +377,7 @@ public Action CommandRecentRecords(int client, int args)
 		return Plugin_Handled;
 	}
 
-	// Open recent records for the player's selected mode
-	DisplayRecentRecordsMenu(client, GOKZ_GetCoreOption(client, Option_Mode));
+	DisplayRecentRecordsModeMenu(client);
 	return Plugin_Handled;
 }
 

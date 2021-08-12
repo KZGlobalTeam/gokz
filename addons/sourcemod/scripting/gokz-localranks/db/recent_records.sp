@@ -94,17 +94,25 @@ public void DB_TxnSuccess_OpenRecentRecords(Handle db, DataPack data, int numQue
 
 // =====[ MENUS ]=====
 
-void DisplayRecentRecordsMenu(int client, int mode)
+void DisplayRecentRecordsModeMenu(int client)
 {
-	recentRecordsMode[client] = mode;
-	
-	Menu menu = new Menu(MenuHandler_RecentRecords);
-	menu.SetTitle("%T", "Recent Records Menu - Title", client, gC_ModeNames[mode]);
-	RecentRecordsMenuAddItems(client, menu);
+	Menu menu = new Menu(MenuHandler_RecentRecordsMode);
+	menu.SetTitle("%T", "Recent Records Mode Menu - Title", client);
+	GOKZ_MenuAddModeItems(client, menu, false);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-static void RecentRecordsMenuAddItems(int client, Menu menu)
+void DisplayRecentRecordsTimeTypeMenu(int client, int mode)
+{
+	recentRecordsMode[client] = mode;
+
+	Menu menu = new Menu(MenuHandler_RecentRecordsTimeType);
+	menu.SetTitle("%T", "Recent Records Menu - Title", client, gC_ModeNames[recentRecordsMode[client]]);
+	RecentRecordsTimeTypeAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+static void RecentRecordsTimeTypeAddItems(int client, Menu menu)
 {
 	char display[32];
 	for (int timeType = 0; timeType < TIMETYPE_COUNT; timeType++)
@@ -118,11 +126,27 @@ static void RecentRecordsMenuAddItems(int client, Menu menu)
 
 // =====[ MENU HANDLERS ]=====
 
-public int MenuHandler_RecentRecords(Menu menu, MenuAction action, int param1, int param2)
+public int MenuHandler_RecentRecordsMode(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		DisplayRecentRecordsTimeTypeMenu(param1, param2);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+public int MenuHandler_RecentRecordsTimeType(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
 		DB_OpenRecentRecords(param1, recentRecordsMode[param1], param2);
+	}
+	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	{
+		DisplayRecentRecordsModeMenu(param1);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -135,7 +159,7 @@ public int MenuHandler_RecentRecordsSubmenu(Menu menu, MenuAction action, int pa
 	// TODO Menu item info is course's MapCourseID, but is currently not used
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
-		DisplayRecentRecordsMenu(param1, recentRecordsMode[param1]);
+		DisplayRecentRecordsTimeTypeMenu(param1, recentRecordsMode[param1]);
 	}
 	else if (action == MenuAction_End)
 	{
