@@ -23,6 +23,7 @@ enum struct Pose
 // =====[ GLOBAL VARIABLES ]===================================================
 
 static int entityTouchCount[MAXPLAYERS + 1];
+static int entityTouchDuration[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -143,10 +144,22 @@ enum struct JumpTracker
 		float speed = pose(0).speed;
 		
 		// Fix certain props that don't give you base velocity
-		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;
+		/* 
+			If the player collides with a wall this can wrongfully invalidate jumps.
+			We can check for speed reduction for abuse; while prop abuses increase speed,
+			wall collision will very likely (if not always) result in a speed reduction.
+		*/
+		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;		
 		if (FloatAbs(speed - actualSpeed) > JS_SPEED_MODIFICATION_TOLERANCE && this.jump.durationTicks != 0)
 		{
-			this.Invalidate();
+			if (actualSpeed <= pose(-1).speed)
+			{
+				pose(0).speed = actualSpeed;
+			}
+			else
+			{
+				this.Invalidate();
+			}
 		}
 		
 		this.jump.height = FloatMax(this.jump.height, this.position[2] - this.takeoffOrigin[2]);
@@ -266,10 +279,7 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		// Check whether the player touches more than just the ground or if
-		// he just teleported.
-		if (entityTouchCount[this.jumper] > 0 ||
-			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
+		// entityTouchCount is unreliable, don't invalidate jumpstats with it here!
 		{
 			return JumpType_Invalid;
 		}
@@ -1319,7 +1329,17 @@ void OnStartTouchGround_JumpTracking(int client)
 void OnStartTouch_JumpTracking(int client)
 {
 	entityTouchCount[client]++;
-	if (!Movement_GetOnGround(client))
+	// Do not immediately invalidate jumps upon collision.
+	// Give the player a few ticks of leniency for late ducking.
+}
+
+void OnTouch_JumpTracking(int client)
+{
+	if (entityTouchCount[client])
+	{
+		entityTouchDuration[client]++;
+	}
+	if (!Movement_GetOnGround(client) && entityTouchDuration[client] > JS_TOUCH_GRACE_TICKS)
 	{
 		jumpTrackers[client].Invalidate();
 	}
@@ -1328,6 +1348,10 @@ void OnStartTouch_JumpTracking(int client)
 void OnEndTouch_JumpTracking(int client)
 {
 	entityTouchCount[client]--;
+	if (!entityTouchCount[client])
+	{
+		entityTouchDuration[client] = 0;
+	}
 }
 
 void OnPlayerRunCmd_JumpTracking(int client, int buttons)
