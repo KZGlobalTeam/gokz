@@ -48,6 +48,29 @@ enum
 
 enum
 {
+	JumpstatDB_PBMenu_JumpType = 0,
+	JumpstatDB_PBMenu_Distance,
+	JumpstatDB_PBMenu_Strafes,
+	JumpstatDB_PBMenu_Sync,
+	JumpstatDB_PBMenu_Pre,
+	JumpstatDB_PBMenu_Max,
+	JumpstatDB_PBMenu_Air
+};
+
+enum
+{
+	JumpstatDB_BlockPBMenu_JumpType = 0,
+	JumpstatDB_BlockPBMenu_Block,
+	JumpstatDB_BlockPBMenu_Distance,
+	JumpstatDB_BlockPBMenu_Strafes,
+	JumpstatDB_BlockPBMenu_Sync,
+	JumpstatDB_BlockPBMenu_Pre,
+	JumpstatDB_BlockPBMenu_Max,
+	JumpstatDB_BlockPBMenu_Air
+};
+
+enum
+{
 	JumpstatDB_Cache_Distance = 0, 
 	JumpstatDB_Cache_Block, 
 	JumpstatDB_Cache_BlockDistance, 

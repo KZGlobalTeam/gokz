@@ -63,6 +63,7 @@ char gC_BeatRecordSound[256];
 #include "gokz-localranks/db/process_new_time.sp"
 #include "gokz-localranks/db/recent_records.sp"
 #include "gokz-localranks/db/update_ranked_map_pool.sp"
+#include "gokz-localranks/db/display_js.sp"
 
 
 

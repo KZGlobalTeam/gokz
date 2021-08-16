@@ -53,7 +53,7 @@ void Call_OnTimeProcessed(
 	Call_Finish();
 }
 
-void Call_OnNewRecord(int client, int steamID, int mapID, int course, int mode, int style, int recordType)
+void Call_OnNewRecord(int client, int steamID, int mapID, int course, int mode, int style, int recordType, float pbDiff, int teleportsUsed)
 {
 	Call_StartForward(H_OnNewRecord);
 	Call_PushCell(client);
@@ -63,6 +63,8 @@ void Call_OnNewRecord(int client, int steamID, int mapID, int course, int mode, 
 	Call_PushCell(mode);
 	Call_PushCell(style);
 	Call_PushCell(recordType);
+	Call_PushCell(pbDiff);
+	Call_PushCell(teleportsUsed);
 	Call_Finish();
 }
 

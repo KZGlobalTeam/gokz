@@ -257,7 +257,7 @@ enum struct Jump
 	int crouchRelease;
 	int crouchTicks;
 	int deadair;
-	int durationTicks;
+	int duration;
 	int originalType;
 	int overlap;
 	int releaseW;
@@ -265,7 +265,6 @@ enum struct Jump
 	int type;
 	float deviation;
 	float distance;
-	float duration;
 	float edge;
 	float height;
 	float maxSpeed;

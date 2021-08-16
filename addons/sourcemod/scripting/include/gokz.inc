@@ -393,7 +393,7 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
 
 /**
  * Teleports a player and removes their velocity and base velocity
- * immediately and also after a 0.1 second delay. Automatically
+ * immediately and also every tick for the next 5 ticks. Automatically
  * makes the player crouch if there is a ceiling above them.
  *
  * @param client		Client index.
