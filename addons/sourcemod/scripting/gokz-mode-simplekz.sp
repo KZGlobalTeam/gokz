@@ -28,8 +28,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 12
-#define PERF_TICKS 2
+#define MODE_VERSION 13
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units
@@ -69,6 +68,7 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
+int gI_Cmdnum[MAXPLAYERS + 1];
 float gF_PSBonusSpeed[MAXPLAYERS + 1];
 float gF_PSVelMod[MAXPLAYERS + 1];
 float gF_PSVelModLanding[MAXPLAYERS + 1];
@@ -82,6 +82,7 @@ float gF_OldOrigin[MAXPLAYERS + 1][3];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
 bool gB_Jumpbugged[MAXPLAYERS + 1];
+int gI_LastJumpButtonCmdnum[MAXPLAYERS + 1];
 
 
 
@@ -178,6 +179,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		TweakJumpbug(player);
 	}
 	
+	gI_Cmdnum[player.ID] = cmdnum;
 	gB_Jumpbugged[player.ID] = false;
 	gI_OldButtons[player.ID] = buttons;
 	gI_OldFlags[player.ID] = GetEntityFlags(player.ID);
@@ -187,6 +189,19 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	player.GetVelocity(gF_OldVelocity[player.ID]);
 	
 	return Plugin_Continue;
+}
+
+public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	
+	if (buttons & IN_JUMP)
+	{
+		gI_LastJumpButtonCmdnum[client] = cmdnum;
+	}
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -492,8 +507,10 @@ float CalcWeaponVelMod(KZPlayer player)
 void TweakJump(KZPlayer player)
 {
 	int cmdsSinceLanding = player.TakeoffCmdNum - player.LandingCmdNum;
+	bool hitTweakedPerf = cmdsSinceLanding == 1
+	 || cmdsSinceLanding <= 3 && gI_Cmdnum[player.ID] - gI_LastJumpButtonCmdnum[player.ID] <= 3;
 	
-	if (cmdsSinceLanding <= PERF_TICKS)
+	if (hitTweakedPerf)
 	{
 		if (cmdsSinceLanding == 1)
 		{
