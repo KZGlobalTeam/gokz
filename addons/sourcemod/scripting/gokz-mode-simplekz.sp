@@ -2,6 +2,7 @@
 
 #include <sdkhooks>
 #include <sdktools>
+#include <dhooks>
 
 #include <movementapi>
 
@@ -75,6 +76,7 @@ float gF_PSVelModLanding[MAXPLAYERS + 1];
 bool gB_PSTurningLeft[MAXPLAYERS + 1];
 float gF_PSTurnRate[MAXPLAYERS + 1];
 int gI_PSTicksSinceIncrement[MAXPLAYERS + 1];
+Handle gH_GetPlayerMaxSpeed;
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -94,7 +96,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-mode-simplekz only supports 128 tickrate servers.");
 	}
-	
+	HookEvents();
 	CreateConVars();
 }
 
@@ -152,9 +154,10 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	ResetClient(client);
-	
-	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
-	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
+	if (IsValidClient(client))
+	{
+		HookClientEvents(client);
+	}
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
@@ -171,7 +174,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	ReduceDuckSlowdown(player);
-	TweakVelMod(player, angles);
+	CalcPrestrafeVelMod(player, angles);
 	FixWaterBoost(player, buttons);
 	FixDisplacementStuck(player);
 	if (gB_Jumpbugged[player.ID])
@@ -189,6 +192,16 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	player.GetVelocity(gF_OldVelocity[player.ID]);
 	
 	return Plugin_Continue;
+}
+
+public MRESReturn DHooks_OnGetPlayerMaxSpeed(int client, Handle hReturn)
+{
+	if (!IsUsingMode(client))
+	{
+		return MRES_Ignored;
+	}
+	DHookSetReturn(hReturn, SPEED_NORMAL * gF_PSVelMod[client]);
+	return MRES_Supercede;
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
@@ -323,7 +336,16 @@ void ResetClient(int client)
 	ResetVelMod(player);
 }
 
-
+void HookEvents()
+{
+	GameData gameData = LoadGameConfigFile("MovementAPI.games");
+	int offset = gameData.GetOffset("GetPlayerMaxSpeed");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get GetPlayerMaxSpeed offset");
+	}
+	gH_GetPlayerMaxSpeed = DHookCreate(offset, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, DHooks_OnGetPlayerMaxSpeed);
+}
 
 // =====[ CONVARS ]=====
 
@@ -366,9 +388,11 @@ void ReplicateConVars(int client)
 
 // =====[ VELOCITY MODIFIER ]=====
 
-void TweakVelMod(KZPlayer player, const float angles[3])
+void HookClientEvents(int client)
 {
-	player.VelocityModifier = CalcPrestrafeVelMod(player, angles) * CalcWeaponVelMod(player);
+	DHookEntity(gH_GetPlayerMaxSpeed, true, client);
+	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 }
 
 void ResetVelMod(KZPlayer player)
@@ -378,7 +402,7 @@ void ResetVelMod(KZPlayer player)
 	gF_PSTurnRate[player.ID] = 0.0;
 }
 
-float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
+void CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 {
 	gI_PSTicksSinceIncrement[player.ID]++;
 	
@@ -386,7 +410,7 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	if (player.Speed < EPSILON)
 	{
 		ResetVelMod(player);
-		return gF_PSVelMod[player.ID];
+		return;
 	}
 	
 	// Current speed without bonus
@@ -468,8 +492,6 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	
 	gF_PSBonusSpeed[player.ID] = newBonusSpeed;
 	gF_PSVelMod[player.ID] = 1.0 + (newBonusSpeed / baseSpeed);
-	
-	return gF_PSVelMod[player.ID];
 }
 
 bool ValidPrestrafeButtons(KZPlayer player)
@@ -495,10 +517,6 @@ float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 	return reward * baseSpeed / SPEED_NORMAL;
 }
 
-float CalcWeaponVelMod(KZPlayer player)
-{
-	return SPEED_NORMAL / player.MaxSpeed;
-}
 
 
 
@@ -801,4 +819,4 @@ void ReduceDuckSlowdown(KZPlayer player)
 	{
 		player.DuckSpeed = DUCK_SPEED_MINIMUM;
 	}
-} 
+}

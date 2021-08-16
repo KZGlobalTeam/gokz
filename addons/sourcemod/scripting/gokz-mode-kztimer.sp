@@ -2,6 +2,7 @@
 
 #include <sdkhooks>
 #include <sdktools>
+#include <dhooks>
 
 #include <movementapi>
 
@@ -65,7 +66,9 @@ bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
 float gF_PreVelMod[MAXPLAYERS + 1];
 float gF_PreVelModLastChange[MAXPLAYERS + 1];
+float gF_RealPreVelMod[MAXPLAYERS + 1];
 int gI_PreTickCounter[MAXPLAYERS + 1];
+Handle gH_GetPlayerMaxSpeed;
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -83,7 +86,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-mode-kztimer only supports 128 tickrate servers.");
 	}
-	
+	HookEvents();
 	CreateConVars();
 }
 
@@ -140,8 +143,10 @@ public void OnLibraryRemoved(const char[] name)
 
 public void OnClientPutInServer(int client)
 {
-	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
-	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
+	if (IsValidClient(client))
+	{
+		HookClientEvents(client);
+	}
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
@@ -157,7 +162,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
-	TweakVelMod(player);
+	gF_RealPreVelMod[player.ID] = CalcPrestrafeVelMod(player);
 	ReduceDuckSlowdown(player);
 	FixWaterBoost(player, buttons);
 	FixDisplacementStuck(player);
@@ -174,6 +179,17 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	Movement_GetVelocity(client, gF_OldVelocity[client]);
 	
 	return Plugin_Continue;
+}
+
+public MRESReturn DHooks_OnGetPlayerMaxSpeed(int client, Handle hReturn)
+{
+	if (!IsUsingMode(client))
+	{
+		return MRES_Ignored;
+	}
+
+	DHookSetReturn(hReturn, SPEED_NORMAL * gF_RealPreVelMod[client]);
+	return MRES_Supercede;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -279,7 +295,16 @@ bool IsUsingMode(int client)
 	return !gB_GOKZCore || GOKZ_GetCoreOption(client, Option_Mode) == Mode_KZTimer;
 }
 
-
+void HookEvents()
+{
+	GameData gameData = LoadGameConfigFile("MovementAPI.games");
+	int offset = gameData.GetOffset("GetPlayerMaxSpeed");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get GetPlayerMaxSpeed offset");
+	}
+	gH_GetPlayerMaxSpeed = DHookCreate(offset, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, DHooks_OnGetPlayerMaxSpeed);
+}
 
 // =====[ CONVARS ]=====
 
@@ -320,9 +345,11 @@ void ReplicateConVars(int client)
 
 // =====[ VELOCITY MODIFIER ]=====
 
-void TweakVelMod(KZPlayer player)
+void HookClientEvents(int client)
 {
-	player.VelocityModifier = CalcPrestrafeVelMod(player) * CalcWeaponVelMod(player);
+	DHookEntity(gH_GetPlayerMaxSpeed, true, client);
+	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 }
 
 // Adapted from KZTimerGlobal
@@ -447,11 +474,6 @@ void ResetPrestrafeVelMod(KZPlayer player)
 {
 	gF_PreVelMod[player.ID] = 1.0;
 	gI_PreTickCounter[player.ID] = 0;
-}
-
-float CalcWeaponVelMod(KZPlayer player)
-{
-	return SPEED_NORMAL / player.MaxSpeed;
 }
 
 
