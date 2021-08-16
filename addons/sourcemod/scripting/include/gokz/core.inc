@@ -62,9 +62,8 @@ enum Option:
 {
 	OPTION_INVALID = -1, 
 	Option_Mode, 
-	Option_Style, 
-	Option_AutoRestart, 
-	Option_CheckpointMessages, 
+	Option_Style,
+	Option_CheckpointMessages,
 	Option_CheckpointSounds, 
 	Option_TeleportSounds, 
 	Option_ErrorSounds, 
@@ -85,13 +84,6 @@ enum
 {
 	Style_Normal = 0, 
 	STYLE_COUNT
-};
-
-enum
-{
-	AutoRestart_Disabled = 0, 
-	AutoRestart_Enabled, 
-	AUTORESTART_COUNT
 };
 
 enum
@@ -280,7 +272,6 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 {
 	"GOKZ - Mode", 
 	"GOKZ - Style", 
-	"GOKZ - Auto Restart", 
 	"GOKZ - Checkpoint Messages", 
 	"GOKZ - Checkpoint Sounds", 
 	"GOKZ - Teleport Sounds", 
@@ -293,7 +284,6 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 {
 	"Movement Mode - 0 = Vanilla, 1 = SimpleKZ, 2 = KZTimer", 
 	"Movement Style - 0 = Normal", 
-	"Automatic Restart Upon Teleport to Start - 0 = Disabled, 1 = Enabled", 
 	"Checkpoint Messages - 0 = Disabled, 1 = Enabled", 
 	"Checkpoint Sounds - 0 = Disabled, 1 = Enabled", 
 	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
@@ -306,7 +296,6 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 {
 	"Options Menu - Mode", 
 	"Options Menu - Style", 
-	"Options Menu - Auto Restart", 
 	"Options Menu - Checkpoint Messages", 
 	"Options Menu - Checkpoint Sounds", 
 	"Options Menu - Teleport Sounds", 
@@ -326,7 +315,6 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 {
 	MODE_COUNT, 
 	STYLE_COUNT, 
-	AUTORESTART_COUNT, 
 	CHECKPOINTMESSAGES_COUNT, 
 	CHECKPOINTSOUNDS_COUNT, 
 	TELEPORTSOUNDS_COUNT, 
@@ -339,7 +327,6 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 {
 	Mode_KZTimer, 
 	Style_Normal, 
-	AutoRestart_Disabled, 
 	CheckpointMessages_Disabled, 
 	CheckpointSounds_Enabled, 
 	TeleportSounds_Disabled, 

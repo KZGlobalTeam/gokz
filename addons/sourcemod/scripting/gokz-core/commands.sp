@@ -22,7 +22,6 @@ void RegisterCommands()
 	RegConsoleCmd("sm_pause", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
-	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_virtualbuttonindicators", CommandToggleVirtualButtonIndicators, "[KZ] Toggle virtual button indicators.");
 	RegConsoleCmd("sm_vbi", CommandToggleVirtualButtonIndicators, "[KZ] Toggle virtual button indicators.");
 	RegConsoleCmd("sm_virtualbuttons", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
@@ -186,19 +185,6 @@ public Action CommandStopTimer(int client, int args)
 	if (TimerStop(client))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Timer Stopped");
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleAutoRestart(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Enabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Disabled);
 	}
 	return Plugin_Handled;
 }
