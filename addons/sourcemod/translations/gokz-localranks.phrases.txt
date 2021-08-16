@@ -523,6 +523,49 @@
 	}
 
 
+	// =====[ JUMPSTATS PB MENU ]=====
+	"Jump Stats Mode Menu - Title"
+	{
+		"#format"	"{1:s}"
+		"en"		"Jumpstats\n \nPlayer - {1}\n \nSelect a Mode"
+	}
+	"Jump Stats Block Type Menu - Title"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Jumpstats\n \nPlayer - {1}\nMode - {2}\n \nSelect a Category"
+	}
+	"Jump Stats Submenu - Title (Jump)"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Jumpstats\n \nPlayer - {1}\nMode - {2}\n "
+	}
+	"Jump Stats Submenu - Title (Block Jump)"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Block Jumpstats\n \nPlayer - {1}\nMode - {2}\n "
+	}
+	"Jump Stats Menu - No Jump Stats"
+	{
+		"#format"	"{1:s}"
+		"en"		"{lime}{1} {grey}does not have any jumpstats."
+	}
+	"Jump Stats Menu - No Block Jump Stats"
+	{
+		"#format"	"{1:s}"
+		"en"		"{lime}{1} {grey}does not have any block jumpstats."
+	}
+	"Jump Stats - Jump Console Header"
+	{
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"{1} jumpstats for {2} <STEAM_1:{3}:{4}>"
+	}
+	"Jump Stats - Block Jump Console Header"
+	{
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"{1} block jumpstats for {2} <STEAM_1:{3}:{4}>"
+	}
+
+
 	// =====[ RECENT RECORDS MENU ]=====
 	"Recent Records Mode Menu - Title"
 	{
