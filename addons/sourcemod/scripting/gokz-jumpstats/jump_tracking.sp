@@ -280,6 +280,7 @@ enum struct JumpTracker
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
 		// entityTouchCount is unreliable, don't invalidate jumpstats with it here!
+		if (GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
 		}
