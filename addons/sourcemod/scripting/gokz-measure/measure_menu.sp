@@ -61,7 +61,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 				float effectiveDist = CalcEffectiveDistance(measurePos[param1][0], measurePos[param1][1]);
 				float verticalDist = measurePos[param1][1][2] - measurePos[param1][0][2];
 				GOKZ_PrintToChat(param1, true, "%t", "Measure Result", horizontalDist, effectiveDist, verticalDist);
-				MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
+				MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 0.2, 200, 200, 200);
 			}
 			else
 			{
@@ -86,7 +86,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 				return;
 			}
 			GOKZ_PrintToChat(param1, true, "%t", "Block Measure Result", RoundFloat(GetVectorHorizontalDistance(measurePos[param1][0], measurePos[param1][1])));
-			MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 2.0, 200, 200, 200);
+			MeasureBeam(param1, measurePos[param1][0], measurePos[param1][1], 5.0, 0.2, 200, 200, 200);
 		}
 		
 		DisplayMeasureMenu(param1, false);
@@ -264,13 +264,13 @@ static void P2PXBeam(int client, int arg)
 	
 	if (arg == 0)
 	{
-		MeasureBeam(client, Origin0, Origin1, 0.97, 2.0, 0, 255, 0);
-		MeasureBeam(client, Origin2, Origin3, 0.97, 2.0, 0, 255, 0);
+		MeasureBeam(client, Origin0, Origin1, 0.97, 0.2, 0, 255, 0);
+		MeasureBeam(client, Origin2, Origin3, 0.97, 0.2, 0, 255, 0);
 	}
 	else
 	{
-		MeasureBeam(client, Origin0, Origin1, 0.97, 2.0, 255, 0, 0);
-		MeasureBeam(client, Origin2, Origin3, 0.97, 2.0, 255, 0, 0);
+		MeasureBeam(client, Origin0, Origin1, 0.97, 0.2, 255, 0, 0);
+		MeasureBeam(client, Origin2, Origin3, 0.97, 0.2, 255, 0, 0);
 	}
 }
 

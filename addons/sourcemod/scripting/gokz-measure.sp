@@ -68,5 +68,5 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnMapStart()
 {
-	gI_BeamModel = PrecacheModel("materials/sprites/bluelaser1.vmt", true);
+	gI_BeamModel = PrecacheModel("materials/sprites/laserbeam.vmt", true);
 } 
