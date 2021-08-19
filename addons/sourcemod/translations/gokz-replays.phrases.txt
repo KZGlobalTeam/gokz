@@ -56,6 +56,11 @@
 		"en"		"Replay Controls"
 		"ru"		"Управление повтором"
 	}
+	"Replay Controls - Teleports"
+	{
+		"#format"	"{1:d}"
+		"en"		"Teleports: {1}"
+	}
 	"Replay Controls - Pause"
 	{
 		"en"		"Pause"
@@ -80,6 +85,10 @@
 	{
 		"en"		"Freecam"
 		"ru"		"Свободная камера"
+	}
+	"Replay Controls - Exit"
+	{
+		"en"		"Exit"
 	}
 	"Replay Controls - Invalid Time"
 	{

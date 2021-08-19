@@ -205,13 +205,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_Recording(client, buttons);
+	OnPlayerRunCmdPost_Recording(client, buttons, tickcount);
 	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
-}
-
-public void GOKZ_OnTeleportToCheckpoint_Post(int client)
-{
-	GOKZ_OnTeleportToCheckpoint_Post_Recording(client);
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)

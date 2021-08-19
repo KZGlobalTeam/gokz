@@ -17,7 +17,8 @@ static float tickrate;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
-static int lastTeleportTick[MAXPLAYERS + 1];
+static int onGroundLastTick[MAXPLAYERS + 1];
+static bool isTeleportTick[MAXPLAYERS + 1];
 static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
 static ArrayList recordedTickData[MAXPLAYERS + 1];
@@ -47,7 +48,7 @@ void OnClientPutInServer_Recording(int client)
     StartRecording(client);
 }
 
-void OnPlayerRunCmdPost_Recording(int client, int buttons)
+void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount)
 {
     if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
 	{
@@ -63,8 +64,14 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
     tickData.angles[0] = angles[0];
     tickData.angles[1] = angles[1];
     // Don't bother tracking eye angle roll (angles[2]) - not used
-    tickData.flags = EncodePlayerFlags(client, buttons);
+    tickData.flags = EncodePlayerFlags(client, buttons, tickCount);
     tickData.speed = GetEntityFlags(client) & FL_ONGROUND ? Movement_GetSpeed(client) : Movement_GetTakeoffSpeed(client);
+
+    // HACK: Reset teleport tick marker. Too bad!
+    if(isTeleportTick[client])
+    {
+        isTeleportTick[client] = false;
+    }
     
     if (timerRunning[client])
     {
@@ -84,11 +91,6 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons)
 
         recordedTickData[client].SetArray(tick, tickData);
     }
-}
-
-void GOKZ_OnTeleportToCheckpoint_Post_Recording(int client)
-{
-    lastTeleportTick[client] = GetGameTickCount();
 }
 
 void GOKZ_OnTimerStart_Recording(int client)
@@ -144,6 +146,8 @@ void GOKZ_OnCountedTeleport_Recording(int client)
         timerRunning[client] = false;
         StartRecording(client);
     }
+
+    isTeleportTick[client] = true;
 }
 
 void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
@@ -509,7 +513,7 @@ static void FormatJumpReplayPath(char[] buffer, int maxlength, int client, int j
         RP_FILE_EXTENSION);
 }
 
-static int EncodePlayerFlags(int client, int buttons)
+static int EncodePlayerFlags(int client, int buttons, int tickCount)
 {
     int flags = 0;
     MoveType movetype = Movement_GetMovetype(client);
@@ -538,8 +542,8 @@ static int EncodePlayerFlags(int client, int buttons)
 
     SetKthBit(flags, 19, GetEntProp(client, Prop_Data, "m_nWaterLevel") != 0);
 
-    SetKthBit(flags, 20, lastTeleportTick[client] - 1 == GetGameTickCount());
-    SetKthBit(flags, 21, Movement_GetTakeoffTick(client) == GetGameTickCount());
+    SetKthBit(flags, 20, isTeleportTick[client]);
+    SetKthBit(flags, 21, Movement_GetTakeoffTick(client) == tickCount);
     SetKthBit(flags, 22, GOKZ_GetHitPerf(client));
     SetKthBit(flags, 23, IsCurrentWeaponSecondary(client));
 

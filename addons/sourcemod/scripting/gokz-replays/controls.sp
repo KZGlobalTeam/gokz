@@ -55,44 +55,55 @@ void ShowReplayControlMenu(int client, int bot)
 {
 	char text[32];
 	
-	Menu menu = new Menu(MenuHandler_ReplayControls);
-	menu.OptionFlags = MENUFLAG_NO_SOUND;
-	menu.Pagination = MENU_NO_PAGINATION;
-	menu.ExitButton = true;
+	Panel panel = new Panel();
 	
 	if (GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
 	{
-		menu.SetTitle("%T - %s", "Replay Controls - Title", client,
+		FormatEx(text, sizeof(text), "%T - %s", "Replay Controls - Title", client,
 			GOKZ_FormatTime(GetPlaybackTime(bot), GOKZ_HUD_GetOption(client, HUDOption_TimerStyle) == TimerStyle_Precise));
+		panel.SetTitle(text);
 	}
 	else
 	{
-		menu.SetTitle("%T", "Replay Controls - Title", client);
+		FormatEx(text, sizeof(text), "%T", "Replay Controls - Title", client);
+		panel.SetTitle(text);
+	}
+
+	if(PlaybackGetTeleports(bot) > 0)
+	{
+		FormatEx(text, sizeof(text), "%T", "Replay Controls - Teleports", client, PlaybackGetTeleports(bot));
+		panel.DrawItem(text, ITEMDRAW_RAWLINE);
 	}
 	
 	if (PlaybackPaused(bot))
 	{
 		FormatEx(text, sizeof(text), "%T", "Replay Controls - Resume", client);
-		menu.AddItem("rp_resume", text);
+		panel.DrawItem(text);
 	}
 	else
 	{
 		FormatEx(text, sizeof(text), "%T", "Replay Controls - Pause", client);
-		menu.AddItem("rp_pause", text);
+		panel.DrawItem(text);
 	}
 	
 	FormatEx(text, sizeof(text), "%T", "Replay Controls - Skip", client);
-	menu.AddItem("rp_skip", text);
+	panel.DrawItem(text);
 	
 	FormatEx(text, sizeof(text), "%T", "Replay Controls - Rewind", client);
-	menu.AddItem("rp_back", text);
+	panel.DrawItem(text);
 	
-	menu.AddItem("rp_spacer", "", ITEMDRAW_SPACER);
+	panel.DrawItem("", ITEMDRAW_SPACER);
 	
 	FormatEx(text, sizeof(text), "%T", "Replay Controls - Freecam", client);
-	menu.AddItem("rp_freecam", text);
+	panel.DrawItem(text);
+
+	panel.DrawItem("", ITEMDRAW_SPACER);
+
+	FormatEx(text, sizeof(text), "%T", "Replay Controls - Exit", client);
+	panel.DrawItem(text);
 	
-	menu.Display(client, MENU_TIME_FOREVER);
+	panel.Send(client, PanelHandler_ReplayControls, MENU_TIME_FOREVER);
+	delete panel;
 }
 
 void ToggleReplayControls(int client)
@@ -119,7 +130,7 @@ bool IsReplayBotControlled(int bot, int botClient)
 				GetEntProp(controllingPlayer[bot], Prop_Send, "m_iObserverMode") == 6);
 }
 
-int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int param2)
+int PanelHandler_ReplayControls(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (!IsValidClient(param1))
 	{
@@ -136,44 +147,35 @@ int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int par
 				return 0;
 			}
 			
-			char item[32];
-			menu.GetItem(param2, item, sizeof(item));
-			if (StrEqual(item, "rp_pause"))
+			// Pause/Resume
+			if (param2 == 1)
 			{
-				PlaybackPause(bot);
+				PlaybackTogglePause(bot);
 				ShowReplayControlMenu(param1, bot);
 			}
-			if (StrEqual(item, "rp_resume"))
-			{
-				PlaybackResume(bot);
-				ShowReplayControlMenu(param1, bot);
-			}
-			else if (StrEqual(item, "rp_skip"))
+			// Forward
+			else if (param2 == 2)
 			{
 				PlaybackSkipForward(bot);
 			}
-			else if (StrEqual(item, "rp_back"))
+			// Rewind
+			else if (param2 == 3)
 			{
 				PlaybackSkipBack(bot);
 			}
-			else if (StrEqual(item, "rp_freecam"))
+			// Freecam
+			else if (param2 == 4)
 			{
 				SetEntProp(param1, Prop_Send, "m_iObserverMode", 6);
 			}
-		}
-		
-		case MenuAction_Cancel:
-		{
-			showReplayControls[param1] = param2 != MenuCancel_Exit;
-		}
-		
-		case MenuAction_End:
-		{
-			showReplayControls[param1] = false;
-			delete menu;
+			// Exit
+			else if (param2 == 7)
+			{
+				showReplayControls[param1] = false;
+				delete menu;
+			}
 		}
 	}
-	
 	return 0;
 }
 
