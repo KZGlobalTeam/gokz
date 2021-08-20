@@ -28,7 +28,8 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-playermodels.txt"
 #define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
 #define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
-
+#define PLAYER_MODEL_T_BOT "models/player/custom_player/legacy/tm_leet_varianta.mdl"
+#define PLAYER_MODEL_CT_BOT "models/player/custom_player/legacy/ctm_idf_variantc.mdl"
 ConVar gCV_gokz_player_models_alpha;
 ConVar gCV_sv_disable_immunity_alpha;
 
@@ -150,16 +151,30 @@ public void RequestFrame_UpdatePlayerModel2(int userid)
 	{
 		return;
 	}
-	
+	// Bots are unaffected by the bobbing animation caused by the new models.
 	switch (GetClientTeam(client))
 	{
 		case CS_TEAM_T:
 		{
-			SetEntityModel(client, PLAYER_MODEL_T);
+			if (IsFakeClient(client))
+			{
+				SetEntityModel(client, PLAYER_MODEL_T_BOT);
+			}
+			else
+			{
+				SetEntityModel(client, PLAYER_MODEL_T);
+			}
 		}
 		case CS_TEAM_CT:
 		{
-			SetEntityModel(client, PLAYER_MODEL_CT);
+			if (IsFakeClient(client))
+			{
+				SetEntityModel(client, PLAYER_MODEL_CT_BOT);
+			}
+			else
+			{
+				SetEntityModel(client, PLAYER_MODEL_CT);
+			}
 		}
 	}
 	
@@ -178,4 +193,6 @@ void PrecachePlayerModels()
 	
 	PrecacheModel(PLAYER_MODEL_T, true);
 	PrecacheModel(PLAYER_MODEL_CT, true);
+	PrecacheModel(PLAYER_MODEL_T_BOT, true);
+	PrecacheModel(PLAYER_MODEL_CT_BOT, true);
 } 
