@@ -285,15 +285,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int AutoRestart {
-		public get() {
-			return this.GetCoreOption(Option_AutoRestart);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_AutoRestart, value);
-		}
-	}
-	
 	property int CheckpointMessages {
 		public get() {
 			return this.GetCoreOption(Option_CheckpointMessages);

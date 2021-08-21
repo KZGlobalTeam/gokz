@@ -12,7 +12,7 @@ enum struct Pose
 	float orientation[3];
 	float velocity[3];
 	float speed;
-	int durationTicks;
+	int duration;
 	int overlap;
 	int deadair;
 	int syncTicks;
@@ -144,7 +144,7 @@ enum struct JumpTracker
 		
 		// Fix certain props that don't give you base velocity
 		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;
-		if (FloatAbs(speed - actualSpeed) > JS_SPEED_MODIFICATION_TOLERANCE && this.jump.durationTicks != 0)
+		if (FloatAbs(speed - actualSpeed) > JS_SPEED_MODIFICATION_TOLERANCE && this.jump.duration != 0)
 		{
 			this.Invalidate();
 		}
@@ -153,7 +153,7 @@ enum struct JumpTracker
 		this.jump.maxSpeed = FloatMax(this.jump.maxSpeed, speed);
 		this.jump.crouchTicks += Movement_GetDucking(this.jumper) ? 1 : 0;
 		this.syncTicks += speed > pose(-1).speed ? 1 : 0;
-		this.jump.durationTicks++;
+		this.jump.duration++;
 		
 		this.UpdateStrafes();
 		this.UpdateFailstat();
@@ -183,9 +183,8 @@ enum struct JumpTracker
 		
 		// Calculate the last stats
 		this.jump.distance = this.CalcDistance();
-		this.jump.sync = float(this.syncTicks) / float(this.jump.durationTicks) * 100.0;
+		this.jump.sync = float(this.syncTicks) / float(this.jump.duration) * 100.0;
 		this.jump.offset = this.position[2] - this.takeoffOrigin[2];
-		this.jump.duration = this.jump.durationTicks * GetTickInterval();
 		
 		this.EndBlockDistance();
 		
@@ -383,7 +382,7 @@ enum struct JumpTracker
 	
 	void UpdatePoseStats_P(Pose p)
 	{
-		p.durationTicks = this.jump.durationTicks;
+		p.duration = this.jump.duration;
 		p.syncTicks = this.syncTicks;
 		p.overlap = this.jump.overlap;
 		p.deadair = this.jump.deadair;
@@ -573,9 +572,8 @@ enum struct JumpTracker
 		if (this.jump.block > 0)
 		{
 			// Calculate the last stats
-			this.jump.sync = float(this.syncTicks) / float(this.jump.durationTicks) * 100.0;
+			this.jump.sync = float(this.syncTicks) / float(this.jump.duration) * 100.0;
 			this.jump.offset = failstatPosition[2] - this.takeoffOrigin[2];
-			this.jump.duration = this.jump.durationTicks * GetTickInterval();
 			
 			// Call the callback for the reporting.
 			Call_OnFailstat(this.jump);
@@ -703,14 +701,14 @@ enum struct JumpTracker
 		
 		// Ladderhops can have a maximum airtime of 102.
 		if (this.jump.type == JumpType_Ladderhop
-			&& this.jump.durationTicks <= 102)
+			&& this.jump.duration <= 102)
 		{
 			return true;
 		}
 		
 		// Crouchjumped or perfed longjumps/bhops can have a maximum of 101 airtime
 		// when the lj bug occurs. Since we've fixed that the airtime is valid.
-		if (this.jump.durationTicks <= 101)
+		if (this.jump.duration <= 101)
 		{
 			return true;
 		}
@@ -812,11 +810,10 @@ enum struct JumpTracker
 						this.jump.miss = FloatAbs(failOrigin[coordDist] - landingPos[coordDist]) - 16.0;
 						this.jump.distance = GetVectorHorizontalDistance(failOrigin, this.takeoffOrigin);
 						this.jump.offset = failOrigin[2] - this.takeoffOrigin[2];
-						this.jump.durationTicks = p.durationTicks;
+						this.jump.duration = p.duration;
 						this.jump.overlap = p.overlap;
 						this.jump.deadair = p.deadair;
-						this.jump.sync = float(p.syncTicks) / float(this.jump.durationTicks) * 100.0;
-						this.jump.duration = this.jump.durationTicks * GetTickInterval();
+						this.jump.sync = float(p.syncTicks) / float(this.jump.duration) * 100.0;
 						break;
 					}
 				}
@@ -1505,7 +1502,7 @@ float GetStrafeAirtime(Jump jump, int strafe)
 	if (strafe < JS_MAX_TRACKED_STRAFES)
 	{
 		return float(jump.strafes_ticks[strafe]) 
-			 / float(jump.durationTicks)
+			 / float(jump.duration)
 			 * 100.0;
 	}
 	else

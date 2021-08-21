@@ -169,18 +169,6 @@
 		"en"		"{grey}The start of {bluegrey}Bonus {1} {grey}was not found."
 		"ru"		"{grey}Начало {bluegrey}Bonus {1} {grey}не найдено."
 	}
-	"Option - Auto Restart - Enable"
-	{
-		"en"		"{grey}Your timer will now restart upon teleporting to start buttons."
-		"chi"		"{grey}你的计时器将重置,直到传送到起点."
-		"ru"		"{grey}Ваш таймер теперь будет перезапускаться после телепортации к кнопке начала."
-	}
-	"Option - Auto Restart - Disable"
-	{
-		"en"		"{grey}Your timer will no longer restart upon teleporting to start buttons."
-		"chi"		"{grey}你的计时器直到传送到起点前不再重置."
-		"ru"		"{grey}Ваш таймер больше не будет перезапускаться при телепортации к кнопке начала."
-	}
 	"Option - Virtual Button Indicators - Enable"
 	{
 		"en"		"{grey}Your virtual start and end buttons are now indicated by circles."
@@ -234,12 +222,6 @@
 	{
 		"en"		"Style"
 		"ru"		"Стиль"
-	}
-	"Options Menu - Auto Restart"
-	{
-		"en"		"Auto restart"
-		"chi"		"自动重新开始"
-		"ru"		"Авто-рестарт"
 	}
 	"Options Menu - Checkpoint Messages"
 	{

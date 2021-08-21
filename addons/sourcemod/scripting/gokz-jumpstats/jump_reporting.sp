@@ -233,7 +233,7 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 		deviationString,
 		GetWidthConsoleString(client, jump.width, jump.strafes),
 		GetFloatConsoleString1(client, "Height", jump.height),
-		GetFloatConsoleString3(client, "Airtime", jump.duration),
+		GetIntConsoleString(client, "Airtime", jump.duration),
 		GetFloatConsoleString1(client, "Offset", jump.offset),
 		GetIntConsoleString(client, "Crouch Ticks", jump.crouchTicks));
 	
@@ -284,13 +284,6 @@ static char[] GetFloatConsoleString2(int client, const char[] stat, float value)
 {
 	char resultString[32];
 	FormatEx(resultString, sizeof(resultString), "| %.2f %T", value, stat, client);
-	return resultString;
-}
-
-static char[] GetFloatConsoleString3(int client, const char[] stat, float value)
-{
-	char resultString[32];
-	FormatEx(resultString, sizeof(resultString), "| %.3f %T", value, stat, client);
 	return resultString;
 }
 

@@ -457,3 +457,35 @@ static void TryRegisterCourse(int course)
 		Call_GOKZ_OnCourseRegistered(course);
 	}
 } 
+
+
+
+// =====[ FIX MISSING SPAWNS ]=====
+
+void OnMapStart_FixMissingSpawns()
+{
+	int tSpawn = FindEntityByClassname(-1, "info_player_terrorist");
+	int ctSpawn = FindEntityByClassname(-1, "info_player_counterterrorist");
+
+	if (tSpawn == -1 && ctSpawn == -1)
+	{
+		LogMessage("Couldn't fix spawns because none exist.");
+		return;
+	}
+
+	if (tSpawn == -1 || ctSpawn == -1)
+	{
+		int validSpawn = (ctSpawn == -1) ? tSpawn : ctSpawn;
+		
+		float origin[3], angles[3];
+		GetEntPropVector(validSpawn, Prop_Data, "m_vecOrigin", origin);
+		GetEntPropVector(validSpawn, Prop_Data, "m_angRotation", angles);
+
+		int newSpawn = CreateEntityByName((tSpawn == -1) ? "info_player_terrorist" : "info_player_counterterrorist");
+		if (DispatchSpawn(newSpawn))
+		{
+			TeleportEntity(newSpawn, origin, angles, NULL_VECTOR);
+		}
+	}
+}
+

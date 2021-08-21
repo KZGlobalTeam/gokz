@@ -2,6 +2,7 @@
 
 #include <sdkhooks>
 #include <sdktools>
+#include <dhooks>
 
 #include <movementapi>
 
@@ -28,8 +29,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 12
-#define PERF_TICKS 2
+#define MODE_VERSION 13
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units
@@ -69,12 +69,14 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
+int gI_Cmdnum[MAXPLAYERS + 1];
 float gF_PSBonusSpeed[MAXPLAYERS + 1];
 float gF_PSVelMod[MAXPLAYERS + 1];
 float gF_PSVelModLanding[MAXPLAYERS + 1];
 bool gB_PSTurningLeft[MAXPLAYERS + 1];
 float gF_PSTurnRate[MAXPLAYERS + 1];
 int gI_PSTicksSinceIncrement[MAXPLAYERS + 1];
+Handle gH_GetPlayerMaxSpeed;
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -82,6 +84,7 @@ float gF_OldOrigin[MAXPLAYERS + 1][3];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
 bool gB_Jumpbugged[MAXPLAYERS + 1];
+int gI_LastJumpButtonCmdnum[MAXPLAYERS + 1];
 
 
 
@@ -93,7 +96,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-mode-simplekz only supports 128 tickrate servers.");
 	}
-	
+	HookEvents();
 	CreateConVars();
 }
 
@@ -151,9 +154,10 @@ public void OnLibraryRemoved(const char[] name)
 public void OnClientPutInServer(int client)
 {
 	ResetClient(client);
-	
-	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
-	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
+	if (IsValidClient(client))
+	{
+		HookClientEvents(client);
+	}
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
@@ -170,7 +174,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	KZPlayer player = KZPlayer(client);
 	RemoveCrouchJumpBind(player, buttons);
 	ReduceDuckSlowdown(player);
-	TweakVelMod(player, angles);
+	CalcPrestrafeVelMod(player, angles);
 	FixWaterBoost(player, buttons);
 	FixDisplacementStuck(player);
 	if (gB_Jumpbugged[player.ID])
@@ -178,6 +182,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		TweakJumpbug(player);
 	}
 	
+	gI_Cmdnum[player.ID] = cmdnum;
 	gB_Jumpbugged[player.ID] = false;
 	gI_OldButtons[player.ID] = buttons;
 	gI_OldFlags[player.ID] = GetEntityFlags(player.ID);
@@ -187,6 +192,29 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	player.GetVelocity(gF_OldVelocity[player.ID]);
 	
 	return Plugin_Continue;
+}
+
+public MRESReturn DHooks_OnGetPlayerMaxSpeed(int client, Handle hReturn)
+{
+	if (!IsUsingMode(client))
+	{
+		return MRES_Ignored;
+	}
+	DHookSetReturn(hReturn, SPEED_NORMAL * gF_PSVelMod[client]);
+	return MRES_Supercede;
+}
+
+public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	
+	if (buttons & IN_JUMP)
+	{
+		gI_LastJumpButtonCmdnum[client] = cmdnum;
+	}
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -308,7 +336,16 @@ void ResetClient(int client)
 	ResetVelMod(player);
 }
 
-
+void HookEvents()
+{
+	GameData gameData = LoadGameConfigFile("MovementAPI.games");
+	int offset = gameData.GetOffset("GetPlayerMaxSpeed");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get GetPlayerMaxSpeed offset");
+	}
+	gH_GetPlayerMaxSpeed = DHookCreate(offset, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, DHooks_OnGetPlayerMaxSpeed);
+}
 
 // =====[ CONVARS ]=====
 
@@ -351,9 +388,11 @@ void ReplicateConVars(int client)
 
 // =====[ VELOCITY MODIFIER ]=====
 
-void TweakVelMod(KZPlayer player, const float angles[3])
+void HookClientEvents(int client)
 {
-	player.VelocityModifier = CalcPrestrafeVelMod(player, angles) * CalcWeaponVelMod(player);
+	DHookEntity(gH_GetPlayerMaxSpeed, true, client);
+	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 }
 
 void ResetVelMod(KZPlayer player)
@@ -363,7 +402,7 @@ void ResetVelMod(KZPlayer player)
 	gF_PSTurnRate[player.ID] = 0.0;
 }
 
-float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
+void CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 {
 	gI_PSTicksSinceIncrement[player.ID]++;
 	
@@ -371,7 +410,7 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	if (player.Speed < EPSILON)
 	{
 		ResetVelMod(player);
-		return gF_PSVelMod[player.ID];
+		return;
 	}
 	
 	// Current speed without bonus
@@ -453,8 +492,6 @@ float CalcPrestrafeVelMod(KZPlayer player, const float angles[3])
 	
 	gF_PSBonusSpeed[player.ID] = newBonusSpeed;
 	gF_PSVelMod[player.ID] = 1.0 + (newBonusSpeed / baseSpeed);
-	
-	return gF_PSVelMod[player.ID];
 }
 
 bool ValidPrestrafeButtons(KZPlayer player)
@@ -480,10 +517,6 @@ float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 	return reward * baseSpeed / SPEED_NORMAL;
 }
 
-float CalcWeaponVelMod(KZPlayer player)
-{
-	return SPEED_NORMAL / player.MaxSpeed;
-}
 
 
 
@@ -492,8 +525,10 @@ float CalcWeaponVelMod(KZPlayer player)
 void TweakJump(KZPlayer player)
 {
 	int cmdsSinceLanding = player.TakeoffCmdNum - player.LandingCmdNum;
+	bool hitTweakedPerf = cmdsSinceLanding == 1
+	 || cmdsSinceLanding <= 3 && gI_Cmdnum[player.ID] - gI_LastJumpButtonCmdnum[player.ID] <= 3;
 	
-	if (cmdsSinceLanding <= PERF_TICKS)
+	if (hitTweakedPerf)
 	{
 		if (cmdsSinceLanding == 1)
 		{
@@ -784,4 +819,4 @@ void ReduceDuckSlowdown(KZPlayer player)
 	{
 		player.DuckSpeed = DUCK_SPEED_MINIMUM;
 	}
-} 
+}

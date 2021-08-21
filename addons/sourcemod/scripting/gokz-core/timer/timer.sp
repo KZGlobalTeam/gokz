@@ -44,11 +44,11 @@ int GetCurrentTimeType(int client)
 	return TimeType_Nub;
 }
 
-bool TimerStart(int client, int course, bool allowMidair = false, bool autoRestart = false, bool playSound = true)
+bool TimerStart(int client, int course, bool allowMidair = false, bool playSound = true)
 {
 	if (!IsPlayerAlive(client)
 		 || JustStartedTimer(client)
-		 || JustTeleported(client) && !autoRestart
+		 || JustTeleported(client)
 		 || JustNoclipped(client)
 		 || !IsPlayerValidMoveType(client)
 		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
@@ -211,13 +211,6 @@ void OnTeleportToStart_Timer(int client)
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro)
 	{
 		TimerStop(client, false);
-	}
-	
-	if (lastStartMode[client] == GOKZ_GetCoreOption(client, Option_Mode)
-		 && GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Enabled
-		 && GOKZ_GetStartPositionType(client) == StartPositionType_MapButton)
-	{
-		TimerStart(client, GetCurrentCourse(client), true, true);
 	}
 }
 
