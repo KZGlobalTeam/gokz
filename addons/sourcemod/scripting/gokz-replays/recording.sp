@@ -17,7 +17,6 @@ static float tickrate;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
-static int onGroundLastTick[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
 static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];

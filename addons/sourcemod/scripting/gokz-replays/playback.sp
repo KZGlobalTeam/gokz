@@ -105,6 +105,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.Buttons = botButtons[bot];
 	info.TakeoffSpeed = botTakeoffSpeed[bot];
 	info.IsTakeoff = botIsTakeoff[bot] && !Movement_GetOnGround(client);
+	info.CurrentTeleport = botCurrentTeleport[bot];
 }
 
 int GetBotFromClient(int client)
@@ -478,14 +479,13 @@ static void LoadFormatVersion2Replay(File file, int bot)
 			file.ReadInt8(botCourse[bot]);
 
 			// Teleports Used
-			int teleportsUsed;
-			file.ReadInt32(teleportsUsed);
+			file.ReadInt32(botTeleportsUsed[bot]);
 
 			// Type
 			botReplayType[bot] = ReplayType_Run;
 			
 			// Finish spit to console
-			PrintToServer("Time: %f\nCourse: %d\nTeleports Used: %d", botTime[bot], botCourse[bot], teleportsUsed);
+			PrintToServer("Time: %f\nCourse: %d\nTeleports Used: %d", botTime[bot], botCourse[bot], botTeleportsUsed[bot]);
 		}
 		case ReplayType_Cheater:
 		{
@@ -543,9 +543,6 @@ static void LoadFormatVersion2Replay(File file, int bot)
 		file.ReadInt32(view_as<int>(tickData.speed));
 		
 		playbackTickData[bot].PushArray(tickData);
-
-		if (i < 5)
-		PrintToServer("Origin[2] = %f", tickData.origin[2]);
 	}
 	
 	playbackTick[bot] = 0;
@@ -862,26 +859,21 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		}
 		botButtons[bot] = buttons;
 
+		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
 		if (currentTickData.flags & RP_MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
 		{
 			botPaused[bot] = false;
-			SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
+			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
 		}
 		else if (currentTickData.flags & RP_MOVETYPE_LADDER)
 		{
 			botPaused[bot] = false;
-			if(Movement_GetMovetype(client) != MOVETYPE_LADDER)
+			if (Movement_GetMovetype(client) != MOVETYPE_LADDER)
 			{
 				Movement_SetMovetype(client, MOVETYPE_NONE);
 			}
-			if(GetEntityFlags(client) & FL_ONGROUND)
-			{
-				SetEntityFlags(client, GetEntityFlags(client) &~ FL_ONGROUND);
-			}
-			if(GetEntityFlags(client) &~ FL_ATCONTROLS)
-			SetEntityFlags(client, GetEntityFlags(client) | FL_ATCONTROLS);
 			Movement_SetMovetype(client, MOVETYPE_LADDER);
 		}
 		else if (currentTickData.flags & RP_MOVETYPE_NONE)
@@ -891,7 +883,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		}
 		else if (currentTickData.flags & RP_UNDER_WATER)
 		{
-			SetEntityFlags(client, GetEntityFlags(client) | FL_INWATER);
+			SetEntityFlags(client, entityFlags | FL_INWATER);
 		}
 		else
 		{

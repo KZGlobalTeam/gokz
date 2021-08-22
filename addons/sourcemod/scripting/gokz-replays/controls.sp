@@ -4,6 +4,7 @@
 
 
 static int controllingPlayer[RP_MAX_BOTS];
+static int botTeleports[RP_MAX_BOTS];
 static bool showReplayControls[MAXPLAYERS + 1];
 
 
@@ -43,10 +44,12 @@ void UpdateReplayControlMenu(int client)
 	}
 	
 	if (showReplayControls[client] &&
+		GOKZ_HUD_GetOption(client, HUDOption_ShowControls) == ReplayControls_Enabled &&
 		(GetClientMenu(client) == MenuSource_None ||
-		 GetClientAvgLoss(client, NetFlow_Both) > EPSILON ||
+		 GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
 		 GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu))
 	{
+		botTeleports[bot] = PlaybackGetTeleports(bot);
 		ShowReplayControlMenu(client, bot);
 	}
 }
@@ -71,7 +74,7 @@ void ShowReplayControlMenu(int client, int bot)
 
 	if(PlaybackGetTeleports(bot) > 0)
 	{
-		FormatEx(text, sizeof(text), "%T", "Replay Controls - Teleports", client, PlaybackGetTeleports(bot));
+		FormatEx(text, sizeof(text), "%T", "Replay Controls - Teleports", client, botTeleports[bot]);
 		panel.DrawItem(text, ITEMDRAW_RAWLINE);
 	}
 	
@@ -132,15 +135,15 @@ bool IsReplayBotControlled(int bot, int botClient)
 
 int PanelHandler_ReplayControls(Menu menu, MenuAction action, int param1, int param2)
 {
-	if (!IsValidClient(param1))
-	{
-		return 0;
-	}
-	
 	switch (action)
 	{
 		case MenuAction_Select:
 		{
+			if (!IsValidClient(param1))
+			{
+				return 0;
+			}
+
 			int bot = GetBotFromClient(GetObserverTarget(param1));
 			if (bot == -1 || controllingPlayer[bot] != param1)
 			{
@@ -171,7 +174,7 @@ int PanelHandler_ReplayControls(Menu menu, MenuAction action, int param1, int pa
 			// Exit
 			else if (param2 == 7)
 			{
-				showReplayControls[param1] = false;
+				CancelReplayControls(param1);
 				delete menu;
 			}
 		}
