@@ -115,4 +115,12 @@ static void ProfileMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T: %d",
 			 "Profile Menu - Points", client, GOKZ_GL_GetRankPoints(player, mode));
 	menu.AddItem(ITEM_INFO_POINTS, display);
+	
+	FormatEx(display, sizeof(display), "%T: %d",
+			 "Profile Menu - Overall Completion", client, GOKZ_GL_GetFinishes(player, mode, TimeType_Nub));
+	menu.AddItem(ITEM_INFO_POINTS, display);
+	
+	FormatEx(display, sizeof(display), "%T: %d",
+			 "Profile Menu - Pro Completion", client, GOKZ_GL_GetFinishes(player, mode, TimeType_Pro));
+	menu.AddItem(ITEM_INFO_POINTS, display);
 }

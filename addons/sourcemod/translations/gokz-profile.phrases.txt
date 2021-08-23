@@ -59,6 +59,14 @@
 	{
 		"en"		"Points"
 	}
+	"Profile Menu - Overall Completion"
+	{
+		"en"		"Nub"
+	}
+	"Profile Menu - Pro Completion"
+	{
+		"en"		"Pro"
+	}
 	
 	//=====[ TAGS ]=====
 	"Tag - Admin"

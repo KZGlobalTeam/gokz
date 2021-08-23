@@ -34,6 +34,11 @@ int GetMapPoints(int client, int mode, int timeType)
 	return pointsMap[client][mode][timeType];
 }
 
+int GetFinishes(int client, int mode, int timeType)
+{
+	return finishes[client][mode][timeType];
+}
+
 bool PointsValid(int client, int mode)
 {
 	return pointsMap[client][mode][TimeType_Pro] != -1
@@ -99,21 +104,24 @@ static void UpdatePointsCallback(JSON_Object ranks, GlobalAPIRequestData request
 		return;
 	}
 	
-	int points;
+	int points, totalFinishes;
 	if (request.Failure || !ranks.IsArray || ranks.Length == 0)
 	{
 		points = 0;
+		totalFinishes = 0;
 		LogError("Failed to get points.");
 	}
 	else
 	{
 		APIPlayerRank rank = view_as<APIPlayerRank>(ranks.GetObjectIndexed(0));
 		points = rank.Points == -1 ? 0 : rank.Points;
+		totalFinishes = rank.Finishes == -1 ? 0 : rank.Finishes;
 	}
 	
 	if (isTotal)
 	{
 		pointsTotal[client][mode][timeType] = points;
+		finishes[client][mode][timeType] = totalFinishes;
 	}
 	else
 	{

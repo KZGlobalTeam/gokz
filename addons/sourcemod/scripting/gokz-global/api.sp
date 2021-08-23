@@ -43,6 +43,7 @@ void CreateNatives()
 	CreateNative("GOKZ_GL_GetProPoints", Native_GetPoints);
 	CreateNative("GOKZ_GL_GetProMapPoints", Native_GetMapPoints);
 	CreateNative("GOKZ_GL_GetRankPoints", Native_GetRankPoints);
+	CreateNative("GOKZ_GL_GetFinishes", Native_GetFinishes);
 	CreateNative("GOKZ_GL_UpdatePoints", Native_UpdatePoints);
 }
 
@@ -94,6 +95,11 @@ public int Native_GetMapPoints(Handle plugin, int numParams)
 public int Native_GetRankPoints(Handle plugin, int numParams)
 {
 	return GetRankPoints(GetNativeCell(1), GetNativeCell(2));
+}
+
+public int Native_GetFinishes(Handle plugin, int numParams)
+{
+	return GetFinishes(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3));
 }
 
 public int Native_UpdatePoints(Handle plugin, int numParams)

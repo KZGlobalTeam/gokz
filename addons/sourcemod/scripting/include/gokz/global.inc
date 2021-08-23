@@ -171,6 +171,15 @@ native void GOKZ_GL_GetMapPoints(int client, int mode, int timeType);
 native int GOKZ_GL_GetRankPoints(int client, int mode);
 
 /**
+ * Get the amount of maps a player finished.
+ *
+ * @param client		Client index.
+ * @param mode			GOKZ mode.
+ * @param timeType		Type of time i.e. NUB or PRO.
+ */
+native void GOKZ_GL_GetFinishes(int client, int mode, int timeType);
+
+/**
  * Fetch the points a player got from the Global API.
  *
  * @param client		Client index. -1 to update all indices.
