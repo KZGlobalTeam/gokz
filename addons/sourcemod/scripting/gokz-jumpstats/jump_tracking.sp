@@ -145,8 +145,7 @@ enum struct JumpTracker
 		
 		// Fix certain props that don't give you base velocity
 		/* 
-			If the player collides with a wall this can wrongfully invalidate jumps.
-			We can check for speed reduction for abuse; while prop abuses increase speed,
+			We check for speed reduction for abuse; while prop abuses increase speed,
 			wall collision will very likely (if not always) result in a speed reduction.
 		*/
 		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;
@@ -278,7 +277,6 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		// entityTouchCount is unreliable, don't invalidate jumpstats with it here!
 		if (GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
@@ -1333,7 +1331,7 @@ void OnStartTouch_JumpTracking(int client)
 
 void OnTouch_JumpTracking(int client)
 {
-	if (entityTouchCount[client])
+	if (entityTouchCount[client] > 0)
 	{
 		entityTouchDuration[client]++;
 	}
@@ -1346,7 +1344,7 @@ void OnTouch_JumpTracking(int client)
 void OnEndTouch_JumpTracking(int client)
 {
 	entityTouchCount[client]--;
-	if (!entityTouchCount[client])
+	if (entityTouchCount[client] == 0)
 	{
 		entityTouchDuration[client] = 0;
 	}
