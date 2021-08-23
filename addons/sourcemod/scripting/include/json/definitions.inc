@@ -4,15 +4,15 @@
  * sm-json
  * Provides a pure SourcePawn implementation of JSON encoding and decoding.
  * https://github.com/clugg/sm-json
- * 
- * sm-json (C)2018 James D. (clug)
+ *
+ * sm-json (C)2019 James Dickens. (clug)
  * SourceMod (C)2004-2008 AlliedModders LLC.  All rights reserved.
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 3.0, as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
@@ -37,18 +37,43 @@
 #define _json_definitions_included
 
 #include <string>
-#include <json/string_helpers>
+#include <json/helpers/string>
 
-// you may need to tinker with these for large objects/floating point numbers
-#define JSON_BUFFER_SIZE 8192
+/**
+ * @section Pretty Print Constants
+ *
+ * Used to determine how pretty printed JSON should be formatted when encoded.
+ * You can modify these if you prefer your JSON formatted differently.
+ */
+
+#define JSON_PP_AFTER_COLON " "
+#define JSON_PP_INDENT "    "
+#define JSON_PP_NEWLINE "\n"
+
+/**
+ * @section Buffer Size Constants
+ *
+ * You may need to change these if you are working with very large arrays or floating point numbers.
+ */
+
 #define JSON_FLOAT_BUFFER_SIZE 32
-#define JSON_INDEX_BUFFER_LENGTH 16
+#define JSON_INDEX_BUFFER_SIZE 16
 
-// meta-key defines
+/**
+ * @section Meta-key Constants
+ *
+ * Used to store metadata for each key in an object.
+ * You shouldn't need to change these unless working with keys that may clash with them.
+ */
+
 #define JSON_ARRAY_INDEX_KEY "__array_index"
 #define JSON_META_TYPE_KEY   ":type"
 #define JSON_META_LENGTH_KEY ":length"
 #define JSON_META_HIDDEN_KEY ":hidden"
+
+/**
+ * @section General
+ */
 
 /**
  * Types of cells within a JSON object
@@ -64,45 +89,15 @@ enum JSON_CELL_TYPE {
 };
 
 /**
- * Multi-dimensional char array mapping characters to their escaped form
- */
-char JSON_STRING_NORMAL[][]  = {"\"",   "\\",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
-char JSON_STRING_ESCAPED[][] = {"\\\"", "\\\\", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
-
-/**
- * Escapes a string based on the rules defined in json/definitions.inc
- *
- * @param buffer        String buffer.
- * @param maxlength     Maximum buffer length.
- */
-public void json_escape_string(char[] buffer, int maxlen) {
-    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
-        ReplaceString(buffer, maxlen, JSON_STRING_NORMAL[i], JSON_STRING_ESCAPED[i]);
-    }
-}
-
-/**
- * Unescapes a string based on the rules defined in json/definitions.inc
- *
- * @param buffer        String buffer.
- * @param maxlength     Maximum buffer length.
- */
-public void json_unescape_string(char[] buffer, int maxlen) {
-    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
-        ReplaceString(buffer, maxlen, JSON_STRING_ESCAPED[i], JSON_STRING_NORMAL[i]);
-    }
-}
-
-/**
- * Checks whether the key provided is an meta-key that
- * should only be used internally.
+ * Checks whether the key provided is a meta-key that should only be used internally.
  *
  * @param key   Key to check.
- * @return      True when it is a meta-key, false otherwise.
+ * @returns     True when it is a meta-key, false otherwise.
  */
-stock bool json_is_meta_key(char[] key) {
-    return json_string_endswith(key, JSON_META_TYPE_KEY) ||
-            json_string_endswith(key, JSON_META_LENGTH_KEY) ||
-            json_string_endswith(key, JSON_META_HIDDEN_KEY) ||
-            StrEqual(key, JSON_ARRAY_INDEX_KEY);
+stock bool json_is_meta_key(char[] key)
+{
+    return json_string_endswith(key, JSON_META_TYPE_KEY)
+        || json_string_endswith(key, JSON_META_LENGTH_KEY)
+        || json_string_endswith(key, JSON_META_HIDDEN_KEY)
+        || StrEqual(key, JSON_ARRAY_INDEX_KEY);
 }

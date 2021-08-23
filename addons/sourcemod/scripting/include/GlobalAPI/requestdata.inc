@@ -395,8 +395,37 @@ methodmap GlobalAPIRequestData < JSON_Object
 		{
 			JSON_Object hArray = new JSON_Object(true);
 
-			for (int i = 0; i < maxlength; i++) 
+			for (int i = 0; i < maxlength; i++)
+			{
 				hArray.PushInt(value[i]);
+			}
+
+			this.SetObject(key, hArray);
+		}
+	}
+
+   /**
+ 	* Adds string array to the request data
+ 	*
+ 	* @note						Item count <= 0 are added as defaults
+ 	* @param key				Key name to set
+ 	* @param itemCount			Amount of strings in the array
+ 	* @noreturn
+ 	*/
+	public void AddStringArray(char[] key, char[][] value, int itemCount)
+	{
+		if (itemCount <= 0)
+		{
+			this.SetDefault(key);
+		}
+		else
+		{
+			JSON_Object hArray = new JSON_Object(true);
+
+			for (int i = 0; i < itemCount; i++)
+			{
+				hArray.PushString(value[i]);
+			}
 
 			this.SetObject(key, hArray);
 		}
@@ -466,6 +495,11 @@ methodmap GlobalAPIRequestData < JSON_Object
 							{
 								int temp = hObject.GetIntIndexed(x);
 								IntToString(temp, value, sizeof(value));
+								AppendToQueryString(paramCount, queryString, maxlength, key, value);
+							}
+							case Type_String:
+							{
+								hObject.GetStringIndexed(x, value, sizeof(value));
 								AppendToQueryString(paramCount, queryString, maxlength, key, value);
 							}
 						}

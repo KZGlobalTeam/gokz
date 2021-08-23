@@ -143,6 +143,41 @@ native void GOKZ_GL_PrintRecords(int client, const char[] map = "", int course, 
  */
 native void GOKZ_GL_DisplayMapTopMenu(int client, const char[] map = "", int course, int mode, int timeType);
 
+/**
+ * Get the total global points of a player.
+ *
+ * @param client		Client index.
+ * @param mode			GOKZ mode.
+ * @param timeType		Type of time i.e. NUB or PRO.
+ */
+native void GOKZ_GL_GetPoints(int client, int mode, int timeType);
+
+/**
+ * Get the global points on the main coruse of the current map.
+ *
+ * @param client		Client index.
+ * @param mode			GOKZ mode.
+ * @param timeType		Type of time i.e. NUB or PRO.
+ */
+native void GOKZ_GL_GetMapPoints(int client, int mode, int timeType);
+
+/**
+ * Get the total global ranking points of a player.
+ *
+ * @param client		Client index.
+ * @param mode			GOKZ mode.
+ * @return				The points.
+ */
+native int GOKZ_GL_GetRankPoints(int client, int mode);
+
+/**
+ * Fetch the points a player got from the Global API.
+ *
+ * @param client		Client index. -1 to update all indices.
+ * @param mode			GOKZ mode. -1 to update all modes.
+ */
+native void GOKZ_GL_UpdatePoints(int client = -1, int mode = -1);
+
 
 
 // =====[ STOCKS ]=====
