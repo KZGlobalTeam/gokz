@@ -22,33 +22,6 @@ enum
 	REPLAYTYPE_COUNT
 };
 
-/*enum (<<= 1)
-{
-	RP_MOVETYPE_WALK = 1 << 0,
-	RP_MOVETYPE_LADDER,
-	RP_MOVETYPE_NOCLIP,
-	RP_MOVETYPE_NONE,
-	RP_IN_ATTACK,
-	RP_IN_ATTACK2,
-	RP_IN_JUMP,
-	RP_IN_DUCK,
-	RP_IN_FORWARD,
-	RP_IN_BACK,
-	RP_IN_LEFT,
-	RP_IN_RIGHT,
-	RP_IN_MOVELEFT,
-	RP_IN_MOVERIGHT,
-	RP_IN_RELOAD,
-	RP_IN_SPEED,
-	RP_FL_ONGROUND,
-	RP_FL_DUCKING,
-	RP_FL_SWIM,
-	RP_UNDER_WATER,
-	RP_TELEPORT_TICK,
-	RP_TAKEOFF_TICK,
-	RP_HIT_PERF,
-	RP_SECONDARY_EQUIPPED,
-};*/
 
 
 // =====[ STRUCTS ] =====
@@ -146,8 +119,7 @@ enum struct ReplayTickData
 #define RP_TELEPORT_TICK		(1 << 20)
 #define RP_TAKEOFF_TICK			(1 << 21)
 #define RP_HIT_PERF				(1 << 22)
-#define RP_EQUIPPED_WEAPON		(1 << 23)
-
+#define RP_SECONDARY_EQUIPPED		(1 << 23)
 
 
 
@@ -161,7 +133,7 @@ enum struct ReplayTickData
  * @param client			Client index.
  * @param filePath			Replay file path.
  */
-forward void GOKZ_RP_OnReplaySaved(int client, const char[] filePath);
+forward void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] filePath);
 
 /**
  * Called when a currently being recorded replay is discarded from

@@ -267,7 +267,7 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 
     delete file;
 
-    Call_OnReplaySaved(client, replayPath);
+    Call_OnReplaySaved(client, ReplayType_Run, replayPath);
 
     return true;
 }
@@ -299,7 +299,7 @@ static bool SaveRecordingOfCheater(int client, ACReason reason)
 
     delete file;
 
-    Call_OnReplaySaved(client, replayPath);
+    Call_OnReplaySaved(client, ReplayType_Cheater, replayPath);
 
     return true;
 }
@@ -331,7 +331,7 @@ static bool SaveRecordingOfJump(int client, Jump jump)
 
     delete file;
 
-    Call_OnReplaySaved(client, replayPath);
+    Call_OnReplaySaved(client, ReplayType_Jump, replayPath);
 
     return true;
 }
