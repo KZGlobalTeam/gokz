@@ -102,6 +102,15 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
+	if (GetTimerRunning(client) && AntiCpTriggerIsTouched(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Anti Checkpoint Area)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	if (!Movement_GetOnGround(client) && Movement_GetMovetype(client) != MOVETYPE_LADDER)
 	{
 		if (showError)

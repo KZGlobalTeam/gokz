@@ -65,6 +65,10 @@
 		"chi"		"{darkred}落地瞬间无法存点."
 		"ru"		"{darkred}Вы не можете поставить чекпойнт после приземления."
 	}
+	"Can't Checkpoint (Anti Checkpoint Area)"
+	{
+		"en"		"{darkred}You can't checkpoint because checkpoints are disabled in this area."
+	}
 	"Can't Teleport (No Checkpoints)"
 	{
 		"en"		"{darkred}You can't teleport because you have not set a checkpoint."
@@ -123,6 +127,10 @@
 	{
 		"en"		"{darkred}You can't pause because you just landed."
 		"ru"		"{darkred}Вы не можете поставить паузу после приземления."
+	}
+	"Can't Pause (Anti Pause Area)"
+	{
+		"en"		"{darkred}You can't pause because pausing is disabled in this area."
 	}
 	"Can't Resume (Just Paused)"
 	{

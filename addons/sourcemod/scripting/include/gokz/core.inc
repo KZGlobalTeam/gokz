@@ -158,6 +158,35 @@ enum
 	MODECVAR_COUNT
 };
 
+// NOTE: gokz-core/map/entlump.sp
+enum EntlumpTokenType
+{
+	EntlumpTokenType_OpenBrace,  // {
+	EntlumpTokenType_CloseBrace, // }
+	EntlumpTokenType_Identifier, // everything that's inside quotations
+	EntlumpTokenType_Unknown,
+	EntlumpTokenType_EndOfStream
+};
+
+// NOTE: gokz-core/map/triggers.sp
+// NOTE: corresponds to climb_teleport_type in kz_mapping_api.fgd
+enum TeleportType
+{
+	TeleportType_Invalid = -1,
+	TeleportType_Normal,
+	TeleportType_MultiBhop,
+	TeleportType_SingleBhop,
+	TeleportType_SequentialBhop,
+	TELEPORTTYPE_COUNT
+};
+
+enum TriggerType
+{
+	TriggerType_Invalid = 0,
+	TriggerType_Teleport,
+	TriggerType_Antibhop
+};
+
 
 
 // =====[ CONSTANTS ]=====
@@ -165,7 +194,8 @@ enum
 #define GOKZ_MAX_CHECKPOINTS 32
 #define GOKZ_MAX_COURSES 100
 
-#define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.11
+#define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.15
+#define GOKZ_MULT_NO_CHECKPOINT_TIME 0.11
 #define GOKZ_LADDER_NO_CHECKPOINT_TIME 1.5
 #define GOKZ_PAUSE_COOLDOWN 1.0
 #define GOKZ_TIMER_START_NO_TELEPORT_TICKS 4
@@ -173,6 +203,18 @@ enum
 #define GOKZ_TIMER_START_NOCLIP_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
+
+#define GOKZ_MAPPING_API_VERSION_NONE 0 // the map doesn't have a mapping api version
+#define GOKZ_MAPPING_API_VERSION 1
+
+#define GOKZ_ANTI_BHOP_TRIGGER_DEFAULT_DELAY 0.2
+#define GOKZ_TELEPORT_TRIGGER_DEFAULT_TYPE TeleportType_Normal
+#define GOKZ_TELEPORT_TRIGGER_DEFAULT_DELAY 0.0
+#define GOKZ_TELEPORT_TRIGGER_DEFAULT_USE_DEST_ANGLES true
+#define GOKZ_TELEPORT_TRIGGER_DEFAULT_RESET_SPEED true
+#define GOKZ_TELEPORT_TRIGGER_DEFAULT_RELATIVE_DESTINATION false
+#define GOKZ_TELEPORT_TRIGGER_DEFAULT_REORIENT_PLAYER false
+#define GOKZ_TELEPORT_TRIGGER_BHOP_MIN_DELAY 0.08
 
 #define GOKZ_SOUND_CHECKPOINT "buttons/blip1.wav"
 #define GOKZ_SOUND_TELEPORT "buttons/blip1.wav"
@@ -186,6 +228,12 @@ enum
 #define GOKZ_END_BUTTON_NAME "climb_endbutton"
 #define GOKZ_BONUS_START_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_startbutton$"
 #define GOKZ_BONUS_END_BUTTON_NAME_REGEX "^climb_bonus(\\d+)_endbutton$"
+#define GOKZ_ANTI_BHOP_TRIGGER_NAME "climb_anti_bhop"
+#define GOKZ_ANTI_CP_TRIGGER_NAME "climb_anti_checkpoint"
+#define GOKZ_ANTI_PAUSE_TRIGGER_NAME "climb_anti_pause"
+#define GOKZ_ANTI_JUMPSTAT_TRIGGER_NAME "climb_anti_jumpstat"
+#define GOKZ_BHOP_RESET_TRIGGER_NAME "climb_bhop_reset"
+#define GOKZ_TELEPORT_TRIGGER_NAME "climb_teleport"
 
 #define GOKZ_START_ZONE_NAME "climb_startzone"
 #define GOKZ_END_ZONE_NAME "climb_endzone"
@@ -202,6 +250,13 @@ enum
 #define GOKZ_OPTION_MAX_NAME_LENGTH 50
 #define GOKZ_OPTION_MAX_DESC_LENGTH 255
 #define GENERAL_OPTION_CATEGORY "General"
+
+// TODO: where do i put the defines?
+#define GOKZ_BSP_HEADER_IDENTIFIER (('P' << 24) | ('S' << 16) | ('B' << 8) | 'V')
+#define GOKZ_ENTLUMP_MAX_KEY 32
+#define GOKZ_ENTLUMP_MAX_VALUE 1024
+
+#define GOKZ_MAX_MAPTRIGGERS_ERROR_LENGTH 256
 
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
@@ -362,6 +417,45 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 	"sv_weapon_encumbrance_per_item", 
 	"sv_weapon_encumbrance_scale"
 };
+
+
+
+// =====[ STRUCTS ]=====
+
+// NOTE: gokz-core/map/entlump.sp
+enum struct EntlumpToken
+{
+	EntlumpTokenType type;
+	char string[GOKZ_ENTLUMP_MAX_VALUE];
+}
+
+// NOTE: gokz-core/map/triggers.sp
+enum struct AntiBhopTrigger
+{
+	int entRef;
+	int hammerID;
+	float time;
+}
+
+enum struct TeleportTrigger
+{
+	int hammerID;
+	TeleportType type;
+	float delay;
+	char tpDestination[256];
+	bool useDestAngles;
+	bool resetSpeed;
+	bool relativeDestination;
+	bool reorientPlayer;
+}
+
+enum struct TouchedTrigger
+{
+	TriggerType triggerType;
+	int entRef; // entref of one of the TeleportTriggers
+	int startTouchTick; // tick where the player touched the trigger
+	int groundTouchTick; // tick where the player touched the ground
+}
 
 
 
