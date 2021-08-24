@@ -240,6 +240,14 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	return MRES_Ignored;
 }
 
+public void OnCSPlayerSpawnPost(int client)
+{
+	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") == -1)
+	{
+		SetEntityFlags(client, GetEntityFlags(client) & ~FL_ONGROUND);
+	}
+}
+
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
 	OnChangeMovetype_Timer(client, newMovetype);
@@ -423,6 +431,7 @@ static void HookEvents()
 static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
 }
 
 static void UpdateTrackingVariables(int client, int cmdnum, int buttons)
