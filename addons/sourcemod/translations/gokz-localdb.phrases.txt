@@ -23,6 +23,11 @@
 		"en"		"{grey}Deleted the {purple}{1} {lightgreen}{2}{default}{3} record of '{default}STEAM_1:{4}:{5}{grey}'"
 		"ru"		"{grey}Удален {purple}{1} {lightgreen}{2}{default}{3} рекорд у '{default}STEAM_1:{4}:{5}{grey}'"
 	}
+	"All Jumps Deleted"
+	{
+		"#format"	"{1:d},{2:d}"
+		"en"		"{grey}Deleted all jumps of '{default}STEAM_1:{1}:{2}{grey}'"
+	}
 	"No SteamID specified"
 	{
 		"en"		"{darkred}No SteamID specified."
@@ -47,6 +52,10 @@
 	{
 		"en"		"Usage: !deletejump <STEAM_1:X:X> <mode> <jump type> <block?>"
 		"ru"		"Используйте: !deletejump <STEAM_1:X:X> <режим> <тип прыжка> <блок?>"
+	}
+	"Delete All Jumps Usage"
+	{
+		"en"		"Usage: !deletealljumps <STEAM_1:X:X>"
 	}
 	"Set Cheater"
 	{

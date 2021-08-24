@@ -219,3 +219,31 @@ public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, 
 		steamAccountID & 1,
 		steamAccountID >> 1);
 }
+
+public void DB_DeleteAllJumps(int client, int steamAccountID)
+{
+	DataPack data = new DataPack();
+	data.WriteCell(client == 0 ? -1 : GetClientUserId(client)); // -1 if called from server console
+	data.WriteCell(steamAccountID);
+	
+	char query[1024];
+	
+	FormatEx(query, sizeof(query), sql_jumpstats_deleteallrecords, steamAccountID);
+	
+	Transaction txn = SQL_CreateTransaction();
+	txn.AddQuery(query);
+	
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_AllJumpsDeleted, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
+}
+
+public void DB_TxnSuccess_AllJumpsDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int steamAccountID = data.ReadCell();
+	delete data;
+	
+	GOKZ_PrintToChatAndLog(client, true, "%t", "All Jumps Deleted", 
+		steamAccountID & 1,
+		steamAccountID >> 1);
+}
