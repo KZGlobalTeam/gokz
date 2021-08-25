@@ -357,8 +357,13 @@ public void OnClientConnected(int client)
 
 public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start post no copy hook
 {
-	OnRoundStart_Timer();
-	OnRoundStart_ForceAllTalk();
+	char objective[64];
+	event.GetString("objective", objective, sizeof(objective));
+	if (IsRealObjective(objective))
+	{
+		OnRoundStart_Timer();
+		OnRoundStart_ForceAllTalk();
+	}
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
@@ -450,3 +455,9 @@ static void UpdateTrackingVariables(int client, int cmdnum, int buttons)
 	gB_OriginTeleported[client] = false;
 	gB_VelocityTeleported[client] = false;
 } 
+
+static bool IsRealObjective(char[] objective)
+{
+	return StrEqual(objective, "PRISON ESCAPE") || StrEqual(objective, "DEATHMATCH")
+		|| StrEqual(objective, "BOMB TARGET") || StrEqual(objective, "HOSTAGE RESCUE");
+}
