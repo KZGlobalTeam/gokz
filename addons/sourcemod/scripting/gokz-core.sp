@@ -359,6 +359,10 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 {
 	char objective[64];
 	event.GetString("objective", objective, sizeof(objective));
+	/* 
+		External plugins that record GOTV demos can call round_start event to fix demo corruption, 
+		which happens to stop the players' timer. GOKZ should only react on real round start events only.
+	*/
 	if (IsRealObjective(objective))
 	{
 		OnRoundStart_Timer();
