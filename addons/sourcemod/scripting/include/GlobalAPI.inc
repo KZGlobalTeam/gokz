@@ -226,7 +226,7 @@ native bool GlobalAPI_GetAuthStatus(OnAPICallFinished callback = INVALID_FUNCTIO
  */
 native bool GlobalAPI_GetBans(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA, const char[] banTypes = DEFAULT_STRING,
 								const char[] banTypesList = DEFAULT_STRING, bool isExpired = DEFAULT_BOOL, const char[] ipAddress = DEFAULT_STRING,
-								int steamId64 = DEFAULT_INT, const char[] steamId = DEFAULT_STRING, const char[] notesContain = DEFAULT_STRING,
+								const char[] steamId64 = DEFAULT_STRING, const char[] steamId = DEFAULT_STRING, const char[] notesContain = DEFAULT_STRING,
 								const char[] statsContain = DEFAULT_STRING, int serverId = DEFAULT_INT, const char[] createdSince = DEFAULT_STRING,
 								const char[] updatedSince = DEFAULT_STRING, int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
@@ -272,7 +272,7 @@ native bool GlobalAPI_CreateBan(OnAPICallFinished callback = INVALID_FUNCTION, a
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetJumpstats(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA, int id = DEFAULT_INT,
-									int serverId = DEFAULT_INT, int steamId64 = DEFAULT_INT, const char[] steamId = DEFAULT_STRING,
+									int serverId = DEFAULT_INT, const char[] steamId64 = DEFAULT_STRING, const char[] steamId = DEFAULT_STRING,
 									const char[] jumpType = DEFAULT_STRING, const char[] steamId64List = DEFAULT_STRING,
 									const char[] jumpTypeList = DEFAULT_STRING, float greaterThanDistance = DEFAULT_FLOAT,
 									float lessThanDistance = DEFAULT_FLOAT, bool isMsl = DEFAULT_BOOL, bool isCrouchBind = DEFAULT_BOOL,
@@ -327,7 +327,7 @@ native bool GlobalAPI_CreateJumpstat(OnAPICallFinished callback = INVALID_FUNCTI
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetJumpstatTop(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA, const char[] jumpType,
-										int id = DEFAULT_INT, int serverId = DEFAULT_INT, int steamId64 = DEFAULT_INT,
+										int id = DEFAULT_INT, int serverId = DEFAULT_INT, const char[] steamId64 = DEFAULT_STRING,
 										const char[] steamId = DEFAULT_STRING, const char[] steamId64List = DEFAULT_STRING,
 										const char[] jumpTypeList = DEFAULT_STRING, float greaterThanDistance = DEFAULT_FLOAT,
 										float lessThanDistance = DEFAULT_FLOAT, bool isMsl = DEFAULT_BOOL, bool isCrouchBind = DEFAULT_BOOL,
@@ -500,7 +500,7 @@ native bool GlobalAPI_GetRecordPlaceById(OnAPICallFinished callback = INVALID_FU
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetRecordsTop(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
-										const char[] steamId = DEFAULT_STRING, int steamId64 = DEFAULT_INT, int mapId = DEFAULT_INT,
+										const char[] steamId = DEFAULT_STRING, const char[] steamId64 = DEFAULT_STRING, int mapId = DEFAULT_INT,
 										const char[] mapName = DEFAULT_STRING, int tickRate = DEFAULT_INT, int stage = DEFAULT_INT,
 										const char[] modes = DEFAULT_STRING, bool hasTeleports = DEFAULT_BOOL,
 										const char[] playerName = DEFAULT_STRING, int offset = DEFAULT_INT, int limit = DEFAULT_INT);
@@ -527,7 +527,7 @@ native bool GlobalAPI_GetRecordsTop(OnAPICallFinished callback = INVALID_FUNCTIO
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetRecordsTopRecent(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
-											const char[] steamId = DEFAULT_STRING, int steamId64 = DEFAULT_INT,
+											const char[] steamId = DEFAULT_STRING, const char[] steamId64 = DEFAULT_STRING,
 											int mapId = DEFAULT_INT, const char[] mapName = DEFAULT_STRING,
 											int tickRate = DEFAULT_INT, int stage = DEFAULT_INT,
 											const char[] modes = DEFAULT_STRING, int topAtLeast = DEFAULT_INT,
@@ -582,7 +582,7 @@ native bool GlobalAPI_GetRecordsTopWorldRecords(OnAPICallFinished callback = INV
  */
 native bool GlobalAPI_GetServers(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
 									int id = DEFAULT_INT, int port = DEFAULT_INT, const char[] ip = DEFAULT_STRING,
-									const char[] name = DEFAULT_STRING, int ownerSteamId64 = DEFAULT_INT,
+									const char[] name = DEFAULT_STRING, const char[] ownerSteamId64 = DEFAULT_STRING,
 									int approvalStatus = DEFAULT_INT, int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
 /**
@@ -614,8 +614,7 @@ native bool GlobalAPI_GetServersByName(OnAPICallFinished callback = INVALID_FUNC
  * @param averageGreaterThan	Average greater than to query
  * @param ratingGreaterThan		Rating greater than to query
  * @param finishesGreaterThan	Finishes greater than to query
- * @param steamId64s			Array of steamid64s to query
- * @param steamId64sLength		Length of the steamid64s array
+ * @param steamId64List			Comma-separated stirng of steamid64s to query
  * @param recordFilterIds		Array of record filter ids to query
  * @param recordFilterIdsLength	Length of the record filter ids array
  * @param mapIds				Array of map ids to query
@@ -634,7 +633,7 @@ native bool GlobalAPI_GetServersByName(OnAPICallFinished callback = INVALID_FUNC
 native bool GlobalAPI_GetPlayerRanks(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
 										int pointsGreaterThan = DEFAULT_INT, float averageGreaterThan = DEFAULT_FLOAT,
 										float ratingGreaterThan = DEFAULT_FLOAT, int finishesGreaterThan = DEFAULT_INT,
-										int[] steamId64s = DEFAULT_INT, int steamId64sLength = DEFAULT_INT, 
+										const char[] steamId64List = DEFAULT_STRING,
 										int[] recordFilterIds = DEFAULT_INT, int recordFilterIdsLength = DEFAULT_INT,
 										int[] mapIds = DEFAULT_INT, int mapIdsLength = DEFAULT_INT,
 										int[] stages = DEFAULT_INT, int stagesLength = DEFAULT_INT,
@@ -668,7 +667,8 @@ native bool GlobalAPI_GetRecordFilters(OnAPICallFinished callback = INVALID_FUNC
 										int[] stages = DEFAULT_INT, int stagesLength = DEFAULT_INT,
 										int[] modeIds = DEFAULT_INT, int modeIdsLength = DEFAULT_INT,
 										int[] tickRates = DEFAULT_INT, int tickRatesLength = DEFAULT_INT,
-										bool hasTeleports = DEFAULT_BOOL, int offset = DEFAULT_INT, int limit = DEFAULT_INT);
+										bool hasTeleports = DEFAULT_BOOL, bool isOverall = DEFAULT_BOOL,
+										int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
 /**
  * Starts a GET HTTP Request to /api/{version}/record_filters/distributions
@@ -696,7 +696,8 @@ native bool GlobalAPI_GetRecordFilterDistributions(OnAPICallFinished callback = 
 													int[] stages = DEFAULT_INT, int stagesLength = DEFAULT_INT,
 													int[] modeIds = DEFAULT_INT, int modeIdsLength = DEFAULT_INT,
 													int[] tickRates = DEFAULT_INT, int tickRatesLength = DEFAULT_INT,
-													bool hasTeleports = DEFAULT_BOOL, int offset = DEFAULT_INT, int limit = DEFAULT_INT);
+													bool hasTeleports = DEFAULT_BOOL, bool isOverall = DEFAULT_BOOL,
+													int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
 /**
  * Starts a GET HTTP Request to /api/{version}/records/replay/list

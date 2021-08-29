@@ -161,6 +161,11 @@ public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_Star
 	OnStartTouch_JumpTracking(client);
 }
 
+public void SDKHook_Touch_CallBack(int client, int touched)
+{
+	OnTouch_JumpTracking(client);
+}
+
 public void SDKHook_EndTouch_Callback(int client, int touched) // SDKHook_EndTouchPost
 {
 	OnEndTouch_JumpTracking(client);
@@ -204,5 +209,6 @@ public void GOKZ_OnSlap(int client)
 static void HookClientEvents(int client)
 {
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
+	SDKHook(client, SDKHook_TouchPost, SDKHook_Touch_CallBack);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
 } 

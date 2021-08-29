@@ -8,6 +8,7 @@ void RegisterCommands()
 	RegAdminCmd("sm_setcheater", CommandSetCheater, ADMFLAG_ROOT, "[KZ] Set a SteamID as a cheater. Usage: !setcheater <STEAM_1:X:X>");
 	RegAdminCmd("sm_setnotcheater", CommandSetNotCheater, ADMFLAG_ROOT, "[KZ] Set a SteamID as not a cheater. Usage: !setnotcheater <STEAM_1:X:X>");
 	RegAdminCmd("sm_deletejump", CommandDeleteJump, ADMFLAG_ROOT, "[KZ] Remove the top jumpstat of a SteamID. Usage: !deletejump <STEAM_1:X:X> <mode> <jump type> <block?>");
+	RegAdminCmd("sm_deletealljumps", CommandDeleteAllJumps, ADMFLAG_ROOT, "[KZ] Remove all jumpstats of a SteamID. Usage: !deletejump <STEAM_1:X:X>");
 }
 
 public Action Command_SaveTimerSetup(int client, int args)
@@ -123,6 +124,30 @@ public Action CommandDeleteJump(int client, int args)
 	isBlock = StrEqual(split[3], "yes", false) || StrEqual(split[3], "true", false) || StrEqual(split[3], "1");
 	
 	DB_DeleteJump(client, steamAccountID, jumpType, mode, isBlock);
+	
+	return Plugin_Handled;
+}
+
+public Action CommandDeleteAllJumps(int client, int args)
+{
+	if (args < 1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Delete All Jumps Usage");
+		return Plugin_Handled;
+	}
+	
+	int steamAccountID;
+	char steamid[32];
+	
+	GetCmdArgString(steamid, sizeof(steamid));
+	steamAccountID = Steam2ToSteamAccountID(steamid);
+	if (steamAccountID == -1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Invalid SteamID");
+		return Plugin_Handled;
+	}
+	
+	DB_DeleteAllJumps(client, steamAccountID);
 	
 	return Plugin_Handled;
 }

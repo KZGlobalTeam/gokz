@@ -1,0 +1,52 @@
+// KZ Mapping API Version 1
+
+@SolidClass base(Trigger) = trigger_multiple :
+	"A trigger volume that can be triggered multiple times."
+[
+	// Default trigger_multiple thing:
+	wait(integer) : "Delay Before Reset" : 1 : "Amount of time, in seconds, after the trigger_multiple has triggered before it can be triggered again. If set to -1, it will never trigger again (in which case you should just use a trigger_once)."
+	
+	climb_teleport_type(choices) : "KZ | Teleport | Type" : "0" : "Only works if the Name is climb_teleport. "
+		+ "The type of teleport trigger. Normal is just a normal teleport. See https://bitbucket.org/kztimerglobalteam/gokz/src/master/MAPPING.md for details" =
+	[
+		0 : "Normal"
+		1 : "Multi Bhop"
+		2 : "Single Bhop"
+		3 : "Sequential Bhop"
+	]
+	
+	climb_teleport_destination(target_destination) : "KZ | Teleport | Destination" : : "Only works if the Name is climb_teleport. " 
+		+ "The entity to which the player should be teleported. Using special targetnames starting with ! won't work. (!activator, !player etc)"
+	
+	climb_teleport_delay(float) : "KZ | Teleport | Delay" : "0.0" : "Only works if the Name is climb_teleport. "
+		+ "This is how long the player can stay in the trigger. If it's one of the bhop triggers, then this means how long the player can stay on ground. For only bhop triggers the minimum delay is 0.08 seconds."
+	
+	climb_teleport_use_dest_angles(boolean) : "KZ | Teleport | Use Destination Angles" : 1 : "Only works if the Name is climb_teleport. "
+		+ "Whether to set the player's view angles to the destination entity's angles or keep the player's current view angles."
+	
+	climb_teleport_reset_speed(boolean) : "KZ | Teleport | Reset Speed" : 1 : "Only works if the Name is climb_teleport. "
+		+ "Whether to reset the player's speed when they get teleported"
+	
+	climb_teleport_reorient_player(boolean) : "KZ | Teleport | Reorient Player" : 0 : "Only works if the Name is climb_teleport. "
+		+ "Reorients the player's velocity and view yaw angle by the teleport destination's yaw angle. This overrides the value of 'Use Destination Angles'."
+	
+	climb_teleport_relative(boolean) : "KZ | Teleport | Relative To Trigger Origin" : 0 : "Only works if the Name is climb_teleport. " 
+		+ "Gets the offset of the player to this trigger, then teleports the player to the destination with that offset added. If 'Reorient Player' is enabled, then the offset is rotated by the destination entity's yaw. Changing the destination yaw will cause visible lag when moving your mouse."
+	
+	climb_anti_bhop_time(float) : "KZ | Anti Bhop | Time" : "0.2" : "Only works if the Name is climb_anti_bhop. "
+		+ "This is the time for which antibhop will be applied. Time is only counted when the player is on the ground."
+	
+	// Inputs
+	input TouchTest(void) : "Tests if the trigger is being touched and fires an output based on whether the value is true or false." 
+	
+	// Outputs
+	output OnTrigger(void) : "Fired whenever the trigger is activated."
+	output OnTouching(void) : "Fired when the TestTouch input is true (something is touching the trigger.)"
+	output OnNotTouching(void) : "Fired when the TestTouch input is not true (nothing is touching the trigger.)"
+]
+
+@SolidClass base(Targetname, worldbase, ResponseContext) = worldspawn : 
+	"This is the world entity. Each map can only contain one, and it's automatically created for you."
+[
+	climb_mapping_api_version(integer) : "KZ | Mapping API Version" : 1 : "When the fgd changes with a Mapping API update and you update the fgd, then you have to change this parameter in hammer to the correct version (written at the top of the new fgd) on every map you use it on!"
+]

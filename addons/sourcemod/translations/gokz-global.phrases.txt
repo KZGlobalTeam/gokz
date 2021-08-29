@@ -159,6 +159,18 @@
 		"chi"		"{default}{1} {grey}- {yellow}未知阶层"
 		"ru"		"{default}{1} {grey}- {yellow}Tier Неизвестен"
 	}
+	"Total Points"
+	{
+		// Total points - PRO: 14000 | NUB: 56000
+		"#format"	"{1:d},{2:d}"
+		"en"		"{default}Total points: {blue}PRO{default}: {1} {yellow}NUB{default}: {2}"
+	}
+	"Map Points"
+	{
+		// Map points - PRO: 560 | NUB: 850
+		"#format"	"{1:d},{2:d}"
+		"en"		"{default}Map points: {blue}PRO{default}: {1} {yellow}NUB{default}: {2}"
+	}
 	"Global Check Header"
 	{
 		"en"		"{grey}Global Records Availability Check"

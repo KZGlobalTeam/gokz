@@ -400,11 +400,15 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
  * @param origin		Origin to teleport to.
  * @param angles		Eye angles to set.
  */
-stock void TeleportPlayer(int client, const float origin[3], const float angles[3])
+stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true)
 {
 	Movement_SetOrigin(client, origin);
-	Movement_SetEyeAngles(client, angles);
-	
+	if (setAngles)
+	{
+		// NOTE: changing angles with TeleportEntity can fail due to packet loss!!!
+		// (Movement_SetEyeAngles is a thin wrapper of TeleportEntity)
+		Movement_SetEyeAngles(client, angles);
+	}
 	// Duck the player if there is something blocking them from above
 	Handle trace = TR_TraceHullFilterEx(origin, 
 		origin, 
@@ -415,11 +419,18 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 		client);
 	bool ducked = TR_DidHit(trace);
 	
-	// Prevent noclip exploit
-	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
-
-	// Intelligently hold player still to prevent booster and trigger exploits
-	StartHoldStill(client, ducked);
+	if (holdStill)
+	{
+		// Prevent noclip exploit
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+		
+		// Intelligently hold player still to prevent booster and trigger exploits
+		StartHoldStill(client, ducked);
+	}
+	else if (ducked)
+	{
+		ForcePlayerDuck(client);
+	}
 	
 	delete trace;
 }
@@ -521,6 +532,29 @@ stock bool IsPlayerStuck(int client)
 }
 
 /**
+ * Retrieves the absolute origin of an entity.
+ *
+ * @param entity			Index of the entity.
+ * @param result			Entity's origin if successful.
+ * @return					Returns true if successful.
+ */
+stock bool GetEntityAbsOrigin(int entity, float result[3])
+{
+	if (!IsValidEntity(entity))
+	{
+		return false;
+	}
+	
+	if (!HasEntProp(entity, Prop_Data, "m_vecAbsOrigin"))
+	{
+		return false;
+	}
+	
+	GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", result);
+	return true;
+}
+
+/**
  * Retrieves the name of an entity.
  *
  * @param entity			Index of the entity.
@@ -531,6 +565,63 @@ stock bool IsPlayerStuck(int client)
 stock int GetEntityName(int entity, char[] buffer, int maxlength)
 {
 	return GetEntPropString(entity, Prop_Data, "m_iName", buffer, maxlength);
+}
+
+/**
+ * Finds an entity by name or by name and classname.
+ * Taken from smlib https://github.com/bcserv/smlib
+ * This can take anywhere from ~0.2% to ~11% of frametime (i5-7600k) in the worst case scenario where
+ * every entity which has a name (4096 of them) is iterated over. Your mileage may vary.
+ *
+ * @param name				Name of the entity to find.
+ * @param className			Optional classname to match along with name.
+ * @param ignorePlayers		Ignore player entities.
+ * @return					Entity index if successful, INVALID_ENT_REFERENCE if not.
+ */
+stock int GOKZFindEntityByName(const char[] name, const char[] className = "", bool ignorePlayers = false)
+{
+	int result = INVALID_ENT_REFERENCE;
+	if (className[0] == '\0')
+	{
+		// HACK: Double the limit to get non-networked entities too.
+		// https://developer.valvesoftware.com/wiki/Entity_limit
+		int realMaxEntities = GetMaxEntities() * 2;
+		int startEntity = 1;
+		if (ignorePlayers)
+		{
+			startEntity = MaxClients + 1;
+		}
+		for (int entity = startEntity; entity < realMaxEntities; entity++)
+		{
+			if (!IsValidEntity(entity))
+			{
+				continue;
+			}
+			
+			char entName[65];
+			GetEntityName(entity, entName, sizeof(entName));
+			if (StrEqual(entName, name))
+			{
+				result = entity;
+				break;
+			}
+		}
+	}
+	else
+	{
+		int entity = INVALID_ENT_REFERENCE;
+		while ((entity = FindEntityByClassname(entity, className)) != INVALID_ENT_REFERENCE)
+		{
+			char entName[65];
+			GetEntityName(entity, entName, sizeof(entName));
+			if (StrEqual(entName, name))
+			{
+				result = entity;
+				break;
+			}
+		}
+	}
+	return result;
 }
 
 /**
@@ -569,4 +660,46 @@ stock bool IsSpectating(int client)
 {
 	int team = GetClientTeam(client);
 	return team == CS_TEAM_SPECTATOR || team == CS_TEAM_NONE;
-} 
+}
+
+/**
+ * Rotate a vector on an axis.
+ *
+ * @param vec				Vector to rotate.
+ * @param axis				Axis to rotate around.
+ * @param theta				Angle in radians.
+ * @param result			Rotated vector.
+ */
+stock void RotateVectorAxis(float vec[3], float axis[3], float theta, float result[3])
+{
+	float cosTheta = Cosine(theta);
+	float sinTheta = Sine(theta);
+	
+	float axisVecCross[3];
+	GetVectorCrossProduct(axis, vec, axisVecCross);
+	
+	for (int i = 0; i < 3; i++)
+	{
+		result[i] = (vec[i] * cosTheta) + (axisVecCross[i] * sinTheta) + (axis[i] * GetVectorDotProduct(axis, vec)) * (1.0 - cosTheta);
+	}
+}
+
+/**
+ * Rotate a vector by pitch and yaw.
+ *
+ * @param vec				Vector to rotate.
+ * @param pitch				Pitch angle (in degrees).
+ * @param yaw				Yaw angle (in degrees).
+ * @param result			Rotated vector.
+ */
+stock void RotateVectorPitchYaw(float vec[3], float pitch, float yaw, float result[3])
+{
+	if (pitch != 0.0)
+	{
+		RotateVectorAxis(vec, view_as<float>({0.0, 1.0, 0.0}), DegToRad(pitch), result);
+	}
+	if (yaw != 0.0)
+	{
+		RotateVectorAxis(result, view_as<float>({0.0, 0.0, 1.0}), DegToRad(yaw), result);
+	}
+}

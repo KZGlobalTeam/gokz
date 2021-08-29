@@ -37,14 +37,14 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	float time = dp.ReadFloat();
 	delete dp;
 	
-	int top_place = response.GetInt("top_100");
-	int top_overall_place = response.GetInt("top_100_overall");
-	
 	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
 		return;
 	}
+	
+	int top_place = response.GetInt("top_100");
+	int top_overall_place = response.GetInt("top_100_overall");
 	
 	if (!IsValidClient(client))
 	{
@@ -55,4 +55,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	{
 		Call_OnNewTopTime(client, course, mode, timeType, top_place, top_overall_place, time);
 	}
-} 
+	
+	// Don't like doing this here, but seems to be the most efficient place
+	GOKZ_GL_UpdatePoints(client);
+}

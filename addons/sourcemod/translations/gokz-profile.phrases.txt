@@ -1,0 +1,80 @@
+"Phrases"
+{
+	//=====[ MENU ]=====
+	"Options Menu - Profile"
+	{
+		"en"		"Profile"
+	}
+	"Options Menu - Show Rank Chat"
+	{
+		"en"		"Show rank in chat"
+	}
+	"Options Menu - Show Rank Clan Tag"
+	{
+		"en"		"Show rank on scoreboard"
+	}
+	"Options Menu - Tag Type"
+	{
+		"en"		"Tag to show"
+	}
+	"Options Menu - Enabled"
+	{
+		"en"		"Enabled"
+	}
+	"Options Menu - Disabled"
+	{
+		"en"		"Disabled"
+	}
+	"Options Menu - Tag Rank"
+	{
+		"en"		"Rank"
+	}
+	"Options Menu - Tag Admin"
+	{
+		"en"		"Admin"
+	}
+	"Options Menu - Tag VIP"
+	{
+		"en"		"VIP"
+	}
+	
+	//=====[ PROFILE ]=====
+	"Profile Menu - Title"
+	{
+		"en"		"Profile"
+	}
+	"Profile Menu - Name"
+	{
+		"en"		"Name"
+	}
+	"Profile Menu - Mode"
+	{
+		"en"		"Mode"
+	}
+	"Profile Menu - Rank"
+	{
+		"en"		"Rank"
+	}
+	"Profile Menu - Points"
+	{
+		"en"		"Points"
+	}
+	"Profile Menu - Overall Completion"
+	{
+		"en"		"Nub"
+	}
+	"Profile Menu - Pro Completion"
+	{
+		"en"		"Pro"
+	}
+	
+	//=====[ TAGS ]=====
+	"Tag - Admin"
+	{
+		"en"		"ADMIN"
+	}
+	"Tag - VIP"
+	{
+		"en"		"VIP"
+	}
+}

@@ -62,6 +62,7 @@ ConVar gCV_EnforcedCVar[ENFORCEDCVAR_COUNT];
 #include "gokz-global/maptop_menu.sp"
 #include "gokz-global/print_records.sp"
 #include "gokz-global/send_time.sp"
+#include "gokz-global/points.sp"
 
 
 
@@ -238,10 +239,17 @@ public void OnClientPutInServer(int client)
 {
 	gB_waitingForFPSKick[client] = false;
 	OnClientPutInServer_PrintRecords(client);
+}
+
+// OnClientAuthorized is apparently too early
+public void OnClientPostAdminCheck(int client)
+{
+	OnClientPostAdminCheck_Points(client);
 	
-	if (GlobalAPI_IsInit() && !IsFakeClient(client))
+	if (GlobalAPI_IsInit() && !IsFakeClient(client) && gI_MapID != -1)
 	{
 		CheckClientGlobalBan(client);
+		UpdatePoints(client);
 	}
 }
 
@@ -309,6 +317,23 @@ public void OnMapStart()
 	
 	// Setup a timer to monitor server/client integrity
 	CreateTimer(1.0, IntegrityChecks, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+}
+
+public void OnMapEnd()
+{
+	// So it doesn't get carried over to the next map
+	gI_MapID = -1;
+}
+
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
+{
+	if (StrEqual(option, gC_CoreOptionNames[Option_Mode])
+	    && !PointsValid(client, newValue)
+	    && GlobalAPI_IsInit()
+	    && gI_MapID != -1)
+	{
+		UpdatePoints(client);
+	}
 }
 
 public void GOKZ_OnModeUnloaded(int mode)
@@ -607,6 +632,15 @@ public int GetMapCallback(JSON_Object map_json, GlobalAPIRequestData request)
 	gI_MapID = map.Id;
 	gI_MapFilesize = map.Filesize;
 	gI_MapTier = map.Difficulty;
+	
+	// We don't do that earlier cause we need the map ID
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && !IsFakeClient(client))
+		{
+			UpdatePoints(client);
+		}
+	}
 }
 
 void CheckClientGlobalBan(int client)
@@ -618,6 +652,12 @@ void CheckClientGlobalBan(int client)
 
 public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequestData request, int client)
 {
+	if (request.Failure)
+	{
+		LogError("Failed to get ban info.");
+		return;
+	}
+	
 	char client_steamid[32], response_steamid[32];
 	GetClientAuthId(client, AuthId_Steam2, client_steamid, sizeof(client_steamid));
 	

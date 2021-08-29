@@ -314,6 +314,51 @@ methodmap APIMode < JSON_Object
 
 // =========================================================== //
 
+methodmap APIPlayerRank < JSON_Object
+{
+	public APIPlayerRank(JSON_Object hPlayerRank)
+	{
+		return view_as<APIPlayerRank>(hPlayerRank);
+	}
+
+	property int Points
+	{
+		public get() { return this.GetInt("points"); }
+	}
+
+	property float Average
+	{
+		public get() { return this.GetFloat("average"); }
+	}
+
+	property float Rating
+	{
+		public get() { return this.GetFloat("rating"); }
+	}
+
+	property int Finishes
+	{
+		public get() { return this.GetInt("finishes"); }
+	}
+
+	public void GetSteamId64(char[] buffer, int maxlength)
+	{
+		this.GetString("steamid64", buffer, maxlength);
+	}
+
+	public void GetSteamId(char[] buffer, int maxlength)
+	{
+		this.GetString("steamid", buffer, maxlength);
+	}
+
+	public void GetPlayerName(char[] buffer, int maxlength)
+	{
+		this.GetString("player_name", buffer, maxlength);
+	}
+}
+
+// =========================================================== //
+
 methodmap APIPlayer < JSON_Object
 {
 	public APIPlayer(JSON_Object hPlayer)
