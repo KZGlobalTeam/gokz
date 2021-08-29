@@ -448,6 +448,15 @@ static void LoadFormatVersion2Replay(File file, int bot)
 	// Style
 	file.ReadInt8(botStyle[bot]);
 
+	// Player Sensitivity
+	int intPlayerSensitivity;
+	file.ReadInt32(intPlayerSensitivity);
+	float playerSensitivity = view_as<float>(intPlayerSensitivity);
+
+	int intPlayerMYaw;
+	file.ReadInt32(intPlayerMYaw);
+	float playerMYaw = view_as<float>(intPlayerMYaw);
+
 	// Tickrate
 	int tickrateAsInt;
 	file.ReadInt32(tickrateAsInt);
@@ -464,7 +473,7 @@ static void LoadFormatVersion2Replay(File file, int bot)
 	file.ReadInt32(botKnife[bot]);
 
 	// Big spit to console
-	PrintToServer("Replay Type: %d\nGOKZ Version: %s\nMap Name: %s\nMap Filesize: %d\nServer IP: %d\nTimestamp: %d\nPlayer Alias: %s\nPlayer Steam ID: %d\nMode: %d\nStyle: %d\nTickrate: %f\nTick Count: %d\nWeapon: %d\nKnife: %d", replayType, gokzVersion, mapName, mapFileSize, serverIP, timestamp, botAlias[bot], steamID, botMode[bot], botStyle[bot], tickrate, tickCount, botWeapon[bot], botKnife[bot]);
+	PrintToServer("Replay Type: %d\nGOKZ Version: %s\nMap Name: %s\nMap Filesize: %d\nServer IP: %d\nTimestamp: %d\nPlayer Alias: %s\nPlayer Steam ID: %d\nMode: %d\nStyle: %d\nPlayer Sensitivity: %f\nPlayer m_yaw: %f\nTickrate: %f\nTick Count: %d\nWeapon: %d\nKnife: %d", replayType, gokzVersion, mapName, mapFileSize, serverIP, timestamp, botAlias[bot], steamID, botMode[bot], botStyle[bot], playerSensitivity, playerMYaw, tickrate, tickCount, botWeapon[bot], botKnife[bot]);
 
 	switch(replayType)
 	{
@@ -861,13 +870,13 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 
 		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
-		if (currentTickData.flags & RP_MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
+		if (currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK) && currentTickData.flags & RP_FL_ONGROUND)
 		{
 			botPaused[bot] = false;
 			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
 		}
-		else if (currentTickData.flags & RP_MOVETYPE_LADDER)
+		else if (currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK))
 		{
 			botPaused[bot] = false;
 			if (Movement_GetMovetype(client) != MOVETYPE_LADDER)
@@ -876,7 +885,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			}
 			Movement_SetMovetype(client, MOVETYPE_LADDER);
 		}
-		else if (currentTickData.flags & RP_MOVETYPE_NONE)
+		else if (currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK))
 		{
 			botPaused[bot] = true;
 			Movement_SetMovetype(client, MOVETYPE_NONE);
@@ -929,10 +938,10 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		if(!botPlaybackPaused[bot])
 		{
 			PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
-			if(currentTickData.flags & RP_MOVETYPE_WALK) PrintToServer("MOVETYPE_WALK");
-			if(currentTickData.flags & RP_MOVETYPE_LADDER) PrintToServer("MOVETYPE_LADDER");
-			if(currentTickData.flags & RP_MOVETYPE_NOCLIP) PrintToServer("MOVETYPE_NOCLIP");
-			if(currentTickData.flags & RP_MOVETYPE_NONE) PrintToServer("MOVETYPE_NONE");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK)) PrintToServer("MOVETYPE_WALK");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_LADDER)) PrintToServer("MOVETYPE_LADDER");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NOCLIP)) PrintToServer("MOVETYPE_NOCLIP");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NOCLIP)) PrintToServer("MOVETYPE_NONE");
 
 			if(currentTickData.flags & RP_IN_ATTACK) PrintToServer("IN_ATTACK");
 			if(currentTickData.flags & RP_IN_ATTACK2) PrintToServer("IN_ATTACK2");
@@ -946,6 +955,8 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			if(currentTickData.flags & RP_IN_MOVERIGHT) PrintToServer("IN_MOVERIGHT");
 			if(currentTickData.flags & RP_IN_RELOAD) PrintToServer("IN_RELOAD");
 			if(currentTickData.flags & RP_IN_SPEED) PrintToServer("IN_SPEED");
+			if(currentTickData.flags & RP_IN_USE) PrintToServer("IN_USE");
+			if(currentTickData.flags & RP_IN_BULLRUSH) PrintToServer("IN_BULLRUSH");
 
 			if(currentTickData.flags & RP_FL_ONGROUND) PrintToServer("FL_ONGROUND");
 			if(currentTickData.flags & RP_FL_DUCKING ) PrintToServer("FL_DUCKING");
@@ -1108,10 +1119,10 @@ static void PlaybackSkipToTick(int bot, int tick)
 		TeleportEntity(botClient[bot], currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 
 		PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
-		if(currentTickData.flags & RP_MOVETYPE_WALK) PrintToServer("MOVETYPE_WALK");
-		if(currentTickData.flags & RP_MOVETYPE_LADDER) PrintToServer("MOVETYPE_LADDER");
-		if(currentTickData.flags & RP_MOVETYPE_NOCLIP) PrintToServer("MOVETYPE_NOCLIP");
-		if(currentTickData.flags & RP_MOVETYPE_NONE) PrintToServer("MOVETYPE_NONE");
+		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK)) PrintToServer("MOVETYPE_WALK");
+		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_LADDER)) PrintToServer("MOVETYPE_LADDER");
+		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NOCLIP)) PrintToServer("MOVETYPE_NOCLIP");
+		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NONE)) PrintToServer("MOVETYPE_NONE");
 
 		if(currentTickData.flags & RP_IN_ATTACK) PrintToServer("IN_ATTACK");
 		if(currentTickData.flags & RP_IN_ATTACK2) PrintToServer("IN_ATTACK2");

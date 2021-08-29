@@ -17,6 +17,8 @@ static float tickrate;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
+static float playerSensitivity[MAXPLAYERS + 1];
+static float playerMYaw[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
 static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
@@ -47,7 +49,7 @@ void OnClientPutInServer_Recording(int client)
     StartRecording(client);
 }
 
-void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount)
+void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const float vel[3], const int mouse[2])
 {
     if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
 	{
@@ -60,11 +62,19 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount)
 
     float angles[3];
     Movement_GetEyeAngles(client, angles);
+    tickData.mouse[0] = mouse[0];
+    tickData.mouse[1] = mouse[1];
+    tickData.vel[0] = vel[0];
+    tickData.vel[1] = vel[1];
+    tickData.vel[2] = vel[2];
     tickData.angles[0] = angles[0];
     tickData.angles[1] = angles[1];
     // Don't bother tracking eye angle roll (angles[2]) - not used
     tickData.flags = EncodePlayerFlags(client, buttons, tickCount);
     tickData.speed = GetEntityFlags(client) & FL_ONGROUND ? Movement_GetSpeed(client) : Movement_GetTakeoffSpeed(client);
+    tickData.packetsPerSecond = GetClientAvgPackets(client, NetFlow_Incoming);
+    tickData.laggedMovementValue = GetEntPropFloat(client, Prop_Send, "m_flLaggedMovementValue");
+    tickData.buttonsForced = GetEntProp(client, Prop_Data, "m_afButtonForced");
 
     // HACK: Reset teleport tick marker. Too bad!
     if(isTeleportTick[client])
@@ -189,6 +199,8 @@ static void StartRecording(int client)
     {
         return;
     }
+    QueryClientConVar(client, "sensitivity", SensitivityCheck, client);
+        QueryClientConVar(client, "m_yaw", MYAWCheck, client);
 
     DiscardRecording(client);
     ResumeRecording(client);
@@ -356,6 +368,8 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
     generalHeader.playerSteamID = GetSteamAccountID(client);
     generalHeader.mode = mode;
     generalHeader.style = style;
+    generalHeader.playerSensitivity = playerSensitivity[client];
+    generalHeader.playerMYaw = playerMYaw[client];
     generalHeader.tickrate = tickrate;
     generalHeader.tickCount = tickCount;
     generalHeader.equippedWeapon = GetPlayerWeaponSlotDefIndex(client, CS_SLOT_SECONDARY);
@@ -387,6 +401,8 @@ static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
     file.WriteInt32(generalHeader.playerSteamID);
     file.WriteInt8(generalHeader.mode);
     file.WriteInt8(generalHeader.style);
+    file.WriteInt32(view_as<int>(generalHeader.playerSensitivity));
+    file.WriteInt32(view_as<int>(generalHeader.playerMYaw));
     file.WriteInt32(view_as<int>(generalHeader.tickrate));
     file.WriteInt32(generalHeader.tickCount);
     file.WriteInt32(generalHeader.equippedWeapon);
@@ -518,10 +534,7 @@ static int EncodePlayerFlags(int client, int buttons, int tickCount)
     MoveType movetype = Movement_GetMovetype(client);
     int clientFlags = GetEntityFlags(client);
     
-    SetKthBit(flags, 0, movetype == MOVETYPE_WALK);
-    SetKthBit(flags, 1, movetype == MOVETYPE_LADDER);
-    SetKthBit(flags, 2, movetype == MOVETYPE_NOCLIP);
-    SetKthBit(flags, 3, movetype == MOVETYPE_NONE);
+    flags = view_as<int>(movetype) & RP_MOVETYPE_MASK;
 
     SetKthBit(flags, 4, IsBitSet(buttons, IN_ATTACK));
     SetKthBit(flags, 5, IsBitSet(buttons, IN_ATTACK2));
@@ -535,16 +548,18 @@ static int EncodePlayerFlags(int client, int buttons, int tickCount)
     SetKthBit(flags, 13, IsBitSet(buttons, IN_MOVERIGHT));
     SetKthBit(flags, 14, IsBitSet(buttons, IN_RELOAD));
     SetKthBit(flags, 15, IsBitSet(buttons, IN_SPEED));
-    SetKthBit(flags, 16, IsBitSet(clientFlags, FL_ONGROUND));
-    SetKthBit(flags, 17, IsBitSet(clientFlags, FL_DUCKING));
-    SetKthBit(flags, 18, IsBitSet(clientFlags, FL_SWIM));
+    SetKthBit(flags, 16, IsBitSet(buttons, IN_USE));
+    SetKthBit(flags, 17, IsBitSet(buttons, IN_BULLRUSH));
+    SetKthBit(flags, 18, IsBitSet(clientFlags, FL_ONGROUND));
+    SetKthBit(flags, 19, IsBitSet(clientFlags, FL_DUCKING));
+    SetKthBit(flags, 20, IsBitSet(clientFlags, FL_SWIM));
 
-    SetKthBit(flags, 19, GetEntProp(client, Prop_Data, "m_nWaterLevel") != 0);
+    SetKthBit(flags, 21, GetEntProp(client, Prop_Data, "m_nWaterLevel") != 0);
 
-    SetKthBit(flags, 20, isTeleportTick[client]);
-    SetKthBit(flags, 21, Movement_GetTakeoffTick(client) == tickCount);
-    SetKthBit(flags, 22, GOKZ_GetHitPerf(client));
-    SetKthBit(flags, 23, IsCurrentWeaponSecondary(client));
+    SetKthBit(flags, 22, isTeleportTick[client]);
+    SetKthBit(flags, 23, Movement_GetTakeoffTick(client) == tickCount);
+    SetKthBit(flags, 24, GOKZ_GetHitPerf(client));
+    SetKthBit(flags, 25, IsCurrentWeaponSecondary(client));
 
     return flags;
 }
@@ -626,4 +641,20 @@ static void CreateReplaysDirectory(const char[] map)
     {
         CreateDirectory(path, 511);
     }
+}
+
+public void MYAWCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		playerMYaw[client] = StringToFloat(cvarValue);
+	}
+}
+
+public void SensitivityCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+    if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		playerSensitivity[client] = StringToFloat(cvarValue);
+	}
 }

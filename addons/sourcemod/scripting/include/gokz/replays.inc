@@ -40,6 +40,8 @@ enum struct GeneralReplayHeader
     int playerSteamID;
     int mode;
     int style;
+	float playerSensitivity;
+	float playerMYaw;
     float tickrate;
     int tickCount;
 	int equippedWeapon;
@@ -68,10 +70,15 @@ enum struct RunReplayHeader
 
 enum struct ReplayTickData
 {
+	float vel[3];
+	int mouse[2];
 	float origin[3];
 	float angles[3];
 	int flags;
 	float speed;
+	float packetsPerSecond;
+	float laggedMovementValue;
+	int buttonsForced;
 }
 
 
@@ -96,10 +103,7 @@ enum struct ReplayTickData
 #define RP_SKIP_TICKS 10 // 10 seconds
 
 
-#define RP_MOVETYPE_WALK		(1 << 0)
-#define RP_MOVETYPE_LADDER		(1 << 1)
-#define RP_MOVETYPE_NOCLIP		(1 << 2)
-#define RP_MOVETYPE_NONE		(1 << 3)
+#define RP_MOVETYPE_MASK		(0xF)
 #define RP_IN_ATTACK			(1 << 4)
 #define RP_IN_ATTACK2			(1 << 5)
 #define RP_IN_JUMP				(1 << 6)
@@ -112,14 +116,16 @@ enum struct ReplayTickData
 #define RP_IN_MOVERIGHT			(1 << 13)
 #define RP_IN_RELOAD			(1 << 14)
 #define RP_IN_SPEED				(1 << 15)
-#define RP_FL_ONGROUND			(1 << 16)
-#define RP_FL_DUCKING			(1 << 17)
-#define RP_FL_SWIM				(1 << 18)
-#define RP_UNDER_WATER			(1 << 19)
-#define RP_TELEPORT_TICK		(1 << 20)
-#define RP_TAKEOFF_TICK			(1 << 21)
-#define RP_HIT_PERF				(1 << 22)
-#define RP_SECONDARY_EQUIPPED		(1 << 23)
+#define RP_IN_USE				(1 << 16)
+#define RP_IN_BULLRUSH			(1 << 17)
+#define RP_FL_ONGROUND			(1 << 18)
+#define RP_FL_DUCKING			(1 << 19)
+#define RP_FL_SWIM				(1 << 20)
+#define RP_UNDER_WATER			(1 << 21)
+#define RP_TELEPORT_TICK		(1 << 22)
+#define RP_TAKEOFF_TICK			(1 << 23)
+#define RP_HIT_PERF				(1 << 24)
+#define RP_SECONDARY_EQUIPPED	(1 << 25)
 
 
 

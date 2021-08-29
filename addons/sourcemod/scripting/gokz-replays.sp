@@ -205,7 +205,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_Recording(client, buttons, tickcount);
+	OnPlayerRunCmdPost_Recording(client, buttons, tickcount, vel, mouse);
 	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
 }
 
