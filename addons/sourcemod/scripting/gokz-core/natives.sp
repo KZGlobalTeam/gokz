@@ -100,7 +100,7 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 	FormatNativeString(0, 3, 4, sizeof(buffer), _, buffer);
 	
 	// The console (client 0) gets a special treatment
-	if (client == 0 || !IsValidClient(client) || alwaysLog)
+	if (client == 0 || (!IsValidClient(client) && !IsClientSourceTV(client)) || alwaysLog)
 	{
 		// Strip colors
 		// We can't regex-replace, so I'm quite sure that's the most efficient way.
@@ -127,11 +127,7 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 			iOut++;
 		} while (buffer[iIn] != '\0' && iIn < sizeof(buffer) - 1 && iOut < sizeof(colorlessBuffer) - 1);
 		colorlessBuffer[iOut] = '\0';
-		// Don't log stuff printed to GOTV (eg. gokz-tips)
-		if (!IsClientSourceTV(client))
-		{
-			LogMessage(colorlessBuffer);
-		}
+		LogMessage(colorlessBuffer);
 	}
 	
 	if (client != 0)
