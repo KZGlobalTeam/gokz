@@ -214,6 +214,31 @@ forward void GOKZ_DB_OnTimeInserted(
 	int runTimeMS, 
 	int teleportsUsed);
 
+/**
+ * Called when jumpstat PB has been achieved.
+ *
+ * @param client		Client index.
+ * @param jumptype		Type of the jump.
+ * @param mode			Mode the jump was performed in.
+ * @param distance		Distance jumped.
+ * @param block			The size of the block jumped across.
+ * @param strafes		The amount of strafes used.
+ * @param sync			Keyboard/mouse synchronisation of the jump.
+ * @param pre			Speed at takeoff.
+ * @param max			Maximum speed during the jump.
+ * @param airtime		Amount of time spend airborne.
+ */
+forward void GOKZ_DB_OnJumpstatPB(
+	int client,
+	int jumptype,
+	int mode,
+	float distance,
+	int block,
+	int strafes,
+	float sync,
+	float pre,
+	float max,
+	int airtime);
 
 
 // =====[ NATIVES ]=====
