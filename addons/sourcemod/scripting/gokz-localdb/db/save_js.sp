@@ -63,7 +63,7 @@ static DataPack JSRecord_FillDataPack(Jump jump, int steamid, int mode, bool blo
 	data.WriteCell(RoundToNearest(jump.sync * GOKZ_DB_JS_SYNC_PRECISION));
 	data.WriteCell(RoundToNearest(jump.preSpeed * GOKZ_DB_JS_PRE_PRECISION));
 	data.WriteCell(RoundToNearest(jump.maxSpeed * GOKZ_DB_JS_MAX_PRECISION));
-	data.WriteCell(RoundToNearest(jump.duration * GOKZ_DB_JS_AIRTIME_PRECISION));
+	data.WriteCell(RoundToNearest(jump.duration * GetTickInterval() * GOKZ_DB_JS_AIRTIME_PRECISION));
 	return data;
 }
 
@@ -146,6 +146,11 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 	int mode = data.ReadCell();
 	int distance = data.ReadCell();
 	int block = data.ReadCell();
+	int strafes = data.ReadCell();
+	int sync = data.ReadCell();
+	int pre = data.ReadCell();
+	int max = data.ReadCell();
+	int airtime = data.ReadCell();
 	delete data;
 	
 	if (!IsValidClient(client) || GOKZ_JS_GetOption(client, JSOption_JumpstatsMaster) == JSToggleOption_Disabled)
@@ -153,13 +158,18 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 		return;
 	}
 	
+	float distanceFloat = float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION;
+	float syncFloat = float(sync) / GOKZ_DB_JS_SYNC_PRECISION;
+	float preFloat = float(pre) / GOKZ_DB_JS_PRE_PRECISION;
+	float maxFloat = float(max) / GOKZ_DB_JS_MAX_PRECISION;
+	
 	if (block == 0)
 	{
 		gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] = distance;
 		GOKZ_PrintToChat(client, true, "%t", "Jump Record", 
 			client, 
 			gC_JumpTypes[jumpType], 
-			float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, 
+			distanceFloat, 
 			gC_ModeNamesShort[mode]);
 	}
 	else
@@ -170,10 +180,12 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 			client, 
 			block, 
 			gC_JumpTypes[jumpType], 
-			float(distance) / GOKZ_DB_JS_DISTANCE_PRECISION, 
+			distanceFloat, 
 			gC_ModeNamesShort[mode], 
 			block);
 	}
+	
+	Call_OnJumpstatPB(client, jumpType, mode, distanceFloat, block, strafes, syncFloat, preFloat, maxFloat, airtime);
 }
 
 public void DB_DeleteJump(int client, int steamAccountID, int jumpType, int mode, int isBlock)
