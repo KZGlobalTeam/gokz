@@ -58,6 +58,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/options.sp"
 #include "gokz-core/teleports.sp"
 #include "gokz-core/triggerfix.sp"
+#include "gokz-core/demofix.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/triggers.sp"
@@ -111,6 +112,7 @@ public void OnPluginStart()
 	OnPluginStart_MapZones();
 	OnPluginStart_Options();
 	OnPluginStart_Triggerfix();
+	OnPluginStart_Demofix();
 }
 
 public void OnAllPluginsLoaded()
@@ -318,6 +320,7 @@ public void OnMapStart()
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
 	OnMapStart_FixMissingSpawns();
+	OnMapStart_Demofix();
 }
 
 public void OnConfigsExecuted()
