@@ -898,7 +898,8 @@ enum struct JumpTracker
 				// Check whether the trace was stuck in the block from the beginning
 				if (FloatAbs(traceEnd[coordDist] - traceStart[coordDist]) > EPSILON)
 				{
-					this.jump.edge = FloatAbs(traceEnd[coordDist] - this.takeoffOrigin[coordDist] + 16.0 * distSign);
+					// Block trace ends 0.03125 in front of the actual block. Adjust the edge correctly.
+					this.jump.edge = FloatAbs(traceEnd[coordDist] - this.takeoffOrigin[coordDist] + (16.0 - 0.03125) * distSign);
 				}
 			}
 		}
@@ -1004,7 +1005,8 @@ enum struct JumpTracker
 		
 		// Calculate distance and edge.
 		this.jump.block = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
-		this.jump.edge = FloatAbs(startBlock[coordDist] - this.takeoffOrigin[coordDist] + 16.0 * distSign);
+		// Block trace ends 0.03125 in front of the actual block. Adjust the edge correctly.
+		this.jump.edge = FloatAbs(startBlock[coordDist] - this.takeoffOrigin[coordDist] + (16.0 - 0.03125) * distSign);
 		
 		// Make it easier to check for blocks that too short
 		if (this.jump.block < JS_MIN_BLOCK_DISTANCE)

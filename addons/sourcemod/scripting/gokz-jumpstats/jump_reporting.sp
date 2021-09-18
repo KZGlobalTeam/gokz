@@ -211,7 +211,7 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 		FormatEx(deviationString, sizeof(deviationString), " %s", GetFloatConsoleString1(client, "Deviation", jump.deviation));
 	}
 	
-	if (jump.edge > 0.0)
+	if (jump.edge >= 0.0)
 	{
 		FormatEx(edgeString, sizeof(edgeString), " %s", GetFloatConsoleString2(client, "Edge", jump.edge));
 	}
@@ -336,7 +336,7 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 		FormatEx(missString, sizeof(missString), " | %s", GetFloatChatString(client, "Miss", jump.miss));
 	}
 	
-	if (jump.edge > 0.0)
+	if (jump.edge >= 0.0)
 	{
 		if (jump.originalType == JumpType_LadderJump)
 		{
