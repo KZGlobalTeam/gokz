@@ -254,9 +254,9 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason)
 	GOKZ_AC_OnPlayerSuspected_Recording(client, reason);
 }
 
-public void GOKZ_JS_OnNewPersonalBest(int client, Jump jump)
+public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-	GOKZ_JS_OnNewPersonalBest_Recording(client, jump);
+	GOKZ_DB_OnJumpstatPB_Recording(client, jumptype, mode, distance, block, strafes, sync, pre, max, airtime);
 }
 
 

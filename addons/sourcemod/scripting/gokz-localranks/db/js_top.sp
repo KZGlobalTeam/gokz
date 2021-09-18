@@ -1,6 +1,7 @@
 
 static int jumpTopMode[MAXPLAYERS + 1];
 static int jumpTopType[MAXPLAYERS + 1];
+static int jumpInfo[MAXPLAYERS + 1][5][3];
 
 
 
@@ -78,10 +79,14 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 			airtime = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Air)) / GOKZ_DB_JS_AIRTIME_PRECISION;
 			
 			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, distance, alias);
-			menu.AddItem(IntToStringEx(i), display, ITEMDRAW_DISABLED);
+			menu.AddItem(IntToStringEx(i), display);
 			
 			PrintToConsole(client, "#%-2d   %.4f   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
 				i + 1, distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+
+			jumpInfo[client][i][0] = steamid;
+			jumpInfo[client][i][1] = type;
+			jumpInfo[client][i][2] = mode;
 		}
 	}
 	else
@@ -222,6 +227,30 @@ public int MenuHandler_JumpTopBlockType(Menu menu, MenuAction action, int param1
 
 public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int param2)
 {
+	if (action == MenuAction_Select)
+	{
+		int botClient = GOKZ_RP_LoadJumpReplay(param1, jumpInfo[param1][param2][0], jumpInfo[param1][param2][1], jumpInfo[param1][param2][2], 0);
+		if (botClient != -1)
+		{
+			// Join spectators and spec the bot
+			GOKZ_JoinTeam(param1, CS_TEAM_SPECTATOR);
+			SetEntProp(param1, Prop_Send, "m_iObserverMode", 4);
+			SetEntPropEnt(param1, Prop_Send, "m_hObserverTarget", botClient);
+			
+			int clientUserID = GetClientUserId(param1);
+			DataPack data = new DataPack();
+			data.WriteCell(clientUserID);
+			data.WriteCell(GetClientUserId(botClient));
+
+			CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
+			CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
+		}
+		else
+		{
+			GOKZ_PlayErrorSound(param1);
+		}
+	}
+
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
 		DisplayJumpTopBlockTypeMenu(param1, jumpTopMode[param1], jumpTopType[param1]);
@@ -230,4 +259,31 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
+}
+
+// =====[ UTILITY ]=====
+
+public Action Timer_ResetSpectate(Handle timer, int clientUID)
+{
+	int client = GetClientOfUserId(clientUID);
+	if (IsValidClient(client))
+	{
+		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
+		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
+	}
+}
+public Action Timer_SpectateBot(Handle timer, DataPack data)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int botClient = GetClientOfUserId(data.ReadCell());
+	delete data;
+	
+	if (IsValidClient(client) && IsValidClient(botClient))
+	{
+		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
+		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", botClient);
+	}
+	return Plugin_Continue;
 }

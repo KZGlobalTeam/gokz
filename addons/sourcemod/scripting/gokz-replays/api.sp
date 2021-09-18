@@ -6,7 +6,8 @@ static GlobalForward H_OnTimerEnd_Post;
 
 void CreateNatives()
 {
-        CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
+    CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
+	CreateNative("GOKZ_RP_LoadJumpReplay", Native_RP_LoadJumpReplay);
 }
 
 public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
@@ -15,6 +16,12 @@ public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
 	GetPlaybackState(GetNativeCell(1), info);
 	SetNativeArray(2, info, sizeof(HUDInfo));
 	return 1;
+}
+
+public int Native_RP_LoadJumpReplay(Handle plugin, int numParams)
+{
+	int botClient = LoadJumpReplayBot(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3), GetNativeCell(4), GetNativeCell(5));
+	return botClient;
 }
 
 // =====[ FORWARDS ]=====

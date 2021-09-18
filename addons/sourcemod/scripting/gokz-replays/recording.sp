@@ -14,6 +14,7 @@
 */
 
 static float tickrate;
+static int currentTick;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
@@ -37,13 +38,19 @@ void OnMapStart_Recording()
 
 void OnClientPutInServer_Recording(int client)
 {
-    if (recordedTickData[client] == null)
+    recordedTickData[client] = new ArrayList(sizeof(ReplayTickData));
+    recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
+    recordingIndex[client] = 0;
+
+    if(IsValidClient(client) && !IsFakeClient(client))
     {
-        recordedTickData[client] = new ArrayList(sizeof(ReplayTickData));
-    }
-    if (recordedRunData[client] == null)
-    {
-        recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
+        // Create directory path for player if not exists
+        char replayPath[PLATFORM_MAX_PATH];
+        BuildPath(Path_SM, replayPath, sizeof(replayPath), "%s/%d", RP_DIRECTORY_JUMPS, GetSteamAccountID(client));
+        if (!DirExists(replayPath))
+        {
+            CreateDirectory(replayPath, 511);
+        }
     }
 
     StartRecording(client);
@@ -80,6 +87,13 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
     if(isTeleportTick[client])
     {
         isTeleportTick[client] = false;
+    }
+
+    currentTick = tickCount;
+    if (Movement_GetTakeoffTick(client) == tickCount)
+    {
+        lastTakeoffTick[client] = tickCount;
+        PrintToServer("Takeoff! %d", tickCount);
     }
     
     if (timerRunning[client])
@@ -184,9 +198,9 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
     SaveRecordingOfCheater(client, reason);
 }
 
-void GOKZ_JS_OnNewPersonalBest_Recording(int client, Jump jump)
+void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, int mode, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-    SaveRecordingOfJump(client, jump);
+    SaveRecordingOfJump(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
 }
 
 
@@ -200,8 +214,8 @@ static void StartRecording(int client)
         return;
     }
     QueryClientConVar(client, "sensitivity", SensitivityCheck, client);
-        QueryClientConVar(client, "m_yaw", MYAWCheck, client);
-
+    QueryClientConVar(client, "m_yaw", MYAWCheck, client);
+    
     DiscardRecording(client);
     ResumeRecording(client);
 }
@@ -316,15 +330,15 @@ static bool SaveRecordingOfCheater(int client, ACReason reason)
     return true;
 }
 
-static bool SaveRecordingOfJump(int client, Jump jump)
+static bool SaveRecordingOfJump(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
     // Create and fill general header
     GeneralReplayHeader generalHeader;
-    FillGeneralHeader(generalHeader, client, ReplayType_Jump, GetGameTickCount() - lastTakeoffTick[client]);
+    FillGeneralHeader(generalHeader, client, ReplayType_Jump, currentTick - lastTakeoffTick[client]);
 
     // Create and fill jump header
     JumpReplayHeader jumpHeader;
-    FillJumpHeader(jumpHeader, jump);
+    FillJumpHeader(jumpHeader, jumptype, distance, block, strafes, sync, pre, max, airtime);
 
     // Build path and create/overwrite associated file
     char replayPath[PLATFORM_MAX_PATH];
@@ -376,12 +390,16 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
     generalHeader.equippedKnife = GetPlayerWeaponSlotDefIndex(client, CS_SLOT_KNIFE);
 }
 
-static void FillJumpHeader(JumpReplayHeader jumpHeader, Jump jump)
+static void FillJumpHeader(JumpReplayHeader jumpHeader, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-    jumpHeader.jumpType = jump.type;
-    jumpHeader.distance = jump.distance;
-    jumpHeader.blockDistance = jump.block;
-    jumpHeader.strafeCount = jump.strafes;
+    jumpHeader.jumpType = jumptype;
+    jumpHeader.distance = distance;
+    jumpHeader.blockDistance = block;
+    jumpHeader.strafeCount = strafes;
+    jumpHeader.sync = sync;
+    jumpHeader.pre = pre;
+    jumpHeader.max = max;
+    jumpHeader.airtime = airtime;
 }
 
 static void WriteGeneralHeader(File file, GeneralReplayHeader generalHeader)
@@ -415,6 +433,10 @@ static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
     file.WriteInt32(view_as<int>(jumpHeader.distance));
     file.WriteInt32(jumpHeader.blockDistance);
     file.WriteInt8(jumpHeader.strafeCount);
+    file.WriteInt32(view_as<int>(jumpHeader.sync));
+    file.WriteInt32(view_as<int>(jumpHeader.pre));
+    file.WriteInt32(view_as<int>(jumpHeader.max));
+    file.WriteInt32((jumpHeader.airtime));
 }
 
 static void WriteTickData(File file, int client, int replayType)
@@ -470,10 +492,18 @@ static void WriteTickData(File file, int client, int replayType)
             }
             else
             {
-                int i = lastTakeoffTick[client];
+                int i = recordingIndex[client] - (currentTick - lastTakeoffTick[client]);
+                if (i < 0)
+                {
+                    i = recordedTickData[client].Length - (i * -1);
+                }
+                PrintToServer("%d %d %d %d %d", lastTakeoffTick[client], currentTick, i, recordedTickData[client].Length, recordingIndex[client]);
                 do
                 {
-                    i %= recordedTickData[client].Length;
+                    if (i == recordedTickData[client].Length && recordedTickData[client].Length == maxCheaterReplayTicks)
+                    {
+                        i = 0;
+                    }
                     recordedTickData[client].GetArray(i, tickData);
                     file.WriteInt32(view_as<int>(tickData.origin[0]));
                     file.WriteInt32(view_as<int>(tickData.origin[1]));
@@ -518,10 +548,9 @@ static void FormatCheaterReplayPath(char[] buffer, int maxlength, int client, in
 static void FormatJumpReplayPath(char[] buffer, int maxlength, int client, int jumpType, int mode, int style)
 {
     BuildPath(Path_SM, buffer, maxlength,
-        "%s/%d/%s/%s_%s_%s.%s",
+        "%s/%d/%d_%s_%s.%s",
         RP_DIRECTORY_JUMPS,
         GetSteamAccountID(client),
-        gC_CurrentMap,
         jumpType,
         gC_ModeNamesShort[mode],
         gC_StyleNamesShort[style],
@@ -635,7 +664,7 @@ static void CreateReplaysDirectory(const char[] map)
         CreateDirectory(path, 511);
     }
 
-    // Create jumps replay directory
+    // Create jumps parent replay directory
     BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_JUMPS);
     if (!DirExists(path))
     {

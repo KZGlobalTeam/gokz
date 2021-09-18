@@ -48,6 +48,11 @@
 		"chi"		"加载录像\n \nMap - {1}\n \n选择模式"
 		"ru"		"Загрузить повтор\n \nКарта - {1}\n \nВыбрать режим"
 	}
+	"Replay Menu - Wrong Map"
+	{
+		"#format"	"{1:s}"
+		"en"		"This replay was not recorded on this map. Please switch to {1} and try again."
+	}
 
 
 	// =====[ REPLAY CONTROL MENU ]=====

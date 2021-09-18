@@ -51,7 +51,7 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 		int replayIndex = StringToInt(info);
 		int replayInfo[RP_CACHE_BLOCKSIZE];
 		g_ReplayInfoCache.GetArray(replayIndex, replayInfo);
-		int botClient = LoadReplayBot(replayInfo[0], replayInfo[1], replayInfo[2], replayInfo[3]);
+		int botClient = LoadRunReplayBot(param1, replayInfo[0], replayInfo[1], replayInfo[2], replayInfo[3]);
 		if (botClient != -1)
 		{
 
@@ -71,7 +71,6 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 		}
 		else
 		{
-			GOKZ_PrintToChat(param1, true, "%t", "No Bots Available");
 			GOKZ_PlayErrorSound(param1);
 		}
 	}

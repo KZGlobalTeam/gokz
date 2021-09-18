@@ -48,7 +48,7 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadReplayBot(int course, int mode, int style, int timeType)
+int LoadRunReplayBot(int client, int course, int mode, int style, int timeType)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
@@ -57,6 +57,7 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 	}
 	else
 	{
+		GOKZ_PrintToChat(client, true, "%t", "No Bots Available");
 		return -1;
 	}
 	
@@ -69,13 +70,45 @@ int LoadReplayBot(int course, int mode, int style, int timeType)
 		return -1;
 	}
 	
-	if (!LoadPlayback(bot, course, mode, style, timeType))
+	if (!LoadRunPlayback(client, bot, course, mode, style, timeType))
 	{
 		return -1;
 	}
 	
 	SetBotStuff(bot);
 	
+	return botClient[bot];
+}
+
+int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style)
+{
+	int bot;
+	if (GetBotsInUse() < RP_MAX_BOTS)
+	{
+		bot = GetUnusedBot();
+	}
+	else
+	{
+		GOKZ_PrintToChat(client, true, "%t", "No Bots Available");
+		return -1;
+	}
+
+	if (bot == -1)
+	{
+		LogError(
+			"Unused bot could not be found even though only %d out of %d are known to be in use.", 
+			GetBotsInUse(), 
+			RP_MAX_BOTS);
+		return -1;
+	}
+
+	if(!LoadJumpPlayback(client, bot, steamID, jumptype, mode, style))
+	{
+		return -1;
+	}
+
+	SetBotStuff(bot);
+
 	return botClient[bot];
 }
 
@@ -262,8 +295,10 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 
 // =====[ PRIVATE ]=====
 
+
+// TODO: Combine these two loads into one with path as a param
 // Returns false if there was a problem loading the playback e.g. doesn't exist
-static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
+static bool LoadRunPlayback(int client, int bot, int course, int mode, int style, int timeType)
 {
 	// Setup file path and file
 	char path[PLATFORM_MAX_PATH];
@@ -305,7 +340,10 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 		case 2:
 		{
 			botReplayVersion[bot] = 2;
-			LoadFormatVersion2Replay(file, bot);
+			if (!LoadFormatVersion2Replay(file, client, bot))
+			{
+				return false;
+			}
 		}
 
 		default:
@@ -316,6 +354,60 @@ static bool LoadPlayback(int bot, int course, int mode, int style, int timeType)
 	}
 
 	return true;
+}
+
+static bool LoadJumpPlayback(int client, int bot, int steamID, int jumptype, int mode, int style)
+{
+	// Setup path and file
+	char path[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, path, sizeof(path), 
+		"%s/%d/%d_%s_%s.%s", 
+		RP_DIRECTORY_JUMPS, steamID, jumptype, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], RP_FILE_EXTENSION);
+	if (!FileExists(path))
+	{
+		LogError("Failed to load file: \"%s\".", path);
+		return false;
+	}
+
+	File file = OpenFile(path, "rb");
+
+	// Check magic number in header
+	int magicNumber;
+	file.ReadInt32(magicNumber);
+	if (magicNumber != RP_MAGIC_NUMBER)
+	{
+		LogError("Failed to load invalid replay file: \"%s\".", path);
+		return false;
+	}
+
+	// Check replay format version
+	int formatVersion;
+	file.ReadInt8(formatVersion);
+	switch(formatVersion)
+	{
+		case 1:
+		{
+			LogError("How did you manage to record a version 2 feature in version 1 format? Please contact devs.");
+			return false;
+		}
+		case 2:
+		{
+			botReplayVersion[bot] = 2;
+			if (!LoadFormatVersion2Replay(file, client, bot))
+			{
+				return false;
+			}
+		}
+
+		default:
+		{
+			LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
+			return false;
+		}
+	}
+
+	return true;
+	
 }
 
 static void LoadFormatVersion1Replay(File file, int bot)
@@ -401,7 +493,7 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	delete file;
 }
 
-static void LoadFormatVersion2Replay(File file, int bot)
+static bool LoadFormatVersion2Replay(File file, int client, int bot)
 {
 	int length;
 
@@ -419,7 +511,13 @@ static void LoadFormatVersion2Replay(File file, int bot)
 	file.ReadInt8(length);
 	char[] mapName = new char[length + 1];
 	file.ReadString(mapName, length, length);
-	mapName[length] = '\0'; 
+	mapName[length] = '\0';
+	if (!StrEqual(mapName, gC_CurrentMap))
+	{
+		LogError("This replay was not recorded on this map, please switch to %s and try again.", mapName);
+		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Map", mapName);
+		return false;
+	}
 
 	// Map filesize
 	int mapFileSize;
@@ -453,6 +551,7 @@ static void LoadFormatVersion2Replay(File file, int bot)
 	file.ReadInt32(intPlayerSensitivity);
 	float playerSensitivity = view_as<float>(intPlayerSensitivity);
 
+	// Player MYAW
 	int intPlayerMYaw;
 	file.ReadInt32(intPlayerMYaw);
 	float playerMYaw = view_as<float>(intPlayerMYaw);
@@ -504,6 +603,9 @@ static void LoadFormatVersion2Replay(File file, int bot)
 			
 			// Type
 			botReplayType[bot] = ReplayType_Cheater;
+
+			// Finish spit to console
+			PrintToServer("AC Reason: %s", gC_ACReasons[ACReason]);
 		}
 		case ReplayType_Jump:
 		{
@@ -516,15 +618,35 @@ static void LoadFormatVersion2Replay(File file, int bot)
 			file.ReadInt32(view_as<int>(distance));
 
 			// Block Distance
-			float blockDistance;
-			file.ReadInt32(view_as<int>(blockDistance));
+			int blockDistance;
+			file.ReadInt32(blockDistance);
 
 			// Strafe Count
 			int strafeCount;
 			file.ReadInt8(strafeCount);
 
+			// Sync
+			float sync;
+			file.ReadInt32(view_as<int>(sync));
+
+			// Pre
+			float pre;
+			file.ReadInt32(view_as<int>(pre));
+
+			// Max
+			float max;
+			file.ReadInt32(view_as<int>(max));
+
+			// Airtime
+			int airtime;
+			file.ReadInt32(airtime);
+
 			// Type
 			botReplayType[bot] = ReplayType_Jump;
+
+			// Finish spit to console
+			PrintToServer("Jump Type: %s\nJump Distance: %f\nBlock Distance: %d\nStrafe Count: %d\nSync: %f\n Pre: %f\nMax: %f\nAirtime: %d", 
+				gC_JumpTypes[jumpType], distance, blockDistance, strafeCount, sync, pre, max, airtime);
 		}
 	}
 
@@ -558,6 +680,8 @@ static void LoadFormatVersion2Replay(File file, int bot)
 	botDataLoaded[bot] = true;
 	
 	delete file;
+
+	return true;
 }
 
 static void PlaybackVersion1(int client, int bot, int &buttons)
@@ -735,7 +859,6 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 		playbackTick[bot]++;
 	}
 }
-
 void PlaybackVersion2(int client, int bot, int &buttons)
 {
 	int size = playbackTickData[bot].Length;
@@ -937,6 +1060,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 
 		if(!botPlaybackPaused[bot])
 		{
+			PrintToServer("Tick: %d", playbackTick[bot]);
 			PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
 			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK)) PrintToServer("MOVETYPE_WALK");
 			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_LADDER)) PrintToServer("MOVETYPE_LADDER");

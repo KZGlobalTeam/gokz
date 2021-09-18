@@ -54,6 +54,10 @@ enum struct JumpReplayHeader
 	float distance;
 	int blockDistance;
 	int strafeCount;
+	float sync;
+	float pre;
+	float max;
+	int airtime;
 }
 
 enum struct CheaterReplayHeader
@@ -173,6 +177,18 @@ forward void GOKZ_RP_OnTimerEnd_Post(int client, const char[] filePath, int cour
  * @return					If successful
  */
 native int GOKZ_RP_GetPlaybackInfo(int client, any[] info);
+
+/**
+ * Called by the LocalDB to initiate a replay of a jump
+ *
+ * @param client			Client index.
+ * @param steamID			The steam ID of the player whose jump is being replayed.
+ * @param jumptype			Jump type.
+ * @param mode				Mode the jump was performed in.
+ * @param style				Style the jump was performed in.
+ * @return					The client ID of the bot performing the replay
+ */
+native int GOKZ_RP_LoadJumpReplay(int client, int steamID, int jumptype, int mode, int style);
 
 
 
