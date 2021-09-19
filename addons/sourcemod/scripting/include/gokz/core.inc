@@ -737,8 +737,9 @@ forward void GOKZ_OnStartPositionSet_Post(int client, StartPositionType type, co
  * @param client		Client index.
  * @param jumped		Whether player jumped.
  * @param ladderJump	Whether it was a ladder jump.
+ * @param jumpbug		Whether player performed a jumpbug.
  */
-forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump);
+forward void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump, bool jumpbug);
 
 /**
  * Called when player's current jump is invalidated.

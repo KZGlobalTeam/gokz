@@ -71,7 +71,7 @@ void CreateGlobalForwards()
 	H_OnUndoTeleport_Post = new GlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
 	H_OnStartPositionSet_Post = new GlobalForward("GOKZ_OnStartPositionSet_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Array, Param_Array);
 	H_OnCountedTeleport_Post = new GlobalForward("GOKZ_OnCountedTeleport_Post", ET_Ignore, Param_Cell);
-	H_OnJumpValidated = new GlobalForward("GOKZ_OnJumpValidated", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+	H_OnJumpValidated = new GlobalForward("GOKZ_OnJumpValidated", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	H_OnJumpInvalidated = new GlobalForward("GOKZ_OnJumpInvalidated", ET_Ignore, Param_Cell);
 	H_OnJoinTeam = new GlobalForward("GOKZ_OnJoinTeam", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnFirstSpawn = new GlobalForward("GOKZ_OnFirstSpawn", ET_Ignore, Param_Cell);
@@ -303,12 +303,13 @@ void Call_GOKZ_OnStartPositionSet_Post(int client, StartPositionType type, const
 	Call_Finish();
 }
 
-void Call_GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
+void Call_GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
 	Call_StartForward(H_OnJumpValidated);
 	Call_PushCell(client);
 	Call_PushCell(jumped);
 	Call_PushCell(ladderJump);
+	Call_PushCell(jumpbug);
 	Call_Finish();
 }
 

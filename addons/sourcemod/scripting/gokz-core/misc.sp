@@ -283,12 +283,12 @@ static void InvalidateJump(int client)
 	}
 }
 
-void OnStopTouchGround_ValidJump(int client, bool jumped)
+void OnStopTouchGround_ValidJump(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
 	if (Movement_GetMovetype(client) == MOVETYPE_WALK)
 	{
 		validJump[client] = true;
-		Call_GOKZ_OnJumpValidated(client, jumped, false);
+		Call_GOKZ_OnJumpValidated(client, jumped, ladderJump, jumpbug);
 	}
 	else
 	{
@@ -309,7 +309,7 @@ void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMo
 	if (oldMovetype == MOVETYPE_LADDER && newMovetype == MOVETYPE_WALK) // Ladderjump
 	{
 		validJump[client] = true;
-		Call_GOKZ_OnJumpValidated(client, false, true);
+		Call_GOKZ_OnJumpValidated(client, false, true, false);
 	}
 	else
 	{
