@@ -521,7 +521,7 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] n
 		}
 		else
 		{
-			for (int i = 1; i <= MaxClients; i++)
+			for (int client = 1; client <= MaxClients; client++)
 			{
 				gB_InValidRun[client] = false;
 			}
