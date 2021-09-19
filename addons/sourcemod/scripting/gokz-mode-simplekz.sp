@@ -338,7 +338,7 @@ void ResetClient(int client)
 
 void HookEvents()
 {
-	GameData gameData = LoadGameConfigFile("MovementAPI.games");
+	GameData gameData = LoadGameConfigFile("movementapi.games");
 	int offset = gameData.GetOffset("GetPlayerMaxSpeed");
 	if (offset == -1)
 	{
