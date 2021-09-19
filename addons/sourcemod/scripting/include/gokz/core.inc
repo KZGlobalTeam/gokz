@@ -191,7 +191,8 @@ enum TriggerType
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_MAX_CHECKPOINTS 32
+#define GOKZ_CHECKPOINT_VERSION 1
+#define GOKZ_MAX_CHECKPOINTS 2048
 #define GOKZ_MAX_COURSES 100
 
 #define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.15
@@ -419,6 +420,48 @@ stock char gC_ModeCVars[MODECVAR_COUNT][] =
 };
 
 
+// =====[ STRUCTS ]=====
+
+enum struct Checkpoint
+{
+	float origin[3];
+	float angles[3];
+	float ladderNormal[3];
+	bool onLadder;
+
+	void Create(int client)
+	{
+		Movement_GetOrigin(client, this.origin);
+		Movement_GetEyeAngles(client, this.angles);
+		GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
+		this.onLadder = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+	}
+}
+
+enum struct UndoTeleportData
+{
+	float tempOrigin[3];
+	float tempAngles[3];
+	float origin[3];
+	float angles[3];	
+	// Undo TP properties
+	bool lastTeleportOnGround;
+	bool lastTeleportInBhopTrigger;
+	
+	void Init(int client, bool lastTeleportInBhopTrigger, bool lastTeleportOnGround)
+	{
+		Movement_GetOrigin(client, this.tempOrigin);
+		Movement_GetEyeAngles(client, this.tempAngles);
+		this.lastTeleportInBhopTrigger = lastTeleportInBhopTrigger;
+		this.lastTeleportOnGround = lastTeleportOnGround;
+	}
+	
+	void Update()
+	{
+		this.origin = this.tempOrigin;
+		this.angles = this.tempAngles;
+	}
+}
 
 // =====[ STRUCTS ]=====
 
@@ -767,6 +810,13 @@ forward void GOKZ_OnOptionsMenuReady(TopMenu topMenu);
  */
 forward void GOKZ_OnCourseRegistered(int course);
 
+/**
+ * Called when a player's run becomes invalidated.
+ * An invalidated run doesn't necessarily stop the timer.
+ *
+ * @param client     	Client index.
+ */
+forward void GOKZ_OnRunInvalidated(int client);
 
 
 // =====[ NATIVES ]=====
@@ -802,6 +852,16 @@ native void GOKZ_SetModeLoaded(int mode, bool loaded, int version = -1);
  * @return				Number of loaded modes.
  */
 native int GOKZ_GetLoadedModeCount();
+
+/**
+ * Sets the player's current mode.
+ * If the player's timer is running, it will be stopped.
+ *
+ * @param client     	Client index.
+ * @param mode       	Mode.
+ * @return           	Whether the operation was successful.
+ */
+native bool GOKZ_SetMode(int client, int mode);
 
 /**
  * Gets the Handle to the options top menu.
@@ -899,6 +959,16 @@ native bool GOKZ_GetTimerRunning(int client);
 native int GOKZ_GetCourse(int client);
 
 /**
+ * Set the player's current course.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client     	Client index.
+ * @param course     	Course number.
+ * @return				Whether native was allowed to proceed.
+ */
+native bool GOKZ_SetCourse(int client, int course);
+
+/**
  * Gets whether a player is paused.
  *
  * @param client    	Client index.
@@ -925,6 +995,13 @@ native float GOKZ_GetTime(int client);
 native bool GOKZ_SetTime(int client, float time);
 
 /**
+ * Mark a player's run as invalid without stopping the timer.
+ *
+ * @param client     	Client index.
+ */
+native void GOKZ_InvalidateRun(int client);
+
+/**
  * Gets a player's current checkpoint count.
  *
  * @param client    	Client index.
@@ -936,11 +1013,49 @@ native int GOKZ_GetCheckpointCount(int client);
  * Sets a player's current checkpoint count.
  * This can be blocked by OnTimerNativeCalledExternally().
  *
- * @param client    	Client index.
- * @param cpCount		Checkpoint count to set to.
+ * @param client      	Client index.
+ * @param cpCount     	Checkpoint count to set to.
  * @return				Whether native was allowed to proceed.
  */
 native int GOKZ_SetCheckpointCount(int client, int cpCount);
+
+/**
+ * Gets checkpoint data of a player.
+ *
+ * @param client     	Client index.
+ * @return           	Client's checkpoint data.
+ */
+native ArrayList GOKZ_GetCheckpointData(int client);
+
+/**
+ * Sets checkpoint data of a player. The checkpoint data is assumed to be ordered.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client        Client index.
+ * @param checkpoints   Checkpoint data.
+ * @param version		Checkpoint version.
+ * @return				Whether native was allowed to proceed and operation was successful.
+ */
+native bool GOKZ_SetCheckpointData(int client, ArrayList checkpoints, int version);
+
+/**
+ * Get undo teleport data of a player.
+ *
+ * @param client     	Client index.
+ * @return           	ArrayList of length 1 containing player's undo teleport data.
+ */
+native ArrayList GOKZ_GetUndoTeleportData(int client);
+
+/**
+ * Set undo teleport data of a player.
+ * This can be blocked by OnTimerNativeCalledExternally().
+ *
+ * @param client			     	Client index.
+ * @param undoTeleportDataArray		ArrayList of length 1 containing player's undo teleport data.
+ * @param version					Checkpoint version.
+ * @return              			Whether native was allowed to proceed and operation was successful.
+ */
+native bool GOKZ_SetUndoTeleportData(int client, ArrayList undoTeleportDataArray, int version);
 
 /**
  * Gets a player's current teleport count.
@@ -1599,6 +1714,10 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetTime");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
+	MarkNativeAsOptional("GOKZ_GetCheckpointData");
+	MarkNativeAsOptional("GOKZ_SetCheckpointData");
+	MarkNativeAsOptional("GOKZ_GetUndoTeleportData");
+	MarkNativeAsOptional("GOKZ_SetUndoTeleportData");
 	MarkNativeAsOptional("GOKZ_GetTeleportCount");
 	MarkNativeAsOptional("GOKZ_SetTeleportCount");
 	MarkNativeAsOptional("GOKZ_RegisterOption");

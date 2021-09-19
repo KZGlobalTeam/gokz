@@ -318,6 +318,7 @@ public void OnMapStart()
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
 	OnMapStart_FixMissingSpawns();
+	OnMapStart_Checkpoints();
 }
 
 public void OnConfigsExecuted()

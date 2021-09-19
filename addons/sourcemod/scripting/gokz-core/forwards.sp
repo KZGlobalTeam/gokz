@@ -37,7 +37,7 @@ static GlobalForward H_OnTimerNativeCalledExternally;
 static GlobalForward H_OnOptionsMenuCreated;
 static GlobalForward H_OnOptionsMenuReady;
 static GlobalForward H_OnCourseRegistered;
-
+static GlobalForward H_OnRunInvalidated;
 
 
 void CreateGlobalForwards()
@@ -77,10 +77,11 @@ void CreateGlobalForwards()
 	H_OnFirstSpawn = new GlobalForward("GOKZ_OnFirstSpawn", ET_Ignore, Param_Cell);
 	H_OnModeLoaded = new GlobalForward("GOKZ_OnModeLoaded", ET_Ignore, Param_Cell);
 	H_OnModeUnloaded = new GlobalForward("GOKZ_OnModeUnloaded", ET_Ignore, Param_Cell);
-	H_OnTimerNativeCalledExternally = new GlobalForward("GOKZ_OnTimerNativeCalledExternally", ET_Event, Param_Cell);
+	H_OnTimerNativeCalledExternally = new GlobalForward("GOKZ_OnTimerNativeCalledExternally", ET_Event, Param_Cell, Param_Cell);
 	H_OnOptionsMenuCreated = new GlobalForward("GOKZ_OnOptionsMenuCreated", ET_Ignore, Param_Cell);
 	H_OnOptionsMenuReady = new GlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
 	H_OnCourseRegistered = new GlobalForward("GOKZ_OnCourseRegistered", ET_Ignore, Param_Cell);
+	H_OnRunInvalidated = new GlobalForward("GOKZ_OnRunInvalidated", ET_Ignore, Param_Cell);
 }
 
 void Call_GOKZ_OnOptionsLoaded(int client)
@@ -347,10 +348,11 @@ void Call_GOKZ_OnModeUnloaded(int mode)
 	Call_Finish();
 }
 
-void Call_GOKZ_OnTimerNativeCalledExternally(Handle plugin, Action &result)
+void Call_GOKZ_OnTimerNativeCalledExternally(Handle plugin, int client, Action &result)
 {
 	Call_StartForward(H_OnTimerNativeCalledExternally);
 	Call_PushCell(plugin);
+	Call_PushCell(client);
 	Call_Finish(result);
 }
 
@@ -372,5 +374,12 @@ void Call_GOKZ_OnCourseRegistered(int course)
 {
 	Call_StartForward(H_OnCourseRegistered);
 	Call_PushCell(course);
+	Call_Finish();
+}
+
+void Call_GOKZ_OnRunInvalidated(int client)
+{
+	Call_StartForward(H_OnRunInvalidated);
+	Call_PushCell(client);
 	Call_Finish();
 }
