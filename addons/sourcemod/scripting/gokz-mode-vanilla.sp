@@ -155,18 +155,7 @@ public void Movement_OnStopTouchGround(int client, bool jumped)
 	if (gB_GOKZCore)
 	{
 		player.GOKZHitPerf = player.HitPerf;
-		
-		// sv_enablebunnyhopping 0 enables a limit to bunnyhop speed. If the player
-		// hits a perfect bunnyhop over 1.1 x m_flMaxspeed, their speed is reduced.
-		float speedCap = GetEntPropFloat(client, Prop_Data, "m_flMaxspeed") * 1.1;
-		if (player.HitPerf && player.TakeoffSpeed > speedCap)
-		{
-			player.GOKZTakeoffSpeed = speedCap;
-		}
-		else
-		{
-			player.GOKZTakeoffSpeed = player.TakeoffSpeed;
-		}
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
 	}
 }
 
@@ -182,23 +171,6 @@ public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType
 	{
 		player.GOKZHitPerf = false;
 		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
-	}
-}
-
-public void Movement_OnPlayerJump(int client, bool jumpbug)
-{
-	if (!IsUsingMode(client))
-	{
-		return;
-	}
-	
-	KZPlayer player = KZPlayer(client);
-	if (jumpbug)
-	{
-		player.GOKZHitPerf = true;
-		
-		// That's an awful hack, but I couldn't reasonably get it to work otherwise
-		player.GOKZTakeoffSpeed = FloatMin(player.Speed, 286.0);
 	}
 }
 

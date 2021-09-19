@@ -29,7 +29,6 @@ static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
 static const float playerMinsEx[3] = { -20.0, -20.0, 0.0 };
 static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
-static bool beginJumpstat[MAXPLAYERS + 1];
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
 static const Jump emptyJump;
@@ -101,7 +100,7 @@ enum struct JumpTracker
 		this.syncTicks = 0;
 		this.strafeDirection = StrafeDirection_None;
 		this.jump.releaseW = 100;
-		
+
 		// We have to show this on the jumpbug stat, not the lj stat
 		this.jump.crouchRelease = this.nextCrouchRelease;
 		this.nextCrouchRelease = 100;
@@ -132,9 +131,6 @@ enum struct JumpTracker
 		
 		// Notify everyone about the takeoff
 		Call_OnTakeoff(this.jumper, this.jump.type);
-		
-		// Measure first tick of jumpstat
-		this.Update();
 	}
 	
 	void Update()
@@ -151,11 +147,12 @@ enum struct JumpTracker
 		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;
 		if (FloatAbs(speed - actualSpeed) > JS_SPEED_MODIFICATION_TOLERANCE && this.jump.duration != 0)
 		{
-			if (actualSpeed <= pose(-1).speed)
+			if (actualSpeed <= pose(-1).speed) 
 			{
 				pose(0).speed = actualSpeed;
 			}
-			else
+			// This check is needed if you land via ducking instead of moving (duckbug)
+			else if (FloatAbs(actualSpeed) > EPSILON)
 			{
 				this.Invalidate();
 			}
@@ -232,28 +229,25 @@ enum struct JumpTracker
 	
 	void CalcTakeoff()
 	{
-		if (this.jump.type == JumpType_Jumpbug)
+		// MovementAPI now correctly calculates the takeoff origin
+		// and velocity for jumpbugs. What is wrong though, is how
+		// mode plugins set bhop prespeed.
+		// Jumpbug takeoff origin is correct.
+		Movement_GetTakeoffOrigin(this.jumper, this.takeoffOrigin);
+		Movement_GetTakeoffVelocity(this.jumper, this.takeoffVelocity);
+		if (this.jump.type == JumpType_Jumpbug || this.jump.type == JumpType_MultiBhop
+			|| this.jump.type == JumpType_Bhop || this.jump.type == JumpType_LowpreBhop
+			|| this.jump.type == JumpType_LowpreWeirdJump || this.jump.type == JumpType_WeirdJump)
 		{
-			float height = this.takeoffOrigin[2];
-			
-			// The MovementAPI doesn't calculate the takeoff origin correctly
-			// for jumpbugs. It should be the position during the last tick.
-			CopyVector(this.position, this.takeoffOrigin);
-			Movement_GetVelocity(this.jumper, this.takeoffVelocity);
-			
-			// We'll copy the previous height as the player never really
-			// reaches the ground. Whether that is correct will be implicitly
-			// validated by the height check in DetermineType()
-			this.takeoffOrigin[2] = height;
-		}
-		else
-		{
-			Movement_GetTakeoffOrigin(this.jumper, this.takeoffOrigin);
-			Movement_GetTakeoffVelocity(this.jumper, this.takeoffVelocity);
+			// Move the origin to the ground.
+			// The difference can only be 2 units maximum.
+			float bhopOrigin[3];
+			CopyVector(this.takeoffOrigin, bhopOrigin);
+			bhopOrigin[2] -= 2.0;
+			TraceHullPosition(this.takeoffOrigin, bhopOrigin, playerMins, playerMaxs, this.takeoffOrigin);
 		}
 		
-		// Correct the takeoff speed and velocity
-		this.jump.preSpeed = GOKZ_GetTakeoffSpeed(this.jumper);
+		this.jump.preSpeed = Movement_GetTakeoffSpeed(this.jumper);
 		poseHistory[this.jumper][0].speed = this.jump.preSpeed;
 	}
 	
@@ -299,9 +293,8 @@ enum struct JumpTracker
 		else if (jumpbug)
 		{
 			// Check for no offset
-			if (this.takeoffOrigin[2] <= this.position[2] &&
-				this.takeoffOrigin[2] > this.position[2] - 10.7 &&
-				this.lastType == JumpType_LongJump)
+			// The origin and offset is now correct, no workaround needed
+			if (FloatAbs(this.jump.offset) < EPSILON &&	this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
 			}
@@ -371,8 +364,8 @@ enum struct JumpTracker
 	
 	void UpdatePose(Pose p)
 	{
-		Movement_GetOrigin(this.jumper, p.position);
-		Movement_GetVelocity(this.jumper, p.velocity);
+		Movement_GetRealOrigin(this.jumper, p.position);
+		Movement_GetRealVelocity(this.jumper, p.velocity);
 		Movement_GetEyeAngles(this.jumper, p.orientation);
 		p.speed = GetVectorHorizontalLength(p.velocity);
 		
@@ -399,16 +392,16 @@ enum struct JumpTracker
 	
 	void UpdateOnGround()
 	{
-		// Using Movement_GetTakeoffTick or doing it only in Begin() is unreliable
-		// for some reason.
-		this.jumpoffTick = GetGameTickCount();
-		
-		// We want acurate values to measure the first tick
+		// We want accurate values to measure the first tick
 		this.UpdatePose(poseHistory[this.jumper][0]);
 	}
 	
 	void UpdateRelease()
 	{
+		// Using UpdateOnGround doesn't work because 
+		// takeoff tick is calculated after leaving the ground.
+		this.jumpoffTick = Movement_GetTakeoffTick(this.jumper);
+		
 		// We also check IN_BACK cause that happens for backwards ladderjumps
 		if (Movement_GetButtons(this.jumper) & IN_FORWARD ||
 			Movement_GetButtons(this.jumper) & IN_BACK)
@@ -681,23 +674,6 @@ enum struct JumpTracker
 		{
 			this.Invalidate();
 		}
-		
-		// Fix last tick ducking
-		float regularLandingOrigin[3];
-		Movement_GetLandingOrigin(this.jumper, regularLandingOrigin);
-		
-		if (this.position[2] < regularLandingOrigin[2] &&
-			GetVectorHorizontalDistance(this.takeoffOrigin, this.position) <
-			GetVectorHorizontalDistance(this.takeoffOrigin, regularLandingOrigin))
-		{
-			this.position[2] = regularLandingOrigin[2];
-		}
-		
-		// It's possible that the landing origin can't be traced.
-		if (this.position[0] != this.position[0])
-		{
-			this.Invalidate();
-		}
 	}
 	
 	bool IsValidAirtime()
@@ -898,7 +874,8 @@ enum struct JumpTracker
 				// Check whether the trace was stuck in the block from the beginning
 				if (FloatAbs(traceEnd[coordDist] - traceStart[coordDist]) > EPSILON)
 				{
-					this.jump.edge = FloatAbs(traceEnd[coordDist] - this.takeoffOrigin[coordDist] + 16.0 * distSign);
+					// Block trace ends 0.03125 in front of the actual block. Adjust the edge correctly.
+					this.jump.edge = FloatAbs(traceEnd[coordDist] - this.takeoffOrigin[coordDist] + (16.0 - 0.03125) * distSign);
 				}
 			}
 		}
@@ -1004,13 +981,14 @@ enum struct JumpTracker
 		
 		// Calculate distance and edge.
 		this.jump.block = RoundFloat(FloatAbs(endBlock[coordDist] - startBlock[coordDist]));
-		this.jump.edge = FloatAbs(startBlock[coordDist] - this.takeoffOrigin[coordDist] + 16.0 * distSign);
+		// Block trace ends 0.03125 in front of the actual block. Adjust the edge correctly.
+		this.jump.edge = FloatAbs(startBlock[coordDist] - this.takeoffOrigin[coordDist] + (16.0 - 0.03125) * distSign);
 		
 		// Make it easier to check for blocks that too short
 		if (this.jump.block < JS_MIN_BLOCK_DISTANCE)
 		{
 			this.jump.block = 0;
-			this.jump.edge = 0.0;
+			this.jump.edge = -1.0;
 		}
 	}
 	
@@ -1082,7 +1060,7 @@ enum struct JumpTracker
 		if (this.jump.block < JS_MIN_LAJ_BLOCK_DISTANCE)
 		{
 			this.jump.block = 0;
-			this.jump.edge = 0.0;
+			this.jump.edge = -1.0;
 		}
 	}
 	
@@ -1103,7 +1081,7 @@ enum struct JumpTracker
 		
 		// Search for the ladder
 		if (!TraceHullPosition(traceOrigin, traceEnd, playerMinsEx, playerMaxsEx, ladderTop)
-			|| FloatAbs(ladderTop[2] - landingHeight - 0.031250) > EPSILON)
+			|| FloatAbs(ladderTop[2] - landingHeight) > EPSILON)
 		{
 			this.Invalidate();
 			return false;
@@ -1289,29 +1267,27 @@ void OnClientPutInServer_JumpTracking(int client)
 	jumpTrackers[client].Init(client);
 }
 
-void OnPlayerJump_JumpTracking(int client, bool jumpbug)
+
+// This was originally meant for invalidating jumpstats but was removed.
+void OnJumpInvalidated_JumpTracking(int client)
 {
-	if (jumpbug)
-	{
-		jumpTrackers[client].Reset(true, false, true);
-		beginJumpstat[client] = true;
-	}
-	jumpTrackers[client].lastJumpTick = GetGameTickCount();
+	jumpTrackers[client].Invalidate();
 }
 
-void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump)
+void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
 	if (!validCmd[client])
 	{
 		return;
 	}
-	
-	// We do not begin the jumpstat here but in OnPlayerRunCmdPost, because at this point
-	// GOKZ_GetTakeoffSpeed does not have the correct value yet. We need this value to
-	// ensure proper measurement of the first tick's sync, gain and loss, though.
-	// Both events happen during the same tick, so we do not lose any measurements.
-	beginJumpstat[client] = true;
-	jumpTrackers[client].Reset(jumped, ladderJump, false);
+
+	// Update: Takeoff speed should be always correct with the new MovementAPI.
+	if (jumped)
+	{
+		jumpTrackers[client].lastJumpTick = GetGameTickCount();
+	}
+	jumpTrackers[client].Reset(jumped, ladderJump, jumpbug);
+	jumpTrackers[client].Begin();
 }
 
 void OnStartTouchGround_JumpTracking(int client)
@@ -1389,17 +1365,7 @@ public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
 	if (!Movement_GetOnGround(client))
 	{
 		isInAir[client] = true;
-	
-		// First tick is done when the jumpstat begins to ensure it is measured
-		if (beginJumpstat[client])
-		{
-			beginJumpstat[client] = false;
-			jumpTrackers[client].Begin();
-		}
-		else
-		{
-			jumpTrackers[client].Update();
-		}
+		jumpTrackers[client].Update();
 	}
 	
 	if (Movement_GetOnGround(client) ||

@@ -5,7 +5,7 @@ static float lastEndTime[MAXPLAYERS + 1];
 static float lastFalseEndTime[MAXPLAYERS + 1];
 static float lastStartSoundTime[MAXPLAYERS + 1];
 static int lastStartMode[MAXPLAYERS + 1];
-
+static bool validTime[MAXPLAYERS + 1];
 
 
 // =====[ PUBLIC ]=====
@@ -23,6 +23,8 @@ float GetCurrentTime(int client)
 void SetCurrentTime(int client, float time)
 {
 	currentTime[client] = time;
+	// The timer should be running if time is not negative.
+	timerRunning[client] = time >= 0.0;
 }
 
 int GetCurrentCourse(int client)
@@ -76,6 +78,7 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool playSound
 	timerRunning[client] = true;
 	currentCourse[client] = course;
 	lastStartMode[client] = GOKZ_GetCoreOption(client, Option_Mode);
+	validTime[client] = true;
 	if (playSound)
 	{
 		PlayTimerStartSound(client);
@@ -112,6 +115,13 @@ bool TimerEnd(int client, int course)
 		return false;
 	}
 	
+	if (!validTime[client])
+	{
+		PlayTimerFalseEndSound(client);
+		lastFalseEndTime[client] = GetGameTime();
+		TimerStop(client, false);
+		return false;
+	}
 	// End Timer
 	timerRunning[client] = false;
 	lastEndTime[client] = GetGameTime();
@@ -172,7 +182,14 @@ void PlayTimerStartSound(int client)
 	}
 }
 
-
+void InvalidateRun(int client)
+{
+	if (validTime[client])
+	{
+		validTime[client] = false;
+		Call_GOKZ_OnRunInvalidated(client);
+	}
+}
 
 // =====[ EVENTS ]=====
 

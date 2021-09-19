@@ -264,9 +264,9 @@ public void Movement_OnStartTouchGround(int client)
 	OnStartTouchGround_MapTriggers(client);
 }
 
-public void Movement_OnStopTouchGround(int client, bool jumped)
+public void Movement_OnStopTouchGround(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
-	OnStopTouchGround_ValidJump(client, jumped);
+	OnStopTouchGround_ValidJump(client, jumped, ladderJump, jumpbug);
 	OnStopTouchGround_MapTriggers(client);
 }
 
@@ -321,6 +321,7 @@ public void OnMapStart()
 	OnMapStart_VirtualButtons();
 	OnMapStart_FixMissingSpawns();
 	OnMapStart_Demofix();
+	OnMapStart_Checkpoints();
 }
 
 public void OnConfigsExecuted()

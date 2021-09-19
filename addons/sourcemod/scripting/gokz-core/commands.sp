@@ -49,6 +49,20 @@ void AddCommandsListeners()
 	AddCommandListener(CommandJoinTeam, "jointeam");
 }
 
+bool SwitchToModeIfAvailable(int client, int mode)
+{
+	if (!GOKZ_GetModeLoaded(mode))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", gC_ModeNames[mode]);
+		return false;
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_Mode, mode);
+		return true;
+	}
+}
+
 public Action CommandOptions(int client, int args)
 {
 	DisplayOptionsMenu(client);
@@ -275,18 +289,3 @@ public Action CommandDisableNoclipNotrigger(int client, int args)
 	return Plugin_Handled;
 }
 
-
-
-// =====[ PRIVATE ]=====
-
-static void SwitchToModeIfAvailable(int client, int mode)
-{
-	if (!GOKZ_GetModeLoaded(mode))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", gC_ModeNames[mode]);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_Mode, mode);
-	}
-}
