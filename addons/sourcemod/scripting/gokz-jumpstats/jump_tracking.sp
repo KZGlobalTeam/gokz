@@ -950,7 +950,8 @@ enum struct JumpTracker
 		// Modify the takeoff and landing origins to line up with the middle and respect
 		// the bounding box of the player.
 		startBlock[coordDist] = this.takeoffOrigin[coordDist] - distSign * 16.0;
-		endBlock[coordDist] = landingOrigin[coordDist] + distSign * 16.0;
+		// Sometimes you can land 0.03125 units in front of a block, so the trace needs to be extended.
+		endBlock[coordDist] = landingOrigin[coordDist] + distSign * (16.0 + 0.03125);
 		startBlock[coordDev] = middle[coordDev];
 		endBlock[coordDev] = middle[coordDev];
 		startBlock[2] = middle[2];
