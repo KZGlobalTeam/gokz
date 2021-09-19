@@ -784,9 +784,10 @@ forward void GOKZ_OnModeUnloaded(int mode);
  * GOKZ_SetTime and GOKZ_SetTeleportCount.
  *
  * @param plugin		Handle of the calling plugin.
+ * @param client		Client index.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
-forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin);
+forward Action GOKZ_OnTimerNativeCalledExternally(Handle plugin, int client);
 
 /**
  * Called when the options menu has been created and 3rd 
