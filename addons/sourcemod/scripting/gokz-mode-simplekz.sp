@@ -69,6 +69,7 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
+bool gB_HitTweakedPerf[MAXPLAYERS + 1];
 int gI_Cmdnum[MAXPLAYERS + 1];
 float gF_PSBonusSpeed[MAXPLAYERS + 1];
 float gF_PSVelMod[MAXPLAYERS + 1];
@@ -83,7 +84,6 @@ bool gB_OldOnGround[MAXPLAYERS + 1];
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
-bool gB_Jumpbugged[MAXPLAYERS + 1];
 int gI_LastJumpButtonCmdnum[MAXPLAYERS + 1];
 
 
@@ -177,13 +177,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	CalcPrestrafeVelMod(player, angles);
 	FixWaterBoost(player, buttons);
 	FixDisplacementStuck(player);
-	if (gB_Jumpbugged[player.ID])
-	{
-		TweakJumpbug(player);
-	}
-	
+
+	gB_HitTweakedPerf[player.ID] = false;
 	gI_Cmdnum[player.ID] = cmdnum;
-	gB_Jumpbugged[player.ID] = false;
 	gI_OldButtons[player.ID] = buttons;
 	gI_OldFlags[player.ID] = GetEntityFlags(player.ID);
 	gB_OldOnGround[player.ID] = player.OnGround;
@@ -231,24 +227,6 @@ public void SDKHook_OnClientPreThink_Post(int client)
 	}
 }
 
-public void SDKHook_OnClientPostThink(int client)
-{
-	if (!IsPlayerAlive(client) || !IsUsingMode(client))
-	{
-		return;
-	}
-	
-	/*
-		Why are we using PostThink for slope boost fix?
-		
-		MovementAPI measures landing speed, calls forwards etc. during 
-		PostThink_Post. We want the slope fix to apply it's speed before 
-		MovementAPI does this, so that we can apply tweaks based on the 
-		'fixed' landing speed.
-	*/
-	SlopeFix(client);
-}
-
 public void Movement_OnStartTouchGround(int client)
 {
 	if (!IsUsingMode(client))
@@ -260,36 +238,24 @@ public void Movement_OnStartTouchGround(int client)
 	gF_PSVelModLanding[player.ID] = gF_PSVelMod[player.ID];
 }
 
-public void Movement_OnStopTouchGround(int client, bool jumped)
+public Action Movement_OnJumpPre(int client, float origin[3], float velocity[3])
 {
-	if (!IsUsingMode(client))
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	KZPlayer player = KZPlayer(client);
-	if (jumped)
-	{
-		TweakJump(player);
-	}
-	else if (gB_GOKZCore)
-	{
-		player.GOKZHitPerf = false;
-		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
-	}
+	return TweakJump(player, origin, velocity);
 }
 
-public void Movement_OnPlayerJump(int client, bool jumpbug)
+public Action Movement_OnCategorizePositionPost(int client, float origin[3], float velocity[3])
 {
-	if (!IsUsingMode(client))
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
-		return;
+		return Plugin_Continue;
 	}
-	
-	if (jumpbug)
-	{
-		gB_Jumpbugged[client] = true;
-	}
+	return SlopeFix(client, origin, velocity);
 }
 
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -392,7 +358,6 @@ void HookClientEvents(int client)
 {
 	DHookEntity(gH_GetPlayerMaxSpeed, true, client);
 	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
-	SDKHook(client, SDKHook_PostThink, SDKHook_OnClientPostThink);
 }
 
 void ResetVelMod(KZPlayer player)
@@ -522,49 +487,50 @@ float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 
 // =====[ JUMPING ]=====
 
-void TweakJump(KZPlayer player)
+Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
 {
-	int cmdsSinceLanding = player.TakeoffCmdNum - player.LandingCmdNum;
-	bool hitTweakedPerf = cmdsSinceLanding == 1
+	// TakeoffCmdnum is not defined here because the player technically hasn't taken off yet.
+	int cmdsSinceLanding = gI_Cmdnum[player.ID] - player.LandingCmdNum;
+	gB_HitTweakedPerf[player.ID] = cmdsSinceLanding <= 1
 	 || cmdsSinceLanding <= 3 && gI_Cmdnum[player.ID] - gI_LastJumpButtonCmdnum[player.ID] <= 3;
 	
-	if (hitTweakedPerf)
+	if (gB_HitTweakedPerf[player.ID])
 	{
-		if (cmdsSinceLanding == 1)
+		if (cmdsSinceLanding <= 1)
 		{
-			NerfRealPerf(player);
+			NerfRealPerf(player, origin);
 		}
 		
 		if (cmdsSinceLanding > 1 || player.TakeoffSpeed > SPEED_NORMAL)
 		{
-			ApplyTweakedTakeoffSpeed(player);
+			ApplyTweakedTakeoffSpeed(player, velocity);
 			
 			// Restore prestrafe lost due to briefly being on the ground
 			gF_PSVelMod[player.ID] = gF_PSVelModLanding[player.ID];
-			
-			if (gB_GOKZCore)
-			{
-				player.GOKZHitPerf = true;
-				player.GOKZTakeoffSpeed = player.Speed;
-			}
 		}
-		else if (gB_GOKZCore)
-		{
-			player.GOKZHitPerf = true;
-			player.GOKZTakeoffSpeed = player.TakeoffSpeed;
-		}
+		return Plugin_Changed;
 	}
-	else if (gB_GOKZCore)
-	{
-		player.GOKZHitPerf = false;
-		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
-	}
+	return Plugin_Continue;
 }
 
-void NerfRealPerf(KZPlayer player)
+public void Movement_OnStopTouchGround(int client)
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	KZPlayer player = KZPlayer(client);
+	player.GOKZHitPerf = gB_HitTweakedPerf[player.ID];
+	player.GOKZTakeoffSpeed = player.TakeoffSpeed;
+}
+
+void NerfRealPerf(KZPlayer player, float origin[3])
 {
 	// Not worth worrying about if player is already falling
-	if (player.VerticalVelocity < EPSILON)
+	// player.VerticalVelocity is not updated yet! Use takeoff velocity.
+	float velocity[3];
+	player.GetTakeoffVelocity(velocity);
+	if (velocity[2] < EPSILON)
 	{
 		return;
 	}
@@ -572,7 +538,7 @@ void NerfRealPerf(KZPlayer player)
 	// Work out where the ground was when they bunnyhopped
 	float startPosition[3], endPosition[3], mins[3], maxs[3], groundOrigin[3];
 	
-	startPosition = gF_OldOrigin[player.ID];
+	startPosition = origin;
 	
 	endPosition = startPosition;
 	endPosition[2] = endPosition[2] - 2.0; // Should be less than 2.0 units away
@@ -589,66 +555,36 @@ void NerfRealPerf(KZPlayer player)
 		TraceEntityFilterPlayers, 
 		player.ID);
 	
-	// This is expected to always hit
+	// This is expected to always hit, previously this can fail upon jumpbugs.
 	if (TR_DidHit(trace))
 	{
 		TR_GetEndPosition(groundOrigin, trace);
-		
-		// Teleport player downwards so it's like they jumped from the ground
-		float newOrigin[3];
-		player.GetOrigin(newOrigin);
-		newOrigin[2] -= gF_OldOrigin[player.ID][2] - groundOrigin[2];
-		
-		if (gB_GOKZCore)
-		{
-			GOKZ_SetValidJumpOrigin(player.ID, newOrigin);
-		}
-		else
-		{
-			SetEntPropVector(player.ID, Prop_Data, "m_vecAbsOrigin", newOrigin);
-		}
+		origin[2] = groundOrigin[2];
 	}
 	
 	delete trace;
 }
 
-void ApplyTweakedTakeoffSpeed(KZPlayer player)
+void ApplyTweakedTakeoffSpeed(KZPlayer player, float velocity[3])
 {
 	// Note that resulting velocity has same direction as landing velocity, not current velocity
-	float velocity[3], baseVelocity[3], newVelocity[3];
-	player.GetVelocity(velocity);
-	player.GetBaseVelocity(baseVelocity);
+	// because current velocity direction can change drastically in just one tick (eg. walls)
+	// and it doesnt make sense for the new velocity to push you in that direction.
+
+	float baseVelocity[3], newVelocity[3];
 	player.GetLandingVelocity(newVelocity);
-	
-	newVelocity[2] = velocity[2];
+	player.GetBaseVelocity(baseVelocity);
 	SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
 	AddVectors(newVelocity, baseVelocity, newVelocity);
-	
-	player.SetVelocity(newVelocity);
-}
-
-void TweakJumpbug(KZPlayer player)
-{
-	if (player.Speed > SPEED_NORMAL)
-	{
-		Movement_SetSpeed(player.ID, CalcTweakedTakeoffSpeed(player, true), true);
-	}
-	if (gB_GOKZCore)
-	{
-		player.GOKZHitPerf = true;
-		player.GOKZTakeoffSpeed = player.Speed;
-	}
+	velocity[0] = newVelocity[0];
+	velocity[1] = newVelocity[1];
 }
 
 // Takeoff speed assuming player has met the conditions to need tweaking
-float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
+float CalcTweakedTakeoffSpeed(KZPlayer player)
 {
 	// Formula
-	if (jumpbug)
-	{
-		return FloatMin(player.Speed, (0.2 * player.Speed + 200) * gF_PSVelMod[player.ID]);
-	}
-	else if (player.LandingSpeed > SPEED_NORMAL)
+	if (player.LandingSpeed > SPEED_NORMAL)
 	{
 		return FloatMin(player.LandingSpeed, (0.2 * player.LandingSpeed + 200) * gF_PSVelModLanding[player.ID]);
 	}
@@ -663,32 +599,30 @@ float CalcTweakedTakeoffSpeed(KZPlayer player, bool jumpbug = false)
 // URL : https://forums.alliedmods.net/showthread.php?p=2322788
 // NOTE : Modified by DanZay for this plugin
 
-void SlopeFix(int client)
+Action SlopeFix(int client, float origin[3], float velocity[3])
 {
+	KZPlayer player = KZPlayer(client);
 	// Check if player landed on the ground
 	if (Movement_GetOnGround(client) && !gB_OldOnGround[client])
 	{
-		// Set up and do tracehull to find out if the player landed on a slope
-		float vPos[3];
-		GetEntPropVector(client, Prop_Data, "m_vecOrigin", vPos);
-		
-		float vMins[3];
-		GetEntPropVector(client, Prop_Send, "m_vecMins", vMins);
-		
-		float vMaxs[3];
-		GetEntPropVector(client, Prop_Send, "m_vecMaxs", vMaxs);
+		float vMins[] = {-16.0, -16.0, 0.0};
+		// Always use ducked hull as the real hull size isn't updated yet.
+		// Might cause slight issues in extremely rare scenarios.
+		float vMaxs[] = {16.0, 16.0, 54.0};
 		
 		float vEndPos[3];
-		vEndPos[0] = vPos[0];
-		vEndPos[1] = vPos[1];
-		vEndPos[2] = vPos[2] - gF_ModeCVarValues[ModeCVar_MaxVelocity];
+		vEndPos[0] = origin[0];
+		vEndPos[1] = origin[1];
+		vEndPos[2] = origin[2] - gF_ModeCVarValues[ModeCVar_MaxVelocity];
 		
-		TR_TraceHullFilter(vPos, vEndPos, vMins, vMaxs, MASK_PLAYERSOLID_BRUSHONLY, TraceRayDontHitSelf, client);
+		// Set up and do tracehull to find out if the player landed on a slope
+		TR_TraceHullFilter(origin, vEndPos, vMins, vMaxs, MASK_PLAYERSOLID_BRUSHONLY, TraceRayDontHitSelf, client);
 		
 		if (TR_DidHit())
 		{
 			// Gets the normal vector of the surface under the player
 			float vPlane[3], vLast[3];
+			player.GetLandingVelocity(vLast);
 			TR_GetPlaneNormal(null, vPlane);
 			
 			// Make sure it's not flat ground and not a surf ramp (1.0 = flat ground, < 0.7 = surf ramp)
@@ -699,10 +633,6 @@ void SlopeFix(int client)
 					(https://mxr.alliedmods.net/hl2sdk-sdk2013/source/game/shared/gamemovement.cpp#3145)
 					With some minor changes to make it actually work
 				*/
-				vLast[0] = gF_OldVelocity[client][0];
-				vLast[1] = gF_OldVelocity[client][1];
-				vLast[2] = gF_OldVelocity[client][2];
-				vLast[2] -= (gF_ModeCVarValues[ModeCVar_Gravity] * GetTickInterval() * 0.5);
 				
 				float fBackOff = GetVectorDotProduct(vLast, vPlane);
 				
@@ -728,11 +658,14 @@ void SlopeFix(int client)
 				// Make sure the player is going down a ramp by checking if they actually will gain speed from the boost
 				if (GetVectorLength(vVel) > GetVectorLength(vLast))
 				{
-					TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, vVel);
+					CopyVector(vVel, velocity);
+					player.SetLandingVelocity(velocity);
+					return Plugin_Changed;
 				}
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 
 public bool TraceRayDontHitSelf(int entity, int mask, any data)
