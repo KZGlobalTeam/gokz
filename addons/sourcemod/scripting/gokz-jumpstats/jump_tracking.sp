@@ -364,8 +364,8 @@ enum struct JumpTracker
 	
 	void UpdatePose(Pose p)
 	{
-		Movement_GetRealOrigin(this.jumper, p.position);
-		Movement_GetRealVelocity(this.jumper, p.velocity);
+		Movement_GetProcessingOrigin(this.jumper, p.position);
+		Movement_GetProcessingVelocity(this.jumper, p.velocity);
 		Movement_GetEyeAngles(this.jumper, p.orientation);
 		p.speed = GetVectorHorizontalLength(p.velocity);
 		
