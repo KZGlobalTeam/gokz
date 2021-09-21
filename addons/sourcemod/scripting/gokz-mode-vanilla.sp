@@ -144,6 +144,16 @@ public void SDKHook_OnClientPreThink_Post(int client)
 	}
 }
 
+public Action Movement_OnJumpPost(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	if (gB_GOKZCore)
+	{
+		player.GOKZHitPerf = player.HitPerf;
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
+	}
+	return Plugin_Continue;
+}
 public void Movement_OnStopTouchGround(int client, bool jumped)
 {
 	if (!IsUsingMode(client))

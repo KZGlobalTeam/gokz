@@ -222,6 +222,17 @@ public Action Movement_OnJumpPre(int client, float origin[3], float velocity[3])
 	return TweakJump(player, velocity);
 }
 
+public Action Movement_OnJumpPost(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	if (gB_GOKZCore)
+	{
+		player.GOKZHitPerf = player.HitPerf;
+		player.GOKZTakeoffSpeed = player.TakeoffSpeed;
+	}
+	return Plugin_Continue;
+}
+
 public void Movement_OnStopTouchGround(int client)
 {
 	KZPlayer player = KZPlayer(client);

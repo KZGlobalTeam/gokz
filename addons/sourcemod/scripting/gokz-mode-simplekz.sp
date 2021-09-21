@@ -513,6 +513,18 @@ Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
 	return Plugin_Continue;
 }
 
+public void Movement_OnJumpPost(int client)
+{
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return;
+	}
+	KZPlayer player = KZPlayer(client);
+	player.GOKZHitPerf = gB_HitTweakedPerf[player.ID];
+	player.GOKZTakeoffSpeed = player.TakeoffSpeed;
+	return Plugin_Continue;
+}
+
 public void Movement_OnStopTouchGround(int client)
 {
 	if (!IsPlayerAlive(client) || !IsUsingMode(client))
