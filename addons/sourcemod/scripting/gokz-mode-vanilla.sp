@@ -146,6 +146,11 @@ public void SDKHook_OnClientPreThink_Post(int client)
 
 public Action Movement_OnJumpPost(int client)
 {
+	if (!IsUsingMode(client))
+	{
+		return Plugin_Continue;
+	}
+
 	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore)
 	{

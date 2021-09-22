@@ -515,7 +515,7 @@ Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
 
 public Action Movement_OnJumpPost(int client)
 {
-	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	if (!IsUsingMode(client))
 	{
 		return Plugin_Continue;
 	}
@@ -527,7 +527,7 @@ public Action Movement_OnJumpPost(int client)
 
 public void Movement_OnStopTouchGround(int client)
 {
-	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	if (!IsUsingMode(client))
 	{
 		return;
 	}

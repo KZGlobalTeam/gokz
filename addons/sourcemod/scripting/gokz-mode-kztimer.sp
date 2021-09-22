@@ -224,6 +224,11 @@ public Action Movement_OnJumpPre(int client, float origin[3], float velocity[3])
 
 public Action Movement_OnJumpPost(int client)
 {
+	if (!IsUsingMode(client))
+	{
+		return Plugin_Continue;
+	}
+
 	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore)
 	{
@@ -235,6 +240,11 @@ public Action Movement_OnJumpPost(int client)
 
 public void Movement_OnStopTouchGround(int client)
 {
+	if (!IsUsingMode(client))
+	{
+		return Plugin_Continue;
+	}
+
 	KZPlayer player = KZPlayer(client);
 	if (gB_GOKZCore)
 	{
