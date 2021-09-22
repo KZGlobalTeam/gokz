@@ -242,7 +242,7 @@ public void Movement_OnStopTouchGround(int client)
 {
 	if (!IsUsingMode(client))
 	{
-		return Plugin_Continue;
+		return;
 	}
 
 	KZPlayer player = KZPlayer(client);
