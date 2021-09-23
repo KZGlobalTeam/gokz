@@ -199,8 +199,17 @@ methodmap KZPlayer < MovementAPIPlayer {
 		public get() {
 			return GOKZ_GetCheckpointCount(this.ID);
 		}
-		public set(int value) {
-			GOKZ_SetCheckpointCount(this.ID, value);
+		public set(int cpCount) {
+			GOKZ_SetCheckpointCount(this.ID, cpCount);
+		}
+	}
+	
+	property ArrayList CheckpointData {
+		public get() {
+			return GOKZ_GetCheckpointData(this.ID);
+		}
+		public set(ArrayList checkpoints) {
+			GOKZ_SetCheckpointData(this.ID, checkpoints, GOKZ_CHECKPOINT_VERSION);
 		}
 	}
 	
