@@ -146,6 +146,19 @@ void OnPlayerSpawn_PlayerCollision(int client)
 	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 }
 
+void OnSetModel_PlayerCollision(int client)
+{
+	// Fix custom models temporarily changing player collisions
+	SetEntPropVector(client, Prop_Data, "m_vecMins", PLAYER_MINS);
+	if (GetEntityFlags(client) & FL_DUCKING != 0)
+	{
+		SetEntPropVector(client, Prop_Data, "m_vecMaxs", PLAYER_MAXS);
+	}
+	else
+	{
+		SetEntPropVector(client, Prop_Data, "m_vecMaxs", PLAYER_MAXS_DUCKED);
+	}
+}
 
 
 // =====[ FORCE SV_FULL_ALLTALK 1 ]=====

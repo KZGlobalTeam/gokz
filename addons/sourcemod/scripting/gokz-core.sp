@@ -38,6 +38,7 @@ public Plugin myinfo =
 
 Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
+Handle gH_DHooks_SetModel;
 
 int gI_CmdNum[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -242,6 +243,12 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	return MRES_Ignored;
 }
 
+public MRESReturn DHooks_OnSetModel(int client, Handle params)
+{
+	OnSetModel_PlayerCollision(client);
+	return MRES_Handled;
+}
+
 public void OnCSPlayerSpawnPost(int client)
 {
 	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") == -1)
@@ -438,12 +445,18 @@ static void HookEvents()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
+	gameData = new GameData("sdktools.games/engine.csgo");
+	offset = gameData.GetOffset("SetEntityModel");
+	gH_DHooks_SetModel = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnSetModel);
+	DHookAddParam(gH_DHooks_SetModel, HookParamType_CharPtr);
+	
 	delete gameData;
 }
 
 static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	DHookEntity(gH_DHooks_SetModel, true, client);
 	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
 }
 
