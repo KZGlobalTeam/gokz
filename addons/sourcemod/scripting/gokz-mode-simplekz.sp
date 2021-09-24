@@ -489,7 +489,7 @@ float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 
 Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
 {
-	// TakeoffCmdnum is not defined here because the player technically hasn't taken off yet.
+	// TakeoffCmdnum and TakeoffSpeed is not defined here because the player technically hasn't taken off yet.
 	int cmdsSinceLanding = gI_Cmdnum[player.ID] - player.LandingCmdNum;
 	gB_HitTweakedPerf[player.ID] = cmdsSinceLanding <= 1
 	 || cmdsSinceLanding <= 3 && gI_Cmdnum[player.ID] - gI_LastJumpButtonCmdnum[player.ID] <= 3;
@@ -500,11 +500,11 @@ Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
 		{
 			NerfRealPerf(player, origin);
 		}
-		
+
+		ApplyTweakedTakeoffSpeed(player, velocity);
+
 		if (cmdsSinceLanding > 1 || player.TakeoffSpeed > SPEED_NORMAL)
 		{
-			ApplyTweakedTakeoffSpeed(player, velocity);
-			
 			// Restore prestrafe lost due to briefly being on the ground
 			gF_PSVelMod[player.ID] = gF_PSVelModLanding[player.ID];
 		}
