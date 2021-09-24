@@ -20,7 +20,7 @@ public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
 
 public int Native_RP_LoadJumpReplay(Handle plugin, int numParams)
 {
-	int botClient = LoadJumpReplayBot(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3), GetNativeCell(4), GetNativeCell(5));
+	int botClient = LoadJumpReplayBot(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3), GetNativeCell(4), GetNativeCell(5), GetNativeCell(6));
 	return botClient;
 }
 

@@ -80,7 +80,7 @@ int LoadRunReplayBot(int client, int course, int mode, int style, int timeType)
 	return botClient[bot];
 }
 
-int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style)
+int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style. int block)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
@@ -102,7 +102,7 @@ int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style
 		return -1;
 	}
 
-	if(!LoadJumpPlayback(client, bot, steamID, jumptype, mode, style))
+	if (!LoadJumpPlayback(client, bot, steamID, jumptype, mode, style, block))
 	{
 		return -1;
 	}
@@ -122,7 +122,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	}
 	if (i == RP_MAX_BOTS + 1) return;
 
-	info.TimerRunning = true;
+	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
 	info.Time = float(playbackTick[bot]) * GetTickInterval();
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
@@ -356,13 +356,22 @@ static bool LoadRunPlayback(int client, int bot, int course, int mode, int style
 	return true;
 }
 
-static bool LoadJumpPlayback(int client, int bot, int steamID, int jumptype, int mode, int style)
+static bool LoadJumpPlayback(int client, int bot, int steamID, int jumptype, int mode, int style, int block)
 {
 	// Setup path and file
 	char path[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, path, sizeof(path), 
-		"%s/%d/%d_%s_%s.%s", 
-		RP_DIRECTORY_JUMPS, steamID, jumptype, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], RP_FILE_EXTENSION);
+	if (block == 0)
+	{
+		BuildPath(Path_SM, path, sizeof(path), 
+			"%s/%d/%d_%s_%s.%s", 
+			RP_DIRECTORY_JUMPS, steamID, jumptype, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], RP_FILE_EXTENSION);
+	}
+	else
+	{
+		BuildPath(Path_SM, path, sizeof(path), 
+			"%s/%d/%s/%d_%s_%s.%s", 
+			RP_DIRECTORY_JUMPS, steamID, RP_DIRECTORY_BLOCKJUMPS, jumptype, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], RP_FILE_EXTENSION);
+	}
 	if (!FileExists(path))
 	{
 		LogError("Failed to load file: \"%s\".", path);
@@ -673,6 +682,13 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		file.ReadInt32(tickData.flags);
 		file.ReadInt32(view_as<int>(tickData.speed));
 		
+		// HACK: Jump replays don't record proper length sometimes. I don't know why.
+		//		 This leads to oversized replays full of 0s at the end.
+		// 		 So, we do this horrible check to dodge that issue.
+		if (tickData.origin[0] == 0 && tickData.origin[1] == 0 && tickData.origin[2] == 0 && tickData.angles[0] == 0 && tickData.angles[1] == 0)
+		{
+			break;
+		}
 		playbackTickData[bot].PushArray(tickData);
 	}
 	

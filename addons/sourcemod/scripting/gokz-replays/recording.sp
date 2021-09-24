@@ -51,6 +51,11 @@ void OnClientPutInServer_Recording(int client)
         {
             CreateDirectory(replayPath, 511);
         }
+        BuildPath(Path_SM, replayPath, sizeof(replayPath), "%s/%d/%s", RP_DIRECTORY_JUMPS, GetSteamAccountID(client), RP_DIRECTORY_BLOCKJUMPS);
+        if (!DirExists(replayPath))
+        {
+            CreateDirectory(replayPath, 511);
+        }
     }
 
     StartRecording(client);
@@ -78,7 +83,7 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
     tickData.angles[1] = angles[1];
     // Don't bother tracking eye angle roll (angles[2]) - not used
     tickData.flags = EncodePlayerFlags(client, buttons, tickCount);
-    tickData.speed = GetEntityFlags(client) & FL_ONGROUND ? Movement_GetSpeed(client) : Movement_GetTakeoffSpeed(client);
+    tickData.speed = Movement_GetSpeed(client);
     tickData.packetsPerSecond = GetClientAvgPackets(client, NetFlow_Incoming);
     tickData.laggedMovementValue = GetEntPropFloat(client, Prop_Send, "m_flLaggedMovementValue");
     tickData.buttonsForced = GetEntProp(client, Prop_Data, "m_afButtonForced");
@@ -342,7 +347,14 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
 
     // Build path and create/overwrite associated file
     char replayPath[PLATFORM_MAX_PATH];
-    FormatJumpReplayPath(replayPath, sizeof(replayPath), client, jumpHeader.jumpType, generalHeader.mode, generalHeader.style);
+    if (block > 0)
+    {
+        FormatJumpReplayPath(replayPath, sizeof(replayPath), client, jumpHeader.jumpType, generalHeader.mode, generalHeader.style);
+    }
+    else
+    {
+        FormatJumpReplayPath(replayPath, sizeof(replayPath), client, jumpHeader.jumpType, generalHeader.mode, generalHeader.style);
+    }
 
     File file = OpenFile(replayPath, "wb");
     if (file == null)
@@ -476,9 +488,11 @@ static void WriteTickData(File file, int client, int replayType)
         }
         case ReplayType_Jump:
         {
+            int i;
             if (timerRunning[client])
             {
-                for (int i = lastTakeoffTick[client]; i <= recordingIndex[client]; i++)
+                i = recordedRunData[client].Length - 1 - (currentTick - lastTakeoffTick[client] - 5);
+                do
                 {
                     recordedRunData[client].GetArray(i, tickData);
                     file.WriteInt32(view_as<int>(tickData.origin[0]));
@@ -488,16 +502,16 @@ static void WriteTickData(File file, int client, int replayType)
                     file.WriteInt32(view_as<int>(tickData.angles[1]));
                     file.WriteInt32(tickData.flags);
                     file.WriteInt32(view_as<int>(tickData.speed));
-                }
+                    i++;
+                } while (i < recordedRunData[client].Length);
             }
             else
             {
-                int i = recordingIndex[client] - (currentTick - lastTakeoffTick[client]);
+                i = recordingIndex[client] - (currentTick - lastTakeoffTick[client]) - 5;
                 if (i < 0)
                 {
-                    i = recordedTickData[client].Length - (i * -1);
+                    i = recordedTickData[client].Length + i;
                 }
-                PrintToServer("%d %d %d %d %d", lastTakeoffTick[client], currentTick, i, recordedTickData[client].Length, recordingIndex[client]);
                 do
                 {
                     if (i == recordedTickData[client].Length && recordedTickData[client].Length == maxCheaterReplayTicks)
@@ -551,6 +565,19 @@ static void FormatJumpReplayPath(char[] buffer, int maxlength, int client, int j
         "%s/%d/%d_%s_%s.%s",
         RP_DIRECTORY_JUMPS,
         GetSteamAccountID(client),
+        jumpType,
+        gC_ModeNamesShort[mode],
+        gC_StyleNamesShort[style],
+        RP_FILE_EXTENSION);
+}
+
+static void FormatBlockJumpReplayPath(char[] buffer, int maxlength, int client, int block, int jumpType, int mode, int style)
+{
+    BuildPath(Path_SM, buffer, maxlength,
+        "%s/%d/%s/%d_%s_%s.%s",
+        RP_DIRECTORY_JUMPS,
+        GetSteamAccountID(client),
+        RP_DIRECTORY_BLOCKJUMPS,
         jumpType,
         gC_ModeNamesShort[mode],
         gC_StyleNamesShort[style],

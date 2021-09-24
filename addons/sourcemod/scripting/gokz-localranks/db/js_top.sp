@@ -1,6 +1,7 @@
 
 static int jumpTopMode[MAXPLAYERS + 1];
 static int jumpTopType[MAXPLAYERS + 1];
+static int blockNum[MAXPLAYERS + 1];
 static int jumpInfo[MAXPLAYERS + 1][5][3];
 
 
@@ -39,6 +40,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 
 	jumpTopMode[client] = mode;
 	jumpTopType[client] = type;
+	blockNum[client] = blockType;
 
 	int rows = SQL_GetRowCount(results[0]);
 	if (rows == 0)
@@ -114,7 +116,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 			airtime = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Air)) / GOKZ_DB_JS_AIRTIME_PRECISION;
 			
 			FormatEx(display, sizeof(display), "#%-2d   %d %T (%.4f)   %s", i + 1, block, "Block", client, distance, alias);
-			menu.AddItem(IntToStringEx(i), display, ITEMDRAW_DISABLED);
+			menu.AddItem(IntToStringEx(i), display);
 			
 			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
 				i + 1, block, "Block", distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
@@ -229,7 +231,7 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 {
 	if (action == MenuAction_Select)
 	{
-		int botClient = GOKZ_RP_LoadJumpReplay(param1, jumpInfo[param1][param2][0], jumpInfo[param1][param2][1], jumpInfo[param1][param2][2], 0);
+		int botClient = GOKZ_RP_LoadJumpReplay(param1, jumpInfo[param1][param2][0], jumpInfo[param1][param2][1], jumpInfo[param1][param2][2], blockNum[param1]);
 		if (botClient != -1)
 		{
 			// Join spectators and spec the bot

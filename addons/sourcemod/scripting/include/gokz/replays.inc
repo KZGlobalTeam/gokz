@@ -93,6 +93,7 @@ enum struct ReplayTickData
 #define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
 #define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM
+#define RP_DIRECTORY_BLOCKJUMPS "blocks"
 #define RP_FILE_EXTENSION "replay"
 #define RP_MAGIC_NUMBER 0x676F6B7A
 #define RP_FORMAT_VERSION 0x02
@@ -186,9 +187,10 @@ native int GOKZ_RP_GetPlaybackInfo(int client, any[] info);
  * @param jumptype			Jump type.
  * @param mode				Mode the jump was performed in.
  * @param style				Style the jump was performed in.
+ * @param block				The length of the block that was jumped. 0 if not a block jump.
  * @return					The client ID of the bot performing the replay
  */
-native int GOKZ_RP_LoadJumpReplay(int client, int steamID, int jumptype, int mode, int style);
+native int GOKZ_RP_LoadJumpReplay(int client, int steamID, int jumptype, int mode, int style, int block);
 
 
 
