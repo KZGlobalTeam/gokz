@@ -256,7 +256,7 @@ public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason)
 
 public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-	GOKZ_DB_OnJumpstatPB_Recording(client, jumptype, mode, distance, block, strafes, sync, pre, max, airtime);
+	GOKZ_DB_OnJumpstatPB_Recording(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
 }
 
 

@@ -203,7 +203,7 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
     SaveRecordingOfCheater(client, reason);
 }
 
-void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, int mode, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
+void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
     SaveRecordingOfJump(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
 }
@@ -349,7 +349,7 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
     char replayPath[PLATFORM_MAX_PATH];
     if (block > 0)
     {
-        FormatJumpReplayPath(replayPath, sizeof(replayPath), client, jumpHeader.jumpType, generalHeader.mode, generalHeader.style);
+        FormatBlockJumpReplayPath(replayPath, sizeof(replayPath), client, block, jumpHeader.jumpType, generalHeader.mode, generalHeader.style);
     }
     else
     {
@@ -574,11 +574,12 @@ static void FormatJumpReplayPath(char[] buffer, int maxlength, int client, int j
 static void FormatBlockJumpReplayPath(char[] buffer, int maxlength, int client, int block, int jumpType, int mode, int style)
 {
     BuildPath(Path_SM, buffer, maxlength,
-        "%s/%d/%s/%d_%s_%s.%s",
+        "%s/%d/%s/%d_%d_%s_%s.%s",
         RP_DIRECTORY_JUMPS,
         GetSteamAccountID(client),
         RP_DIRECTORY_BLOCKJUMPS,
         jumpType,
+        block,
         gC_ModeNamesShort[mode],
         gC_StyleNamesShort[style],
         RP_FILE_EXTENSION);

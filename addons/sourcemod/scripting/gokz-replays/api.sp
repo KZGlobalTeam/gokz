@@ -6,7 +6,7 @@ static GlobalForward H_OnTimerEnd_Post;
 
 void CreateNatives()
 {
-    CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
+	CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
 	CreateNative("GOKZ_RP_LoadJumpReplay", Native_RP_LoadJumpReplay);
 }
 

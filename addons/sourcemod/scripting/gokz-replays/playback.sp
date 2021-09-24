@@ -80,7 +80,7 @@ int LoadRunReplayBot(int client, int course, int mode, int style, int timeType)
 	return botClient[bot];
 }
 
-int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style. int block)
+int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style, int block)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
