@@ -150,19 +150,19 @@ void PlaybackSkipForward(int bot)
 {
 	if (playbackTick[bot] + 1 < playbackTickData[bot].Length)
 	{
-		PlaybackSkipToTick(bot, playbackTick[bot] + 1);
+		PlaybackSkipToTick(bot, playbackTick[bot] + RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())));
 	}
 }
 
 void PlaybackSkipBack(int bot)
 {
-	if (playbackTick[bot] < RP_SKIP_TICKS)
+	if (playbackTick[bot] < RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())))
 	{
 		PlaybackSkipToTick(bot, 0);
 	}
 	else
 	{
-		PlaybackSkipToTick(bot, playbackTick[bot] - 1);
+		PlaybackSkipToTick(bot, playbackTick[bot] - RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())));
 	}
 }
 

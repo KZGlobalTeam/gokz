@@ -105,7 +105,7 @@ enum struct ReplayTickData
 #define RP_MIN_CHEATER_REPLAY_LENGTH 30 // 30 seconds
 #define RP_MAX_CHEATER_REPLAY_LENGTH 120 // 2 minutes
 #define RP_MAX_BHOP_GROUND_TICKS 5
-#define RP_SKIP_TICKS 10 // 10 seconds
+#define RP_SKIP_TIME 10 // 10 seconds
 
 
 #define RP_MOVETYPE_MASK		(0xF)
