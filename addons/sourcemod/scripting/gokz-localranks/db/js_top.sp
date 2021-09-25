@@ -250,26 +250,7 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 				RP_DIRECTORY_JUMPS, jumpInfo[param1][param2][0], RP_DIRECTORY_BLOCKJUMPS, jumpTopType[param1], blockNums[param1][param2], gC_ModeNamesShort[jumpInfo[param1][param2][2]], gC_StyleNamesShort[0], RP_FILE_EXTENSION);
 		}
 
-		int botClient = GOKZ_RP_LoadJumpReplay(param1, path);
-		if (botClient != -1)
-		{
-			// Join spectators and spec the bot
-			GOKZ_JoinTeam(param1, CS_TEAM_SPECTATOR);
-			SetEntProp(param1, Prop_Send, "m_iObserverMode", 4);
-			SetEntPropEnt(param1, Prop_Send, "m_hObserverTarget", botClient);
-			
-			int clientUserID = GetClientUserId(param1);
-			DataPack data = new DataPack();
-			data.WriteCell(clientUserID);
-			data.WriteCell(GetClientUserId(botClient));
-
-			CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
-			CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
-		}
-		else
-		{
-			GOKZ_PlayErrorSound(param1);
-		}
+		GOKZ_RP_LoadJumpReplay(param1, path);
 	}
 
 	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)

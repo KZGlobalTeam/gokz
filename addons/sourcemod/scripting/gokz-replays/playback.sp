@@ -58,6 +58,7 @@ int LoadReplayBot(int client, char[] path)
 	else
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No Bots Available");
+		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
 	
@@ -67,15 +68,18 @@ int LoadReplayBot(int client, char[] path)
 			"Unused bot could not be found even though only %d out of %d are known to be in use.", 
 			GetBotsInUse(), 
 			RP_MAX_BOTS);
+		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
 
 	if (!LoadPlayback(client, bot, path))
 	{
+		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
 
 	SetBotStuff(bot);
+	MakePlayerSpectate(client, botClient[bot]);
 	return botClient[bot];
 }
 
@@ -1188,4 +1192,45 @@ static bool IsCurrentWeaponSecondary(int client)
     int activeWeaponEnt = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
     int secondaryEnt = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
     return activeWeaponEnt == secondaryEnt;
+}
+
+static void MakePlayerSpectate(int client, int bot)
+{
+	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
+	SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
+		
+	int clientUserID = GetClientUserId(client);
+	DataPack data = new DataPack();
+	data.WriteCell(clientUserID);
+	data.WriteCell(GetClientUserId(bot));
+
+	CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
+	CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
+	EnableReplayControls(client);
+}
+
+public Action Timer_ResetSpectate(Handle timer, int clientUID)
+{
+	int client = GetClientOfUserId(clientUID);
+	if (IsValidClient(client))
+	{
+		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
+		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
+	}
+}
+public Action Timer_SpectateBot(Handle timer, DataPack data)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int bot = GetClientOfUserId(data.ReadCell());
+	delete data;
+	
+	if (IsValidClient(client) && IsValidClient(bot))
+	{
+		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
+		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
+	}
+	return Plugin_Continue;
 }
