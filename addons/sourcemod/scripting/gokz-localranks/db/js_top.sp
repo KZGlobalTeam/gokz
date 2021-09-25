@@ -1,7 +1,7 @@
 
 static int jumpTopMode[MAXPLAYERS + 1];
 static int jumpTopType[MAXPLAYERS + 1];
-static int blockNum[MAXPLAYERS + 1];
+static int blockNums[MAXPLAYERS + 1][5];
 static int jumpInfo[MAXPLAYERS + 1][5][3];
 
 
@@ -40,7 +40,6 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 
 	jumpTopMode[client] = mode;
 	jumpTopType[client] = type;
-	blockNum[client] = blockType;
 
 	int rows = SQL_GetRowCount(results[0]);
 	if (rows == 0)
@@ -89,6 +88,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 			jumpInfo[client][i][0] = steamid;
 			jumpInfo[client][i][1] = type;
 			jumpInfo[client][i][2] = mode;
+			blockNums[client][i] = 0;
 		}
 	}
 	else
@@ -120,6 +120,11 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 			
 			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
 				i + 1, block, "Block", distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+
+			jumpInfo[client][i][0] = steamid;
+			jumpInfo[client][i][1] = type;
+			jumpInfo[client][i][2] = mode;
+			blockNums[client][i] = block;
 		}
 	}
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -231,7 +236,21 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 {
 	if (action == MenuAction_Select)
 	{
-		int botClient = GOKZ_RP_LoadJumpReplay(param1, jumpInfo[param1][param2][0], jumpInfo[param1][param2][1], jumpInfo[param1][param2][2], blockNum[param1]);
+		char path[PLATFORM_MAX_PATH];
+		if (blockNums[param1][param2] == 0)
+		{
+			BuildPath(Path_SM, path, sizeof(path), 
+				"%s/%d/%d_%s_%s.%s", 
+				RP_DIRECTORY_JUMPS, jumpInfo[param1][param2][0], jumpTopType[param1], gC_ModeNamesShort[jumpInfo[param1][param2][2]], gC_StyleNamesShort[0], RP_FILE_EXTENSION);
+		}
+		else
+		{
+			BuildPath(Path_SM, path, sizeof(path), 
+				"%s/%d/%s/%d_%d_%s_%s.%s", 
+				RP_DIRECTORY_JUMPS, jumpInfo[param1][param2][0], RP_DIRECTORY_BLOCKJUMPS, jumpTopType[param1], blockNums[param1][param2], gC_ModeNamesShort[jumpInfo[param1][param2][2]], gC_StyleNamesShort[0], RP_FILE_EXTENSION);
+		}
+
+		int botClient = GOKZ_RP_LoadJumpReplay(param1, path);
 		if (botClient != -1)
 		{
 			// Join spectators and spec the bot

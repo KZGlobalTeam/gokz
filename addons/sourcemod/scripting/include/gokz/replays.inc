@@ -183,14 +183,10 @@ native int GOKZ_RP_GetPlaybackInfo(int client, any[] info);
  * Called by the LocalDB to initiate a replay of a jump
  *
  * @param client			Client index.
- * @param steamID			The steam ID of the player whose jump is being replayed.
- * @param jumptype			Jump type.
- * @param mode				Mode the jump was performed in.
- * @param style				Style the jump was performed in.
- * @param block				The length of the block that was jumped. 0 if not a block jump.
- * @return					The client ID of the bot performing the replay
+ * @param path				Path to the replay file.
+ * @return					The client ID of the bot performing the replay.
  */
-native int GOKZ_RP_LoadJumpReplay(int client, int steamID, int jumptype, int mode, int style, int block);
+native int GOKZ_RP_LoadJumpReplay(int client, char[] path);
 
 
 

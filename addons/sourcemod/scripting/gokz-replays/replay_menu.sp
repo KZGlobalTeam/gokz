@@ -51,7 +51,24 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 		int replayIndex = StringToInt(info);
 		int replayInfo[RP_CACHE_BLOCKSIZE];
 		g_ReplayInfoCache.GetArray(replayIndex, replayInfo);
-		int botClient = LoadRunReplayBot(param1, replayInfo[0], replayInfo[1], replayInfo[2], replayInfo[3]);
+
+		char path[PLATFORM_MAX_PATH];
+		BuildPath(Path_SM, path, sizeof(path),
+			"%s/%s/%d_%s_%s_%s.%s",
+			RP_DIRECTORY_RUNS, gC_CurrentMap, replayInfo[0], gC_ModeNamesShort[replayInfo[1]], gC_StyleNamesShort[replayInfo[2]], gC_TimeTypeNames[replayInfo[3]], RP_FILE_EXTENSION);
+		if (!FileExists(path))
+		{
+			BuildPath(Path_SM, path, sizeof(path),
+				"%s/%d_%s_%s_%s.%s",
+				RP_DIRECTORY, gC_CurrentMap, replayInfo[0], gC_ModeNamesShort[replayInfo[1]], gC_StyleNamesShort[replayInfo[2]], gC_TimeTypeNames[replayInfo[3]], RP_FILE_EXTENSION);
+			if (!FileExists(path))
+			{
+				LogError("Failed to load file: \"%s\".", path);
+				GOKZ_PrintToChat(param1, true, "%t", "Replay Menu - No File");
+				return;
+			}
+		}
+		int botClient = LoadReplayBot(param1, path);
 		if (botClient != -1)
 		{
 

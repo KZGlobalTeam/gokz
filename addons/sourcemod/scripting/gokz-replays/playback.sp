@@ -48,7 +48,7 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadRunReplayBot(int client, int course, int mode, int style, int timeType)
+int LoadReplayBot(int client, char[] path)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
@@ -69,46 +69,13 @@ int LoadRunReplayBot(int client, int course, int mode, int style, int timeType)
 			RP_MAX_BOTS);
 		return -1;
 	}
-	
-	if (!LoadRunPlayback(client, bot, course, mode, style, timeType))
-	{
-		return -1;
-	}
-	
-	SetBotStuff(bot);
-	
-	return botClient[bot];
-}
 
-int LoadJumpReplayBot(int client, int steamID, int jumptype, int mode, int style, int block)
-{
-	int bot;
-	if (GetBotsInUse() < RP_MAX_BOTS)
-	{
-		bot = GetUnusedBot();
-	}
-	else
-	{
-		GOKZ_PrintToChat(client, true, "%t", "No Bots Available");
-		return -1;
-	}
-
-	if (bot == -1)
-	{
-		LogError(
-			"Unused bot could not be found even though only %d out of %d are known to be in use.", 
-			GetBotsInUse(), 
-			RP_MAX_BOTS);
-		return -1;
-	}
-
-	if (!LoadJumpPlayback(client, bot, steamID, jumptype, mode, style, block))
+	if (!LoadPlayback(client, bot, path))
 	{
 		return -1;
 	}
 
 	SetBotStuff(bot);
-
 	return botClient[bot];
 }
 
@@ -295,27 +262,15 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 
 // =====[ PRIVATE ]=====
 
-
-// TODO: Combine these two loads into one with path as a param
 // Returns false if there was a problem loading the playback e.g. doesn't exist
-static bool LoadRunPlayback(int client, int bot, int course, int mode, int style, int timeType)
+static bool LoadPlayback(int client, int bot, char[] path)
 {
-	// Setup file path and file
-	char path[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, path, sizeof(path), 
-		"%s/%s/%d_%s_%s_%s.%s", 
-		RP_DIRECTORY_RUNS, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
 	if (!FileExists(path))
 	{
-		BuildPath(Path_SM, path, sizeof(path),
-		"%s/%s/%d_%s_%s_%s.%s", RP_DIRECTORY, gC_CurrentMap, course, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], gC_TimeTypeNames[timeType], RP_FILE_EXTENSION);
-		if (!FileExists(path))
-		{
-			LogError("Failed to load file: \"%s\".", path);
-			return false;
-		}
+		LogError("Failed to load file: \"%s\".", path);
+		return false;
 	}
-	
+
 	File file = OpenFile(path, "rb");
 	
 	// Check magic number in header
@@ -354,69 +309,6 @@ static bool LoadRunPlayback(int client, int bot, int course, int mode, int style
 	}
 
 	return true;
-}
-
-static bool LoadJumpPlayback(int client, int bot, int steamID, int jumptype, int mode, int style, int block)
-{
-	// Setup path and file
-	char path[PLATFORM_MAX_PATH];
-	if (block == 0)
-	{
-		BuildPath(Path_SM, path, sizeof(path), 
-			"%s/%d/%d_%s_%s.%s", 
-			RP_DIRECTORY_JUMPS, steamID, jumptype, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], RP_FILE_EXTENSION);
-	}
-	else
-	{
-		BuildPath(Path_SM, path, sizeof(path), 
-			"%s/%d/%s/%d_%s_%s.%s", 
-			RP_DIRECTORY_JUMPS, steamID, RP_DIRECTORY_BLOCKJUMPS, jumptype, gC_ModeNamesShort[mode], gC_StyleNamesShort[style], RP_FILE_EXTENSION);
-	}
-	if (!FileExists(path))
-	{
-		LogError("Failed to load file: \"%s\".", path);
-		return false;
-	}
-
-	File file = OpenFile(path, "rb");
-
-	// Check magic number in header
-	int magicNumber;
-	file.ReadInt32(magicNumber);
-	if (magicNumber != RP_MAGIC_NUMBER)
-	{
-		LogError("Failed to load invalid replay file: \"%s\".", path);
-		return false;
-	}
-
-	// Check replay format version
-	int formatVersion;
-	file.ReadInt8(formatVersion);
-	switch(formatVersion)
-	{
-		case 1:
-		{
-			LogError("How did you manage to record a version 2 feature in version 1 format? Please contact devs.");
-			return false;
-		}
-		case 2:
-		{
-			botReplayVersion[bot] = 2;
-			if (!LoadFormatVersion2Replay(file, client, bot))
-			{
-				return false;
-			}
-		}
-
-		default:
-		{
-			LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
-			return false;
-		}
-	}
-
-	return true;
-	
 }
 
 static void LoadFormatVersion1Replay(File file, int bot)
