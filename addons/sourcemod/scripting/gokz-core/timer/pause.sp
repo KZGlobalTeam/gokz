@@ -200,6 +200,9 @@ void OnPlayerSpawn_Pause(int client)
 		lastResumeTime[client] = GetEngineTime();
 	}
 	
+	Movement_SetDuckSpeed(client, lastDuckValue[client]);
+	SetEntPropFloat(client, Prop_Send, "m_flStamina", lastStaminaValue[client]);
+	
 	// Call Post Forward
 	Call_GOKZ_OnResume_Post(client);
 }
