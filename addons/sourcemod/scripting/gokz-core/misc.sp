@@ -561,5 +561,5 @@ static bool IsSpawnValid(float origin[3])
 static void AutoJoinTeam(int client)
 {
 	int team = GetRandomInt(CS_TEAM_T, CS_TEAM_CT);
-	GOKZ_JoinTeam(client, team, false);
+	JoinTeam(client, team, false);
 }
