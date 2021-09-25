@@ -115,19 +115,19 @@ public void Movement_OnStartTouchGround(int client)
 	OnStartTouchGround_JumpTracking(client);
 }
 
-public void Movement_OnPlayerJump(int client, bool jumpbug)
-{
-	OnPlayerJump_JumpTracking(client, jumpbug);
-}
-
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
 	OnChangeMovetype_JumpTracking(client, oldMovetype, newMovetype);
 }
 
-public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
+public void GOKZ_OnJumpInvalidated(int client)
 {
-	OnJumpValidated_JumpTracking(client, jumped, ladderJump);
+	OnJumpInvalidated_JumpTracking(client);
+}
+
+public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump, bool jumpbug)
+{
+	OnJumpValidated_JumpTracking(client, jumped, ladderJump, jumpbug);
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)

@@ -273,6 +273,11 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	}
 }
 
+public void GOKZ_OnRunInvalidated(int client)
+{
+	gB_InValidRun[client] = false;
+}
+
 public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime)
 {
 	AnnounceNewTopTime(client, course, mode, timeType, rank, rankOverall);
@@ -341,12 +346,13 @@ public void GOKZ_OnModeUnloaded(int mode)
 	gB_ModeCheck[mode] = false;
 }
 
-public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin)
+public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin, int client)
 {
 	char pluginName[64];
 	GetPluginInfo(plugin, PlInfo_Name, pluginName, sizeof(pluginName));
-	LogMessage("gokz-core native called by \"%s\" was blocked.", pluginName);
-	return Plugin_Stop;
+	LogMessage("Invalidated %N's run as gokz-core native was called by \"%s\"", client, pluginName);
+	GOKZ_InvalidateRun(client);
+	return Plugin_Continue;
 }
 
 
@@ -382,11 +388,6 @@ void PrintGlobalCheckToChat(int client)
 		FormatEx(modeCheck, sizeof(modeCheck), "%s {grey}| {purple}%s %s", modeCheck, gC_ModeNames[i], gB_ModeCheck[i] ? "{green}✓" : "{darkred}X");
 	}
 	GOKZ_PrintToChat(client, false, "%s", modeCheck);
-}
-
-void InvalidateRun(int client)
-{
-	gB_InValidRun[client] = false;
 }
 
 void AnnounceNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall)
@@ -520,9 +521,9 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] n
 		}
 		else
 		{
-			for (int i = 1; i <= MaxClients; i++)
+			for (int client = 1; client <= MaxClients; client++)
 			{
-				InvalidateRun(i);
+				gB_InValidRun[client] = false;
 			}
 			
 			// You have to change map before you can re-activate that

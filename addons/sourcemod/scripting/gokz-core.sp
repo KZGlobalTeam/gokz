@@ -38,6 +38,7 @@ public Plugin myinfo =
 
 Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
+Handle gH_DHooks_SetModel;
 
 int gI_CmdNum[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -58,6 +59,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/options.sp"
 #include "gokz-core/teleports.sp"
 #include "gokz-core/triggerfix.sp"
+#include "gokz-core/demofix.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/triggers.sp"
@@ -111,6 +113,7 @@ public void OnPluginStart()
 	OnPluginStart_MapZones();
 	OnPluginStart_Options();
 	OnPluginStart_Triggerfix();
+	OnPluginStart_Demofix();
 }
 
 public void OnAllPluginsLoaded()
@@ -240,6 +243,12 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	return MRES_Ignored;
 }
 
+public MRESReturn DHooks_OnSetModel(int client, Handle params)
+{
+	OnSetModel_PlayerCollision(client);
+	return MRES_Handled;
+}
+
 public void OnCSPlayerSpawnPost(int client)
 {
 	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") == -1)
@@ -262,9 +271,9 @@ public void Movement_OnStartTouchGround(int client)
 	OnStartTouchGround_MapTriggers(client);
 }
 
-public void Movement_OnStopTouchGround(int client, bool jumped)
+public void Movement_OnStopTouchGround(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
-	OnStopTouchGround_ValidJump(client, jumped);
+	OnStopTouchGround_ValidJump(client, jumped, ladderJump, jumpbug);
 	OnStopTouchGround_MapTriggers(client);
 }
 
@@ -318,6 +327,8 @@ public void OnMapStart()
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
 	OnMapStart_FixMissingSpawns();
+	OnMapStart_Demofix();
+	OnMapStart_Checkpoints();
 }
 
 public void OnConfigsExecuted()
@@ -443,12 +454,18 @@ static void HookEvents()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
+	gameData = new GameData("sdktools.games/engine.csgo");
+	offset = gameData.GetOffset("SetEntityModel");
+	gH_DHooks_SetModel = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnSetModel);
+	DHookAddParam(gH_DHooks_SetModel, HookParamType_CharPtr);
+	
 	delete gameData;
 }
 
 static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	DHookEntity(gH_DHooks_SetModel, true, client);
 	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
 }
 
