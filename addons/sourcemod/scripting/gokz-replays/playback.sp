@@ -808,7 +808,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			// End the breather period
 			inBreather[bot] = false;
 			botPlaybackPaused[bot] = false;
-			
+
 			// Start the bot if first tick. Clear bot if last tick.
 			playbackTick[bot]++;
 			if (playbackTick[bot] == size)
@@ -851,11 +851,11 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		}
 
 		// Play timer start/end sound, if necessary
-		if (playbackTick[bot] == preAndPostRunTickCount)
+		if (playbackTick[bot] == preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
 			EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		}
-		if (playbackTick[bot] == playbackTickData[bot].Length - preAndPostRunTickCount)
+		if (playbackTick[bot] == playbackTickData[bot].Length - preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
 			EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		}

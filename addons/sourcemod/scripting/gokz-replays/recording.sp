@@ -14,11 +14,13 @@
 */
 
 static float tickrate;
+static int preAndPostRunTickCount;
 static int currentTick;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
 static int recordingIndexOnTimerStart[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
+static int lastTakeoffPBTick[MAXPLAYERS + 1];
 static float playerSensitivity[MAXPLAYERS + 1];
 static float playerMYaw[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
@@ -33,6 +35,7 @@ void OnMapStart_Recording()
 {
     CreateReplaysDirectory(gC_CurrentMap);
     tickrate = 1/GetTickInterval();
+    preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME * tickrate);
     maxCheaterReplayTicks = RoundToCeil(RP_MAX_CHEATER_REPLAY_LENGTH * tickrate);
 }
 
@@ -221,6 +224,34 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
 
 void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
+    lastTakeoffPBTick[client] = lastTakeoffTick[client];
+    DataPack dp = new DataPack();
+    dp.WriteCell(client);
+    dp.WriteCell(jumptype);
+    dp.WriteFloat(distance);
+    dp.WriteCell(block);
+    dp.WriteCell(strafes);
+    dp.WriteFloat(sync);
+    dp.WriteFloat(pre);
+    dp.WriteFloat(max);
+    dp.WriteCell(airtime);
+    CreateTimer(2.0, SaveJump, dp);
+}
+
+public Action SaveJump(Handle timer, DataPack dp)
+{
+    dp.Reset();
+    int client = dp.ReadCell();
+    int jumptype = dp.ReadCell();
+    float distance = dp.ReadFloat();
+    int block = dp.ReadCell();
+    int strafes = dp.ReadCell();
+    float sync = dp.ReadFloat();
+    float pre = dp.ReadFloat();
+    float max = dp.ReadFloat();
+    int airtime = dp.ReadCell();
+    delete dp;
+
     SaveRecordingOfJump(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
 }
 
@@ -514,7 +545,7 @@ static void WriteTickData(File file, int client, int replayType)
         {
             if (timerRunning[client])
             {
-                i = recordedRunData[client].Length - 1 - (currentTick - lastTakeoffTick[client] - 5);
+                i = recordedRunData[client].Length - 1 - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
                 do
                 {
                     recordedRunData[client].GetArray(i, tickData);
@@ -524,7 +555,7 @@ static void WriteTickData(File file, int client, int replayType)
             }
             else
             {
-                i = recordingIndex[client] - (currentTick - lastTakeoffTick[client]) - 5;
+                i = recordingIndex[client] - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
                 if (i < 0)
                 {
                     i = recordedTickData[client].Length + i;
