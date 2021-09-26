@@ -17,6 +17,7 @@ static float tickrate;
 static int currentTick;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
+static int recordingIndexOnTimerStart[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
 static float playerSensitivity[MAXPLAYERS + 1];
 static float playerMYaw[MAXPLAYERS + 1];
@@ -98,7 +99,6 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
     if (Movement_GetTakeoffTick(client) == tickCount)
     {
         lastTakeoffTick[client] = tickCount;
-        PrintToServer("Takeoff! %d", tickCount);
     }
     
     if (timerRunning[client])
@@ -107,7 +107,7 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
         recordedRunData[client].Resize(runTick + 1);
         recordedRunData[client].SetArray(runTick, tickData);
     }
-    if (!timerRunning[client] || recordedRunData[client].Length < maxCheaterReplayTicks)
+    else
     {
         int tick = GetArraySize(recordedTickData[client]);
         if (tick < maxCheaterReplayTicks)
@@ -129,6 +129,22 @@ void GOKZ_OnTimerStart_Recording(int client)
 
 void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
 {
+    DataPack dp = new DataPack();
+    dp.WriteCell(client);
+    dp.WriteCell(course);
+    dp.WriteFloat(time);
+    dp.WriteCell(teleportsUsed);
+    CreateTimer(2.0, EndRecording, dp);
+}
+
+public Action EndRecording(Handle timer, DataPack dp)
+{
+    dp.Reset();
+    int client = dp.ReadCell();
+    int course = dp.ReadCell();
+    float time = dp.ReadFloat();
+    int teleportsUsed = dp.ReadCell();
+    delete dp;
     if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
     {
         SaveRecordingOfCheater(client, view_as<ACReason>(0));
@@ -220,6 +236,7 @@ static void StartRecording(int client)
     }
     QueryClientConVar(client, "sensitivity", SensitivityCheck, client);
     QueryClientConVar(client, "m_yaw", MYAWCheck, client);
+    recordingIndexOnTimerStart[client] = recordingIndex[client];
     
     DiscardRecording(client);
     ResumeRecording(client);
@@ -454,54 +471,54 @@ static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
 static void WriteTickData(File file, int client, int replayType)
 {
     ReplayTickData tickData;
+    int i;
     switch(replayType)
     {
         case ReplayType_Run:
         {
-            for (int i = 0; i < recordedRunData[client].Length; i++)
+            // 2 seconds pre timer starting
+            i = recordingIndexOnTimerStart[client] - RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
+            if (i < 0)
+            {
+                i = recordedTickData[client].Length + i;
+            }
+            for (int j = i; j != recordingIndexOnTimerStart[client]; j++)
+            {
+                if (j == recordedTickData[client].Length)
+                {
+                    j = 0;
+                }
+                recordedTickData[client].GetArray(j, tickData);
+                WriteTickDataToFile(file, tickData);
+            }
+
+            // Actual run
+            // This includes the 2 seconds breather after the timer stops
+            for (i = 0; i < recordedRunData[client].Length; i++)
             {
                 recordedRunData[client].GetArray(i, tickData);
-                file.WriteInt32(view_as<int>(tickData.origin[0]));
-                file.WriteInt32(view_as<int>(tickData.origin[1]));
-                file.WriteInt32(view_as<int>(tickData.origin[2]));
-                file.WriteInt32(view_as<int>(tickData.angles[0]));
-                file.WriteInt32(view_as<int>(tickData.angles[1]));
-                file.WriteInt32(tickData.flags);
-                file.WriteInt32(view_as<int>(tickData.speed));
+                WriteTickDataToFile(file, tickData);
             }
         }
         case ReplayType_Cheater:
         {
-            int i = recordingIndex[client];
+            i = recordingIndex[client];
             do
             {
                 i %= recordedTickData[client].Length;
-                file.WriteInt32(view_as<int>(tickData.origin[0]));
-                file.WriteInt32(view_as<int>(tickData.origin[1]));
-                file.WriteInt32(view_as<int>(tickData.origin[2]));
-                file.WriteInt32(view_as<int>(tickData.angles[0]));
-                file.WriteInt32(view_as<int>(tickData.angles[1]));
-                file.WriteInt32(tickData.flags);
-                file.WriteInt32(view_as<int>(tickData.speed));
+                WriteTickDataToFile(file, tickData);
                 i++;
             } while (i != recordingIndex[client]);
         }
         case ReplayType_Jump:
         {
-            int i;
             if (timerRunning[client])
             {
                 i = recordedRunData[client].Length - 1 - (currentTick - lastTakeoffTick[client] - 5);
                 do
                 {
                     recordedRunData[client].GetArray(i, tickData);
-                    file.WriteInt32(view_as<int>(tickData.origin[0]));
-                    file.WriteInt32(view_as<int>(tickData.origin[1]));
-                    file.WriteInt32(view_as<int>(tickData.origin[2]));
-                    file.WriteInt32(view_as<int>(tickData.angles[0]));
-                    file.WriteInt32(view_as<int>(tickData.angles[1]));
-                    file.WriteInt32(tickData.flags);
-                    file.WriteInt32(view_as<int>(tickData.speed));
+                    WriteTickDataToFile(file, tickData);
                     i++;
                 } while (i < recordedRunData[client].Length);
             }
@@ -519,18 +536,23 @@ static void WriteTickData(File file, int client, int replayType)
                         i = 0;
                     }
                     recordedTickData[client].GetArray(i, tickData);
-                    file.WriteInt32(view_as<int>(tickData.origin[0]));
-                    file.WriteInt32(view_as<int>(tickData.origin[1]));
-                    file.WriteInt32(view_as<int>(tickData.origin[2]));
-                    file.WriteInt32(view_as<int>(tickData.angles[0]));
-                    file.WriteInt32(view_as<int>(tickData.angles[1]));
-                    file.WriteInt32(tickData.flags);
-                    file.WriteInt32(view_as<int>(tickData.speed));
+                    WriteTickDataToFile(file, tickData);
                     i++;
                 } while (i != recordingIndex[client]);
             }
         }
     }
+}
+
+static void WriteTickDataToFile(File file, ReplayTickData tickData)
+{
+    file.WriteInt32(view_as<int>(tickData.origin[0]));
+    file.WriteInt32(view_as<int>(tickData.origin[1]));
+    file.WriteInt32(view_as<int>(tickData.origin[2]));
+    file.WriteInt32(view_as<int>(tickData.angles[0]));
+    file.WriteInt32(view_as<int>(tickData.angles[1]));
+    file.WriteInt32(tickData.flags);
+    file.WriteInt32(view_as<int>(tickData.speed));
 }
 
 static void FormatRunReplayPath(char[] buffer, int maxlength, int course, int mode, int style, int timeType)

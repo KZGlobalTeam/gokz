@@ -8,6 +8,8 @@
 
 
 
+static int preAndPostRunTickCount;
+
 static int playbackTick[RP_MAX_BOTS];
 static ArrayList playbackTickData[RP_MAX_BOTS];
 static bool inBreather[RP_MAX_BOTS];
@@ -94,7 +96,18 @@ void GetPlaybackState(int client, HUDInfo info)
 	if (i == RP_MAX_BOTS + 1) return;
 
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
-	info.Time = float(playbackTick[bot]) * GetTickInterval();
+	if (playbackTick[bot] < preAndPostRunTickCount)
+	{
+		info.Time = 0.0;
+	}
+	else if (playbackTick[bot] >= preAndPostRunTickCount)
+	{
+		info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
+	}
+	else if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
+	{
+		info.Time = botTime[bot];
+	}
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
 	info.Paused = false;
@@ -193,7 +206,7 @@ void TrySkipToTime(int client, int seconds)
 
 float GetPlaybackTime(int bot)
 {
-	return playbackTick[bot] / 128.0;
+	return playbackTick[bot] / GetTickInterval();
 }
 
 
@@ -567,7 +580,8 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	}
 	
 	// Read tick data
-	for (int i = 0; i < tickCount; i++)
+	preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
+	for (int i = 0; i < tickCount + preAndPostRunTickCount; i++)
 	{
 		ReplayTickData tickData;
 		file.ReadInt32(view_as<int>(tickData.origin[0]));
@@ -788,20 +802,13 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			// Start the breather period
 			inBreather[bot] = true;
 			breatherStartTime[bot] = GetEngineTime();
-			if (playbackTick[bot] == (size - 1)) 
-			{
-				EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-			}
 		}
 		else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
 		{
 			// End the breather period
 			inBreather[bot] = false;
 			botPlaybackPaused[bot] = false;
-			if (playbackTick[bot] == 0)
-			{
-				EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
-			}
+			
 			// Start the bot if first tick. Clear bot if last tick.
 			playbackTick[bot]++;
 			if (playbackTick[bot] == size)
@@ -841,6 +848,16 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		{
 			TeleportEntity(client, currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 			return;
+		}
+
+		// Play timer start/end sound, if necessary
+		if (playbackTick[bot] == preAndPostRunTickCount)
+		{
+			EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+		}
+		if (playbackTick[bot] == playbackTickData[bot].Length - preAndPostRunTickCount)
+		{
+			EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		}
 
 		// Set velocity to travel from current origin to recorded origin
