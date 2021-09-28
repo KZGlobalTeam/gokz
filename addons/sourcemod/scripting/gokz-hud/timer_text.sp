@@ -122,7 +122,8 @@ static void ShowTimerText(KZPlayer player, HUDInfo info)
 			// as it doesn't seem to be possible to display a Menu with no items.
 			Panel panel = new Panel(null);
 			panel.SetTitle(FormatTimerTextForMenu(player, info));
-			if (IsFakeClient(GetObserverTarget(player.ID))
+			int observerTarget = GetObserverTarget(player.ID);
+			if (observerTarget != -1 && IsFakeClient(observerTarget)
 				 && info.TimeType == TimeType_Nub)
 			{
 				char text[32];
