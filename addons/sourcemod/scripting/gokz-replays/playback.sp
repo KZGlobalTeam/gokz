@@ -100,13 +100,13 @@ void GetPlaybackState(int client, HUDInfo info)
 	{
 		info.Time = 0.0;
 	}
-	else if (playbackTick[bot] >= preAndPostRunTickCount)
-	{
-		info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
-	}
 	else if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
 	{
 		info.Time = botTime[bot];
+	}
+	else if (playbackTick[bot] >= preAndPostRunTickCount)
+	{
+		info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
 	}
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
@@ -206,7 +206,20 @@ void TrySkipToTime(int client, int seconds)
 
 float GetPlaybackTime(int bot)
 {
-	return playbackTick[bot] / GetTickInterval();
+	if (playbackTick[bot] < preAndPostRunTickCount)
+	{
+		return 0.0;
+	}
+	if (playbackTick[bot] >= playbackTickData[bot].Length - (preAndPostRunTickCount * 2))
+	{
+		return botTime[bot];
+	}
+	if (playbackTick[bot] >= preAndPostRunTickCount)
+	{
+		return (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
+	}
+
+	return 0.0;
 }
 
 
