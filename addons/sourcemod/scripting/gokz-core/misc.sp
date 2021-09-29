@@ -205,12 +205,16 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 static bool savedOnLadder[MAXPLAYERS + 1];
-static MoveType specMovetype[MAXPLAYERS + 1];
 
 void OnClientPutInServer_JoinTeam(int client)
 {
+	// After OnClientPutInServer, player is moved to the origin of a point_viewcontrol entity.
+	// We need to wait one tick before assign the player's team and teleport them to a valid spawn.
+	if (!IsFakeClient(client))
+	{
+		RequestFrame(AutoJoinTeam, client);
+	}
 	hasSavedPosition[client] = false;
-	specMovetype[client] = MOVETYPE_WALK;
 }
 
 void OnTimerStart_JoinTeam(int client)
@@ -259,6 +263,12 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 		else
 		{
 			player.StopTimer();
+			// Just joining a team alone can put you into weird invalid spawns. 
+			// Need to teleport the player to a valid one.
+			float spawnOrigin[3];
+			float spawnAngles[3];
+			GetValidSpawn(spawnOrigin, spawnAngles);
+			TeleportPlayer(client, spawnOrigin, spawnAngles);
 		}
 		hasSavedPosition[client] = false;
 		Call_GOKZ_OnJoinTeam(client, newTeam);
@@ -473,7 +483,7 @@ static void TryRegisterCourse(int course)
 
 
 
-// =====[ FIX MISSING SPAWNS ]=====
+// =====[ SPAWN FIXES ]=====
 
 void OnMapStart_FixMissingSpawns()
 {
@@ -488,11 +498,8 @@ void OnMapStart_FixMissingSpawns()
 
 	if (tSpawn == -1 || ctSpawn == -1)
 	{
-		int validSpawn = (ctSpawn == -1) ? tSpawn : ctSpawn;
-		
 		float origin[3], angles[3];
-		GetEntPropVector(validSpawn, Prop_Data, "m_vecOrigin", origin);
-		GetEntPropVector(validSpawn, Prop_Data, "m_angRotation", angles);
+		GetValidSpawn(origin, angles);
 
 		int newSpawn = CreateEntityByName((tSpawn == -1) ? "info_player_terrorist" : "info_player_counterterrorist");
 		if (DispatchSpawn(newSpawn))
@@ -502,3 +509,57 @@ void OnMapStart_FixMissingSpawns()
 	}
 }
 
+static bool GetValidSpawn(float origin[3], float angles[3])
+{
+	// Return true if the spawn found is truly valid (not in the ground or out of bounds)
+	bool foundValidSpawn;
+	bool searchCT;
+	float spawnOrigin[3];
+	int spawnEntity = -1;
+	while (!foundValidSpawn)
+	{
+		if (searchCT)
+		{
+			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_counterterrorist");
+		}
+		else
+		{
+			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_terrorist");
+		}
+		
+		if (spawnEntity != -1)
+		{
+			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", origin);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", angles);
+			if (IsSpawnValid(spawnOrigin))
+			{
+				foundValidSpawn = true;
+			}
+		}
+		else if (!searchCT)
+		{
+			searchCT = true;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return foundValidSpawn;
+}
+
+static bool IsSpawnValid(float origin[3])
+{
+	Handle trace = TR_TraceHullFilterEx(origin, origin, PLAYER_MINS, PLAYER_MAXS, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	if (!TR_StartSolid(trace) && !TR_AllSolid(trace) && TR_GetFraction(trace) == 1.0)
+	{
+		return true;
+	}
+	return false;
+}
+
+static void AutoJoinTeam(int client)
+{
+	int team = GetRandomInt(CS_TEAM_T, CS_TEAM_CT);
+	JoinTeam(client, team, false);
+}
