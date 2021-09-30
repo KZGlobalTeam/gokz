@@ -40,6 +40,9 @@ enum ObsMode
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
+#define PLAYER_MINS view_as<float>( {-16.0, -16.0, 0.0} )
+#define PLAYER_MAXS view_as<float>( {16.0, 16.0, 72.0} )
+#define PLAYER_MAXS_DUCKED view_as<float>( {16.0, 16.0, 54.0} )
 
 
 
