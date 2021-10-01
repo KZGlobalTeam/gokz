@@ -65,6 +65,7 @@ enum struct JumpTracker
 	int nextCrouchRelease;
 	int syncTicks;
 	int lastCrouchPressedTick;
+	int tickCount;
 	bool failstatBlockDetected;
 	bool failstatFailed;
 	bool failstatValid;
@@ -176,7 +177,7 @@ enum struct JumpTracker
 		// The jump is so invalid we don't even have to bother.
 		// Also check if the player just teleported.
 		if (this.jump.type == JumpType_FullInvalid ||
-			GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
+			this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return;
 		}
@@ -271,15 +272,15 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		if (GetGameTickCount() - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
+		if (this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
 		}
 		else if (ladderJump)
 		{
-			if (GetGameTickCount() - this.lastJumpTick <= JS_MAX_BHOP_GROUND_TICKS)
+			if (this.tickCount - this.lastJumpTick <= JS_MAX_BHOP_GROUND_TICKS)
 			{
-				return GetGameTickCount() - this.ladderGrabTick > JS_MAX_BHOP_GROUND_TICKS ? JumpType_Ladderhop : JumpType_Invalid;
+				return this.tickCount - this.ladderGrabTick > JS_MAX_BHOP_GROUND_TICKS ? JumpType_Ladderhop : JumpType_Invalid;
 			}
 			else
 			{
@@ -406,16 +407,16 @@ enum struct JumpTracker
 		if (Movement_GetButtons(this.jumper) & IN_FORWARD ||
 			Movement_GetButtons(this.jumper) & IN_BACK)
 		{
-			this.lastWPressedTick = GetGameTickCount();
+			this.lastWPressedTick = this.tickCount;
 		}
 		else if (this.jump.releaseW > 99)
 		{
-			this.jump.releaseW = this.lastWPressedTick - this.jumpoffTick;
+			this.jump.releaseW = this.lastWPressedTick - this.jumpoffTick + 1;
 		}
 		
 		if (Movement_GetButtons(this.jumper) & IN_DUCK)
 		{
-			this.lastCrouchPressedTick = GetGameTickCount();
+			this.lastCrouchPressedTick = this.tickCount;
 			this.nextCrouchRelease = 100;
 		}
 		else if (this.nextCrouchRelease > 99)
@@ -1285,7 +1286,7 @@ void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump, bool
 	// Update: Takeoff speed should be always correct with the new MovementAPI.
 	if (jumped)
 	{
-		jumpTrackers[client].lastJumpTick = GetGameTickCount();
+		jumpTrackers[client].lastJumpTick = jumpTrackers[client].tickCount;
 	}
 	jumpTrackers[client].Reset(jumped, ladderJump, jumpbug);
 	jumpTrackers[client].Begin();
@@ -1327,13 +1328,14 @@ void OnEndTouch_JumpTracking(int client)
 	}
 }
 
-void OnPlayerRunCmd_JumpTracking(int client, int buttons)
+void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 {
 	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
 		return;
 	}
-	
+
+	jumpTrackers[client].tickCount = tickcount;
 	// Don't bother checking if player is already in air and jumpstat is already invalid
 	if (Movement_GetOnGround(client) ||
 		jumpTrackers[client].jump.type != JumpType_FullInvalid)
@@ -1342,7 +1344,7 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons)
 	}
 }
 
-public void OnPlayerRunCmdPost_JumpTracking(int client, int cmdnum)
+public void OnPlayerRunCmdPost_JumpTracking(int client)
 {
 	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
@@ -1384,7 +1386,7 @@ public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, Move
 {
 	if (newMovetype == MOVETYPE_LADDER)
 	{
-		jumpTrackers[client].ladderGrabTick = GetGameTickCount();
+		jumpTrackers[client].ladderGrabTick = jumpTrackers[client].tickCount;
 	}
 }
 
@@ -1509,5 +1511,5 @@ void OnTeleport_FailstatAlways(int client)
 	// gokz-core does that too, but for some reason we have to do it again
 	InvalidateJumpstat(client);
 
-	jumpTrackers[client].lastTeleportTick = GetGameTickCount();
+	jumpTrackers[client].lastTeleportTick = jumpTrackers[client].tickCount;
 }
