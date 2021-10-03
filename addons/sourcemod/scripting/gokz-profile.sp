@@ -115,7 +115,8 @@ public void GOKZ_OnOptionsLoaded(int client)
 {
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
-		UpdateTags(client, gI_Rank[client][GOKZ_GetCoreOption(client, Option_Mode)]);
+		int mode = GOKZ_GetCoreOption(client, Option_Mode);
+		UpdateTags(client, gI_Rank[client][mode], mode);
 	}
 }
 
@@ -164,12 +165,12 @@ public void UpdateRank(int client, int mode)
 		
 		if (tagType == ProfileTagType_Admin)
 		{
-			FormatEx(tag, sizeof(tag), "%T", "Tag - Admin", client);
+			FormatEx(tag, sizeof(tag), "[%s %T]", "Tag - Admin", gC_ModeNamesShort[mode], client);
 			color = TAG_COLOR_ADMIN;
 		}
 		if (tagType == ProfileTagType_VIP)
 		{
-			FormatEx(tag, sizeof(tag), "%T", "Tag - VIP", client);
+			FormatEx(tag, sizeof(tag), "[%s %T]", "Tag - VIP", gC_ModeNamesShort[mode], client);
 			color = TAG_COLOR_VIP;
 		}
 		
@@ -188,7 +189,7 @@ public void UpdateRank(int client, int mode)
 	int points = GOKZ_GL_GetRankPoints(client, mode);
 	if (points == -1)
 	{
-		UpdateTags(client, -1);
+		UpdateTags(client, -1, mode);
 		return;
 	}
 	
@@ -204,7 +205,7 @@ public void UpdateRank(int client, int mode)
 	
 	if (GOKZ_GetCoreOption(client, Option_Mode) == mode)
 	{
-		UpdateTags(client, rank);
+		UpdateTags(client, rank, mode);
 	}
 	
 	if (gI_Rank[client][mode] != rank)
@@ -214,13 +215,13 @@ public void UpdateRank(int client, int mode)
 	}
 }
 
-void UpdateTags(int client, int rank)
+void UpdateTags(int client, int rank, int mode)
 {
 	if (rank != -1 &&
 	    GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
 	{
 		char str[64];
-		FormatEx(str, sizeof(str), "[%s]", gC_rankName[rank]);
+		FormatEx(str, sizeof(str), "[%s %s]", gC_ModeNamesShort[mode], gC_rankName[rank]);
 		CS_SetClientClanTag(client, str);
 	}
 	else

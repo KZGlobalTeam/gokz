@@ -270,7 +270,8 @@ static bool IsValidMovetype(MoveType movetype)
 {
 	return movetype == MOVETYPE_WALK
 	 || movetype == MOVETYPE_LADDER
-	 || movetype == MOVETYPE_NONE;
+	 || movetype == MOVETYPE_NONE
+	 || movetype == MOVETYPE_OBSERVER;
 }
 
 static bool JustTeleported(int client)
