@@ -161,7 +161,7 @@ void PlaybackTogglePause(int bot)
 
 void PlaybackSkipForward(int bot)
 {
-	if (playbackTick[bot] + 1 < playbackTickData[bot].Length)
+	if (playbackTick[bot] + RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())) < playbackTickData[bot].Length)
 	{
 		PlaybackSkipToTick(bot, playbackTick[bot] + RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())));
 	}
@@ -1000,7 +1000,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			}
 		}
 
-		if(!botPlaybackPaused[bot])
+		if(!botPlaybackPaused[bot] && false)
 		{
 			PrintToServer("Tick: %d", playbackTick[bot]);
 			PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);

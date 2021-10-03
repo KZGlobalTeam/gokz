@@ -546,6 +546,10 @@ static void WriteTickData(File file, int client, int replayType)
             if (timerRunning[client])
             {
                 i = recordedRunData[client].Length - 1 - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
+                if (i < 0)
+                {
+                    i = recordedTickData[client].Length + i;
+                }
                 do
                 {
                     recordedRunData[client].GetArray(i, tickData);
