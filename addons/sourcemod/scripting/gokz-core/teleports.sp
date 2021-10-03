@@ -86,7 +86,7 @@ void MakeCheckpoint(int client)
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	checkpointIndexEnd[client] = checkpointIndex[client];
 	// The list has yet to be filled up, do PushArray instead of SetArray
-	if (checkpoints[client].Length < GOKZ_MAX_CHECKPOINTS)
+	if (checkpoints[client].Length < GOKZ_MAX_CHECKPOINTS && checkpointIndex[client] == checkpoints[client].Length)
 	{
 		checkpoints[client].PushArray(cp);
 		// Initialize start and end index for the first checkpoint
