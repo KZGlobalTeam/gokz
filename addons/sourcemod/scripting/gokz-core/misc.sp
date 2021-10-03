@@ -29,6 +29,7 @@ void OnPlayerSpawn_GodMode(int client)
 {
 	// Stop players from taking damage
 	SetEntProp(client, Prop_Data, "m_takedamage", 0);
+	SetEntityFlags(client, GetEntityFlags(client) | FL_GODMODE);
 }
 
 
