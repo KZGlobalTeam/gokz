@@ -706,3 +706,66 @@ stock void RotateVectorPitchYaw(float vec[3], float pitch, float yaw, float resu
 		RotateVectorAxis(result, view_as<float>({0.0, 0.0, 1.0}), DegToRad(yaw), result);
 	}
 }
+
+/**
+ * Attempts to return a valid spawn location. 
+ *
+ * @param origin			Spawn origin if found.
+ * @param angles			Spawn angles if found.
+ * @return					Whether a valid spawn point is found.
+ */
+stock bool GetValidSpawn(float origin[3], float angles[3])
+{
+	// Return true if the spawn found is truly valid (not in the ground or out of bounds)
+	bool foundValidSpawn;
+	bool searchCT;
+	float spawnOrigin[3];
+	int spawnEntity = -1;
+	while (!foundValidSpawn)
+	{
+		if (searchCT)
+		{
+			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_counterterrorist");
+		}
+		else
+		{
+			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_terrorist");
+		}
+		
+		if (spawnEntity != -1)
+		{
+			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", origin);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", angles);
+			if (IsSpawnValid(spawnOrigin))
+			{
+				foundValidSpawn = true;
+			}
+		}
+		else if (!searchCT)
+		{
+			searchCT = true;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return foundValidSpawn;
+}
+
+/**
+ * Check whether a position is a valid spawn location. 
+ * A spawn location is considered valid if it is in bounds and not stuck inside the ground.
+ *
+ * @param origin			Origin vector.
+ * @return					Whether the origin is a valid spawn location.
+ */
+stock bool IsSpawnValid(float origin[3])
+{
+	Handle trace = TR_TraceHullFilterEx(origin, origin, PLAYER_MINS, PLAYER_MAXS, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	if (!TR_StartSolid(trace) && !TR_AllSolid(trace) && TR_GetFraction(trace) == 1.0)
+	{
+		return true;
+	}
+	return false;
+}
