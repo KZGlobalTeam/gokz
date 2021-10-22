@@ -388,6 +388,11 @@ void TeleportToStart(int client)
 	if (startType[client] == StartPositionType_Spawn)
 	{
 		GOKZ_RespawnPlayer(client, .restorePos = false);
+		// Respawning alone does not guarantee a valid spawn.
+		float spawnOrigin[3];
+		float spawnAngles[3];
+		GetValidSpawn(spawnOrigin, spawnAngles);
+		TeleportPlayer(client, spawnOrigin, spawnAngles);
 	}
 	else if (startType[client] == StartPositionType_Custom)
 	{

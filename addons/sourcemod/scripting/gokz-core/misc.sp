@@ -510,55 +510,6 @@ void OnMapStart_FixMissingSpawns()
 	}
 }
 
-static bool GetValidSpawn(float origin[3], float angles[3])
-{
-	// Return true if the spawn found is truly valid (not in the ground or out of bounds)
-	bool foundValidSpawn;
-	bool searchCT;
-	float spawnOrigin[3];
-	int spawnEntity = -1;
-	while (!foundValidSpawn)
-	{
-		if (searchCT)
-		{
-			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_counterterrorist");
-		}
-		else
-		{
-			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_terrorist");
-		}
-		
-		if (spawnEntity != -1)
-		{
-			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", origin);
-			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", angles);
-			if (IsSpawnValid(spawnOrigin))
-			{
-				foundValidSpawn = true;
-			}
-		}
-		else if (!searchCT)
-		{
-			searchCT = true;
-		}
-		else
-		{
-			break;
-		}
-	}
-	return foundValidSpawn;
-}
-
-static bool IsSpawnValid(float origin[3])
-{
-	Handle trace = TR_TraceHullFilterEx(origin, origin, PLAYER_MINS, PLAYER_MAXS, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-	if (!TR_StartSolid(trace) && !TR_AllSolid(trace) && TR_GetFraction(trace) == 1.0)
-	{
-		return true;
-	}
-	return false;
-}
-
 static void AutoJoinTeam(int client)
 {
 	int team = GetRandomInt(CS_TEAM_T, CS_TEAM_CT);
