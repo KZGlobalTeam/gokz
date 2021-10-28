@@ -16,7 +16,6 @@
  * `!bonus`/`!b` - Teleport to the start of a bonus. Usage: `!b <#bonus>`
  * `!pause`/`!resume` - Toggle pausing your timer and stopping you in your position.
  * `!stop` - Stop your timer.
- * `!autorestart` - Toggle auto restart upon teleporting to start.
  * `!virtualbuttonindicators`/`!vbi` - Toggle virtual button indicators.
  * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
  * `!mode` - Open the movement mode selection menu.
