@@ -13,16 +13,9 @@ void MeasureGetPos(int client, int arg)
 
 void MeasureResetPos(int client)
 {
-	if (gH_P2PRed[client] != null)
-	{
-		delete gH_P2PRed[client];
-		gH_P2PRed[client] = null;
-	}
-	if (gH_P2PGreen[client] != null)
-	{
-		delete gH_P2PGreen[client];
-		gH_P2PGreen[client] = null;
-	}
+	delete gH_P2PRed[client];
+	delete gH_P2PGreen[client];
+
 	gB_MeasurePosSet[client][0] = false;
 	gB_MeasurePosSet[client][1] = false;
 	
@@ -158,22 +151,15 @@ static void MeasureGetPosEx(int client, int arg, float origin[3], float angles[3
 	
 	if (arg == 0)
 	{
-		if (gH_P2PRed[client] != null)
-		{
-			delete gH_P2PRed[client];
-			gH_P2PRed[client] = null;
-		}
+		delete gH_P2PRed[client];
 		gB_MeasurePosSet[client][0] = true;
 		gH_P2PRed[client] = CreateTimer(1.0, Timer_P2PRed, GetClientUserId(client), TIMER_REPEAT);
 		P2PXBeam(client, 0);
 	}
 	else
 	{
-		if (gH_P2PGreen[client] != null)
-		{
-			delete gH_P2PGreen[client];
-			gH_P2PGreen[client] = null;
-		}
+		delete gH_P2PGreen[client];
+		gH_P2PGreen[client] = null;
 		gB_MeasurePosSet[client][1] = true;
 		P2PXBeam(client, 1);
 		gH_P2PGreen[client] = CreateTimer(1.0, Timer_P2PGreen, GetClientUserId(client), TIMER_REPEAT);
