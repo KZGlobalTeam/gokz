@@ -281,7 +281,7 @@ static bool EntlumpParseEntity(StringMap result, char[] entityLump, int &entlump
 					if (result.GetString(token.string, tempString, sizeof(tempString)))
 					{
 						result.Remove(token.string);
-						values = new ArrayList(GOKZ_ENTLUMP_MAX_VALUE);
+						values = new ArrayList(ByteCountToCells(GOKZ_ENTLUMP_MAX_VALUE));
 						values.PushString(tempString);
 						values.PushString(valueToken.string);
 						result.SetValue(token.string, values);

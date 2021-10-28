@@ -787,8 +787,10 @@ stock bool IsSpawnValid(float origin[3])
 	Handle trace = TR_TraceHullFilterEx(origin, origin, PLAYER_MINS, PLAYER_MAXS, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
 	if (!TR_StartSolid(trace) && !TR_AllSolid(trace) && TR_GetFraction(trace) == 1.0)
 	{
+		delete trace;
 		return true;
 	}
+	delete trace;
 	return false;
 }
 

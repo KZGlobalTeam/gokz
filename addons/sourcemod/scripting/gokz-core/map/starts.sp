@@ -57,31 +57,37 @@ void OnEntitySpawned_MapStarts(int entity)
 void OnEntitySpawnedPost_MapStarts(int entity)
 {
 	char buffer[32];
-
 	GetEntityClassname(entity, buffer, sizeof(buffer));
 	
 	if (StrEqual("trigger_multiple", buffer, false))
 	{
-		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0 && StrEqual(GOKZ_START_ZONE_NAME, buffer, false))
+		bool isStartZone;
+		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0)
 		{
-			StoreSearchStart(0, entity, CourseTimerType_ZoneNew);
-		}		
-		else 
-		{
-			TimerButtonTrigger trigger;
-			if (IsTimerButtonTrigger(entity, trigger) && trigger.isStartTimer)
+			if (StrEqual(GOKZ_START_ZONE_NAME, buffer, false))
 			{
-				StoreSearchStart(trigger.course, entity, CourseTimerType_ZoneLegacy);
+				isStartZone = true;
+				StoreSearchStart(0, entity, CourseTimerType_ZoneNew);
 			}
 			else if (GetStartZoneBonusNumber(entity) != -1)
 			{
 				int course = GetStartZoneBonusNumber(entity);
 				if (GOKZ_IsValidCourse(course, true))
 				{
+					isStartZone = true;
 					StoreSearchStart(course, entity, CourseTimerType_ZoneNew);
 				}
 			}
 		}
+		if (!isStartZone)
+		{
+			TimerButtonTrigger trigger;
+			if (IsTimerButtonTrigger(entity, trigger) && trigger.isStartTimer)
+			{
+				StoreSearchStart(trigger.course, entity, CourseTimerType_ZoneLegacy);
+			}
+		}
+
 	}
 	else if (StrEqual("func_button", buffer, false))
 	{
@@ -89,7 +95,7 @@ void OnEntitySpawnedPost_MapStarts(int entity)
 		{
 			return;
 		}
-		
+
 		if (StrEqual(GOKZ_START_BUTTON_NAME, buffer, false))
 		{
 			StoreSearchStart(0, entity, CourseTimerType_Button);
@@ -162,7 +168,7 @@ static void StoreSearchStart(int course, int entity, CourseTimerType type)
 		startType[course] = CourseTimerType_Default;
 	}
 
-	// Real zone is always better than "fake" zones which are better than buttons 
+	// Real zone is always better than "fake" zones which are better than buttons
 	// as the buttons found in a map with fake zones aren't meant to be visible.
 	if (startType[course] >= type)
 	{
@@ -190,7 +196,7 @@ static void StoreSearchStart(int course, int entity, CourseTimerType type)
 static int GetStartBonusNumber(int entity)
 {
 	return GOKZ_MatchIntFromEntityName(entity, RE_BonusStart, 1);
-} 
+}
 
 static int GetStartButtonBonusNumber(int entity)
 {

@@ -28,24 +28,30 @@ void OnEntitySpawnedPost_MapEnd(int entity)
 	
 	if (StrEqual("trigger_multiple", buffer, false))
 	{
-		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0 && StrEqual(GOKZ_END_ZONE_NAME, buffer, false))
+		bool isEndZone;
+		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0)
 		{
-			StoreEnd(0, entity, CourseTimerType_ZoneNew);
-		}		
-		else 
-		{
-			TimerButtonTrigger trigger;
-			if (IsTimerButtonTrigger(entity, trigger) && !trigger.isStartTimer)
+			if (StrEqual(GOKZ_END_ZONE_NAME, buffer, false))
 			{
-				StoreEnd(trigger.course, entity, CourseTimerType_ZoneLegacy);
+				isEndZone = true;
+				StoreEnd(0, entity, CourseTimerType_ZoneNew);
 			}
 			else if (GetEndZoneBonusNumber(entity) != -1)
 			{
 				int course = GetEndZoneBonusNumber(entity);
 				if (GOKZ_IsValidCourse(course, true))
 				{
+					isEndZone = true;
 					StoreEnd(course, entity, CourseTimerType_ZoneNew);
 				}
+			}
+		}
+		if (!isEndZone)
+		{
+			TimerButtonTrigger trigger;
+			if (IsTimerButtonTrigger(entity, trigger) && !trigger.isStartTimer)
+			{
+				StoreEnd(trigger.course, entity, CourseTimerType_ZoneLegacy);
 			}
 		}
 	}
@@ -55,7 +61,7 @@ void OnEntitySpawnedPost_MapEnd(int entity)
 		{
 			return;
 		}
-		
+
 		if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
 		{
 			StoreEnd(0, entity, CourseTimerType_Button);
@@ -98,14 +104,13 @@ bool GetMapEndPosition(int course, float origin[3], float angles[3])
 
 static void StoreEnd(int course, int entity, CourseTimerType type)
 {
-	LogMessage("StoreEnd called for %i, %i, %i", entity, course, type);
 	// If StoreEnd is called, then there is at least an end position (even though it might not be a valid one)
 	if (endType[course] < CourseTimerType_Default)
 	{
 		endType[course] = CourseTimerType_Default;
 	}
 
-	// Real zone is always better than "fake" zones which are better than buttons 
+	// Real zone is always better than "fake" zones which are better than buttons
 	// as the buttons found in a map with fake zones aren't meant to be visible.
 	if (endType[course] >= type)
 	{
