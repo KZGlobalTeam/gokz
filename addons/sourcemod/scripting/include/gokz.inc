@@ -826,7 +826,6 @@ stock void GetEntityPositions(int entity, float origin[3], float center[3], floa
  */
 stock bool FindValidPositionAroundTimerEntity(int entity, float originDest[3], float anglesDest[3], bool isButton)
 {
-	//LogMessage("FindValidPositionAroundTimerEntity %i", entity);
 	float origin[3], center[3], angles[3], distFromCenter[3];
 	GetEntityPositions(entity, origin, center, angles, distFromCenter);
 	float extraOffset[3];
