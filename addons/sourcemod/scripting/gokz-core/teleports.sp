@@ -377,7 +377,7 @@ void TeleportToStart(int client)
 {
 	// Call Pre Forward
 	Action result;
-	Call_GOKZ_OnTeleportToStart(client, result);
+	Call_GOKZ_OnTeleportToStart(client, GetCurrentCourse(client), result);
 	if (result != Plugin_Continue)
 	{
 		return;
@@ -410,7 +410,36 @@ void TeleportToStart(int client)
 	}
 	
 	// Call Post Forward
-	Call_GOKZ_OnTeleportToStart_Post(client);
+	Call_GOKZ_OnTeleportToStart_Post(client, GetCurrentCourse(client));
+}
+
+void TeleportToSearchStart(int client, int course)
+{
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToStart(client, course, result);
+	if (result != Plugin_Continue)
+	{
+		return;
+	}
+	float origin[3], angles[3];
+	if (!GetSearchStartPosition(course, origin, angles))
+	{
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Start Found");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", course);
+		}
+		return;
+	}
+	GOKZ_StopTimer(client, false);
+
+	TeleportDo(client, origin, angles);
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToStart_Post(client, course);
 }
 
 StartPositionType GetStartPosition(int client, float position[3], float angles[3])
@@ -431,17 +460,29 @@ StartPositionType GetStartPosition(int client, float position[3], float angles[3
 
 bool TeleportToCourseStart(int client, int course)
 {
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToStart(client, course, result);
+	if (result != Plugin_Continue)
+	{
+		return false;
+	}	
 	float origin[3], angles[3];
 	
 	if (!GetMapStartPosition(course, origin, angles))
 	{
-		return false;
+		if (!GetSearchStartPosition(course, origin, angles))
+		{
+			return false;
+		}
 	}
 
 	GOKZ_StopTimer(client);
 	
 	TeleportDo(client, origin, angles);
 	
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToStart_Post(client, course);	
 	return true;
 }
 
@@ -535,11 +576,11 @@ bool ClearCustomStartPosition(int client)
 
 // TELEPORT TO END
 
-void TeleportToEnd(int client)
+void TeleportToEnd(int client, int course)
 {
 	// Call Pre Forward
 	Action result;
-	Call_GOKZ_OnTeleportToEnd(client, result);
+	Call_GOKZ_OnTeleportToEnd(client, course, result);
 	if (result != Plugin_Continue)
 	{
 		return;
@@ -547,11 +588,22 @@ void TeleportToEnd(int client)
 
 	GOKZ_StopTimer(client, false);
 
-	// Teleport to End
+	if (!GetMapEndPosition(course, endOrigin[client], endAngles[client]))
+	{
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No End Found");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No End Found (Bonus)", course);
+		}
+		return;
+	}
 	TeleportDo(client, endOrigin[client], endAngles[client]);
 
 	// Call Post Forward
-	Call_GOKZ_OnTeleportToEnd_Post(client);
+	Call_GOKZ_OnTeleportToEnd_Post(client, course);
 }
 
 void SetEndPosition(int client, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR)

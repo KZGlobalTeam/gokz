@@ -42,6 +42,16 @@ enum StartPositionType:
 	STARTPOSITIONTYPE_COUNT
 };
 
+enum CourseTimerType:
+{
+	CourseTimerType_None,
+	CourseTimerType_Default,
+	CourseTimerType_Button,
+	CourseTimerType_ZoneLegacy,
+	CourseTimerType_ZoneNew,
+	CourseTimerType_COUNT
+};
+
 enum OptionProp:
 {
 	OptionProp_Cookie = 0, 
@@ -259,6 +269,8 @@ enum TriggerType
 
 #define GOKZ_MAX_MAPTRIGGERS_ERROR_LENGTH 256
 
+#define CHAR_ESCAPE view_as<char>(27)
+
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
 	"NUB", 
@@ -463,7 +475,6 @@ enum struct UndoTeleportData
 	}
 }
 
-// =====[ STRUCTS ]=====
 
 // NOTE: gokz-core/map/entlump.sp
 enum struct EntlumpToken
@@ -500,7 +511,13 @@ enum struct TouchedTrigger
 	int groundTouchTick; // tick where the player touched the ground
 }
 
-
+// Legacy triggers that activate timer buttons.
+enum struct TimerButtonTrigger
+{
+	int hammerID;
+	int course;
+	bool isStartTimer;
+}
 
 // =====[ FORWARDS ]=====
 
@@ -671,14 +688,16 @@ forward void GOKZ_OnNextCheckpoint_Post(int client);
  * Called when a player teleports to start.
  *
  * @param client		Client index.
+ * @param course		Course index.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
-forward Action GOKZ_OnTeleportToStart(int client);
+forward Action GOKZ_OnTeleportToStart(int client, int course);
 
 /**
  * Called when a player has teleported to start.
  *
  * @param client		Client index.
+ * @param course		Course index.
  */
 forward void GOKZ_OnTeleportToStart_Post(int client);
 
@@ -686,6 +705,7 @@ forward void GOKZ_OnTeleportToStart_Post(int client);
  * Called when a player teleports to end.
  *
  * @param client		Client index.
+ * @param course		Course index.
  * @return				Plugin_Handled or Plugin_Stop to block, Plugin_Continue to proceed.
  */
 forward Action GOKZ_OnTeleportToEnd(int client);
@@ -694,6 +714,7 @@ forward Action GOKZ_OnTeleportToEnd(int client);
  * Called when a player has teleported to end.
  *
  * @param client		Client index.
+ * @param course		Course index.
  */
 forward void GOKZ_OnTeleportToEnd_Post(int client);
 
@@ -1085,6 +1106,14 @@ native bool GOKZ_SetTeleportCount(int client, int tpCount);
 native void GOKZ_TeleportToStart(int client);
 
 /**
+ * Teleports a player to the start zone/button of the specified course.
+ *
+ * @param client    	Client index.
+ * @param course		Course index.
+ */
+native void GOKZ_TeleportToSearchStart(int client, int course);
+
+/**
  * Gets the virtual button position the player currently has.
  *
  * @param client    	Client index.
@@ -1154,8 +1183,9 @@ native bool GOKZ_SetStartPositionToMapStart(int client, int course);
  * Teleports a player to end.
  *
  * @param client		Client index.
+ * @param course		Course index.
  */
-native void GOKZ_TeleportToEnd(int client);
+native void GOKZ_TeleportToEnd(int client, int course);
 
 /**
  * Set a new checkpoint at a player's current position.

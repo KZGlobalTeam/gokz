@@ -4,11 +4,13 @@
 	Reads data from the current map file.
 */
 
+static Regex RE_BonusStartButton;
+static Regex RE_BonusEndButton;
 
 
 // =====[ PUBLIC ]=====
 
-void EntlumpParse(StringMap antiBhopTriggers, StringMap teleportTriggers, int &mappingApiVersion)
+void EntlumpParse(StringMap antiBhopTriggers, StringMap teleportTriggers, StringMap timerButtonTriggers, int &mappingApiVersion)
 {
 	char mapPath[512];
 	GetCurrentMap(mapPath, sizeof(mapPath));
@@ -62,38 +64,63 @@ void EntlumpParse(StringMap antiBhopTriggers, StringMap teleportTriggers, int &m
 						{
 							PushMappingApiError("ERROR: Entity lump: Couldn't parse Mapping API version from map properties: \"%s\".", versionString);
 							mappingApiVersion = GOKZ_MAPPING_API_VERSION_NONE;
-							break;
 						}
 					}
 					else
 					{
-						// map doesn't have a mapping api version. break out of the loop.
+						// map doesn't have a mapping api version.
 						mappingApiVersion = GOKZ_MAPPING_API_VERSION_NONE;
-						break;
 					}
 				}
-				else if (entity.GetString("targetname", targetName, sizeof(targetName)))
+				else if (StrEqual("trigger_multiple", classname, false))
 				{
-					// get trigger properties if applicable
-					TriggerType triggerType = GetTriggerType(targetName);
-					if (triggerType == TriggerType_Antibhop)
+					TriggerType triggerType;
+					if (!gotWorldSpawn || mappingApiVersion != GOKZ_MAPPING_API_VERSION_NONE)
 					{
-						AntiBhopTrigger trigger;
-						if (GetAntiBhopTriggerEntityProperties(trigger, entity))
+						if (entity.GetString("targetname", targetName, sizeof(targetName)))
 						{
-							char key[32];
-							IntToString(trigger.hammerID, key, sizeof(key));
-							antiBhopTriggers.SetArray(key, trigger, sizeof(trigger));
+							// get trigger properties if applicable
+							triggerType = GetTriggerType(targetName);
+							if (triggerType == TriggerType_Antibhop)
+							{
+								AntiBhopTrigger trigger;
+								if (GetAntiBhopTriggerEntityProperties(trigger, entity))
+								{
+									char key[32];
+									IntToString(trigger.hammerID, key, sizeof(key));
+									antiBhopTriggers.SetArray(key, trigger, sizeof(trigger));
+								}
+							}
+							else if (triggerType == TriggerType_Teleport)
+							{
+								TeleportTrigger trigger;
+								if (GetTeleportTriggerEntityProperties(trigger, entity))
+								{
+									char key[32];
+									IntToString(trigger.hammerID, key, sizeof(key));
+									teleportTriggers.SetArray(key, trigger, sizeof(trigger));
+								}
+							}
 						}
 					}
-					else if (triggerType == TriggerType_Teleport)
+					
+					// Tracking legacy timer triggers that press the timer buttons upon triggered.
+					if (triggerType == TriggerType_Invalid)
 					{
-						TeleportTrigger trigger;
-						if (GetTeleportTriggerEntityProperties(trigger, entity))
+						char touchOutput[128];
+						ArrayList value;	
+						
+						if (entity.GetString("OnStartTouch", touchOutput, sizeof(touchOutput)))
 						{
-							char key[32];
-							IntToString(trigger.hammerID, key, sizeof(key));
-							teleportTriggers.SetArray(key, trigger, sizeof(trigger));
+							TimerButtonTriggerCheck(touchOutput, sizeof(touchOutput), entity, timerButtonTriggers);
+						}
+						else if (entity.GetValue("OnStartTouch", value)) // If there are multiple outputs, we have to check for all of them.
+						{
+							for (int i = 0; i < value.Length; i++)
+							{
+								value.GetString(i, touchOutput, sizeof(touchOutput));
+								TimerButtonTriggerCheck(touchOutput, sizeof(touchOutput), entity, timerButtonTriggers);
+							}
 						}
 					}
 				}
@@ -112,6 +139,25 @@ void EntlumpParse(StringMap antiBhopTriggers, StringMap teleportTriggers, int &m
 	}
 }
 
+
+// =====[ EVENTS ]=====
+
+void OnPluginStart_MapFile()
+{
+	char buffer[64];
+	char press[8];
+	FormatEx(press, sizeof(press), "%s%s", CHAR_ESCAPE, "Press");
+
+	buffer = GOKZ_BONUS_START_BUTTON_NAME_REGEX;
+	ReplaceStringEx(buffer, sizeof(buffer), "$", "");
+	StrCat(buffer, sizeof(buffer), press);
+	RE_BonusStartButton = CompileRegex(buffer);
+
+	buffer = GOKZ_BONUS_END_BUTTON_NAME_REGEX;
+	ReplaceStringEx(buffer, sizeof(buffer), "$", "");
+	StrCat(buffer, sizeof(buffer), press);
+	RE_BonusEndButton = CompileRegex(buffer);
+}
 
 
 // =====[ PRIVATE ]=====
@@ -230,7 +276,24 @@ static bool EntlumpParseEntity(StringMap result, char[] entityLump, int &entlump
 				valueToken = EntlumpGetToken(entityLump, entlumpIndex);
 				if (valueToken.type == EntlumpTokenType_Identifier)
 				{
-					result.SetString(token.string, valueToken.string);
+					char tempString[GOKZ_ENTLUMP_MAX_VALUE];
+					ArrayList values;
+					if (result.GetString(token.string, tempString, sizeof(tempString)))
+					{
+						result.Remove(token.string);
+						values = new ArrayList(GOKZ_ENTLUMP_MAX_VALUE);
+						values.PushString(tempString);
+						values.PushString(valueToken.string);
+						result.SetValue(token.string, values);
+					}
+					else if (result.GetValue(token.string, values))
+					{
+						values.PushString(valueToken.string);
+					}
+					else
+					{
+						result.SetString(token.string, valueToken.string);
+					}
 				}
 				else
 				{
@@ -353,4 +416,65 @@ static bool GetTeleportTriggerEntityProperties(TeleportTrigger result, StringMap
 	}
 	
 	return true;
+}
+
+static void TimerButtonTriggerCheck(char[] touchOutput, int size, StringMap entity, StringMap timerButtonTriggers)
+{
+	int course = 0;
+	char startOutput[128];
+	char endOutput[128];
+	FormatEx(startOutput, sizeof(startOutput), "%s%s%s", GOKZ_START_BUTTON_NAME, CHAR_ESCAPE, "Press");
+	FormatEx(endOutput, sizeof(endOutput), "%s%s%s", GOKZ_END_BUTTON_NAME, CHAR_ESCAPE, "Press");
+	if (StrContains(touchOutput, startOutput, false) != -1)
+	{
+		TimerButtonTrigger trigger;
+		if (GetHammerIDFromEntityStringMap(trigger.hammerID, entity))
+		{
+			trigger.course = 0;
+			trigger.isStartTimer = true;
+		}
+		char key[32];
+		IntToString(trigger.hammerID, key, sizeof(key));
+		timerButtonTriggers.SetArray(key, trigger, sizeof(trigger));
+	}
+	else if (StrContains(touchOutput, endOutput, false) != -1)
+	{
+		TimerButtonTrigger trigger;
+		if (GetHammerIDFromEntityStringMap(trigger.hammerID, entity))
+		{
+			trigger.course = 0;
+			trigger.isStartTimer = false;
+		}
+		char key[32];
+		IntToString(trigger.hammerID, key, sizeof(key));
+		timerButtonTriggers.SetArray(key, trigger, sizeof(trigger));
+	}
+	else if (RE_BonusStartButton.Match(touchOutput) > 0)
+	{
+		RE_BonusStartButton.GetSubString(1, touchOutput, sizeof(size));
+		course = StringToInt(touchOutput);
+		TimerButtonTrigger trigger;
+		if (GetHammerIDFromEntityStringMap(trigger.hammerID, entity))
+		{
+			trigger.course = course;
+			trigger.isStartTimer = true;
+		}
+		char key[32];
+		IntToString(trigger.hammerID, key, sizeof(key));
+		timerButtonTriggers.SetArray(key, trigger, sizeof(trigger));
+	}
+	else if (RE_BonusEndButton.Match(touchOutput) > 0)
+	{
+		RE_BonusEndButton.GetSubString(1, touchOutput, sizeof(size));
+		course = StringToInt(touchOutput);
+		TimerButtonTrigger trigger;
+		if (GetHammerIDFromEntityStringMap(trigger.hammerID, entity))
+		{
+			trigger.course = course;
+			trigger.isStartTimer = false;
+		}
+		char key[32];
+		IntToString(trigger.hammerID, key, sizeof(key));
+		timerButtonTriggers.SetArray(key, trigger, sizeof(trigger));
+	}
 }
