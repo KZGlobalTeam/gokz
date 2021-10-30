@@ -57,21 +57,30 @@ void OnEntitySpawnedPost_MapEnd(int entity)
 	}
 	else if (StrEqual("func_button", buffer, false))
 	{
-		if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
+		bool isEndButton;
+		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0)
 		{
-			return;
-		}
-
-		if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
-		{
-			StoreEnd(0, entity, CourseTimerType_Button);
-		}
-		else
-		{
-			int course = GetEndButtonBonusNumber(entity);
-			if (GOKZ_IsValidCourse(course, true))
+			if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
 			{
-				StoreEnd(course, entity, CourseTimerType_Button);
+				isEndButton = true;
+				StoreEnd(0, entity, CourseTimerType_Button);
+			}
+			else
+			{
+				int course = GetEndButtonBonusNumber(entity);
+				if (GOKZ_IsValidCourse(course, true))
+				{
+					isEndButton = true;
+					StoreEnd(course, entity, CourseTimerType_Button);
+				}
+			}
+		}
+		if (!isEndButton)
+		{
+			TimerButtonTrigger trigger;
+			if (IsTimerButtonTrigger(entity, trigger) && !trigger.isStartTimer)
+			{
+				StoreEnd(trigger.course, entity, CourseTimerType_Button);
 			}
 		}
 	}
@@ -126,6 +135,7 @@ static void StoreEnd(int course, int entity, CourseTimerType type)
 		// Attempt with various positions around the entity, pick the first valid one.
 		if (!FindValidPositionAroundTimerEntity(entity, endOrigin[course], endAngles[course], type == CourseTimerType_Button))
 		{
+			endOrigin[course][2] -= 64.0; // Move the origin down so the eye position is directly on top of the button/zone.
 			return;
 		}
 	}

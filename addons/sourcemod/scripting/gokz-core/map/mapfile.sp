@@ -124,7 +124,24 @@ void EntlumpParse(StringMap antiBhopTriggers, StringMap teleportTriggers, String
 						}
 					}
 				}
-				
+				else if (StrEqual("func_button", classname, false))
+				{
+					char pressOutput[128];
+					ArrayList value;	
+					
+					if (entity.GetString("OnPressed", pressOutput, sizeof(pressOutput)))
+					{
+						TimerButtonTriggerCheck(pressOutput, sizeof(pressOutput), entity, timerButtonTriggers);
+					}
+					else if (entity.GetValue("OnPressed", value)) // If there are multiple outputs, we have to check for all of them.
+					{
+						for (int i = 0; i < value.Length; i++)
+						{
+							value.GetString(i, pressOutput, sizeof(pressOutput));
+							TimerButtonTriggerCheck(pressOutput, sizeof(pressOutput), entity, timerButtonTriggers);
+						}
+					}
+				}
 				// clear for next loop
 				entity.Clear();
 			}

@@ -909,7 +909,8 @@ static bool CanSeeBox(float origin[3], float center[3], float distFromCenter[3])
 		maxs[i] -= 0.03125;
 		traceDest[i] = FloatClamp(traceOrigin[i], mins[i], maxs[i]);
 	}
-	Handle trace = TR_TraceRayFilterEx(traceOrigin, traceDest, MASK_VISIBLE, RayType_EndPoint, TraceEntityFilterPlayers);
+	int mask = (MASK_NPCSOLID_BRUSHONLY | MASK_OPAQUE_AND_NPCS) & ~CONTENTS_OPAQUE;
+	Handle trace = TR_TraceRayFilterEx(traceOrigin, traceDest, mask, RayType_EndPoint, TraceEntityFilterPlayers);
 	if (TR_DidHit(trace))
 	{
 		float end[3];
