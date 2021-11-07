@@ -78,6 +78,12 @@
 				"windows"	"2"
 				"linux"		"3"
 			}
+
+			"CCSTeam::RemovePlayer"
+			{
+				"windows"	"221"
+				"linux"		"222"
+			}
 		}
 	}
 }
