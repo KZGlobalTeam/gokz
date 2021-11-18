@@ -806,6 +806,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 void PlaybackVersion2(int client, int bot, int &buttons)
 {
 	int size = playbackTickData[bot].Length;
+	ReplayTickData prevTickData;
 	ReplayTickData currentTickData;
 	
 	// If first or last frame of the playback
@@ -813,6 +814,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 	{
 		// Move the bot and pause them at that tick
 		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
+		playbackTickData[bot].GetArray(IntMax(playbackTick[bot] - 1, 0), prevTickData);
 		TeleportEntity(client, currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		
 		if (!inBreather[bot])
@@ -860,6 +862,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		
 		// Load in the next tick
 		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
+		playbackTickData[bot].GetArray(IntMax(playbackTick[bot] - 1, 0), prevTickData);
 		
 		// Check if the replay is paused
 		if (botPlaybackPaused[bot])
@@ -882,8 +885,11 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		float currentOrigin[3], velocity[3];
 		Movement_GetOrigin(client, currentOrigin);
 		MakeVectorFromPoints(currentOrigin, currentTickData.origin, velocity);
-		ScaleVector(velocity, 128.0);
+		ScaleVector(velocity, 1.0 / GetTickInterval());
 		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, velocity);
+		
+		// NOTE: This is better than TeleportEntity/Movement_SetOrigin, because the game interpolates the origin with this.
+		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", prevTickData.origin);
 		
 		botSpeed[bot] = currentTickData.speed;
 
@@ -940,13 +946,14 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 
 		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
-		if (currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK) && currentTickData.flags & RP_FL_ONGROUND)
+		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
+		if (replayMoveType == MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
 		{
 			botPaused[bot] = false;
 			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
 		}
-		else if (currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK))
+		else if (replayMoveType == MOVETYPE_WALK)
 		{
 			botPaused[bot] = false;
 			if (Movement_GetMovetype(client) != MOVETYPE_LADDER)
@@ -955,7 +962,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			}
 			Movement_SetMovetype(client, MOVETYPE_LADDER);
 		}
-		else if (currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK))
+		else if (replayMoveType == MOVETYPE_WALK)
 		{
 			botPaused[bot] = true;
 			Movement_SetMovetype(client, MOVETYPE_NONE);
