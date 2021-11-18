@@ -397,7 +397,7 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(RP_TICK_DATA_BLOCKSIZE, length);
+		playbackTickData[bot] = new ArrayList(RP_V1_TICK_DATA_BLOCKSIZE), length);
 	}
 	else
 	{  // Make sure it's all clear and the correct size
@@ -405,10 +405,10 @@ static void LoadFormatVersion1Replay(File file, int bot)
 		playbackTickData[bot].Resize(length);
 	}
 	
-	any tickData[RP_TICK_DATA_BLOCKSIZE];
+	any tickData[RP_V1_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < length; i++)
 	{
-		file.Read(tickData, RP_TICK_DATA_BLOCKSIZE, 4);
+		file.Read(tickData, RP_V1_TICK_DATA_BLOCKSIZE, 4);
 		playbackTickData[bot].Set(i, view_as<float>(tickData[0]), 0); // origin[0]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[1]), 1); // origin[1]
 		playbackTickData[bot].Set(i, view_as<float>(tickData[2]), 2); // origin[2]

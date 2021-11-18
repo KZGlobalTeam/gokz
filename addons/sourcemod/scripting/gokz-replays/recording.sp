@@ -150,6 +150,7 @@ public Action EndRecording(Handle timer, DataPack dp)
     delete dp;
     if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
     {
+		// TODO(GameChaos): actual ACReason?
         SaveRecordingOfCheater(client, view_as<ACReason>(0));
         Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
     }
@@ -279,7 +280,7 @@ static void DiscardRecording(int client)
     if(recordedRunData[client].Length >= maxCheaterReplayTicks)
     {
         recordedTickData[client].Clear();
-        any runData[RP_TICK_DATA_BLOCKSIZE];
+        any runData[sizeof(ReplayTickData)];
         for (int i = recordedRunData[client].Length - maxCheaterReplayTicks; i < recordedRunData[client].Length; i++)
         {
             recordedRunData[client].GetArray(i, runData, sizeof(runData));
