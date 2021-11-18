@@ -99,7 +99,7 @@ enum struct ReplayTickData
 #define RP_FORMAT_VERSION 0x02
 #define RP_NAV_FILE "maps/gokz-replays.nav"
 #define RP_V1_TICK_DATA_BLOCKSIZE 7
-#define RP_V2_TICK_DATA_BLOCKSIZE 15
+#define RP_V2_TICK_DATA_BLOCKSIZE 16
 #define RP_CACHE_BLOCKSIZE 4
 #define RP_MAX_BOTS 2
 #define RP_PLAYBACK_BREATHER_TIME 2.0

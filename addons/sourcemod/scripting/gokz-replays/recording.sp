@@ -76,15 +76,9 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 
     Movement_GetOrigin(client, tickData.origin);
 
-    float angles[3];
-    Movement_GetEyeAngles(client, angles);
-    tickData.mouse[0] = mouse[0];
-    tickData.mouse[1] = mouse[1];
-    tickData.vel[0] = vel[0];
-    tickData.vel[1] = vel[1];
-    tickData.vel[2] = vel[2];
-    tickData.angles[0] = angles[0];
-    tickData.angles[1] = angles[1];
+    tickData.mouse = mouse;
+    tickData.vel = vel;
+    Movement_GetEyeAngles(client, tickData.angles);
     // Don't bother tracking eye angle roll (angles[2]) - not used
     tickData.flags = EncodePlayerFlags(client, buttons, tickCount);
     tickData.speed = Movement_GetSpeed(client);
@@ -582,6 +576,7 @@ static void WriteTickData(File file, int client, int replayType)
 
 static void WriteTickDataToFile(File file, ReplayTickData tickData)
 {
+	// TODO(GameChaos): replay compression.
     file.WriteInt32(view_as<int>(tickData.vel[0]));
     file.WriteInt32(view_as<int>(tickData.vel[1]));
     file.WriteInt32(view_as<int>(tickData.vel[2]));
@@ -592,6 +587,7 @@ static void WriteTickDataToFile(File file, ReplayTickData tickData)
     file.WriteInt32(view_as<int>(tickData.origin[2]));
     file.WriteInt32(view_as<int>(tickData.angles[0]));
     file.WriteInt32(view_as<int>(tickData.angles[1]));
+    file.WriteInt32(view_as<int>(tickData.angles[2]));
     file.WriteInt32(tickData.flags);
     file.WriteInt32(view_as<int>(tickData.speed));
     file.WriteInt32(view_as<int>(tickData.packetsPerSecond));

@@ -597,6 +597,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	for (int i = 0; i < tickCount + preAndPostRunTickCount; i++)
 	{
 		ReplayTickData tickData;
+		// TODO(GameChaos): replay compression.
 		file.ReadInt32(view_as<int>(tickData.vel[0]));
 		file.ReadInt32(view_as<int>(tickData.vel[1]));
 		file.ReadInt32(view_as<int>(tickData.vel[2]));
@@ -607,6 +608,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		file.ReadInt32(view_as<int>(tickData.origin[2]));
 		file.ReadInt32(view_as<int>(tickData.angles[0]));
 		file.ReadInt32(view_as<int>(tickData.angles[1]));
+		file.ReadInt32(view_as<int>(tickData.angles[2]));
 		file.ReadInt32(tickData.flags);
 		file.ReadInt32(view_as<int>(tickData.speed));
 		file.ReadInt32(view_as<int>(tickData.packetsPerSecond));
