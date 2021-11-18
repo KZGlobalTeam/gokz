@@ -33,8 +33,8 @@ enum
 	RPDELTA_MOUSE[2],
 	RPDELTA_ORIGIN[3],
 	RPDELTA_ANGLES[3],
+	RPDELTA_VELOCITY[3],
 	RPDELTA_FLAGS,
-	RPDELTA_SPEED,
 	RPDELTA_PACKETSPERSECOND,
 	RPDELTA_LAGGEDMOVEMENTVALUE,
 	RPDELTA_BUTTONSFORCED,
@@ -101,8 +101,8 @@ enum struct ReplayTickData
 	int mouse[2];
 	float origin[3];
 	float angles[3];
+	float velocity[3];
 	int flags;
-	float speed;
 	float packetsPerSecond;
 	float laggedMovementValue;
 	int buttonsForced;

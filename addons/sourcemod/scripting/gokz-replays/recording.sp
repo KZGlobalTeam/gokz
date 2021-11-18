@@ -78,10 +78,9 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 
     tickData.mouse = mouse;
     tickData.vel = vel;
+    Movement_GetVelocity(client, tickData.velocity);
     Movement_GetEyeAngles(client, tickData.angles);
-    // Don't bother tracking eye angle roll (angles[2]) - not used
     tickData.flags = EncodePlayerFlags(client, buttons, tickCount);
-    tickData.speed = Movement_GetSpeed(client);
     tickData.packetsPerSecond = GetClientAvgPackets(client, NetFlow_Incoming);
     tickData.laggedMovementValue = GetEntPropFloat(client, Prop_Send, "m_flLaggedMovementValue");
     tickData.buttonsForced = GetEntProp(client, Prop_Data, "m_afButtonForced");

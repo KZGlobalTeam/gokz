@@ -886,12 +886,13 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		Movement_GetOrigin(client, currentOrigin);
 		MakeVectorFromPoints(currentOrigin, currentTickData.origin, velocity);
 		ScaleVector(velocity, 1.0 / GetTickInterval());
-		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, velocity);
+		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, currentTickData.velocity);
 		
 		// NOTE: This is better than TeleportEntity/Movement_SetOrigin, because the game interpolates the origin with this.
 		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", prevTickData.origin);
 		
-		botSpeed[bot] = currentTickData.speed;
+		
+		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
 		// Set buttons
 		if (currentTickData.flags & RP_IN_ATTACK)
@@ -988,7 +989,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		{
 			hitPerf[bot] = currentTickData.flags & RP_HIT_PERF > 0;
 			botIsTakeoff[bot] = true;
-			botTakeoffSpeed[bot] = currentTickData.speed;
+			botTakeoffSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 		}
 
 		if ((currentTickData.flags & RP_SECONDARY_EQUIPPED) && !IsCurrentWeaponSecondary(client))
