@@ -497,6 +497,7 @@ static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
 static void WriteTickData(File file, int client, int replayType)
 {
     ReplayTickData tickData;
+    ReplayTickData prevTickData;
     int i;
     switch(replayType)
     {
@@ -508,36 +509,53 @@ static void WriteTickData(File file, int client, int replayType)
             {
                 i = recordedTickData[client].Length + i;
             }
+
+            int previousJ = i;
+            bool isFirstTick = true;
             for (int j = i; j != recordingIndexOnTimerStart[client]; j++)
             {
                 if (j == recordedTickData[client].Length)
                 {
                     j = 0;
                 }
+
+                if (isFirstTick)
+                {
+                    previousJ = j;
+                }
                 recordedTickData[client].GetArray(j, tickData);
-                WriteTickDataToFile(file, tickData);
+                recordedTickData[client].GetArray(previousJ, prevTickData);
+                WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+                previousJ = j;
+                isFirstTick = false;
             }
 
             // Actual run
             // This includes the 2 seconds breather after the timer stops
+            int previousI = 0;
             for (i = 0; i < recordedRunData[client].Length; i++)
             {
                 recordedRunData[client].GetArray(i, tickData);
-                WriteTickDataToFile(file, tickData);
+                recordedRunData[client].GetArray(previousI, tickData);
+                WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+                previousI = i;
             }
         }
         case ReplayType_Cheater:
         {
+            // TODO: this doesn't work.
             i = recordingIndex[client];
             do
             {
                 i %= recordedTickData[client].Length;
-                WriteTickDataToFile(file, tickData);
+                WriteTickDataToFile(file, false, tickData, prevTickData);
                 i++;
             } while (i != recordingIndex[client]);
         }
         case ReplayType_Jump:
         {
+            bool isFirstTick = true;
+            int previousI = 0;
             if (timerRunning[client])
             {
                 i = recordedRunData[client].Length - 1 - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
@@ -547,8 +565,15 @@ static void WriteTickData(File file, int client, int replayType)
                 }
                 do
                 {
+                    if (isFirstTick)
+                    {
+                        previousI = i;
+                    }
                     recordedRunData[client].GetArray(i, tickData);
-                    WriteTickDataToFile(file, tickData);
+                    recordedRunData[client].GetArray(previousI, prevTickData);
+                    WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+                    previousI = i;
+                    isFirstTick = false;
                     i++;
                 } while (i < recordedRunData[client].Length);
             }
@@ -565,8 +590,15 @@ static void WriteTickData(File file, int client, int replayType)
                     {
                         i = 0;
                     }
+                    if (isFirstTick)
+                    {
+                        previousI = i;
+                    }
                     recordedTickData[client].GetArray(i, tickData);
-                    WriteTickDataToFile(file, tickData);
+                    recordedTickData[client].GetArray(previousI, prevTickData);
+                    WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+                    previousI = i;
+                    isFirstTick = false;
                     i++;
                 } while (i != recordingIndex[client]);
             }
@@ -574,25 +606,43 @@ static void WriteTickData(File file, int client, int replayType)
     }
 }
 
-static void WriteTickDataToFile(File file, ReplayTickData tickData)
+static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tickDataStruct, ReplayTickData prevTickDataStruct)
 {
-	// TODO(GameChaos): replay compression.
-    file.WriteInt32(view_as<int>(tickData.vel[0]));
-    file.WriteInt32(view_as<int>(tickData.vel[1]));
-    file.WriteInt32(view_as<int>(tickData.vel[2]));
-    file.WriteInt32(tickData.mouse[0]);
-    file.WriteInt32(tickData.mouse[1]);
-    file.WriteInt32(view_as<int>(tickData.origin[0]));
-    file.WriteInt32(view_as<int>(tickData.origin[1]));
-    file.WriteInt32(view_as<int>(tickData.origin[2]));
-    file.WriteInt32(view_as<int>(tickData.angles[0]));
-    file.WriteInt32(view_as<int>(tickData.angles[1]));
-    file.WriteInt32(view_as<int>(tickData.angles[2]));
-    file.WriteInt32(tickData.flags);
-    file.WriteInt32(view_as<int>(tickData.speed));
-    file.WriteInt32(view_as<int>(tickData.packetsPerSecond));
-    file.WriteInt32(view_as<int>(tickData.laggedMovementValue));
-    file.WriteInt32(tickData.buttonsForced);
+	any tickData[RP_V2_TICK_DATA_BLOCKSIZE];
+	any prevTickData[RP_V2_TICK_DATA_BLOCKSIZE];
+	TickDataToArray(tickDataStruct, tickData);
+	TickDataToArray(prevTickDataStruct, prevTickData);
+	
+	int deltaFlags = (1 << RPDELTA_DELTAFLAGS);
+	if (isFirstTick)
+	{
+		// NOTE: Set every bit to 1 until RP_V2_TICK_DATA_BLOCKSIZE.
+		deltaFlags = (1 << (RP_V2_TICK_DATA_BLOCKSIZE)) - 1;
+	}
+	else
+	{
+		// NOTE: Test tickData against prevTickData for differences.
+		for (int i = 1; i < sizeof(tickData); i++)
+		{
+			// If the bits in tickData[i] are different to prevTickData[i], then
+			// set the corresponding bitflag.
+			if (tickData[i] ^ prevTickData[i])
+			{
+				deltaFlags |= (1 << i);
+			}
+		}
+	}
+
+	file.WriteInt32(deltaFlags);
+	// NOTE: write only data that has changed since the previous tick.
+	for (int i = 1; i < sizeof(tickData); i++)
+	{
+		int currentFlag = (1 << i);
+		if (deltaFlags & currentFlag)
+		{
+			file.WriteInt32(tickData[i]);
+		}
+	}
 }
 
 static void FormatRunReplayPath(char[] buffer, int maxlength, int course, int mode, int style, int timeType)

@@ -283,4 +283,55 @@ static void UpdateCurrentMap()
 	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
 	Format(mapBuffer, sizeof(mapBuffer), "maps/%s.bsp", mapBuffer);
 	gC_CurrentMapFileSize = FileSize(mapBuffer);
-} 
+}
+
+
+
+// =====[ PUBLIC ]=====
+
+// NOTE: These serialisation functions were made because the internal data layout of enum structs can change.
+void TickDataToArray(ReplayTickData tickData, any result[RP_V2_TICK_DATA_BLOCKSIZE])
+{
+	// NOTE: HAS to match ReplayTickData exactly!
+	result[0]  = tickData.deltaFlags;
+	result[1]  = tickData.deltaFlags2;
+	result[2]  = tickData.vel[0];
+	result[3]  = tickData.vel[1];
+	result[4]  = tickData.vel[2];
+	result[5]  = tickData.mouse[0];
+	result[6]  = tickData.mouse[1];
+	result[7]  = tickData.origin[0];
+	result[8]  = tickData.origin[1];
+	result[9]  = tickData.origin[2];
+	result[10] = tickData.angles[0];
+	result[11] = tickData.angles[1];
+	result[12] = tickData.angles[2];
+	result[13] = tickData.flags;
+	result[14] = tickData.speed;
+	result[15] = tickData.packetsPerSecond;
+	result[16] = tickData.laggedMovementValue;
+	result[17] = tickData.buttonsForced;
+}
+
+void TickDataFromArray(any array[RP_V2_TICK_DATA_BLOCKSIZE], ReplayTickData result)
+{
+	// NOTE: HAS to match ReplayTickData exactly!
+	result.deltaFlags          = array[0];
+	result.deltaFlags2         = array[1];
+	result.vel[0]              = array[2];
+	result.vel[1]              = array[3];
+	result.vel[2]              = array[4];
+	result.mouse[0]            = array[5];
+	result.mouse[1]            = array[6];
+	result.origin[0]           = array[7];
+	result.origin[1]           = array[8];
+	result.origin[2]           = array[9];
+	result.angles[0]           = array[10];
+	result.angles[1]           = array[11];
+	result.angles[2]           = array[12];
+	result.flags               = array[13];
+	result.speed               = array[14];
+	result.packetsPerSecond    = array[15];
+	result.laggedMovementValue = array[16];
+	result.buttonsForced       = array[17];
+}

@@ -397,7 +397,7 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(RP_V1_TICK_DATA_BLOCKSIZE), length);
+		playbackTickData[bot] = new ArrayList(RP_V1_TICK_DATA_BLOCKSIZE, length);
 	}
 	else
 	{  // Make sure it's all clear and the correct size
@@ -594,27 +594,22 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	
 	// Read tick data
 	preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
+	any tickDataArray[RP_V2_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < tickCount + preAndPostRunTickCount; i++)
 	{
-		ReplayTickData tickData;
-		// TODO(GameChaos): replay compression.
-		file.ReadInt32(view_as<int>(tickData.vel[0]));
-		file.ReadInt32(view_as<int>(tickData.vel[1]));
-		file.ReadInt32(view_as<int>(tickData.vel[2]));
-		file.ReadInt32(tickData.mouse[0]);
-		file.ReadInt32(tickData.mouse[1]);
-		file.ReadInt32(view_as<int>(tickData.origin[0]));
-		file.ReadInt32(view_as<int>(tickData.origin[1]));
-		file.ReadInt32(view_as<int>(tickData.origin[2]));
-		file.ReadInt32(view_as<int>(tickData.angles[0]));
-		file.ReadInt32(view_as<int>(tickData.angles[1]));
-		file.ReadInt32(view_as<int>(tickData.angles[2]));
-		file.ReadInt32(tickData.flags);
-		file.ReadInt32(view_as<int>(tickData.speed));
-		file.ReadInt32(view_as<int>(tickData.packetsPerSecond));
-		file.ReadInt32(view_as<int>(tickData.laggedMovementValue));
-		file.ReadInt32(tickData.buttonsForced);
+		file.ReadInt32(tickDataArray[RPDELTA_DELTAFLAGS]);
 		
+		for (int index = 1; index < sizeof(tickDataArray); index++)
+		{
+			int currentFlag = (1 << index);
+			if (tickDataArray[RPDELTA_DELTAFLAGS] & currentFlag)
+			{
+				file.ReadInt32(tickDataArray[index]);
+			}
+		}
+		
+		ReplayTickData tickData;
+		TickDataFromArray(tickDataArray, tickData);
 		// HACK: Jump replays don't record proper length sometimes. I don't know why.
 		//		 This leads to oversized replays full of 0s at the end.
 		// 		 So, we do this horrible check to dodge that issue.

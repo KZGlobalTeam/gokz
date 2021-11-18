@@ -22,6 +22,26 @@ enum
 	REPLAYTYPE_COUNT
 };
 
+// NOTE: Replays use delta compression for storage.
+// This enum is the indices of the ReplayTickData enum struct.
+// NOTE: This has to match the ReplayTickData enum struct!!!
+enum
+{
+	RPDELTA_DELTAFLAGS = 0,
+	RPDELTA_DELTAFLAGS2,
+	RPDELTA_VEL[3],
+	RPDELTA_MOUSE[2],
+	RPDELTA_ORIGIN[3],
+	RPDELTA_ANGLES[3],
+	RPDELTA_FLAGS,
+	RPDELTA_SPEED,
+	RPDELTA_PACKETSPERSECOND,
+	RPDELTA_LAGGEDMOVEMENTVALUE,
+	RPDELTA_BUTTONSFORCED,
+	
+	RP_V2_TICK_DATA_BLOCKSIZE
+};
+
 
 
 // =====[ STRUCTS ] =====
@@ -72,8 +92,11 @@ enum struct RunReplayHeader
 	int teleportsUsed;
 }
 
+// NOTE: Make sure to change the RPDELTA_* enum, TickDataToArray() and TickDataFromArray() when adding/removing stuff from this!!!
 enum struct ReplayTickData
 {
+	int deltaFlags;
+	int deltaFlags2;
 	float vel[3];
 	int mouse[2];
 	float origin[3];
@@ -99,7 +122,6 @@ enum struct ReplayTickData
 #define RP_FORMAT_VERSION 0x02
 #define RP_NAV_FILE "maps/gokz-replays.nav"
 #define RP_V1_TICK_DATA_BLOCKSIZE 7
-#define RP_V2_TICK_DATA_BLOCKSIZE 16
 #define RP_CACHE_BLOCKSIZE 4
 #define RP_MAX_BOTS 2
 #define RP_PLAYBACK_BREATHER_TIME 2.0
