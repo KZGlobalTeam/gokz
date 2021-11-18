@@ -581,6 +581,11 @@ static void WriteTickData(File file, int client, int replayType)
 
 static void WriteTickDataToFile(File file, ReplayTickData tickData)
 {
+    file.WriteInt32(view_as<int>(tickData.vel[0]));
+    file.WriteInt32(view_as<int>(tickData.vel[1]));
+    file.WriteInt32(view_as<int>(tickData.vel[2]));
+    file.WriteInt32(tickData.mouse[0]);
+    file.WriteInt32(tickData.mouse[1]);
     file.WriteInt32(view_as<int>(tickData.origin[0]));
     file.WriteInt32(view_as<int>(tickData.origin[1]));
     file.WriteInt32(view_as<int>(tickData.origin[2]));
@@ -588,6 +593,9 @@ static void WriteTickDataToFile(File file, ReplayTickData tickData)
     file.WriteInt32(view_as<int>(tickData.angles[1]));
     file.WriteInt32(tickData.flags);
     file.WriteInt32(view_as<int>(tickData.speed));
+    file.WriteInt32(view_as<int>(tickData.packetsPerSecond));
+    file.WriteInt32(view_as<int>(tickData.laggedMovementValue));
+    file.WriteInt32(tickData.buttonsForced);
 }
 
 static void FormatRunReplayPath(char[] buffer, int maxlength, int course, int mode, int style, int timeType)

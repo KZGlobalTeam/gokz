@@ -597,6 +597,11 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	for (int i = 0; i < tickCount + preAndPostRunTickCount; i++)
 	{
 		ReplayTickData tickData;
+		file.ReadInt32(view_as<int>(tickData.vel[0]));
+		file.ReadInt32(view_as<int>(tickData.vel[1]));
+		file.ReadInt32(view_as<int>(tickData.vel[2]));
+		file.ReadInt32(tickData.mouse[0]);
+		file.ReadInt32(tickData.mouse[1]);
 		file.ReadInt32(view_as<int>(tickData.origin[0]));
 		file.ReadInt32(view_as<int>(tickData.origin[1]));
 		file.ReadInt32(view_as<int>(tickData.origin[2]));
@@ -604,6 +609,9 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		file.ReadInt32(view_as<int>(tickData.angles[1]));
 		file.ReadInt32(tickData.flags);
 		file.ReadInt32(view_as<int>(tickData.speed));
+		file.ReadInt32(view_as<int>(tickData.packetsPerSecond));
+		file.ReadInt32(view_as<int>(tickData.laggedMovementValue));
+		file.ReadInt32(tickData.buttonsForced);
 		
 		// HACK: Jump replays don't record proper length sometimes. I don't know why.
 		//		 This leads to oversized replays full of 0s at the end.
