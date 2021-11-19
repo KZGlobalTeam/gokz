@@ -94,7 +94,12 @@ void GetPlaybackState(int client, HUDInfo info)
 		bot = botClient[i] == client ? i : bot;
 	}
 	if (i == RP_MAX_BOTS + 1) return;
-
+	
+	if (playbackTickData[bot] == INVALID_HANDLE)
+	{
+		return;
+	}
+	
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
 	if (playbackTick[bot] < preAndPostRunTickCount)
 	{
