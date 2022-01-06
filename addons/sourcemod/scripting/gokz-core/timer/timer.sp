@@ -71,6 +71,9 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool autoResta
 		GOKZ_Resume(client);
 	}
 	
+	// Prevent noclip exploit
+	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+
 	// Start Timer
 	currentTime[client] = 0.0;
 	timerRunning[client] = true;
