@@ -1,4 +1,4 @@
-image: i386/alpine:3.9
+image: alpine:3.13
 
 definitions:
   step: &compile
@@ -7,12 +7,12 @@ definitions:
       - addons/sourcemod/plugins/gokz-*.smx
     script:
       - apk update
-      - apk add wget libc6-compat libstdc++
+      - apk add wget gcompat libstdc++
       - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=${SM_VERSION}" | tar x -vzf -
       - cd ./addons/sourcemod/scripting
       - export BITBUCKET_COMMIT_SHORT=$(echo ${BITBUCKET_COMMIT} | cut -c1-7)
       - echo "#define GOKZ_VERSION \"${BITBUCKET_COMMIT_SHORT}\"" > include/gokz/version.inc
-      - for file in gokz-*.sp; do ./spcomp $file; done;
+      - for file in gokz-*.sp; do ./spcomp64 $file; done;
       - cd ../../../
       - mv addons/sourcemod/scripting/*.smx addons/sourcemod/plugins
 
@@ -37,11 +37,11 @@ pipelines:
             - addons/sourcemod/plugins/gokz-*.smx
           script:
             - apk update
-            - apk add wget libc6-compat libstdc++
+            - apk add wget gcompat libstdc++
             - wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=${SM_VERSION}" | tar x -vzf -
             - cd ./addons/sourcemod/scripting
             - echo "#define GOKZ_VERSION \"${BITBUCKET_TAG}\"" > include/gokz/version.inc
-            - for file in gokz-*.sp; do ./spcomp $file; done;
+            - for file in gokz-*.sp; do ./spcomp64 $file; done;
             - cd ../../../
             - mv addons/sourcemod/scripting/*.smx addons/sourcemod/plugins
       - step: 

@@ -462,6 +462,9 @@ public void ContinueHoldStill(DataPack data)
 			Movement_SetMovetype(client, MOVETYPE_LADDER);
 		}
 		
+		// Prevent noclip exploit
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+		
 		// Force duck on player and make sure that the player can't trigger triggers above them.
 		// they can still trigger triggers even when we force ducking.
 		if (ducked)
