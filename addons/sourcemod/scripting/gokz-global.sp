@@ -621,7 +621,7 @@ public int GetModeInfoCallback(JSON_Object modes, GlobalAPIRequestData request)
 
 public int GetMapCallback(JSON_Object map_json, GlobalAPIRequestData request)
 {
-	if (request.Failure)
+	if (request.Failure || map_json == INVALID_HANDLE)
 	{
 		LogError("Failed to get map info.");
 		return;

@@ -40,8 +40,8 @@ void CreateNatives()
 {
 	CreateNative("GOKZ_GL_PrintRecords", Native_PrintRecords);
 	CreateNative("GOKZ_GL_DisplayMapTopMenu", Native_DisplayMapTopMenu);
-	CreateNative("GOKZ_GL_GetProPoints", Native_GetPoints);
-	CreateNative("GOKZ_GL_GetProMapPoints", Native_GetMapPoints);
+	CreateNative("GOKZ_GL_GetPoints", Native_GetPoints);
+	CreateNative("GOKZ_GL_GetMapPoints", Native_GetMapPoints);
 	CreateNative("GOKZ_GL_GetRankPoints", Native_GetRankPoints);
 	CreateNative("GOKZ_GL_GetFinishes", Native_GetFinishes);
 	CreateNative("GOKZ_GL_UpdatePoints", Native_UpdatePoints);
