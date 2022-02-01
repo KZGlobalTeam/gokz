@@ -12,12 +12,12 @@ void OnPluginStart_TeamNumber()
 	}
 	
 	StartPrepSDKCall(SDKCall_Entity);
-	PrepSDKCall_SetVirtual(gamedataConf.GetOffset("CCSTeam:RemovePlayer"));
+	PrepSDKCall_SetVirtual(gamedataConf.GetOffset("CCSTeam::RemovePlayer"));
 	PrepSDKCall_AddParameter(SDKType_CBasePlayer, SDKPass_Pointer);
 	H_RemovePlayer = EndPrepSDKCall();
 	if (H_RemovePlayer == INVALID_HANDLE)
 	{
-		SetFailState("Unable to prepare SDKCall for CCSTeam:RemovePlayer!");
+		SetFailState("Unable to prepare SDKCall for CCSTeam::RemovePlayer!");
 	}
 }
 
