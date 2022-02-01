@@ -19,17 +19,20 @@ void ShowProfile(int client, int player = 0)
 		profileTargetPlayer[client] = player;
 		profileMode[client] = GOKZ_GetCoreOption(player, Option_Mode);
 	}
-		
+	
 	if (GOKZ_GL_GetRankPoints(profileTargetPlayer[client], profileMode[client]) < 0)
 	{
-		GOKZ_GL_UpdatePoints(profileTargetPlayer[client], profileMode[client]);
-		profileWaitingForUpdate[client] = true;
+		if (!profileWaitingForUpdate[client])
+		{
+			GOKZ_GL_UpdatePoints(profileTargetPlayer[client], profileMode[client]);
+			profileWaitingForUpdate[client] = true;
+		}
 		return;
 	}
 	
 	profileWaitingForUpdate[client] = false;
 	Menu menu = new Menu(MenuHandler_Profile);
-	menu.SetTitle("%T", "Profile Menu - Title", client);
+	menu.SetTitle("%T - %N", "Profile Menu - Title", client, profileTargetPlayer[client]);
 	ProfileMenuAddItems(client, menu);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -79,7 +82,13 @@ public int MenuHandler_Profile(Menu menu, MenuAction action, int param1, int par
 		}
 		else if (StrEqual(info, ITEM_INFO_RANK, false))
 		{
-			// TODO Show rank info
+			ShowRankInfo(param1);
+			return;
+		}
+		else if (StrEqual(info, ITEM_INFO_POINTS, false))
+		{
+			ShowPointsInfo(param1);
+			return;
 		}
 		
 		ShowProfile(param1);
@@ -100,10 +109,6 @@ static void ProfileMenuAddItems(int client, Menu menu)
 	int player = profileTargetPlayer[client];
 	int mode = profileMode[client];
 	
-	FormatEx(display, sizeof(display), "%T: %N",
-			 "Profile Menu - Name", client, player);
-	menu.AddItem(ITEM_INFO_NAME, display);
-	
 	FormatEx(display, sizeof(display), "%T: %s",
 			 "Profile Menu - Mode", client, gC_ModeNames[mode]);
 	menu.AddItem(ITEM_INFO_MODE, display);
@@ -115,12 +120,101 @@ static void ProfileMenuAddItems(int client, Menu menu)
 	FormatEx(display, sizeof(display), "%T: %d",
 			 "Profile Menu - Points", client, GOKZ_GL_GetRankPoints(player, mode));
 	menu.AddItem(ITEM_INFO_POINTS, display);
+}
+
+static void ShowRankInfo(int client)
+{
+	Menu menu = new Menu(MenuHandler_RankInfo);
+	menu.SetTitle("%T - %N", "Rank Info Menu - Title", client, profileTargetPlayer[client]);
+	RankInfoMenuAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+static void RankInfoMenuAddItems(int client, Menu menu)
+{
+	char display[32];
+	int player = profileTargetPlayer[client];
+	int mode = profileMode[client];
+	
+	FormatEx(display, sizeof(display), "%T: %s",
+			 "Rank Info Menu - Current Rank", client, gC_rankName[gI_Rank[player][mode]]);
+	menu.AddItem("", display);
+	
+	int next_rank = gI_Rank[player][mode] + 1;
+	PrintToServer("%d", next_rank);
+	if (next_rank == RANK_COUNT)
+	{
+		FormatEx(display, sizeof(display), "%T: -",
+			 "Rank Info Menu - Next Rank", client);
+		menu.AddItem("", display);
+		
+		FormatEx(display, sizeof(display), "%T: 0",
+				 "Rank Info Menu - Points needed", client);
+		menu.AddItem("", display);
+	}
+	else
+	{
+		FormatEx(display, sizeof(display), "%T: %s",
+			 "Rank Info Menu - Next Rank", client, gC_rankName[next_rank]);
+		menu.AddItem("", display);
+		
+		FormatEx(display, sizeof(display), "%T: %d",
+				 "Rank Info Menu - Points needed", client, gI_rankThreshold[mode][next_rank] - GOKZ_GL_GetRankPoints(player, mode));
+		menu.AddItem("", display);
+	}
+}
+
+static int MenuHandler_RankInfo(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Cancel)
+	{
+		ShowProfile(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+static void ShowPointsInfo(int client)
+{
+	Menu menu = new Menu(MenuHandler_PointsInfo);
+	menu.SetTitle("%T - %N", "Points Info Menu - Title", client, profileTargetPlayer[client]);
+	PointsInfoMenuAddItems(client, menu);
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+static void PointsInfoMenuAddItems(int client, Menu menu)
+{
+	char display[32];
+	int player = profileTargetPlayer[client];
+	int mode = profileMode[client];
 	
 	FormatEx(display, sizeof(display), "%T: %d",
-			 "Profile Menu - Overall Completion", client, GOKZ_GL_GetFinishes(player, mode, TimeType_Nub));
-	menu.AddItem(ITEM_INFO_POINTS, display);
+			 "Points Info Menu - Overall Points", client, GOKZ_GL_GetPoints(player, mode, TimeType_Nub));
+	menu.AddItem("", display);
 	
 	FormatEx(display, sizeof(display), "%T: %d",
-			 "Profile Menu - Pro Completion", client, GOKZ_GL_GetFinishes(player, mode, TimeType_Pro));
-	menu.AddItem(ITEM_INFO_POINTS, display);
+			 "Points Info Menu - Pro Points", client, GOKZ_GL_GetPoints(player, mode, TimeType_Pro));
+	menu.AddItem("", display);
+	
+	FormatEx(display, sizeof(display), "%T: %d",
+			 "Points Info Menu - Overall Completion", client, GOKZ_GL_GetFinishes(player, mode, TimeType_Nub));
+	menu.AddItem("", display);
+	
+	FormatEx(display, sizeof(display), "%T: %d",
+			 "Points Info Menu - Pro Completion", client, GOKZ_GL_GetFinishes(player, mode, TimeType_Pro));
+	menu.AddItem("", display);
+}
+
+static int MenuHandler_PointsInfo(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Cancel)
+	{
+		ShowProfile(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 }

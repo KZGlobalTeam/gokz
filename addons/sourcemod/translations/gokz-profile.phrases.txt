@@ -59,13 +59,41 @@
 	{
 		"en"		"Points"
 	}
-	"Profile Menu - Overall Completion"
+	"Rank Info Menu - Title"
 	{
-		"en"		"Nub"
+		"en"		"Rank Info"
 	}
-	"Profile Menu - Pro Completion"
+	"Rank Info Menu - Current Rank"
 	{
-		"en"		"Pro"
+		"en"		"Current"
+	}
+	"Rank Info Menu - Next Rank"
+	{
+		"en"		"Next"
+	}
+	"Rank Info Menu - Points needed"
+	{
+		"en"		"Points needed"
+	}
+	"Points Info Menu - Title"
+	{
+		"en"		"Point Info"
+	}
+	"Points Info Menu - Overall Points"
+	{
+		"en"		"Nub Points"
+	}
+	"Points Info Menu - Pro Points"
+	{
+		"en"		"Pro Points"
+	}
+	"Points Info Menu - Overall Completion"
+	{
+		"en"		"Nub runs"
+	}
+	"Points Info Menu - Pro Completion"
+	{
+		"en"		"Pro runs"
 	}
 	
 	//=====[ TAGS ]=====
