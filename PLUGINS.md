@@ -20,13 +20,9 @@ Tracks player inputs and automatically bans them if they are, without a doubt, u
 
 A simple chat processor. Also blocks many game messages to keep chat relatively clean.
 
-### gokz-clantags
-
-Sets the clan tags of players to show what mode they are currently playing.
-
 ### gokz-global
 
-Uses the [GlobalAPI SourceMod plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) to link the server to a global database, allowing players to compete across servers by submitting their timer to a global leaderboard. Also enforces several configuration restrictions and a global ban list. **Requires gokz-replays and gokz-anticheat. Integrates with gokz-localranks menus.**
+Uses the [GlobalAPI SourceMod plugin](https://bitbucket.org/kztimerglobalteam/globalapi-smplugin) to link the server to a global database, allowing players to compete across servers by submitting their timer to a global leaderboard. Also enforces several configuration restrictions and a global ban list. **Requires gokz-replays and gokz-anticheat. Integrates with gokz-localranks menus.**
 
 ### gokz-goto
 
@@ -62,6 +58,10 @@ Adds an option allowing the player to pick a pistol to be equipped with.
 ### gokz-playermodels
 
 Sets player models upon spawning to models that have more subtle landing animations.
+
+### gokz-profile
+
+Displays information about players, including ranks derived from the Global API.
 
 ### gokz-quiet
 

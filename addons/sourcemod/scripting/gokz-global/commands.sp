@@ -11,7 +11,6 @@ void RegisterCommands()
 	RegConsoleCmd("sm_gbwr", CommandPrintBonusRecords, "[KZ] Show bonus global record times in chat. Usage: !bgwr <#bonus> <map>");
 	RegConsoleCmd("sm_gmaptop", CommandMapTop, "[KZ] Open a menu showing the top global main course times of a map. Usage: !gmaptop <map>");
 	RegConsoleCmd("sm_gbmaptop", CommandBonusMapTop, "[KZ] Open a menu showing the top global bonus times of a map. Usage: !gbmaptop <#bonus> <map>");
-	RegConsoleCmd("sm_gpoints", CommandPoints, "[KZ] Show the global points of the player overall and on the current map.");
 }
 
 public Action CommandGlobalCheck(int client, int args)
@@ -166,16 +165,5 @@ public Action CommandBonusMapTop(int client, int args)
 			GOKZ_PrintToChat(client, true, "%t", "Invalid Bonus Number", argBonus);
 		}
 	}
-	return Plugin_Handled;
-}
-
-public Action CommandPoints(int client, int args)
-{
-	KZPlayer player = KZPlayer(client);
-	int mode = player.Mode;
-	
-	GOKZ_PrintToChat(client, true, "%t", "Total Points", GetPoints(client, mode, TimeType_Pro), GetPoints(client, mode, TimeType_Nub));
-	GOKZ_PrintToChat(client, true, "%t", "Map Points", GetMapPoints(client, mode, TimeType_Pro), GetMapPoints(client, mode, TimeType_Nub));
-	
 	return Plugin_Handled;
 }

@@ -307,7 +307,7 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
     FROM Times AS b \
     WHERE a.MapCourseID=b.MapCourseID AND a.Mode=b.Mode \
     AND a.Created>b.Created AND a.RunTime>b.RunTime) \
-    ORDER BY a.Created DESC \
+    ORDER BY a.TimeID DESC \
     LIMIT %d";
 
 char sql_getrecentrecords_pro[] = "\
@@ -322,7 +322,7 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
     FROM Times AS b \
     WHERE b.Teleports=0 AND a.MapCourseID=b.MapCourseID AND a.Mode=b.Mode \
     AND a.Created>b.Created AND a.RunTime>b.RunTime) \
-    ORDER BY a.Created DESC \
+    ORDER BY a.TimeID DESC \
     LIMIT %d";
 
 

@@ -52,7 +52,7 @@ void CreateGlobalForwards()
 	H_OnTimerStopped = new GlobalForward("GOKZ_OnTimerStopped", ET_Ignore, Param_Cell);
 	H_OnPause = new GlobalForward("GOKZ_OnPause", ET_Hook, Param_Cell);
 	H_OnPause_Post = new GlobalForward("GOKZ_OnPause_Post", ET_Ignore, Param_Cell);
-	H_OnResume = new GlobalForward("GOKZ_OnResume_Post", ET_Hook, Param_Cell);
+	H_OnResume = new GlobalForward("GOKZ_OnResume", ET_Hook, Param_Cell);
 	H_OnResume_Post = new GlobalForward("GOKZ_OnResume_Post", ET_Ignore, Param_Cell);
 	H_OnMakeCheckpoint = new GlobalForward("GOKZ_OnMakeCheckpoint", ET_Hook, Param_Cell);
 	H_OnMakeCheckpoint_Post = new GlobalForward("GOKZ_OnMakeCheckpoint_Post", ET_Ignore, Param_Cell);

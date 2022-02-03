@@ -326,6 +326,11 @@ methodmap APIPlayerRank < JSON_Object
 		public get() { return this.GetInt("points"); }
 	}
 
+	property int PointsOverall
+	{
+		public get() { return this.GetInt("points_overall"); }
+	}
+
 	property float Average
 	{
 		public get() { return this.GetFloat("average"); }

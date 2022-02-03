@@ -11,6 +11,10 @@
 #pragma newdecls required
 #pragma semicolon 1
 
+/*
+	Lets players measure the distance between two points.
+	Credits to DaFox (https://forums.alliedmods.net/showthread.php?t=88830?t=88830)
+*/
 
 
 public Plugin myinfo = 
@@ -25,10 +29,16 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-measure.txt"
 
 int gI_BeamModel;
+bool gB_Measuring[MAXPLAYERS + 1];
+bool gB_MeasurePosSet[MAXPLAYERS + 1][2];
+float gF_MeasurePos[MAXPLAYERS + 1][2][3];
+float gF_MeasureNormal[MAXPLAYERS + 1][2][3];
+Handle gH_P2PRed[MAXPLAYERS + 1];
+Handle gH_P2PGreen[MAXPLAYERS + 1];
 
+#include "gokz-measure/measurer.sp"
 #include "gokz-measure/commands.sp"
 #include "gokz-measure/measure_menu.sp"
-
 
 
 // =====[ PLUGIN EVENTS ]=====
