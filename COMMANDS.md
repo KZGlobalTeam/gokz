@@ -53,6 +53,8 @@
 ### gokz-measure
 
  * `!measure` - Open the distance measurement menu.
+ * `+measure` - Start measuring (bind to a key)
+ * `!measureblock` - Measure the gap of a block you're currently aiming at.
 
 ### gokz-goto
 
@@ -129,8 +131,15 @@ Many of these commands return results for your currently selected mode.
  * `!tier` - Show the map's tier in chat.
  * `!gr`/`!gwr` - Show main course global record times in chat. Usage: `!gr <map>`
  * `!gbr`/`!gbwr` - Show bonus global record times in chat. Usage: `!bgr <#bonus> <map>`
+ * `!gpb` - Show your personal best for a map. Usage: `!gpb <map>`
+ * `!gbpb` - Show your personal best for a bonus on the current map. Usage: `!gbpb <#bonus>`
  * `!gmaptop` - Open a menu showing the top global main course times of a map. Usage: `!gmaptop <map>`
  * `!gbmaptop` - Open a menu showing the top global bonus times of a map. Usage: `!gbmaptop <#bonus> <map>`
+
+### gokz-profile
+
+ * `!profile`/`!p` - Open the profile of a player. Usage: `!p <player>`
+ * `!profileoptions`/`!pfo` - Open the profile options menu.
 
 # Admin Commands
 
