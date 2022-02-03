@@ -294,7 +294,15 @@ public int Native_SetChatTag(Handle plugin, int numParams)
 	
 	char str[64];
 	GetNativeString(2, str, sizeof(str));
-	FormatEx(gC_PlayerTags[client], sizeof(gC_PlayerTags[]), "[%s %s] ", gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)], str);
+	if (str[0] == '\0')
+	{
+		// To prevent the space after the mode
+		FormatEx(gC_PlayerTags[client], sizeof(gC_PlayerTags[]), "[%s] ", gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+	}
+	else
+	{
+		FormatEx(gC_PlayerTags[client], sizeof(gC_PlayerTags[]), "[%s %s] ", gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)], str);
+	}
 	
 	GetNativeString(3, gC_PlayerTagColors[client], sizeof(gC_PlayerTagColors[]));
 }

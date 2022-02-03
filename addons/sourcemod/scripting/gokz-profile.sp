@@ -187,12 +187,6 @@ public void UpdateRank(int client, int mode)
 	
 	
 	int points = GOKZ_GL_GetRankPoints(client, mode);
-	if (points == -1)
-	{
-		UpdateTags(client, -1, mode);
-		return;
-	}
-	
 	int rank;
 	for (rank = 1; rank < RANK_COUNT; rank++)
 	{
@@ -205,7 +199,14 @@ public void UpdateRank(int client, int mode)
 	
 	if (GOKZ_GetCoreOption(client, Option_Mode) == mode)
 	{
-		UpdateTags(client, rank, mode);
+		if (points == -1)
+		{
+			UpdateTags(client, -1, mode);
+		}
+		else
+		{
+			UpdateTags(client, rank, mode);
+		}
 	}
 	
 	if (gI_Rank[client][mode] != rank)
@@ -226,7 +227,7 @@ void UpdateTags(int client, int rank, int mode)
 	}
 	else
 	{
-		CS_SetClientClanTag(client, gC_ModeNames[GOKZ_GetCoreOption(client, Option_Mode)]);
+		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
 	}
 	
 	if (gB_Chat)
