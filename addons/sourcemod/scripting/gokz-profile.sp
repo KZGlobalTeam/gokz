@@ -161,30 +161,37 @@ public void UpdateRank(int client, int mode)
 	
 	if (tagType != ProfileTagType_Rank)
 	{
-		char tag[64], color[64];
+		char clanTag[64], chatTag[32], color[64];
 		
 		if (tagType == ProfileTagType_Admin)
 		{
-			FormatEx(tag, sizeof(tag), "[%s %T]", "Tag - Admin", gC_ModeNamesShort[mode], client);
+			FormatEx(clanTag, sizeof(clanTag), "[%s %T]", gC_ModeNamesShort[mode], "Tag - Admin", client);
+			FormatEx(chatTag, sizeof(chatTag), "%T", "Tag - Admin", client);
 			color = TAG_COLOR_ADMIN;
 		}
 		if (tagType == ProfileTagType_VIP)
 		{
-			FormatEx(tag, sizeof(tag), "[%s %T]", "Tag - VIP", gC_ModeNamesShort[mode], client);
+			FormatEx(clanTag, sizeof(clanTag), "[%s %T]", gC_ModeNamesShort[mode], "Tag - VIP", client);
+			FormatEx(chatTag, sizeof(chatTag), "%T", "Tag - VIP", client);
 			color = TAG_COLOR_VIP;
 		}
 		
-		if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
+		if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) != ProfileOptionBool_Enabled)
 		{
-			CS_SetClientClanTag(client, tag);
+			FormatEx(clanTag, sizeof(clanTag), "[%s]", gC_ModeNamesShort[mode]);
 		}
+		CS_SetClientClanTag(client, clanTag);
+		
 		if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankChat]) == ProfileOptionBool_Enabled)
 		{
-			GOKZ_CH_SetChatTag(client, tag, color);
+			GOKZ_CH_SetChatTag(client, chatTag, color);
+		}
+		else
+		{
+			GOKZ_CH_SetChatTag(client, "", "{default}");
 		}
 		return;
 	}
-	
 	
 	int points = GOKZ_GL_GetRankPoints(client, mode);
 	int rank;
@@ -218,16 +225,17 @@ public void UpdateRank(int client, int mode)
 
 void UpdateTags(int client, int rank, int mode)
 {
+	char str[64];
 	if (rank != -1 &&
 	    GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
 	{
-		char str[64];
 		FormatEx(str, sizeof(str), "[%s %s]", gC_ModeNamesShort[mode], gC_rankName[rank]);
 		CS_SetClientClanTag(client, str);
 	}
 	else
 	{
-		CS_SetClientClanTag(client, gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+		FormatEx(str, sizeof(str), "[%s]", gC_ModeNamesShort[mode]);
+		CS_SetClientClanTag(client, str);
 	}
 	
 	if (gB_Chat)
@@ -239,7 +247,7 @@ void UpdateTags(int client, int rank, int mode)
 		}
 		else
 		{
-			GOKZ_CH_SetChatTag(client, "", "");
+			GOKZ_CH_SetChatTag(client, "", "{default}");
 		}
 	}
 }

@@ -9,7 +9,7 @@
 	{
 		"en"		"Show rank in chat"
 	}
-	"Options Menu - Show Rank Clan Tag"
+	"Options Menu - Show Rank Clan"
 	{
 		"en"		"Show rank on scoreboard"
 	}
