@@ -975,7 +975,7 @@ enum struct JumpTracker
 		if (checkOffset)
 		{
 			endBlock[2] += 1.0;
-			if (FloatAbs(this.FindBlockHeight(endBlock, float(distSign) * 17.0, coordDist, 1.0) - landingOrigin[2] - 0.031250) > EPSILON)
+			if (FloatAbs(this.FindBlockHeight(endBlock, float(distSign) * 17.0, coordDist, 1.0) - landingOrigin[2]) > EPSILON)
 			{
 				return;
 			}
