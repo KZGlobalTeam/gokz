@@ -33,6 +33,11 @@
 		"#format"	"{1:d}"
 		"en"		"{grey}Deleted jump with id {default}{1}"
 	}
+	"Time Deleted"
+	{
+		"#format"	"{1:d}"
+		"en"		"{grey}Deleted time with id {default}{1}"
+	}
 	"No SteamID specified"
 	{
 		"en"		"{darkred}No SteamID specified."
@@ -57,6 +62,10 @@
 	{
 		"en"		"{darkred}Invalid jump id."
 	}
+	"Invalid Time ID"
+	{
+		"en"		"{darkred}Invalid time id."
+	}
 	"Delete Best Jump Usage"
 	{
 		"en"		"Usage: !deletebestjump <STEAM_1:X:X> <mode> <jump type> <block?>"
@@ -69,6 +78,10 @@
 	"Delete Jump Usage"
 	{
 		"en"		"Usage: !deletejump <id>"
+	}
+	"Delete Time Usage"
+	{
+		"en"		"Usage: !deletetime <id>"
 	}
 	"Set Cheater"
 	{

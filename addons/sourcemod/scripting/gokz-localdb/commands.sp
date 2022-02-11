@@ -10,6 +10,7 @@ void RegisterCommands()
 	RegAdminCmd("sm_deletebestjump", CommandDeleteBestJump, ADMFLAG_ROOT, "[KZ] Remove the top jumpstat of a SteamID. Usage: !deletebestjump <STEAM_1:X:X> <mode> <jump type> <block?>");
 	RegAdminCmd("sm_deletealljumps", CommandDeleteAllJumps, ADMFLAG_ROOT, "[KZ] Remove all jumpstats of a SteamID. Usage: !deletealljumps <STEAM_1:X:X>");
 	RegAdminCmd("sm_deletejump", CommandDeleteJump, ADMFLAG_ROOT, "[KZ] Remove jumpstat by it's ID. Usage: !deletejump <ID>");
+	RegAdminCmd("sm_deletetime", CommandDeleteTime, ADMFLAG_ROOT, "[KZ] Remove a time by it's id. Usage: !deletetime <id>");
 }
 
 public Action Command_SaveTimerSetup(int client, int args)
@@ -171,6 +172,28 @@ public Action CommandDeleteJump(int client, int args)
 	}
 
 	DB_DeleteJump(client, jumpID);
-	
+
+	return Plugin_Handled;
+}
+
+public Action CommandDeleteTime(int client, int args)
+{
+	if (args < 1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Delete Time Usage");
+		return Plugin_Handled;
+	}
+
+	char buffer[24];
+	int timeID;
+	GetCmdArgString(buffer, sizeof(buffer));
+	if (StringToIntEx(buffer, timeID) == 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Invalid Time ID");
+		return Plugin_Handled;
+	}
+
+	DB_DeleteTime(client, timeID);
+
 	return Plugin_Handled;
 }
