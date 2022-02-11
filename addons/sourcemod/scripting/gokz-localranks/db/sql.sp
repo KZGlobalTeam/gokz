@@ -94,7 +94,7 @@ SELECT Times.RunTime \
     LIMIT %d";
 
 char sql_getmaptop[] = "\
-SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
+SELECT t.TimeID, t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     FROM Times t \
     INNER JOIN MapCourses mc ON mc.MapCourseID=t.MapCourseID \
     INNER JOIN Players p ON p.SteamID32=t.SteamID32 \
@@ -105,7 +105,7 @@ SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     LIMIT %d";
 
 char sql_getmaptoppro[] = "\
-SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
+SELECT t.TimeID, t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     FROM Times t \
     INNER JOIN MapCourses mc ON mc.MapCourseID=t.MapCourseID \
     INNER JOIN Players p ON p.SteamID32=t.SteamID32 \
