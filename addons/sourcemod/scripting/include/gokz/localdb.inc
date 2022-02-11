@@ -35,7 +35,8 @@ enum
 
 enum
 {
-	JumpstatDB_Top20_SteamID = 0, 
+	JumpstatDB_Top20_JumpID = 0,
+	JumpstatDB_Top20_SteamID, 
 	JumpstatDB_Top20_Alias, 
 	JumpstatDB_Top20_Block, 
 	JumpstatDB_Top20_Distance, 
