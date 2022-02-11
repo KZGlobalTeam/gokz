@@ -9,7 +9,7 @@ void RegisterCommands()
 	RegAdminCmd("sm_setnotcheater", CommandSetNotCheater, ADMFLAG_ROOT, "[KZ] Set a SteamID as not a cheater. Usage: !setnotcheater <STEAM_1:X:X>");
 	RegAdminCmd("sm_deletebestjump", CommandDeleteBestJump, ADMFLAG_ROOT, "[KZ] Remove the top jumpstat of a SteamID. Usage: !deletebestjump <STEAM_1:X:X> <mode> <jump type> <block?>");
 	RegAdminCmd("sm_deletealljumps", CommandDeleteAllJumps, ADMFLAG_ROOT, "[KZ] Remove all jumpstats of a SteamID. Usage: !deletealljumps <STEAM_1:X:X>");
-	RegAdminCmd("sm_deletejump", CommandDeleteJump, ADMFLAG_ROOT, "[KZ] Remove jumpstat by it's ID. Usage: !deletejump <ID>");
+	RegAdminCmd("sm_deletejump", CommandDeleteJump, ADMFLAG_ROOT, "[KZ] Remove a jumpstat by it's id. Usage: !deletejump <id>");
 	RegAdminCmd("sm_deletetime", CommandDeleteTime, ADMFLAG_ROOT, "[KZ] Remove a time by it's id. Usage: !deletetime <id>");
 }
 
