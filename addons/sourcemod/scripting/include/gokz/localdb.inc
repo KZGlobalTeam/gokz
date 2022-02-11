@@ -49,7 +49,8 @@ enum
 
 enum
 {
-	JumpstatDB_PBMenu_JumpType = 0,
+	JumpstatDB_PBMenu_JumpID = 0,
+	JumpstatDB_PBMenu_JumpType,
 	JumpstatDB_PBMenu_Distance,
 	JumpstatDB_PBMenu_Strafes,
 	JumpstatDB_PBMenu_Sync,
@@ -60,7 +61,8 @@ enum
 
 enum
 {
-	JumpstatDB_BlockPBMenu_JumpType = 0,
+	JumpstatDB_BlockPBMenu_JumpID = 0,
+	JumpstatDB_BlockPBMenu_JumpType,
 	JumpstatDB_BlockPBMenu_Block,
 	JumpstatDB_BlockPBMenu_Distance,
 	JumpstatDB_BlockPBMenu_Strafes,
