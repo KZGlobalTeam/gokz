@@ -171,5 +171,6 @@ public Action CommandDeleteJump(int client, int args)
 	}
 
 	DB_DeleteJump(client, jumpID);
+	
 	return Plugin_Handled;
 }
