@@ -164,10 +164,15 @@ enum struct ReplayTickData
  * This includes replays of cheaters which are saved if
  * the player is marked as a cheater by gokz-localdb.
  *
- * @param client			Client index.
+ * @param client			The client ID of the player who completed the run.
+ * @param replayType		The type of the replay (Run/Jump/Cheater).
+ * @param map				The name of the map the run was completed on.
+ * @param course			The specific course on the map the run was completed on.
+ * @param timeType			The type of time (Pro/Nub).
+ * @param time				The time the run was completed in.
  * @param filePath			Replay file path.
  */
-forward void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] filePath);
+forward void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath);
 
 /**
  * Called when a currently being recorded replay is discarded from

@@ -340,7 +340,7 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 
     delete file;
 
-    Call_OnReplaySaved(client, ReplayType_Run, replayPath);
+    Call_OnReplaySaved(client, ReplayType_Run, gC_CurrentMap, course, timeType, time, replayPath);
 
     return true;
 }
@@ -371,8 +371,6 @@ static bool SaveRecordingOfCheater(int client, ACReason reason)
     WriteTickData(file, client, ReplayType_Cheater);
 
     delete file;
-
-    Call_OnReplaySaved(client, ReplayType_Cheater, replayPath);
 
     return true;
 }
@@ -410,8 +408,6 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
     WriteTickData(file, client, ReplayType_Jump);
 
     delete file;
-
-    Call_OnReplaySaved(client, ReplayType_Jump, replayPath);
 
     return true;
 }

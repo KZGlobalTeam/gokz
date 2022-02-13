@@ -1,8 +1,12 @@
 /*
-	Sends a time to the global API.
+	Sends a run to the global API.
 */
 
 
+
+char storedSteamId[17], storedMap[64];
+int lastRecordId, storedCourse, storedTimeType;
+float storedTime;
 
 // =====[ PUBLIC ]=====
 
@@ -58,4 +62,33 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	
 	// Don't like doing this here, but seems to be the most efficient place
 	GOKZ_GL_UpdatePoints(client);
+
+	APIRecord apiRecord = new APIRecord(response);
+	lastRecordId = apiRecord.Id;
+	apiRecord.GetSteamId64(storedSteamId, sizeof(storedSteamId));
+	apiRecord.GetMapName(storedMap, sizeof(storedMap));
+	storedCourse = apiRecord.Stage;
+	storedTimeType = apiRecord.Teleports > 0 ? TimeType_Nub : TimeType_Pro;
+	storedTime = apiRecord.Time;
+}
+
+public void SendReplay(int client, int replayReplayType, const char[] replayMap, int replayCourse, int replayTimeType, float replayTime, const char[] replayFilePath)
+{
+	char replaySteamId[17];
+	GetClientAuthId(client, AuthId_SteamID64, replaySteamId, sizeof(replaySteamId));
+	if (lastRecordId != -1 && StrEqual(storedSteamId, replaySteamId) && StrEqual(storedMap, replayMap)
+			&& storedCourse == replayCourse && storedTimeType == replayTimeType && storedTime == replayTime)
+	{
+		GlobalAPI_CreateReplayForRecordId(SendReplayCallback, DEFAULT_DATA, lastRecordId, replayFilePath);
+		lastRecordId = -1;
+	}
+	else
+	{
+		LogError("Failed to upload replay to the global API. No recordId found.");
+	}
+}
+
+public int SendReplayCallback(JSON_Object response, GlobalAPIRequestData request, DataPack dp)
+{
+
 }

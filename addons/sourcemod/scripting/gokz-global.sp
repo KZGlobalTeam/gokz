@@ -61,7 +61,7 @@ ConVar gCV_EnforcedCVar[ENFORCEDCVAR_COUNT];
 #include "gokz-global/commands.sp"
 #include "gokz-global/maptop_menu.sp"
 #include "gokz-global/print_records.sp"
-#include "gokz-global/send_time.sp"
+#include "gokz-global/send_run.sp"
 #include "gokz-global/points.sp"
 
 
@@ -270,6 +270,14 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 	if (gB_GloballyVerified[client] && gB_InValidRun[client])
 	{
 		SendTime(client, course, time, teleportsUsed);
+	}
+}
+
+public void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath)
+{
+	if (gB_GloballyVerified[client] && gB_InValidRun[client])
+	{
+		SendReplay(client, replayType, map, course, timeType, time, filePath);
 	}
 }
 
