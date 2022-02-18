@@ -277,7 +277,7 @@ public void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, 
 {
 	if (gB_GloballyVerified[client] && gB_InValidRun[client])
 	{
-		SendReplay(client, replayType, map, course, timeType, time, filePath);
+		OnReplaySaved_SendReplay(client, replayType, map, course, timeType, time, filePath);
 	}
 }
 
