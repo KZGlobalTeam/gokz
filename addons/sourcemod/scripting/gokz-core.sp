@@ -340,7 +340,6 @@ public void OnMapStart()
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
 	OnMapStart_FixMissingSpawns();
-	OnMapStart_Demofix();
 	OnMapStart_Checkpoints();
 	OnMapStart_TeamNumber();
 }
@@ -391,6 +390,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 	{
 		OnRoundStart_Timer();
 		OnRoundStart_ForceAllTalk();
+		OnRoundStart_Demofix();
 		return;
 	}
 	else
@@ -405,6 +405,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 		{
 			OnRoundStart_Timer();
 			OnRoundStart_ForceAllTalk();
+			OnRoundStart_Demofix();
 		}
 	}
 }
