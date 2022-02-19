@@ -196,28 +196,28 @@ enum
 stock char gC_ProfileOptionNames[PROFILEOPTION_COUNT][] = 
 {
 	"GOKZ Profile - Show Rank Chat",
-	"GOKZ Profile - Show Rank Clan Tag",
+	"GOKZ Profile - Show Rank Clan",
 	"GOKZ Profile - Tag Type"
 };
 
 stock char gC_ProfileOptionDescriptions[PROFILEOPTION_COUNT][] = 
 {
 	"Show Rank Tag in Chat - 0 = Disabled, 1 = Enabled",
-	"Show Rank in Clan Tag - 0 = Disabled, 1 = Enabled",
+	"Show Rank in Clan - 0 = Disabled, 1 = Enabled",
 	"Type of Tag to Show - 0 = Rank, 1 = Admin, 2 = VIP"
 };
 
 stock char gC_ProfileOptionPhrases[PROFILEOPTION_COUNT][] = 
 {
 	"Options Menu - Show Rank Chat",
-	"Options Menu - Show Rank Clan Tag",
+	"Options Menu - Show Rank Clan",
 	"Options Menu - Tag Type",
 };
 
 stock char gC_ProfileBoolPhrases[PROFILEOPTIONBOOL_COUNT][] = 
 {
-	"Options Menu - Enabled",
-	"Options Menu - Disabled"
+	"Options Menu - Disabled",
+	"Options Menu - Enabled"
 };
 
 stock char gC_ProfileTagTypePhrases[PROFILETAGTYPE_COUNT][] = 

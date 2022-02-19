@@ -2,6 +2,7 @@
 
 #include <sdkhooks>
 #include <sdktools>
+#include <dhooks>
 
 #include <movementapi>
 
@@ -60,14 +61,16 @@ float gF_ModeCVarValues[MODECVAR_COUNT] =
 
 bool gB_GOKZCore;
 ConVar gCV_ModeCVar[MODECVAR_COUNT];
-
-
+bool gB_ProcessingMaxSpeed[MAXPLAYERS + 1];
+Handle gH_GetPlayerMaxSpeed;
+Handle gH_GetPlayerMaxSpeed_SDKCall;
 
 // =====[ PLUGIN EVENTS ]=====
 
 public void OnPluginStart()
 {
 	CreateConVars();
+	HookEvents();
 }
 
 public void OnAllPluginsLoaded()
@@ -123,11 +126,39 @@ public void OnLibraryRemoved(const char[] name)
 
 public void OnClientPutInServer(int client)
 {
-	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+	if (IsValidClient(client))
+	{
+		HookClientEvents(client);
+	}
 	if (IsUsingMode(client))
 	{
 		ReplicateConVars(client);
 	}
+}
+
+void HookClientEvents(int client)
+{
+	DHookEntity(gH_GetPlayerMaxSpeed, true, client);
+	SDKHook(client, SDKHook_PreThinkPost, SDKHook_OnClientPreThink_Post);
+}
+
+public MRESReturn DHooks_OnGetPlayerMaxSpeed(int client, Handle hReturn)
+{
+	if (!IsUsingMode(client) || gB_ProcessingMaxSpeed[client])
+	{
+		return MRES_Ignored;
+	}
+	gB_ProcessingMaxSpeed[client] = true;
+	float maxSpeed = SDKCall(gH_GetPlayerMaxSpeed_SDKCall, client);
+	// Prevent players from running faster than 250u/s
+	if (maxSpeed > SPEED_NORMAL)
+	{
+		DHookSetReturn(hReturn, SPEED_NORMAL);
+		gB_ProcessingMaxSpeed[client] = false;
+		return MRES_Supercede;
+	}
+	gB_ProcessingMaxSpeed[client] = false;
+	return MRES_Ignored;
 }
 
 public void SDKHook_OnClientPreThink_Post(int client)
@@ -207,6 +238,21 @@ bool IsUsingMode(int client)
 	return !gB_GOKZCore || GOKZ_GetCoreOption(client, Option_Mode) == Mode_Vanilla;
 }
 
+void HookEvents()
+{
+	GameData gameData = LoadGameConfigFile("movementapi.games");
+	int offset = gameData.GetOffset("GetPlayerMaxSpeed");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get GetPlayerMaxSpeed offset");
+	}
+	gH_GetPlayerMaxSpeed = DHookCreate(offset, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, DHooks_OnGetPlayerMaxSpeed);
+
+	StartPrepSDKCall(SDKCall_Player);
+	PrepSDKCall_SetFromConf(gameData, SDKConf_Virtual, "GetPlayerMaxSpeed");
+	PrepSDKCall_SetReturnInfo(SDKType_Float, SDKPass_ByValue);
+	gH_GetPlayerMaxSpeed_SDKCall = EndPrepSDKCall();
+}
 
 
 // =====[ CONVARS ]=====

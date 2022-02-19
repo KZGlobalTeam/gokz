@@ -60,6 +60,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/teleports.sp"
 #include "gokz-core/triggerfix.sp"
 #include "gokz-core/demofix.sp"
+#include "gokz-core/teamnumfix.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/triggers.sp"
@@ -115,6 +116,7 @@ public void OnPluginStart()
 	OnPluginStart_Triggerfix();
 	OnPluginStart_Demofix();
 	OnPluginStart_MapFile();
+	OnPluginStart_TeamNumber();
 }
 
 public void OnAllPluginsLoaded()
@@ -224,6 +226,16 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	}
 }
 
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	if (IsValidClient(client))
+	{
+		OnPlayerJoinTeam_TeamNumber(event, client);
+	}
+	return Plugin_Continue;
+}
+
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
@@ -231,6 +243,7 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 	{
 		OnPlayerDeath_Timer(client);
 		OnPlayerDeath_ValidJump(client);
+		OnPlayerDeath_TeamNumber(client);
 	}
 	return Plugin_Continue;
 }
@@ -328,8 +341,13 @@ public void OnMapStart()
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
 	OnMapStart_FixMissingSpawns();
-	OnMapStart_Demofix();
 	OnMapStart_Checkpoints();
+	OnMapStart_TeamNumber();
+}
+
+public void OnGameFrame()
+{
+	OnGameFrame_TeamNumber();
 }
 
 public void OnConfigsExecuted()
@@ -379,6 +397,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 	{
 		OnRoundStart_Timer();
 		OnRoundStart_ForceAllTalk();
+		OnRoundStart_Demofix();
 		return;
 	}
 	else
@@ -393,6 +412,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // 
 		{
 			OnRoundStart_Timer();
 			OnRoundStart_ForceAllTalk();
+			OnRoundStart_Demofix();
 		}
 	}
 }
@@ -446,6 +466,7 @@ static void HookEvents()
 	AddCommandsListeners();
 	
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
