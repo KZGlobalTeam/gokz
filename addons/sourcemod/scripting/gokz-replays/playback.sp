@@ -166,21 +166,21 @@ void PlaybackTogglePause(int bot)
 
 void PlaybackSkipForward(int bot)
 {
-	if (playbackTick[bot] + RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())) < playbackTickData[bot].Length)
+	if (playbackTick[bot] + RoundToZero(RP_SKIP_TIME / GetTickInterval()) < playbackTickData[bot].Length)
 	{
-		PlaybackSkipToTick(bot, playbackTick[bot] + RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())));
+		PlaybackSkipToTick(bot, playbackTick[bot] + RoundToZero(RP_SKIP_TIME / GetTickInterval()));
 	}
 }
 
 void PlaybackSkipBack(int bot)
 {
-	if (playbackTick[bot] < RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())))
+	if (playbackTick[bot] < RoundToZero(RP_SKIP_TIME / GetTickInterval()))
 	{
 		PlaybackSkipToTick(bot, 0);
 	}
 	else
 	{
-		PlaybackSkipToTick(bot, playbackTick[bot] - RoundToZero(RP_SKIP_TIME * FloatAbs(1.0 / GetTickInterval())));
+		PlaybackSkipToTick(bot, playbackTick[bot] - RoundToZero(RP_SKIP_TIME / GetTickInterval()));
 	}
 }
 
@@ -496,6 +496,10 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	int tickrateAsInt;
 	file.ReadInt32(tickrateAsInt);
 	float tickrate = view_as<float>(tickrateAsInt);
+	if (tickrate != RoundToZero(1 / GetTickInterval()))
+	{
+		GOKZ_PrintToChat(client, false, "Cannot play replay, tickrate %f is not equivalent to server tickrate %f", tickrate, (RoundToZero(1 / GetTickInterval())));
+	}
 
 	// Tick Count
 	int tickCount;
@@ -508,7 +512,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	file.ReadInt32(botKnife[bot]);
 
 	// Big spit to console
-	PrintToServer("Replay Type: %d\nGOKZ Version: %s\nMap Name: %s\nMap Filesize: %d\nServer IP: %d\nTimestamp: %d\nPlayer Alias: %s\nPlayer Steam ID: %d\nMode: %d\nStyle: %d\nPlayer Sensitivity: %f\nPlayer m_yaw: %f\nTickrate: %f\nTick Count: %d\nWeapon: %d\nKnife: %d", replayType, gokzVersion, mapName, mapFileSize, serverIP, timestamp, botAlias[bot], steamID, botMode[bot], botStyle[bot], playerSensitivity, playerMYaw, tickrate, tickCount, botWeapon[bot], botKnife[bot]);
+	PrintToConsole(client, "Replay Type: %d\nGOKZ Version: %s\nMap Name: %s\nMap Filesize: %d\nServer IP: %d\nTimestamp: %d\nPlayer Alias: %s\nPlayer Steam ID: %d\nMode: %d\nStyle: %d\nPlayer Sensitivity: %f\nPlayer m_yaw: %f\nTickrate: %f\nTick Count: %d\nWeapon: %d\nKnife: %d", replayType, gokzVersion, mapName, mapFileSize, serverIP, timestamp, botAlias[bot], steamID, botMode[bot], botStyle[bot], playerSensitivity, playerMYaw, tickrate, tickCount, botWeapon[bot], botKnife[bot]);
 
 	switch(replayType)
 	{
@@ -529,7 +533,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 			botReplayType[bot] = ReplayType_Run;
 			
 			// Finish spit to console
-			PrintToServer("Time: %f\nCourse: %d\nTeleports Used: %d", botTime[bot], botCourse[bot], botTeleportsUsed[bot]);
+			PrintToConsole(client, "Time: %f\nCourse: %d\nTeleports Used: %d", botTime[bot], botCourse[bot], botTeleportsUsed[bot]);
 		}
 		case ReplayType_Cheater:
 		{
@@ -541,7 +545,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 			botReplayType[bot] = ReplayType_Cheater;
 
 			// Finish spit to console
-			PrintToServer("AC Reason: %s", gC_ACReasons[ACReason]);
+			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[ACReason]);
 		}
 		case ReplayType_Jump:
 		{
@@ -581,7 +585,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 			botReplayType[bot] = ReplayType_Jump;
 
 			// Finish spit to console
-			PrintToServer("Jump Type: %s\nJump Distance: %f\nBlock Distance: %d\nStrafe Count: %d\nSync: %f\n Pre: %f\nMax: %f\nAirtime: %d", 
+			PrintToConsole(client, "Jump Type: %s\nJump Distance: %f\nBlock Distance: %d\nStrafe Count: %d\nSync: %f\n Pre: %f\nMax: %f\nAirtime: %d", 
 				gC_JumpTypes[jumpType], distance, blockDistance, strafeCount, sync, pre, max, airtime);
 		}
 	}
@@ -1018,7 +1022,8 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			}
 		}
 
-		if(!botPlaybackPaused[bot] && false)
+		#if defined DEBUG
+		if(!botPlaybackPaused[bot])
 		{
 			PrintToServer("Tick: %d", playbackTick[bot]);
 			PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
@@ -1052,6 +1057,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			if(currentTickData.flags & RP_SECONDARY_EQUIPPED) PrintToServer("SECONDARY_WEAPON_EQUIPPED");
 			PrintToServer("==============================================================");
 		}
+		#endif
 
 		playbackTick[bot]++;
 	}
@@ -1202,33 +1208,35 @@ static void PlaybackSkipToTick(int bot, int tick)
 
 		TeleportEntity(botClient[bot], currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 
-		PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
-		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK)) PrintToServer("MOVETYPE_WALK");
-		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_LADDER)) PrintToServer("MOVETYPE_LADDER");
-		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NOCLIP)) PrintToServer("MOVETYPE_NOCLIP");
-		if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NONE)) PrintToServer("MOVETYPE_NONE");
+		#if defined DEBUG 
+			PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK)) PrintToServer("MOVETYPE_WALK");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_LADDER)) PrintToServer("MOVETYPE_LADDER");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NOCLIP)) PrintToServer("MOVETYPE_NOCLIP");
+			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_NONE)) PrintToServer("MOVETYPE_NONE");
 
-		if(currentTickData.flags & RP_IN_ATTACK) PrintToServer("IN_ATTACK");
-		if(currentTickData.flags & RP_IN_ATTACK2) PrintToServer("IN_ATTACK2");
-		if(currentTickData.flags & RP_IN_JUMP) PrintToServer("IN_JUMP");
-		if(currentTickData.flags & RP_IN_DUCK) PrintToServer("IN_DUCK");
-		if(currentTickData.flags & RP_IN_FORWARD) PrintToServer("IN_FORWARD");
-		if(currentTickData.flags & RP_IN_BACK) PrintToServer("IN_BACK");
-		if(currentTickData.flags & RP_IN_LEFT) PrintToServer("IN_LEFT");
-		if(currentTickData.flags & RP_IN_RIGHT) PrintToServer("IN_RIGHT");
-		if(currentTickData.flags & RP_IN_MOVELEFT) PrintToServer("IN_MOVELEFT");
-		if(currentTickData.flags & RP_IN_MOVERIGHT) PrintToServer("IN_MOVERIGHT");
-		if(currentTickData.flags & RP_IN_RELOAD) PrintToServer("IN_RELOAD");
-		if(currentTickData.flags & RP_IN_SPEED) PrintToServer("IN_SPEED");
-		if(currentTickData.flags & RP_FL_ONGROUND) PrintToServer("FL_ONGROUND");
-		if(currentTickData.flags & RP_FL_DUCKING ) PrintToServer("FL_DUCKING");
-		if(currentTickData.flags & RP_FL_SWIM) PrintToServer("FL_SWIM");
-		if(currentTickData.flags & RP_UNDER_WATER) PrintToServer("WATERLEVEL!=0");
-		if(currentTickData.flags & RP_TELEPORT_TICK) PrintToServer("TELEPORT");
-		if(currentTickData.flags & RP_TAKEOFF_TICK) PrintToServer("TAKEOFF");
-		if(currentTickData.flags & RP_HIT_PERF) PrintToServer("PERF");
-		if(currentTickData.flags & RP_SECONDARY_EQUIPPED) PrintToServer("SECONDARY_WEAPON_EQUIPPED");
-		PrintToServer("==============================================================");
+			if(currentTickData.flags & RP_IN_ATTACK) PrintToServer("IN_ATTACK");
+			if(currentTickData.flags & RP_IN_ATTACK2) PrintToServer("IN_ATTACK2");
+			if(currentTickData.flags & RP_IN_JUMP) PrintToServer("IN_JUMP");
+			if(currentTickData.flags & RP_IN_DUCK) PrintToServer("IN_DUCK");
+			if(currentTickData.flags & RP_IN_FORWARD) PrintToServer("IN_FORWARD");
+			if(currentTickData.flags & RP_IN_BACK) PrintToServer("IN_BACK");
+			if(currentTickData.flags & RP_IN_LEFT) PrintToServer("IN_LEFT");
+			if(currentTickData.flags & RP_IN_RIGHT) PrintToServer("IN_RIGHT");
+			if(currentTickData.flags & RP_IN_MOVELEFT) PrintToServer("IN_MOVELEFT");
+			if(currentTickData.flags & RP_IN_MOVERIGHT) PrintToServer("IN_MOVERIGHT");
+			if(currentTickData.flags & RP_IN_RELOAD) PrintToServer("IN_RELOAD");
+			if(currentTickData.flags & RP_IN_SPEED) PrintToServer("IN_SPEED");
+			if(currentTickData.flags & RP_FL_ONGROUND) PrintToServer("FL_ONGROUND");
+			if(currentTickData.flags & RP_FL_DUCKING ) PrintToServer("FL_DUCKING");
+			if(currentTickData.flags & RP_FL_SWIM) PrintToServer("FL_SWIM");
+			if(currentTickData.flags & RP_UNDER_WATER) PrintToServer("WATERLEVEL!=0");
+			if(currentTickData.flags & RP_TELEPORT_TICK) PrintToServer("TELEPORT");
+			if(currentTickData.flags & RP_TAKEOFF_TICK) PrintToServer("TAKEOFF");
+			if(currentTickData.flags & RP_HIT_PERF) PrintToServer("PERF");
+			if(currentTickData.flags & RP_SECONDARY_EQUIPPED) PrintToServer("SECONDARY_WEAPON_EQUIPPED");
+			PrintToServer("==============================================================");
+		#endif
 	}
 
 	Movement_SetMovetype(botClient[bot], MOVETYPE_NOCLIP);

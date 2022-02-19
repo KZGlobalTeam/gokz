@@ -20,6 +20,8 @@
 #pragma newdecls required
 #pragma semicolon 1
 
+//#define DEBUG
+
 
 
 public Plugin myinfo = 

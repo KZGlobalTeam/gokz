@@ -1,8 +1,8 @@
 
 static int jumpTopMode[MAXPLAYERS + 1];
 static int jumpTopType[MAXPLAYERS + 1];
-static int blockNums[MAXPLAYERS + 1][5];
-static int jumpInfo[MAXPLAYERS + 1][5][3];
+static int blockNums[MAXPLAYERS + 1][JS_TOP_RECORD_COUNT];
+static int jumpInfo[MAXPLAYERS + 1][JS_TOP_RECORD_COUNT][3];
 
 
 
