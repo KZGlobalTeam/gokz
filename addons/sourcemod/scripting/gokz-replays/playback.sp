@@ -450,7 +450,6 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	mapName[length] = '\0';
 	if (!StrEqual(mapName, gC_CurrentMap))
 	{
-		LogError("This replay was not recorded on this map, please switch to %s and try again.", mapName);
 		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Map", mapName);
 		return false;
 	}
@@ -498,7 +497,8 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	float tickrate = view_as<float>(tickrateAsInt);
 	if (tickrate != RoundToZero(1 / GetTickInterval()))
 	{
-		GOKZ_PrintToChat(client, false, "Cannot play replay, tickrate %f is not equivalent to server tickrate %f", tickrate, (RoundToZero(1 / GetTickInterval())));
+		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Tickrate", tickrate, (RoundToZero(1 / GetTickInterval())));
+		return false;
 	}
 
 	// Tick Count

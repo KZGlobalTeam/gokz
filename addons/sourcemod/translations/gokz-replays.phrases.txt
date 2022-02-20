@@ -57,6 +57,11 @@
 	{
 		"en"		"{darkred}There is no file for this replay. Please contact an admin if you think this is an error."
 	}
+	"Replay Menu - Wrong Tickrate"
+	{
+		"#format"	"{1:f},{2:f}"
+		"en"		"{darkred}This replay was recorded on {1} tickrate. This server's tickrate is {2}."
+	}
 
 
 	// =====[ REPLAY CONTROL MENU ]=====
