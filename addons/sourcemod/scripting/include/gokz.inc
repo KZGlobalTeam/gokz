@@ -40,9 +40,9 @@ enum ObsMode
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
-#define PLAYER_MINS view_as<float>( {-16.0, -16.0, 0.0} )
-#define PLAYER_MAXS view_as<float>( {16.0, 16.0, 72.0} )
-#define PLAYER_MAXS_DUCKED view_as<float>( {16.0, 16.0, 54.0} )
+stock float PLAYER_MINS[3] = {-16.0, -16.0, 0.0};
+stock float PLAYER_MAXS[3] = {16.0, 16.0, 72.0};
+stock float PLAYER_MAXS_DUCKED[3] = {16.0, 16.0, 54.0};
 
 
 
@@ -136,6 +136,28 @@ stock float FloatMin(float value1, float value2)
 	}
 	return value2;
 }
+
+/**
+ * Clamp a float value between an upper and lower bound.
+ *
+ * @param value			Preferred value.
+ * @param min			Minimum value.
+ * @param max			Maximum value.
+ * @return				The closest value to the preferred value.
+ */
+stock float FloatClamp(float value, float min, float max)
+{
+	if (value >= max)
+	{
+		return max;
+	}
+	if (value <= min)
+	{
+		return min;
+	}
+	return value;
+}
+
 
 /**
  * Returns the greater of two int values.
@@ -770,4 +792,138 @@ stock bool IsSpawnValid(float origin[3])
 	}
 	delete trace;
 	return false;
+}
+
+/**
+ * Get an entity's origin, angles, its bounding box's center and the distance from the center to its bounding box's edges.
+ *
+ * @param entity			Index of the entity.
+ * @param origin			Entity's origin.
+ * @param center			Center of the entity's bounding box.
+ * @param angles			Entity's angles.
+ * @param distFromCenter	The distance between the center of the entity's bounding box and its edges.
+ */
+stock void GetEntityPositions(int entity, float origin[3], float center[3], float angles[3], float distFromCenter[3])
+{
+	float maxs[3], mins[3];
+	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
+	GetEntPropVector(entity, Prop_Data, "m_angRotation", angles);
+	
+	GetEntPropVector(entity, Prop_Send, "m_vecMaxs", maxs);
+	GetEntPropVector(entity, Prop_Send, "m_vecMins", mins);
+	for (int i = 0; i < 3; i++)
+	{
+		center[i] = origin[i] + (maxs[i] + mins[i]) / 2;
+		distFromCenter[i] = (maxs[i] - mins[i]) / 2;
+	}
+}
+
+/**
+ * Find a valid position around a timer.
+ *
+ * @param entity			Index of the timer entity.
+ * @param originDest		Result origin if a valid position is found.
+ * @param anglesDest		Result angles if a valid position is found.
+ * @return					Whether a valid position is found.
+ */
+stock bool FindValidPositionAroundTimerEntity(int entity, float originDest[3], float anglesDest[3], bool isButton)
+{
+	float origin[3], center[3], angles[3], distFromCenter[3];
+	GetEntityPositions(entity, origin, center, angles, distFromCenter);
+	float extraOffset[3];
+	if (isButton) // Test several positions within button press range.
+	{
+		extraOffset[0] = 32.0;
+		extraOffset[1] = 32.0;
+		extraOffset[2] = 32.0;
+	}
+	else // Test positions at the inner surface of the zone.
+	{
+		extraOffset[0] = -(PLAYER_MAXS[0] - PLAYER_MINS[0]) - 1.03125;
+		extraOffset[1] = -(PLAYER_MAXS[1] - PLAYER_MINS[1]) - 1.03125;
+		extraOffset[2] = -(PLAYER_MAXS[2] - PLAYER_MINS[2]) - 1.03125;
+	}
+	if (FindValidPositionAroundCenter(center, distFromCenter, extraOffset, originDest, anglesDest))
+	{
+		return true;
+	}
+	// Test the positions right next to the timer button/zones if the tests above fail.
+	// This can fail when the timer has a cover brush over it.
+	extraOffset[0] = 0.03125;
+	extraOffset[1] = 0.03125;
+	extraOffset[2] = 0.03125;
+	return FindValidPositionAroundCenter(center, distFromCenter, extraOffset, originDest, anglesDest);
+}
+
+static bool FindValidPositionAroundCenter(float center[3], float distFromCenter[3], float extraOffset[3], float originDest[3], float anglesDest[3])
+{
+	float testOrigin[3];
+	int x, y;
+	
+	for (int i = 0; i < 3; i++)
+	{
+		// The search starts from the center then outwards to opposite directions.
+		x = i == 2 ? -1 : i;
+		for (int j = 0; j < 3; j++)
+		{
+			y = j == 2 ? -1 : j;
+			for (int z = -1; z <= 1; z++)
+			{
+				testOrigin = center;
+				testOrigin[0] = testOrigin[0] + (distFromCenter[0] + extraOffset[0]) * x + (PLAYER_MAXS[0] - PLAYER_MINS[0]) * x * 0.5;
+				testOrigin[1] = testOrigin[1] + (distFromCenter[1] + extraOffset[1]) * y + (PLAYER_MAXS[1] - PLAYER_MINS[1]) * y * 0.5;
+				testOrigin[2] = testOrigin[2] + (distFromCenter[2] + extraOffset[2]) * z + (PLAYER_MAXS[2] - PLAYER_MINS[2]) * z;
+
+				// Check if there's a line of sight towards the zone as well.
+				if (IsSpawnValid(testOrigin) && CanSeeBox(testOrigin, center, distFromCenter))
+				{
+					originDest = testOrigin;
+					// Always look towards the center.
+					float offsetVector[3];
+					offsetVector[0] = -(distFromCenter[0] + extraOffset[0]) * x;
+					offsetVector[1] = -(distFromCenter[1] + extraOffset[1]) * y;
+					offsetVector[2] = -(distFromCenter[2] + extraOffset[2]) * z;
+					GetVectorAngles(offsetVector, anglesDest);
+					anglesDest[2] = 0.0; // Roll should always be 0.0
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+static bool CanSeeBox(float origin[3], float center[3], float distFromCenter[3])
+{
+	float traceOrigin[3], traceDest[3], mins[3], maxs[3];
+
+	CopyVector(origin, traceOrigin);
+	
+
+	SubtractVectors(center, distFromCenter, mins);
+	AddVectors(center, distFromCenter, maxs);
+
+	for (int i = 0; i < 3; i++)
+	{
+		mins[i] += 0.03125;
+		maxs[i] -= 0.03125;
+		traceDest[i] = FloatClamp(traceOrigin[i], mins[i], maxs[i]);
+	}
+	int mask = (MASK_NPCSOLID_BRUSHONLY | MASK_OPAQUE_AND_NPCS) & ~CONTENTS_OPAQUE;
+	Handle trace = TR_TraceRayFilterEx(traceOrigin, traceDest, mask, RayType_EndPoint, TraceEntityFilterPlayers);
+	if (TR_DidHit(trace))
+	{
+		float end[3];
+		TR_GetEndPosition(end, trace);
+		for (int i = 0; i < 3; i++)
+		{
+			if (end[i] != traceDest[i])
+			{
+				delete trace;
+				return false;
+			}
+		}
+	}
+	delete trace;
+	return true;
 }

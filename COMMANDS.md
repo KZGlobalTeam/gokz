@@ -9,7 +9,8 @@
  * `!next` - Go forward a checkpoint.
  * `!undo` - Undo teleport.
  * `!start`/`!restart`/`!r` - Teleport to your start position.
- * `!end` - Teleport to the endtimer.
+ * `!searchstart` - Search for the start timer of a course and teleport to it. Usage: `!searchstart <main/#course>`
+ * `!end` - Teleport to the end timer of a course. Usage: `!end <main/#course>`.
  * `!setstartpos`/`!ssp` - Set your custom start position to your current position.
  * `!clearstartpos`/`!csp` - Clear your custom start position.
  * `!main`/`!m` - Teleport to the start of the main course.
@@ -81,7 +82,7 @@
 
 ### gokz-jumpstats
 
- * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
+ * `!jso` - Open the jumpstats options menu.
  * `!jsalways` - Toggle the 'Always-on' jumpstat mode.
 
 ### gokz-replays
@@ -115,6 +116,7 @@ Many of these commands return results for your currently selected mode.
  * `!pc` - Show course completion in chat. Usage: `!pc <player>`
  * `!rr`/`!latest` - Open a menu showing recently broken records.
  * `!jumptop`/`!jstop` - Open a menu showing the top jumpstats.
+ * `!jumpstats`/`!js` - Open a menu showing jumpstat PBs. Usage: `!js <jumper>`
  * `!ljpb` - Show PB Long Jump in chat. Usage: `!ljpb <jumper>`
  * `!bhpb` - Show PB Bunnyhop in chat. Usage: `!bhpb <jumper>`
  * `!lbhpb` - Show PB Lowpre Bunnyhop in chat. Usage: `!lbhpb <jumper>`
@@ -153,7 +155,10 @@ Many of these commands return results for your currently selected mode.
  * `!loadtimersetup`/`!lts` - Load & lock the timer setup (start position and virtual buttons) from the database.
  * `!setcheater` - Set a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
  * `!setnotcheater` - Set a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
- * `!deletejump` - Remove the top jumpstat of a SteamID. Usage: `!deletejump <STEAM_1:X:X> <mode> <jump type> <block?>`
+ * `!deletebestjump` - Remove the top jumpstat of a SteamID. Usage: `!deletebestjump <STEAM_1:X:X> <mode> <jump type> <block?>`
+ * `!deletealljumps` - Remove all jumpstats of a SteamID. Usage: `!deletealljumps <STEAM_1:X:X>`
+ * `!deletejump` - Remove a jumpstat by it's id. Usage: `!deletejump <id>`
+ * `!deletetime` - Remove a time by it's id. Usage: `!deletetime <id>`
 
 ### gokz-localranks
 

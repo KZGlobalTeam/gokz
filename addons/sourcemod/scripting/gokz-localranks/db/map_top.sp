@@ -188,7 +188,7 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 		DisplayMapTopMenu(client, mode);
 		return;
 	}
-	
+
 	Menu menu = new Menu(MenuHandler_MapTopSubmenu);
 	menu.Pagination = 5;
 	
@@ -205,31 +205,53 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 	}
 	
 	// Add submenu items
-	char display[128];
+	char display[128], title[65], admin[65];
 	char playerName[MAX_NAME_LENGTH];
 	float runTime;
-	int teleports, rank = 0;
+	int timeid, steamid, teleports, rank = 0;
+
+	bool clientIsAdmin = CheckCommandAccess(client, "sm_deletetime", ADMFLAG_ROOT, false);
+
+	FormatEx(title, sizeof(title), "%s %s %s %T", gC_ModeNames[mode], mapName, gC_TimeTypeNames[timeType], "Top", client);
+	strcopy(display, sizeof(display), "----------------------------------------------------------------");
+	display[strlen(title)] = '\0';
+	PrintToConsole(client, title);
+	PrintToConsole(client, display);
 	
 	while (SQL_FetchRow(results[2]))
 	{
 		rank++;
-		SQL_FetchString(results[2], 1, playerName, sizeof(playerName));
-		runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 2));
+		timeid = SQL_FetchInt(results[2], 0);
+		steamid = SQL_FetchInt(results[2], 1);
+		SQL_FetchString(results[2], 2, playerName, sizeof(playerName));
+		runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 3));
+
+		if (clientIsAdmin)
+		{
+			FormatEx(admin, sizeof(admin), "<id: %d>", timeid);
+		}
+
 		switch (timeType)
 		{
 			case TimeType_Nub:
 			{
-				teleports = SQL_FetchInt(results[2], 3);
+				teleports = SQL_FetchInt(results[2], 4);
 				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP      %s", 
 					rank, GOKZ_FormatTime(runTime), teleports, playerName);
+
+				PrintToConsole(client, "#%-2d   %11s  %3d TP   %s <STEAM_1:%d:%d>   %s", 
+					rank, GOKZ_FormatTime(runTime), teleports, playerName, steamid & 1, steamid >> 1, admin);
 			}
 			case TimeType_Pro:
 			{
 				FormatEx(display, sizeof(display), "#%-2d   %11s   %s", 
 					rank, GOKZ_FormatTime(runTime), playerName);
+
+				PrintToConsole(client, "#%-2d   %11s   %s <STEAM_1:%d:%d>   %s", 
+					rank, GOKZ_FormatTime(runTime), playerName, steamid & 1, steamid >> 1, admin);
 			}
 		}
-		menu.AddItem(IntToStringEx(SQL_FetchInt(results[2], 0)), display, ITEMDRAW_DISABLED);
+		menu.AddItem("", display, ITEMDRAW_DISABLED);
 	}
 	
 	menu.Display(client, MENU_TIME_FOREVER);

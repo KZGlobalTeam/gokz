@@ -6,7 +6,7 @@
 
 static Regex RE_BonusEndButton;
 static Regex RE_BonusEndZone;
-static bool endExists[GOKZ_MAX_COURSES];
+static CourseTimerType endType[GOKZ_MAX_COURSES];
 static float endOrigin[GOKZ_MAX_COURSES][3];
 static float endAngles[GOKZ_MAX_COURSES][3];
 
@@ -20,48 +20,67 @@ void OnPluginStart_MapEnd()
 	RE_BonusEndZone = CompileRegex(GOKZ_BONUS_END_ZONE_NAME_REGEX);
 }
 
-void OnEntitySpawned_MapEnd(int entity)
+void OnEntitySpawnedPost_MapEnd(int entity)
 {
 	char buffer[32];
 
 	GetEntityClassname(entity, buffer, sizeof(buffer));
-	if (StrEqual("func_button", buffer, false))
+	
+	if (StrEqual("trigger_multiple", buffer, false))
 	{
-		if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
+		bool isEndZone;
+		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0)
 		{
-			return;
-		}
-		
-		if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
-		{
-			StoreEnd(0, entity);
-		}
-		else
-		{
-			int course = GetEndButtonBonusNumber(entity);
-			if (GOKZ_IsValidCourse(course, true))
+			if (StrEqual(GOKZ_END_ZONE_NAME, buffer, false))
 			{
-				StoreEnd(course, entity);
+				isEndZone = true;
+				StoreEnd(0, entity, CourseTimerType_ZoneNew);
+			}
+			else if (GetEndZoneBonusNumber(entity) != -1)
+			{
+				int course = GetEndZoneBonusNumber(entity);
+				if (GOKZ_IsValidCourse(course, true))
+				{
+					isEndZone = true;
+					StoreEnd(course, entity, CourseTimerType_ZoneNew);
+				}
+			}
+		}
+		if (!isEndZone)
+		{
+			TimerButtonTrigger trigger;
+			if (IsTimerButtonTrigger(entity, trigger) && !trigger.isStartTimer)
+			{
+				StoreEnd(trigger.course, entity, CourseTimerType_ZoneLegacy);
 			}
 		}
 	}
-	else if (StrEqual("trigger_multiple", buffer, false))
+	else if (StrEqual("func_button", buffer, false))
 	{
-		if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
+		bool isEndButton;
+		if (GetEntityName(entity, buffer, sizeof(buffer)) != 0)
 		{
-			return;
-		}
-		
-		if (StrEqual(GOKZ_END_ZONE_NAME, buffer, false))
-		{
-			StoreEnd(0, entity);
-		}
-		else
-		{
-			int course = GetEndZoneBonusNumber(entity);
-			if (GOKZ_IsValidCourse(course, true))
+			if (StrEqual(GOKZ_END_BUTTON_NAME, buffer, false))
 			{
-				StoreEnd(course, entity);
+				isEndButton = true;
+				StoreEnd(0, entity, CourseTimerType_Button);
+			}
+			else
+			{
+				int course = GetEndButtonBonusNumber(entity);
+				if (GOKZ_IsValidCourse(course, true))
+				{
+					isEndButton = true;
+					StoreEnd(course, entity, CourseTimerType_Button);
+				}
+			}
+		}
+		if (!isEndButton)
+		{
+			TimerButtonTrigger trigger;
+			if (IsTimerButtonTrigger(entity, trigger) && !trigger.isStartTimer)
+			{
+				StoreEnd(trigger.course, entity, CourseTimerType_Button);
 			}
 		}
 	}
@@ -71,13 +90,13 @@ void OnMapStart_MapEnd()
 {
 	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
 	{
-		endExists[course] = false;
+		endType[course] = CourseTimerType_None;
 	}
 }
 
 bool GetMapEndPosition(int course, float origin[3], float angles[3])
 {
-	if (!endExists[course])
+	if (endType[course] == CourseTimerType_None)
 	{
 		return false;
 	}
@@ -92,18 +111,37 @@ bool GetMapEndPosition(int course, float origin[3], float angles[3])
 
 // =====[ PRIVATE ]=====
 
-static void StoreEnd(int course, int entity)
+static void StoreEnd(int course, int entity, CourseTimerType type)
 {
-	float origin[3], angles[3];
-	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
-	GetEntPropVector(entity, Prop_Data, "m_angRotation", angles);
-	angles[2] = 0.0; // Roll should always be 0.0
+	// If StoreEnd is called, then there is at least an end position (even though it might not be a valid one)
+	if (endType[course] < CourseTimerType_Default)
+	{
+		endType[course] = CourseTimerType_Default;
+	}
 
-	endExists[course] = true;
-	endOrigin[course] = origin;
-	endAngles[course] = angles;
+	// Real zone is always better than "fake" zones which are better than buttons
+	// as the buttons found in a map with fake zones aren't meant to be visible.
+	if (endType[course] >= type)
+	{
+		return;
+	}
 
-	endOrigin[course][2] += 32.0;
+	float origin[3], distFromCenter[3];
+	GetEntityPositions(entity, origin, endOrigin[course], endAngles[course], distFromCenter);
+	
+	// If it is a button or the center of the center of the zone is invalid
+	if (type == CourseTimerType_Button || !IsSpawnValid(endOrigin[course]))
+	{
+		// Attempt with various positions around the entity, pick the first valid one.
+		if (!FindValidPositionAroundTimerEntity(entity, endOrigin[course], endAngles[course], type == CourseTimerType_Button))
+		{
+			endOrigin[course][2] -= 64.0; // Move the origin down so the eye position is directly on top of the button/zone.
+			return;
+		}
+	}
+	
+	// Only update the CourseTimerType if a valid position is found.
+	endType[course] = type;
 }
 
 static int GetEndButtonBonusNumber(int entity)

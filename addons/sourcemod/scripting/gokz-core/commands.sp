@@ -8,6 +8,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
+	RegConsoleCmd("sm_searchstart", CommandSearchStart, "[KZ] Teleport to the start zone/button of a specified course.");
 	RegConsoleCmd("sm_end", CommandTeleportToEnd, "[KZ] Teleport to the end.");
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
@@ -114,9 +115,58 @@ public Action CommandTeleportToStart(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandSearchStart(int client, int args)
+{
+	if (args == 0)
+	{
+		GOKZ_TeleportToSearchStart(client, GetCurrentCourse(client));
+		return Plugin_Handled;
+	}
+	else
+	{
+		char argCourse[4];
+		GetCmdArg(1, argCourse, sizeof(argCourse));
+		int course = StringToInt(argCourse);
+		if (GOKZ_IsValidCourse(course, false))
+		{
+			GOKZ_TeleportToSearchStart(client, course);
+		}
+		else if (StrEqual(argCourse, "main", false) || course == 0)
+		{
+			GOKZ_TeleportToSearchStart(client, 0);
+		}
+		else 
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Course Number", argCourse);
+		}
+	}
+	return Plugin_Handled;
+}
+
 public Action CommandTeleportToEnd(int client, int args)
 {
-	GOKZ_TeleportToEnd(client);
+	if (args == 0)
+	{  
+		GOKZ_TeleportToEnd(client, GetCurrentCourse(client));
+	}
+	else
+	{
+		char argCourse[4];
+		GetCmdArg(1, argCourse, sizeof(argCourse));
+		int course = StringToInt(argCourse);
+		if (GOKZ_IsValidCourse(course, false))
+		{
+			GOKZ_TeleportToEnd(client, course);
+		}
+		else if (StrEqual(argCourse, "main", false) || course == 0)
+		{
+			GOKZ_TeleportToEnd(client, 0);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Course Number", argCourse);
+		}
+	}
 	return Plugin_Handled;
 }
 

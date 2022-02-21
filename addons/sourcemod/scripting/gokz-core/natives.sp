@@ -15,6 +15,7 @@ void CreateNatives()
 	CreateNative("GOKZ_StopTimer", Native_StopTimer);
 	CreateNative("GOKZ_StopTimerAll", Native_StopTimerAll);
 	CreateNative("GOKZ_TeleportToStart", Native_TeleportToStart);
+	CreateNative("GOKZ_TeleportToSearchStart", Native_TeleportToSearchStart);
 	CreateNative("GOKZ_GetVirtualButtonPosition", Native_GetVirtualButtonPosition);
 	CreateNative("GOKZ_SetVirtualButtonPosition", Native_SetVirtualButtonPosition);
 	CreateNative("GOKZ_LockVirtualButtons", Native_LockVirtualButtons);
@@ -200,6 +201,11 @@ public int Native_TeleportToStart(Handle plugin, int numParams)
 	TeleportToStart(GetNativeCell(1));
 }
 
+public int Native_TeleportToSearchStart(Handle plugin, int numParams)
+{
+	TeleportToSearchStart(GetNativeCell(1), GetNativeCell(2));
+}
+
 public int Native_GetVirtualButtonPosition(Handle plugin, int numParams)
 {
 	int course;
@@ -247,7 +253,7 @@ public int Native_SetStartPosition(Handle plugin, int numParams)
 
 public int Native_TeleportToEnd(Handle plugin, int numParams)
 {
-	TeleportToEnd(GetNativeCell(1));
+	TeleportToEnd(GetNativeCell(1), GetNativeCell(2));
 }
 
 public int Native_GetStartPositionType(Handle plugin, int numParams)

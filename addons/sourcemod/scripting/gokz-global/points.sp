@@ -109,13 +109,12 @@ static void UpdatePointsCallback(JSON_Object ranks, GlobalAPIRequestData request
 	{
 		points = 0;
 		totalFinishes = 0;
-		LogError("Failed to get points.");
 	}
 	else
 	{
 		APIPlayerRank rank = view_as<APIPlayerRank>(ranks.GetObjectIndexed(0));
-		points = timeType == TimeType_Nub ? rank.PointsOverall : rank.Points;
-		points = points == -1 ? 0 : points;
+		// points = timeType == TimeType_Nub ? rank.PointsOverall : rank.Points;
+		points = points == -1 ? 0 : rank.Points;
 		totalFinishes = rank.Finishes == -1 ? 0 : rank.Finishes;
 	}
 	

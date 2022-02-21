@@ -94,7 +94,7 @@ SELECT Times.RunTime \
     LIMIT %d";
 
 char sql_getmaptop[] = "\
-SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
+SELECT t.TimeID, t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     FROM Times t \
     INNER JOIN MapCourses mc ON mc.MapCourseID=t.MapCourseID \
     INNER JOIN Players p ON p.SteamID32=t.SteamID32 \
@@ -105,7 +105,7 @@ SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     LIMIT %d";
 
 char sql_getmaptoppro[] = "\
-SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
+SELECT t.TimeID, t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     FROM Times t \
     INNER JOIN MapCourses mc ON mc.MapCourseID=t.MapCourseID \
     INNER JOIN Players p ON p.SteamID32=t.SteamID32 \
@@ -330,7 +330,7 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
 // =====[ JUMPSTATS ]=====
 
 char sql_jumpstats_gettop[] = "\
-SELECT p.SteamID32, p.Alias, j.Block, j.Distance, j.Strafes, j.Sync, j.Pre, j.Max, j.Airtime \
+SELECT j.JumpID, p.SteamID32, p.Alias, j.Block, j.Distance, j.Strafes, j.Sync, j.Pre, j.Max, j.Airtime \
 	FROM \
 		Jumpstats j \
     INNER JOIN \
@@ -381,7 +381,7 @@ SELECT JumpID, Distance, Block \
     ORDER BY Block DESC, Distance DESC";
 
 char sql_jumpstats_getpbs[] = "\
-SELECT b.JumpType, b.Distance, b.Strafes, b.Sync, b.Pre, b.Max, b.Airtime \
+SELECT b.JumpID, b.JumpType, b.Distance, b.Strafes, b.Sync, b.Pre, b.Max, b.Airtime \
     FROM Jumpstats b \
     INNER JOIN ( \
         SELECT a.SteamID32, a.Mode, a.JumpType, MAX(a.Distance) Distance \
@@ -394,7 +394,7 @@ SELECT b.JumpType, b.Distance, b.Strafes, b.Sync, b.Pre, b.Max, b.Airtime \
     ORDER BY b.JumpType";
 
 char sql_jumpstats_getblockpbs[] = "\
-SELECT c.JumpType, c.Block, c.Distance, c.Strafes, c.Sync, c.Pre, c.Max, c.Airtime \
+SELECT c.JumpID, c.JumpType, c.Block, c.Distance, c.Strafes, c.Sync, c.Pre, c.Max, c.Airtime \
     FROM Jumpstats c \
     INNER JOIN ( \
         SELECT a.SteamID32, a.Mode, a.JumpType, a.Block, MAX(b.Distance) Distance \
