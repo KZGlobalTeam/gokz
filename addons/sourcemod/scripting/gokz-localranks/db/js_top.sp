@@ -47,9 +47,11 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 		return;
 	}
 	
-	char display[128], alias[33], title[65];
-	int steamid, block, strafes;
+	char display[128], alias[33], title[65], admin[65];
+	int jumpid, steamid, block, strafes;
 	float distance, sync, pre, max, airtime;
+
+	bool clientIsAdmin = CheckCommandAccess(client, "sm_deletejump", ADMFLAG_ROOT, false);
 
 	Menu menu = new Menu(MenuHandler_JumpTopList);
 	menu.Pagination = 5;
@@ -68,6 +70,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 		for (int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
+			jumpid = SQL_FetchInt(results[0], JumpstatDB_Top20_JumpID);
 			steamid = SQL_FetchInt(results[0], JumpstatDB_Top20_SteamID);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
 			distance = float(SQL_FetchInt(results[0], JumpstatDB_Top20_Distance)) / GOKZ_DB_JS_DISTANCE_PRECISION;
@@ -79,9 +82,16 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 			
 			FormatEx(display, sizeof(display), "#%-2d   %.4f   %s", i + 1, distance, alias);
 			menu.AddItem(IntToStringEx(i), display, ITEMDRAW_DISABLED);
-			
-			PrintToConsole(client, "#%-2d   %.4f   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
-				i + 1, distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+
+			if (clientIsAdmin)
+			{
+				FormatEx(admin, sizeof(admin), "<id: %d>", jumpid);
+			}
+
+			PrintToConsole(client, "#%-2d   %.4f   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]   %s", 
+				i + 1, distance, alias, steamid & 1, steamid >> 1, 
+				strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air",
+				admin);
 		}
 	}
 	else
@@ -98,6 +108,7 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 		for (int i = 0; i < rows; i++)
 		{
 			SQL_FetchRow(results[0]);
+			jumpid = SQL_FetchInt(results[0], JumpstatDB_Top20_JumpID);
 			steamid = SQL_FetchInt(results[0], JumpstatDB_Top20_SteamID);
 			SQL_FetchString(results[0], JumpstatDB_Top20_Alias, alias, sizeof(alias));
 			block = SQL_FetchInt(results[0], JumpstatDB_Top20_Block);
@@ -111,8 +122,15 @@ void DB_TxnSuccess_GetJumpTop(Handle db, DataPack data, int numQueries, Handle[]
 			FormatEx(display, sizeof(display), "#%-2d   %d %T (%.4f)   %s", i + 1, block, "Block", client, distance, alias);
 			menu.AddItem(IntToStringEx(i), display, ITEMDRAW_DISABLED);
 			
-			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
-				i + 1, block, "Block", distance, alias, steamid & 1, steamid >> 1, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+			if (clientIsAdmin)
+			{
+				FormatEx(admin, sizeof(admin), "<id: %d>", jumpid);
+			}
+			
+			PrintToConsole(client, "#%-2d   %d %t (%.4f)   %s <STEAM_1:%d:%d>   [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]   %s", 
+				i + 1, block, "Block", distance, alias, steamid & 1, steamid >> 1, 
+				strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air", 
+				admin);
 		}
 	}
 	menu.Display(client, MENU_TIME_FOREVER);

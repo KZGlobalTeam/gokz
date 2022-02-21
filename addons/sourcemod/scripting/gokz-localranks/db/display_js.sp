@@ -194,10 +194,11 @@ public void DB_TxnSuccess_OpenJumpStats(Handle db, DataPack datapack, int numQue
 		menu.SetTitle("%T", "Jump Stats Submenu - Title (Block Jump)", client, alias, gC_ModeNames[mode]);
 	}
 
+	char buffer[128], admin[64];
+	bool clientIsAdmin = CheckCommandAccess(client, "sm_deletejump", ADMFLAG_ROOT, false);
+
 	if (blockType == 0)
 	{
-		char buffer[128];
-
 		FormatEx(buffer, sizeof(buffer), "%T", "Jump Stats - Jump Console Header", 
 			client, gC_ModeNames[mode], alias, targetSteamID & 1, targetSteamID >> 1);
 		PrintToConsole(client, "%s", buffer);
@@ -208,6 +209,7 @@ public void DB_TxnSuccess_OpenJumpStats(Handle db, DataPack datapack, int numQue
 
 		while (SQL_FetchRow(results[1]))
 		{
+			int jumpid = SQL_FetchInt(results[1], JumpstatDB_PBMenu_JumpID);
 			int jumpType = SQL_FetchInt(results[1], JumpstatDB_PBMenu_JumpType);
 			float distance = SQL_FetchFloat(results[1], JumpstatDB_PBMenu_Distance) / GOKZ_DB_JS_DISTANCE_PRECISION;
 			int strafes = SQL_FetchInt(results[1], JumpstatDB_PBMenu_Strafes);
@@ -222,14 +224,17 @@ public void DB_TxnSuccess_OpenJumpStats(Handle db, DataPack datapack, int numQue
 			FormatEx(buffer, sizeof(buffer), "%8s", gC_JumpTypesShort[jumpType]);
 			buffer[3] = '\0';
 
-			PrintToConsole(client, "%s  %0.4f  [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
-				buffer, distance, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+			if (clientIsAdmin)
+			{
+				FormatEx(admin, sizeof(admin), "<id: %d>", jumpid);
+			}
+
+			PrintToConsole(client, "%s  %0.4f  [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]   %s", 
+				buffer, distance, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air", admin);
 		}
 	}
 	else
 	{
-		char buffer[128];
-
 		FormatEx(buffer, sizeof(buffer), "%T", "Jump Stats - Block Jump Console Header", 
 			client, gC_ModeNames[mode], alias, targetSteamID & 1, targetSteamID >> 1);
 		PrintToConsole(client, "%s", buffer);
@@ -240,6 +245,7 @@ public void DB_TxnSuccess_OpenJumpStats(Handle db, DataPack datapack, int numQue
 
 		while (SQL_FetchRow(results[1]))
 		{
+			int jumpid = SQL_FetchInt(results[1], JumpstatDB_BlockPBMenu_JumpID);
 			int jumpType = SQL_FetchInt(results[1], JumpstatDB_BlockPBMenu_JumpType);
 			int block = SQL_FetchInt(results[1], JumpstatDB_BlockPBMenu_Block);
 			float distance = SQL_FetchFloat(results[1], JumpstatDB_BlockPBMenu_Distance) / GOKZ_DB_JS_DISTANCE_PRECISION;
@@ -255,8 +261,13 @@ public void DB_TxnSuccess_OpenJumpStats(Handle db, DataPack datapack, int numQue
 			FormatEx(buffer, sizeof(buffer), "%8s", gC_JumpTypesShort[jumpType]);
 			buffer[3] = '\0';
 
-			PrintToConsole(client, "%s  %d %t (%0.4f)  [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]", 
-				buffer, block, "Block", distance, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air");
+			if (clientIsAdmin)
+			{
+				FormatEx(admin, sizeof(admin), "<id: %d>", jumpid);
+			}
+
+			PrintToConsole(client, "%s  %d %t (%0.4f)  [%d %t | %.2f%% %t | %.2f %t | %.2f %t | %.4f %t]   %s", 
+				buffer, block, "Block", distance, strafes, "Strafes", sync, "Sync", pre, "Pre", max, "Max", airtime, "Air", admin);
 		}
 	}
 

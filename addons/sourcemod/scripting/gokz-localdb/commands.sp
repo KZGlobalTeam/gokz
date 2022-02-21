@@ -7,8 +7,10 @@ void RegisterCommands()
 	
 	RegAdminCmd("sm_setcheater", CommandSetCheater, ADMFLAG_ROOT, "[KZ] Set a SteamID as a cheater. Usage: !setcheater <STEAM_1:X:X>");
 	RegAdminCmd("sm_setnotcheater", CommandSetNotCheater, ADMFLAG_ROOT, "[KZ] Set a SteamID as not a cheater. Usage: !setnotcheater <STEAM_1:X:X>");
-	RegAdminCmd("sm_deletejump", CommandDeleteJump, ADMFLAG_ROOT, "[KZ] Remove the top jumpstat of a SteamID. Usage: !deletejump <STEAM_1:X:X> <mode> <jump type> <block?>");
-	RegAdminCmd("sm_deletealljumps", CommandDeleteAllJumps, ADMFLAG_ROOT, "[KZ] Remove all jumpstats of a SteamID. Usage: !deletejump <STEAM_1:X:X>");
+	RegAdminCmd("sm_deletebestjump", CommandDeleteBestJump, ADMFLAG_ROOT, "[KZ] Remove the top jumpstat of a SteamID. Usage: !deletebestjump <STEAM_1:X:X> <mode> <jump type> <block?>");
+	RegAdminCmd("sm_deletealljumps", CommandDeleteAllJumps, ADMFLAG_ROOT, "[KZ] Remove all jumpstats of a SteamID. Usage: !deletealljumps <STEAM_1:X:X>");
+	RegAdminCmd("sm_deletejump", CommandDeleteJump, ADMFLAG_ROOT, "[KZ] Remove a jumpstat by it's id. Usage: !deletejump <id>");
+	RegAdminCmd("sm_deletetime", CommandDeleteTime, ADMFLAG_ROOT, "[KZ] Remove a time by it's id. Usage: !deletetime <id>");
 }
 
 public Action Command_SaveTimerSetup(int client, int args)
@@ -68,11 +70,11 @@ public Action CommandSetNotCheater(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action CommandDeleteJump(int client, int args)
+public Action CommandDeleteBestJump(int client, int args)
 {
 	if (args < 3)
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Delete Jump Usage");
+		GOKZ_PrintToChat(client, true, "%t", "Delete Best Jump Usage");
 		return Plugin_Handled;
 	}
 	
@@ -123,7 +125,7 @@ public Action CommandDeleteJump(int client, int args)
 	// Is it a block jump?
 	isBlock = StrEqual(split[3], "yes", false) || StrEqual(split[3], "true", false) || StrEqual(split[3], "1");
 	
-	DB_DeleteJump(client, steamAccountID, jumpType, mode, isBlock);
+	DB_DeleteBestJump(client, steamAccountID, jumpType, mode, isBlock);
 	
 	return Plugin_Handled;
 }
@@ -149,5 +151,49 @@ public Action CommandDeleteAllJumps(int client, int args)
 	
 	DB_DeleteAllJumps(client, steamAccountID);
 	
+	return Plugin_Handled;
+}
+
+public Action CommandDeleteJump(int client, int args)
+{
+	if (args < 1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Delete Jump Usage");
+		return Plugin_Handled;
+	}
+
+	char buffer[24];
+	int jumpID;
+	GetCmdArgString(buffer, sizeof(buffer));
+	if (StringToIntEx(buffer, jumpID) == 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Invalid Jump ID");
+		return Plugin_Handled;
+	}
+
+	DB_DeleteJump(client, jumpID);
+
+	return Plugin_Handled;
+}
+
+public Action CommandDeleteTime(int client, int args)
+{
+	if (args < 1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Delete Time Usage");
+		return Plugin_Handled;
+	}
+
+	char buffer[24];
+	int timeID;
+	GetCmdArgString(buffer, sizeof(buffer));
+	if (StringToIntEx(buffer, timeID) == 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Invalid Time ID");
+		return Plugin_Handled;
+	}
+
+	DB_DeleteTime(client, timeID);
+
 	return Plugin_Handled;
 }

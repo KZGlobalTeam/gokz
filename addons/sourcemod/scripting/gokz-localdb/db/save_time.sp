@@ -55,3 +55,29 @@ public void DB_TxnSuccess_SaveTime(Handle db, DataPack data, int numQueries, Han
 	
 	Call_OnTimeInserted(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
 } 
+
+public void DB_DeleteTime(int client, int timeID)
+{
+	DataPack data = new DataPack();
+	data.WriteCell(client == 0 ? -1 : GetClientUserId(client)); // -1 if called from server console
+	data.WriteCell(timeID);
+
+	char query[1024];
+	FormatEx(query, sizeof(query), sql_times_delete, timeID);
+
+	Transaction txn = SQL_CreateTransaction();
+	txn.AddQuery(query);
+
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_TimeDeleted, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
+}
+
+public void DB_TxnSuccess_TimeDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int timeID = data.ReadCell();
+	delete data;
+
+	GOKZ_PrintToChatAndLog(client, true, "%t", "Time Deleted", 
+		timeID);
+}

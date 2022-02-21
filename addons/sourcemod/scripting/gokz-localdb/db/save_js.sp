@@ -188,7 +188,7 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 	Call_OnJumpstatPB(client, jumpType, mode, distanceFloat, block, strafes, syncFloat, preFloat, maxFloat, airtime);
 }
 
-public void DB_DeleteJump(int client, int steamAccountID, int jumpType, int mode, int isBlock)
+public void DB_DeleteBestJump(int client, int steamAccountID, int jumpType, int mode, int isBlock)
 {
 	DataPack data = new DataPack();
 	data.WriteCell(client == 0 ? -1 : GetClientUserId(client)); // -1 if called from server console
@@ -204,10 +204,10 @@ public void DB_DeleteJump(int client, int steamAccountID, int jumpType, int mode
 	Transaction txn = SQL_CreateTransaction();
 	txn.AddQuery(query);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_JumpDeleted, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_BestJumpDeleted, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
-public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void DB_TxnSuccess_BestJumpDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	char blockString[16] = "";
 	
@@ -224,7 +224,7 @@ public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, 
 		FormatEx(blockString, sizeof(blockString), "%T ", "Block", client);
 	}
 	
-	GOKZ_PrintToChatAndLog(client, true, "%t", "Jump Deleted", 
+	GOKZ_PrintToChatAndLog(client, true, "%t", "Best Jump Deleted", 
 		gC_ModeNames[mode], 
 		blockString, 
 		gC_JumpTypes[jumpType],
@@ -258,4 +258,30 @@ public void DB_TxnSuccess_AllJumpsDeleted(Handle db, DataPack data, int numQueri
 	GOKZ_PrintToChatAndLog(client, true, "%t", "All Jumps Deleted", 
 		steamAccountID & 1,
 		steamAccountID >> 1);
+}
+
+public void DB_DeleteJump(int client, int jumpID)
+{
+	DataPack data = new DataPack();
+	data.WriteCell(client == 0 ? -1 : GetClientUserId(client)); // -1 if called from server console
+	data.WriteCell(jumpID);
+
+	char query[1024];
+	FormatEx(query, sizeof(query), sql_jumpstats_deletejump, jumpID);
+
+	Transaction txn = SQL_CreateTransaction();
+	txn.AddQuery(query);
+
+	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_JumpDeleted, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
+}
+
+public void DB_TxnSuccess_JumpDeleted(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+{
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int jumpID = data.ReadCell();
+	delete data;
+
+	GOKZ_PrintToChatAndLog(client, true, "%t", "Jump Deleted", 
+		jumpID);
 }
