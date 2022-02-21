@@ -72,6 +72,7 @@ static MRESReturn DHook_ProcessMovementPost(Handle hParams)
 			// The current velocity doesn't match the velocity of the end of movement processing,
 			// so it must have been modified by something like a trigger.
 			InvalidateJumpstat(client);
+			break;
 		}
 	}
 
