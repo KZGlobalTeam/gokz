@@ -115,6 +115,7 @@ public void OnPluginStart()
 	OnPluginStart_Options();
 	OnPluginStart_Triggerfix();
 	OnPluginStart_Demofix();
+	OnPluginStart_MapFile();
 	OnPluginStart_TeamNumber();
 }
 
@@ -367,6 +368,7 @@ public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &
 public void OnEntityCreated(int entity, const char[] classname)
 {
 	SDKHook(entity, SDKHook_Spawn, OnEntitySpawned);
+	SDKHook(entity, SDKHook_SpawnPost, OnEntitySpawnedPost);
 	OnEntityCreated_Triggerfix(entity, classname);
 }
 
@@ -375,8 +377,13 @@ public void OnEntitySpawned(int entity)
 	OnEntitySpawned_MapTriggers(entity);
 	OnEntitySpawned_MapButtons(entity);
 	OnEntitySpawned_MapStarts(entity);
-	OnEntitySpawned_MapEnd(entity);
 	OnEntitySpawned_MapZones(entity);
+}
+
+public void OnEntitySpawnedPost(int entity)
+{
+	OnEntitySpawnedPost_MapStarts(entity);
+	OnEntitySpawnedPost_MapEnd(entity);
 }
 
 public void OnClientConnected(int client)

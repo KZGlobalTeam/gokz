@@ -20,6 +20,7 @@ static int bhopTouchCount[MAXPLAYERS + 1];
 static ArrayList triggerTouchList[MAXPLAYERS + 1]; // arraylist of TouchedTrigger that the player is currently touching. this array won't ever get long (unless the mapper does something weird).
 static StringMap antiBhopTriggers; // stringmap of AntiBhopTrigger with key being a string of the m_iHammerID entprop.
 static StringMap teleportTriggers; // stringmap of TeleportTrigger with key being a string of the m_iHammerID entprop.
+static StringMap timerButtonTriggers; // stringmap of legacy timer zone triggers with key being a string of the m_iHammerID entprop.
 static ArrayList parseErrorStrings;
 
 
@@ -89,6 +90,16 @@ bool IsBhopTrigger(TeleportType type)
 			|| type == TeleportType_SequentialBhop;
 }
 
+bool IsTimerButtonTrigger(int entity, TimerButtonTrigger trigger)
+{
+	char hammerID[32];
+	bool gotHammerID = GetEntityHammerIDString(entity, hammerID, sizeof(hammerID));
+	if (gotHammerID && timerButtonTriggers.GetArray(hammerID, trigger, sizeof(trigger)))
+	{
+		return true;
+	}
+	return false;
+}
 
 // =====[ EVENTS ]=====
 
@@ -97,6 +108,7 @@ void OnPluginStart_MapTriggers()
 	parseErrorStrings = new ArrayList(ByteCountToCells(GOKZ_MAX_MAPTRIGGERS_ERROR_LENGTH));
 	antiBhopTriggers = new StringMap();
 	teleportTriggers = new StringMap();
+	timerButtonTriggers = new StringMap();
 }
 
 void OnMapStart_MapTriggers()
@@ -104,8 +116,9 @@ void OnMapStart_MapTriggers()
 	parseErrorStrings.Clear();
 	antiBhopTriggers.Clear();
 	teleportTriggers.Clear();
+	timerButtonTriggers.Clear();
 	mapMappingApiVersion = GOKZ_MAPPING_API_VERSION_NONE;
-	EntlumpParse(antiBhopTriggers, teleportTriggers, mapMappingApiVersion);
+	EntlumpParse(antiBhopTriggers, teleportTriggers, timerButtonTriggers, mapMappingApiVersion);
 	
 	if (mapMappingApiVersion > GOKZ_MAPPING_API_VERSION)
 	{

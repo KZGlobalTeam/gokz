@@ -176,6 +176,15 @@
 		"#format"	"{1:d}"
 		"en"		"{grey}The start of {bluegrey}Bonus {1} {grey}was not found."
 		"ru"		"{grey}Начало {bluegrey}Bonus {1} {grey}не найдено."
+	}	
+	"No End Found"
+	{
+		"en"		"{grey}The end of the {bluegrey}Main Course {grey}was not found."
+	}
+	"No End Found (Bonus)"
+	{
+		"#format"	"{1:d}"
+		"en"		"{grey}The end of {bluegrey}Bonus {1} {grey}was not found."
 	}
 	"Option - Virtual Button Indicators - Enable"
 	{

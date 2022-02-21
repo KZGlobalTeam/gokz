@@ -88,6 +88,14 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_TeleportToStart(this.ID);
 	}
 	
+	public void TeleportToSearchStart(int course) {
+		GOKZ_TeleportToSearchStart(this.ID, course);
+	}
+	
+	public void TeleportToEnd(int course) {
+		GOKZ_TeleportToEnd(this.ID, course);
+	}
+
 	property StartPositionType StartPositionType {
 		public get() {
 			return GOKZ_GetStartPositionType(this.ID);

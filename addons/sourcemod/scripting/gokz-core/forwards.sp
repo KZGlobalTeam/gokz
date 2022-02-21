@@ -63,10 +63,10 @@ void CreateGlobalForwards()
 	H_OnPrevCheckpoint_Post = new GlobalForward("GOKZ_OnPrevCheckpoint_Post", ET_Ignore, Param_Cell);
 	H_OnNextCheckpoint = new GlobalForward("GOKZ_OnNextCheckpoint", ET_Hook, Param_Cell);
 	H_OnNextCheckpoint_Post = new GlobalForward("GOKZ_OnNextCheckpoint_Post", ET_Ignore, Param_Cell);
-	H_OnTeleportToStart = new GlobalForward("GOKZ_OnTeleportToStart", ET_Hook, Param_Cell);
-	H_OnTeleportToStart_Post = new GlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell);
-	H_OnTeleportToEnd = new GlobalForward("GOKZ_OnTeleportToEnd", ET_Hook, Param_Cell);
-	H_OnTeleportToEnd_Post = new GlobalForward("GOKZ_OnTeleportToEnd_Post", ET_Ignore, Param_Cell);
+	H_OnTeleportToStart = new GlobalForward("GOKZ_OnTeleportToStart", ET_Hook, Param_Cell, Param_Cell);
+	H_OnTeleportToStart_Post = new GlobalForward("GOKZ_OnTeleportToStart_Post", ET_Ignore, Param_Cell, Param_Cell);
+	H_OnTeleportToEnd = new GlobalForward("GOKZ_OnTeleportToEnd", ET_Hook, Param_Cell, Param_Cell);
+	H_OnTeleportToEnd_Post = new GlobalForward("GOKZ_OnTeleportToEnd_Post", ET_Ignore, Param_Cell, Param_Cell);
 	H_OnUndoTeleport = new GlobalForward("GOKZ_OnUndoTeleport", ET_Hook, Param_Cell);
 	H_OnUndoTeleport_Post = new GlobalForward("GOKZ_OnUndoTeleport_Post", ET_Ignore, Param_Cell);
 	H_OnStartPositionSet_Post = new GlobalForward("GOKZ_OnStartPositionSet_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Array, Param_Array);
@@ -244,31 +244,35 @@ void Call_GOKZ_OnNextCheckpoint_Post(int client)
 	Call_Finish();
 }
 
-void Call_GOKZ_OnTeleportToStart(int client, Action &result)
+void Call_GOKZ_OnTeleportToStart(int client, int course, Action &result)
 {
 	Call_StartForward(H_OnTeleportToStart);
 	Call_PushCell(client);
+	Call_PushCell(course);
 	Call_Finish(result);
 }
 
-void Call_GOKZ_OnTeleportToStart_Post(int client)
+void Call_GOKZ_OnTeleportToStart_Post(int client, int course)
 {
 	Call_StartForward(H_OnTeleportToStart_Post);
 	Call_PushCell(client);
+	Call_PushCell(course);
 	Call_Finish();
 }
 
-void Call_GOKZ_OnTeleportToEnd(int client, Action &result)
+void Call_GOKZ_OnTeleportToEnd(int client, int course, Action &result)
 {
 	Call_StartForward(H_OnTeleportToEnd);
 	Call_PushCell(client);
+	Call_PushCell(course);
 	Call_Finish(result);
 }
 
-void Call_GOKZ_OnTeleportToEnd_Post(int client)
+void Call_GOKZ_OnTeleportToEnd_Post(int client, int course)
 {
 	Call_StartForward(H_OnTeleportToEnd_Post);
 	Call_PushCell(client);
+	Call_PushCell(course);
 	Call_Finish();
 }
 
