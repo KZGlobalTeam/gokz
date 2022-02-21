@@ -1,5 +1,6 @@
 #include <sourcemod>
 
+#include <dhooks>
 #include <sdkhooks>
 #include <sdktools>
 
@@ -34,6 +35,7 @@ public Plugin myinfo =
 #include "gokz-jumpstats/distance_tiers.sp"
 #include "gokz-jumpstats/jump_reporting.sp"
 #include "gokz-jumpstats/jump_tracking.sp"
+#include "gokz-jumpstats/jump_validating.sp"
 #include "gokz-jumpstats/options.sp"
 #include "gokz-jumpstats/options_menu.sp"
 
@@ -56,6 +58,8 @@ public void OnPluginStart()
 	LoadBroadcastTiers();
 	CreateGlobalForwards();
 	RegisterCommands();
+	
+	OnPluginStart_JumpValidating();
 }
 
 public void OnAllPluginsLoaded()
