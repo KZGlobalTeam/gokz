@@ -21,7 +21,7 @@
 #define GlobalAPI_Backend_Version "v2.0"
 #define GlobalAPI_Backend_Staging_Version "v2.0"
 #define GlobalAPI_BaseUrl "https://kztimerglobal.com/api/" ... GlobalAPI_Backend_Version
-#define GlobalAPI_Staging_BaseUrl "https://staging.kztimerglobal.com/api/" ... GlobalAPI_Backend_Staging_Version
+#define GlobalAPI_Staging_BaseUrl "https://globalapi.ruto.sh/api/" ... GlobalAPI_Backend_Staging_Version
 
 #define GlobalAPI_Max_BaseUrl_Length 128
 #define GlobalAPI_Max_QueryParam_Num 20
@@ -740,7 +740,7 @@ native bool GlobalAPI_GetReplayByReplayId(OnAPICallFinished callback = INVALID_F
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_CreateReplayForRecordId(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
-												int recordId, char[] replayFile);
+												int recordId, const char[] replayFile);
 
 // ======================= PLUGIN INFO ======================= //
 

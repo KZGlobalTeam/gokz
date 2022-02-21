@@ -122,6 +122,14 @@ static void ShowTimerText(KZPlayer player, HUDInfo info)
 			// as it doesn't seem to be possible to display a Menu with no items.
 			Panel panel = new Panel(null);
 			panel.SetTitle(FormatTimerTextForMenu(player, info));
+			int observerTarget = GetObserverTarget(player.ID);
+			if (observerTarget != -1 && IsFakeClient(observerTarget)
+				 && info.TimeType == TimeType_Nub)
+			{
+				char text[32];
+				FormatEx(text, sizeof(text), "%t", "TP Menu - Spectator Teleports", info.CurrentTeleport);
+				panel.DrawItem(text, ITEMDRAW_RAWLINE);
+			}
 			panel.Send(player.ID, PanelHandler_Menu, MENU_TIME_FOREVER);
 			delete panel;
 			gB_MenuShowing[player.ID] = true;

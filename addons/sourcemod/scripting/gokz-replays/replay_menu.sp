@@ -51,29 +51,25 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 		int replayIndex = StringToInt(info);
 		int replayInfo[RP_CACHE_BLOCKSIZE];
 		g_ReplayInfoCache.GetArray(replayIndex, replayInfo);
-		int botClient = LoadReplayBot(replayInfo[0], replayInfo[1], replayInfo[2], replayInfo[3]);
-		if (botClient != -1)
-		{
 
-			// Join spectators and spec the bot
-			GOKZ_JoinTeam(param1, CS_TEAM_SPECTATOR);
-			SetEntProp(param1, Prop_Send, "m_iObserverMode", 4);
-			SetEntPropEnt(param1, Prop_Send, "m_hObserverTarget", botClient);
-			
-			int clientUserID = GetClientUserId(param1);
-			DataPack data = new DataPack();
-			data.WriteCell(clientUserID);
-			data.WriteCell(GetClientUserId(botClient));
-
-			CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
-			CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
-			EnableReplayControls(param1);
-		}
-		else
+		char path[PLATFORM_MAX_PATH];
+		BuildPath(Path_SM, path, sizeof(path),
+			"%s/%s/%d_%s_%s_%s.%s",
+			RP_DIRECTORY_RUNS, gC_CurrentMap, replayInfo[0], gC_ModeNamesShort[replayInfo[1]], gC_StyleNamesShort[replayInfo[2]], gC_TimeTypeNames[replayInfo[3]], RP_FILE_EXTENSION);
+		if (!FileExists(path))
 		{
-			GOKZ_PrintToChat(param1, true, "%t", "No Bots Available");
-			GOKZ_PlayErrorSound(param1);
+			BuildPath(Path_SM, path, sizeof(path),
+				"%s/%d_%s_%s_%s.%s",
+				RP_DIRECTORY, gC_CurrentMap, replayInfo[0], gC_ModeNamesShort[replayInfo[1]], gC_StyleNamesShort[replayInfo[2]], gC_TimeTypeNames[replayInfo[3]], RP_FILE_EXTENSION);
+			if (!FileExists(path))
+			{
+				LogError("Failed to load file: \"%s\".", path);
+				GOKZ_PrintToChat(param1, true, "%t", "Replay Menu - No File");
+				return;
+			}
 		}
+		
+		LoadReplayBot(param1, path);
 	}
 	else if (action == MenuAction_Cancel)
 	{
@@ -83,31 +79,6 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 	{
 		delete menu;
 	}
-}
-
-public Action Timer_ResetSpectate(Handle timer, int clientUID)
-{
-	int client = GetClientOfUserId(clientUID);
-	if (IsValidClient(client))
-	{
-		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
-	}
-}
-public Action Timer_SpectateBot(Handle timer, DataPack data)
-{
-	data.Reset();
-	int client = GetClientOfUserId(data.ReadCell());
-	int botClient = GetClientOfUserId(data.ReadCell());
-	delete data;
-	
-	if (IsValidClient(client) && IsValidClient(botClient))
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", botClient);
-	}
-	return Plugin_Continue;
 }
 
 

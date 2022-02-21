@@ -108,5 +108,19 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_ShowControls:
+		{
+			switch (newValue)
+			{
+				case ReplayControls_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Controls - Disable");
+				}
+				case ReplayControls_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Controls - Enable");
+				}
+			}
+		}
 	}
 } 

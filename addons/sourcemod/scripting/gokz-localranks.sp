@@ -13,6 +13,7 @@
 #undef REQUIRE_PLUGIN
 #include <gokz/global>
 #include <gokz/jumpstats>
+#include <gokz/replays>
 #include <updater>
 
 #pragma newdecls required
