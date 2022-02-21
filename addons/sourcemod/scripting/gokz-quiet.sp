@@ -26,11 +26,14 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-quiet.txt"
 
+// Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
+#define BLANK_SOUNDSCAPEINDEX 482
+
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
 TopMenuObject gTMO_ItemsQuiet[QTOPTION_COUNT];
 
-
+int gI_CurrentSoundscapeIndex[MAXPLAYERS + 1] = {BLANK_SOUNDSCAPEINDEX, ...};
 
 // =====[ PLUGIN EVENTS ]=====
 
@@ -96,10 +99,19 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	{
 		return;
 	}
-
+	
+	int soundscapeIndex = GetEntProp(client, Prop_Data, "soundscapeIndex");
 	if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_MapSounds]) == MapSounds_Disabled)
 	{
-		SetEntProp(client, Prop_Data, "soundscapeIndex", 0);
+		if (soundscapeIndex != BLANK_SOUNDSCAPEINDEX)
+		{
+			gI_CurrentSoundscapeIndex[client] = soundscapeIndex;
+		}
+		SetEntProp(client, Prop_Data, "soundscapeIndex", BLANK_SOUNDSCAPEINDEX);
+	}
+	else
+	{
+		gI_CurrentSoundscapeIndex[client] = soundscapeIndex;
 	}
 }
 
@@ -260,6 +272,13 @@ void OnOptionsMenuReady_Options()
 
 void OnOptionChanged_Options(int client, QTOption option, any newValue)
 {
+	if (option == QTOption_MapSounds && newValue == MapSounds_Enabled)
+	{
+		if (gI_CurrentSoundscapeIndex[client] != BLANK_SOUNDSCAPEINDEX)
+		{
+			SetEntProp(client, Prop_Data, "soundscapeIndex", gI_CurrentSoundscapeIndex[client]);
+		}
+	}
 	PrintOptionChangeMessage(client, option, newValue);
 }
 
