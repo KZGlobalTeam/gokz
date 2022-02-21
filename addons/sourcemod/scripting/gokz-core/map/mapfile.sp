@@ -8,7 +8,7 @@ static Regex RE_BonusStartButton;
 static Regex RE_BonusEndButton;
 
 // NOTE: 4 megabyte array for entity lump reading.
-static char entityLump[4194304];
+static char gEntityLump[4194304];
 
 // =====[ PUBLIC ]=====
 
@@ -40,20 +40,20 @@ void EntlumpParse(StringMap antiBhopTriggers, StringMap teleportTriggers, String
 			// jump to the start of the entity lump
 			file.Seek(offset, SEEK_SET);
 			
-			int charactersRead = file.ReadString(entityLump, sizeof(entityLump), length);
+			int charactersRead = file.ReadString(gEntityLump, sizeof(gEntityLump), length);
 			delete file;
-			if (charactersRead >= sizeof(entityLump - 1))
+			if (charactersRead >= sizeof(gEntityLump) - 1)
 			{
 				PushMappingApiError("ERROR: Entity lump: The map's entity lump is too big! Reduce the amount of entities in your map.");
 				return;
 			}
-			entityLump[length] = '\0';
+			gEntityLump[length] = '\0';
 			
 			int index = 0;
 			
 			StringMap entity = new StringMap();
 			bool gotWorldSpawn = false;
-			while (EntlumpParseEntity(entity, entityLump, index))
+			while (EntlumpParseEntity(entity, gEntityLump, index))
 			{
 				char classname[128];
 				char targetName[GOKZ_ENTLUMP_MAX_VALUE];
