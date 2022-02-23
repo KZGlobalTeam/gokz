@@ -202,7 +202,7 @@ public MRESReturn DHooks_OnGetPlayerMaxSpeed(int client, Handle hReturn)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || !IsUsingMode(client))
 	{
 		return;
 	}
