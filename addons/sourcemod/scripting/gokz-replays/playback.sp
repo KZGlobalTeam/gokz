@@ -1208,6 +1208,16 @@ static void PlaybackSkipToTick(int bot, int tick)
 
 		TeleportEntity(botClient[bot], currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 
+		int direction = tick < playbackTick[bot] ? -1 : 1;
+		for (int i = playbackTick[bot]; i != tick; i += direction)
+		{
+			playbackTickData[bot].GetArray(i, currentTickData);
+			if (currentTickData.flags & RP_TELEPORT_TICK)
+			{
+				botCurrentTeleport[bot] += direction;
+			}
+		}
+
 		#if defined DEBUG 
 			PrintToServer("X %f \nY %f \nZ %f\nPitch %f\nYaw %f", currentTickData.origin[0], currentTickData.origin[1], currentTickData.origin[2], currentTickData.angles[0], currentTickData.angles[1]);
 			if(currentTickData.flags & RP_MOVETYPE_MASK == view_as<int>(MOVETYPE_WALK)) PrintToServer("MOVETYPE_WALK");
