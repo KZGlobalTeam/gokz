@@ -44,7 +44,7 @@ void OnClientPutInServer_Recording(int client)
 {
     recordedTickData[client] = new ArrayList(sizeof(ReplayTickData));
     recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
-    recordingIndex[client] = 0;
+    ResetRollingIndex(client);
 
     if(IsValidClient(client) && !IsFakeClient(client))
     {
@@ -86,7 +86,7 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
     tickData.buttonsForced = GetEntProp(client, Prop_Data, "m_afButtonForced");
 
     // HACK: Reset teleport tick marker. Too bad!
-    if(isTeleportTick[client])
+    if (isTeleportTick[client])
     {
         isTeleportTick[client] = false;
     }
@@ -110,8 +110,8 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
         {
             recordedTickData[client].Resize(tick + 1);
         }
-        tick = recordingIndex[client];
-        recordingIndex[client] = recordingIndex[client] == maxCheaterReplayTicks - 1 ? 0 : recordingIndex[client] + 1;
+        tick = GetRollingIndex(client);
+        recordingIndex[client] = recordingIndex[client] >= maxCheaterReplayTicks - 1 ? 0 : recordingIndex[client] + 1;
 
         recordedTickData[client].SetArray(tick, tickData);
     }
@@ -261,7 +261,7 @@ static void StartRecording(int client)
     }
     QueryClientConVar(client, "sensitivity", SensitivityCheck, client);
     QueryClientConVar(client, "m_yaw", MYAWCheck, client);
-    recordingIndexOnTimerStart[client] = recordingIndex[client];
+    recordingIndexOnTimerStart[client] = GetRollingIndex(client);
     
     DiscardRecording(client);
     ResumeRecording(client);
@@ -269,17 +269,22 @@ static void StartRecording(int client)
 
 static void DiscardRecording(int client)
 {
-    // Make sure we still have 2 mins of footage.
-    if(recordedRunData[client].Length >= maxCheaterReplayTicks)
+    // Write any data from the run to our rolling buffer, up to max cheater replay length
+    int length = recordedRunData[client].Length < maxCheaterReplayTicks ? recordedRunData[client].Length : maxCheaterReplayTicks;
+    PrintToServer("Writing %d tick(s) of run data to tick data.", length);
+    PrintToServer("Rolling index is %d and index on start is %d", GetRollingIndex(client), recordingIndexOnTimerStart[client]);
+    // Ensure the rolling buffer has correct size.
+    if (recordedTickData[client].Length < maxCheaterReplayTicks)
     {
-        recordedTickData[client].Clear();
-        any runData[sizeof(ReplayTickData)];
-        for (int i = recordedRunData[client].Length - maxCheaterReplayTicks; i < recordedRunData[client].Length; i++)
-        {
-            recordedRunData[client].GetArray(i, runData, sizeof(runData));
-            recordedTickData[client].PushArray(runData, sizeof(runData));
-        }
-        recordingIndex[client] = 0;
+        recordedTickData[client].Resize(maxCheaterReplayTicks);
+    }
+
+    any runData[sizeof(ReplayTickData)];
+    for (int i = recordedRunData[client].Length - length; i < recordedRunData[client].Length; i++)
+    {
+        recordedRunData[client].GetArray(i, runData, sizeof(runData));
+        recordedTickData[client].SetArray(GetRollingIndex(client), runData);
+        IncrementRollingIndex(client);
     }
     recordedRunData[client].Clear();
     Call_OnReplayDiscarded(client);
@@ -499,10 +504,10 @@ static void WriteTickData(File file, int client, int replayType)
         case ReplayType_Run:
         {
             // 2 seconds pre timer starting
-            i = recordingIndexOnTimerStart[client] - RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
+            i = recordingIndexOnTimerStart[client] - preAndPostRunTickCount;
             if (i < 0)
             {
-                i = recordedTickData[client].Length + i;
+                i = recordedTickData[client].Length - 1 + i;
             }
 
             int previousJ = i;
@@ -539,13 +544,13 @@ static void WriteTickData(File file, int client, int replayType)
         case ReplayType_Cheater:
         {
             // TODO: this doesn't work.
-            i = recordingIndex[client];
+            i = GetRollingIndex(client);
             do
             {
                 i %= recordedTickData[client].Length;
                 WriteTickDataToFile(file, false, tickData, prevTickData);
                 i++;
-            } while (i != recordingIndex[client]);
+            } while (i != GetRollingIndex(client));
         }
         case ReplayType_Jump:
         {
@@ -574,10 +579,10 @@ static void WriteTickData(File file, int client, int replayType)
             }
             else
             {
-                i = recordingIndex[client] - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
+                i = GetRollingIndex(client) - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
                 if (i < 0)
                 {
-                    i = recordedTickData[client].Length + i;
+                    i = recordedTickData[client].Length - 1 + i;
                 }
                 do
                 {
@@ -595,7 +600,7 @@ static void WriteTickData(File file, int client, int replayType)
                     previousI = i;
                     isFirstTick = false;
                     i++;
-                } while (i != recordingIndex[client]);
+                } while (i != GetRollingIndex(client));
             }
         }
     }
@@ -821,4 +826,50 @@ public void SensitivityCheck(QueryCookie cookie, int client, ConVarQueryResult r
 	{
 		playerSensitivity[client] = StringToFloat(cvarValue);
 	}
+}
+
+static void IncrementRollingIndex(int client)
+{
+    recordingIndex[client]++;
+    if (recordingIndex[client] >= recordedTickData[client].Length - 1)
+    {
+        recordingIndex[client] -= recordedTickData[client].Length - 1;
+    }
+}
+
+static void DecrementRollingIndex(int client)
+{
+    recordingIndex[client]--;
+    if (recordingIndex[client] < 0)
+    {
+        recordingIndex[client] = recordedTickData[client].Length - 1 + recordingIndex[client];
+    }
+}
+
+static void AddToRollingIndex(int client, int value)
+{
+    recordingIndex[client] += value;
+    if (recordingIndex[client] >= recordedTickData[client].Length - 1)
+    {
+        recordingIndex[client] -= recordedTickData[client].Length - 1;
+    }
+}
+
+static void SubtractFromRollingIndex(int client, int value)
+{
+    recordingIndex[client] -= value;
+    if (recordingIndex[client] < 0)
+    {
+        recordingIndex[client] = recordedTickData[client].Length - 1 + recordingIndex[client];
+    }
+}
+
+static int GetRollingIndex(int client)
+{
+    return recordingIndex[client];
+}
+
+static void ResetRollingIndex(int client)
+{
+    recordingIndex[client] = 0;
 }
