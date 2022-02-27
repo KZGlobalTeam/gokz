@@ -55,6 +55,7 @@ void EnableNoclip(int client)
 	if (IsPlayerAlive(client))
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		GOKZ_StopTimer(client);
 	}
 }
 
@@ -89,6 +90,7 @@ void EnableNoclipNotrigger(int client)
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
+		GOKZ_StopTimer(client);
 	}
 }
 
