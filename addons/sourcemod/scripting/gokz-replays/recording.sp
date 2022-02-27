@@ -271,8 +271,6 @@ static void DiscardRecording(int client)
 {
     // Write any data from the run to our rolling buffer, up to max cheater replay length
     int length = recordedRunData[client].Length < maxCheaterReplayTicks ? recordedRunData[client].Length : maxCheaterReplayTicks;
-    PrintToServer("Writing %d tick(s) of run data to tick data.", length);
-    PrintToServer("Rolling index is %d and index on start is %d", GetRollingIndex(client), recordingIndexOnTimerStart[client]);
     // Ensure the rolling buffer has correct size.
     if (recordedTickData[client].Length < maxCheaterReplayTicks)
     {
