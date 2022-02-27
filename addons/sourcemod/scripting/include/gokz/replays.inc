@@ -10,9 +10,13 @@
 #define _gokz_replays_included_
 
 // Bit of a hack, but need it for other plugins that depend on replays to compile
+#if defined REQUIRE_PLUGIN
 #undef REQUIRE_PLUGIN
 #include <gokz/anticheat>
 #define REQUIRE_PLUGIN
+#else
+#include <gokz/anticheat>
+#endif
 
 
 
