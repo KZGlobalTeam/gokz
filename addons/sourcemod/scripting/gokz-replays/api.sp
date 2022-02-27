@@ -24,7 +24,7 @@ public int Native_RP_LoadJumpReplay(Handle plugin, int numParams)
 	GetNativeStringLength(2, len);
 	char[] path = new char[len + 1];
 	GetNativeString(2, path, len + 1);
-	int botClient = LoadReplayBot(GetNativeCell(1), path);
+	int botClient = LoadReplayBot(GetNativeCell(1), path, true);
 	return botClient;
 }
 
