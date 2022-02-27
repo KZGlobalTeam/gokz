@@ -9,8 +9,6 @@
 #endif
 #define _gokz_replays_included_
 
-#include <gokz/anticheat>
-
 
 
 // =====[ ENUMS ]=====
