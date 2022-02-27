@@ -880,10 +880,11 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			return;
 		}
 
-		// Play timer start/end sound, if necessary
+		// Play timer start/end sound, if necessary. Reset teleports
 		if (playbackTick[bot] == preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
 			EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			botCurrentTeleport[bot] = 0;
 		}
 		if (playbackTick[bot] == playbackTickData[bot].Length - preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
