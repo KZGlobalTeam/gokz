@@ -835,6 +835,8 @@ static void IncrementRollingIndex(int client)
     }
 }
 
+// Not currently used, but might be useful at some point
+/*
 static void DecrementRollingIndex(int client)
 {
     recordingIndex[client]--;
@@ -861,6 +863,7 @@ static void SubtractFromRollingIndex(int client, int value)
         recordingIndex[client] = recordedTickData[client].Length - 1 + recordingIndex[client];
     }
 }
+*/
 
 static int GetRollingIndex(int client)
 {

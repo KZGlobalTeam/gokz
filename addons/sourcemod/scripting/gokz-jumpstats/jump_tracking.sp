@@ -24,6 +24,7 @@ enum struct Pose
 
 static int entityTouchCount[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
+static int lastNoclipTime[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -1334,8 +1335,14 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 	{
 		return;
 	}
-
+	
 	jumpTrackers[client].tickCount = tickcount;
+	
+	if (CheckNoclip(client))
+	{
+		lastNoclipTime[client] = GetGameTickCount();
+	}
+	
 	// Don't bother checking if player is already in air and jumpstat is already invalid
 	if (Movement_GetOnGround(client) ||
 		jumpTrackers[client].jump.type != JumpType_FullInvalid)
@@ -1409,7 +1416,7 @@ static void UpdateValidCmd(int client, int buttons)
 		validCmd[client] = true;
 	}
 	
-	if (CheckNoclip(client))
+	if (GetGameTickCount() - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
