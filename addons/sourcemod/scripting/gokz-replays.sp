@@ -15,7 +15,6 @@
 #include <gokz/hud>
 #include <gokz/jumpstats>
 #include <gokz/localdb>
-#include <gokz/anticheat>
 #include <updater>
 
 #pragma newdecls required

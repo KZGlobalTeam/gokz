@@ -9,6 +9,11 @@
 #endif
 #define _gokz_replays_included_
 
+// Bit of a hack, but need it for other plugins that depend on replays to compile
+#undef REQUIRE_PLUGIN
+#include <gokz/anticheat>
+#define REQUIRE_PLUGIN
+
 
 
 // =====[ ENUMS ]=====
