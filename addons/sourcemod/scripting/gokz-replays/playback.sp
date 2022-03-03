@@ -896,11 +896,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		Movement_GetOrigin(client, currentOrigin);
 		MakeVectorFromPoints(currentOrigin, currentTickData.origin, velocity);
 		ScaleVector(velocity, 1.0 / GetTickInterval());
-		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, currentTickData.velocity);
-		
-		// NOTE: This is better than TeleportEntity/Movement_SetOrigin, because the game interpolates the origin with this.
-		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", prevTickData.origin);
-		
+		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, velocity);
 		
 		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
