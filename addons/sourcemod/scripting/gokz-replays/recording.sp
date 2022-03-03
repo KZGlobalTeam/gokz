@@ -269,21 +269,7 @@ static void StartRecording(int client)
 
 static void DiscardRecording(int client)
 {
-    // Write any data from the run to our rolling buffer, up to max cheater replay length
-    int length = recordedRunData[client].Length < maxCheaterReplayTicks ? recordedRunData[client].Length : maxCheaterReplayTicks;
-    // Ensure the rolling buffer has correct size.
-    if (recordedTickData[client].Length < maxCheaterReplayTicks)
-    {
-        recordedTickData[client].Resize(maxCheaterReplayTicks);
-    }
-
-    any runData[sizeof(ReplayTickData)];
-    for (int i = recordedRunData[client].Length - length; i < recordedRunData[client].Length; i++)
-    {
-        recordedRunData[client].GetArray(i, runData, sizeof(runData));
-        recordedTickData[client].SetArray(GetRollingIndex(client), runData);
-        IncrementRollingIndex(client);
-    }
+    TransferRunDataToRollingData(client);
     recordedRunData[client].Clear();
     Call_OnReplayDiscarded(client);
 }
@@ -382,7 +368,7 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
 {
     // Create and fill general header
     GeneralReplayHeader generalHeader;
-    FillGeneralHeader(generalHeader, client, ReplayType_Jump, currentTick - lastTakeoffTick[client]);
+    FillGeneralHeader(generalHeader, client, ReplayType_Jump, currentTick - lastTakeoffPBTick[client]);
 
     // Create and fill jump header
     JumpReplayHeader jumpHeader;
@@ -559,49 +545,55 @@ static void WriteTickData(File file, int client, int replayType)
                 i = recordedRunData[client].Length - 1 - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
                 if (i < 0)
                 {
-                    i = recordedTickData[client].Length + i;
+                    TransferRunDataToRollingData(client);
+                    SaveJumpFromRollingData(client, file);
                 }
-                do
+                else
                 {
-                    if (isFirstTick)
+                    do
                     {
+                        if (isFirstTick)
+                        {
+                            previousI = i;
+                        }
+                        recordedRunData[client].GetArray(i, tickData);
+                        recordedRunData[client].GetArray(previousI, prevTickData);
+                        WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
                         previousI = i;
-                    }
-                    recordedRunData[client].GetArray(i, tickData);
-                    recordedRunData[client].GetArray(previousI, prevTickData);
-                    WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-                    previousI = i;
-                    isFirstTick = false;
-                    i++;
-                } while (i < recordedRunData[client].Length);
+                        isFirstTick = false;
+                        i++;
+                    } while (i < recordedRunData[client].Length);
+                }
             }
             else
             {
-                i = GetRollingIndex(client) - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
-                if (i < 0)
-                {
-                    i = recordedTickData[client].Length - 1 + i;
-                }
-                do
-                {
-                    if (i == recordedTickData[client].Length && recordedTickData[client].Length == maxCheaterReplayTicks)
-                    {
-                        i = 0;
-                    }
-                    if (isFirstTick)
-                    {
-                        previousI = i;
-                    }
-                    recordedTickData[client].GetArray(i, tickData);
-                    recordedTickData[client].GetArray(previousI, prevTickData);
-                    WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-                    previousI = i;
-                    isFirstTick = false;
-                    i++;
-                } while (i != GetRollingIndex(client));
+                SaveJumpFromRollingData(client, file);
             }
         }
     }
+}
+
+static void SaveJumpFromRollingData(int client, File file)
+{
+    ReplayTickData tickData;
+    ReplayTickData prevTickData;
+    bool isFirstTick = true;
+    int previousI = 0;
+    int currentRollingIndex = GetRollingIndex(client);
+    SubtractFromRollingIndex(client, preAndPostRunTickCount + (currentTick - lastTakeoffPBTick[client]));
+    do
+    {
+        if (isFirstTick)
+        {
+            previousI = GetRollingIndex(client);
+        }
+        recordedTickData[client].GetArray(GetRollingIndex(client), tickData);
+        recordedTickData[client].GetArray(previousI, prevTickData);
+        WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+        previousI = GetRollingIndex(client);
+        isFirstTick = false;
+        IncrementRollingIndex(client);
+    } while (GetRollingIndex(client) != currentRollingIndex);
 }
 
 static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tickDataStruct, ReplayTickData prevTickDataStruct)
@@ -853,7 +845,7 @@ static void AddToRollingIndex(int client, int value)
     {
         recordingIndex[client] -= recordedTickData[client].Length - 1;
     }
-}
+}*/
 
 static void SubtractFromRollingIndex(int client, int value)
 {
@@ -863,7 +855,6 @@ static void SubtractFromRollingIndex(int client, int value)
         recordingIndex[client] = recordedTickData[client].Length - 1 + recordingIndex[client];
     }
 }
-*/
 
 static int GetRollingIndex(int client)
 {
@@ -873,4 +864,23 @@ static int GetRollingIndex(int client)
 static void ResetRollingIndex(int client)
 {
     recordingIndex[client] = 0;
+}
+
+static void TransferRunDataToRollingData(int client)
+{
+    // Write any data from the run to our rolling buffer, up to max cheater replay length
+    int length = recordedRunData[client].Length < maxCheaterReplayTicks ? recordedRunData[client].Length : maxCheaterReplayTicks;
+    // Ensure the rolling buffer has correct size.
+    if (recordedTickData[client].Length < maxCheaterReplayTicks)
+    {
+        recordedTickData[client].Resize(maxCheaterReplayTicks);
+    }
+
+    any runData[sizeof(ReplayTickData)];
+    for (int i = recordedRunData[client].Length - length; i < recordedRunData[client].Length; i++)
+    {
+        recordedRunData[client].GetArray(i, runData, sizeof(runData));
+        recordedTickData[client].SetArray(GetRollingIndex(client), runData);
+        IncrementRollingIndex(client);
+    }
 }
