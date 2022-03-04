@@ -348,6 +348,7 @@ public void OnMapStart()
 public void OnGameFrame()
 {
 	OnGameFrame_TeamNumber();
+	OnGameFrame_Triggerfix();
 }
 
 public void OnConfigsExecuted()
