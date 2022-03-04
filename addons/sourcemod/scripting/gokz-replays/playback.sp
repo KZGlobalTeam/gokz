@@ -954,34 +954,29 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
 		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
-		if (replayMoveType == MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
+		if (Movement_GetSpeed(client) > SPEED_NORMAL * 2)
+		{
+			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		}
+		else if (replayMoveType == MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
 		{
 			botPaused[bot] = false;
 			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
 		}
-		else if (replayMoveType == MOVETYPE_WALK)
+		else if (replayMoveType == MOVETYPE_LADDER)
 		{
 			botPaused[bot] = false;
-			if (Movement_GetMovetype(client) != MOVETYPE_LADDER)
-			{
-				Movement_SetMovetype(client, MOVETYPE_NONE);
-			}
 			Movement_SetMovetype(client, MOVETYPE_LADDER);
-		}
-		else if (replayMoveType == MOVETYPE_WALK)
-		{
-			botPaused[bot] = true;
-			Movement_SetMovetype(client, MOVETYPE_NONE);
-		}
-		else if (currentTickData.flags & RP_UNDER_WATER)
-		{
-			SetEntityFlags(client, entityFlags | FL_INWATER);
 		}
 		else
 		{
-			botPaused[bot] = false;
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
+		}
+		
+		if (currentTickData.flags & RP_UNDER_WATER)
+		{
+			SetEntityFlags(client, entityFlags | FL_INWATER);
 		}
 
 		// Set some variables
