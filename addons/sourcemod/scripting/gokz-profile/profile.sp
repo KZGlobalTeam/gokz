@@ -141,7 +141,6 @@ static void RankInfoMenuAddItems(int client, Menu menu)
 	menu.AddItem("", display);
 	
 	int next_rank = gI_Rank[player][mode] + 1;
-	PrintToServer("%d", next_rank);
 	if (next_rank == RANK_COUNT)
 	{
 		FormatEx(display, sizeof(display), "%T: -",
