@@ -744,14 +744,8 @@ static int GetPlayerWeaponSlotDefIndex(int client, int slot)
     {
         return -1;
     }
-
-    char clsName[128];
-    GetEntityClassname(ent, clsName, sizeof(clsName));
-
-    CSWeaponID weaponId = CS_AliasToWeaponID(clsName);
-    int defIndex = CS_WeaponIDToItemDefIndex(weaponId);
- 
-    return defIndex;
+    
+    return GetEntProp(ent, Prop_Send, "m_iItemDefinitionIndex");
 }
 
 static bool IsCurrentWeaponSecondary(int client)

@@ -1134,6 +1134,7 @@ static void SetBotStuff(int bot)
 
 	char weaponName[128];
 	// Give the bot the knife stored in the replay
+	/*
 	if (botKnife[bot] != 0)
 	{
 		CS_WeaponIDToAlias(CS_ItemDefIndexToID(botKnife[bot]), weaponName, sizeof(weaponName));
@@ -1144,6 +1145,10 @@ static void SetBotStuff(int bot)
 	{
 		GivePlayerItem(client, "weapon_knife");
 	}
+	*/
+	// We are currently not doing that, as it would require us to disable the
+	// FollowCSGOServerGuidelines failsafe if the bot has a non-standard knife.
+	GivePlayerItem(client, "weapon_knife");
 	
 	// Give the bot the pistol stored in the replay
 	if (botWeapon[bot] != 0)
