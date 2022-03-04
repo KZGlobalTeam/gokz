@@ -418,6 +418,7 @@ static void HookTrigger(int entity, const char[] classname)
 	{
 		SDKHook(entity, SDKHook_StartTouchPost, Hook_TriggerStartTouch);
 		SDKHook(entity, SDKHook_EndTouchPost, Hook_TriggerEndTouch);
+		SDKHook(entity, SDKHook_TouchPost, Hook_TriggerTouch);
 	}
 }
 
