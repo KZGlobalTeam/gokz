@@ -12,7 +12,7 @@ static int processMovementTicks[MAXPLAYERS+1];
 static float playerFrameTime[MAXPLAYERS+1];
 
 static bool touchingTrigger[MAXPLAYERS+1][2048];
-
+static bool triggerTouchFired[MAXPLAYERS+1][2048];
 static int lastGroundEnt[MAXPLAYERS + 1];
 static bool duckedLastTick[MAXPLAYERS + 1];
 static bool mapTeleportedSequentialTicks[MAXPLAYERS+1];
@@ -142,12 +142,39 @@ public void OnClientConnected_Triggerfix(int client)
 	for (int i = 0; i < sizeof(touchingTrigger[]); i++)
 	{
 		touchingTrigger[client][i] = false;
+		triggerTouchFired[client][i] = false;
 	}
 }
 
 public void OnClientPutInServer_Triggerfix(int client)
 {
 	SDKHook(client, SDKHook_PostThink, Hook_PlayerPostThink);
+}
+
+public void OnGameFrame_Triggerfix()
+{
+	// Loop through all the players and make sure that triggers that are supposed to be fired but weren't now
+	// get fired properly.
+	// This must be run OUTSIDE of usercmd, because sometimes usercmd gets delayed heavily.
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && IsPlayerAlive(client) && !CheckWater(client) && 
+			(GetEntityMoveType(client) == MOVETYPE_WALK || GetEntityMoveType(client) == MOVETYPE_LADDER))
+		{
+			DoTriggerFix(client);
+
+			// Reset the Touch tracking. 
+			// We save a bit of performance by putting this inside the loop
+			// Even if triggerTouchFired is not correct, touchingTrigger still is. 
+			// That should prevent DoTriggerFix from activating the wrong triggers. 
+			// Plus, players respawn where they previously are as well with a timer on,
+			// so this should not be a big problem.
+			for (int trigger = 0; trigger < sizeof(triggerTouchFired[]); trigger++)
+			{
+				triggerTouchFired[client][trigger] = false;
+			}
+		}
+	}
 }
 
 static void Event_PlayerJump(Event event, const char[] name, bool dontBroadcast)
@@ -185,6 +212,15 @@ static Action Hook_TriggerEndTouch(int entity, int other)
 	return Plugin_Continue;
 }
 
+static Action Hook_TriggerTouch(int entity, int other)
+{
+	if (1 <= other <= MaxClients)
+	{
+	 	triggerTouchFired[other][entity] = true;
+	}
+	return Plugin_Continue;	
+}
+
 static MRESReturn DHook_ProcessMovementPre(Handle hParams)
 {
 	int client = DHookGetParam(hParams, 1);
@@ -206,6 +242,43 @@ static MRESReturn DHook_ProcessMovementPre(Handle hParams)
 	return MRES_Ignored;
 }
 
+static bool DoTriggerFix(int client)
+{
+	// Adapted from DoTriggerjumpFix right below.
+	float landingMins[3], landingMaxs[3];
+	float origin[3];
+
+	GetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
+	GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
+	GetEntPropVector(client, Prop_Data, "m_vecMaxs", landingMaxs);
+
+	ArrayList triggers = new ArrayList();
+	// Get a list of triggers that we are touching now.
+
+	TR_EnumerateEntitiesHull(origin, origin, landingMins, landingMaxs, true, AddTrigger, triggers);
+	
+	bool didSomething = false;
+	
+	for (int i = 0; i < triggers.Length; i++)
+	{
+		int trigger = triggers.Get(i);
+		
+		// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
+
+		// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
+		// in the last tick, we make sure that it is called now.		
+		if (touchingTrigger[client][trigger] && !triggerTouchFired[client][trigger])
+		{
+			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
+		}
+		didSomething = true;
+	}
+	
+	delete triggers;
+	
+	return didSomething;
+}
+
 static bool DoTriggerjumpFix(int client, const float landingPoint[3], const float landingMins[3], const float landingMaxs[3])
 {
 	// It's possible to land above a trigger but also in another trigger_teleport, have the teleport move you to
@@ -223,6 +296,7 @@ static bool DoTriggerjumpFix(int client, const float landingPoint[3], const floa
 	ArrayList triggers = new ArrayList();
 	
 	// Find triggers that are between us and the ground (using the bounding box quadrant we landed with if applicable).
+	// This will fail on triggers thinner than 0.03125 unit thick, but it's highly unlikely that a mapper would put a trigger that thin.
 	TR_EnumerateEntitiesHull(landingPoint, landingPoint, landingMins, landingMaxsBelow, true, AddTrigger, triggers);
 	
 	bool didSomething = false;
@@ -320,7 +394,9 @@ static void Hook_PlayerPostThink(int client)
 	// reset it here because we don't need it again
 	jumpBugged[client] = false;
 	
-	if (landed && TR_GetFraction() > 0.0)
+	// Must use TR_DidHit because if the unduck origin is closer than 0.03125 units from the ground, 
+	// the trace fraction would return 0.0.
+	if (landed && TR_DidHit())
 	{
 		DoTriggerjumpFix(client, landingPoint, landingMins, landingMaxs);
 		// Check if a trigger we just touched put us in the air (probably due to a teleport).
