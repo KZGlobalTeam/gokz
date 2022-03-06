@@ -4,6 +4,7 @@
 #include <sdktools>
 
 #include <gokz/core>
+#include <gokz/kzplayer>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -54,39 +55,41 @@ enum struct Location {
 	float ladderNormal[3];
 	int collisionGroup;
 	float waterJumpTime;
+	bool hasWalkMovedSinceLastJump;
 
-	void Create(int client)
+	void Create(int client, int target)
 	{
-		this.flags = GetEntityFlags(client);
-		this.mode = GOKZ_GetCoreOption(client, Option_Mode);
-		this.course = GOKZ_GetCourse(client);
-		GetClientAbsOrigin(client, this.position);
-		GetClientEyeAngles(client, this.angles);
-		GetEntPropVector(client, Prop_Data, "m_vecVelocity", this.velocity);
-		this.duckAmount = GetEntPropFloat(client, Prop_Send, "m_flDuckAmount");
-		this.ducking = !!GetEntProp(client, Prop_Send, "m_bDucking");
-		this.ducked = !!GetEntProp(client, Prop_Send, "m_bDucked");
-		this.lastDuckTime = GetEntPropFloat(client, Prop_Send, "m_flLastDuckTime");
-		this.duckSpeed = Movement_GetDuckSpeed(client);
-		this.stamina = GetEntPropFloat(client, Prop_Send, "m_flStamina");
 		GetClientName(client, this.locationCreator, sizeof(Location::locationCreator));
-		this.movetype = Movement_GetMovetype(client);
-		GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
-		this.collisionGroup = GetEntProp(client, Prop_Send, "m_CollisionGroup");
-		this.waterJumpTime = GetEntPropFloat(client, Prop_Data, "m_flWaterJumpTime");
+		this.flags = GetEntityFlags(target);
+		this.mode = GOKZ_GetCoreOption(target, Option_Mode);
+		this.course = GOKZ_GetCourse(target);
+		GetClientAbsOrigin(target, this.position);
+		GetClientEyeAngles(target, this.angles);
+		GetEntPropVector(target, Prop_Data, "m_vecVelocity", this.velocity);
+		this.duckAmount = GetEntPropFloat(target, Prop_Send, "m_flDuckAmount");
+		this.ducking = !!GetEntProp(target, Prop_Send, "m_bDucking");
+		this.ducked = !!GetEntProp(target, Prop_Send, "m_bDucked");
+		this.lastDuckTime = GetEntPropFloat(target, Prop_Send, "m_flLastDuckTime");
+		this.duckSpeed = Movement_GetDuckSpeed(target);
+		this.stamina = GetEntPropFloat(target, Prop_Send, "m_flStamina");
+		this.movetype = Movement_GetMovetype(target);
+		GetEntPropVector(target, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
+		this.collisionGroup = GetEntProp(target, Prop_Send, "m_CollisionGroup");
+		this.waterJumpTime = GetEntPropFloat(target, Prop_Data, "m_flWaterJumpTime");
+		this.hasWalkMovedSinceLastJump = !!GetEntProp(target, Prop_Data, "m_bHasWalkMovedSinceLastJump");
 
-		if (GOKZ_GetTimerRunning(client))
+		if (GOKZ_GetTimerRunning(target))
 		{
-			this.currentTime = GOKZ_GetTime(client);
+			this.currentTime = GOKZ_GetTime(target);
 		}
 		else
 		{
 			this.currentTime = -1.0;
 		}
-		this.checkpointData = GOKZ_GetCheckpointData(client);
-		this.checkpointCount = GOKZ_GetCheckpointCount(client);
-		this.teleportCount = GOKZ_GetTeleportCount(client);
-		this.undoTeleportData = GOKZ_GetUndoTeleportData(client);
+		this.checkpointData = GOKZ_GetCheckpointData(target);
+		this.checkpointCount = GOKZ_GetCheckpointCount(target);
+		this.teleportCount = GOKZ_GetTeleportCount(target);
+		this.undoTeleportData = GOKZ_GetUndoTeleportData(target);
 	}
 
 	bool Load(int client)
@@ -117,6 +120,7 @@ enum struct Location {
 		SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", this.collisionGroup);
 		SetEntPropFloat(client, Prop_Data, "m_flWaterJumpTime", this.waterJumpTime);
+		SetEntProp(client, Prop_Data, "m_bHasWalkMovedSinceLastJump", this.hasWalkMovedSinceLastJump);
 
 		GOKZ_InvalidateRun(client);
 		return true;
@@ -233,16 +237,23 @@ public Action Command_SaveLoc(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	else if (!IsPlayerAlive(client))
+	int target = -1;
+	if (!IsPlayerAlive(client))
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
-		return Plugin_Handled;
+		KZPlayer player = KZPlayer(client);
+		target = player.ObserverTarget;
+		if (target == -1)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
+			GOKZ_PlayErrorSound(client);
+			return Plugin_Handled;
+		}
 	}
 	
 	if (args == 0)
 	{
 		// save location with empty <name>
-		SaveLocation(client, "");
+		SaveLocation(client, "", target);
 	}
 	else if (args == 1)
 	{
@@ -253,7 +264,7 @@ public Action Command_SaveLoc(int client, int args)
 		if (IsValidLocationName(arg))
 		{
 			// save location with <name>
-			SaveLocation(client, arg);
+			SaveLocation(client, arg, target);
 		}
 		else
 		{
@@ -551,10 +562,14 @@ public int LocMenuHandler(Menu menu, MenuAction action, int client, int choice)
 
 // ====[ SAVE LOCATION ]====
 
-void SaveLocation(int client, char[] name)
+void SaveLocation(int client, char[] name, int target)
 {
 	Location loc;
-	loc.Create(client);
+	if (target == -1)
+	{
+		target = client;
+	}
+	loc.Create(client, target);
 	strcopy(loc.locationName, sizeof(Location::locationName), name);
 	GetClientName(client, loc.locationCreator, sizeof(loc.locationCreator));
 	gA_Locations.PushArray(loc);
