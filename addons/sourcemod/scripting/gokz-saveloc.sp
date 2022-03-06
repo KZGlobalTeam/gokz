@@ -233,6 +233,11 @@ public Action Command_SaveLoc(int client, int args)
 	{
 		return Plugin_Handled;
 	}
+	else if (!IsPlayerAlive(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
+		return Plugin_Handled;
+	}
 	
 	if (args == 0)
 	{
