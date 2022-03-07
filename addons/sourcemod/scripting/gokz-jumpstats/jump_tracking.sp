@@ -1267,6 +1267,7 @@ void OnOptionChanged_JumpTracking(int client, const char[] option)
 void OnClientPutInServer_JumpTracking(int client)
 {
 	entityTouchCount[client] = 0;
+	lastNoclipTime[client] = 0;
 	jumpTrackers[client].Init(client);
 }
 
