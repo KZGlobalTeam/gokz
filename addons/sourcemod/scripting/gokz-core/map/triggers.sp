@@ -237,8 +237,8 @@ void OnEntitySpawned_MapTriggers(int entity)
 			TeleportTrigger teleportTrigger;
 			if (gotHammerID && teleportTriggers.GetArray(hammerID, teleportTrigger, sizeof(teleportTrigger)))
 			{
-				SDKHook(entity, SDKHook_StartTouchPost, OnTeleportTrigTouchStart_MapTriggers);
-				SDKHook(entity, SDKHook_EndTouchPost, OnTeleportTrigTouchEnd_MapTriggers);
+				HookSingleEntityOutput(entity, "OnStartTouch", OnTeleportTrigTouchStart_MapTriggers);
+				HookSingleEntityOutput(entity, "OnEndTouch", OnTeleportTrigTouchEnd_MapTriggers);
 			}
 			else
 			{
@@ -250,8 +250,8 @@ void OnEntitySpawned_MapTriggers(int entity)
 			AntiBhopTrigger antiBhopTrigger;
 			if (gotHammerID && antiBhopTriggers.GetArray(hammerID, antiBhopTrigger, sizeof(antiBhopTrigger)))
 			{
-				SDKHook(entity, SDKHook_StartTouchPost, OnAntiBhopTrigTouchStart_MapTriggers);
-				SDKHook(entity, SDKHook_EndTouchPost, OnAntiBhopTrigTouchEnd_MapTriggers);
+				HookSingleEntityOutput(entity, "OnStartTouch", OnAntiBhopTrigTouchStart_MapTriggers);
+				HookSingleEntityOutput(entity, "OnEndTouch", OnAntiBhopTrigTouchEnd_MapTriggers);
 			}
 			else
 			{
@@ -260,37 +260,37 @@ void OnEntitySpawned_MapTriggers(int entity)
 		}
 		else if (StrEqual(GOKZ_BHOP_RESET_TRIGGER_NAME, name))
 		{
-			SDKHook(entity, SDKHook_StartTouchPost, OnBhopResetTouchStart_MapTriggers);
+			HookSingleEntityOutput(entity, "OnStartTouch", OnBhopResetTouchStart_MapTriggers);
 		}
 		else if (StrEqual(GOKZ_ANTI_CP_TRIGGER_NAME, name, false))
 		{
-			SDKHook(entity, SDKHook_StartTouchPost, OnAntiCpTrigTouchStart_MapTriggers);
-			SDKHook(entity, SDKHook_EndTouchPost, OnAntiCpTrigTouchEnd_MapTriggers);
+			HookSingleEntityOutput(entity, "OnStartTouch", OnAntiCpTrigTouchStart_MapTriggers);
+			HookSingleEntityOutput(entity, "OnEndTouch", OnAntiCpTrigTouchEnd_MapTriggers);
 		}
 		else if (StrEqual(GOKZ_ANTI_PAUSE_TRIGGER_NAME, name, false))
 		{
-			SDKHook(entity, SDKHook_StartTouchPost, OnAntiPauseTrigTouchStart_MapTriggers);
-			SDKHook(entity, SDKHook_EndTouchPost, OnAntiPauseTrigTouchEnd_MapTriggers);
+			HookSingleEntityOutput(entity, "OnStartTouch", OnAntiPauseTrigTouchStart_MapTriggers);
+			HookSingleEntityOutput(entity, "OnEndTouch", OnAntiPauseTrigTouchEnd_MapTriggers);
 		}
 		else if (StrEqual(GOKZ_ANTI_JUMPSTAT_TRIGGER_NAME, name, false))
 		{
-			SDKHook(entity, SDKHook_StartTouchPost, OnAntiJumpstatTrigTouchStart_MapTriggers);
-			SDKHook(entity, SDKHook_EndTouchPost, OnAntiJumpstatTrigTouchEnd_MapTriggers);
+			HookSingleEntityOutput(entity, "OnStartTouch", OnAntiJumpstatTrigTouchStart_MapTriggers);
+			HookSingleEntityOutput(entity, "OnEndTouch", OnAntiJumpstatTrigTouchEnd_MapTriggers);
 		}
 		else
 		{
-			SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouchStart_MapTriggers);
-			SDKHook(entity, SDKHook_EndTouchPost, OnTrigMultTouchEnd_MapTriggers);
+			HookSingleEntityOutput(entity, "OnStartTouch", OnTrigMultTouchStart_MapTriggers);
+			HookSingleEntityOutput(entity, "OnEndTouch", OnTrigMultTouchEnd_MapTriggers);
 		}
 	}
 	else if (StrEqual("trigger_teleport", classname))
 	{
-		SDKHook(entity, SDKHook_StartTouchPost, OnTrigTeleTouchStart_MapTriggers);
-		SDKHook(entity, SDKHook_EndTouchPost, OnTrigTeleTouchEnd_MapTriggers);
+		HookSingleEntityOutput(entity, "OnStartTouch", OnTrigTeleTouchStart_MapTriggers);
+		HookSingleEntityOutput(entity, "OnEndTouch", OnTrigTeleTouchEnd_MapTriggers);
 	}
 }
 
-public void OnAntiBhopTrigTouchStart_MapTriggers(int entity, int other)
+public void OnAntiBhopTrigTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -300,7 +300,7 @@ public void OnAntiBhopTrigTouchStart_MapTriggers(int entity, int other)
 	AddTriggerToTouchList(other, entity, TriggerType_Antibhop);
 }
 
-public void OnAntiBhopTrigTouchEnd_MapTriggers(int entity, int other)
+public void OnAntiBhopTrigTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -310,7 +310,7 @@ public void OnAntiBhopTrigTouchEnd_MapTriggers(int entity, int other)
 	RemoveTriggerFromTouchList(other, entity);
 }
 
-public void OnTeleportTrigTouchStart_MapTriggers(int entity, int other)
+public void OnTeleportTrigTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -329,7 +329,7 @@ public void OnTeleportTrigTouchStart_MapTriggers(int entity, int other)
 	AddTriggerToTouchList(other, entity, TriggerType_Teleport);
 }
 
-public void OnTeleportTrigTouchEnd_MapTriggers(int entity, int other)
+public void OnTeleportTrigTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -348,7 +348,7 @@ public void OnTeleportTrigTouchEnd_MapTriggers(int entity, int other)
 	RemoveTriggerFromTouchList(other, entity);
 }
 
-public void OnBhopResetTouchStart_MapTriggers(int entity, int other)
+public void OnBhopResetTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -358,7 +358,7 @@ public void OnBhopResetTouchStart_MapTriggers(int entity, int other)
 	ResetBhopState(other);
 }
 
-public void OnTrigMultTouchStart_MapTriggers(int entity, int other)
+public void OnTrigMultTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -369,7 +369,7 @@ public void OnTrigMultTouchStart_MapTriggers(int entity, int other)
 	triggerTouchCount[other]++;
 }
 
-public void OnAntiCpTrigTouchStart_MapTriggers(int entity, int other)
+public void OnAntiCpTrigTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -379,7 +379,7 @@ public void OnAntiCpTrigTouchStart_MapTriggers(int entity, int other)
 	antiCpTriggerTouchCount[other]++;
 }
 
-public void OnAntiCpTrigTouchEnd_MapTriggers(int entity, int other)
+public void OnAntiCpTrigTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -389,7 +389,7 @@ public void OnAntiCpTrigTouchEnd_MapTriggers(int entity, int other)
 	antiCpTriggerTouchCount[other]--;
 }
 
-public void OnAntiPauseTrigTouchStart_MapTriggers(int entity, int other)
+public void OnAntiPauseTrigTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -399,7 +399,7 @@ public void OnAntiPauseTrigTouchStart_MapTriggers(int entity, int other)
 	antiPauseTriggerTouchCount[other]++;
 }
 
-public void OnAntiPauseTrigTouchEnd_MapTriggers(int entity, int other)
+public void OnAntiPauseTrigTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -409,7 +409,7 @@ public void OnAntiPauseTrigTouchEnd_MapTriggers(int entity, int other)
 	antiPauseTriggerTouchCount[other]--;
 }
 
-public void OnAntiJumpstatTrigTouchStart_MapTriggers(int entity, int other)
+public void OnAntiJumpstatTrigTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -419,7 +419,7 @@ public void OnAntiJumpstatTrigTouchStart_MapTriggers(int entity, int other)
 	antiJumpstatTriggerTouchCount[other]++;
 }
 
-public void OnAntiJumpstatTrigTouchEnd_MapTriggers(int entity, int other)
+public void OnAntiJumpstatTrigTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -429,7 +429,7 @@ public void OnAntiJumpstatTrigTouchEnd_MapTriggers(int entity, int other)
 	antiJumpstatTriggerTouchCount[other]--;
 }
 
-public void OnTrigMultTouchEnd_MapTriggers(int entity, int other)
+public void OnTrigMultTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -439,7 +439,7 @@ public void OnTrigMultTouchEnd_MapTriggers(int entity, int other)
 	triggerTouchCount[other]--;
 }
 
-public void OnTrigTeleTouchStart_MapTriggers(int entity, int other)
+public void OnTrigTeleTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
@@ -450,7 +450,7 @@ public void OnTrigTeleTouchStart_MapTriggers(int entity, int other)
 	triggerTouchCount[other]++;
 }
 
-public void OnTrigTeleTouchEnd_MapTriggers(int entity, int other)
+public void OnTrigTeleTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
 	{
