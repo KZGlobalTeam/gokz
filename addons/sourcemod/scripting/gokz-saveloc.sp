@@ -56,6 +56,7 @@ enum struct Location {
 	int collisionGroup;
 	float waterJumpTime;
 	bool hasWalkMovedSinceLastJump;
+	float ignoreLadderJumpTimeOffset;
 
 	void Create(int client, int target)
 	{
@@ -77,6 +78,7 @@ enum struct Location {
 		this.collisionGroup = GetEntProp(target, Prop_Send, "m_CollisionGroup");
 		this.waterJumpTime = GetEntPropFloat(target, Prop_Data, "m_flWaterJumpTime");
 		this.hasWalkMovedSinceLastJump = !!GetEntProp(target, Prop_Data, "m_bHasWalkMovedSinceLastJump");
+		this.ignoreLadderJumpTimeOffset = GetEntPropFloat(target, Prop_Data, "m_ignoreLadderJumpTime") - GetGameTime();
 
 		if (GOKZ_GetTimerRunning(target))
 		{
@@ -121,6 +123,7 @@ enum struct Location {
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", this.collisionGroup);
 		SetEntPropFloat(client, Prop_Data, "m_flWaterJumpTime", this.waterJumpTime);
 		SetEntProp(client, Prop_Data, "m_bHasWalkMovedSinceLastJump", this.hasWalkMovedSinceLastJump);
+		SetEntPropFloat(client, Prop_Data, "m_ignoreLadderJumpTime", this.ignoreLadderJumpTimeOffset + GetGameTime());
 
 		GOKZ_InvalidateRun(client);
 		return true;
