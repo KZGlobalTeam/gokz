@@ -460,13 +460,15 @@ enum struct UndoTeleportData
 	// Undo TP properties
 	bool lastTeleportOnGround;
 	bool lastTeleportInBhopTrigger;
+	bool lastTeleportInAntiCpTrigger;
 	
-	void Init(int client, bool lastTeleportInBhopTrigger, bool lastTeleportOnGround)
+	void Init(int client, bool lastTeleportInBhopTrigger, bool lastTeleportOnGround, bool lastTeleportInAntiCpTrigger)
 	{
 		Movement_GetOrigin(client, this.tempOrigin);
 		Movement_GetEyeAngles(client, this.tempAngles);
 		this.lastTeleportInBhopTrigger = lastTeleportInBhopTrigger;
 		this.lastTeleportOnGround = lastTeleportOnGround;
+		this.lastTeleportInAntiCpTrigger = lastTeleportInAntiCpTrigger;
 	}
 	
 	void Update()

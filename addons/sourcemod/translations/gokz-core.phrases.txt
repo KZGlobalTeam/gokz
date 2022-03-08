@@ -111,6 +111,10 @@
 		"chi"		"{darkred}落地瞬间无法撤销存点."
 		"ru"		"{darkred}Вы не можете отменить после приземления."
 	}
+	"Can't Undo (AntiCp)"
+	{
+		"en"		"{darkred}You can't undo because you teleported while in an anti-checkpoint zone."
+	}
 	"Can't Pause (Just Resumed)"
 	{
 		"en"		"{darkred}You can't pause because you just resumed."

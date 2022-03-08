@@ -686,6 +686,15 @@ bool CanUndoTeleport(int client, bool showError = false)
 		}
 		return false;
 	}
+	if (undoTeleportData[client].lastTeleportInAntiCpTrigger)
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (AntiCp)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	return true;
 }
 
@@ -770,7 +779,7 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	}
 	
 	// Store information about where player is teleporting from
-	undoTeleportData[client].Init(client, BhopTriggersJustTouched(client), Movement_GetOnGround(client));
+	undoTeleportData[client].Init(client, BhopTriggersJustTouched(client), Movement_GetOnGround(client), AntiCpTriggerIsTouched(client));
 	
 	teleportCount[client]++;
 	TeleportPlayer(client, destOrigin, destAngles);
