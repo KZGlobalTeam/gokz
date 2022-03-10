@@ -224,6 +224,8 @@ public void DB_TxnSuccess_BestJumpDeleted(Handle db, DataPack data, int numQueri
 		FormatEx(blockString, sizeof(blockString), "%T ", "Block", client);
 	}
 	
+	ClearCache(client);
+	
 	GOKZ_PrintToChatAndLog(client, true, "%t", "Best Jump Deleted", 
 		gC_ModeNames[mode], 
 		blockString, 
@@ -254,6 +256,8 @@ public void DB_TxnSuccess_AllJumpsDeleted(Handle db, DataPack data, int numQueri
 	int client = GetClientOfUserId(data.ReadCell());
 	int steamAccountID = data.ReadCell();
 	delete data;
+	
+	ClearCache(client);
 	
 	GOKZ_PrintToChatAndLog(client, true, "%t", "All Jumps Deleted", 
 		steamAccountID & 1,
