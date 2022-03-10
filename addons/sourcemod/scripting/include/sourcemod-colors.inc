@@ -95,7 +95,7 @@ stock void CSkipNextClient(int client)
 */
 stock void CPrintToChat(int client, const char[] message, any ...)
 {
-	if (client < 1 || client > MaxClients || !IsClientInGame(client) || IsFakeClient(client))
+	if ((client < 1 || client > MaxClients || !IsClientInGame(client) || IsFakeClient(client)) && !IsClientSourceTV(client))
 		return;
 	
 	SetGlobalTransTarget(client);

@@ -40,6 +40,9 @@ enum ObsMode
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
+stock float PLAYER_MINS[3] = {-16.0, -16.0, 0.0};
+stock float PLAYER_MAXS[3] = {16.0, 16.0, 72.0};
+stock float PLAYER_MAXS_DUCKED[3] = {16.0, 16.0, 54.0};
 
 
 
@@ -133,6 +136,28 @@ stock float FloatMin(float value1, float value2)
 	}
 	return value2;
 }
+
+/**
+ * Clamp a float value between an upper and lower bound.
+ *
+ * @param value			Preferred value.
+ * @param min			Minimum value.
+ * @param max			Maximum value.
+ * @return				The closest value to the preferred value.
+ */
+stock float FloatClamp(float value, float min, float max)
+{
+	if (value >= max)
+	{
+		return max;
+	}
+	if (value <= min)
+	{
+		return min;
+	}
+	return value;
+}
+
 
 /**
  * Returns the greater of two int values.
@@ -393,18 +418,22 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
 
 /**
  * Teleports a player and removes their velocity and base velocity
- * immediately and also after a 0.1 second delay. Automatically
+ * immediately and also every tick for the next 5 ticks. Automatically
  * makes the player crouch if there is a ceiling above them.
  *
  * @param client		Client index.
  * @param origin		Origin to teleport to.
  * @param angles		Eye angles to set.
  */
-stock void TeleportPlayer(int client, const float origin[3], const float angles[3])
+stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true)
 {
 	Movement_SetOrigin(client, origin);
-	Movement_SetEyeAngles(client, angles);
-	
+	if (setAngles)
+	{
+		// NOTE: changing angles with TeleportEntity can fail due to packet loss!!!
+		// (Movement_SetEyeAngles is a thin wrapper of TeleportEntity)
+		Movement_SetEyeAngles(client, angles);
+	}
 	// Duck the player if there is something blocking them from above
 	Handle trace = TR_TraceHullFilterEx(origin, 
 		origin, 
@@ -415,11 +444,18 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 		client);
 	bool ducked = TR_DidHit(trace);
 	
-	// Prevent noclip exploit
-	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
-
-	// Intelligently hold player still to prevent booster and trigger exploits
-	StartHoldStill(client, ducked);
+	if (holdStill)
+	{
+		// Prevent noclip exploit
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
+		
+		// Intelligently hold player still to prevent booster and trigger exploits
+		StartHoldStill(client, ducked);
+	}
+	else if (ducked)
+	{
+		ForcePlayerDuck(client);
+	}
 	
 	delete trace;
 }
@@ -524,6 +560,29 @@ stock bool IsPlayerStuck(int client)
 }
 
 /**
+ * Retrieves the absolute origin of an entity.
+ *
+ * @param entity			Index of the entity.
+ * @param result			Entity's origin if successful.
+ * @return					Returns true if successful.
+ */
+stock bool GetEntityAbsOrigin(int entity, float result[3])
+{
+	if (!IsValidEntity(entity))
+	{
+		return false;
+	}
+	
+	if (!HasEntProp(entity, Prop_Data, "m_vecAbsOrigin"))
+	{
+		return false;
+	}
+	
+	GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", result);
+	return true;
+}
+
+/**
  * Retrieves the name of an entity.
  *
  * @param entity			Index of the entity.
@@ -534,6 +593,63 @@ stock bool IsPlayerStuck(int client)
 stock int GetEntityName(int entity, char[] buffer, int maxlength)
 {
 	return GetEntPropString(entity, Prop_Data, "m_iName", buffer, maxlength);
+}
+
+/**
+ * Finds an entity by name or by name and classname.
+ * Taken from smlib https://github.com/bcserv/smlib
+ * This can take anywhere from ~0.2% to ~11% of frametime (i5-7600k) in the worst case scenario where
+ * every entity which has a name (4096 of them) is iterated over. Your mileage may vary.
+ *
+ * @param name				Name of the entity to find.
+ * @param className			Optional classname to match along with name.
+ * @param ignorePlayers		Ignore player entities.
+ * @return					Entity index if successful, INVALID_ENT_REFERENCE if not.
+ */
+stock int GOKZFindEntityByName(const char[] name, const char[] className = "", bool ignorePlayers = false)
+{
+	int result = INVALID_ENT_REFERENCE;
+	if (className[0] == '\0')
+	{
+		// HACK: Double the limit to get non-networked entities too.
+		// https://developer.valvesoftware.com/wiki/Entity_limit
+		int realMaxEntities = GetMaxEntities() * 2;
+		int startEntity = 1;
+		if (ignorePlayers)
+		{
+			startEntity = MaxClients + 1;
+		}
+		for (int entity = startEntity; entity < realMaxEntities; entity++)
+		{
+			if (!IsValidEntity(entity))
+			{
+				continue;
+			}
+			
+			char entName[65];
+			GetEntityName(entity, entName, sizeof(entName));
+			if (StrEqual(entName, name))
+			{
+				result = entity;
+				break;
+			}
+		}
+	}
+	else
+	{
+		int entity = INVALID_ENT_REFERENCE;
+		while ((entity = FindEntityByClassname(entity, className)) != INVALID_ENT_REFERENCE)
+		{
+			char entName[65];
+			GetEntityName(entity, entName, sizeof(entName));
+			if (StrEqual(entName, name))
+			{
+				result = entity;
+				break;
+			}
+		}
+	}
+	return result;
 }
 
 /**
@@ -572,4 +688,245 @@ stock bool IsSpectating(int client)
 {
 	int team = GetClientTeam(client);
 	return team == CS_TEAM_SPECTATOR || team == CS_TEAM_NONE;
-} 
+}
+
+/**
+ * Rotate a vector on an axis.
+ *
+ * @param vec				Vector to rotate.
+ * @param axis				Axis to rotate around.
+ * @param theta				Angle in radians.
+ * @param result			Rotated vector.
+ */
+stock void RotateVectorAxis(float vec[3], float axis[3], float theta, float result[3])
+{
+	float cosTheta = Cosine(theta);
+	float sinTheta = Sine(theta);
+	
+	float axisVecCross[3];
+	GetVectorCrossProduct(axis, vec, axisVecCross);
+	
+	for (int i = 0; i < 3; i++)
+	{
+		result[i] = (vec[i] * cosTheta) + (axisVecCross[i] * sinTheta) + (axis[i] * GetVectorDotProduct(axis, vec)) * (1.0 - cosTheta);
+	}
+}
+
+/**
+ * Rotate a vector by pitch and yaw.
+ *
+ * @param vec				Vector to rotate.
+ * @param pitch				Pitch angle (in degrees).
+ * @param yaw				Yaw angle (in degrees).
+ * @param result			Rotated vector.
+ */
+stock void RotateVectorPitchYaw(float vec[3], float pitch, float yaw, float result[3])
+{
+	if (pitch != 0.0)
+	{
+		RotateVectorAxis(vec, view_as<float>({0.0, 1.0, 0.0}), DegToRad(pitch), result);
+	}
+	if (yaw != 0.0)
+	{
+		RotateVectorAxis(result, view_as<float>({0.0, 0.0, 1.0}), DegToRad(yaw), result);
+	}
+}
+
+/**
+ * Attempts to return a valid spawn location. 
+ *
+ * @param origin			Spawn origin if found.
+ * @param angles			Spawn angles if found.
+ * @return					Whether a valid spawn point is found.
+ */
+stock bool GetValidSpawn(float origin[3], float angles[3])
+{
+	// Return true if the spawn found is truly valid (not in the ground or out of bounds)
+	bool foundValidSpawn;
+	bool searchCT;
+	float spawnOrigin[3];
+	int spawnEntity = -1;
+	while (!foundValidSpawn)
+	{
+		if (searchCT)
+		{
+			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_counterterrorist");
+		}
+		else
+		{
+			spawnEntity = FindEntityByClassname(spawnEntity, "info_player_terrorist");
+		}
+		
+		if (spawnEntity != -1)
+		{
+			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", origin);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", angles);
+			if (IsSpawnValid(spawnOrigin))
+			{
+				foundValidSpawn = true;
+			}
+		}
+		else if (!searchCT)
+		{
+			searchCT = true;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return foundValidSpawn;
+}
+
+/**
+ * Check whether a position is a valid spawn location. 
+ * A spawn location is considered valid if it is in bounds and not stuck inside the ground.
+ *
+ * @param origin			Origin vector.
+ * @return					Whether the origin is a valid spawn location.
+ */
+stock bool IsSpawnValid(float origin[3])
+{
+	Handle trace = TR_TraceHullFilterEx(origin, origin, PLAYER_MINS, PLAYER_MAXS, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+	if (!TR_StartSolid(trace) && !TR_AllSolid(trace) && TR_GetFraction(trace) == 1.0)
+	{
+		delete trace;
+		return true;
+	}
+	delete trace;
+	return false;
+}
+
+/**
+ * Get an entity's origin, angles, its bounding box's center and the distance from the center to its bounding box's edges.
+ *
+ * @param entity			Index of the entity.
+ * @param origin			Entity's origin.
+ * @param center			Center of the entity's bounding box.
+ * @param angles			Entity's angles.
+ * @param distFromCenter	The distance between the center of the entity's bounding box and its edges.
+ */
+stock void GetEntityPositions(int entity, float origin[3], float center[3], float angles[3], float distFromCenter[3])
+{
+	float maxs[3], mins[3];
+	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
+	GetEntPropVector(entity, Prop_Data, "m_angRotation", angles);
+	
+	GetEntPropVector(entity, Prop_Send, "m_vecMaxs", maxs);
+	GetEntPropVector(entity, Prop_Send, "m_vecMins", mins);
+	for (int i = 0; i < 3; i++)
+	{
+		center[i] = origin[i] + (maxs[i] + mins[i]) / 2;
+		distFromCenter[i] = (maxs[i] - mins[i]) / 2;
+	}
+}
+
+/**
+ * Find a valid position around a timer.
+ *
+ * @param entity			Index of the timer entity.
+ * @param originDest		Result origin if a valid position is found.
+ * @param anglesDest		Result angles if a valid position is found.
+ * @return					Whether a valid position is found.
+ */
+stock bool FindValidPositionAroundTimerEntity(int entity, float originDest[3], float anglesDest[3], bool isButton)
+{
+	float origin[3], center[3], angles[3], distFromCenter[3];
+	GetEntityPositions(entity, origin, center, angles, distFromCenter);
+	float extraOffset[3];
+	if (isButton) // Test several positions within button press range.
+	{
+		extraOffset[0] = 32.0;
+		extraOffset[1] = 32.0;
+		extraOffset[2] = 32.0;
+	}
+	else // Test positions at the inner surface of the zone.
+	{
+		extraOffset[0] = -(PLAYER_MAXS[0] - PLAYER_MINS[0]) - 1.03125;
+		extraOffset[1] = -(PLAYER_MAXS[1] - PLAYER_MINS[1]) - 1.03125;
+		extraOffset[2] = -(PLAYER_MAXS[2] - PLAYER_MINS[2]) - 1.03125;
+	}
+	if (FindValidPositionAroundCenter(center, distFromCenter, extraOffset, originDest, anglesDest))
+	{
+		return true;
+	}
+	// Test the positions right next to the timer button/zones if the tests above fail.
+	// This can fail when the timer has a cover brush over it.
+	extraOffset[0] = 0.03125;
+	extraOffset[1] = 0.03125;
+	extraOffset[2] = 0.03125;
+	return FindValidPositionAroundCenter(center, distFromCenter, extraOffset, originDest, anglesDest);
+}
+
+static bool FindValidPositionAroundCenter(float center[3], float distFromCenter[3], float extraOffset[3], float originDest[3], float anglesDest[3])
+{
+	float testOrigin[3];
+	int x, y;
+	
+	for (int i = 0; i < 3; i++)
+	{
+		// The search starts from the center then outwards to opposite directions.
+		x = i == 2 ? -1 : i;
+		for (int j = 0; j < 3; j++)
+		{
+			y = j == 2 ? -1 : j;
+			for (int z = -1; z <= 1; z++)
+			{
+				testOrigin = center;
+				testOrigin[0] = testOrigin[0] + (distFromCenter[0] + extraOffset[0]) * x + (PLAYER_MAXS[0] - PLAYER_MINS[0]) * x * 0.5;
+				testOrigin[1] = testOrigin[1] + (distFromCenter[1] + extraOffset[1]) * y + (PLAYER_MAXS[1] - PLAYER_MINS[1]) * y * 0.5;
+				testOrigin[2] = testOrigin[2] + (distFromCenter[2] + extraOffset[2]) * z + (PLAYER_MAXS[2] - PLAYER_MINS[2]) * z;
+
+				// Check if there's a line of sight towards the zone as well.
+				if (IsSpawnValid(testOrigin) && CanSeeBox(testOrigin, center, distFromCenter))
+				{
+					originDest = testOrigin;
+					// Always look towards the center.
+					float offsetVector[3];
+					offsetVector[0] = -(distFromCenter[0] + extraOffset[0]) * x;
+					offsetVector[1] = -(distFromCenter[1] + extraOffset[1]) * y;
+					offsetVector[2] = -(distFromCenter[2] + extraOffset[2]) * z;
+					GetVectorAngles(offsetVector, anglesDest);
+					anglesDest[2] = 0.0; // Roll should always be 0.0
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+static bool CanSeeBox(float origin[3], float center[3], float distFromCenter[3])
+{
+	float traceOrigin[3], traceDest[3], mins[3], maxs[3];
+
+	CopyVector(origin, traceOrigin);
+	
+
+	SubtractVectors(center, distFromCenter, mins);
+	AddVectors(center, distFromCenter, maxs);
+
+	for (int i = 0; i < 3; i++)
+	{
+		mins[i] += 0.03125;
+		maxs[i] -= 0.03125;
+		traceDest[i] = FloatClamp(traceOrigin[i], mins[i], maxs[i]);
+	}
+	int mask = (MASK_NPCSOLID_BRUSHONLY | MASK_OPAQUE_AND_NPCS) & ~CONTENTS_OPAQUE;
+	Handle trace = TR_TraceRayFilterEx(traceOrigin, traceDest, mask, RayType_EndPoint, TraceEntityFilterPlayers);
+	if (TR_DidHit(trace))
+	{
+		float end[3];
+		TR_GetEndPosition(end, trace);
+		for (int i = 0; i < 3; i++)
+		{
+			if (end[i] != traceDest[i])
+			{
+				delete trace;
+				return false;
+			}
+		}
+	}
+	delete trace;
+	return true;
+}

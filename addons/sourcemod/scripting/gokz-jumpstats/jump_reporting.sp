@@ -211,7 +211,7 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 		FormatEx(deviationString, sizeof(deviationString), " %s", GetFloatConsoleString1(client, "Deviation", jump.deviation));
 	}
 	
-	if (jump.edge > 0.0)
+	if (jump.edge > 0.0 || (jump.block > 0 && jump.edge == 0.0))
 	{
 		FormatEx(edgeString, sizeof(edgeString), " %s", GetFloatConsoleString2(client, "Edge", jump.edge));
 	}
@@ -233,7 +233,7 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 		deviationString,
 		GetWidthConsoleString(client, jump.width, jump.strafes),
 		GetFloatConsoleString1(client, "Height", jump.height),
-		GetFloatConsoleString3(client, "Airtime", jump.duration),
+		GetIntConsoleString(client, "Airtime", jump.duration),
 		GetFloatConsoleString1(client, "Offset", jump.offset),
 		GetIntConsoleString(client, "Crouch Ticks", jump.crouchTicks));
 	
@@ -287,13 +287,6 @@ static char[] GetFloatConsoleString2(int client, const char[] stat, float value)
 	return resultString;
 }
 
-static char[] GetFloatConsoleString3(int client, const char[] stat, float value)
-{
-	char resultString[32];
-	FormatEx(resultString, sizeof(resultString), "| %.3f %T", value, stat, client);
-	return resultString;
-}
-
 static char[] GetIntConsoleString(int client, const char[] stat, int value)
 {
 	char resultString[32];
@@ -343,7 +336,7 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 		FormatEx(missString, sizeof(missString), " | %s", GetFloatChatString(client, "Miss", jump.miss));
 	}
 	
-	if (jump.edge > 0.0)
+	if (jump.edge > 0.0 || (jump.block > 0 && jump.edge == 0.0))
 	{
 		if (jump.originalType == JumpType_LadderJump)
 		{

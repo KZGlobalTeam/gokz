@@ -10,7 +10,7 @@ static GlobalForward H_OnPBMissed;
 void CreateGlobalForwards()
 {
 	H_OnTimeProcessed = new GlobalForward("GOKZ_LR_OnTimeProcessed", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Cell);
-	H_OnNewRecord = new GlobalForward("GOKZ_LR_OnNewRecord", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnNewRecord = new GlobalForward("GOKZ_LR_OnNewRecord", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell, Param_Float, Param_Cell);
 	H_OnRecordMissed = new GlobalForward("GOKZ_LR_OnRecordMissed", ET_Ignore, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	H_OnPBMissed = new GlobalForward("GOKZ_LR_OnPBMissed", ET_Ignore, Param_Cell, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
@@ -53,7 +53,7 @@ void Call_OnTimeProcessed(
 	Call_Finish();
 }
 
-void Call_OnNewRecord(int client, int steamID, int mapID, int course, int mode, int style, int recordType)
+void Call_OnNewRecord(int client, int steamID, int mapID, int course, int mode, int style, int recordType, float pbDiff, int teleportsUsed)
 {
 	Call_StartForward(H_OnNewRecord);
 	Call_PushCell(client);
@@ -63,6 +63,8 @@ void Call_OnNewRecord(int client, int steamID, int mapID, int course, int mode, 
 	Call_PushCell(mode);
 	Call_PushCell(style);
 	Call_PushCell(recordType);
+	Call_PushFloat(pbDiff);
+	Call_PushCell(teleportsUsed);
 	Call_Finish();
 }
 

@@ -84,6 +84,7 @@ enum
 #define JS_MAX_LADDERJUMP_OFFSET 2.0
 #define JS_MAX_BHOP_GROUND_TICKS 5
 #define JS_MAX_WEIRDJUMP_FALL_OFFSET 64.0
+#define JS_TOUCH_GRACE_TICKS 3
 #define JS_MAX_TRACKED_STRAFES 48
 #define JS_MIN_BLOCK_DISTANCE 186
 #define JS_MIN_LAJ_BLOCK_DISTANCE 50
@@ -256,7 +257,7 @@ enum struct Jump
 	int crouchRelease;
 	int crouchTicks;
 	int deadair;
-	int durationTicks;
+	int duration;
 	int originalType;
 	int overlap;
 	int releaseW;
@@ -264,7 +265,6 @@ enum struct Jump
 	int type;
 	float deviation;
 	float distance;
-	float duration;
 	float edge;
 	float height;
 	float maxSpeed;

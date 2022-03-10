@@ -141,6 +141,8 @@ static void ResetRacer(int client)
 {
 	racerStatus[client] = RacerStatus_Available;
 	racerRaceID[client] = -1;
+	lastTimerStartTime[client] = 0.0;
+	lastCheckpointTime[client] = 0.0;
 }
 
 static void ResetRacersInRace(int raceID)

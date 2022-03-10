@@ -1,5 +1,6 @@
 #include <sourcemod>
 
+#include <dhooks>
 #include <sdkhooks>
 #include <sdktools>
 
@@ -34,6 +35,7 @@ public Plugin myinfo =
 #include "gokz-jumpstats/distance_tiers.sp"
 #include "gokz-jumpstats/jump_reporting.sp"
 #include "gokz-jumpstats/jump_tracking.sp"
+#include "gokz-jumpstats/jump_validating.sp"
 #include "gokz-jumpstats/options.sp"
 #include "gokz-jumpstats/options_menu.sp"
 
@@ -56,6 +58,8 @@ public void OnPluginStart()
 	LoadBroadcastTiers();
 	CreateGlobalForwards();
 	RegisterCommands();
+	
+	OnPluginStart_JumpValidating();
 }
 
 public void OnAllPluginsLoaded()
@@ -101,13 +105,13 @@ public void OnClientPutInServer(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	OnPlayerRunCmd_JumpTracking(client, buttons);
+	OnPlayerRunCmd_JumpTracking(client, buttons, tickcount);
 	return Plugin_Continue;
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
-	OnPlayerRunCmdPost_JumpTracking(client, cmdnum);
+	OnPlayerRunCmdPost_JumpTracking(client);
 }
 
 public void Movement_OnStartTouchGround(int client)
@@ -115,19 +119,19 @@ public void Movement_OnStartTouchGround(int client)
 	OnStartTouchGround_JumpTracking(client);
 }
 
-public void Movement_OnPlayerJump(int client, bool jumpbug)
-{
-	OnPlayerJump_JumpTracking(client, jumpbug);
-}
-
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
 	OnChangeMovetype_JumpTracking(client, oldMovetype, newMovetype);
 }
 
-public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump)
+public void GOKZ_OnJumpInvalidated(int client)
 {
-	OnJumpValidated_JumpTracking(client, jumped, ladderJump);
+	OnJumpInvalidated_JumpTracking(client);
+}
+
+public void GOKZ_OnJumpValidated(int client, bool jumped, bool ladderJump, bool jumpbug)
+{
+	OnJumpValidated_JumpTracking(client, jumped, ladderJump, jumpbug);
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
@@ -159,6 +163,11 @@ public void GOKZ_JS_OnFailstatAlways(Jump jump)
 public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost
 {
 	OnStartTouch_JumpTracking(client);
+}
+
+public void SDKHook_Touch_CallBack(int client, int touched)
+{
+	OnTouch_JumpTracking(client);
 }
 
 public void SDKHook_EndTouch_Callback(int client, int touched) // SDKHook_EndTouchPost
@@ -204,5 +213,6 @@ public void GOKZ_OnSlap(int client)
 static void HookClientEvents(int client)
 {
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
+	SDKHook(client, SDKHook_TouchPost, SDKHook_Touch_CallBack);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
 } 

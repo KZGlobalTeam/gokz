@@ -402,20 +402,6 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Switched Mode", gC_ModeNames[newValue]);
 		}
-		case Option_AutoRestart:
-		{
-			switch (newValue)
-			{
-				case AutoRestart_Disabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Auto Restart - Disable");
-				}
-				case AutoRestart_Enabled:
-				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Auto Restart - Enable");
-				}
-			}
-		}
 		case Option_VirtualButtonIndicators:
 		{
 			switch (newValue)

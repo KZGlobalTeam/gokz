@@ -8,6 +8,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_next", CommandNextCheckpoint, "[KZ] Go forward a checkpoint.");
 	RegConsoleCmd("sm_undo", CommandUndoTeleport, "[KZ] Undo teleport.");
 	RegConsoleCmd("sm_start", CommandTeleportToStart, "[KZ] Teleport to the start.");
+	RegConsoleCmd("sm_searchstart", CommandSearchStart, "[KZ] Teleport to the start zone/button of a specified course.");
 	RegConsoleCmd("sm_end", CommandTeleportToEnd, "[KZ] Teleport to the end.");
 	RegConsoleCmd("sm_restart", CommandTeleportToStart, "[KZ] Teleport to your start position.");
 	RegConsoleCmd("sm_r", CommandTeleportToStart, "[KZ] Teleport to your start position.");
@@ -22,7 +23,6 @@ void RegisterCommands()
 	RegConsoleCmd("sm_pause", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_resume", CommandTogglePause, "[KZ] Toggle pausing your timer and stopping you in your position.");
 	RegConsoleCmd("sm_stop", CommandStopTimer, "[KZ] Stop your timer.");
-	RegConsoleCmd("sm_autorestart", CommandToggleAutoRestart, "[KZ] Toggle auto restart upon teleporting to start.");
 	RegConsoleCmd("sm_virtualbuttonindicators", CommandToggleVirtualButtonIndicators, "[KZ] Toggle virtual button indicators.");
 	RegConsoleCmd("sm_vbi", CommandToggleVirtualButtonIndicators, "[KZ] Toggle virtual button indicators.");
 	RegConsoleCmd("sm_virtualbuttons", CommandToggleVirtualButtonsLock, "[KZ] Toggle locking virtual buttons, preventing them from being moved.");
@@ -48,6 +48,20 @@ void RegisterCommands()
 void AddCommandsListeners()
 {
 	AddCommandListener(CommandJoinTeam, "jointeam");
+}
+
+bool SwitchToModeIfAvailable(int client, int mode)
+{
+	if (!GOKZ_GetModeLoaded(mode))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", gC_ModeNames[mode]);
+		return false;
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_Mode, mode);
+		return true;
+	}
 }
 
 public Action CommandOptions(int client, int args)
@@ -101,9 +115,58 @@ public Action CommandTeleportToStart(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandSearchStart(int client, int args)
+{
+	if (args == 0)
+	{
+		GOKZ_TeleportToSearchStart(client, GetCurrentCourse(client));
+		return Plugin_Handled;
+	}
+	else
+	{
+		char argCourse[4];
+		GetCmdArg(1, argCourse, sizeof(argCourse));
+		int course = StringToInt(argCourse);
+		if (GOKZ_IsValidCourse(course, false))
+		{
+			GOKZ_TeleportToSearchStart(client, course);
+		}
+		else if (StrEqual(argCourse, "main", false) || course == 0)
+		{
+			GOKZ_TeleportToSearchStart(client, 0);
+		}
+		else 
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Course Number", argCourse);
+		}
+	}
+	return Plugin_Handled;
+}
+
 public Action CommandTeleportToEnd(int client, int args)
 {
-	GOKZ_TeleportToEnd(client);
+	if (args == 0)
+	{  
+		GOKZ_TeleportToEnd(client, GetCurrentCourse(client));
+	}
+	else
+	{
+		char argCourse[4];
+		GetCmdArg(1, argCourse, sizeof(argCourse));
+		int course = StringToInt(argCourse);
+		if (GOKZ_IsValidCourse(course, false))
+		{
+			GOKZ_TeleportToEnd(client, course);
+		}
+		else if (StrEqual(argCourse, "main", false) || course == 0)
+		{
+			GOKZ_TeleportToEnd(client, 0);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Course Number", argCourse);
+		}
+	}
 	return Plugin_Handled;
 }
 
@@ -186,19 +249,6 @@ public Action CommandStopTimer(int client, int args)
 	if (TimerStop(client))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Timer Stopped");
-	}
-	return Plugin_Handled;
-}
-
-public Action CommandToggleAutoRestart(int client, int args)
-{
-	if (GOKZ_GetCoreOption(client, Option_AutoRestart) == AutoRestart_Disabled)
-	{
-		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Enabled);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_AutoRestart, AutoRestart_Disabled);
 	}
 	return Plugin_Handled;
 }
@@ -289,18 +339,3 @@ public Action CommandDisableNoclipNotrigger(int client, int args)
 	return Plugin_Handled;
 }
 
-
-
-// =====[ PRIVATE ]=====
-
-static void SwitchToModeIfAvailable(int client, int mode)
-{
-	if (!GOKZ_GetModeLoaded(mode))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", gC_ModeNames[mode]);
-	}
-	else
-	{
-		GOKZ_SetCoreOption(client, Option_Mode, mode);
-	}
-}

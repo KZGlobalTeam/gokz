@@ -82,6 +82,12 @@ bool CanPause(int client)
 			GOKZ_PlayErrorSound(client);
 			return false;
 		}
+		else if (AntiPauseTriggerIsTouched(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Anti Pause Area)");
+			GOKZ_PlayErrorSound(client);
+			return false;
+		}
 	}
 	
 	return true;

@@ -6,7 +6,8 @@ static GlobalForward H_OnTimerEnd_Post;
 
 void CreateNatives()
 {
-        CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
+	CreateNative("GOKZ_RP_GetPlaybackInfo", Native_RP_GetPlaybackInfo);
+	CreateNative("GOKZ_RP_LoadJumpReplay", Native_RP_LoadJumpReplay);
 }
 
 public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
@@ -17,19 +18,34 @@ public int Native_RP_GetPlaybackInfo(Handle plugin, int numParams)
 	return 1;
 }
 
+public int Native_RP_LoadJumpReplay(Handle plugin, int numParams)
+{
+	int len;
+	GetNativeStringLength(2, len);
+	char[] path = new char[len + 1];
+	GetNativeString(2, path, len + 1);
+	int botClient = LoadReplayBot(GetNativeCell(1), path);
+	return botClient;
+}
+
 // =====[ FORWARDS ]=====
 
 void CreateGlobalForwards()
 {
-	H_OnReplaySaved = new GlobalForward("GOKZ_RP_OnReplaySaved", ET_Ignore, Param_Cell, Param_String);
+	H_OnReplaySaved = new GlobalForward("GOKZ_RP_OnReplaySaved", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_Cell, Param_Float, Param_String);
 	H_OnReplayDiscarded = new GlobalForward("GOKZ_RP_OnReplayDiscarded", ET_Ignore, Param_Cell);
 	H_OnTimerEnd_Post = new GlobalForward("GOKZ_RP_OnTimerEnd_Post", ET_Ignore, Param_Cell, Param_String, Param_Cell, Param_Float, Param_Cell);
 }
 
-void Call_OnReplaySaved(int client, const char[] filePath)
+void Call_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath)
 {
 	Call_StartForward(H_OnReplaySaved);
 	Call_PushCell(client);
+	Call_PushCell(replayType);
+	Call_PushString(map);
+	Call_PushCell(course);
+	Call_PushCell(timeType);
+	Call_PushFloat(time);
 	Call_PushString(filePath);
 	Call_Finish();
 }

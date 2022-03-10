@@ -35,7 +35,8 @@ enum
 
 enum
 {
-	JumpstatDB_Top20_SteamID = 0, 
+	JumpstatDB_Top20_JumpID = 0,
+	JumpstatDB_Top20_SteamID, 
 	JumpstatDB_Top20_Alias, 
 	JumpstatDB_Top20_Block, 
 	JumpstatDB_Top20_Distance, 
@@ -44,6 +45,31 @@ enum
 	JumpstatDB_Top20_Pre, 
 	JumpstatDB_Top20_Max, 
 	JumpstatDB_Top20_Air
+};
+
+enum
+{
+	JumpstatDB_PBMenu_JumpID = 0,
+	JumpstatDB_PBMenu_JumpType,
+	JumpstatDB_PBMenu_Distance,
+	JumpstatDB_PBMenu_Strafes,
+	JumpstatDB_PBMenu_Sync,
+	JumpstatDB_PBMenu_Pre,
+	JumpstatDB_PBMenu_Max,
+	JumpstatDB_PBMenu_Air
+};
+
+enum
+{
+	JumpstatDB_BlockPBMenu_JumpID = 0,
+	JumpstatDB_BlockPBMenu_JumpType,
+	JumpstatDB_BlockPBMenu_Block,
+	JumpstatDB_BlockPBMenu_Distance,
+	JumpstatDB_BlockPBMenu_Strafes,
+	JumpstatDB_BlockPBMenu_Sync,
+	JumpstatDB_BlockPBMenu_Pre,
+	JumpstatDB_BlockPBMenu_Max,
+	JumpstatDB_BlockPBMenu_Air
 };
 
 enum
@@ -98,7 +124,7 @@ enum
 #define GOKZ_DB_JS_PRE_PRECISION 100
 #define GOKZ_DB_JS_MAX_PRECISION 100
 #define GOKZ_DB_JS_AIRTIME_PRECISION 10000
-#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 20
+#define GOKZ_DB_JS_MAX_JUMPS_PER_PLAYER 100
 
 stock char gC_DBOptionNames[DBOPTION_COUNT][] = 
 {
@@ -191,6 +217,31 @@ forward void GOKZ_DB_OnTimeInserted(
 	int runTimeMS, 
 	int teleportsUsed);
 
+/**
+ * Called when jumpstat PB has been achieved.
+ *
+ * @param client		Client index.
+ * @param jumptype		Type of the jump.
+ * @param mode			Mode the jump was performed in.
+ * @param distance		Distance jumped.
+ * @param block			The size of the block jumped across.
+ * @param strafes		The amount of strafes used.
+ * @param sync			Keyboard/mouse synchronisation of the jump.
+ * @param pre			Speed at takeoff.
+ * @param max			Maximum speed during the jump.
+ * @param airtime		Amount of time spend airborne.
+ */
+forward void GOKZ_DB_OnJumpstatPB(
+	int client,
+	int jumptype,
+	int mode,
+	float distance,
+	int block,
+	int strafes,
+	float sync,
+	float pre,
+	float max,
+	int airtime);
 
 
 // =====[ NATIVES ]=====

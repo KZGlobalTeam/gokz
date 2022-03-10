@@ -5,10 +5,11 @@
 
 
 
-static int checkpointCount[MAXPLAYERS + 1]; // Absolute total number of checkpoints
-static int storedCheckpointCount[MAXPLAYERS + 1]; // Current number of valid stored checkpoints
-static int checkpointPrevCount[MAXPLAYERS + 1]; // Number of checkpoints back from latest checkpoint
+static ArrayList checkpoints[MAXPLAYERS + 1];
+static int checkpointCount[MAXPLAYERS + 1];
 static int checkpointIndex[MAXPLAYERS + 1];
+static int checkpointIndexStart[MAXPLAYERS + 1];
+static int checkpointIndexEnd[MAXPLAYERS + 1];
 static int teleportCount[MAXPLAYERS + 1];
 static StartPositionType startType[MAXPLAYERS + 1];
 static StartPositionType nonCustomStartType[MAXPLAYERS + 1];
@@ -18,15 +19,7 @@ static float customStartOrigin[MAXPLAYERS + 1][3];
 static float customStartAngles[MAXPLAYERS + 1][3];
 static float endOrigin[MAXPLAYERS + 1][3];
 static float endAngles[MAXPLAYERS + 1][3];
-static float checkpointOrigin[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
-static float checkpointAngles[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
-static float checkpointLadderNormal[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS][3];
-static bool checkpointOnLadder[MAXPLAYERS + 1][GOKZ_MAX_CHECKPOINTS];
-static bool lastTeleportOnGround[MAXPLAYERS + 1];
-static bool lastTeleportInBhopTrigger[MAXPLAYERS + 1];
-static float undoOrigin[MAXPLAYERS + 1][3];
-static float undoAngles[MAXPLAYERS + 1][3];
-
+static UndoTeleportData undoTeleportData[MAXPLAYERS + 1];
 
 
 // =====[ PUBLIC ]=====
@@ -51,8 +44,19 @@ void SetTeleportCount(int client, int tpCount)
 	teleportCount[client] = tpCount;
 }
 
-
 // CHECKPOINT
+
+void OnMapStart_Checkpoints()
+{
+	for (int client = 0; client < MAXPLAYERS + 1; client++)
+	{
+		if (checkpoints[client] != INVALID_HANDLE)
+		{
+			delete checkpoints[client];
+		}
+		checkpoints[client] = new ArrayList(sizeof(Checkpoint));
+	}
+}
 
 void MakeCheckpoint(int client)
 {
@@ -71,13 +75,38 @@ void MakeCheckpoint(int client)
 	
 	// Make Checkpoint
 	checkpointCount[client]++;
-	storedCheckpointCount[client] = IntMin(storedCheckpointCount[client] + 1, GOKZ_MAX_CHECKPOINTS);
-	checkpointPrevCount[client] = 0;
+	Checkpoint cp;
+	cp.Create(client);
+
+	if (checkpoints[client] == INVALID_HANDLE)
+	{
+		checkpoints[client] = new ArrayList(sizeof(Checkpoint));
+	}
+
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
-	Movement_GetOrigin(client, checkpointOrigin[client][checkpointIndex[client]]);
-	Movement_GetEyeAngles(client, checkpointAngles[client][checkpointIndex[client]]);
-	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", checkpointLadderNormal[client][checkpointIndex[client]]);
-	checkpointOnLadder[client][checkpointIndex[client]] = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+	checkpointIndexEnd[client] = checkpointIndex[client];
+	// The list has yet to be filled up, do PushArray instead of SetArray
+	if (checkpoints[client].Length < GOKZ_MAX_CHECKPOINTS && checkpointIndex[client] == checkpoints[client].Length)
+	{
+		checkpoints[client].PushArray(cp);
+		// Initialize start and end index for the first checkpoint
+		if (checkpoints[client].Length == 1)
+		{
+			checkpointIndexStart[client] = 0;
+			checkpointIndexEnd[client] = 0;
+		}
+	}
+	else
+	{
+		checkpoints[client].SetArray(checkpointIndex[client], cp);
+		// The new checkpoint has overridden the oldest checkpoint, move the start index by one.
+		if (checkpointIndexEnd[client] == checkpointIndexStart[client])
+		{
+			checkpointIndexStart[client] = NextIndex(checkpointIndexStart[client], GOKZ_MAX_CHECKPOINTS);
+		}
+	}
+
+	
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
 		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
@@ -98,6 +127,15 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (GetTimerRunning(client) && AntiCpTriggerIsTouched(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Anti Checkpoint Area)");
 			GOKZ_PlayErrorSound(client);
 		}
 		return false;
@@ -123,7 +161,74 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 	return true;
 }
 
+ArrayList GetCheckpointData(int client)
+{
+	// Don't clone the entire thing, return an ordered list of checkpoints.
+	// Doing this should be cleaner, saves memory and should be faster than a full Clone().
+	ArrayList checkpointData = new ArrayList(sizeof(Checkpoint));
+	if (checkpointIndex[client] == -1)
+	{
+		// No checkpoint was made, return empty ArrayList
+		return checkpointData;
+	}
+	for (int i = checkpointIndexStart[client]; i != checkpointIndexEnd[client]; i = NextIndex(i, GOKZ_MAX_CHECKPOINTS))
+	{
+		Checkpoint cp;
+		checkpoints[client].GetArray(i, cp);
+		checkpointData.PushArray(cp);
+	}
+	return checkpointData;
+}
 
+bool SetCheckpointData(int client, ArrayList cps, int version)
+{
+	if (version != GOKZ_CHECKPOINT_VERSION)
+	{
+		return false;
+	}
+	// cps is assumed to be ordered.
+	if (cps != INVALID_HANDLE)
+	{
+		delete checkpoints[client];
+		checkpoints[client] = cps.Clone();
+		if (cps.Length == 0)
+		{
+			checkpointIndexStart[client] = -1;
+			checkpointIndexEnd[client] = -1;
+		}
+		else
+		{
+			checkpointIndexStart[client] = 0;
+			checkpointIndexEnd[client] = checkpoints[client].Length - 1;
+		}
+		checkpointIndex[client] = checkpointIndexEnd[client];
+		return true;
+	}
+	return false;
+}
+
+ArrayList GetUndoTeleportData(int client)
+{
+	// Enum structs cannot be sent directly over natives, we put it in an ArrayList of one instead.
+	// We use another struct instead of reusing Checkpoint so normal checkpoints don't use more memory than needed.
+	ArrayList undoTeleportDataArray = new ArrayList(sizeof(UndoTeleportData));
+	undoTeleportDataArray.PushArray(undoTeleportData[client]);
+	return undoTeleportDataArray;
+}
+
+bool SetUndoTeleportData(int client, ArrayList undoTeleportDataArray, int version)
+{
+	if (version != GOKZ_CHECKPOINT_VERSION)
+	{
+		return false;
+	}
+	if (undoTeleportDataArray != INVALID_HANDLE && undoTeleportDataArray.Length == 1)
+	{
+		undoTeleportDataArray.GetArray(0, undoTeleportData[client], sizeof(UndoTeleportData));
+		return true;
+	}
+	return false;
+}
 // TELEPORT
 
 void TeleportToCheckpoint(int client)
@@ -158,7 +263,7 @@ bool CanTeleportToCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (checkpointCount[client] == 0)
+	if (checkpoints[client] == INVALID_HANDLE || checkpoints[client].Length <= 0)
 	{
 		if (showError)
 		{
@@ -187,9 +292,7 @@ void PrevCheckpoint(int client)
 	{
 		return;
 	}
-	
-	storedCheckpointCount[client]--;
-	checkpointPrevCount[client]++;
+
 	checkpointIndex[client] = PrevIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	CheckpointTeleportDo(client);
 	
@@ -208,7 +311,7 @@ bool CanPrevCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (storedCheckpointCount[client] <= 1)
+	if (checkpointIndex[client] == checkpointIndexStart[client])
 	{
 		if (showError)
 		{
@@ -237,9 +340,6 @@ void NextCheckpoint(int client)
 	{
 		return;
 	}
-	
-	storedCheckpointCount[client]++;
-	checkpointPrevCount[client]--;
 	checkpointIndex[client] = NextIndex(checkpointIndex[client], GOKZ_MAX_CHECKPOINTS);
 	CheckpointTeleportDo(client);
 	
@@ -258,7 +358,7 @@ bool CanNextCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (checkpointPrevCount[client] == 0)
+	if (checkpointIndex[client] == checkpointIndexEnd[client])
 	{
 		if (showError)
 		{
@@ -277,7 +377,7 @@ void TeleportToStart(int client)
 {
 	// Call Pre Forward
 	Action result;
-	Call_GOKZ_OnTeleportToStart(client, result);
+	Call_GOKZ_OnTeleportToStart(client, GetCurrentCourse(client), result);
 	if (result != Plugin_Continue)
 	{
 		return;
@@ -288,6 +388,11 @@ void TeleportToStart(int client)
 	if (startType[client] == StartPositionType_Spawn)
 	{
 		GOKZ_RespawnPlayer(client, .restorePos = false);
+		// Respawning alone does not guarantee a valid spawn.
+		float spawnOrigin[3];
+		float spawnAngles[3];
+		GetValidSpawn(spawnOrigin, spawnAngles);
+		TeleportPlayer(client, spawnOrigin, spawnAngles);
 	}
 	else if (startType[client] == StartPositionType_Custom)
 	{
@@ -305,7 +410,36 @@ void TeleportToStart(int client)
 	}
 	
 	// Call Post Forward
-	Call_GOKZ_OnTeleportToStart_Post(client);
+	Call_GOKZ_OnTeleportToStart_Post(client, GetCurrentCourse(client));
+}
+
+void TeleportToSearchStart(int client, int course)
+{
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToStart(client, course, result);
+	if (result != Plugin_Continue)
+	{
+		return;
+	}
+	float origin[3], angles[3];
+	if (!GetSearchStartPosition(course, origin, angles))
+	{
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Start Found");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", course);
+		}
+		return;
+	}
+	GOKZ_StopTimer(client, false);
+
+	TeleportDo(client, origin, angles);
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToStart_Post(client, course);
 }
 
 StartPositionType GetStartPosition(int client, float position[3], float angles[3])
@@ -326,17 +460,29 @@ StartPositionType GetStartPosition(int client, float position[3], float angles[3
 
 bool TeleportToCourseStart(int client, int course)
 {
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnTeleportToStart(client, course, result);
+	if (result != Plugin_Continue)
+	{
+		return false;
+	}	
 	float origin[3], angles[3];
 	
 	if (!GetMapStartPosition(course, origin, angles))
 	{
-		return false;
+		if (!GetSearchStartPosition(course, origin, angles))
+		{
+			return false;
+		}
 	}
 
 	GOKZ_StopTimer(client);
 	
 	TeleportDo(client, origin, angles);
 	
+	// Call Post Forward
+	Call_GOKZ_OnTeleportToStart_Post(client, course);	
 	return true;
 }
 
@@ -430,11 +576,11 @@ bool ClearCustomStartPosition(int client)
 
 // TELEPORT TO END
 
-void TeleportToEnd(int client)
+void TeleportToEnd(int client, int course)
 {
 	// Call Pre Forward
 	Action result;
-	Call_GOKZ_OnTeleportToEnd(client, result);
+	Call_GOKZ_OnTeleportToEnd(client, course, result);
 	if (result != Plugin_Continue)
 	{
 		return;
@@ -442,11 +588,22 @@ void TeleportToEnd(int client)
 
 	GOKZ_StopTimer(client, false);
 
-	// Teleport to End
+	if (!GetMapEndPosition(course, endOrigin[client], endAngles[client]))
+	{
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No End Found");
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "No End Found (Bonus)", course);
+		}
+		return;
+	}
 	TeleportDo(client, endOrigin[client], endAngles[client]);
 
 	// Call Post Forward
-	Call_GOKZ_OnTeleportToEnd_Post(client);
+	Call_GOKZ_OnTeleportToEnd_Post(client, course);
 }
 
 void SetEndPosition(int client, const float origin[3] = NULL_VECTOR, const float angles[3] = NULL_VECTOR)
@@ -494,7 +651,7 @@ void UndoTeleport(int client)
 	}
 	
 	// Undo Teleport
-	TeleportDo(client, undoOrigin[client], undoAngles[client]);
+	TeleportDo(client, undoTeleportData[client].origin, undoTeleportData[client].angles);
 	
 	// Call Post Forward
 	Call_GOKZ_OnUndoTeleport_Post(client);
@@ -511,7 +668,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (!lastTeleportOnGround[client])
+	if (!undoTeleportData[client].lastTeleportOnGround)
 	{
 		if (showError)
 		{
@@ -520,11 +677,20 @@ bool CanUndoTeleport(int client, bool showError = false)
 		}
 		return false;
 	}
-	if (lastTeleportInBhopTrigger[client])
+	if (undoTeleportData[client].lastTeleportInBhopTrigger)
 	{
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (Just Landed)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	if (undoTeleportData[client].lastTeleportInAntiCpTrigger)
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Undo (AntiCp)");
 			GOKZ_PlayErrorSound(client);
 		}
 		return false;
@@ -538,13 +704,16 @@ bool CanUndoTeleport(int client, bool showError = false)
 
 void OnClientPutInServer_Teleports(int client)
 {
-	checkpointCount[client] = 0;
-	storedCheckpointCount[client] = 0;
-	checkpointPrevCount[client] = 0;
+	checkpointIndex[client] = -1;
+	checkpointIndexStart[client] = -1;
+	checkpointIndexEnd[client] = -1;
 	teleportCount[client] = 0;
 	startType[client] = StartPositionType_Spawn;
 	nonCustomStartType[client] = StartPositionType_Spawn;
-	
+	if (checkpoints[client] != INVALID_HANDLE)
+	{
+		checkpoints[client].Clear();
+	}
 	// Set start and end position to main course if we know of it
 	SetStartPositionToMapStart(client, 0);
 	SetEndPositionToMapEnd(client, 0);
@@ -554,9 +723,11 @@ void OnClientPutInServer_Teleports(int client)
 void OnTimerStart_Teleports(int client)
 {
 	checkpointCount[client] = 0;
-	storedCheckpointCount[client] = 0;
-	checkpointPrevCount[client] = 0;
+	checkpointIndex[client] = -1;
+	checkpointIndexStart[client] = -1;
+	checkpointIndexEnd[client] = -1;
 	teleportCount[client] = 0;
+	checkpoints[client].Clear();
 }
 
 void OnStartButtonPress_Teleports(int client, int course)
@@ -608,19 +779,12 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	}
 	
 	// Store information about where player is teleporting from
-	float oldOrigin[3];
-	Movement_GetOrigin(client, oldOrigin);
-	float oldAngles[3];
-	Movement_GetEyeAngles(client, oldAngles);
-	lastTeleportInBhopTrigger[client] = BhopTriggersJustTouched(client);
-	lastTeleportOnGround[client] = Movement_GetOnGround(client);
+	undoTeleportData[client].Init(client, BhopTriggersJustTouched(client), Movement_GetOnGround(client), AntiCpTriggerIsTouched(client));
 	
 	teleportCount[client]++;
 	TeleportPlayer(client, destOrigin, destAngles);
-	
-	undoOrigin[client] = oldOrigin;
-	undoAngles[client] = oldAngles;
-	
+	// TeleportPlayer needs to be done before undo TP data can be fully updated.
+	undoTeleportData[client].Update();
 	if (GOKZ_GetCoreOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
 	{
 		EmitSoundToClient(client, GOKZ_SOUND_TELEPORT);
@@ -632,12 +796,15 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 
 static void CheckpointTeleportDo(int client)
 {
-	TeleportDo(client, checkpointOrigin[client][checkpointIndex[client]], checkpointAngles[client][checkpointIndex[client]]);
+	Checkpoint cp;
+	checkpoints[client].GetArray(checkpointIndex[client], cp);
+	
+	TeleportDo(client, cp.origin, cp.angles);
 	
 	// Handle ladder stuff
-	if (checkpointOnLadder[client][checkpointIndex[client]])
+	if (cp.onLadder)
 	{
-		SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", checkpointLadderNormal[client][checkpointIndex[client]]);
+		SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", cp.ladderNormal);
 		if (!GOKZ_GetPaused(client))
 		{
 			Movement_SetMovetype(client, MOVETYPE_LADDER);

@@ -52,7 +52,7 @@ public void DB_TxnSuccess_CacheJSPBs(Handle db, int userID, int numQueries, Hand
 	}
 }
 
-static void ClearCache(int client)
+void ClearCache(int client)
 {
 	for (int mode = 0; mode < MODE_COUNT; mode += 1)
 	{

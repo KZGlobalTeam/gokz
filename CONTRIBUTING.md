@@ -5,7 +5,7 @@ GOKZ is a community project. All are welcome to contribute as long as they follo
 ## General Procedure
 
  1. Create an issue so that we may first discuss the proposed changes or additions.
- 2. Fork the repository (https://bitbucket.org/kztimerglobalteam/gokz/fork).
+ 2. Fork the repository (https://github.com/KZGlobalTeam/gokz).
  3. Create a new branch off of the `dev` branch.
  4. Commit and push your code to your new branch.
  5. Create a pull request targeting our `dev` branch, making a reference to the issue.
@@ -16,7 +16,7 @@ Once your pull request is checked and approved, your branch will be merged into 
 
 To keep our code beautiful and maintainable, please adhere to the style guide.
 
-As a general rule, the style of your code should match what already exists. It is recommended to use [**SPEdit**](https://github.com/JulienKluge/Spedit) and its built-in syntax reformatter to assist formatting your code to match the project's style.
+As a general rule, the style of your code should match what already exists. It is recommended to use [**SPCode**](https://github.com/SPCodeOrg/SPCode) and its built-in syntax reformatter to assist formatting your code to match the project's style.
 
 Our SourcePawn code is written in the [transitional syntax](https://wiki.alliedmods.net/SourcePawn_Transitional_Syntax) introduced with SourceMod 1.7.
 

@@ -82,7 +82,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	{
 		return;
 	}
-	
+
 	OnPlayerRunCmdPost_JumpBeam(client);
 	UpdateOldVariables(client);
 }
@@ -93,7 +93,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 
 public void OnMapStart()
 {
-	gI_BeamModel = PrecacheModel("materials/sprites/laser.vmt", true);
+	gI_BeamModel = PrecacheModel("materials/sprites/laserbeam.vmt", true);
 }
 
 public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
@@ -176,7 +176,7 @@ void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	beamEnd = origin;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 0.25, 0.25, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.ID);
 }
 
@@ -206,7 +206,7 @@ void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	}
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 0.25, 0.25, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.ID);
 }
 
@@ -223,7 +223,7 @@ void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	beamEnd[2] = takeoffOrigin[2] + 0.1;
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
-	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 3.0, 3.0, 10, 0.0, beamColour, 0);
+	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 0.25, 0.25, 10, 0.0, beamColour, 0);
 	TE_SendToClient(player.ID);
 }
 

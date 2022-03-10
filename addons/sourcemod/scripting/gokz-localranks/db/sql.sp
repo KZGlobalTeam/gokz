@@ -94,7 +94,7 @@ SELECT Times.RunTime \
     LIMIT %d";
 
 char sql_getmaptop[] = "\
-SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
+SELECT t.TimeID, t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     FROM Times t \
     INNER JOIN MapCourses mc ON mc.MapCourseID=t.MapCourseID \
     INNER JOIN Players p ON p.SteamID32=t.SteamID32 \
@@ -105,7 +105,7 @@ SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     LIMIT %d";
 
 char sql_getmaptoppro[] = "\
-SELECT t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
+SELECT t.TimeID, t.SteamID32, p.Alias, t.RunTime AS PBTime, t.Teleports \
     FROM Times t \
     INNER JOIN MapCourses mc ON mc.MapCourseID=t.MapCourseID \
     INNER JOIN Players p ON p.SteamID32=t.SteamID32 \
@@ -241,7 +241,7 @@ char sql_gettopplayers[] = "\
 SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     FROM Times \
     INNER JOIN \
-    (SELECT Times.MapCourseID, MIN(Times.RunTime) AS RecordTime \
+    (SELECT Times.MapCourseID, Times.Mode, MIN(Times.RunTime) AS RecordTime \
     FROM Times \
     INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID \
     INNER JOIN Maps ON Maps.MapID=MapCourses.MapID \
@@ -249,7 +249,7 @@ SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     WHERE Players.Cheater=0 AND Maps.InRankedPool=1 AND MapCourses.Course=0 \
     AND Times.Mode=%d \
     GROUP BY Times.MapCourseID) Records \
-    ON Times.MapCourseID=Records.MapCourseID AND Times.RunTime=Records.RecordTime \
+    ON Times.MapCourseID=Records.MapCourseID AND Times.Mode=Records.Mode AND Times.RunTime=Records.RecordTime \
     INNER JOIN Players ON Players.SteamID32=Times.SteamID32 \
     GROUP BY Players.SteamID32, Players.Alias \
     ORDER BY RecordCount DESC \
@@ -259,7 +259,7 @@ char sql_gettopplayerspro[] = "\
 SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     FROM Times \
     INNER JOIN \
-    (SELECT Times.MapCourseID, MIN(Times.RunTime) AS RecordTime \
+    (SELECT Times.MapCourseID, Times.Mode, MIN(Times.RunTime) AS RecordTime \
     FROM Times \
     INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID \
     INNER JOIN Maps ON Maps.MapID=MapCourses.MapID \
@@ -267,7 +267,7 @@ SELECT Players.SteamID32, Players.Alias, COUNT(*) AS RecordCount \
     WHERE Players.Cheater=0 AND Maps.InRankedPool=1 AND MapCourses.Course=0 \
     AND Times.Mode=%d AND Times.Teleports=0 \
     GROUP BY Times.MapCourseID) Records \
-    ON Times.MapCourseID=Records.MapCourseID AND Times.RunTime=Records.RecordTime \
+    ON Times.MapCourseID=Records.MapCourseID AND Times.Mode=Records.Mode AND Times.RunTime=Records.RecordTime AND Times.Teleports=0 \
     INNER JOIN Players ON Players.SteamID32=Times.SteamID32 \
     GROUP BY Players.SteamID32, Players.Alias \
     ORDER BY RecordCount DESC \
@@ -301,13 +301,13 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
     INNER JOIN MapCourses ON a.MapCourseID=MapCourses.MapCourseID \
     INNER JOIN Maps ON MapCourses.MapID=Maps.MapID \
     INNER JOIN Players ON a.SteamID32=Players.SteamID32 \
-    WHERE Players.Cheater=0 AND a.Mode=%d \
+    WHERE Players.Cheater=0 AND Maps.InRankedPool AND a.Mode=%d \
     AND NOT EXISTS \
     (SELECT * \
     FROM Times AS b \
     WHERE a.MapCourseID=b.MapCourseID AND a.Mode=b.Mode \
     AND a.Created>b.Created AND a.RunTime>b.RunTime) \
-    ORDER BY a.Created DESC \
+    ORDER BY a.TimeID DESC \
     LIMIT %d";
 
 char sql_getrecentrecords_pro[] = "\
@@ -316,13 +316,13 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
     INNER JOIN MapCourses ON a.MapCourseID=MapCourses.MapCourseID \
     INNER JOIN Maps ON MapCourses.MapID=Maps.MapID \
     INNER JOIN Players ON a.SteamID32=Players.SteamID32 \
-    WHERE Players.Cheater=0 AND a.Mode=%d AND a.Teleports=0 \
+    WHERE Players.Cheater=0 AND Maps.InRankedPool AND a.Mode=%d AND a.Teleports=0 \
     AND NOT EXISTS \
     (SELECT * \
     FROM Times AS b \
     WHERE b.Teleports=0 AND a.MapCourseID=b.MapCourseID AND a.Mode=b.Mode \
     AND a.Created>b.Created AND a.RunTime>b.RunTime) \
-    ORDER BY a.Created DESC \
+    ORDER BY a.TimeID DESC \
     LIMIT %d";
 
 
@@ -330,7 +330,7 @@ SELECT Maps.Name, MapCourses.Course, MapCourses.MapCourseID, Players.Alias, a.Ru
 // =====[ JUMPSTATS ]=====
 
 char sql_jumpstats_gettop[] = "\
-SELECT p.SteamID32, p.Alias, j.Block, j.Distance, j.Strafes, j.Sync, j.Pre, j.Max, j.Airtime \
+SELECT j.JumpID, p.SteamID32, p.Alias, j.Block, j.Distance, j.Strafes, j.Sync, j.Pre, j.Max, j.Airtime \
 	FROM \
 		Jumpstats j \
     INNER JOIN \
@@ -379,3 +379,35 @@ SELECT JumpID, Distance, Block \
         Mode = %d AND \
         IsBlockJump = %d \
     ORDER BY Block DESC, Distance DESC";
+
+char sql_jumpstats_getpbs[] = "\
+SELECT b.JumpID, b.JumpType, b.Distance, b.Strafes, b.Sync, b.Pre, b.Max, b.Airtime \
+    FROM Jumpstats b \
+    INNER JOIN ( \
+        SELECT a.SteamID32, a.Mode, a.JumpType, MAX(a.Distance) Distance \
+        FROM Jumpstats a \
+        WHERE a.SteamID32=%d AND a.Mode=%d AND NOT a.IsBlockJump \
+        GROUP BY a.JumpType \
+    ) a ON a.JumpType=b.JumpType AND a.Distance=b.Distance \
+    WHERE a.SteamID32=b.SteamID32 AND a.Mode=b.Mode AND NOT b.IsBlockJump \
+    GROUP BY b.JumpType \
+    ORDER BY b.JumpType";
+
+char sql_jumpstats_getblockpbs[] = "\
+SELECT c.JumpID, c.JumpType, c.Block, c.Distance, c.Strafes, c.Sync, c.Pre, c.Max, c.Airtime \
+    FROM Jumpstats c \
+    INNER JOIN ( \
+        SELECT a.SteamID32, a.Mode, a.JumpType, a.Block, MAX(b.Distance) Distance \
+        FROM Jumpstats b \
+        INNER JOIN ( \
+            SELECT a.SteamID32, a.Mode, a.JumpType, MAX(a.Block) Block \
+            FROM Jumpstats a \
+            WHERE a.SteamID32=%d AND a.Mode=%d AND a.IsBlockJump \
+            GROUP BY a.JumpType \
+        ) a ON a.JumpType=b.JumpType AND a.Block=b.Block \
+        WHERE a.SteamID32=b.SteamID32 AND a.Mode=b.Mode AND b.IsBlockJump \
+        GROUP BY b.JumpType \
+    ) b ON b.JumpType=c.JumpType AND b.Block=c.Block AND b.Distance=c.Distance \
+    WHERE b.SteamID32=c.SteamID32 AND b.Mode=c.Mode AND c.IsBlockJump \
+    GROUP BY c.JumpType \
+    ORDER BY c.JumpType";

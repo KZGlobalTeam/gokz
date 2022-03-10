@@ -111,7 +111,8 @@ stock void Movement_GetOriginEx(int client, float result[3])
 	if (TR_DidHit(trace))
 	{
 		TR_GetEndPosition(result, trace);
-		result[2] = result[2] - 0.03125; // Get rid of the offset (CS:GO quirk?)
+		// Do not get rid of the offset. The offset is correct, as the player must be
+		// at least 0.03125 units away from the ground.
 	}
 	else
 	{

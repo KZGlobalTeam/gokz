@@ -28,6 +28,8 @@ void RegisterCommands()
 	RegConsoleCmd("sm_lajpb", CommandLAJPB, "[KZ] Show PB Ladder Jump in chat. Usage: !lajpb <jumper>");
 	RegConsoleCmd("sm_lahpb", CommandLAHPB, "[KZ] Show PB Ladderhop in chat. Usage: !lahpb <jumper>");
 	RegConsoleCmd("sm_jbpb", CommandJBPB, "[KZ] Show PB Jumpbug in chat. Usage: !jbpb <jumper>");
+	RegConsoleCmd("sm_js", CommandJS, "[KZ] Open a menu showing jumpstat PBs. Usage: !js <jumper>");
+	RegConsoleCmd("sm_jumpstats", CommandJS, "[KZ] Open a menu showing jumpstat PBs. Usage: !jumpstats <jumper>");
 	RegConsoleCmd("sm_jstop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 	RegConsoleCmd("sm_jumptop", CommandJSTop, "[KZ] Open a menu showing the top jumpstats.");
 
@@ -118,6 +120,12 @@ public Action CommandPB(int client, int args)
 	if (args == 0)
 	{  // Print their PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 0, GOKZ_GetCoreOption(client, Option_Mode));
+		if (gB_GOKZGlobal)
+		{
+			char steamid[32];
+			GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+			GOKZ_GL_PrintRecords(client, "", 0, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+		}
 	}
 	else if (args == 1)
 	{  // Print their PBs for specified map and their current mode
@@ -145,6 +153,12 @@ public Action CommandBPB(int client, int args)
 	if (args == 0)
 	{  // Print their Bonus 1 PBs for current map and their current mode
 		DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), 1, GOKZ_GetCoreOption(client, Option_Mode));
+		if (gB_GOKZGlobal)
+		{
+			char steamid[32];
+			GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+			GOKZ_GL_PrintRecords(client, "", 1, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+		}
 	}
 	else if (args == 1)
 	{  // Print their specified Bonus # PBs for current map and their current mode
@@ -154,6 +168,12 @@ public Action CommandBPB(int client, int args)
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
 			DB_PrintPBs(client, GetSteamAccountID(client), GOKZ_DB_GetCurrentMapID(), bonus, GOKZ_GetCoreOption(client, Option_Mode));
+			if (gB_GOKZGlobal)
+			{
+				char steamid[32];
+				GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+				GOKZ_GL_PrintRecords(client, "", bonus, GOKZ_GetCoreOption(client, Option_Mode), steamid);
+			}
 		}
 		else
 		{
@@ -359,8 +379,7 @@ public Action CommandRecentRecords(int client, int args)
 		return Plugin_Handled;
 	}
 
-	// Open recent records for the player's selected mode
-	DisplayRecentRecordsMenu(client, GOKZ_GetCoreOption(client, Option_Mode));
+	DisplayRecentRecordsModeMenu(client);
 	return Plugin_Handled;
 }
 
@@ -420,6 +439,26 @@ public Action CommandLAHPB(int client, int args)
 public Action CommandJBPB(int client, int args)
 {
 	DisplayJumpstatRecordCommand(client, args, JumpType_Jumpbug);
+	return Plugin_Handled;
+}
+
+public Action CommandJS(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+
+	if (args < 1)
+	{
+		DB_OpenJumpStatsModeMenu(client, GetSteamAccountID(client));
+	}
+	else if (args >= 1)
+	{
+		char argPlayer[MAX_NAME_LENGTH];
+		GetCmdArg(1, argPlayer, sizeof(argPlayer));
+		DB_OpenJumpStatsModeMenu_FindPlayer(client, argPlayer);
+	}
 	return Plugin_Handled;
 }
 

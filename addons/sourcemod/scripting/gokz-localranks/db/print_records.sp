@@ -82,9 +82,9 @@ public void DB_TxnSuccess_PrintRecords(Handle db, DataPack data, int numQueries,
 		mapHasRecord = true;
 		if (SQL_FetchRow(results[2]))
 		{
-			SQL_FetchString(results[2], 1, recordHolder, sizeof(recordHolder));
-			runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 2));
-			teleportsUsed = SQL_FetchInt(results[2], 3);
+			SQL_FetchString(results[2], 2, recordHolder, sizeof(recordHolder));
+			runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 3));
+			teleportsUsed = SQL_FetchInt(results[2], 4);
 		}
 	}
 	// Get Pro WR info from results
@@ -93,8 +93,8 @@ public void DB_TxnSuccess_PrintRecords(Handle db, DataPack data, int numQueries,
 		mapHasRecordPro = true;
 		if (SQL_FetchRow(results[3]))
 		{
-			SQL_FetchString(results[3], 1, recordHolderPro, sizeof(recordHolderPro));
-			runTimePro = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[3], 2));
+			SQL_FetchString(results[3], 2, recordHolderPro, sizeof(recordHolderPro));
+			runTimePro = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[3], 3));
 		}
 	}
 	

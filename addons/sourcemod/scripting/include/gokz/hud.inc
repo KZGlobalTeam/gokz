@@ -23,7 +23,8 @@ enum HUDOption:
 	HUDOption_TimerStyle,
 	HUDOption_TimerType, 
 	HUDOption_SpeedText, 
-	HUDOption_ShowWeapon, 
+	HUDOption_ShowWeapon,
+	HUDOption_ShowControls, 
 	HUDOPTION_COUNT
 };
 
@@ -89,6 +90,13 @@ enum
 	SHOWWEAPON_COUNT
 };
 
+enum
+{
+	ReplayControls_Disabled = 0,
+	ReplayControls_Enabled,
+	REPLAYCONTROLS_COUNT
+};
+
 
 
 // =====[ STRUCTS ]======
@@ -111,6 +119,7 @@ enum struct HUDInfo
 	bool HitPerf;
 	float TakeoffSpeed;
 	int Buttons;
+	int CurrentTeleport;
 }
 
 
@@ -130,7 +139,8 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Timer Style", 
 	"GOKZ HUD - Show Time Type",
 	"GOKZ HUD - Speed Text", 
-	"GOKZ HUD - Show Weapon"
+	"GOKZ HUD - Show Weapon",
+	"GOKZ HUD - Show Controls"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -142,7 +152,8 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Timer Style - 0 = Standard, 1 = Precise",
 	"Timer Type - 0 = Disabled, 1 = Enabled", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
-	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled"
+	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
+	"Replay Controls Display - 0 = Disbled, 1 = Enabled"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -154,7 +165,8 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Timer Style", 
 	"Options Menu - Timer Type",
 	"Options Menu - Speed Text", 
-	"Options Menu - Show Weapon"
+	"Options Menu - Show Weapon",
+	"Options Menu - Show Controls"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -166,7 +178,8 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	TIMERSTYLE_COUNT,
 	TIMERTYPE_COUNT, 
 	SPEEDTEXT_COUNT, 
-	SHOWWEAPON_COUNT
+	SHOWWEAPON_COUNT,
+	REPLAYCONTROLS_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -178,7 +191,8 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	TimerStyle_Standard, 
 	TimerType_Enabled,
 	SpeedText_InfoPanel, 
-	ShowWeapon_Enabled
+	ShowWeapon_Enabled,
+	ReplayControls_Enabled
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -215,6 +229,12 @@ stock char gC_SpeedTextPhrases[SPEEDTEXT_COUNT][] =
 	"Options Menu - Disabled", 
 	"Options Menu - Info Panel", 
 	"Options Menu - Bottom"
+};
+
+stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
+{
+	"Options Menu - Disabled",
+	"Options Menu - Enabled"
 };
 
 

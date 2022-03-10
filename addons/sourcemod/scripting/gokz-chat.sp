@@ -29,6 +29,8 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-chat.txt"
 
 bool gB_BaseComm;
+char gC_PlayerTags[MAXPLAYERS + 1][32];
+char gC_PlayerTagColors[MAXPLAYERS + 1][16];
 
 ConVar gCV_gokz_chat_processing;
 ConVar gCV_gokz_connection_messages;
@@ -39,6 +41,7 @@ ConVar gCV_gokz_connection_messages;
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-chat");
 	return APLRes_Success;
 }
@@ -51,6 +54,7 @@ public void OnPluginStart()
 	HookEvents();
 	
 	OnPluginStart_BlockRadio();
+	OnPluginStart_BlockChatWheel();
 }
 
 public void OnAllPluginsLoaded()
@@ -82,12 +86,18 @@ public void OnLibraryRemoved(const char[] name)
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
 {
-	if (gCV_gokz_chat_processing.BoolValue && IsClientInGame(client))
+	if (client > 0 && gCV_gokz_chat_processing.BoolValue && IsClientInGame(client))
 	{
 		OnClientSayCommand_ChatProcessing(client, command, sArgs);
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public void OnClientConnected(int client)
+{
+	gC_PlayerTags[client][0] = '\0';
+	gC_PlayerTagColors[client][0] = '\0';
 }
 
 public void OnClientPutInServer(int client)
@@ -170,15 +180,17 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 	
 	if (IsSpectating(client))
 	{
-		GOKZ_PrintToChatAll(false, "{default}* {lime}%s{default} : %s", sanitisedName, sanitisedMessage);
-		PrintToConsoleAll("* %s : %s", sanitisedName, sanitisedMessage);
-		PrintToServer("* %s : %s", sanitisedName, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "{default}* %s%s{lime}%s{default} : %s",
+							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+		PrintToConsoleAll("* %s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+		PrintToServer("* %s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 	}
 	else
 	{
-		GOKZ_PrintToChatAll(false, "{lime}%s{default} : %s", sanitisedName, sanitisedMessage);
-		PrintToConsoleAll("%s : %s", sanitisedName, sanitisedMessage);
-		PrintToServer("%s : %s", sanitisedName, sanitisedMessage);
+		GOKZ_PrintToChatAll(false, "%s%s{lime}%s{default} : %s",
+							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+		PrintToConsoleAll("%s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+		PrintToServer("%s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 	}
 }
 
@@ -238,7 +250,7 @@ void PrintDisconnectMessage(int client, Event event) // Hooked to player_disconn
 
 
 
-// =====[ BLOCK RADIO ]=====
+// =====[ BLOCK RADIO AND CHATWHEEL]=====
 
 static char radioCommands[][] = 
 {
@@ -256,7 +268,41 @@ public void OnPluginStart_BlockRadio()
 	}
 }
 
+public void OnPluginStart_BlockChatWheel()
+{
+	AddCommandListener(CommandBlock, "playerchatwheel");
+	AddCommandListener(CommandBlock, "chatwheel_ping");	
+}
+
 public Action CommandBlock(int client, const char[] command, int argc)
 {
 	return Plugin_Handled;
-} 
+}
+
+
+
+// =====[ NATIVES ]=====
+
+void CreateNatives()
+{
+	CreateNative("GOKZ_CH_SetChatTag", Native_SetChatTag);
+}
+
+public int Native_SetChatTag(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char str[64];
+	GetNativeString(2, str, sizeof(str));
+	if (str[0] == '\0')
+	{
+		// To prevent the space after the mode
+		FormatEx(gC_PlayerTags[client], sizeof(gC_PlayerTags[]), "[%s] ", gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+	}
+	else
+	{
+		FormatEx(gC_PlayerTags[client], sizeof(gC_PlayerTags[]), "[%s %s] ", gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)], str);
+	}
+	
+	GetNativeString(3, gC_PlayerTagColors[client], sizeof(gC_PlayerTagColors[]));
+}

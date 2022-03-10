@@ -88,6 +88,14 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_TeleportToStart(this.ID);
 	}
 	
+	public void TeleportToSearchStart(int course) {
+		GOKZ_TeleportToSearchStart(this.ID, course);
+	}
+	
+	public void TeleportToEnd(int course) {
+		GOKZ_TeleportToEnd(this.ID, course);
+	}
+
 	property StartPositionType StartPositionType {
 		public get() {
 			return GOKZ_GetStartPositionType(this.ID);
@@ -199,8 +207,17 @@ methodmap KZPlayer < MovementAPIPlayer {
 		public get() {
 			return GOKZ_GetCheckpointCount(this.ID);
 		}
-		public set(int value) {
-			GOKZ_SetCheckpointCount(this.ID, value);
+		public set(int cpCount) {
+			GOKZ_SetCheckpointCount(this.ID, cpCount);
+		}
+	}
+	
+	property ArrayList CheckpointData {
+		public get() {
+			return GOKZ_GetCheckpointData(this.ID);
+		}
+		public set(ArrayList checkpoints) {
+			GOKZ_SetCheckpointData(this.ID, checkpoints, GOKZ_CHECKPOINT_VERSION);
 		}
 	}
 	
@@ -282,15 +299,6 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 		public set(int value) {
 			this.SetCoreOption(Option_Style, value);
-		}
-	}
-	
-	property int AutoRestart {
-		public get() {
-			return this.GetCoreOption(Option_AutoRestart);
-		}
-		public set(int value) {
-			this.SetCoreOption(Option_AutoRestart, value);
 		}
 	}
 	

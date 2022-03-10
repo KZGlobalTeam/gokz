@@ -4,12 +4,14 @@
 #include <sdktools>
 
 #include <gokz/core>
+#include <gokz/kzplayer>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-
+#pragma newdecls required
+#pragma semicolon 1
 
 public Plugin myinfo = 
 {
@@ -24,16 +26,113 @@ public Plugin myinfo =
 
 #define MAX_LOCATION_NAME_LENGTH 32
 
-ArrayList gA_Position;
-ArrayList gA_Angles;
-ArrayList gA_Velocity;
-ArrayList gF_DuckSpeed;
-ArrayList gF_Stamina;
-ArrayList gA_LocationName;
-ArrayList gA_LocationCreator;
-ArrayList gA_MoveType;
-ArrayList gA_LadderNormal;
+enum struct Location {
+	// Location name must be first for FindString to work.
+	char locationName[MAX_LOCATION_NAME_LENGTH];
+	char locationCreator[MAX_NAME_LENGTH];
+	
+	// GOKZ related states
+	int mode;
+	int course;
+	float currentTime;
+	ArrayList checkpointData;
+	int checkpointCount;
+	int teleportCount;
+	ArrayList undoTeleportData;
+
+	// Movement related states
+	int flags;
+	float position[3];
+	float angles[3];
+	float velocity[3];
+	float duckAmount;
+	bool ducking;
+	bool ducked;
+	float lastDuckTime;
+	float duckSpeed;
+	float stamina;
+	MoveType movetype;
+	float ladderNormal[3];
+	int collisionGroup;
+	float waterJumpTime;
+	bool hasWalkMovedSinceLastJump;
+	float ignoreLadderJumpTimeOffset;
+
+	void Create(int client, int target)
+	{
+		GetClientName(client, this.locationCreator, sizeof(Location::locationCreator));
+		this.flags = GetEntityFlags(target);
+		this.mode = GOKZ_GetCoreOption(target, Option_Mode);
+		this.course = GOKZ_GetCourse(target);
+		GetClientAbsOrigin(target, this.position);
+		GetClientEyeAngles(target, this.angles);
+		GetEntPropVector(target, Prop_Data, "m_vecVelocity", this.velocity);
+		this.duckAmount = GetEntPropFloat(target, Prop_Send, "m_flDuckAmount");
+		this.ducking = !!GetEntProp(target, Prop_Send, "m_bDucking");
+		this.ducked = !!GetEntProp(target, Prop_Send, "m_bDucked");
+		this.lastDuckTime = GetEntPropFloat(target, Prop_Send, "m_flLastDuckTime");
+		this.duckSpeed = Movement_GetDuckSpeed(target);
+		this.stamina = GetEntPropFloat(target, Prop_Send, "m_flStamina");
+		this.movetype = Movement_GetMovetype(target);
+		GetEntPropVector(target, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
+		this.collisionGroup = GetEntProp(target, Prop_Send, "m_CollisionGroup");
+		this.waterJumpTime = GetEntPropFloat(target, Prop_Data, "m_flWaterJumpTime");
+		this.hasWalkMovedSinceLastJump = !!GetEntProp(target, Prop_Data, "m_bHasWalkMovedSinceLastJump");
+		this.ignoreLadderJumpTimeOffset = GetEntPropFloat(target, Prop_Data, "m_ignoreLadderJumpTime") - GetGameTime();
+
+		if (GOKZ_GetTimerRunning(target))
+		{
+			this.currentTime = GOKZ_GetTime(target);
+		}
+		else
+		{
+			this.currentTime = -1.0;
+		}
+		this.checkpointData = GOKZ_GetCheckpointData(target);
+		this.checkpointCount = GOKZ_GetCheckpointCount(target);
+		this.teleportCount = GOKZ_GetTeleportCount(target);
+		this.undoTeleportData = GOKZ_GetUndoTeleportData(target);
+	}
+
+	bool Load(int client)
+	{
+		if (!GOKZ_SetMode(client, this.mode))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "LoadLoc - Mode Not Available");
+		}
+		GOKZ_SetCourse(client, this.course);
+		if (this.currentTime >= 0.0)
+		{
+			GOKZ_SetTime(client, this.currentTime);
+		}
+		GOKZ_SetCheckpointData(client, this.checkpointData, GOKZ_CHECKPOINT_VERSION);
+		GOKZ_SetCheckpointCount(client, this.checkpointCount);
+		GOKZ_SetTeleportCount(client, this.teleportCount);
+		GOKZ_SetUndoTeleportData(client, this.undoTeleportData, GOKZ_CHECKPOINT_VERSION);
+
+		SetEntityFlags(client, this.flags);
+		TeleportEntity(client, this.position, this.angles, this.velocity);
+		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", this.duckAmount);
+		SetEntProp(client, Prop_Send, "m_bDucking", this.ducking);
+		SetEntProp(client, Prop_Send, "m_bDucked", this.ducked);
+		SetEntPropFloat(client, Prop_Send, "m_flLastDuckTime", this.lastDuckTime);
+		Movement_SetDuckSpeed(client, this.duckSpeed);
+		SetEntPropFloat(client, Prop_Send, "m_flStamina", this.stamina);
+		Movement_SetMovetype(client, this.movetype);
+		SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
+		SetEntProp(client, Prop_Send, "m_CollisionGroup", this.collisionGroup);
+		SetEntPropFloat(client, Prop_Data, "m_flWaterJumpTime", this.waterJumpTime);
+		SetEntProp(client, Prop_Data, "m_bHasWalkMovedSinceLastJump", this.hasWalkMovedSinceLastJump);
+		SetEntPropFloat(client, Prop_Data, "m_ignoreLadderJumpTime", this.ignoreLadderJumpTimeOffset + GetGameTime());
+
+		GOKZ_InvalidateRun(client);
+		return true;
+	}
+}
+
+ArrayList gA_Locations;
 bool gB_LocMenuOpen[MAXPLAYERS + 1];
+bool gB_UsedLoc[MAXPLAYERS + 1];
 int gI_MostRecentLocation[MAXPLAYERS + 1];
 
 
@@ -101,9 +200,17 @@ public void OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast)
 public Action GOKZ_OnTimerStart(int client, int course)
 {
 	CloseLocMenu(client);
+	gB_UsedLoc[client] = false;
 }
 
-
+public Action GOKZ_OnTimerEnd(int client, int course, float time)
+{
+	if (gB_UsedLoc[client])
+	{
+		PrintEndTimeString_SaveLoc(client, course, time);
+	}
+	return Plugin_Continue;
+}
 
 // =====[ GENERAL ]=====
 
@@ -121,6 +228,8 @@ void RegisterCommands()
 {
 	RegConsoleCmd("sm_saveloc", Command_SaveLoc, "[KZ] Save location. Usage: !saveloc <name>");
 	RegConsoleCmd("sm_loadloc", Command_LoadLoc, "[KZ] Load location. Usage: !loadloc <#id OR name>");
+	RegConsoleCmd("sm_prevloc", Command_PrevLoc, "[KZ] Go back to the previous location.");
+	RegConsoleCmd("sm_nextloc", Command_NextLoc, "[KZ] Go forward to the next location.");
 	RegConsoleCmd("sm_locmenu", Command_LocMenu, "[KZ] Open location menu.");
 	RegConsoleCmd("sm_nameloc", Command_NameLoc, "[KZ] Name location. Usage: !nameloc <#id> <name>");
 }
@@ -131,11 +240,23 @@ public Action Command_SaveLoc(int client, int args)
 	{
 		return Plugin_Handled;
 	}
+	int target = -1;
+	if (!IsPlayerAlive(client))
+	{
+		KZPlayer player = KZPlayer(client);
+		target = player.ObserverTarget;
+		if (target == -1)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
+			GOKZ_PlayErrorSound(client);
+			return Plugin_Handled;
+		}
+	}
 	
 	if (args == 0)
 	{
 		// save location with empty <name>
-		SaveLocation(client, "");
+		SaveLocation(client, "", target);
 	}
 	else if (args == 1)
 	{
@@ -146,7 +267,7 @@ public Action Command_SaveLoc(int client, int args)
 		if (IsValidLocationName(arg))
 		{
 			// save location with <name>
-			SaveLocation(client, arg);
+			SaveLocation(client, arg, target);
 		}
 		else
 		{
@@ -172,15 +293,9 @@ public Action Command_LoadLoc(int client, int args)
 		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
 		return Plugin_Handled;
 	}
-	else if (gA_Position.Length == 0)
+	else if (gA_Locations.Length == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No Locations Found");
-		return Plugin_Handled;
-	}
-	
-	if (GOKZ_GetTimerRunning(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Timer Running");
 		return Plugin_Handled;
 	}
 	
@@ -196,7 +311,7 @@ public Action Command_LoadLoc(int client, int args)
 		char arg[MAX_LOCATION_NAME_LENGTH];
 		GetCmdArg(1, arg, sizeof(arg));
 		int id;
-		
+
 		if (arg[0] == '#')
 		{
 			// load location <#id>
@@ -205,7 +320,7 @@ public Action Command_LoadLoc(int client, int args)
 		else
 		{
 			// load location <name>
-			id = gA_LocationName.FindString(arg);
+			id = gA_Locations.FindString(arg);
 		}
 		
 		if (IsValidLocationId(id))
@@ -225,13 +340,53 @@ public Action Command_LoadLoc(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Command_PrevLoc(int client, int args)
+{
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
+	else if (gA_Locations.Length == 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "No Locations Found");
+		return Plugin_Handled;
+	}
+	else if (gI_MostRecentLocation[client] <= 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "PrevLoc - Can't Prev Location (No Location Found)");
+		return Plugin_Handled;
+	}
+	LoadLocation(client, gI_MostRecentLocation[client] - 1);
+	return Plugin_Handled;
+}
+
+public Action Command_NextLoc(int client, int args)
+{
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
+	else if (gA_Locations.Length == 0)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "No Locations Found");
+		return Plugin_Handled;
+	}
+	else if (gI_MostRecentLocation[client] >= gA_Locations.Length - 1)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "NextLoc - Can't Next Location (No Location Found)");
+		return Plugin_Handled;
+	}
+	LoadLocation(client, gI_MostRecentLocation[client] + 1);
+	return Plugin_Handled;
+}
+
 public Action Command_NameLoc(int client, int args)
 {
 	if (!IsValidClient(client))
 	{
 		return Plugin_Handled;
 	}
-	else if (gA_Position.Length == 0)
+	else if (gA_Locations.Length == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No Locations Found");
 		return Plugin_Handled;
@@ -310,15 +465,9 @@ public Action Command_LocMenu(int client, int args)
 		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
 		return Plugin_Handled;
 	}
-	else if (gA_Position.Length == 0)
+	else if (gA_Locations.Length == 0)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "No Locations Found");
-		return Plugin_Handled;
-	}
-	
-	if (GOKZ_GetTimerRunning(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Timer Running");
 		return Plugin_Handled;
 	}
 	
@@ -326,8 +475,6 @@ public Action Command_LocMenu(int client, int args)
 	
 	return Plugin_Handled;
 }
-
-
 
 // ====[ SAVELOC MENU ]====
 
@@ -337,7 +484,7 @@ void ShowLocMenu(int client)
 	locMenu.SetTitle("%t", "LocMenu - Title");
 	
 	// fill the menu with all locations
-	for (int i = 0; i < gA_Position.Length; i++)
+	for (int i = 0; i < gA_Locations.Length; i++)
 	{
 		char item[MAX_LOCATION_NAME_LENGTH];
 		Format(item, sizeof(item), "%i", i);
@@ -350,7 +497,7 @@ void ShowLocMenu(int client)
 	{
 		firstItem = gI_MostRecentLocation[client] - (gI_MostRecentLocation[client] % 6);
 	}
-	
+
 	locMenu.DisplayAt(client, firstItem, MENU_TIME_FOREVER);
 }
 
@@ -369,12 +516,14 @@ public int LocMenuHandler(Menu menu, MenuAction action, int client, int choice)
 		
 		case MenuAction_DisplayItem:
 		{
+			Location loc;
 			char item[MAX_LOCATION_NAME_LENGTH];
 			menu.GetItem(choice, item, sizeof(item));
 			
 			int id = StringToInt(item);
+			gA_Locations.GetArray(id, loc);
 			char name[MAX_LOCATION_NAME_LENGTH];
-			gA_LocationName.GetString(id, name, sizeof(name));
+			strcopy(name, sizeof(name), loc.locationName);
 			
 			if (id == gI_MostRecentLocation[client])
 			{
@@ -416,39 +565,20 @@ public int LocMenuHandler(Menu menu, MenuAction action, int client, int choice)
 
 // ====[ SAVE LOCATION ]====
 
-void SaveLocation(int client, char[] name)
+void SaveLocation(int client, char[] name, int target)
 {
-	float position[3];
-	float angles[3];
-	float velocity[3];
-	float ladderNormal[3];
-	float duckSpeed;
-	float stamina;
-	char creator[MAX_NAME_LENGTH];
-	int id = gA_Position.Length;
-	MoveType movetype;
-	
-	GetClientAbsOrigin(client, position);
-	GetClientEyeAngles(client, angles);
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
-	duckSpeed = Movement_GetDuckSpeed(client);
-	stamina = GetEntPropFloat(client, Prop_Send, "m_flStamina");
-	GetClientName(client, creator, sizeof(creator));
-	movetype = Movement_GetMovetype(client);
-	GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
-	
-	gI_MostRecentLocation[client] = id;
-	gA_Position.PushArray(position);
-	gA_Angles.PushArray(angles);
-	gA_Velocity.PushArray(velocity);
-	gF_DuckSpeed.Push(duckSpeed);
-	gF_Stamina.Push(stamina);
-	gA_LocationName.PushString(name);
-	gA_LocationCreator.PushString(creator);
-	gA_MoveType.Push(movetype);
-	gA_LadderNormal.PushArray(ladderNormal);
-	
-	GOKZ_PrintToChat(client, true, "%t", "SaveLoc - ID Name", id, name);
+	Location loc;
+	if (target == -1)
+	{
+		target = client;
+	}
+	loc.Create(client, target);
+	strcopy(loc.locationName, sizeof(Location::locationName), name);
+	GetClientName(client, loc.locationCreator, sizeof(loc.locationCreator));
+	gA_Locations.PushArray(loc);
+	gI_MostRecentLocation[client] = gA_Locations.Length - 1;
+
+	GOKZ_PrintToChat(client, true, "%t", "SaveLoc - ID Name", gA_Locations.Length - 1, name);
 	
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -467,59 +597,33 @@ bool LoadLocation(int client, int id)
 		GOKZ_PrintToChat(client, true, "%t", "Must Be Alive");
 		return false;
 	}
-	
-	if (GOKZ_GetTimerRunning(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Timer Running");
-		return false;
-	}
-	
-	float position[3];
-	float angles[3];
-	float velocity[3];
-	float ladderNormal[3];
-	float duckSpeed;
-	float stamina;
-	char name[MAX_LOCATION_NAME_LENGTH];
-	char creator[MAX_NAME_LENGTH];
 	char clientName[MAX_NAME_LENGTH];
-	MoveType movetype;
 	
-	gA_Position.GetArray(id, position, sizeof(position));
-	gA_Angles.GetArray(id, angles, sizeof(angles));
-	gA_Velocity.GetArray(id, velocity, sizeof(velocity));
-	duckSpeed = gF_DuckSpeed.Get(id);
-	stamina = gF_Stamina.Get(id);
-	gA_LocationName.GetString(id, name, sizeof(name));
-	gA_LocationCreator.GetString(id, creator, sizeof(creator));
 	GetClientName(client, clientName, sizeof(clientName));
-	movetype = gA_MoveType.Get(id);
-	gA_LadderNormal.GetArray(id, ladderNormal, sizeof(ladderNormal));
-	
-	TeleportEntity(client, position, angles, velocity);
-	Movement_SetDuckSpeed(client, duckSpeed);
-	SetEntPropFloat(client, Prop_Send, "m_flStamina", stamina);
-	Movement_SetMovetype(client, movetype);
-	SetEntPropVector(client, Prop_Send, "m_vecLadderNormal", ladderNormal);
-	
+	Location loc;
+	gA_Locations.GetArray(id, loc);
+	if (loc.Load(client))
+	{
+		gB_UsedLoc[client] = true;
+	}
 	// print message if loading new location
 	if (gI_MostRecentLocation[client] != id)
 	{
 		gI_MostRecentLocation[client] = id;
 		
-		if (StrEqual(clientName, creator))
+		if (StrEqual(clientName, loc.locationCreator))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "LoadLoc - ID Name", id, name);
+			GOKZ_PrintToChat(client, true, "%t", "LoadLoc - ID Name", id, loc.locationName);
 		}
 		else
 		{
-			if (StrEqual(name, ""))
+			if (StrEqual(loc.locationName, ""))
 			{
-				GOKZ_PrintToChat(client, true, "%t", "LoadLoc - ID Creator", id, creator);
+				GOKZ_PrintToChat(client, true, "%t", "LoadLoc - ID Creator", id, loc.locationCreator);
 			}
 			else
 			{
-				GOKZ_PrintToChat(client, true, "%t", "LoadLoc - ID Name Creator", id, name, creator);
+				GOKZ_PrintToChat(client, true, "%t", "LoadLoc - ID Name Creator", id, loc.locationName, loc.locationCreator);
 			}
 		}
 	}
@@ -535,7 +639,9 @@ bool LoadLocation(int client, int id)
 
 void NameLocation(int client, int id, char[] name)
 {
-	gA_LocationName.SetString(id, name);
+	Location loc;
+	gA_Locations.GetArray(id, loc);
+	strcopy(loc.locationName, sizeof(Location::locationName), name);
 	
 	GOKZ_PrintToChat(client, true, "%t", "NameLoc - ID Name", id, name);
 	
@@ -551,29 +657,19 @@ void NameLocation(int client, int id, char[] name)
 
 void CreateArrays()
 {
-	gA_Position = new ArrayList(3);
-	gA_Angles = new ArrayList(3);
-	gA_Velocity = new ArrayList(3);
-	gF_DuckSpeed = new ArrayList(1);
-	gF_Stamina = new ArrayList(1);
-	gA_LocationName = new ArrayList(ByteCountToCells(MAX_LOCATION_NAME_LENGTH));
-	gA_LocationCreator = new ArrayList(ByteCountToCells(MAX_NAME_LENGTH));
-	gA_MoveType = new ArrayList(1);
-	gA_LadderNormal = new ArrayList(3);
+	gA_Locations = new ArrayList(sizeof(Location));
 }
 
 void ClearLocations()
 {
-	gA_Position.Clear();
-	gA_Angles.Clear();
-	gA_Velocity.Clear();
-	gF_DuckSpeed.Clear();
-	gF_Stamina.Clear();
-	gA_LocationName.Clear();
-	gA_LocationCreator.Clear();
-	gA_MoveType.Clear();
-	gA_LadderNormal.Clear();
-	
+	Location loc;
+	for (int i = 0; i < gA_Locations.Length; i++)
+	{
+		// Prevent memory leak
+		gA_Locations.GetArray(i, loc);
+		delete loc.checkpointData;
+	}
+	gA_Locations.Clear();
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		gI_MostRecentLocation[i] = -1;
@@ -600,22 +696,69 @@ void CloseLocMenu(int client)
 
 bool IsValidLocationId(int id)
 {
-	return !(id < 0) && !(id > gA_Position.Length - 1);
+	return !(id < 0) && !(id > gA_Locations.Length - 1);
 }
 
 bool IsValidLocationName(char[] name)
 {
 	// check if location name starts with letter and is unique
-	return IsCharAlpha(name[0]) && gA_LocationName.FindString(name) == -1;
+	return IsCharAlpha(name[0]) && gA_Locations.FindString(name) == -1;
 }
 
 bool IsClientLocationCreator(int client, int id)
 {
 	char clientName[MAX_NAME_LENGTH];
-	char creator[MAX_NAME_LENGTH];
-	
+	Location loc;
+	gA_Locations.GetArray(id, loc);
 	GetClientName(client, clientName, sizeof(clientName));
-	gA_LocationCreator.GetString(id, creator, sizeof(creator));
 	
-	return StrEqual(clientName, creator);
+	return StrEqual(clientName, loc.locationCreator);
+} 
+
+// ====[ PRIVATE ]====
+
+static void PrintEndTimeString_SaveLoc(int client, int course, float time)
+{
+	if (course == 0)
+	{
+		switch (GOKZ_GetTimeType(client))
+		{
+			case TimeType_Nub:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Beat Map (NUB)", 
+					client, 
+					GOKZ_FormatTime(time), 
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+			case TimeType_Pro:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Beat Map (PRO)", 
+					client, 
+					GOKZ_FormatTime(time), 
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+		}
+	}
+	else
+	{
+		switch (GOKZ_GetTimeType(client))
+		{
+			case TimeType_Nub:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Beat Bonus (NUB)", 
+					client, 
+					GOKZ_GetCourse(client), 
+					GOKZ_FormatTime(time), 
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+			case TimeType_Pro:
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Beat Bonus (PRO)", 
+					client, 
+					GOKZ_GetCourse(client), 
+					GOKZ_FormatTime(time), 
+					gC_ModeNamesShort[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
+		}
+	}
 } 

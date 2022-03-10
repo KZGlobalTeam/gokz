@@ -12,7 +12,7 @@ static int processMovementTicks[MAXPLAYERS+1];
 static float playerFrameTime[MAXPLAYERS+1];
 
 static bool touchingTrigger[MAXPLAYERS+1][2048];
-
+static bool triggerTouchFired[MAXPLAYERS+1][2048];
 static int lastGroundEnt[MAXPLAYERS + 1];
 static bool duckedLastTick[MAXPLAYERS + 1];
 static bool mapTeleportedSequentialTicks[MAXPLAYERS+1];
@@ -21,6 +21,7 @@ static float jumpBugOrigin[MAXPLAYERS + 1][3];
 
 static ConVar cvGravity;
 
+static Handle acceptInputHookPre;
 static Handle processMovementHookPre;
 static Address serverGameEnts;
 static Handle markEntitiesAsTouching;
@@ -35,7 +36,7 @@ public void OnPluginStart_Triggerfix()
 		SetFailState("Could not find sv_gravity");
 	}
 	
-	Handle gamedataConf = LoadGameConfigFile("gokz-core.games");
+	GameData gamedataConf = LoadGameConfigFile("gokz-core.games");
 	if (gamedataConf == null)
 	{
 		SetFailState("Failed to load gokz-core gamedata");
@@ -106,6 +107,21 @@ public void OnPluginStart_Triggerfix()
 	{
 		SetFailState("Unable to prepare SDKCall for IServerGameEnts::MarkEntitiesAsTouching");
 	}
+
+	gamedataConf = LoadGameConfigFile("sdktools.games/engine.csgo");
+	offset = gamedataConf.GetOffset("AcceptInput");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get AcceptInput offset");
+	}
+
+	acceptInputHookPre = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, DHooks_AcceptInput);
+	DHookAddParam(acceptInputHookPre, HookParamType_CharPtr);
+	DHookAddParam(acceptInputHookPre, HookParamType_CBaseEntity);
+	DHookAddParam(acceptInputHookPre, HookParamType_CBaseEntity);
+	//varaint_t is a union of 12 (float[3]) plus two int type params 12 + 8 = 20
+	DHookAddParam(acceptInputHookPre, HookParamType_Object, 20, DHookPass_ByVal|DHookPass_ODTOR|DHookPass_OCTOR|DHookPass_OASSIGNOP);
+	DHookAddParam(acceptInputHookPre, HookParamType_Int);
 	
 	delete CreateInterface;
 	delete gamedataConf;
@@ -142,12 +158,40 @@ public void OnClientConnected_Triggerfix(int client)
 	for (int i = 0; i < sizeof(touchingTrigger[]); i++)
 	{
 		touchingTrigger[client][i] = false;
+		triggerTouchFired[client][i] = false;
 	}
 }
 
 public void OnClientPutInServer_Triggerfix(int client)
 {
 	SDKHook(client, SDKHook_PostThink, Hook_PlayerPostThink);
+	DHookEntity(acceptInputHookPre, false, client);
+}
+
+public void OnGameFrame_Triggerfix()
+{
+	// Loop through all the players and make sure that triggers that are supposed to be fired but weren't now
+	// get fired properly.
+	// This must be run OUTSIDE of usercmd, because sometimes usercmd gets delayed heavily.
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && IsPlayerAlive(client) && !CheckWater(client) && 
+			(GetEntityMoveType(client) == MOVETYPE_WALK || GetEntityMoveType(client) == MOVETYPE_LADDER))
+		{
+			DoTriggerFix(client);
+
+			// Reset the Touch tracking. 
+			// We save a bit of performance by putting this inside the loop
+			// Even if triggerTouchFired is not correct, touchingTrigger still is. 
+			// That should prevent DoTriggerFix from activating the wrong triggers. 
+			// Plus, players respawn where they previously are as well with a timer on,
+			// so this should not be a big problem.
+			for (int trigger = 0; trigger < sizeof(triggerTouchFired[]); trigger++)
+			{
+				triggerTouchFired[client][trigger] = false;
+			}
+		}
+	}
 }
 
 static void Event_PlayerJump(Event event, const char[] name, bool dontBroadcast)
@@ -185,6 +229,15 @@ static Action Hook_TriggerEndTouch(int entity, int other)
 	return Plugin_Continue;
 }
 
+static Action Hook_TriggerTouch(int entity, int other)
+{
+	if (1 <= other <= MaxClients)
+	{
+	 	triggerTouchFired[other][entity] = true;
+	}
+	return Plugin_Continue;	
+}
+
 static MRESReturn DHook_ProcessMovementPre(Handle hParams)
 {
 	int client = DHookGetParam(hParams, 1);
@@ -206,6 +259,110 @@ static MRESReturn DHook_ProcessMovementPre(Handle hParams)
 	return MRES_Ignored;
 }
 
+static MRESReturn DHooks_AcceptInput(int client, DHookReturn hReturn, DHookParam hParams)
+{	
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || CheckWater(client) || 
+		(GetEntityMoveType(client) != MOVETYPE_WALK && GetEntityMoveType(client) != MOVETYPE_LADDER))
+	{
+		return MRES_Ignored;
+	}
+	
+	// Get args
+	static char param[64];
+	static char command[64];
+	DHookGetParamString(hParams, 1, command, sizeof(command));
+	if (StrEqual(command, "AddOutput"))
+	{
+		DHookGetParamObjectPtrString(hParams, 4, 0, ObjectValueType_String, param, sizeof(param));
+		char kv[16];
+		SplitString(param, " ", kv, sizeof(kv));
+		if (StrEqual(kv[0], "targetname", false)) // KVs are case insensitive.
+		{
+			DoTriggerFix(client, true);
+		}
+	}
+	return MRES_Ignored;
+}
+
+static bool DoTriggerFix(int client, bool targetnameFix = false)
+{
+	char name[64];
+	if (targetnameFix)
+	{
+		GetEntPropString(client, Prop_Send, "m_iName", name, 64);
+		// There's no filter to check yet.
+		if (!name[0])
+		{
+			return false;
+		}
+	}
+	// Adapted from DoTriggerjumpFix right below.
+	float landingMins[3], landingMaxs[3];
+	float origin[3];
+
+	GetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
+	GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
+	GetEntPropVector(client, Prop_Data, "m_vecMaxs", landingMaxs);
+
+	ArrayList triggers = new ArrayList();
+	// Get a list of triggers that we are touching now.
+
+	TR_EnumerateEntitiesHull(origin, origin, landingMins, landingMaxs, true, AddTrigger, triggers);
+	
+	bool didSomething = false;
+	
+	for (int i = 0; i < triggers.Length; i++)
+	{
+		int trigger = triggers.Get(i);
+		if (!touchingTrigger[client][trigger])
+		{
+			// Normally this wouldn't happen, because the trigger should be colliding with the player's hull if it gets here.
+			continue;
+		}
+
+		if (targetnameFix)
+		{
+			char filterName[64];
+			GetEntPropString(trigger, Prop_Data, "m_iFilterName", filterName, sizeof(filterName));
+			
+			if (!filterName[0])
+			{
+				// No filter, move on.
+				continue;
+			}
+			int filter = GetEntPropEnt(trigger, Prop_Data, "m_hFilter");
+			GetEntPropString(filter, Prop_Data, "m_iFilterName", filterName, sizeof(filterName));
+
+			bool whitelist = !GetEntProp(filter, Prop_Data, "m_bNegated");
+			bool matchFilter = whitelist == StrEqual(filterName, name);
+
+			if (matchFilter)
+			{
+				// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
+				SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
+				
+				// Name will be changed right after this so it will need to be triggered again.
+				triggerTouchFired[client][trigger] = false;
+			}
+			didSomething = true;
+		}
+		else
+		{
+			// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
+			// in the last tick, we make sure that it is called now.		
+			if (!triggerTouchFired[client][trigger])
+			{
+				SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
+			}
+			didSomething = true;
+		}
+	}
+	
+	delete triggers;
+	
+	return didSomething;
+}
+
 static bool DoTriggerjumpFix(int client, const float landingPoint[3], const float landingMins[3], const float landingMaxs[3])
 {
 	// It's possible to land above a trigger but also in another trigger_teleport, have the teleport move you to
@@ -223,6 +380,7 @@ static bool DoTriggerjumpFix(int client, const float landingPoint[3], const floa
 	ArrayList triggers = new ArrayList();
 	
 	// Find triggers that are between us and the ground (using the bounding box quadrant we landed with if applicable).
+	// This will fail on triggers thinner than 0.03125 unit thick, but it's highly unlikely that a mapper would put a trigger that thin.
 	TR_EnumerateEntitiesHull(landingPoint, landingPoint, landingMins, landingMaxsBelow, true, AddTrigger, triggers);
 	
 	bool didSomething = false;
@@ -320,7 +478,9 @@ static void Hook_PlayerPostThink(int client)
 	// reset it here because we don't need it again
 	jumpBugged[client] = false;
 	
-	if (landed && TR_GetFraction() > 0.0)
+	// Must use TR_DidHit because if the unduck origin is closer than 0.03125 units from the ground, 
+	// the trace fraction would return 0.0.
+	if (landed && TR_DidHit())
 	{
 		DoTriggerjumpFix(client, landingPoint, landingMins, landingMaxs);
 		// Check if a trigger we just touched put us in the air (probably due to a teleport).
@@ -342,6 +502,7 @@ static void HookTrigger(int entity, const char[] classname)
 	{
 		SDKHook(entity, SDKHook_StartTouchPost, Hook_TriggerStartTouch);
 		SDKHook(entity, SDKHook_EndTouchPost, Hook_TriggerEndTouch);
+		SDKHook(entity, SDKHook_TouchPost, Hook_TriggerTouch);
 	}
 }
 

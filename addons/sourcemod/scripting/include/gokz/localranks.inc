@@ -91,7 +91,9 @@ forward void GOKZ_LR_OnNewRecord(
 	int course, 
 	int mode, 
 	int style, 
-	int recordType);
+	int recordType,
+	float pbDiff,
+	int teleportsUsed);
 
 /**
  * Called when a player misses the server record time.

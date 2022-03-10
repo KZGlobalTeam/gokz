@@ -18,6 +18,7 @@
 #include <updater>
 
 #include <gokz/kzplayer>
+#include <gokz/jumpstats>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -37,6 +38,7 @@ public Plugin myinfo =
 
 Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
+Handle gH_DHooks_SetModel;
 
 int gI_CmdNum[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -57,9 +59,12 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/options.sp"
 #include "gokz-core/teleports.sp"
 #include "gokz-core/triggerfix.sp"
+#include "gokz-core/demofix.sp"
+#include "gokz-core/teamnumfix.sp"
 
 #include "gokz-core/map/buttons.sp"
-#include "gokz-core/map/bhop_triggers.sp"
+#include "gokz-core/map/triggers.sp"
+#include "gokz-core/map/mapfile.sp"
 #include "gokz-core/map/prefix.sp"
 #include "gokz-core/map/starts.sp"
 #include "gokz-core/map/zones.sp"
@@ -102,12 +107,16 @@ public void OnPluginStart()
 	HookEvents();
 	RegisterCommands();
 	
+	OnPluginStart_MapTriggers();
 	OnPluginStart_MapButtons();
 	OnPluginStart_MapStarts();
 	OnPluginStart_MapEnd();
 	OnPluginStart_MapZones();
 	OnPluginStart_Options();
 	OnPluginStart_Triggerfix();
+	OnPluginStart_Demofix();
+	OnPluginStart_MapFile();
+	OnPluginStart_TeamNumber();
 }
 
 public void OnAllPluginsLoaded()
@@ -154,7 +163,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_FirstSpawn(client);
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
-	OnClientPutInServer_BhopTriggers(client);
+	OnClientPutInServer_MapTriggers(client);
 	OnClientPutInServer_Triggerfix(client);
 	OnClientPutInServer_Noclip(client);
 	HookClientEvents(client);
@@ -169,6 +178,7 @@ public void OnClientDisconnect(int client)
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	gI_CmdNum[client] = cmdnum;
+	OnPlayerRunCmd_MapTriggers(client, buttons);
 	return Plugin_Continue;
 }
 
@@ -206,6 +216,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (IsValidClient(client))
 	{
+		OnPlayerSpawn_MapTriggers(client);
 		OnPlayerSpawn_Modes(client);
 		OnPlayerSpawn_Pause(client);
 		OnPlayerSpawn_ValidJump(client);
@@ -215,6 +226,16 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 	}
 }
 
+public Action OnPlayerJoinTeam(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	if (IsValidClient(client))
+	{
+		OnPlayerJoinTeam_TeamNumber(event, client);
+	}
+	return Plugin_Continue;
+}
+
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
@@ -222,6 +243,7 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 	{
 		OnPlayerDeath_Timer(client);
 		OnPlayerDeath_ValidJump(client);
+		OnPlayerDeath_TeamNumber(client);
 	}
 	return Plugin_Continue;
 }
@@ -233,6 +255,12 @@ public MRESReturn DHooks_OnTeleport(int client, Handle params)
 	OnTeleport_ValidJump(client);
 	OnTeleport_DelayVirtualButtons(client);
 	return MRES_Ignored;
+}
+
+public MRESReturn DHooks_OnSetModel(int client, Handle params)
+{
+	OnSetModel_PlayerCollision(client);
+	return MRES_Handled;
 }
 
 public void OnCSPlayerSpawnPost(int client)
@@ -248,18 +276,19 @@ public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType
 	OnChangeMovetype_Timer(client, newMovetype);
 	OnChangeMovetype_Pause(client, newMovetype);
 	OnChangeMovetype_ValidJump(client, oldMovetype, newMovetype);
-	OnChangeMovetype_MapBhopTriggers(client, newMovetype);
+	OnChangeMovetype_MapTriggers(client, newMovetype);
 }
 
 public void Movement_OnStartTouchGround(int client)
 {
 	OnStartTouchGround_MapZones(client);
-	OnStartTouchGround_MapBhopTriggers(client);
+	OnStartTouchGround_MapTriggers(client);
 }
 
-public void Movement_OnStopTouchGround(int client, bool jumped)
+public void Movement_OnStopTouchGround(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
-	OnStopTouchGround_ValidJump(client, jumped);
+	OnStopTouchGround_ValidJump(client, jumped, ladderJump, jumpbug);
+	OnStopTouchGround_MapTriggers(client);
 }
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
@@ -303,6 +332,7 @@ public void GOKZ_OnJoinTeam(int client, int team)
 
 public void OnMapStart()
 {
+	OnMapStart_MapTriggers();
 	OnMapStart_KZConfig();
 	OnMapStart_Options();
 	OnMapStart_Prefix();
@@ -310,6 +340,15 @@ public void OnMapStart()
 	OnMapStart_MapStarts();
 	OnMapStart_MapEnd();
 	OnMapStart_VirtualButtons();
+	OnMapStart_FixMissingSpawns();
+	OnMapStart_Checkpoints();
+	OnMapStart_TeamNumber();
+}
+
+public void OnGameFrame()
+{
+	OnGameFrame_TeamNumber();
+	OnGameFrame_Triggerfix();
 }
 
 public void OnConfigsExecuted()
@@ -330,16 +369,22 @@ public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &
 public void OnEntityCreated(int entity, const char[] classname)
 {
 	SDKHook(entity, SDKHook_Spawn, OnEntitySpawned);
+	SDKHook(entity, SDKHook_SpawnPost, OnEntitySpawnedPost);
 	OnEntityCreated_Triggerfix(entity, classname);
 }
 
 public void OnEntitySpawned(int entity)
 {
-	OnEntitySpawned_MapBhopTriggers(entity);
+	OnEntitySpawned_MapTriggers(entity);
 	OnEntitySpawned_MapButtons(entity);
 	OnEntitySpawned_MapStarts(entity);
-	OnEntitySpawned_MapEnd(entity);
 	OnEntitySpawned_MapZones(entity);
+}
+
+public void OnEntitySpawnedPost(int entity)
+{
+	OnEntitySpawnedPost_MapStarts(entity);
+	OnEntitySpawnedPost_MapEnd(entity);
 }
 
 public void OnClientConnected(int client)
@@ -349,8 +394,28 @@ public void OnClientConnected(int client)
 
 public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) // round_start post no copy hook
 {
-	OnRoundStart_Timer();
-	OnRoundStart_ForceAllTalk();
+	if (event == INVALID_HANDLE)
+	{
+		OnRoundStart_Timer();
+		OnRoundStart_ForceAllTalk();
+		OnRoundStart_Demofix();
+		return;
+	}
+	else
+	{
+		char objective[64];
+		event.GetString("objective", objective, sizeof(objective));
+		/* 
+			External plugins that record GOTV demos can call round_start event to fix demo corruption, 
+			which happens to stop the players' timer. GOKZ should only react on real round start events only.
+		*/
+		if (IsRealObjective(objective))
+		{
+			OnRoundStart_Timer();
+			OnRoundStart_ForceAllTalk();
+			OnRoundStart_Demofix();
+		}
+	}
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
@@ -402,6 +467,7 @@ static void HookEvents()
 	AddCommandsListeners();
 	
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
+	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
@@ -417,12 +483,18 @@ static void HookEvents()
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_VectorPtr);
 	DHookAddParam(gH_DHooks_OnTeleport, HookParamType_Bool);
 	
+	gameData = new GameData("sdktools.games/engine.csgo");
+	offset = gameData.GetOffset("SetEntityModel");
+	gH_DHooks_SetModel = DHookCreate(offset, HookType_Entity, ReturnType_Void, ThisPointer_CBaseEntity, DHooks_OnSetModel);
+	DHookAddParam(gH_DHooks_SetModel, HookParamType_CharPtr);
+	
 	delete gameData;
 }
 
 static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
+	DHookEntity(gH_DHooks_SetModel, true, client);
 	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
 }
 
@@ -442,3 +514,9 @@ static void UpdateTrackingVariables(int client, int cmdnum, int buttons)
 	gB_OriginTeleported[client] = false;
 	gB_VelocityTeleported[client] = false;
 } 
+
+static bool IsRealObjective(char[] objective)
+{
+	return StrEqual(objective, "PRISON ESCAPE") || StrEqual(objective, "DEATHMATCH")
+		|| StrEqual(objective, "BOMB TARGET") || StrEqual(objective, "HOSTAGE RESCUE");
+}

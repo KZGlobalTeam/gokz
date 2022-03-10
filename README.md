@@ -26,15 +26,15 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
  * 128 Tick (`-tickrate 128`)
  * [SourceMod ^1.10](https://www.sourcemod.net/downloads.php?branch=stable)
  * [DHooks Extension ^2.2.0](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
- * [MovementAPI Plugin ^2.1.0](https://github.com/danzayau/MovementAPI)
- * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalrecordssmplugin) (required for gokz-globals plugin)
+ * [MovementAPI Plugin ^2.2.0](https://github.com/danzayau/MovementAPI)
+ * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalapi-smplugin) (required for gokz-globals plugin)
  * Optional - A "console cleaner" extension to prevent `Datatable warning` server console spam
  * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (automatically install minor GOKZ updates)
 
 ### Installing
 
  * Ensure your server is up to date and meets the above requirements.
- * Download and extract `GOKZ-latest.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
+ * Download and extract `GOKZ-latest.zip` from the [Releases](https://github.com/KZGlobalTeam/gokz/releases) to `csgo`.
  * Add a MySQL or SQLite database called `gokz` to `csgo/addons/sourcemod/configs/databases.cfg`.
  * When the plugins first load, various configuration files will be auto-generated and can be found in `csgo/cfg/sourcemod/gokz`.
  * Use `sm_updatemappool` to populate the ranked map pool with those in `csgo/cfg/sourcemod/gokz/gokz-localranks-mappool.cfg`.
@@ -43,7 +43,7 @@ Please refer to the forum for a [more detailed installation guide](https://forum
 
 ### Updating
 
- * Minor updates - Download and extract `GOKZ-latest-upgrade.zip` from [Downloads](https://bitbucket.org/kztimerglobalteam/gokz/downloads/) to `csgo`.
+ * Minor updates - Download and extract `GOKZ-latest-upgrade.zip` from the [Releases](https://github.com/KZGlobalTeam/gokz/releases) to `csgo`.
  * Major updates - Check the new version's release notes for specific instructions.
 
 ### Commands
@@ -62,7 +62,7 @@ GOKZ is an open-source, community-driven project. If you are interested in helpi
 
  * **DanZay** - danzayau@gmail.com - [*Steam*](https://steamcommunity.com/id/DanZay)
  * **zealain** - zealained@gmail.com - [*Steam*](https://steamcommunity.com/id/zealain)
- * **KZTimerGlobal Team** - [*Bitbucket*](https://bitbucket.org/kztimerglobalteam/profile/members)
+ * **KZTimerGlobal Team** - [*GitHub*](https://github.com/KZGlobalTeam)
 
 ## Links
 
@@ -72,4 +72,4 @@ GOKZ is an open-source, community-driven project. If you are interested in helpi
 
 [Steam Group](https://steamcommunity.com/groups/GOKZTimer)
 
-[Wiki](https://bitbucket.org/kztimerglobalteam/gokz/wiki)
+[Wiki](https://github.com/KZGlobalTeam/gokz/wiki)

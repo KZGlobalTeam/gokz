@@ -29,6 +29,7 @@ void OnPlayerSpawn_GodMode(int client)
 {
 	// Stop players from taking damage
 	SetEntProp(client, Prop_Data, "m_takedamage", 0);
+	SetEntityFlags(client, GetEntityFlags(client) | FL_GODMODE);
 }
 
 
@@ -148,6 +149,19 @@ void OnPlayerSpawn_PlayerCollision(int client)
 	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 }
 
+void OnSetModel_PlayerCollision(int client)
+{
+	// Fix custom models temporarily changing player collisions
+	SetEntPropVector(client, Prop_Data, "m_vecMins", PLAYER_MINS);
+	if (GetEntityFlags(client) & FL_DUCKING != 0)
+	{
+		SetEntPropVector(client, Prop_Data, "m_vecMaxs", PLAYER_MAXS);
+	}
+	else
+	{
+		SetEntPropVector(client, Prop_Data, "m_vecMaxs", PLAYER_MAXS_DUCKED);
+	}
+}
 
 
 // =====[ FORCE SV_FULL_ALLTALK 1 ]=====
@@ -194,12 +208,16 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 static bool savedOnLadder[MAXPLAYERS + 1];
-static MoveType specMovetype[MAXPLAYERS + 1];
 
 void OnClientPutInServer_JoinTeam(int client)
 {
+	// After OnClientPutInServer, player is moved to the origin of a point_viewcontrol entity.
+	// We need to wait one tick before assign the player's team and teleport them to a valid spawn.
+	if (!IsFakeClient(client))
+	{
+		RequestFrame(AutoJoinTeam, client);
+	}
 	hasSavedPosition[client] = false;
-	specMovetype[client] = MOVETYPE_WALK;
 }
 
 void OnTimerStart_JoinTeam(int client)
@@ -248,6 +266,12 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 		else
 		{
 			player.StopTimer();
+			// Just joining a team alone can put you into weird invalid spawns. 
+			// Need to teleport the player to a valid one.
+			float spawnOrigin[3];
+			float spawnAngles[3];
+			GetValidSpawn(spawnOrigin, spawnAngles);
+			TeleportPlayer(client, spawnOrigin, spawnAngles);
 		}
 		hasSavedPosition[client] = false;
 		Call_GOKZ_OnJoinTeam(client, newTeam);
@@ -285,12 +309,12 @@ static void InvalidateJump(int client)
 	}
 }
 
-void OnStopTouchGround_ValidJump(int client, bool jumped)
+void OnStopTouchGround_ValidJump(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
 	if (Movement_GetMovetype(client) == MOVETYPE_WALK)
 	{
 		validJump[client] = true;
-		Call_GOKZ_OnJumpValidated(client, jumped, false);
+		Call_GOKZ_OnJumpValidated(client, jumped, ladderJump, jumpbug);
 	}
 	else
 	{
@@ -311,7 +335,7 @@ void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMo
 	if (oldMovetype == MOVETYPE_LADDER && newMovetype == MOVETYPE_WALK) // Ladderjump
 	{
 		validJump[client] = true;
-		Call_GOKZ_OnJumpValidated(client, false, true);
+		Call_GOKZ_OnJumpValidated(client, false, true, false);
 	}
 	else
 	{
@@ -459,3 +483,37 @@ static void TryRegisterCourse(int course)
 		Call_GOKZ_OnCourseRegistered(course);
 	}
 } 
+
+
+
+// =====[ SPAWN FIXES ]=====
+
+void OnMapStart_FixMissingSpawns()
+{
+	int tSpawn = FindEntityByClassname(-1, "info_player_terrorist");
+	int ctSpawn = FindEntityByClassname(-1, "info_player_counterterrorist");
+
+	if (tSpawn == -1 && ctSpawn == -1)
+	{
+		LogMessage("Couldn't fix spawns because none exist.");
+		return;
+	}
+
+	if (tSpawn == -1 || ctSpawn == -1)
+	{
+		float origin[3], angles[3];
+		GetValidSpawn(origin, angles);
+
+		int newSpawn = CreateEntityByName((tSpawn == -1) ? "info_player_terrorist" : "info_player_counterterrorist");
+		if (DispatchSpawn(newSpawn))
+		{
+			TeleportEntity(newSpawn, origin, angles, NULL_VECTOR);
+		}
+	}
+}
+
+static void AutoJoinTeam(int client)
+{
+	int team = GetRandomInt(CS_TEAM_T, CS_TEAM_CT);
+	JoinTeam(client, team, false);
+}

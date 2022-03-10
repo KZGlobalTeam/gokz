@@ -9,14 +9,14 @@
  * `!next` - Go forward a checkpoint.
  * `!undo` - Undo teleport.
  * `!start`/`!restart`/`!r` - Teleport to your start position.
- * `!end` - Teleport to the endtimer.
+ * `!searchstart` - Search for the start timer of a course and teleport to it. Usage: `!searchstart <main/#course>`
+ * `!end` - Teleport to the end timer of a course. Usage: `!end <main/#course>`.
  * `!setstartpos`/`!ssp` - Set your custom start position to your current position.
  * `!clearstartpos`/`!csp` - Clear your custom start position.
  * `!main`/`!m` - Teleport to the start of the main course.
  * `!bonus`/`!b` - Teleport to the start of a bonus. Usage: `!b <#bonus>`
  * `!pause`/`!resume` - Toggle pausing your timer and stopping you in your position.
  * `!stop` - Stop your timer.
- * `!autorestart` - Toggle auto restart upon teleporting to start.
  * `!virtualbuttonindicators`/`!vbi` - Toggle virtual button indicators.
  * `!virtualbuttons`/`!vb` - Toggle locking virtual buttons, preventing them from being moved.
  * `!mode` - Open the movement mode selection menu.
@@ -54,6 +54,8 @@
 ### gokz-measure
 
  * `!measure` - Open the distance measurement menu.
+ * `+measure` - Start measuring (bind to a key)
+ * `!measureblock` - Measure the gap of a block you're currently aiming at.
 
 ### gokz-goto
 
@@ -80,7 +82,7 @@
 
 ### gokz-jumpstats
 
- * `!jumpstats`/`!js`/`!ljstats` - Open the jumpstats options menu.
+ * `!jso` - Open the jumpstats options menu.
  * `!jsalways` - Toggle the 'Always-on' jumpstat mode.
 
 ### gokz-replays
@@ -114,6 +116,7 @@ Many of these commands return results for your currently selected mode.
  * `!pc` - Show course completion in chat. Usage: `!pc <player>`
  * `!rr`/`!latest` - Open a menu showing recently broken records.
  * `!jumptop`/`!jstop` - Open a menu showing the top jumpstats.
+ * `!jumpstats`/`!js` - Open a menu showing jumpstat PBs. Usage: `!js <jumper>`
  * `!ljpb` - Show PB Long Jump in chat. Usage: `!ljpb <jumper>`
  * `!bhpb` - Show PB Bunnyhop in chat. Usage: `!bhpb <jumper>`
  * `!lbhpb` - Show PB Lowpre Bunnyhop in chat. Usage: `!lbhpb <jumper>`
@@ -130,8 +133,15 @@ Many of these commands return results for your currently selected mode.
  * `!tier` - Show the map's tier in chat.
  * `!gr`/`!gwr` - Show main course global record times in chat. Usage: `!gr <map>`
  * `!gbr`/`!gbwr` - Show bonus global record times in chat. Usage: `!bgr <#bonus> <map>`
+ * `!gpb` - Show your personal best for a map. Usage: `!gpb <map>`
+ * `!gbpb` - Show your personal best for a bonus on the current map. Usage: `!gbpb <#bonus>`
  * `!gmaptop` - Open a menu showing the top global main course times of a map. Usage: `!gmaptop <map>`
  * `!gbmaptop` - Open a menu showing the top global bonus times of a map. Usage: `!gbmaptop <#bonus> <map>`
+
+### gokz-profile
+
+ * `!profile`/`!p` - Open the profile of a player. Usage: `!p <player>`
+ * `!profileoptions`/`!pfo` - Open the profile options menu.
 
 # Admin Commands
 
@@ -145,7 +155,10 @@ Many of these commands return results for your currently selected mode.
  * `!loadtimersetup`/`!lts` - Load & lock the timer setup (start position and virtual buttons) from the database.
  * `!setcheater` - Set a SteamID as a cheater. Usage: `!setcheater <STEAM_1:X:X>`
  * `!setnotcheater` - Set a SteamID as not a cheater. Usage: `!setnotcheater <STEAM_1:X:X>`
- * `!deletejump` - Remove the top jumpstat of a SteamID. Usage: `!deletejump <STEAM_1:X:X> <mode> <jump type> <block?>`
+ * `!deletebestjump` - Remove the top jumpstat of a SteamID. Usage: `!deletebestjump <STEAM_1:X:X> <mode> <jump type> <block?>`
+ * `!deletealljumps` - Remove all jumpstats of a SteamID. Usage: `!deletealljumps <STEAM_1:X:X>`
+ * `!deletejump` - Remove a jumpstat by it's id. Usage: `!deletejump <id>`
+ * `!deletetime` - Remove a time by it's id. Usage: `!deletetime <id>`
 
 ### gokz-localranks
 
