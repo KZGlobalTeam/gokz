@@ -34,17 +34,17 @@ stock int gI_rankThreshold[MODE_COUNT][RANK_COUNT] = {
 		80000,
 		
 		100000,
-		130000,
+		120000,
 		150000,
 		
 		200000,
 		230000,
 		250000,
 		
-		300000,
 		400000,
-		500000,
-		650000
+		600000,
+		800000,
+		1000000
 	},
 	{
 		0,
@@ -65,7 +65,7 @@ stock int gI_rankThreshold[MODE_COUNT][RANK_COUNT] = {
 		80000,
 		
 		100000,
-		130000,
+		120000,
 		150000,
 		
 		200000,
@@ -75,7 +75,7 @@ stock int gI_rankThreshold[MODE_COUNT][RANK_COUNT] = {
 		300000,
 		400000,
 		500000,
-		600000
+		800000
 	},
 	{
 		0,
@@ -105,8 +105,8 @@ stock int gI_rankThreshold[MODE_COUNT][RANK_COUNT] = {
 		
 		250000,
 		300000,
-		350000,
-		400000
+		400000,
+		600000
 	},
 };
 
