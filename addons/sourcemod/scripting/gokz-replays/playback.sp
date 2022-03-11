@@ -101,17 +101,24 @@ void GetPlaybackState(int client, HUDInfo info)
 	}
 	
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
-	if (playbackTick[bot] < preAndPostRunTickCount && botReplayVersion[bot] == 2)
-	{
-		info.Time = 0.0;
-	}
-	else if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
+	if (botReplayVersion[bot] == 1)
 	{
 		info.Time = botTime[bot];
 	}
-	else if (playbackTick[bot] >= preAndPostRunTickCount)
+	else if (botReplayVersion[bot] == 2)
 	{
-		info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
+		if (playbackTick[bot] < preAndPostRunTickCount)
+		{
+			info.Time = 0.0;
+		}
+		else if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
+		{
+			info.Time = botTime[bot];
+		}
+		else if (playbackTick[bot] >= preAndPostRunTickCount)
+		{
+			info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
+		}
 	}
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
