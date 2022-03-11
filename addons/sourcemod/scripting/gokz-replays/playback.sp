@@ -101,7 +101,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	}
 	
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
-	if (playbackTick[bot] < preAndPostRunTickCount)
+	if (playbackTick[bot] < preAndPostRunTickCount && botReplayVersion[bot] == 2)
 	{
 		info.Time = 0.0;
 	}
