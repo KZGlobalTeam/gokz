@@ -25,6 +25,7 @@ enum struct Pose
 static int entityTouchCount[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
 static int lastNoclipTime[MAXPLAYERS + 1];
+static int lastDuckbugTime[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -305,7 +306,7 @@ enum struct JumpTracker
 				return JumpType_Invalid;
 			}
 		}
-		else if (this.HitBhop())
+		else if (this.HitBhop() && !this.HitDuckbugRecently())
 		{
 			// Check for no offset
 			if (FloatAbs(this.jump.offset) < EPSILON)
@@ -352,7 +353,10 @@ enum struct JumpTracker
 		return true;
 	}
 	
-	
+	bool HitDuckbugRecently()
+	{
+		return GetGameTickCount() - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+	}
 	
 	// =====[ UPDATE HELPERS ]====================================================
 	
@@ -663,16 +667,6 @@ enum struct JumpTracker
 	{
 		// Try to prevent a form of booster abuse
 		if (!this.IsValidAirtime())
-		{
-			this.Invalidate();
-		}
-		
-		// Prevent a form of bugged jumpbugs
-		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_Vanilla &&
-			(this.jump.type == JumpType_Bhop ||
-			this.jump.type == JumpType_MultiBhop ||
-			this.jump.type == JumpType_WeirdJump) &&
-			this.jump.height > 51.0)
 		{
 			this.Invalidate();
 		}
@@ -1388,6 +1382,11 @@ public void OnPlayerRunCmdPost_JumpTracking(int client)
 	
 	// We always have to track this, no matter if in the air or not
 	jumpTrackers[client].UpdateRelease();
+	
+	if (Movement_GetDuckbugged(client))
+	{
+		lastDuckbugTime[client] = GetGameTickCount();
+	}
 }
 
 public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, MoveType newMovetype)
