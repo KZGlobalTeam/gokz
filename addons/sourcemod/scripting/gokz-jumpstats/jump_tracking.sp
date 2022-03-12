@@ -80,6 +80,7 @@ enum struct JumpTracker
 		this.jumper = jumper;
 		this.jump.jumper = jumper;
 		this.nextCrouchRelease = 100;
+		this.tickCount = GetGameTickCount();
 	}
 	
 	
