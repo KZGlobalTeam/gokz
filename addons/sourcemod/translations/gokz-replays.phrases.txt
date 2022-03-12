@@ -53,6 +53,11 @@
 		"#format"	"{1:s}"
 		"en"		"{darkred}This replay was not recorded on this map. Please switch to {1} and try again."
 	}
+	"Replay Menu - Jump Replay Wrong Map"
+	{
+		"#format"	"{1:s}"
+		"en"		"{darkred}Warning! This jump replay was not recorded on this map, it will play from your current location. Please switch to {1} if you want to see better playback."
+	}
 	"Replay Menu - No File"
 	{
 		"en"		"{darkred}There is no file for this replay. Please contact an admin if you think this is an error."

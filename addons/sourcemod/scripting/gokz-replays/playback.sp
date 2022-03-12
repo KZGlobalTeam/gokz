@@ -43,6 +43,8 @@ static bool hitBhop[RP_MAX_BOTS];
 static bool hitPerf[RP_MAX_BOTS];
 static bool botJumped[RP_MAX_BOTS];
 static bool botIsTakeoff[RP_MAX_BOTS];
+static bool isJumpReplay[RP_MAX_BOTS];
+static float jumpReplayOffset[RP_MAX_BOTS][3];
 static float botLandingSpeed[RP_MAX_BOTS];
 
 
@@ -50,7 +52,7 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadReplayBot(int client, char[] path)
+int LoadReplayBot(int client, char[] path, bool jumpReplay = false)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
@@ -73,7 +75,10 @@ int LoadReplayBot(int client, char[] path)
 		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
-
+	
+	isJumpReplay[bot] = jumpReplay;
+	jumpReplayOffset[bot] = NULL_VECTOR;
+	
 	if (!LoadPlayback(client, bot, path))
 	{
 		GOKZ_PlayErrorSound(client);
@@ -455,10 +460,19 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	char[] mapName = new char[length + 1];
 	file.ReadString(mapName, length, length);
 	mapName[length] = '\0';
+	bool wrongMap = false;
 	if (!StrEqual(mapName, gC_CurrentMap))
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Map", mapName);
-		return false;
+		if (!isJumpReplay[bot])
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Map", mapName);
+			return false;
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Jump Replay Wrong Map", mapName);
+			wrongMap = true;
+		}
 	}
 
 	// Map filesize
@@ -626,6 +640,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		
 		ReplayTickData tickData;
 		TickDataFromArray(tickDataArray, tickData);
+		
+		if (i == 0 && wrongMap && isJumpReplay[bot])
+		{
+			float playerOrigin[3];
+			GetClientAbsOrigin(client, playerOrigin);
+			SubtractVectors(playerOrigin, tickData.origin, jumpReplayOffset[bot]);
+		}
+		
 		// HACK: Jump replays don't record proper length sometimes. I don't know why.
 		//		 This leads to oversized replays full of 0s at the end.
 		// 		 So, we do this horrible check to dodge that issue.
@@ -831,6 +853,13 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		// Move the bot and pause them at that tick
 		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
 		playbackTickData[bot].GetArray(IntMax(playbackTick[bot] - 1, 0), prevTickData);
+		
+		if (isJumpReplay[bot] && !IsNullVector(jumpReplayOffset[bot]))
+		{
+			AddVectors(currentTickData.origin, jumpReplayOffset[bot], currentTickData.origin);
+			AddVectors(prevTickData.origin, jumpReplayOffset[bot], prevTickData.origin);
+		}
+		
 		TeleportEntity(client, currentTickData.origin, currentTickData.angles, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		
 		if (!inBreather[bot])
@@ -879,6 +908,12 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		// Load in the next tick
 		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
 		playbackTickData[bot].GetArray(IntMax(playbackTick[bot] - 1, 0), prevTickData);
+		
+		if (isJumpReplay[bot] && !IsNullVector(jumpReplayOffset[bot]))
+		{
+			AddVectors(currentTickData.origin, jumpReplayOffset[bot], currentTickData.origin);
+			AddVectors(prevTickData.origin, jumpReplayOffset[bot], prevTickData.origin);
+		}
 		
 		// Check if the replay is paused
 		if (botPlaybackPaused[bot])
