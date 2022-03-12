@@ -21,7 +21,7 @@ void OnClientPostAdminCheck_Points(int client)
 
 int GetRankPoints(int client, int mode)
 {
-	return pointsTotal[client][mode][TimeType_Nub] + pointsTotal[client][mode][TimeType_Pro];
+	return pointsTotal[client][mode][TimeType_Nub];
 }
 
 int GetPoints(int client, int mode, int timeType)

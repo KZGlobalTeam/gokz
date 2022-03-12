@@ -564,10 +564,7 @@ Action TweakJump(KZPlayer player, float velocity[3])
 	{
 		if (GetVectorHorizontalLength(velocity) > PERF_SPEED_CAP)
 		{
-			float baseVelocity[3];
-			player.GetBaseVelocity(baseVelocity);
 			SetVectorHorizontalLength(velocity, PERF_SPEED_CAP);
-			AddVectors(velocity, baseVelocity, velocity);
 			return Plugin_Changed;
 		}
 	}
