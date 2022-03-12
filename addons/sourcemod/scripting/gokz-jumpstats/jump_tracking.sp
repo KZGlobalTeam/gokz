@@ -1262,6 +1262,7 @@ void OnClientPutInServer_JumpTracking(int client)
 {
 	entityTouchCount[client] = 0;
 	lastNoclipTime[client] = 0;
+	lastDuckbugTime[client] = 0;
 	jumpTrackers[client].Init(client);
 }
 
