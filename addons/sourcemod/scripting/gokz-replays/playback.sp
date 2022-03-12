@@ -321,6 +321,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 	if (magicNumber != RP_MAGIC_NUMBER)
 	{
 		LogError("Failed to load invalid replay file: \"%s\".", path);
+		delete file;
 		return false;
 	}
 	
@@ -346,6 +347,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 		default:
 		{
 			LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
+			delete file;
 			return false;
 		}
 	}
@@ -458,6 +460,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	if (!StrEqual(mapName, gC_CurrentMap))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Map", mapName);
+		delete file;
 		return false;
 	}
 
@@ -505,6 +508,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	if (tickrate != RoundToZero(1 / GetTickInterval()))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Tickrate", tickrate, (RoundToZero(1 / GetTickInterval())));
+		delete file;
 		return false;
 	}
 
