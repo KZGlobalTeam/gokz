@@ -1295,7 +1295,7 @@ void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump, bool
 	// If it is then this is not a valid jumpstat.	
 	int buttons = GetClientButtons(client);
 	float ignoreLadderJumpTime = GetEntPropFloat(client, Prop_Data, "m_ignoreLadderJumpTime");
-	if (buttons & IN_JUMP && ignoreLadderJumpTime <= GetGameTime())
+	if (ladderJump && buttons & IN_JUMP && ignoreLadderJumpTime <= GetGameTime())
 	{
 		return;
 	}
