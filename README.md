@@ -52,7 +52,7 @@ Please see [COMMANDS.md](COMMANDS.md) for a list of player and admin commands.
 
 ### Mapping
 
-Please see [MAPPING.md](MAPPING.md) to see how to make maps that work with GOKZ.
+Please see the [Mapping-API](https://github.com/KZGlobalTeam/gokz/wiki/Mapping-API) to see how to make maps that work with GOKZ.
 
 ## Contributing
 
