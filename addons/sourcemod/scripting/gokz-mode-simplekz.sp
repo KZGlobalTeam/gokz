@@ -78,6 +78,7 @@ bool gB_PSTurningLeft[MAXPLAYERS + 1];
 float gF_PSTurnRate[MAXPLAYERS + 1];
 int gI_PSTicksSinceIncrement[MAXPLAYERS + 1];
 Handle gH_GetPlayerMaxSpeed;
+DynamicDetour gH_AirAccelerate;
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
@@ -85,6 +86,7 @@ float gF_OldOrigin[MAXPLAYERS + 1][3];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
 int gI_LastJumpButtonCmdnum[MAXPLAYERS + 1];
+int gI_OffsetCGameMovement_player;
 
 
 
@@ -200,6 +202,25 @@ public MRESReturn DHooks_OnGetPlayerMaxSpeed(int client, Handle hReturn)
 	return MRES_Supercede;
 }
 
+public MRESReturn DHooks_OnAirAccelerate_Pre(Address pThis, DHookParam hParams)
+{
+	int client = GOKZGetClientFromGameMovementAddress(pThis, gI_OffsetCGameMovement_player);
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return MRES_Ignored;
+	}
+	
+	// NOTE: Prestrafing changes GetPlayerMaxSpeed, which changes air acceleration, so if wishspeed is bigger than SPEED_NORMAL, cap it.
+	float wishspeed = DHookGetParam(hParams, 2);
+	if (wishspeed > SPEED_NORMAL)
+	{
+		DHookSetParam(hParams, 2, SPEED_NORMAL);
+		return MRES_ChangedHandled;
+	}
+	
+	return MRES_Ignored;
+}
+
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
 	if (!IsValidClient(client) || !IsPlayerAlive(client) || !IsUsingMode(client))
@@ -305,12 +326,35 @@ void ResetClient(int client)
 void HookEvents()
 {
 	GameData gameData = LoadGameConfigFile("movementapi.games");
+	if (gameData == INVALID_HANDLE)
+	{
+		SetFailState("Failed to find movementapi.games config");
+	}
+	
 	int offset = gameData.GetOffset("GetPlayerMaxSpeed");
 	if (offset == -1)
 	{
 		SetFailState("Failed to get GetPlayerMaxSpeed offset");
 	}
 	gH_GetPlayerMaxSpeed = DHookCreate(offset, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, DHooks_OnGetPlayerMaxSpeed);
+	
+	gH_AirAccelerate = DynamicDetour.FromConf(gameData, "CGameMovement::AirAccelerate");
+	if (gH_AirAccelerate == INVALID_HANDLE)
+	{
+		SetFailState("Failed to find CGameMovement::AirAccelerate function signature");
+	}
+	
+	if (!gH_AirAccelerate.Enable(Hook_Pre, DHooks_OnAirAccelerate_Pre))
+	{
+		SetFailState("Failed to enable detour on CGameMovement::AirAccelerate");
+	}
+	
+	char buffer[16];
+	if (!gameData.GetKeyValue("CGameMovement::player", buffer, sizeof(buffer)))
+	{
+		SetFailState("Failed to get CGameMovement::player offset.");
+	}
+	gI_OffsetCGameMovement_player = StringToInt(buffer);
 }
 
 // =====[ CONVARS ]=====
