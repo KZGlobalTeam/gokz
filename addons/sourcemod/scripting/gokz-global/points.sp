@@ -65,8 +65,11 @@ void UpdatePoints(int client, int mode = -1)
 	GetPlayerRanks(client, mode, TimeType_Nub);
 	GetPlayerRanks(client, mode, TimeType_Pro);
 	
-	GetPlayerRanks(client, mode, TimeType_Nub, gI_MapID);
-	GetPlayerRanks(client, mode, TimeType_Pro, gI_MapID);
+	if (gI_MapID != -1)
+	{
+		GetPlayerRanks(client, mode, TimeType_Nub, gI_MapID);
+		GetPlayerRanks(client, mode, TimeType_Pro, gI_MapID);
+	}
 }
 
 static void GetPlayerRanks(int client, int mode, int timeType, int mapID = DEFAULT_INT)
