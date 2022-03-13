@@ -692,7 +692,6 @@ public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequ
 	
 	if (player.IsBanned && gB_GOKZLocalDB)
 	{
-		GOKZ_PrintToChat(client, false, "Banned");
 		GOKZ_DB_SetCheater(client, true);
 	}
 }
