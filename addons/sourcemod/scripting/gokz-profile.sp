@@ -4,11 +4,11 @@
 
 #include <gokz/core>
 #include <gokz/profile>
+#include <gokz/global>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
-#include <gokz/global>
 #include <gokz/chat>
 
 #pragma newdecls required
@@ -28,7 +28,6 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-profile.txt"
 
 int gI_Rank[MAXPLAYERS + 1][MODE_COUNT];
-bool gB_Global;
 bool gB_Localranks;
 bool gB_Chat;
 
@@ -60,7 +59,6 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	gB_Global = LibraryExists("gokz-global");
 	gB_Localranks = LibraryExists("gokz-localranks");
 	gB_Chat = LibraryExists("gokz-chat");
 	for (int client = 1; client < MaxClients; client++)
@@ -84,14 +82,12 @@ public void OnLibraryAdded(const char[] name)
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	gB_Global = gB_Global || StrEqual(name, "gokz-global");
 	gB_Localranks = gB_Localranks || StrEqual(name, "gokz-localranks");
 	gB_Chat = gB_Chat || StrEqual(name, "gokz-chat");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
-	gB_Global = gB_Global && !StrEqual(name, "gokz-global");
 	gB_Localranks = gB_Localranks && !StrEqual(name, "gokz-localranks");
 	gB_Chat = gB_Chat && !StrEqual(name, "gokz-chat");
 }
