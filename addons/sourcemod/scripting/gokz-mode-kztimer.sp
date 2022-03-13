@@ -198,11 +198,14 @@ public MRESReturn DHooks_OnAirAccelerate_Pre(Address pThis, DHookParam hParams)
 		return MRES_Ignored;
 	}
 	
-	// NOTE: Prestrafing changes GetPlayerMaxSpeed, which changes air acceleration, so if wishspeed is bigger than SPEED_NORMAL, cap it.
+	// NOTE: Prestrafing changes GetPlayerMaxSpeed, which changes
+	// air acceleration, so remove gF_PreVelMod[client] from wishspeed/maxspeed.
+	// This also applies to when the player is ducked: their wishspeed is
+	// 85 and with prestrafing can be ~93.
 	float wishspeed = DHookGetParam(hParams, 2);
-	if (wishspeed > SPEED_NORMAL)
+	if (gF_PreVelMod[client] > 1.0)
 	{
-		DHookSetParam(hParams, 2, SPEED_NORMAL);
+		DHookSetParam(hParams, 2, wishspeed / gF_PreVelMod[client]);
 		return MRES_ChangedHandled;
 	}
 	
