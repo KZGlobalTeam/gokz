@@ -244,7 +244,7 @@ public void OnClientPutInServer(int client)
 // OnClientAuthorized is apparently too early
 public void OnClientPostAdminCheck(int client)
 {
-	OnClientPostAdminCheck_Points(client);
+	ResetPoints(client);
 	
 	if (GlobalAPI_IsInit() && !IsFakeClient(client))
 	{
@@ -336,14 +336,16 @@ public void OnMapEnd()
 {
 	// So it doesn't get carried over to the next map
 	gI_MapID = -1;
+	for (int client = 1; client < MaxClients; client++)
+	{
+		ResetMapPoints(client);
+	}
 }
 
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode])
-	    && !PointsValid(client, newValue)
-	    && GlobalAPI_IsInit()
-	    && gI_MapID != -1)
+	    && GlobalAPI_IsInit())
 	{
 		UpdatePoints(client);
 	}
@@ -646,7 +648,7 @@ public int GetMapCallback(JSON_Object map_json, GlobalAPIRequestData request)
 	// We don't do that earlier cause we need the map ID
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if (IsValidClient(client) && !IsFakeClient(client))
+		if (IsValidClient(client) && IsClientAuthorized(client) && !IsFakeClient(client))
 		{
 			UpdatePoints(client);
 		}

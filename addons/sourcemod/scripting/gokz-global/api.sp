@@ -104,5 +104,6 @@ public int Native_GetFinishes(Handle plugin, int numParams)
 
 public int Native_UpdatePoints(Handle plugin, int numParams)
 {
-	UpdatePoints(GetNativeCell(1), GetNativeCell(2));
+	// We're gonna always force an update here, cause otherwise the call doesn't really make sense
+	UpdatePoints(GetNativeCell(1), true, GetNativeCell(2));
 }
