@@ -114,7 +114,7 @@ stock char gC_rankName[RANK_COUNT][] = {
 	"New",
 	"Beginner-",
 	"Beginner",
-	"Beginner",
+	"Beginner+",
 	"Amateur-",
 	"Amateur",
 	"Amateur+",
