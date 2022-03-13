@@ -182,13 +182,16 @@ public void UpdateRank(int client, int mode)
 		}
 		CS_SetClientClanTag(client, clanTag);
 		
-		if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankChat]) == ProfileOptionBool_Enabled)
+		if (gB_Chat)
 		{
-			GOKZ_CH_SetChatTag(client, chatTag, color);
-		}
-		else
-		{
-			GOKZ_CH_SetChatTag(client, "", "{default}");
+			if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankChat]) == ProfileOptionBool_Enabled)
+			{
+				GOKZ_CH_SetChatTag(client, chatTag, color);
+			}
+			else
+			{
+				GOKZ_CH_SetChatTag(client, "", "{default}");
+			}
 		}
 		return;
 	}
