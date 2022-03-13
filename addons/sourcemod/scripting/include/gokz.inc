@@ -745,6 +745,7 @@ stock bool GetValidSpawn(float origin[3], float angles[3])
 	bool foundValidSpawn;
 	bool searchCT;
 	float spawnOrigin[3];
+	float spawnAngles[3];
 	int spawnEntity = -1;
 	while (!foundValidSpawn)
 	{
@@ -759,10 +760,12 @@ stock bool GetValidSpawn(float origin[3], float angles[3])
 		
 		if (spawnEntity != -1)
 		{
-			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", origin);
-			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", angles);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", spawnOrigin);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", spawnAngles);
 			if (IsSpawnValid(spawnOrigin))
 			{
+				origin = spawnOrigin;
+				angles = spawnAngles;
 				foundValidSpawn = true;
 			}
 		}

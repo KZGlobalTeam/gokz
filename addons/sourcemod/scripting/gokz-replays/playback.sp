@@ -101,17 +101,24 @@ void GetPlaybackState(int client, HUDInfo info)
 	}
 	
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
-	if (playbackTick[bot] < preAndPostRunTickCount && botReplayVersion[bot] == 2)
-	{
-		info.Time = 0.0;
-	}
-	else if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
+	if (botReplayVersion[bot] == 1)
 	{
 		info.Time = botTime[bot];
 	}
-	else if (playbackTick[bot] >= preAndPostRunTickCount)
+	else if (botReplayVersion[bot] == 2)
 	{
-		info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
+		if (playbackTick[bot] < preAndPostRunTickCount)
+		{
+			info.Time = 0.0;
+		}
+		else if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
+		{
+			info.Time = botTime[bot];
+		}
+		else if (playbackTick[bot] >= preAndPostRunTickCount)
+		{
+			info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
+		}
 	}
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
@@ -314,6 +321,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 	if (magicNumber != RP_MAGIC_NUMBER)
 	{
 		LogError("Failed to load invalid replay file: \"%s\".", path);
+		delete file;
 		return false;
 	}
 	
@@ -339,6 +347,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 		default:
 		{
 			LogError("Failed to load replay file with unsupported format version: \"%s\".", path);
+			delete file;
 			return false;
 		}
 	}
@@ -451,6 +460,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	if (!StrEqual(mapName, gC_CurrentMap))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Map", mapName);
+		delete file;
 		return false;
 	}
 
@@ -498,6 +508,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	if (tickrate != RoundToZero(1 / GetTickInterval()))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Replay Menu - Wrong Tickrate", tickrate, (RoundToZero(1 / GetTickInterval())));
+		delete file;
 		return false;
 	}
 
