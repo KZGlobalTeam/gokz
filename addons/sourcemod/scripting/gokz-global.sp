@@ -558,12 +558,8 @@ public void OnEnforcedConVarChanged(ConVar convar, const char[] oldValue, const 
 static void SetupAPI()
 {
 	GetCurrentMap(gC_CurrentMap, sizeof(gC_CurrentMap));
+	GetMapDisplayName(gC_CurrentMap, gC_CurrentMap, sizeof(gC_CurrentMap));
 	GetMapFullPath(gC_CurrentMapPath, sizeof(gC_CurrentMapPath));
-	
-	// If the map comes from the workshop, we need to strip part of the path first
-	char parts[3][64];
-	int num = ExplodeString(gC_CurrentMap, "/", parts, 3, 64);
-	gC_CurrentMap = parts[num - 1];
 	
 	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 	GlobalAPI_GetModes(GetModeInfoCallback);
