@@ -246,7 +246,7 @@ public void OnClientPostAdminCheck(int client)
 {
 	OnClientPostAdminCheck_Points(client);
 	
-	if (GlobalAPI_IsInit() && !IsFakeClient(client) && gI_MapID != -1)
+	if (GlobalAPI_IsInit() && !IsFakeClient(client))
 	{
 		CheckClientGlobalBan(client);
 		UpdatePoints(client);
