@@ -45,7 +45,10 @@ void OnClientPutInServer_Recording(int client)
     recordedTickData[client] = new ArrayList(sizeof(ReplayTickData));
     recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
     ResetRollingIndex(client);
+}
 
+void OnClientAuthorized_Recording(int client)
+{
     if(IsValidClient(client) && !IsFakeClient(client))
     {
         // Create directory path for player if not exists

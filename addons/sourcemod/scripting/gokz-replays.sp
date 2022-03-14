@@ -194,6 +194,11 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_Playback(client);
 }
 
+public void OnClientAuthorized(int client, const char[] auth)
+{
+	OnClientAuthorized_Recording(client);
+}
+
 public void OnClientDisconnect(int client)
 {
 	OnClientDisconnect_Playback(client);
