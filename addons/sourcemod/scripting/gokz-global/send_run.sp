@@ -62,7 +62,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	}
 	
 	// Don't like doing this here, but seems to be the most efficient place
-	GOKZ_GL_UpdatePoints(client);
+	UpdatePoints(client, true);
 
 	// Check if we can send the replay
 	lastRecordId[client] = response.GetInt("record_id");

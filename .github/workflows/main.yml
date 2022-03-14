@@ -52,6 +52,7 @@ jobs:
             !LICENSE
             !addons/sourcemod/scripting*
             !*.zip
+            !*.fgd
           
       - name: upload-upgrade
         uses: actions/upload-artifact@v2
@@ -67,3 +68,4 @@ jobs:
             !addons/sourcemod/scripting*
             !cfg*
             !*.zip
+            !*.fgd

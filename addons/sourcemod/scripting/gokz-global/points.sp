@@ -5,7 +5,8 @@ int pointsMap[MAXPLAYERS + 1][MODE_COUNT][TIMETYPE_COUNT];
 int requestsInProgress[MAXPLAYERS + 1];
 
 
-void OnClientPostAdminCheck_Points(int client)
+
+void ResetPoints(int client)
 {
 	for (int mode = 0; mode < MODE_COUNT; mode++)
 	{
@@ -13,6 +14,18 @@ void OnClientPostAdminCheck_Points(int client)
 		{
 			pointsTotal[client][mode][type] = -1;
 			finishes[client][mode][type] = -1;
+			pointsMap[client][mode][type] = -1;
+		}
+	}
+	requestsInProgress[client] = 0;
+}
+
+void ResetMapPoints(int client)
+{
+	for (int mode = 0; mode < MODE_COUNT; mode++)
+	{
+		for (int type = 0; type < TIMETYPE_COUNT; type++)
+		{
 			pointsMap[client][mode][type] = -1;
 		}
 	}
@@ -39,16 +52,8 @@ int GetFinishes(int client, int mode, int timeType)
 	return finishes[client][mode][timeType];
 }
 
-bool PointsValid(int client, int mode)
-{
-	return pointsMap[client][mode][TimeType_Pro] != -1
-		&& pointsMap[client][mode][TimeType_Nub] != -1
-		&& pointsTotal[client][mode][TimeType_Pro] != -1
-		&& pointsTotal[client][mode][TimeType_Nub] != -1;
-}
-
 // Note: This only gets 128 tick records
-void UpdatePoints(int client, int mode = -1)
+void UpdatePoints(int client, bool force = false, int mode = -1)
 {
 	if (requestsInProgress[client] != 0)
 	{
@@ -60,13 +65,19 @@ void UpdatePoints(int client, int mode = -1)
 		mode = GOKZ_GetCoreOption(client, Option_Mode);
 	}
 	
-	requestsInProgress[client] = 4;
+	if (!force || pointsTotal[client][mode][TimeType_Nub] == -1)
+	{
+		GetPlayerRanks(client, mode, TimeType_Nub);
+		GetPlayerRanks(client, mode, TimeType_Pro);
+		requestsInProgress[client] += 2;
+	}
 	
-	GetPlayerRanks(client, mode, TimeType_Nub);
-	GetPlayerRanks(client, mode, TimeType_Pro);
-	
-	GetPlayerRanks(client, mode, TimeType_Nub, gI_MapID);
-	GetPlayerRanks(client, mode, TimeType_Pro, gI_MapID);
+	if (gI_MapID != -1 && (!force || pointsMap[client][mode][TimeType_Nub] == -1))
+	{
+		GetPlayerRanks(client, mode, TimeType_Nub, gI_MapID);
+		GetPlayerRanks(client, mode, TimeType_Pro, gI_MapID);
+		requestsInProgress[client] += 2;
+	}
 }
 
 static void GetPlayerRanks(int client, int mode, int timeType, int mapID = DEFAULT_INT)
