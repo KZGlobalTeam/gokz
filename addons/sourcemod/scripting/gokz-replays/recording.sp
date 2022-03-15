@@ -160,7 +160,7 @@ public Action EndRecording(Handle timer, DataPack dp)
     int teleportsUsed = dp.ReadCell();
     delete dp;
     
-    postRunRecording[client] = true;
+    postRunRecording[client] = false;
 
     if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
     {
