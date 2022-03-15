@@ -417,7 +417,7 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
     generalHeader.replayType = replayType;
     generalHeader.gokzVersion = GOKZ_VERSION;
     generalHeader.mapName = gC_CurrentMap;
-    generalHeader.mapFileSize = gC_CurrentMapFileSize;
+    generalHeader.mapFileSize = gI_CurrentMapFileSize;
     generalHeader.serverIP = FindConVar("hostip").IntValue;
     generalHeader.timestamp = GetTime();
     GetClientName(client, generalHeader.playerAlias, sizeof(GeneralReplayHeader::playerAlias));
