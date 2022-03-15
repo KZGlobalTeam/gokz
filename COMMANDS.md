@@ -142,6 +142,7 @@ Many of these commands return results for your currently selected mode.
 
  * `!profile`/`!p` - Open the profile of a player. Usage: `!p <player>`
  * `!profileoptions`/`!pfo` - Open the profile options menu.
+ * `!ranks` - Show all available ranks and the points required for them.
 
 # Admin Commands
 
