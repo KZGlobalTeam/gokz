@@ -377,6 +377,13 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
     JumpReplayHeader jumpHeader;
     FillJumpHeader(jumpHeader, jumptype, distance, block, strafes, sync, pre, max, airtime);
 
+    // Make sure the client is authenticated
+    if (GetSteamAccountID(client) == 0)
+    {
+        LogError("Failed to save jump, client is not authenticated.");
+        return false;
+    }
+
     // Build path and create/overwrite associated file
     char replayPath[PLATFORM_MAX_PATH];
     if (block > 0)
@@ -392,6 +399,7 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
     if (file == null)
     {
         LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
+        delete file;
         return false;
     }
 
