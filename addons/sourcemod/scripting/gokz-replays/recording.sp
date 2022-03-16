@@ -527,26 +527,24 @@ static void WriteTickData(File file, int client, int replayType)
 {
     ReplayTickData tickData;
     ReplayTickData prevTickData;
+    int previousI = 0;
+    bool isFirstTick = true;
     switch(replayType)
     {
         case ReplayType_Run:
         {
             // Full run including pre and post
-            int previousJ = 0;
-            bool isFirstTick = true;
             for (int i = 0; i < recordedPostRunData[client].Length; i++)
             {
                 recordedPostRunData[client].GetArray(i, tickData);
-                recordedPostRunData[client].GetArray(previousJ, prevTickData);
+                recordedPostRunData[client].GetArray(previousI, prevTickData);
                 WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-                previousJ = i;
+                previousI = i;
                 isFirstTick = false;
             }
         }
         case ReplayType_Cheater:
         {
-            int previousI = 0;
-            bool isFirstTick = true;
             for (int i = 0; i < recordedRecentData[client].Length; i++)
             {
             	int rollingI = RecordingIndexAdd(client, i);
@@ -561,8 +559,6 @@ static void WriteTickData(File file, int client, int replayType)
         case ReplayType_Jump:
         {
         	int replayLength = currentTick - lastTakeoffPBTick[client] + 2 * preAndPostRunTickCount;
-        	int previousI = 0;
-        	bool isFirstTick = true;
         	for (int i = 0; i < replayLength; i++)
             {
             	int rollingI = RecordingIndexAdd(client, i - replayLength);
