@@ -627,7 +627,7 @@ static void FormatRunReplayPath(char[] buffer, int maxlength, int course, int mo
 static void FormatCheaterReplayPath(char[] buffer, int maxlength, int client, int mode, int style)
 {
     BuildPath(Path_SM, buffer, maxlength,
-        "%s/%d/%s_%d_%s_%s.%s",
+        "%s/%d_%s_%d_%s_%s.%s",
         RP_DIRECTORY_CHEATERS,
         GetSteamAccountID(client),
         gC_CurrentMap,
