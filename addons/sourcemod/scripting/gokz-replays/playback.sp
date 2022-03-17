@@ -615,7 +615,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Read tick data
 	preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
 	any tickDataArray[RP_V2_TICK_DATA_BLOCKSIZE];
-	for (int i = 0; i < tickCount + preAndPostRunTickCount; i++)
+	for (int i = 0; i < tickCount; i++)
 	{
 		file.ReadInt32(tickDataArray[RPDELTA_DELTAFLAGS]);
 		
