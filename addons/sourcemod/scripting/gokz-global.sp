@@ -664,6 +664,11 @@ void CheckClientGlobalBan(int client)
 
 public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequestData request, int client)
 {
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
 	if (request.Failure)
 	{
 		LogError("Failed to get ban info.");
