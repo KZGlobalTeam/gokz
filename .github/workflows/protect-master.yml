@@ -1,4 +1,4 @@
-name: CI
+name: protect-master
 
 on:
   pull_request_target:
