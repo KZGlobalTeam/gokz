@@ -25,6 +25,7 @@ static Handle acceptInputHookPre;
 static Handle processMovementHookPre;
 static Address serverGameEnts;
 static Handle markEntitiesAsTouching;
+static Handle passesTriggerFilters;
 
 public void OnPluginStart_Triggerfix()
 {
@@ -41,6 +42,18 @@ public void OnPluginStart_Triggerfix()
 	{
 		SetFailState("Failed to load gokz-core gamedata");
 	}
+	
+	// PassesTriggerFilters
+	StartPrepSDKCall(SDKCall_Entity);
+	if (!PrepSDKCall_SetFromConf(gamedataConf, SDKConf_Virtual, "CBaseTrigger::PassesTriggerFilters"))
+	{
+		SetFailState("Failed to get CBaseTrigger::PassesTriggerFilters offset");
+	}
+	PrepSDKCall_SetReturnInfo(SDKType_Bool, SDKPass_Plain);
+	PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
+	passesTriggerFilters = EndPrepSDKCall();
+
+	if (passesTriggerFilters == null) SetFailState("Unable to prepare SDKCall for CBaseTrigger::PassesTriggerFilters");
 	
 	// CreateInterface
 	// Thanks SlidyBat and ici
@@ -276,26 +289,22 @@ static MRESReturn DHooks_AcceptInput(int client, DHookReturn hReturn, DHookParam
 		DHookGetParamObjectPtrString(hParams, 4, 0, ObjectValueType_String, param, sizeof(param));
 		char kv[16];
 		SplitString(param, " ", kv, sizeof(kv));
-		if (StrEqual(kv[0], "targetname", false)) // KVs are case insensitive.
+		// KVs are case insensitive.
+		// Any of these inputs can change the filter behavior.
+		if (StrEqual(kv[0], "targetname", false) || StrEqual(kv[0], "teamnumber", false) || StrEqual(kv[0], "classname", false) || StrEqual(command, "ResponseContext", false))
 		{
 			DoTriggerFix(client, true);
 		}
 	}
+	else if (StrEqual(command, "AddContext") || StrEqual(command, "RemoveContext") || StrEqual(command, "ClearContext"))
+	{
+		DoTriggerFix(client, true);
+	}
 	return MRES_Ignored;
 }
 
-static bool DoTriggerFix(int client, bool targetnameFix = false)
+static bool DoTriggerFix(int client, bool filterFix = false)
 {
-	char name[64];
-	if (targetnameFix)
-	{
-		GetEntPropString(client, Prop_Send, "m_iName", name, 64);
-		// There's no filter to check yet.
-		if (!name[0])
-		{
-			return false;
-		}
-	}
 	// Adapted from DoTriggerjumpFix right below.
 	float landingMins[3], landingMaxs[3];
 	float origin[3];
@@ -320,40 +329,20 @@ static bool DoTriggerFix(int client, bool targetnameFix = false)
 			continue;
 		}
 
-		if (targetnameFix)
+		if (filterFix && SDKCall(passesTriggerFilters, trigger, client))
 		{
-			char filterName[64];
-			GetEntPropString(trigger, Prop_Data, "m_iFilterName", filterName, sizeof(filterName));
+			// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
+			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
 			
-			if (!filterName[0])
-			{
-				// No filter, move on.
-				continue;
-			}
-			int filter = GetEntPropEnt(trigger, Prop_Data, "m_hFilter");
-			GetEntPropString(filter, Prop_Data, "m_iFilterName", filterName, sizeof(filterName));
-
-			bool whitelist = !GetEntProp(filter, Prop_Data, "m_bNegated");
-			bool matchFilter = whitelist == StrEqual(filterName, name);
-
-			if (matchFilter)
-			{
-				// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
-				SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
-				
-				// Name will be changed right after this so it will need to be triggered again.
-				triggerTouchFired[client][trigger] = false;
-			}
+			// Player properties might be changed right after this so it will need to be triggered again.
+			triggerTouchFired[client][trigger] = false;
 			didSomething = true;
 		}
-		else
+		else if (!triggerTouchFired[client][trigger])
 		{
 			// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
 			// in the last tick, we make sure that it is called now.		
-			if (!triggerTouchFired[client][trigger])
-			{
-				SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
-			}
+			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
 			didSomething = true;
 		}
 	}
