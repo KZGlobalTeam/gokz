@@ -63,6 +63,11 @@ Sets player models upon spawning to models that have more subtle landing animati
 
 Displays information about players, including ranks derived from the Global API.
 
+The plugin also provides "ADMIN" and "VIP" flags. Access to using these flags can be overridden by giving access to the following Sourcemod "commands":
+
+* `gokz_flag_admin` (Default `ADMFLAG_GENERIC`).
+* `gokz_flag_vip` (Default `ADMFLAG_CUSTOM1`).
+
 ### gokz-quiet
 
 Adds options and features to reduce visual and audio noise, such as hiding other players.
