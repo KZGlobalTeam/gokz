@@ -50,7 +50,8 @@ void OnClientPutInServer_Recording(int client)
 
 void OnClientAuthorized_Recording(int client)
 {
-    if(IsValidClient(client) && !IsFakeClient(client))
+	// Apparently the client isn't valid yet here, so we can't check for that!
+	if(!IsFakeClient(client))
     {
         // Create directory path for player if not exists
         char replayPath[PLATFORM_MAX_PATH];
