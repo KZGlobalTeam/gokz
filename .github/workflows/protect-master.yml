@@ -7,7 +7,7 @@ on:
 jobs:
   protect-master-pr:
     runs-on: ubuntu-20.04
-    if: ${{ github.base_ref == 'master' && (github.repository != 'KZGlobalTeam/gokz-old' || github.head_ref != 'dev') }}
+    if: ${{ github.base_ref == 'master' && (github.repository != 'KZGlobalTeam/gokz' || github.head_ref != 'dev') }}
     steps:
     - uses: actions/github-script@v6
       with:
