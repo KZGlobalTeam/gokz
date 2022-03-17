@@ -32,7 +32,7 @@ public Action CommandMeasureEnd(int client, int args)
 	}
 	gB_Measuring[client] = false;
 	MeasureGetPos(client, 1);
-	MeasureDistance(client, 0.01);
+	MeasureDistance(client, MEASURE_MIN_DIST);
 	CreateTimer(4.9, Timer_DeletePoints, GetClientUserId(client));
 	return Plugin_Handled;
 }

@@ -55,7 +55,7 @@ bool MeasureDistance(int client, float minDistToMeasureBlock = -1.0)
 		float horizontalDist = GetVectorHorizontalDistance(gF_MeasurePos[client][0], gF_MeasurePos[client][1]);
 		float effectiveDist = CalcEffectiveDistance(gF_MeasurePos[client][0], gF_MeasurePos[client][1]);
 		float verticalDist = gF_MeasurePos[client][1][2] - gF_MeasurePos[client][0][2];
-		if (minDistToMeasureBlock >= 0.0 && horizontalDist <= minDistToMeasureBlock)
+		if (minDistToMeasureBlock >= 0.0 && (horizontalDist <= minDistToMeasureBlock || verticalDist <= minDistToMeasureBlock)
 		{
 			return MeasureBlock(client);
 		}
