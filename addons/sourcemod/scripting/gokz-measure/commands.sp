@@ -15,6 +15,10 @@ public Action CommandMeasureMenu(int client, int args)
 
 public Action CommandMeasureStart(int client, int args)
 {
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
 	gB_Measuring[client] = true;
 	MeasureGetPos(client, 0);
 	return Plugin_Handled;
@@ -22,15 +26,23 @@ public Action CommandMeasureStart(int client, int args)
 
 public Action CommandMeasureEnd(int client, int args)
 {
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
 	gB_Measuring[client] = false;
 	MeasureGetPos(client, 1);
-	MeasureDistance(client);
+	MeasureDistance(client, MEASURE_MIN_DIST);
 	CreateTimer(4.9, Timer_DeletePoints, GetClientUserId(client));
 	return Plugin_Handled;
 }
 
 public Action CommandMeasureBlock(int client, int args)
 {
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
 	MeasureBlock(client);
 	CreateTimer(4.9, Timer_DeletePoints, GetClientUserId(client));
 	return Plugin_Handled;

@@ -47,7 +47,7 @@ bool MeasureBlock(int client)
 	return true;
 }
 
-bool MeasureDistance(int client)
+bool MeasureDistance(int client, float minDistToMeasureBlock = -1.0)
 {
 	// Find Distance
 	if (gB_MeasurePosSet[client][0] && gB_MeasurePosSet[client][1])
@@ -55,8 +55,15 @@ bool MeasureDistance(int client)
 		float horizontalDist = GetVectorHorizontalDistance(gF_MeasurePos[client][0], gF_MeasurePos[client][1]);
 		float effectiveDist = CalcEffectiveDistance(gF_MeasurePos[client][0], gF_MeasurePos[client][1]);
 		float verticalDist = gF_MeasurePos[client][1][2] - gF_MeasurePos[client][0][2];
-		GOKZ_PrintToChat(client, true, "%t", "Measure Result", horizontalDist, effectiveDist, verticalDist);
-		MeasureBeam(client, gF_MeasurePos[client][0], gF_MeasurePos[client][1], 5.0, 0.2, 200, 200, 200);
+		if (minDistToMeasureBlock >= 0.0 && (horizontalDist <= minDistToMeasureBlock && verticalDist <= minDistToMeasureBlock))
+		{
+			return MeasureBlock(client);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Measure Result", horizontalDist, effectiveDist, verticalDist);
+			MeasureBeam(client, gF_MeasurePos[client][0], gF_MeasurePos[client][1], 5.0, 0.2, 200, 200, 200);
+		}
 		return true;
 	}
 	else

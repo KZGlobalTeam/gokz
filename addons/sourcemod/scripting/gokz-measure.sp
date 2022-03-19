@@ -27,7 +27,7 @@ public Plugin myinfo =
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-measure.txt"
-
+#define MEASURE_MIN_DIST 0.01
 int gI_BeamModel;
 bool gB_Measuring[MAXPLAYERS + 1];
 bool gB_MeasurePosSet[MAXPLAYERS + 1][2];
