@@ -297,7 +297,7 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			// The origin and offset is now correct, no workaround needed
-			if (FloatAbs(this.jump.offset) < EPSILON &&	this.lastType == JumpType_LongJump)
+			if (FloatAbs(this.jump.offset) < JS_OFFSET_EPSILON && this.lastType == JumpType_LongJump)
 			{
 				return JumpType_Jumpbug;
 			}
@@ -309,7 +309,7 @@ enum struct JumpTracker
 		else if (this.HitBhop())
 		{
 			// Check for no offset
-			if (FloatAbs(this.jump.offset) < EPSILON)
+			if (FloatAbs(this.jump.offset) < JS_OFFSET_EPSILON)
 			{
 				switch (this.lastType)
 				{
@@ -977,7 +977,7 @@ enum struct JumpTracker
 		if (checkOffset)
 		{
 			endBlock[2] += 1.0;
-			if (FloatAbs(this.FindBlockHeight(endBlock, float(distSign) * 17.0, coordDist, 1.0) - landingOrigin[2]) > EPSILON)
+			if (FloatAbs(this.FindBlockHeight(endBlock, float(distSign) * 17.0, coordDist, 1.0) - landingOrigin[2]) > JS_OFFSET_EPSILON)
 			{
 				return;
 			}
@@ -1085,7 +1085,7 @@ enum struct JumpTracker
 		
 		// Search for the ladder
 		if (!TraceHullPosition(traceOrigin, traceEnd, playerMinsEx, playerMaxsEx, ladderTop)
-			|| FloatAbs(ladderTop[2] - landingHeight) > EPSILON)
+			|| FloatAbs(ladderTop[2] - landingHeight) > JS_OFFSET_EPSILON)
 		{
 			this.Invalidate();
 			return false;
