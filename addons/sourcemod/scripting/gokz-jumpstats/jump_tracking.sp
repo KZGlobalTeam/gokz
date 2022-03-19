@@ -274,7 +274,7 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		if (this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
+		if (gB_SpeedJustModifiedExternally[this.jumper] || this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
 		}
