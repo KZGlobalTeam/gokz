@@ -153,6 +153,11 @@ public void GOKZ_GL_OnPointsUpdated(int client, int mode)
 
 public void UpdateRank(int client, int mode)
 {
+	if (!IsValidClient(client) || IsFakeClient(client))
+	{
+		return;
+	}
+	
 	int tagType = GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_TagType]);
 	
 	if (tagType != ProfileTagType_Rank)
