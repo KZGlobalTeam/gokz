@@ -68,4 +68,4 @@ jobs:
             !addons/sourcemod/scripting*
             !cfg*
             !*.zip
-            !.fgd
+            !*.fgd

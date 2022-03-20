@@ -747,6 +747,7 @@ stock bool GetValidSpawn(float origin[3], float angles[3])
 	bool foundValidSpawn;
 	bool searchCT;
 	float spawnOrigin[3];
+	float spawnAngles[3];
 	int spawnEntity = -1;
 	while (!foundValidSpawn)
 	{
@@ -761,10 +762,12 @@ stock bool GetValidSpawn(float origin[3], float angles[3])
 		
 		if (spawnEntity != -1)
 		{
-			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", origin);
-			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", angles);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_vecOrigin", spawnOrigin);
+			GetEntPropVector(spawnEntity, Prop_Data, "m_angRotation", spawnAngles);
 			if (IsSpawnValid(spawnOrigin))
 			{
+				origin = spawnOrigin;
+				angles = spawnAngles;
 				foundValidSpawn = true;
 			}
 		}
@@ -933,7 +936,6 @@ static bool CanSeeBox(float origin[3], float center[3], float distFromCenter[3])
 	return true;
 }
 
-
 /**
  * Gets the nearest point in the oriented bounding box of an entity to a point.
  *
@@ -987,4 +989,56 @@ stock float CalcDistanceToLine(float P[3], float vLineA[3], float vLineB[3])
 	}
 	SubtractVectors(P, vClosest, delta);
 	return GetVectorLength(delta);
+}
+
+/**
+ * Gets entity index from the address to an entity.
+ *
+ * @param pEntity			Entity address.
+ * @return					Entity index.
+ * @error					Couldn't find offset for m_angRotation, m_vecViewOffset, couldn't confirm offset of m_RefEHandle.
+ */
+stock int GOKZGetEntityFromAddress(Address pEntity)
+{
+	static int offs_RefEHandle;
+	if (offs_RefEHandle)
+	{
+		return EntRefToEntIndex(LoadFromAddress(pEntity + view_as<Address>(offs_RefEHandle), NumberType_Int32) | (1 << 31));
+	}
+	
+	// if we don't have it already, attempt to lookup offset based on SDK information
+	// CWorld is derived from CBaseEntity so it should have both offsets
+	int offs_angRotation = FindDataMapInfo(0, "m_angRotation"), offs_vecViewOffset = FindDataMapInfo(0, "m_vecViewOffset");
+	if (offs_angRotation == -1)
+	{
+		SetFailState("Could not find offset for ((CBaseEntity) CWorld)::m_angRotation");
+	}
+	else if (offs_vecViewOffset == -1)
+	{
+		SetFailState("Could not find offset for ((CBaseEntity) CWorld)::m_vecViewOffset");
+	}
+	else if ((offs_angRotation + 0x0C) != (offs_vecViewOffset - 0x04))
+	{
+		char game[32];
+		GetGameFolderName(game, sizeof(game));
+		SetFailState("Could not confirm offset of CBaseEntity::m_RefEHandle (incorrect assumption for game '%s'?)", game);
+	}
+	
+	// offset seems right, cache it for the next call
+	offs_RefEHandle = offs_angRotation + 0x0C;
+	return GOKZGetEntityFromAddress(pEntity);
+}
+
+/**
+ * Gets client index from CGameMovement class.
+ *
+ * @param addr							Address of CGameMovement class.
+ * @param offsetCGameMovement_player	Offset of CGameMovement::player.
+ * @return								Client index.
+ * @error								Couldn't find offset for m_angRotation, m_vecViewOffset, couldn't confirm offset of m_RefEHandle.
+ */
+stock int GOKZGetClientFromGameMovementAddress(Address addr, int offsetCGameMovement_player)
+{
+	Address playerAddr = view_as<Address>(LoadFromAddress(view_as<Address>(view_as<int>(addr) + offsetCGameMovement_player), NumberType_Int32));
+	return GOKZGetEntityFromAddress(playerAddr);
 }

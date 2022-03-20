@@ -18,7 +18,6 @@ static int preAndPostRunTickCount;
 static int currentTick;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
-static int recordingIndexOnTimerStart[MAXPLAYERS + 1];
 static int lastTakeoffTick[MAXPLAYERS + 1];
 static int lastTakeoffPBTick[MAXPLAYERS + 1];
 static float playerSensitivity[MAXPLAYERS + 1];
@@ -26,7 +25,9 @@ static float playerMYaw[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
 static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
-static ArrayList recordedTickData[MAXPLAYERS + 1];
+static bool postRunRecording[MAXPLAYERS + 1];
+static ArrayList recordedRecentData[MAXPLAYERS + 1];
+static ArrayList recordedPostRunData[MAXPLAYERS + 1];
 static ArrayList recordedRunData[MAXPLAYERS + 1];
 
 // =====[ EVENTS ]=====
@@ -39,14 +40,18 @@ void OnMapStart_Recording()
     maxCheaterReplayTicks = RoundToCeil(RP_MAX_CHEATER_REPLAY_LENGTH * tickrate);
 }
 
-
 void OnClientPutInServer_Recording(int client)
 {
-    recordedTickData[client] = new ArrayList(sizeof(ReplayTickData));
+    recordedRecentData[client] = new ArrayList(sizeof(ReplayTickData));
     recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
-    ResetRollingIndex(client);
+    recordedPostRunData[client] = new ArrayList(sizeof(ReplayTickData));
+    recordingIndex[client] = 0;
+}
 
-    if(IsValidClient(client) && !IsFakeClient(client))
+void OnClientAuthorized_Recording(int client)
+{
+	// Apparently the client isn't valid yet here, so we can't check for that!
+	if(!IsFakeClient(client))
     {
         // Create directory path for player if not exists
         char replayPath[PLATFORM_MAX_PATH];
@@ -61,8 +66,6 @@ void OnClientPutInServer_Recording(int client)
             CreateDirectory(replayPath, 511);
         }
     }
-
-    StartRecording(client);
 }
 
 void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const float vel[3], const int mouse[2])
@@ -103,24 +106,32 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
         recordedRunData[client].Resize(runTick + 1);
         recordedRunData[client].SetArray(runTick, tickData);
     }
+    
+    if (postRunRecording[client])
+    {
+        int runTick = GetArraySize(recordedPostRunData[client]);
+        recordedPostRunData[client].Resize(runTick + 1);
+        recordedPostRunData[client].SetArray(runTick, tickData);
+    }
+    
+    int tick = recordingIndex[client];
+    if (recordedRecentData[client].Length < maxCheaterReplayTicks)
+    {
+        recordedRecentData[client].Resize(recordedRecentData[client].Length + 1);
+        recordingIndex[client] = recordingIndex[client] + 1 == maxCheaterReplayTicks ? 0 : recordingIndex[client] + 1;
+    }
     else
     {
-        int tick = GetArraySize(recordedTickData[client]);
-        if (tick < maxCheaterReplayTicks)
-        {
-            recordedTickData[client].Resize(tick + 1);
-        }
-        tick = GetRollingIndex(client);
-        recordingIndex[client] = recordingIndex[client] >= maxCheaterReplayTicks - 1 ? 0 : recordingIndex[client] + 1;
-
-        recordedTickData[client].SetArray(tick, tickData);
+    	recordingIndex[client] = RecordingIndexAdd(client, 1);
     }
+
+    recordedRecentData[client].SetArray(tick, tickData);
 }
 
 void GOKZ_OnTimerStart_Recording(int client)
 {
     timerRunning[client] = true;
-    StartRecording(client);
+    StartRunRecording(client);
 }
 
 void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
@@ -130,7 +141,15 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
     dp.WriteCell(course);
     dp.WriteFloat(time);
     dp.WriteCell(teleportsUsed);
-    CreateTimer(2.0, EndRecording, dp);
+    delete recordedPostRunData[client];
+    recordedPostRunData[client] = recordedRunData[client];
+    recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
+    if (timerRunning[client])
+    {
+   		CreateTimer(RP_PLAYBACK_BREATHER_TIME, EndRecording, dp);
+   		postRunRecording[client] = true;
+   		timerRunning[client] = false;
+    }
 }
 
 public Action EndRecording(Handle timer, DataPack dp)
@@ -141,27 +160,24 @@ public Action EndRecording(Handle timer, DataPack dp)
     float time = dp.ReadFloat();
     int teleportsUsed = dp.ReadCell();
     delete dp;
+    
+    postRunRecording[client] = false;
+
     if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
     {
-		// TODO(GameChaos): actual ACReason?
-        SaveRecordingOfCheater(client, view_as<ACReason>(0));
+        Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
+        return;
+    }
+    
+    char path[PLATFORM_MAX_PATH];
+    if (SaveRecordingOfRun(path, client, course, time, teleportsUsed))
+    {
+        Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed);
+    }
+    else
+    {
         Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
     }
-    else if (timerRunning[client])
-    {
-        char path[PLATFORM_MAX_PATH];
-        if (SaveRecordingOfRun(path, client, course, time, teleportsUsed))
-        {
-            Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed);
-        }
-        else
-        {
-            Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
-        }
-    }
-
-    timerRunning[client] = false;
-    StartRecording(client);
 }
 
 void GOKZ_OnPause_Recording(int client)
@@ -177,7 +193,6 @@ void GOKZ_OnResume_Recording(int client)
 void GOKZ_OnTimerStopped_Recording(int client)
 {
     timerRunning[client] = false;
-    StartRecording(client);
 }
 
 void GOKZ_OnCountedTeleport_Recording(int client)
@@ -185,7 +200,6 @@ void GOKZ_OnCountedTeleport_Recording(int client)
     if (gB_NubRecordMissed[client])
     {
         timerRunning[client] = false;
-        StartRecording(client);
     }
 
     isTeleportTick[client] = true;
@@ -197,8 +211,8 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
 	{
 		timerRunning[client] = false;
-		StartRecording(client);
 	}
+
 	// If on a NUB run and missed NUB record, then can no longer beat a server record
 	// Otherwise wait to see if they teleport before stopping the recording
 	if (recordType == RecordType_Nub)
@@ -206,7 +220,6 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 		if (GOKZ_GetTeleportCount(client) > 0)
 		{
 			timerRunning[client] = false;
-			StartRecording(client);
 		}
 	}
 }
@@ -229,7 +242,7 @@ void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, in
     dp.WriteFloat(pre);
     dp.WriteFloat(max);
     dp.WriteCell(airtime);
-    CreateTimer(2.0, SaveJump, dp);
+    CreateTimer(RP_PLAYBACK_BREATHER_TIME, SaveJump, dp);
 }
 
 public Action SaveJump(Handle timer, DataPack dp)
@@ -253,7 +266,7 @@ public Action SaveJump(Handle timer, DataPack dp)
 
 // =====[ PRIVATE ]=====
 
-static void StartRecording(int client)
+static void StartRunRecording(int client)
 {
     if (IsFakeClient(client))
     {
@@ -261,15 +274,41 @@ static void StartRecording(int client)
     }
     QueryClientConVar(client, "sensitivity", SensitivityCheck, client);
     QueryClientConVar(client, "m_yaw", MYAWCheck, client);
-    recordingIndexOnTimerStart[client] = GetRollingIndex(client);
     
     DiscardRecording(client);
     ResumeRecording(client);
+    
+    // Copy pre data
+    int index;
+    recordedRunData[client].Resize(preAndPostRunTickCount);
+    if (recordedRecentData[client].Length < preAndPostRunTickCount)
+    {
+    	index = recordingIndex[client] - preAndPostRunTickCount;
+    }
+    else
+    {
+    	index = RecordingIndexAdd(client, -preAndPostRunTickCount);
+    }
+    for (int i = 0; i < preAndPostRunTickCount; i++)
+    {
+    	ReplayTickData tickData;
+    	if (index < 0)
+    	{
+    		recordedRecentData[client].GetArray(0, tickData);
+	    	recordedRunData[client].SetArray(i, tickData);
+	    	index += 1;
+    	}
+    	else
+    	{
+    		recordedRecentData[client].GetArray(index, tickData);
+	    	recordedRunData[client].SetArray(i, tickData);
+	    	index = RecordingIndexAdd(client, -preAndPostRunTickCount + i + 1);
+    	}
+    }
 }
 
 static void DiscardRecording(int client)
 {
-    TransferRunDataToRollingData(client);
     recordedRunData[client].Clear();
     Call_OnReplayDiscarded(client);
 }
@@ -291,7 +330,7 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 
     // Create and fill General Header
     GeneralReplayHeader generalHeader;
-    FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedRunData[client].Length);
+    FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedPostRunData[client].Length);
 
     // Create and fill Run Header
     RunReplayHeader runHeader;
@@ -314,8 +353,8 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
     File file = OpenFile(replayPath, "wb");
     if (file == null)
 	{
-		    LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
-		    return false;
+		LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
+		return false;
     }
 
     WriteGeneralHeader(file, generalHeader);
@@ -338,7 +377,7 @@ static bool SaveRecordingOfCheater(int client, ACReason reason)
 {
     // Create and fill general header
     GeneralReplayHeader generalHeader;
-    FillGeneralHeader(generalHeader, client, ReplayType_Cheater, recordedTickData[client].Length);
+    FillGeneralHeader(generalHeader, client, ReplayType_Cheater, recordedRecentData[client].Length);
 
     // Create and fill cheater header
     CheaterReplayHeader cheaterHeader;
@@ -374,6 +413,13 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
     JumpReplayHeader jumpHeader;
     FillJumpHeader(jumpHeader, jumptype, distance, block, strafes, sync, pre, max, airtime);
 
+    // Make sure the client is authenticated
+    if (GetSteamAccountID(client) == 0)
+    {
+        LogError("Failed to save jump, client is not authenticated.");
+        return false;
+    }
+
     // Build path and create/overwrite associated file
     char replayPath[PLATFORM_MAX_PATH];
     if (block > 0)
@@ -389,6 +435,7 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
     if (file == null)
     {
         LogError("Failed to create/open replay file to write to: \"%s\".", replayPath);
+        delete file;
         return false;
     }
 
@@ -400,7 +447,6 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
 
     return true;
 }
-
 
 static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int replayType, int tickCount)
 {
@@ -482,118 +528,49 @@ static void WriteTickData(File file, int client, int replayType)
 {
     ReplayTickData tickData;
     ReplayTickData prevTickData;
-    int i;
+    int previousI = 0;
+    bool isFirstTick = true;
     switch(replayType)
     {
         case ReplayType_Run:
         {
-            // 2 seconds pre timer starting
-            i = recordingIndexOnTimerStart[client] - preAndPostRunTickCount;
-            if (i < 0)
+            // Full run including pre and post
+            for (int i = 0; i < recordedPostRunData[client].Length; i++)
             {
-                i = recordedTickData[client].Length - 1 + i;
-            }
-
-            int previousJ = i;
-            bool isFirstTick = true;
-            for (int j = i; j != recordingIndexOnTimerStart[client]; j++)
-            {
-                if (j == recordedTickData[client].Length)
-                {
-                    j = 0;
-                }
-
-                if (isFirstTick)
-                {
-                    previousJ = j;
-                }
-                recordedTickData[client].GetArray(j, tickData);
-                recordedTickData[client].GetArray(previousJ, prevTickData);
-                WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-                previousJ = j;
-                isFirstTick = false;
-            }
-
-            // Actual run
-            // This includes the 2 seconds breather after the timer stops
-            int previousI = 0;
-            for (i = 0; i < recordedRunData[client].Length; i++)
-            {
-                recordedRunData[client].GetArray(i, tickData);
-                recordedRunData[client].GetArray(previousI, tickData);
+                recordedPostRunData[client].GetArray(i, tickData);
+                recordedPostRunData[client].GetArray(previousI, prevTickData);
                 WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
                 previousI = i;
+                isFirstTick = false;
             }
         }
         case ReplayType_Cheater:
         {
-            // TODO: this doesn't work.
-            i = GetRollingIndex(client);
-            do
+            for (int i = 0; i < recordedRecentData[client].Length; i++)
             {
-                i %= recordedTickData[client].Length;
-                WriteTickDataToFile(file, false, tickData, prevTickData);
-                i++;
-            } while (i != GetRollingIndex(client));
+            	int rollingI = RecordingIndexAdd(client, i);
+                recordedRecentData[client].GetArray(rollingI, tickData);
+                recordedRecentData[client].GetArray(previousI, prevTickData);
+                WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+                previousI = i;
+                isFirstTick = false;
+            }
+            
         }
         case ReplayType_Jump:
         {
-            bool isFirstTick = true;
-            int previousI = 0;
-            if (timerRunning[client])
+        	int replayLength = currentTick - lastTakeoffPBTick[client] + 2 * preAndPostRunTickCount;
+        	for (int i = 0; i < replayLength; i++)
             {
-                i = recordedRunData[client].Length - 1 - preAndPostRunTickCount - (currentTick - lastTakeoffPBTick[client]);
-                if (i < 0)
-                {
-                    TransferRunDataToRollingData(client);
-                    SaveJumpFromRollingData(client, file);
-                }
-                else
-                {
-                    do
-                    {
-                        if (isFirstTick)
-                        {
-                            previousI = i;
-                        }
-                        recordedRunData[client].GetArray(i, tickData);
-                        recordedRunData[client].GetArray(previousI, prevTickData);
-                        WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-                        previousI = i;
-                        isFirstTick = false;
-                        i++;
-                    } while (i < recordedRunData[client].Length);
-                }
-            }
-            else
-            {
-                SaveJumpFromRollingData(client, file);
+            	int rollingI = RecordingIndexAdd(client, i - replayLength);
+                recordedRecentData[client].GetArray(rollingI, tickData);
+                recordedRecentData[client].GetArray(previousI, prevTickData);
+                WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+                previousI = i;
+                isFirstTick = false;
             }
         }
     }
-}
-
-static void SaveJumpFromRollingData(int client, File file)
-{
-    ReplayTickData tickData;
-    ReplayTickData prevTickData;
-    bool isFirstTick = true;
-    int previousI = 0;
-    int currentRollingIndex = GetRollingIndex(client);
-    SubtractFromRollingIndex(client, preAndPostRunTickCount + (currentTick - lastTakeoffPBTick[client]));
-    do
-    {
-        if (isFirstTick)
-        {
-            previousI = GetRollingIndex(client);
-        }
-        recordedTickData[client].GetArray(GetRollingIndex(client), tickData);
-        recordedTickData[client].GetArray(previousI, prevTickData);
-        WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-        previousI = GetRollingIndex(client);
-        isFirstTick = false;
-        IncrementRollingIndex(client);
-    } while (GetRollingIndex(client) != currentRollingIndex);
 }
 
 static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tickDataStruct, ReplayTickData prevTickDataStruct)
@@ -651,7 +628,7 @@ static void FormatRunReplayPath(char[] buffer, int maxlength, int course, int mo
 static void FormatCheaterReplayPath(char[] buffer, int maxlength, int client, int mode, int style)
 {
     BuildPath(Path_SM, buffer, maxlength,
-        "%s/%d/%s_%d_%s_%s.%s",
+        "%s/%d_%s_%d_%s_%s.%s",
         RP_DIRECTORY_CHEATERS,
         GetSteamAccountID(client),
         gC_CurrentMap,
@@ -812,69 +789,12 @@ public void SensitivityCheck(QueryCookie cookie, int client, ConVarQueryResult r
 	}
 }
 
-static void IncrementRollingIndex(int client)
+static int RecordingIndexAdd(int client, int offset)
 {
-    recordingIndex[client]++;
-    if (recordingIndex[client] >= recordedTickData[client].Length - 1)
-    {
-        recordingIndex[client] -= recordedTickData[client].Length - 1;
-    }
-}
-
-// Not currently used, but might be useful at some point
-/*
-static void DecrementRollingIndex(int client)
-{
-    recordingIndex[client]--;
-    if (recordingIndex[client] < 0)
-    {
-        recordingIndex[client] = recordedTickData[client].Length - 1 + recordingIndex[client];
-    }
-}
-
-static void AddToRollingIndex(int client, int value)
-{
-    recordingIndex[client] += value;
-    if (recordingIndex[client] >= recordedTickData[client].Length - 1)
-    {
-        recordingIndex[client] -= recordedTickData[client].Length - 1;
-    }
-}*/
-
-static void SubtractFromRollingIndex(int client, int value)
-{
-    recordingIndex[client] -= value;
-    if (recordingIndex[client] < 0)
-    {
-        recordingIndex[client] = recordedTickData[client].Length - 1 + recordingIndex[client];
-    }
-}
-
-static int GetRollingIndex(int client)
-{
-    return recordingIndex[client];
-}
-
-static void ResetRollingIndex(int client)
-{
-    recordingIndex[client] = 0;
-}
-
-static void TransferRunDataToRollingData(int client)
-{
-    // Write any data from the run to our rolling buffer, up to max cheater replay length
-    int length = recordedRunData[client].Length < maxCheaterReplayTicks ? recordedRunData[client].Length : maxCheaterReplayTicks;
-    // Ensure the rolling buffer has correct size.
-    if (recordedTickData[client].Length < maxCheaterReplayTicks)
-    {
-        recordedTickData[client].Resize(maxCheaterReplayTicks);
-    }
-
-    any runData[sizeof(ReplayTickData)];
-    for (int i = recordedRunData[client].Length - length; i < recordedRunData[client].Length; i++)
-    {
-        recordedRunData[client].GetArray(i, runData, sizeof(runData));
-        recordedTickData[client].SetArray(GetRollingIndex(client), runData);
-        IncrementRollingIndex(client);
-    }
+	int index = recordingIndex[client] + offset;
+	if (index < 0)
+	{
+		index += recordedRecentData[client].Length;
+	}
+	return index % recordedRecentData[client].Length;
 }

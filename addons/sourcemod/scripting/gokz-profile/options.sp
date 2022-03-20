@@ -121,14 +121,14 @@ public void TopMenuHandler_Profile(TopMenu topmenu, TopMenuAction action, TopMen
 					}
 					case ProfileTagType_Admin:
 					{
-						if (GetAdminFlag(GetUserAdmin(param), Admin_Ban))
+						if (CheckCommandAccess(param, "gokz_flag_admin", ADMFLAG_GENERIC))
 						{
 							break;
 						}
 					}
 					case ProfileTagType_VIP:
 					{
-						if (GetAdminFlag(GetUserAdmin(param), Admin_Custom1))
+						if (CheckCommandAccess(param, "gokz_flag_vip", ADMFLAG_CUSTOM1))
 						{
 							break;
 						}
