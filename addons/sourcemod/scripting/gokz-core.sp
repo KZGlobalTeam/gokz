@@ -281,6 +281,11 @@ public void OnCSPlayerSpawnPost(int client)
 	}
 }
 
+public void OnClientPreThinkPost(int client)
+{
+	OnClientPreThinkPost_UseButtons(client);
+}
+
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
 {
 	OnChangeMovetype_Timer(client, newMovetype);
@@ -513,6 +518,7 @@ static void HookClientEvents(int client)
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 	DHookEntity(gH_DHooks_SetModel, true, client);
 	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
+	SDKHook(client, SDKHook_PreThinkPost, OnClientPreThinkPost);
 }
 
 static void UpdateTrackingVariables(int client, int cmdnum, int buttons)
