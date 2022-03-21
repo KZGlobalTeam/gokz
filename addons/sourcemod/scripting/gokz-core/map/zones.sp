@@ -26,18 +26,18 @@ void OnStartTouchGround_MapZones(int client)
 void OnEntitySpawned_MapZones(int entity)
 {
 	char buffer[32];
-	
+
 	GetEntityClassname(entity, buffer, sizeof(buffer));
 	if (!StrEqual("trigger_multiple", buffer, false))
 	{
 		return;
 	}
-	
+
 	if (GetEntityName(entity, buffer, sizeof(buffer)) == 0)
 	{
 		return;
 	}
-	
+
 	int course = 0;
 	if (StrEqual(GOKZ_START_ZONE_NAME, buffer, false))
 	{
@@ -69,7 +69,7 @@ public void OnStartZoneStartTouch(const char[] name, int caller, int activator, 
 	{
 		return;
 	}
-	
+
 	ProcessStartZoneStartTouch(activator, 0);
 }
 
@@ -79,7 +79,7 @@ public void OnStartZoneEndTouch(const char[] name, int caller, int activator, fl
 	{
 		return;
 	}
-	
+
 	ProcessStartZoneEndTouch(activator, 0);
 }
 
@@ -89,7 +89,7 @@ public void OnEndZoneStartTouch(const char[] name, int caller, int activator, fl
 	{
 		return;
 	}
-	
+
 	ProcessEndZoneStartTouch(activator, 0);
 }
 
@@ -99,13 +99,13 @@ public void OnBonusStartZoneStartTouch(const char[] name, int caller, int activa
 	{
 		return;
 	}
-	
+
 	int course = GetStartZoneBonusNumber(caller);
 	if (!GOKZ_IsValidCourse(course, true))
 	{
 		return;
 	}
-	
+
 	ProcessStartZoneStartTouch(activator, course);
 }
 
@@ -115,13 +115,13 @@ public void OnBonusStartZoneEndTouch(const char[] name, int caller, int activato
 	{
 		return;
 	}
-	
+
 	int course = GetStartZoneBonusNumber(caller);
 	if (!GOKZ_IsValidCourse(course, true))
 	{
 		return;
 	}
-	
+
 	ProcessStartZoneEndTouch(activator, course);
 }
 
@@ -131,13 +131,13 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 	{
 		return;
 	}
-	
+
 	int course = GetEndZoneBonusNumber(caller);
 	if (!GOKZ_IsValidCourse(course, true))
 	{
 		return;
 	}
-	
+
 	ProcessEndZoneStartTouch(activator, course);
 }
 
@@ -148,10 +148,10 @@ public void OnBonusEndZoneStartTouch(const char[] name, int caller, int activato
 static void ProcessStartZoneStartTouch(int client, int course)
 {
 	touchedGroundSinceTouchingStartZone[client] = Movement_GetOnGround(client);
-	
+
 	GOKZ_StopTimer(client, false);
 	SetCurrentCourse(client, course);
-	
+
 	OnStartZoneStartTouch_Teleports(client, course);
 }
 
@@ -161,7 +161,7 @@ static void ProcessStartZoneEndTouch(int client, int course)
 	{
 		return;
 	}
-	
+
 	GOKZ_StartTimer(client, course, true);
 }
 

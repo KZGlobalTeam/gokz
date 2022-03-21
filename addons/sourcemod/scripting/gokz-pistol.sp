@@ -45,7 +45,7 @@ public void OnPluginStart()
 {
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-pistol.phrases");
-	
+
 	HookEvents();
 	RegisterCommands();
 }
@@ -56,7 +56,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	
+
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
@@ -128,10 +128,10 @@ void GivePistol(int client, int pistol)
 	{
 		return;
 	}
-	
+
 	int playerTeam = GetClientTeam(client);
 	bool switchedTeams = false;
-	
+
 	// Switch teams to the side that buys that gun so that gun skins load
 	if (gI_PistolTeams[pistol] == CS_TEAM_CT && playerTeam != CS_TEAM_CT)
 	{
@@ -143,14 +143,14 @@ void GivePistol(int client, int pistol)
 		CS_SwitchTeam(client, CS_TEAM_T);
 		switchedTeams = true;
 	}
-	
+
 	// Give the player this pistol (or remove it)
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
 	if (currentPistol != -1)
 	{
 		RemovePlayerItem(client, currentPistol);
 	}
-	
+
 	if (pistol == Pistol_Disabled)
 	{
 		// Force switch to knife to avoid weird behaviour
@@ -161,7 +161,7 @@ void GivePistol(int client, int pistol)
 	{
 		GivePlayerItem(client, gC_PistolClassNames[pistol]);
 	}
-	
+
 	// Go back to original team
 	if (switchedTeams)
 	{
@@ -179,7 +179,7 @@ void DisplayPistolMenu(int client, int atItem = 0, bool fromOptionsMenu = false)
 	menu.SetTitle("%T", "Pistol Menu - Title", client);
 	PistolMenuAddItems(client, menu);
 	menu.DisplayAt(client, atItem, MENU_TIME_FOREVER);
-	
+
 	gB_CameFromOptionsMenu[client] = fromOptionsMenu;
 }
 
@@ -204,7 +204,7 @@ void PistolMenuAddItems(int client, Menu menu)
 {
 	int selectedPistol = GOKZ_GetOption(client, PISTOL_OPTION_NAME);
 	char display[32];
-	
+
 	for (int pistol = 0; pistol < PISTOL_COUNT; pistol++)
 	{
 		if (pistol == Pistol_Disabled)
@@ -215,13 +215,13 @@ void PistolMenuAddItems(int client, Menu menu)
 		{
 			FormatEx(display, sizeof(display), "%s", gC_PistolNames[pistol]);
 		}
-		
+
 		// Add asterisk to selected pistol
 		if (pistol == selectedPistol)
 		{
 			Format(display, sizeof(display), "%s*", display);
 		}
-		
+
 		menu.AddItem("", display, ITEMDRAW_DEFAULT);
 	}
 }
@@ -251,7 +251,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	{
 		return;
 	}
-	
+
 	gTM_Options = topMenu;
 	gTMO_CatGeneral = gTM_Options.FindCategory(GENERAL_OPTION_CATEGORY);
 	gTMO_ItemPistol = gTM_Options.AddItem(PISTOL_OPTION_NAME, TopMenuHandler_Pistol, gTMO_CatGeneral);
@@ -263,7 +263,7 @@ public void TopMenuHandler_Pistol(TopMenu topmenu, TopMenuAction action, TopMenu
 	{
 		return;
 	}
-	
+
 	if (action == TopMenuAction_DisplayOption)
 	{
 		int pistol = GOKZ_GetOption(param, PISTOL_OPTION_NAME);

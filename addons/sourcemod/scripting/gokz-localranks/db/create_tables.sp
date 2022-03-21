@@ -7,7 +7,7 @@
 void DB_CreateTables()
 {
 	Transaction txn = SQL_CreateTransaction();
-	
+
 	// Create/alter database tables
 	switch (g_DBType)
 	{
@@ -20,7 +20,7 @@ void DB_CreateTables()
 			txn.AddQuery(mysql_maps_alter1);
 		}
 	}
-	
+
 	// No error logs for this transaction as it will always throw an error
 	// if the column already exists, which is more annoying than helpful.
 	SQL_ExecuteTransaction(gH_DB, txn, _, _, _, DBPrio_High);
