@@ -15,11 +15,8 @@
 
 static float tickrate;
 static int preAndPostRunTickCount;
-static int currentTick;
 static int maxCheaterReplayTicks;
 static int recordingIndex[MAXPLAYERS + 1];
-static int lastTakeoffTick[MAXPLAYERS + 1];
-static int lastTakeoffPBTick[MAXPLAYERS + 1];
 static float playerSensitivity[MAXPLAYERS + 1];
 static float playerMYaw[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
@@ -92,12 +89,6 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
     if (isTeleportTick[client])
     {
         isTeleportTick[client] = false;
-    }
-
-    currentTick = tickCount;
-    if (Movement_GetTakeoffTick(client) == tickCount)
-    {
-        lastTakeoffTick[client] = tickCount;
     }
     
     if (timerRunning[client])
@@ -231,7 +222,6 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
 
 void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-    lastTakeoffPBTick[client] = lastTakeoffTick[client];
     DataPack dp = new DataPack();
     dp.WriteCell(client);
     dp.WriteCell(jumptype);
@@ -405,13 +395,21 @@ static bool SaveRecordingOfCheater(int client, ACReason reason)
 
 static bool SaveRecordingOfJump(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-    // Create and fill general header
-    GeneralReplayHeader generalHeader;
-    FillGeneralHeader(generalHeader, client, ReplayType_Jump, currentTick - lastTakeoffPBTick[client]);
+	// Just cause I know how buggy jumpstats can be
+	int airtimeTicks = RoundToNearest((float(airtime) / GOKZ_DB_JS_AIRTIME_PRECISION) * tickrate);
+	if (airtimeTicks + 2 * preAndPostRunTickCount >= maxCheaterReplayTicks)
+	{
+        LogError("WARNING: Invalid airtime (this is probably a bugged jump, please report it!).");
+        return false;
+	}
+	
+	// Create and fill general header
+	GeneralReplayHeader generalHeader;
+	FillGeneralHeader(generalHeader, client, ReplayType_Jump, 2 * preAndPostRunTickCount + airtimeTicks);
 
-    // Create and fill jump header
-    JumpReplayHeader jumpHeader;
-    FillJumpHeader(jumpHeader, jumptype, distance, block, strafes, sync, pre, max, airtime);
+	// Create and fill jump header
+	JumpReplayHeader jumpHeader;
+	FillJumpHeader(jumpHeader, jumptype, distance, block, strafes, sync, pre, max, airtime);
 
     // Make sure the client is authenticated
     if (GetSteamAccountID(client) == 0)
@@ -441,7 +439,7 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
 
     WriteGeneralHeader(file, generalHeader);
     WriteJumpHeader(file, jumpHeader);
-    WriteTickData(file, client, ReplayType_Jump);
+    WriteTickData(file, client, ReplayType_Jump, airtimeTicks);
 
     delete file;
 
@@ -524,7 +522,7 @@ static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
     file.WriteInt32((jumpHeader.airtime));
 }
 
-static void WriteTickData(File file, int client, int replayType)
+static void WriteTickData(File file, int client, int replayType, int airtime = 0)
 {
     ReplayTickData tickData;
     ReplayTickData prevTickData;
@@ -559,7 +557,7 @@ static void WriteTickData(File file, int client, int replayType)
         }
         case ReplayType_Jump:
         {
-        	int replayLength = currentTick - lastTakeoffPBTick[client] + 2 * preAndPostRunTickCount;
+        	int replayLength = 2 * preAndPostRunTickCount + airtime;
         	for (int i = 0; i < replayLength; i++)
             {
             	int rollingI = RecordingIndexAdd(client, i - replayLength);
