@@ -427,6 +427,10 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
  */
 stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true)
 {
+	// Clear the player's parent before teleporting to fix being
+	// teleported into seemingly random places if the player has a parent.
+	AcceptEntityInput(client, "ClearParent");
+	
 	Movement_SetOrigin(client, origin);
 	if (setAngles)
 	{
