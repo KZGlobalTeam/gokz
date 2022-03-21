@@ -310,6 +310,9 @@ public void OnMapStart()
 {
 	LoadSounds();
 
+	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
+	gI_CurrentMapFileSize = GetCurrentMapFileSize();
+	
 	gB_BannedCommandsCheck = true;
 	
 	// Prevent just reloading the plugin after messing with the map
@@ -559,9 +562,6 @@ public void OnEnforcedConVarChanged(ConVar convar, const char[] oldValue, const 
 
 static void SetupAPI()
 {
-	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
-	gI_CurrentMapFileSize = GetCurrentMapFileSize();
-	
 	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 	GlobalAPI_GetModes(GetModeInfoCallback);
 	GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
