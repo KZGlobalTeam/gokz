@@ -554,10 +554,17 @@ static void RemoveTriggerFromTouchList(int client, int trigger)
 
 static void TouchAntibhopTrigger(TouchedTrigger touched, int &newButtons, int flags)
 {
-	// player hasn't touched the ground inside this trigger yet
-	if (!(flags & FL_ONGROUND)
-		|| touched.groundTouchTick == -1)
+	if (!(flags & FL_ONGROUND))
 	{
+		// Disable jump when the player is in the air.
+		// This is a very simple way to fix jumpbugging antibhop triggers.
+		newButtons &= ~IN_JUMP;
+		return;
+	}
+	
+	if (touched.groundTouchTick == -1)
+	{
+		// The player hasn't touched the ground inside this trigger yet.
 		return;
 	}
 	
