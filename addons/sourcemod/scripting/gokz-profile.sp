@@ -153,6 +153,11 @@ public void GOKZ_GL_OnPointsUpdated(int client, int mode)
 
 public void UpdateRank(int client, int mode)
 {
+	if (!IsValidClient(client) || IsFakeClient(client))
+	{
+		return;
+	}
+	
 	int tagType = GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_TagType]);
 	
 	if (tagType != ProfileTagType_Rank)
@@ -226,7 +231,7 @@ void UpdateTags(int client, int rank, int mode)
 {
 	char str[64];
 	if (rank != -1 &&
-	    GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
+		GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
 	{
 		FormatEx(str, sizeof(str), "[%s %s]", gC_ModeNamesShort[mode], gC_rankName[rank]);
 		CS_SetClientClanTag(client, str);
@@ -261,6 +266,7 @@ void RegisterCommands()
 	RegConsoleCmd("sm_p", CommandProfile, "[KZ] Show the profile of a player. Usage: !p <player>");
 	RegConsoleCmd("sm_profileoptions", CommandProfileOptions, "[KZ] Show the profile options.");
 	RegConsoleCmd("sm_pfo", CommandProfileOptions, "[KZ] Show the profile options.");
+	RegConsoleCmd("sm_ranks", CommandRanks, "[KZ] Show all the available ranks.");
 }
 
 public Action CommandProfile(int client, int args)
@@ -288,6 +294,28 @@ public Action CommandProfileOptions(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandRanks(int client, int args)
+{
+	char rankBuffer[256];
+	char buffer[256];
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+
+	Format(buffer, sizeof(buffer), "%s: ", gC_ModeNamesShort[mode]);
+
+	for (int i = 0; i < RANK_COUNT; i++) {
+		Format(rankBuffer, sizeof(rankBuffer), "%s%s (%d) ", gC_rankColor[i], gC_rankName[i], gI_rankThreshold[mode][i]);
+		StrCat(buffer, sizeof(buffer), rankBuffer);
+
+		if (i > 0 && i % 3 == 0) {
+			GOKZ_PrintToChat(client, true, buffer);
+			Format(buffer, sizeof(buffer), "%s: ", gC_ModeNamesShort[mode]);
+		}
+	}
+
+	GOKZ_PrintToChat(client, true, buffer);
+
+	return Plugin_Handled;
+}
 
 
 // =====[ FORWARDS ]=====

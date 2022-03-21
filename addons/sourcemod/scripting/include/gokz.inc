@@ -427,6 +427,10 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
  */
 stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true)
 {
+	// Clear the player's parent before teleporting to fix being
+	// teleported into seemingly random places if the player has a parent.
+	AcceptEntityInput(client, "ClearParent");
+	
 	Movement_SetOrigin(client, origin);
 	if (setAngles)
 	{
@@ -943,4 +947,56 @@ static bool CanSeeBox(float origin[3], float center[3], float distFromCenter[3])
 	}
 	delete trace;
 	return true;
+}
+
+/**
+ * Gets entity index from the address to an entity.
+ *
+ * @param pEntity			Entity address.
+ * @return					Entity index.
+ * @error					Couldn't find offset for m_angRotation, m_vecViewOffset, couldn't confirm offset of m_RefEHandle.
+ */
+stock int GOKZGetEntityFromAddress(Address pEntity)
+{
+	static int offs_RefEHandle;
+	if (offs_RefEHandle)
+	{
+		return EntRefToEntIndex(LoadFromAddress(pEntity + view_as<Address>(offs_RefEHandle), NumberType_Int32) | (1 << 31));
+	}
+	
+	// if we don't have it already, attempt to lookup offset based on SDK information
+	// CWorld is derived from CBaseEntity so it should have both offsets
+	int offs_angRotation = FindDataMapInfo(0, "m_angRotation"), offs_vecViewOffset = FindDataMapInfo(0, "m_vecViewOffset");
+	if (offs_angRotation == -1)
+	{
+		SetFailState("Could not find offset for ((CBaseEntity) CWorld)::m_angRotation");
+	}
+	else if (offs_vecViewOffset == -1)
+	{
+		SetFailState("Could not find offset for ((CBaseEntity) CWorld)::m_vecViewOffset");
+	}
+	else if ((offs_angRotation + 0x0C) != (offs_vecViewOffset - 0x04))
+	{
+		char game[32];
+		GetGameFolderName(game, sizeof(game));
+		SetFailState("Could not confirm offset of CBaseEntity::m_RefEHandle (incorrect assumption for game '%s'?)", game);
+	}
+	
+	// offset seems right, cache it for the next call
+	offs_RefEHandle = offs_angRotation + 0x0C;
+	return GOKZGetEntityFromAddress(pEntity);
+}
+
+/**
+ * Gets client index from CGameMovement class.
+ *
+ * @param addr							Address of CGameMovement class.
+ * @param offsetCGameMovement_player	Offset of CGameMovement::player.
+ * @return								Client index.
+ * @error								Couldn't find offset for m_angRotation, m_vecViewOffset, couldn't confirm offset of m_RefEHandle.
+ */
+stock int GOKZGetClientFromGameMovementAddress(Address addr, int offsetCGameMovement_player)
+{
+	Address playerAddr = view_as<Address>(LoadFromAddress(view_as<Address>(view_as<int>(addr) + offsetCGameMovement_player), NumberType_Int32));
+	return GOKZGetEntityFromAddress(playerAddr);
 }

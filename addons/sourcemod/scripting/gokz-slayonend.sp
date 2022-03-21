@@ -49,7 +49,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	
+
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
@@ -154,7 +154,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	{
 		return;
 	}
-	
+
 	gTM_Options = topMenu;
 	gTMO_CatGeneral = gTM_Options.FindCategory(GENERAL_OPTION_CATEGORY);
 	gTMO_ItemSlayOnEnd = gTM_Options.AddItem(SLAYONEND_OPTION_NAME, TopMenuHandler_SlayOnEnd, gTMO_CatGeneral);
@@ -166,7 +166,7 @@ public void TopMenuHandler_SlayOnEnd(TopMenu topmenu, TopMenuAction action, TopM
 	{
 		return;
 	}
-	
+
 	if (action == TopMenuAction_DisplayOption)
 	{
 		if (GOKZ_GetOption(param, SLAYONEND_OPTION_NAME) == SlayOnEnd_Disabled)

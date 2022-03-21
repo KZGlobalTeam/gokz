@@ -345,7 +345,7 @@ public void OnMapEnd()
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode])
-	    && GlobalAPI_IsInit())
+		&& GlobalAPI_IsInit())
 	{
 		UpdatePoints(client);
 	}
@@ -663,6 +663,11 @@ void CheckClientGlobalBan(int client)
 
 public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequestData request, int client)
 {
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
 	if (request.Failure)
 	{
 		LogError("Failed to get ban info.");

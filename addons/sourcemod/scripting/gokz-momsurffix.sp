@@ -12,11 +12,11 @@
 //#define DEBUG_MEMTEST
 
 public Plugin myinfo = {
-    name = "GOKZ Momsurffix",
-    author = "GAMMA CASE",
-    description = "Ported surf fix from momentum mod. Modified for GOKZ by GameChaos. Original source code: https://github.com/GAMMACASE/MomSurfFix",
-    version = GOKZ_VERSION,
-    url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	name = "GOKZ Momsurffix",
+	author = "GAMMA CASE",
+	description = "Ported surf fix from momentum mod. Modified for GOKZ by GameChaos. Original source code: https://github.com/GAMMACASE/MomSurfFix",
+	version = GOKZ_VERSION,
+	url = "https://bitbucket.org/kztimerglobalteam/gokz"
 };
 
 #define FLT_EPSILON 1.192092896e-07

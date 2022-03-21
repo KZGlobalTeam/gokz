@@ -66,10 +66,8 @@ int LoadReplayBot(int client, char[] path)
 	
 	if (bot == -1)
 	{
-		LogError(
-			"Unused bot could not be found even though only %d out of %d are known to be in use.", 
-			GetBotsInUse(), 
-			RP_MAX_BOTS);
+		LogError("Unused bot could not be found even though only %d out of %d are known to be in use.", 
+				 GetBotsInUse(), RP_MAX_BOTS);
 		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
@@ -615,7 +613,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Read tick data
 	preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
 	any tickDataArray[RP_V2_TICK_DATA_BLOCKSIZE];
-	for (int i = 0; i < tickCount + preAndPostRunTickCount; i++)
+	for (int i = 0; i < tickCount; i++)
 	{
 		file.ReadInt32(tickDataArray[RPDELTA_DELTAFLAGS]);
 		
@@ -1009,9 +1007,9 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			int item = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
 			if (item != -1)
 			{
-    			char name[64];
-    			GetEntityClassname(item, name, sizeof(name));
-    			FakeClientCommand(client, "use %s", name);
+				char name[64];
+				GetEntityClassname(item, name, sizeof(name));
+				FakeClientCommand(client, "use %s", name);
 			}
 		}
 		else if (!(currentTickData.flags & RP_SECONDARY_EQUIPPED) && IsCurrentWeaponSecondary(client))
@@ -1019,9 +1017,9 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			int item = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
 			if (item != -1)
 			{
-    			char name[64];
-    			GetEntityClassname(item, name, sizeof(name));
-    			FakeClientCommand(client, "use %s", name);
+				char name[64];
+				GetEntityClassname(item, name, sizeof(name));
+				FakeClientCommand(client, "use %s", name);
 			}
 		}
 
@@ -1263,9 +1261,9 @@ static void PlaybackSkipToTick(int bot, int tick)
 
 static bool IsCurrentWeaponSecondary(int client)
 {
-    int activeWeaponEnt = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-    int secondaryEnt = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
-    return activeWeaponEnt == secondaryEnt;
+	int activeWeaponEnt = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	int secondaryEnt = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
+	return activeWeaponEnt == secondaryEnt;
 }
 
 static void MakePlayerSpectate(int client, int bot)
