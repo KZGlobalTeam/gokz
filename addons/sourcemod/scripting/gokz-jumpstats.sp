@@ -30,6 +30,9 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-jumpstats.txt"
 
+// This must be global because it's both used by jump tracking and validating.
+bool gB_SpeedJustModifiedExternally[MAXPLAYERS + 1];
+
 #include "gokz-jumpstats/api.sp"
 #include "gokz-jumpstats/commands.sp"
 #include "gokz-jumpstats/distance_tiers.sp"
@@ -38,7 +41,6 @@ public Plugin myinfo =
 #include "gokz-jumpstats/jump_validating.sp"
 #include "gokz-jumpstats/options.sp"
 #include "gokz-jumpstats/options_menu.sp"
-
 
 
 // =====[ PLUGIN EVENTS ]=====

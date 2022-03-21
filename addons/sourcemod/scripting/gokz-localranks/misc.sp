@@ -41,14 +41,14 @@ static bool LoadSounds()
 	{
 		return false;
 	}
-	
+
 	char downloadPath[256];
-	
+
 	kv.GetString("beatrecord", gC_BeatRecordSound, sizeof(gC_BeatRecordSound));
 	FormatEx(downloadPath, sizeof(downloadPath), "sound/%s", gC_BeatRecordSound);
 	AddFileToDownloadsTable(downloadPath);
 	PrecacheSound(gC_BeatRecordSound, true);
-	
+
 	delete kv;
 	return true;
 }
@@ -197,7 +197,7 @@ void AnnounceNewRecord(int client, int course, int mode, int recordType)
 			}
 		}
 	}
-	
+
 	PlayBeatRecordSound(); // Play sound!
 }
 
@@ -219,22 +219,22 @@ void UpdateRecordMissed(int client)
 	{
 		return;
 	}
-	
+
 	int course = GOKZ_GetCourse(client);
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	float currentTime = GOKZ_GetTime(client);
-	
+
 	bool nubRecordExists = gB_RecordExistsCache[course][mode][TimeType_Nub];
 	float nubRecordTime = gF_RecordTimesCache[course][mode][TimeType_Nub];
 	bool nubRecordMissed = gB_RecordMissed[client][TimeType_Nub];
 	bool proRecordExists = gB_RecordExistsCache[course][mode][TimeType_Pro];
 	float proRecordTime = gF_RecordTimesCache[course][mode][TimeType_Pro];
 	bool proRecordMissed = gB_RecordMissed[client][TimeType_Pro];
-	
+
 	if (nubRecordExists && !nubRecordMissed && currentTime >= nubRecordTime)
 	{
 		gB_RecordMissed[client][TimeType_Nub] = true;
-		
+
 		// Check if nub record is also the pro record, and call the forward appropriately
 		if (proRecordExists && FloatAbs(nubRecordTime - proRecordTime) < EPSILON)
 		{
@@ -273,22 +273,22 @@ void UpdatePBMissed(int client)
 	{
 		return;
 	}
-	
+
 	int course = GOKZ_GetCourse(client);
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	float currentTime = GOKZ_GetTime(client);
-	
+
 	bool nubPBExists = gB_PBExistsCache[client][course][mode][TimeType_Nub];
 	float nubPBTime = gF_PBTimesCache[client][course][mode][TimeType_Nub];
 	bool nubPBMissed = gB_PBMissed[client][TimeType_Nub];
 	bool proPBExists = gB_PBExistsCache[client][course][mode][TimeType_Pro];
 	float proPBTime = gF_PBTimesCache[client][course][mode][TimeType_Pro];
 	bool proPBMissed = gB_PBMissed[client][TimeType_Pro];
-	
+
 	if (nubPBExists && !nubPBMissed && currentTime >= nubPBTime)
 	{
 		gB_PBMissed[client][TimeType_Nub] = true;
-		
+
 		// Check if nub PB is also the pro PB, and call the forward appropriately
 		if (proPBExists && FloatAbs(nubPBTime - proPBTime) < EPSILON)
 		{

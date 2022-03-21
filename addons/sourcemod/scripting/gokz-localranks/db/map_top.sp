@@ -236,7 +236,7 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 			case TimeType_Nub:
 			{
 				teleports = SQL_FetchInt(results[2], 4);
-				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP      %s", 
+				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP	  %s", 
 					rank, GOKZ_FormatTime(runTime), teleports, playerName);
 
 				PrintToConsole(client, "#%-2d   %11s  %3d TP   %s <STEAM_1:%d:%d>   %s", 

@@ -45,12 +45,12 @@ public int Native_GetHitPerf(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(3));
-	
+
 	if (sampleSize == 0)
 	{
 		return 0;
 	}
-	
+
 	bool[] perfs = new bool[sampleSize];
 	SortByRecent(gB_BhopHitPerf[client], AC_MAX_BHOP_SAMPLES, perfs, sampleSize, gI_BhopIndex[client]);
 	SetNativeArray(2, perfs, sampleSize);
@@ -61,15 +61,15 @@ public int Native_GetPerfCount(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(2));
-	
+
 	if (sampleSize == 0)
 	{
 		return 0;
 	}
-	
+
 	bool[] perfs = new bool[sampleSize];
 	GOKZ_AC_GetHitPerf(client, perfs, sampleSize);
-	
+
 	int perfCount = 0;
 	for (int i = 0; i < sampleSize; i++)
 	{
@@ -85,12 +85,12 @@ public int Native_GetPerfRatio(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(2));
-	
+
 	if (sampleSize == 0)
 	{
 		return view_as<int>(0.0);
 	}
-	
+
 	int perfCount = GOKZ_AC_GetPerfCount(client, sampleSize);
 	return view_as<int>(float(perfCount) / float(sampleSize));
 }
@@ -99,23 +99,23 @@ public int Native_GetJumpInputs(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(3));
-	
+
 	if (sampleSize == 0)
 	{
 		return 0;
 	}
-	
+
 	int[] preJumpInputs = new int[sampleSize];
 	SortByRecent(gI_BhopPreJumpInputs[client], AC_MAX_BHOP_SAMPLES, preJumpInputs, sampleSize, gI_BhopIndex[client]);
 	int[] postJumpInputs = new int[sampleSize];
 	SortByRecent(gI_BhopPostJumpInputs[client], AC_MAX_BHOP_SAMPLES, postJumpInputs, sampleSize, gI_BhopIndex[client]);
-	
+
 	int[] jumpInputs = new int[sampleSize];
 	for (int i = 0; i < sampleSize; i++)
 	{
 		jumpInputs[i] = preJumpInputs[i] + postJumpInputs[i];
 	}
-	
+
 	SetNativeArray(2, jumpInputs, sampleSize);
 	return sampleSize;
 }
@@ -124,15 +124,15 @@ public int Native_GetAverageJumpInputs(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(2));
-	
+
 	if (sampleSize == 0)
 	{
 		return view_as<int>(0.0);
 	}
-	
+
 	int[] jumpInputs = new int[sampleSize];
 	GOKZ_AC_GetJumpInputs(client, jumpInputs, sampleSize);
-	
+
 	int jumpInputCount = 0;
 	for (int i = 0; i < sampleSize; i++)
 	{
@@ -145,12 +145,12 @@ public int Native_GetPreJumpInputs(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(3));
-	
+
 	if (sampleSize == 0)
 	{
 		return 0;
 	}
-	
+
 	int[] preJumpInputs = new int[sampleSize];
 	SortByRecent(gI_BhopPreJumpInputs[client], AC_MAX_BHOP_SAMPLES, preJumpInputs, sampleSize, gI_BhopIndex[client]);
 	SetNativeArray(2, preJumpInputs, sampleSize);
@@ -161,12 +161,12 @@ public int Native_GetPostJumpInputs(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	int sampleSize = IntMin(GOKZ_AC_GetSampleSize(client), GetNativeCell(3));
-	
+
 	if (sampleSize == 0)
 	{
 		return 0;
 	}
-	
+
 	int[] postJumpInputs = new int[sampleSize];
 	SortByRecent(gI_BhopPostJumpInputs[client], AC_MAX_BHOP_SAMPLES, postJumpInputs, sampleSize, gI_BhopIndex[client]);
 	SetNativeArray(2, postJumpInputs, sampleSize);

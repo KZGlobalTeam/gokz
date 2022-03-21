@@ -279,14 +279,16 @@ void OnEntitySpawned_MapTriggers(int entity)
 		}
 		else
 		{
-			HookSingleEntityOutput(entity, "OnStartTouch", OnTrigMultTouchStart_MapTriggers);
-			HookSingleEntityOutput(entity, "OnEndTouch", OnTrigMultTouchEnd_MapTriggers);
+			// NOTE: SDKHook touch hooks bypass trigger filters. We want that only with
+			// non mapping api triggers because it prevents checkpointing on bhop blocks.
+			SDKHook(entity, SDKHook_StartTouchPost, OnTrigMultTouchStart_MapTriggers);
+			SDKHook(entity, SDKHook_EndTouchPost, OnTrigMultTouchEnd_MapTriggers);
 		}
 	}
 	else if (StrEqual("trigger_teleport", classname))
 	{
-		HookSingleEntityOutput(entity, "OnStartTouch", OnTrigTeleTouchStart_MapTriggers);
-		HookSingleEntityOutput(entity, "OnEndTouch", OnTrigTeleTouchEnd_MapTriggers);
+		SDKHook(entity, SDKHook_StartTouchPost, OnTrigTeleTouchStart_MapTriggers);
+		SDKHook(entity, SDKHook_EndTouchPost, OnTrigTeleTouchEnd_MapTriggers);
 	}
 }
 
@@ -358,17 +360,6 @@ public void OnBhopResetTouchStart_MapTriggers(const char[] output, int entity, i
 	ResetBhopState(other);
 }
 
-public void OnTrigMultTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
-{
-	if (!IsValidClient(other))
-	{
-		return;
-	}
-	
-	lastTrigMultiTouchTime[other] = GetEngineTime();
-	triggerTouchCount[other]++;
-}
-
 public void OnAntiCpTrigTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
 {
 	if (!IsValidClient(other))
@@ -429,7 +420,18 @@ public void OnAntiJumpstatTrigTouchEnd_MapTriggers(const char[] output, int enti
 	antiJumpstatTriggerTouchCount[other]--;
 }
 
-public void OnTrigMultTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
+public void OnTrigMultTouchStart_MapTriggers(int entity, int other)
+{
+	if (!IsValidClient(other))
+	{
+		return;
+	}
+	
+	lastTrigMultiTouchTime[other] = GetEngineTime();
+	triggerTouchCount[other]++;
+}
+
+public void OnTrigMultTouchEnd_MapTriggers(int entity, int other)
 {
 	if (!IsValidClient(other))
 	{
@@ -439,7 +441,7 @@ public void OnTrigMultTouchEnd_MapTriggers(const char[] output, int entity, int 
 	triggerTouchCount[other]--;
 }
 
-public void OnTrigTeleTouchStart_MapTriggers(const char[] output, int entity, int other, float delay)
+public void OnTrigTeleTouchStart_MapTriggers(int entity, int other)
 {
 	if (!IsValidClient(other))
 	{
@@ -450,7 +452,7 @@ public void OnTrigTeleTouchStart_MapTriggers(const char[] output, int entity, in
 	triggerTouchCount[other]++;
 }
 
-public void OnTrigTeleTouchEnd_MapTriggers(const char[] output, int entity, int other, float delay)
+public void OnTrigTeleTouchEnd_MapTriggers(int entity, int other)
 {
 	if (!IsValidClient(other))
 	{
@@ -552,10 +554,17 @@ static void RemoveTriggerFromTouchList(int client, int trigger)
 
 static void TouchAntibhopTrigger(TouchedTrigger touched, int &newButtons, int flags)
 {
-	// player hasn't touched the ground inside this trigger yet
-	if (!(flags & FL_ONGROUND)
-		|| touched.groundTouchTick == -1)
+	if (!(flags & FL_ONGROUND))
 	{
+		// Disable jump when the player is in the air.
+		// This is a very simple way to fix jumpbugging antibhop triggers.
+		newButtons &= ~IN_JUMP;
+		return;
+	}
+	
+	if (touched.groundTouchTick == -1)
+	{
+		// The player hasn't touched the ground inside this trigger yet.
 		return;
 	}
 	

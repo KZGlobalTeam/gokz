@@ -65,6 +65,7 @@ static MRESReturn DHook_ProcessMovementPost(Handle hParams)
 	Movement_GetProcessingVelocity(client, pVelocity);
 	Movement_GetVelocity(client, velocity);
 
+	gB_SpeedJustModifiedExternally[client] = false;
 	for (int i = 0; i < 3; i++)
 	{
 		if (FloatAbs(pVelocity[i] - velocity[i]) > EPSILON)
@@ -72,6 +73,7 @@ static MRESReturn DHook_ProcessMovementPost(Handle hParams)
 			// The current velocity doesn't match the velocity of the end of movement processing,
 			// so it must have been modified by something like a trigger.
 			InvalidateJumpstat(client);
+			gB_SpeedJustModifiedExternally[client] = true;
 			break;
 		}
 	}

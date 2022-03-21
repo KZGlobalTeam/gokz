@@ -164,10 +164,10 @@ public Action Timer_Paint(Handle timer)
 }
 
 void TE_SetupWorldDecal(const float origin[3], int index)
-{    
-    TE_Start("World Decal");
-    TE_WriteVector("m_vecOrigin", origin);
-    TE_WriteNum("m_nIndex", index);
+{	
+	TE_Start("World Decal");
+	TE_WriteVector("m_vecOrigin", origin);
+	TE_WriteNum("m_nIndex", index);
 }
 
 int PrecachePaint(char[] filename)
