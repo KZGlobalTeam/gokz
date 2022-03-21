@@ -231,7 +231,7 @@ void UpdateTags(int client, int rank, int mode)
 {
 	char str[64];
 	if (rank != -1 &&
-	    GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
+		GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
 	{
 		FormatEx(str, sizeof(str), "[%s %s]", gC_ModeNamesShort[mode], gC_rankName[rank]);
 		CS_SetClientClanTag(client, str);

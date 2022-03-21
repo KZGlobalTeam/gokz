@@ -45,7 +45,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 		{
 			if (!MeasureBlock(param1))
 			{
-        		DisplayMeasureMenu(param1, false);
+				DisplayMeasureMenu(param1, false);
 			}
 		}
 		
