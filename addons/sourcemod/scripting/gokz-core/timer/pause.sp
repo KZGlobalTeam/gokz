@@ -124,6 +124,9 @@ void Resume(int client)
 	{
 		Movement_SetMovetype(client, MOVETYPE_WALK);
 	}
+	
+	// Prevent noclip exploit
+	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 	paused[client] = false;
 	if (GetTimerRunning(client))
 	{
