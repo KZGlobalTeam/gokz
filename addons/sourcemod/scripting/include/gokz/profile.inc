@@ -282,3 +282,10 @@ public SharedPlugin __pl_gokz_profile =
 	required = 0, 
 	#endif
 };
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_profile_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_PF_GetRank");
+}
+#endif

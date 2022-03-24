@@ -1709,15 +1709,17 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetModeVersion");
 	MarkNativeAsOptional("GOKZ_SetModeLoaded");
 	MarkNativeAsOptional("GOKZ_GetLoadedModeCount");
+	MarkNativeAsOptional("GOKZ_SetMode");
+	MarkNativeAsOptional("GOKZ_GetOptionsTopMenu");
+	MarkNativeAsOptional("GOKZ_GetCourseRegistered");
 	MarkNativeAsOptional("GOKZ_PrintToChat");
 	MarkNativeAsOptional("GOKZ_PrintToChatAndLog");
-	MarkNativeAsOptional("GOKZ_GetOptionsTopMenu");
-	
 	MarkNativeAsOptional("GOKZ_StartTimer");
 	MarkNativeAsOptional("GOKZ_EndTimer");
 	MarkNativeAsOptional("GOKZ_StopTimer");
 	MarkNativeAsOptional("GOKZ_StopTimerAll");
 	MarkNativeAsOptional("GOKZ_TeleportToStart");
+	MarkNativeAsOptional("GOKZ_TeleportToSearchStart");
 	MarkNativeAsOptional("GOKZ_GetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_SetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_LockVirtualButtons");
@@ -1741,12 +1743,13 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
-	
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
 	MarkNativeAsOptional("GOKZ_GetCourse");
+	MarkNativeAsOptional("GOKZ_SetCourse");
 	MarkNativeAsOptional("GOKZ_GetPaused");
 	MarkNativeAsOptional("GOKZ_GetTime");
 	MarkNativeAsOptional("GOKZ_SetTime");
+	MarkNativeAsOptional("GOKZ_InvalidateRun");
 	MarkNativeAsOptional("GOKZ_GetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_SetCheckpointCount");
 	MarkNativeAsOptional("GOKZ_GetCheckpointData");

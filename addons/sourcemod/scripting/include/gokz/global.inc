@@ -265,5 +265,10 @@ public void __pl_gokz_global_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_GL_PrintRecords");
 	MarkNativeAsOptional("GOKZ_GL_DisplayMapTopMenu");
+	MarkNativeAsOptional("GOKZ_GL_GetPoints");
+	MarkNativeAsOptional("GOKZ_GL_GetMapPoints");
+	MarkNativeAsOptional("GOKZ_GL_GetRankPoints");
+	MarkNativeAsOptional("GOKZ_GL_GetFinishes");
+	MarkNativeAsOptional("GOKZ_GL_UpdatePoints");
 }
 #endif
