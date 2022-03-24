@@ -61,14 +61,15 @@ public void OnAllPluginsLoaded()
 	}
 	gB_Localranks = LibraryExists("gokz-localranks");
 	gB_Chat = LibraryExists("gokz-chat");
-	for (int client = 1; client < MaxClients; client++)
+
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && !IsFakeClient(client))
 		{
 			UpdateRank(client, GOKZ_GetCoreOption(client, Option_Mode));
 		}
 	}
-	
+
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
