@@ -268,9 +268,9 @@ void UpdateTags(int client, int rank, int mode)
 	}
 }
 
-bool CanUseTagType(int client, int desiredType)
+bool CanUseTagType(int client, int tagType)
 {
-	switch (desiredType)
+	switch (tagType)
 	{
 		case ProfileTagType_Rank: return true;
 		case ProfileTagType_VIP: return CheckCommandAccess(client, "gokz_flag_vip", ADMFLAG_CUSTOM1);
@@ -281,13 +281,13 @@ bool CanUseTagType(int client, int desiredType)
 
 int GetAvailableTagTypeOrDefault(int client)
 {
-	int desiredType = GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_TagType]);
-	if (!CanUseTagType(client, desiredType))
+	int tagType = GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_TagType]);
+	if (!CanUseTagType(client, tagType))
 	{
 		return ProfileTagType_Rank;
 	}
 
-	return desiredType;
+	return tagType;
 }
 
 // =====[ COMMANDS ]=====
