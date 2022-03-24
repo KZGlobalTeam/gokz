@@ -977,6 +977,14 @@ native void GOKZ_StopTimerAll(bool playSound = true);
 native bool GOKZ_GetTimerRunning(int client);
 
 /**
+ * Gets whether or not a player's timer is valid i.e the run is a valid run.
+ *
+ * @param client    	Client index.
+ * @return				Whether player's timer is running.
+ */
+native bool GOKZ_GetValidTimer(int client);
+
+/**
  * Gets the course a player is currently running.
  *
  * @param client    	Client index.

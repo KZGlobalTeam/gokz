@@ -41,6 +41,7 @@ void CreateNatives()
 	CreateNative("GOKZ_SetValidJumpOrigin", Native_SetValidJumpOrigin);
 	
 	CreateNative("GOKZ_GetTimerRunning", Native_GetTimerRunning);
+	CreateNative("GOKZ_GetValidTimer", Native_GetValidTimer);
 	CreateNative("GOKZ_GetCourse", Native_GetCourse);
 	CreateNative("GOKZ_SetCourse", Native_SetCourse);
 	CreateNative("GOKZ_GetPaused", Native_GetPaused);
@@ -352,6 +353,11 @@ public int Native_SetValidJumpOrigin(Handle plugin, int numParams)
 public int Native_GetTimerRunning(Handle plugin, int numParams)
 {
 	return view_as<int>(GetTimerRunning(GetNativeCell(1)));
+}
+
+public int Native_GetValidTimer(Handle plugin, int numParams)
+{
+	return view_as<int>(GetValidTimer(GetNativeCell(1)));
 }
 
 public int Native_GetCourse(Handle plugin, int numParams)
