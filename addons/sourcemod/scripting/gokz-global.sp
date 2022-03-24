@@ -360,7 +360,7 @@ public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin, int client)
 {
 	char pluginName[64];
 	GetPluginInfo(plugin, PlInfo_Name, pluginName, sizeof(pluginName));
-	if (GOKZ_GetTimerRunning(client))
+	if (GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
 	{
 		LogMessage("Invalidated %N's run as gokz-core native was called by \"%s\"", client, pluginName);
 	}
