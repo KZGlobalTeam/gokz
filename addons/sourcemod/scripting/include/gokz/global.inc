@@ -270,5 +270,10 @@ public void __pl_gokz_global_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GL_GetRankPoints");
 	MarkNativeAsOptional("GOKZ_GL_GetFinishes");
 	MarkNativeAsOptional("GOKZ_GL_UpdatePoints");
+	MarkNativeAsOptional("GOKZ_GL_GetAPIKeyValid");
+	MarkNativeAsOptional("GOKZ_GL_GetPluginsValid");
+	MarkNativeAsOptional("GOKZ_GL_GetSettingsEnforcerValid");
+	MarkNativeAsOptional("GOKZ_GL_GetMapValid");
+	MarkNativeAsOptional("GOKZ_GL_GetPlayerValid");
 }
 #endif
