@@ -435,6 +435,7 @@ public SharedPlugin __pl_gokz_jumpstats =
 #if !defined REQUIRE_PLUGIN
 public void __pl_gokz_jumpstats_SetNTVOptional()
 {
+	MarkNativeAsOptional("GOKZ_JS_GetDefaultOption");
 	MarkNativeAsOptional("GOKZ_JS_InvalidateJump");
 }
 #endif
