@@ -387,10 +387,9 @@ SELECT b.JumpID, b.JumpType, b.Distance, b.Strafes, b.Sync, b.Pre, b.Max, b.Airt
         SELECT a.SteamID32, a.Mode, a.JumpType, MAX(a.Distance) Distance \
         FROM Jumpstats a \
         WHERE a.SteamID32=%d AND a.Mode=%d AND NOT a.IsBlockJump \
-        GROUP BY a.JumpType \
+        GROUP BY a.JumpType, a.Mode, a.SteamID32 \
     ) a ON a.JumpType=b.JumpType AND a.Distance=b.Distance \
     WHERE a.SteamID32=b.SteamID32 AND a.Mode=b.Mode AND NOT b.IsBlockJump \
-    GROUP BY b.JumpType \
     ORDER BY b.JumpType";
 
 char sql_jumpstats_getblockpbs[] = "\
@@ -403,11 +402,10 @@ SELECT c.JumpID, c.JumpType, c.Block, c.Distance, c.Strafes, c.Sync, c.Pre, c.Ma
             SELECT a.SteamID32, a.Mode, a.JumpType, MAX(a.Block) Block \
             FROM Jumpstats a \
             WHERE a.SteamID32=%d AND a.Mode=%d AND a.IsBlockJump \
-            GROUP BY a.JumpType \
+            GROUP BY a.JumpType, a.Mode, a.SteamID32 \
         ) a ON a.JumpType=b.JumpType AND a.Block=b.Block \
         WHERE a.SteamID32=b.SteamID32 AND a.Mode=b.Mode AND b.IsBlockJump \
-        GROUP BY b.JumpType \
+        GROUP BY a.JumpType, a.Mode, a.SteamID32, a.Block \
     ) b ON b.JumpType=c.JumpType AND b.Block=c.Block AND b.Distance=c.Distance \
     WHERE b.SteamID32=c.SteamID32 AND b.Mode=c.Mode AND c.IsBlockJump \
-    GROUP BY c.JumpType \
     ORDER BY c.JumpType";

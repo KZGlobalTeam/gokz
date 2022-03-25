@@ -262,6 +262,15 @@ static void StartRunRecording(int client)
 	{
 		return;
 	}
+
+	// *Very* ugly hack to fix an exception when starting the timer on the very
+	// first tick after loading the plugin.
+	if (recordedRecentData[client].Length == 0)
+	{
+		RequestFrame(StartRunRecording, client);
+		return;
+	}
+
 	QueryClientConVar(client, "sensitivity", SensitivityCheck, client);
 	QueryClientConVar(client, "m_yaw", MYAWCheck, client);
 	
