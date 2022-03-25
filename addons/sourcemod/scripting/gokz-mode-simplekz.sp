@@ -630,9 +630,11 @@ void ApplyTweakedTakeoffSpeed(KZPlayer player, float velocity[3])
 	// because current velocity direction can change drastically in just one tick (eg. walls)
 	// and it doesnt make sense for the new velocity to push you in that direction.
 
-	float newVelocity[3];
+	float newVelocity[3], baseVelocity[3];
 	player.GetLandingVelocity(newVelocity);
+	player.GetBaseVelocity(baseVelocity);
 	SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
+	AddVectors(newVelocity, baseVelocity, newVelocity); // For backwards compatibility
 	velocity[0] = newVelocity[0];
 	velocity[1] = newVelocity[1];
 }
