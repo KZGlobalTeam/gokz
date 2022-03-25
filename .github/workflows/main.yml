@@ -6,7 +6,7 @@ env:
 on:
   push:
     branches: [ master, dev ]
-    tags: [ 'v*' ]
+    tags: [ '*' ]
   pull_request:
     branches: [ master, dev ]
 
