@@ -586,9 +586,9 @@ public void Movement_OnStopTouchGround(int client)
 void NerfRealPerf(KZPlayer player, float origin[3])
 {
 	// Not worth worrying about if player is already falling
-	// player.VerticalVelocity is not updated yet! Use takeoff velocity.
+	// player.VerticalVelocity is not updated yet! Use processing velocity.
 	float velocity[3];
-	player.GetTakeoffVelocity(velocity);
+	Movement_GetProcessingVelocity(player.ID, velocity);
 	if (velocity[2] < EPSILON)
 	{
 		return;
