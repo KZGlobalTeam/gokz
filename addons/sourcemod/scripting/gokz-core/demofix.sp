@@ -6,6 +6,8 @@ void OnPluginStart_Demofix()
 	AddCommandListener(Command_Demorestart, "demorestart");
 	CV_EnableDemofix = AutoExecConfig_CreateConVar("gokz_demofix", "1", "Whether GOKZ applies demo record fix to server. (0 = Disabled, 1 = Update warmup period once, 2 = Regularly reset warmup period)", _, true, 0.0, true, 2.0);
 	CV_EnableDemofix.AddChangeHook(OnDemofixConVarChanged);
+	// If the map is tweaking the warmup value, we need to rerun the fix again.
+	FindConVar("mp_warmuptime").AddChangeHook(OnDemofixConVarChanged);
 }
 
 void OnRoundStart_Demofix()
