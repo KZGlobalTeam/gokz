@@ -340,8 +340,15 @@ static bool DoTriggerFix(int client, bool filterFix = false)
 		}
 		else if (!triggerTouchFired[client][trigger])
 		{
+			char className[64];
+			GetEntityClassname(trigger, className, sizeof(className));
+			if (GetEntityFlags(client) & FL_BASEVELOCITY && StrEqual(className, "trigger_push"))
+			{
+				// We are currently affected by a push trigger, do not try to touch it again to prevent double boost.
+				continue;
+			}
 			// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
-			// in the last tick, we make sure that it is called now.		
+			// in the last tick, we make sure that it is called now.
 			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
 			didSomething = true;
 		}

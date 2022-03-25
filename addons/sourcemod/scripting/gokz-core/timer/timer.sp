@@ -15,6 +15,11 @@ bool GetTimerRunning(int client)
 	return timerRunning[client];
 }
 
+bool GetValidTimer(int client)
+{
+	return validTime[client];
+}
+
 float GetCurrentTime(int client)
 {
 	return currentTime[client];

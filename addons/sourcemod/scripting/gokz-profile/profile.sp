@@ -55,7 +55,7 @@ void Profile_OnClientDisconnect(int client)
 
 void Profile_OnPointsUpdated(int player, int mode)
 {
-	for (int client = 1; client < MaxClients; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (profileWaitingForUpdate[client]
 			&& profileTargetPlayer[client] == player

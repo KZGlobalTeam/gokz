@@ -109,34 +109,19 @@ public void TopMenuHandler_Profile(TopMenu topmenu, TopMenuAction action, TopMen
 	else if (action == TopMenuAction_SelectOption)
 	{
 		GOKZ_CycleOption(param, gC_ProfileOptionNames[option]);
+
 		if (option == ProfileOption_TagType)
 		{
-			for(;;)
+			for (int i = 0; i < PROFILETAGTYPE_COUNT; i++)
 			{
-				switch (GOKZ_GetOption(param, gC_ProfileOptionNames[option]))
+				int tagType = GOKZ_GetOption(param, gC_ProfileOptionNames[option]);
+				if (!CanUseTagType(param, tagType))
 				{
-					case ProfileTagType_Rank:
-					{
-						break;
-					}
-					case ProfileTagType_Admin:
-					{
-						if (CheckCommandAccess(param, "gokz_flag_admin", ADMFLAG_GENERIC))
-						{
-							break;
-						}
-					}
-					case ProfileTagType_VIP:
-					{
-						if (CheckCommandAccess(param, "gokz_flag_vip", ADMFLAG_CUSTOM1))
-						{
-							break;
-						}
-					}
+					GOKZ_CycleOption(param, gC_ProfileOptionNames[option]);
 				}
-				GOKZ_CycleOption(param, gC_ProfileOptionNames[option]);
 			}
 		}
+
 		gTM_Options.Display(param, TopMenuPosition_LastCategory);
 	}
 }
