@@ -121,7 +121,7 @@ public void OnClientConnected(int client)
 {
 	for (int mode = 0; mode < MODE_COUNT; mode++)
 	{
-		gI_Rank[client][mode] = -1;
+		gI_Rank[client][mode] = 0;
 	}
 	Profile_OnClientConnected(client);
 }
