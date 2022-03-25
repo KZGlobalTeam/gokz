@@ -1155,7 +1155,7 @@ static void SetBotStuff(int bot)
 	GivePlayerItem(client, "weapon_knife");
 	
 	// Give the bot the pistol stored in the replay
-	if (botWeapon[bot] != 0)
+	if (botWeapon[bot] != -1)
 	{
 		CS_WeaponIDToAlias(CS_ItemDefIndexToID(botWeapon[bot]), weaponName, sizeof(weaponName));
 		Format(weaponName, sizeof(weaponName), "weapon_%s", weaponName);
