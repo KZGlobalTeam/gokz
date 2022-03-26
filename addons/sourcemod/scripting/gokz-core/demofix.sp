@@ -1,5 +1,6 @@
 static ConVar CV_EnableDemofix;
 static Handle H_DemofixTimer;
+static bool mapRunning;
 
 void OnPluginStart_Demofix()
 {
@@ -8,6 +9,21 @@ void OnPluginStart_Demofix()
 	CV_EnableDemofix.AddChangeHook(OnDemofixConVarChanged);
 	// If the map is tweaking the warmup value, we need to rerun the fix again.
 	FindConVar("mp_warmuptime").AddChangeHook(OnDemofixConVarChanged);
+	// We assume that the map is already loaded on late load.
+	if (gB_LateLoad)
+	{
+		mapRunning = true;
+	}
+}
+
+void OnMapStart_Demofix()
+{
+	mapRunning = true;
+}
+
+void OnMapEnd_Demofix()
+{
+	mapRunning = false;
 }
 
 void OnRoundStart_Demofix()
@@ -78,6 +94,10 @@ static void EnableDemoRecord()
 {
 	// Enable warmup to allow demo recording
 	// m_fWarmupPeriodEnd is set in the past to hide the timer UI
+	if (!mapRunning)
+	{
+		return;
+	}
 	GameRules_SetProp("m_bWarmupPeriod", 1);
 	GameRules_SetPropFloat("m_fWarmupPeriodStart", GetGameTime() - 1.0);
 	GameRules_SetPropFloat("m_fWarmupPeriodEnd", GetGameTime() - 1.0);
