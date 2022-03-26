@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 15
+#define MODE_VERSION 16
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units
@@ -586,9 +586,9 @@ public void Movement_OnStopTouchGround(int client)
 void NerfRealPerf(KZPlayer player, float origin[3])
 {
 	// Not worth worrying about if player is already falling
-	// player.VerticalVelocity is not updated yet! Use takeoff velocity.
+	// player.VerticalVelocity is not updated yet! Use processing velocity.
 	float velocity[3];
-	player.GetTakeoffVelocity(velocity);
+	Movement_GetProcessingVelocity(player.ID, velocity);
 	if (velocity[2] < EPSILON)
 	{
 		return;
@@ -630,9 +630,11 @@ void ApplyTweakedTakeoffSpeed(KZPlayer player, float velocity[3])
 	// because current velocity direction can change drastically in just one tick (eg. walls)
 	// and it doesnt make sense for the new velocity to push you in that direction.
 
-	float newVelocity[3];
+	float newVelocity[3], baseVelocity[3];
 	player.GetLandingVelocity(newVelocity);
+	player.GetBaseVelocity(baseVelocity);
 	SetVectorHorizontalLength(newVelocity, CalcTweakedTakeoffSpeed(player));
+	AddVectors(newVelocity, baseVelocity, newVelocity); // For backwards compatibility
 	velocity[0] = newVelocity[0];
 	velocity[1] = newVelocity[1];
 }
