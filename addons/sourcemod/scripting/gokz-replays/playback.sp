@@ -377,6 +377,10 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	file.ReadInt32(botMode[bot]);
 	file.ReadInt32(botStyle[bot]);
 	
+	// Old replays don't store the weapon information
+	botKnife[bot] = CS_WeaponIDToItemDefIndex(CSWeapon_KNIFE);
+	botWeapon[bot] = (botMode[bot] == Mode_Vanilla) ? -1 : CS_WeaponIDToItemDefIndex(CSWeapon_USP_SILENCER);
+	
 	// Time
 	int timeAsInt;
 	file.ReadInt32(timeAsInt);
