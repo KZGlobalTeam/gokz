@@ -331,7 +331,10 @@ static bool LoadPlayback(int client, int bot, char[] path)
 		case 1:
 		{
 			botReplayVersion[bot] = 1;
-			LoadFormatVersion1Replay(file, bot);
+			if (!LoadFormatVersion1Replay(file, bot))
+			{
+				return false;
+			}
 		}
 		case 2:
 		{
@@ -353,7 +356,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 	return true;
 }
 
-static void LoadFormatVersion1Replay(File file, int bot)
+static bool LoadFormatVersion1Replay(File file, int bot)
 {	
 	// Old replays only support runs, not jumps
 	botReplayType[bot] = ReplayType_Run;
@@ -416,6 +419,14 @@ static void LoadFormatVersion1Replay(File file, int bot)
 		playbackTickData[bot].Clear();
 		playbackTickData[bot].Resize(length);
 	}
+
+	// The replay has no replay data, this shouldn't happen normally,
+	// but this would cause issues in other code, so we don't even try to load this.
+	if (length == 0)
+	{
+		delete file;
+		return false;
+	}
 	
 	any tickData[RP_V1_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < length; i++)
@@ -434,6 +445,7 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	botDataLoaded[bot] = true;
 	
 	delete file;
+	return true;
 }
 
 static bool LoadFormatVersion2Replay(File file, int client, int bot)
@@ -513,6 +525,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Tick Count
 	int tickCount;
 	file.ReadInt32(tickCount);
+
+	// The replay has no replay data, this shouldn't happen normally,
+	// but this would cause issues in other code, so we don't even try to load this.
+	if (tickCount == 0)
+	{
+		delete file;
+		return false;
+	}
 
 	// Equipped Weapon
 	file.ReadInt32(botWeapon[bot]);
