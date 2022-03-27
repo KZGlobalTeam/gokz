@@ -53,7 +53,8 @@ int GetCurrentTimeType(int client)
 
 bool TimerStart(int client, int course, bool allowMidair = false, bool playSound = true)
 {
-	if (!IsPlayerAlive(client)
+	if (!IsClientInGame(client)
+		 || !IsPlayerAlive(client)
 		 || JustStartedTimer(client)
 		 || JustTeleported(client)
 		 || JustNoclipped(client)
