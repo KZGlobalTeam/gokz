@@ -12,14 +12,14 @@ bool RegisterOption(const char[] name, const char[] description, OptionType type
 		LogError("Failed to register option \"%s\" due to invalid default value and value range.", name);
 		return false;
 	}
-	
-	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH - 1)
+
+	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH)
 	{
 		LogError("Failed to register option \"%s\" because its name is too long.", name);
 		return false;
 	}
 	
-	if (strlen(name) > GOKZ_OPTION_MAX_NAME_LENGTH - 1)
+	if (strlen(description) > GOKZ_OPTION_MAX_DESC_LENGTH)
 	{
 		LogError("Failed to register option \"%s\" because its description is too long.", name);
 		return false;
