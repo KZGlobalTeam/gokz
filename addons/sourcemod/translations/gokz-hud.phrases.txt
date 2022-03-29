@@ -220,6 +220,10 @@
 		"chi"		"空速文字"
 		"ru"		"Текст скорости"
 	}
+	"Options Menu - Speed Color"
+	{
+		"en"		"Speed color"
+	}
 	"Options Menu - Show Weapon"
 	{
 		"en"		"Show weapon"

@@ -43,7 +43,7 @@ void OnPluginStart_TimerText()
 
 void OnPlayerRunCmdPost_TimerText(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 3)
+	if (cmdnum % 3 == 1)
 	{
 		UpdateTimerText(client, info);
 	}

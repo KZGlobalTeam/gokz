@@ -22,7 +22,8 @@ enum HUDOption:
 	HUDOption_TimerText, 
 	HUDOption_TimerStyle,
 	HUDOption_TimerType, 
-	HUDOption_SpeedText, 
+	HUDOption_SpeedText,
+	HUDOption_SpeedColor,
 	HUDOption_ShowWeapon,
 	HUDOption_ShowControls, 
 	HUDOPTION_COUNT
@@ -85,6 +86,13 @@ enum
 
 enum
 {
+	SpeedColor_Simple = 0, 
+	SpeedColor_Advanced, 
+	SPEEDCOLOR_COUNT
+};
+
+enum
+{
 	ShowWeapon_Disabled = 0, 
 	ShowWeapon_Enabled, 
 	SHOWWEAPON_COUNT
@@ -117,6 +125,7 @@ enum struct HUDInfo
 	int ID;
 	bool Jumped;
 	bool HitPerf;
+	bool HitJB;
 	float TakeoffSpeed;
 	int Buttons;
 	int CurrentTeleport;
@@ -139,6 +148,7 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Timer Style", 
 	"GOKZ HUD - Show Time Type",
 	"GOKZ HUD - Speed Text", 
+	"GOKZ HUD - Speed Color",
 	"GOKZ HUD - Show Weapon",
 	"GOKZ HUD - Show Controls"
 };
@@ -151,7 +161,8 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Teleport Menu, 3 = Bottom, 4 = Top", 
 	"Timer Style - 0 = Standard, 1 = Precise",
 	"Timer Type - 0 = Disabled, 1 = Enabled", 
-	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
+	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom",
+	"Speed Color - 0 = Simple, 1 = Advanced",
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
 	"Replay Controls Display - 0 = Disbled, 1 = Enabled"
 };
@@ -165,6 +176,7 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Timer Style", 
 	"Options Menu - Timer Type",
 	"Options Menu - Speed Text", 
+	"Options Menu - Speed Color", 
 	"Options Menu - Show Weapon",
 	"Options Menu - Show Controls"
 };
@@ -178,6 +190,7 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	TIMERSTYLE_COUNT,
 	TIMERTYPE_COUNT, 
 	SPEEDTEXT_COUNT, 
+	SPEEDCOLOR_COUNT,
 	SHOWWEAPON_COUNT,
 	REPLAYCONTROLS_COUNT
 };
@@ -191,6 +204,7 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	TimerStyle_Standard, 
 	TimerType_Enabled,
 	SpeedText_InfoPanel, 
+	SpeedColor_Simple,
 	ShowWeapon_Enabled,
 	ReplayControls_Enabled
 };
@@ -229,6 +243,12 @@ stock char gC_SpeedTextPhrases[SPEEDTEXT_COUNT][] =
 	"Options Menu - Disabled", 
 	"Options Menu - Info Panel", 
 	"Options Menu - Bottom"
+};
+
+stock char gC_SpeedColorPhrases[SPEEDCOLOR_COUNT][] = 
+{
+	"Options Menu - Simple", 
+	"Options Menu - Advanced"
 };
 
 stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =

@@ -28,7 +28,11 @@ bool IsDrawingInfoPanel(int client)
 
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 10 == 0 || info.IsTakeoff)
+	// The hint text panel update speed depends on the client ping.
+	// To optimize resource usage, we scale the update speed with it.
+	// The fastest speed the client can get is around once every 2 ticks.
+	int updateSpeed = RoundToFloor(GetClientAvgLatency(client, NetFlow_Outgoing) / GetTickInterval());
+	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateInfoPanel(client, info);
 	}
@@ -159,17 +163,29 @@ static char[] GetSpeedString(KZPlayer player, HUDInfo info)
 		}
 		else
 		{
-			FormatEx(speedString, sizeof(speedString), 
-				"%T: <font color='#ffffff'>%.0f</font> %s\n", 
-				"Info Panel Text - Speed", player.ID, 
-				RoundToPowerOfTen(info.Speed, -2), 
-				GetTakeoffString(info));
+			if (GOKZ_HUD_GetOption(player.ID, HUDOption_SpeedColor) == SpeedColor_Advanced
+			&& Movement_GetVerticalVelocity(info.ID) > 0.0 && Movement_GetVerticalVelocity(info.ID) < 140.0)
+			{
+				FormatEx(speedString, sizeof(speedString), 
+					"%T: <font color='#ff2020'>%.0f</font> %s\n", 
+					"Info Panel Text - Speed", player.ID, 
+					RoundToPowerOfTen(info.Speed, -2), 
+					GetTakeoffString(player, info));
+			}
+			else
+			{
+				FormatEx(speedString, sizeof(speedString), 
+					"%T: <font color='#ffffff'>%.0f</font> %s\n", 
+					"Info Panel Text - Speed", player.ID, 
+					RoundToPowerOfTen(info.Speed, -2), 
+					GetTakeoffString(player, info));
+			}
 		}
 	}
 	return speedString;
 }
 
-static char[] GetTakeoffString(HUDInfo info)
+static char[] GetTakeoffString(KZPlayer player, HUDInfo info)
 {
 	char takeoffString[96], duckString[32];
 	
@@ -189,8 +205,15 @@ static char[] GetTakeoffString(HUDInfo info)
 		duckString = "";
 		infoPanelShowDuckString[info.ID] = false;
 	}
-	
-	if (info.HitPerf)
+
+	if (info.HitJB && GOKZ_HUD_GetOption(player.ID, HUDOption_SpeedColor) == SpeedColor_Advanced)
+	{
+		FormatEx(takeoffString, sizeof(takeoffString), 
+			"(<font color='#ffff20'>%.0f</font>)%s", 
+			RoundToPowerOfTen(info.TakeoffSpeed, -2), 
+			duckString);
+	}
+	else if (info.HitPerf)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#40ff40'>%.0f</font>)%s", 
