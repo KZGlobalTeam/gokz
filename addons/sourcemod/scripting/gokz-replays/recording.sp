@@ -917,13 +917,9 @@ static int RecordingIndexAdd(int client, int offset)
 
 static void RemoveFromRunningTimers(int client, Handle timerToRemove)
 {
-	for (int i = 0; i < runningTimers[client].Length; i++)
+	int index = runningTimers[client].FindValue(timerToRemove);
+	if (index != -1)
 	{
-		Handle timer = runningTimers[client].Get(i);
-		if (timer == timerToRemove)
-		{
-			runningTimers[client].Erase(i);
-			break;
-		}
+		runningTimers[client].Erase(index);
 	}
 }
