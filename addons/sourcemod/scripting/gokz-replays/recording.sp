@@ -219,7 +219,7 @@ public Action Timer_EndRecording(Handle timer, DataPack data)
 	// The client left after the run was done but before the post-run
 	// breather had the chance to finish. This should not happen, as we
 	// trigger all running timers on disconnect.
-	if (!client)
+	if (!IsValidClient(client))
 	{
 		return Plugin_Stop;
 	}
@@ -337,7 +337,7 @@ public Action SaveJump(Handle timer, DataPack data)
 	// The client left after the jump was done but before the post-jump
 	// breather had the chance to finish. This should not happen, as we
 	// trigger all running timers on disconnect.
-	if (!client)
+	if (!IsValidClient(client))
 	{
 		return Plugin_Stop;
 	}
@@ -355,7 +355,7 @@ public Action SaveJump(Handle timer, DataPack data)
 static void RequestFrame_StartRunRecording(int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if (client)
+	if (IsValidClient(client))
 	{
 		StartRunRecording(client);
 	}
