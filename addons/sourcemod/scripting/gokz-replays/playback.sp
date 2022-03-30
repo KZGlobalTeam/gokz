@@ -1187,10 +1187,7 @@ static void SetBotClanTag(int bot)
 
 static void SetBotName(int bot)
 {
-	int client = botClient[bot];
 	char name[MAX_NAME_LENGTH];
-
-	gB_HideNameChange = true;
 
 	if (botReplayType[bot] == ReplayType_Run)
 	{
@@ -1220,7 +1217,8 @@ static void SetBotName(int bot)
 			botAlias[bot]);
 	}
 	
-	SetClientName(client, name);
+	gB_HideNameChange = true;
+	SetClientName(botClient[bot], name);
 }
 
 // Returns the number of bots that are currently replaying
