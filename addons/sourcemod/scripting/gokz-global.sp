@@ -194,7 +194,7 @@ public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, c
 			if (!gB_waitingForFPSKick[client])
 			{
 				gB_waitingForFPSKick[client] = true;
-				CreateTimer(GL_FPS_MAX_KICK_TIMEOUT, FPSKickPlayer, client, TIMER_FLAG_NO_MAPCHANGE);
+				CreateTimer(GL_FPS_MAX_KICK_TIMEOUT, FPSKickPlayer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				GOKZ_PrintToChat(client, true, "%t", "Warn Player fps_max");
 				if (GOKZ_GetTimerRunning(client))
 				{
@@ -221,8 +221,9 @@ public void MYAWCheck(QueryCookie cookie, int client, ConVarQueryResult result, 
 	}
 }
 
-Action FPSKickPlayer(Handle timer, int client)
+Action FPSKickPlayer(Handle timer, int userid)
 {
+	int client = GetClientOfUserId(userid);
 	if (IsValidClient(client) && !IsFakeClient(client) && gB_waitingForFPSKick[client])
 	{
 		KickClient(client, "%T", "Kick Player fps_max", client);
