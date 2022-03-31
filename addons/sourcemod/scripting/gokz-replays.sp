@@ -188,14 +188,10 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] i
 
 // =====[ CLIENT EVENTS ]=====
 
-public void OnClientConnected(int client)
-{
-	OnClientConnected_Recording(client);
-}
-
 public void OnClientPutInServer(int client)
 {
 	OnClientPutInServer_Playback(client);
+	OnClientPutInServer_Recording(client);
 }
 
 public void OnClientAuthorized(int client, const char[] auth)

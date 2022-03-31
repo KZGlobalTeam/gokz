@@ -38,7 +38,7 @@ void OnMapStart_Recording()
 	maxCheaterReplayTicks = RoundToCeil(RP_MAX_CHEATER_REPLAY_LENGTH * tickrate);
 }
 
-void OnClientConnected_Recording(int client)
+void OnClientPutInServer_Recording(int client)
 {
 	recordingIndex[client] = 0;
 	playerSensitivity[client] = -1.0;
@@ -88,6 +88,13 @@ void OnClientAuthorized_Recording(int client)
 
 void OnClientDisconnect_Recording(int client)
 {
+	// Stop exceptions if OnClientPutInServer was never ran for this client id.
+	// As long as the arrays aren't null we'll be fine.
+	if (runningTimers[client] == null)
+	{
+		return;
+	}
+
 	// Trigger all timers early
 	if(!IsFakeClient(client))
 	{
