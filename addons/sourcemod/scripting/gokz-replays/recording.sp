@@ -164,6 +164,13 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 
 Action GOKZ_OnTimerStart_Recording(int client)
 {
+	// Hack to fix an exception when starting the timer on the very
+	// first tick after loading the plugin.
+	if (recordedRecentData[client].Length == 0)
+	{
+		return Plugin_Handled;
+	}
+
 	// We are still recording the post-run breather for the previous run,
 	// this means we still did not save the replay, so we would end up
 	// overwriting the data in the buffers.
@@ -352,27 +359,10 @@ public Action SaveJump(Handle timer, DataPack data)
 
 // =====[ PRIVATE ]=====
 
-static void RequestFrame_StartRunRecording(int userid)
-{
-	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client))
-	{
-		StartRunRecording(client);
-	}
-}
-
 static void StartRunRecording(int client)
 {
 	if (IsFakeClient(client))
 	{
-		return;
-	}
-
-	// *Very* ugly hack to fix an exception when starting the timer on the very
-	// first tick after loading the plugin.
-	if (recordedRecentData[client].Length == 0)
-	{
-		RequestFrame(RequestFrame_StartRunRecording, GetClientUserId(client));
 		return;
 	}
 
