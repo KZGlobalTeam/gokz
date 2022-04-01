@@ -40,30 +40,7 @@ void OnMapStart_Recording()
 
 void OnClientPutInServer_Recording(int client)
 {
-	recordingIndex[client] = 0;
-	playerSensitivity[client] = -1.0;
-	playerMYaw[client] = -1.0;
-	isTeleportTick[client] = false;
-	timerRunning[client] = false;
-	recordingPaused[client] = false;
-	postRunRecording[client] = false;
-
-	if (recordedRecentData[client] == null)
-		recordedRecentData[client] = new ArrayList(sizeof(ReplayTickData));
-
-	if (recordedRunData[client] == null)
-		recordedRunData[client] = new ArrayList(sizeof(ReplayTickData)); 
-
-	if (recordedPostRunData[client] == null)
-		recordedPostRunData[client] = new ArrayList(sizeof(ReplayTickData)); 
-
-	if (runningTimers[client] == null)
-		runningTimers[client] = new ArrayList();
-
-	recordedRecentData[client].Clear();
-	recordedRunData[client].Clear();
-	recordedPostRunData[client].Clear();
-	runningTimers[client].Clear();
+	ClearClientRecordingState(client);
 }
 
 void OnClientAuthorized_Recording(int client)
@@ -109,10 +86,7 @@ void OnClientDisconnect_Recording(int client)
 		delete timers;
 	}
 
-	recordedRecentData[client].Clear();
-	recordedRunData[client].Clear();
-	recordedPostRunData[client].Clear();
-	runningTimers[client].Clear();
+	ClearClientRecordingState(client);
 }
 
 void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const float vel[3], const int mouse[2])
@@ -365,6 +339,34 @@ public Action SaveJump(Handle timer, DataPack data)
 
 
 // =====[ PRIVATE ]=====
+
+static void ClearClientRecordingState(int client)
+{
+	recordingIndex[client] = 0;
+	playerSensitivity[client] = -1.0;
+	playerMYaw[client] = -1.0;
+	isTeleportTick[client] = false;
+	timerRunning[client] = false;
+	recordingPaused[client] = false;
+	postRunRecording[client] = false;
+
+	if (recordedRecentData[client] == null)
+		recordedRecentData[client] = new ArrayList(sizeof(ReplayTickData));
+
+	if (recordedRunData[client] == null)
+		recordedRunData[client] = new ArrayList(sizeof(ReplayTickData)); 
+
+	if (recordedPostRunData[client] == null)
+		recordedPostRunData[client] = new ArrayList(sizeof(ReplayTickData)); 
+
+	if (runningTimers[client] == null)
+		runningTimers[client] = new ArrayList();
+
+	recordedRecentData[client].Clear();
+	recordedRunData[client].Clear();
+	recordedPostRunData[client].Clear();
+	runningTimers[client].Clear();
+}
 
 static void StartRunRecording(int client)
 {
