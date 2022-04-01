@@ -24,7 +24,6 @@ static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
 static bool postRunRecording[MAXPLAYERS + 1];
 static ArrayList recordedRecentData[MAXPLAYERS + 1];
-static ArrayList recordedPostRunData[MAXPLAYERS + 1];
 static ArrayList recordedRunData[MAXPLAYERS + 1];
 static ArrayList runningTimers[MAXPLAYERS + 1];
 
@@ -115,18 +114,11 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 		isTeleportTick[client] = false;
 	}
 	
-	if (timerRunning[client])
+	if (timerRunning[client] || postRunRecording[client])
 	{
 		int runTick = GetArraySize(recordedRunData[client]);
 		recordedRunData[client].Resize(runTick + 1);
 		recordedRunData[client].SetArray(runTick, tickData);
-	}
-	
-	if (postRunRecording[client])
-	{
-		int runTick = GetArraySize(recordedPostRunData[client]);
-		recordedPostRunData[client].Resize(runTick + 1);
-		recordedPostRunData[client].SetArray(runTick, tickData);
 	}
 	
 	int tick = recordingIndex[client];
@@ -181,7 +173,6 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 	{
 		timerRunning[client] = false;
 		postRunRecording[client] = true;
-		recordedPostRunData[client].Clear();
 
    		Handle timer = CreateTimer(RP_PLAYBACK_BREATHER_TIME, Timer_EndRecording, data);
 		if (timer != INVALID_HANDLE)
@@ -356,15 +347,11 @@ static void ClearClientRecordingState(int client)
 	if (recordedRunData[client] == null)
 		recordedRunData[client] = new ArrayList(sizeof(ReplayTickData)); 
 
-	if (recordedPostRunData[client] == null)
-		recordedPostRunData[client] = new ArrayList(sizeof(ReplayTickData)); 
-
 	if (runningTimers[client] == null)
 		runningTimers[client] = new ArrayList();
 
 	recordedRecentData[client].Clear();
 	recordedRunData[client].Clear();
-	recordedPostRunData[client].Clear();
 	runningTimers[client].Clear();
 }
 
@@ -433,7 +420,7 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 
 	// Create and fill General Header
 	GeneralReplayHeader generalHeader;
-	FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedRunData[client].Length + recordedPostRunData[client].Length);
+	FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedRunData[client].Length);
 
 	// Create and fill Run Header
 	RunReplayHeader runHeader;
@@ -644,19 +631,10 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 	{
 		case ReplayType_Run:
 		{
-			// Pre-run breather is copied into run data at timer start since that buffer
-			// is being used for other parts of the code and can't be stopped from updating.
 			for (int i = 0; i < recordedRunData[client].Length; i++)
 			{
 				recordedRunData[client].GetArray(i, tickData);
 				recordedRunData[client].GetArray(IntMax(0, i-1), prevTickData);
-				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-				isFirstTick = false;
-			}
-			for (int i = 0; i < recordedPostRunData[client].Length; i++)
-			{
-				recordedPostRunData[client].GetArray(i, tickData);
-				recordedPostRunData[client].GetArray(IntMax(0, i-1), prevTickData);
 				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
 				isFirstTick = false;
 			}
