@@ -286,7 +286,15 @@ enum struct JumpTracker
 			}
 			else
 			{
-				return JumpType_LadderJump;
+				// Check for ladder gliding.
+				if (GetClientButtons(this.jumper) & IN_JUMP)
+				{
+					return JumpType_Invalid;
+				}
+				else
+				{
+					return JumpType_LadderJump;
+				}
 			}
 		}
 		else if (!jumped)
