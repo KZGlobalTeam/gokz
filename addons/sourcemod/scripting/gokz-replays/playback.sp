@@ -310,7 +310,8 @@ static bool LoadPlayback(int client, int bot, char[] path)
 {
 	if (!FileExists(path))
 	{
-		LogError("Failed to load file: \"%s\".", path);
+		// This can happen relatively frequently, e.g. for jumps without a replay,
+		// therefore we're not logging it for now to avoid clutter.
 		return false;
 	}
 
