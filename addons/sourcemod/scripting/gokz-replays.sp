@@ -190,8 +190,8 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] i
 
 public void OnClientPutInServer(int client)
 {
-	OnClientPutInServer_Recording(client);
 	OnClientPutInServer_Playback(client);
+	OnClientPutInServer_Recording(client);
 }
 
 public void OnClientAuthorized(int client, const char[] auth)
@@ -202,6 +202,7 @@ public void OnClientAuthorized(int client, const char[] auth)
 public void OnClientDisconnect(int client)
 {
 	OnClientDisconnect_Playback(client);
+	OnClientDisconnect_Recording(client);
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -216,10 +217,21 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
 }
 
+public Action GOKZ_OnTimerStart(int client, int course)
+{
+	Action action = GOKZ_OnTimerStart_Recording(client);
+	if (action != Plugin_Continue)
+	{
+		return action;
+	}
+	
+	return Plugin_Continue;
+}
+
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	gB_NubRecordMissed[client] = false;
-	GOKZ_OnTimerStart_Recording(client);
+	GOKZ_OnTimerStart_Post_Recording(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
