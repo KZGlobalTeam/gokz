@@ -52,7 +52,7 @@ void ToggleNoclip(int client)
 
 void EnableNoclip(int client)
 {
-	if (IsPlayerAlive(client))
+	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		GOKZ_StopTimer(client);
@@ -61,7 +61,7 @@ void EnableNoclip(int client)
 
 void DisableNoclip(int client)
 {
-	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	if (IsValidClient(client) && IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		noclipReleaseTime[client] = GetGameTickCount();
 		Movement_SetMovetype(client, MOVETYPE_WALK);
@@ -86,7 +86,7 @@ void ToggleNoclipNotrigger(int client)
 
 void EnableNoclipNotrigger(int client)
 {
-	if (IsPlayerAlive(client))
+	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
@@ -96,7 +96,7 @@ void EnableNoclipNotrigger(int client)
 
 void DisableNoclipNotrigger(int client)
 {
-	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	if (IsValidClient(client) && IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		noclipReleaseTime[client] = GetGameTickCount();
 		Movement_SetMovetype(client, MOVETYPE_WALK);
