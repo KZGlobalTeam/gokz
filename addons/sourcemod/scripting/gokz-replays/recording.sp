@@ -169,37 +169,39 @@ void GOKZ_OnTimerStart_Post_Recording(int client)
 
 void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
 {
+	if (!timerRunning[client])
+	{
+		return;
+	}
+
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(course);
 	data.WriteFloat(time);
 	data.WriteCell(teleportsUsed);
 
-	if (timerRunning[client])
+	// The previous run breather still did not finish, end it now or
+	// we will start overwriting the data.
+	if (runningRunBreatherTimer[client] != INVALID_HANDLE)
 	{
-		// The previous run breather still did not finish, end it now or
-		// we will start overwriting the data.
-		if (runningRunBreatherTimer[client] != INVALID_HANDLE)
-		{
-			TriggerTimer(runningRunBreatherTimer[client], false);
-		}
+		TriggerTimer(runningRunBreatherTimer[client], false);
+	}
 
-		timerRunning[client] = false;
-		postRunRecording[client] = true;
+	timerRunning[client] = false;
+	postRunRecording[client] = true;
 
-		// Swap recordedRunData and recordedPostRunData.
-		// This lets new runs start immediately, before the post-run breather is
-		// finished recording.
-		ArrayList tmp = recordedPostRunData[client];
-		recordedPostRunData[client] = recordedRunData[client];
-		recordedRunData[client] = tmp;
-		recordedRunData[client].Clear();
+	// Swap recordedRunData and recordedPostRunData.
+	// This lets new runs start immediately, before the post-run breather is
+	// finished recording.
+	ArrayList tmp = recordedPostRunData[client];
+	recordedPostRunData[client] = recordedRunData[client];
+	recordedRunData[client] = tmp;
+	recordedRunData[client].Clear();
 
-   		runningRunBreatherTimer[client] = CreateTimer(RP_PLAYBACK_BREATHER_TIME, Timer_EndRecording, data);
-		if (runningRunBreatherTimer[client] == INVALID_HANDLE)
-		{
-			LogError("Could not create a timer so can't end the run replay recording");
-		}
+	runningRunBreatherTimer[client] = CreateTimer(RP_PLAYBACK_BREATHER_TIME, Timer_EndRecording, data);
+	if (runningRunBreatherTimer[client] == INVALID_HANDLE)
+	{
+		LogError("Could not create a timer so can't end the run replay recording");
 	}
 }
 
