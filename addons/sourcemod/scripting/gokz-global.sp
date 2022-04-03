@@ -41,7 +41,7 @@ bool gB_APIKeyCheck;
 bool gB_ModeCheck[MODE_COUNT];
 bool gB_BannedCommandsCheck;
 char gC_CurrentMap[64];
-char gC_CurrentMapPath[PLATFORM_MAX_PATH];
+int gI_CurrentMapFileSize;
 bool gB_InValidRun[MAXPLAYERS + 1];
 bool gB_GloballyVerified[MAXPLAYERS + 1];
 bool gB_EnforcerOnFreshMap;
@@ -50,7 +50,7 @@ int gI_FPSMax[MAXPLAYERS + 1];
 bool gB_waitingForFPSKick[MAXPLAYERS + 1];
 bool gB_MapValidated;
 int gI_MapID;
-int gI_MapFilesize;
+int gI_MapFileSize;
 int gI_MapTier;
 
 ConVar gCV_gokz_settings_enforcer;
@@ -89,7 +89,7 @@ public void OnPluginStart()
 	gB_APIKeyCheck = false;
 	gB_MapValidated = false;
 	gI_MapID = -1;
-	gI_MapFilesize = -1;
+	gI_MapFileSize = -1;
 	gI_MapTier = -1;
 	
 	for (int mode = 0; mode < MODE_COUNT; mode++)
@@ -194,7 +194,7 @@ public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, c
 			if (!gB_waitingForFPSKick[client])
 			{
 				gB_waitingForFPSKick[client] = true;
-				CreateTimer(GL_FPS_MAX_KICK_TIMEOUT, FPSKickPlayer, client, TIMER_FLAG_NO_MAPCHANGE);
+				CreateTimer(GL_FPS_MAX_KICK_TIMEOUT, FPSKickPlayer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				GOKZ_PrintToChat(client, true, "%t", "Warn Player fps_max");
 				if (GOKZ_GetTimerRunning(client))
 				{
@@ -221,8 +221,9 @@ public void MYAWCheck(QueryCookie cookie, int client, ConVarQueryResult result, 
 	}
 }
 
-Action FPSKickPlayer(Handle timer, int client)
+Action FPSKickPlayer(Handle timer, int userid)
 {
+	int client = GetClientOfUserId(userid);
 	if (IsValidClient(client) && !IsFakeClient(client) && gB_waitingForFPSKick[client])
 	{
 		KickClient(client, "%T", "Kick Player fps_max", client);
@@ -310,6 +311,9 @@ public void OnMapStart()
 {
 	LoadSounds();
 
+	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
+	gI_CurrentMapFileSize = GetCurrentMapFileSize();
+	
 	gB_BannedCommandsCheck = true;
 	
 	// Prevent just reloading the plugin after messing with the map
@@ -381,7 +385,7 @@ bool MapCheck()
 {
 	return gB_MapValidated
 	 && gI_MapID > 0
-	 && gI_MapFilesize == FileSize(gC_CurrentMapPath);
+	 && gI_MapFileSize == gI_CurrentMapFileSize;
 }
 
 void PrintGlobalCheckToChat(int client)
@@ -562,10 +566,6 @@ public void OnEnforcedConVarChanged(ConVar convar, const char[] oldValue, const 
 
 static void SetupAPI()
 {
-	GetCurrentMap(gC_CurrentMap, sizeof(gC_CurrentMap));
-	GetMapDisplayName(gC_CurrentMap, gC_CurrentMap, sizeof(gC_CurrentMap));
-	GetMapFullPath(gC_CurrentMapPath, sizeof(gC_CurrentMapPath));
-	
 	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 	GlobalAPI_GetModes(GetModeInfoCallback);
 	GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
@@ -645,7 +645,7 @@ public int GetMapCallback(JSON_Object map_json, GlobalAPIRequestData request)
 	
 	gB_MapValidated = map.IsValidated;
 	gI_MapID = map.Id;
-	gI_MapFilesize = map.Filesize;
+	gI_MapFileSize = map.Filesize;
 	gI_MapTier = map.Difficulty;
 	
 	// We don't do that earlier cause we need the map ID

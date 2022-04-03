@@ -24,8 +24,10 @@ static bool timerRunning[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
 static bool postRunRecording[MAXPLAYERS + 1];
 static ArrayList recordedRecentData[MAXPLAYERS + 1];
-static ArrayList recordedPostRunData[MAXPLAYERS + 1];
 static ArrayList recordedRunData[MAXPLAYERS + 1];
+static ArrayList recordedPostRunData[MAXPLAYERS + 1];
+static Handle runningRunBreatherTimer[MAXPLAYERS + 1];
+static ArrayList runningJumpstatTimers[MAXPLAYERS + 1];
 
 // =====[ EVENTS ]=====
 
@@ -39,10 +41,7 @@ void OnMapStart_Recording()
 
 void OnClientPutInServer_Recording(int client)
 {
-	recordedRecentData[client] = new ArrayList(sizeof(ReplayTickData));
-	recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
-	recordedPostRunData[client] = new ArrayList(sizeof(ReplayTickData));
-	recordingIndex[client] = 0;
+	ClearClientRecordingState(client);
 }
 
 void OnClientAuthorized_Recording(int client)
@@ -63,6 +62,37 @@ void OnClientAuthorized_Recording(int client)
 			CreateDirectory(replayPath, 511);
 		}
 	}
+}
+
+void OnClientDisconnect_Recording(int client)
+{
+	// Stop exceptions if OnClientPutInServer was never ran for this client id.
+	// As long as the arrays aren't null we'll be fine.
+	if (runningJumpstatTimers[client] == null)
+	{
+		return;
+	}
+
+	// Trigger all timers early
+	if(!IsFakeClient(client))
+	{
+		if (runningRunBreatherTimer[client] != INVALID_HANDLE)
+		{
+			TriggerTimer(runningRunBreatherTimer[client], false);
+		}
+
+		// We have to clone the array because the timer callback removes the timer
+		// from the array we're running over, and doing weird tricks is scary.
+		ArrayList timers = runningJumpstatTimers[client].Clone();
+		for (int i = 0; i < timers.Length; i++)
+		{
+			Handle timer = timers.Get(i);
+			TriggerTimer(timer, false);
+		}
+		delete timers;
+	}
+
+	ClearClientRecordingState(client);
 }
 
 void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const float vel[3], const int mouse[2])
@@ -97,12 +127,12 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 		recordedRunData[client].Resize(runTick + 1);
 		recordedRunData[client].SetArray(runTick, tickData);
 	}
-	
+
 	if (postRunRecording[client])
 	{
-		int runTick = GetArraySize(recordedPostRunData[client]);
-		recordedPostRunData[client].Resize(runTick + 1);
-		recordedPostRunData[client].SetArray(runTick, tickData);
+		int tick = GetArraySize(recordedPostRunData[client]);
+		recordedPostRunData[client].Resize(tick + 1);
+		recordedPostRunData[client].SetArray(tick, tickData);
 	}
 	
 	int tick = recordingIndex[client];
@@ -119,7 +149,19 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 	recordedRecentData[client].SetArray(tick, tickData);
 }
 
-void GOKZ_OnTimerStart_Recording(int client)
+Action GOKZ_OnTimerStart_Recording(int client)
+{
+	// Hack to fix an exception when starting the timer on the very
+	// first tick after loading the plugin.
+	if (recordedRecentData[client].Length == 0)
+	{
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+void GOKZ_OnTimerStart_Post_Recording(int client)
 {
 	timerRunning[client] = true;
 	StartRunRecording(client);
@@ -127,37 +169,66 @@ void GOKZ_OnTimerStart_Recording(int client)
 
 void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
 {
-	DataPack dp = new DataPack();
-	dp.WriteCell(client);
-	dp.WriteCell(course);
-	dp.WriteFloat(time);
-	dp.WriteCell(teleportsUsed);
-	delete recordedPostRunData[client];
-	recordedPostRunData[client] = recordedRunData[client];
-	recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
-	if (timerRunning[client])
+	if (!timerRunning[client])
 	{
-   		CreateTimer(RP_PLAYBACK_BREATHER_TIME, EndRecording, dp);
-   		postRunRecording[client] = true;
-   		timerRunning[client] = false;
+		return;
+	}
+
+	DataPack data = new DataPack();
+	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(course);
+	data.WriteFloat(time);
+	data.WriteCell(teleportsUsed);
+
+	// The previous run breather still did not finish, end it now or
+	// we will start overwriting the data.
+	if (runningRunBreatherTimer[client] != INVALID_HANDLE)
+	{
+		TriggerTimer(runningRunBreatherTimer[client], false);
+	}
+
+	timerRunning[client] = false;
+	postRunRecording[client] = true;
+
+	// Swap recordedRunData and recordedPostRunData.
+	// This lets new runs start immediately, before the post-run breather is
+	// finished recording.
+	ArrayList tmp = recordedPostRunData[client];
+	recordedPostRunData[client] = recordedRunData[client];
+	recordedRunData[client] = tmp;
+	recordedRunData[client].Clear();
+
+	runningRunBreatherTimer[client] = CreateTimer(RP_PLAYBACK_BREATHER_TIME, Timer_EndRecording, data);
+	if (runningRunBreatherTimer[client] == INVALID_HANDLE)
+	{
+		LogError("Could not create a timer so can't end the run replay recording");
 	}
 }
 
-public Action EndRecording(Handle timer, DataPack dp)
+public Action Timer_EndRecording(Handle timer, DataPack data)
 {
-	dp.Reset();
-	int client = dp.ReadCell();
-	int course = dp.ReadCell();
-	float time = dp.ReadFloat();
-	int teleportsUsed = dp.ReadCell();
-	delete dp;
-	
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int course = data.ReadCell();
+	float time = data.ReadFloat();
+	int teleportsUsed = data.ReadCell();
+	delete data;
+
+	// The client left after the run was done but before the post-run
+	// breather had the chance to finish. This should not happen, as we
+	// trigger all running timers on disconnect.
+	if (!IsValidClient(client))
+	{
+		return Plugin_Stop;
+	}
+
+	runningRunBreatherTimer[client] = INVALID_HANDLE;
 	postRunRecording[client] = false;
 
 	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
 	{
 		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
-		return;
+		return Plugin_Stop;
 	}
 	
 	char path[PLATFORM_MAX_PATH];
@@ -169,6 +240,8 @@ public Action EndRecording(Handle timer, DataPack dp)
 	{
 		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
 	}
+
+	return Plugin_Stop;
 }
 
 void GOKZ_OnPause_Recording(int client)
@@ -222,52 +295,93 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
 
 void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-	DataPack dp = new DataPack();
-	dp.WriteCell(client);
-	dp.WriteCell(jumptype);
-	dp.WriteFloat(distance);
-	dp.WriteCell(block);
-	dp.WriteCell(strafes);
-	dp.WriteFloat(sync);
-	dp.WriteFloat(pre);
-	dp.WriteFloat(max);
-	dp.WriteCell(airtime);
-	CreateTimer(RP_PLAYBACK_BREATHER_TIME, SaveJump, dp);
+	DataPack data = new DataPack();
+	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(jumptype);
+	data.WriteFloat(distance);
+	data.WriteCell(block);
+	data.WriteCell(strafes);
+	data.WriteFloat(sync);
+	data.WriteFloat(pre);
+	data.WriteFloat(max);
+	data.WriteCell(airtime);
+
+	Handle timer = CreateTimer(RP_PLAYBACK_BREATHER_TIME, SaveJump, data);
+	if (timer != INVALID_HANDLE)
+	{
+		runningJumpstatTimers[client].Push(timer);
+	}
+	else
+	{
+		LogError("Could not create a timer so can't save jumpstat pb replay");
+	}
 }
 
-public Action SaveJump(Handle timer, DataPack dp)
+public Action SaveJump(Handle timer, DataPack data)
 {
-	dp.Reset();
-	int client = dp.ReadCell();
-	int jumptype = dp.ReadCell();
-	float distance = dp.ReadFloat();
-	int block = dp.ReadCell();
-	int strafes = dp.ReadCell();
-	float sync = dp.ReadFloat();
-	float pre = dp.ReadFloat();
-	float max = dp.ReadFloat();
-	int airtime = dp.ReadCell();
-	delete dp;
+	data.Reset();
+	int client = GetClientOfUserId(data.ReadCell());
+	int jumptype = data.ReadCell();
+	float distance = data.ReadFloat();
+	int block = data.ReadCell();
+	int strafes = data.ReadCell();
+	float sync = data.ReadFloat();
+	float pre = data.ReadFloat();
+	float max = data.ReadFloat();
+	int airtime = data.ReadCell();
+	delete data;
+
+	// The client left after the jump was done but before the post-jump
+	// breather had the chance to finish. This should not happen, as we
+	// trigger all running timers on disconnect.
+	if (!IsValidClient(client))
+	{
+		return Plugin_Stop;
+	}
+
+	RemoveFromRunningTimers(client, timer);
 
 	SaveRecordingOfJump(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
+	return Plugin_Stop;
 }
 
 
 
 // =====[ PRIVATE ]=====
 
+static void ClearClientRecordingState(int client)
+{
+	recordingIndex[client] = 0;
+	playerSensitivity[client] = -1.0;
+	playerMYaw[client] = -1.0;
+	isTeleportTick[client] = false;
+	timerRunning[client] = false;
+	recordingPaused[client] = false;
+	postRunRecording[client] = false;
+	runningRunBreatherTimer[client] = INVALID_HANDLE;
+
+	if (recordedRecentData[client] == null)
+		recordedRecentData[client] = new ArrayList(sizeof(ReplayTickData));
+
+	if (recordedRunData[client] == null)
+		recordedRunData[client] = new ArrayList(sizeof(ReplayTickData));
+
+	if (recordedPostRunData[client] == null)
+		recordedPostRunData[client] = new ArrayList(sizeof(ReplayTickData));
+
+	if (runningJumpstatTimers[client] == null)
+		runningJumpstatTimers[client] = new ArrayList();
+
+	recordedRecentData[client].Clear();
+	recordedRunData[client].Clear();
+	recordedPostRunData[client].Clear();
+	runningJumpstatTimers[client].Clear();
+}
+
 static void StartRunRecording(int client)
 {
 	if (IsFakeClient(client))
 	{
-		return;
-	}
-
-	// *Very* ugly hack to fix an exception when starting the timer on the very
-	// first tick after loading the plugin.
-	if (recordedRecentData[client].Length == 0)
-	{
-		RequestFrame(StartRunRecording, client);
 		return;
 	}
 
@@ -467,7 +581,7 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
 	generalHeader.replayType = replayType;
 	generalHeader.gokzVersion = GOKZ_VERSION;
 	generalHeader.mapName = gC_CurrentMap;
-	generalHeader.mapFileSize = gC_CurrentMapFileSize;
+	generalHeader.mapFileSize = gI_CurrentMapFileSize;
 	generalHeader.serverIP = FindConVar("hostip").IntValue;
 	generalHeader.timestamp = GetTime();
 	GetClientName(client, generalHeader.playerAlias, sizeof(GeneralReplayHeader::playerAlias));
@@ -535,19 +649,16 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 {
 	ReplayTickData tickData;
 	ReplayTickData prevTickData;
-	int previousI = 0;
 	bool isFirstTick = true;
 	switch(replayType)
 	{
 		case ReplayType_Run:
 		{
-			// Full run including pre and post
 			for (int i = 0; i < recordedPostRunData[client].Length; i++)
 			{
 				recordedPostRunData[client].GetArray(i, tickData);
-				recordedPostRunData[client].GetArray(previousI, prevTickData);
+				recordedPostRunData[client].GetArray(IntMax(0, i-1), prevTickData);
 				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-				previousI = i;
 				isFirstTick = false;
 			}
 		}
@@ -557,9 +668,8 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 			{
 				int rollingI = RecordingIndexAdd(client, i);
 				recordedRecentData[client].GetArray(rollingI, tickData);
-				recordedRecentData[client].GetArray(previousI, prevTickData);
+				recordedRecentData[client].GetArray(IntMax(0, i-1), prevTickData);
 				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-				previousI = i;
 				isFirstTick = false;
 			}
 			
@@ -571,9 +681,8 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 			{
 				int rollingI = RecordingIndexAdd(client, i - replayLength);
 				recordedRecentData[client].GetArray(rollingI, tickData);
-				recordedRecentData[client].GetArray(previousI, prevTickData);
+				recordedRecentData[client].GetArray(IntMax(0, i-1), prevTickData);
 				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
-				previousI = i;
 				isFirstTick = false;
 			}
 		}
@@ -804,4 +913,13 @@ static int RecordingIndexAdd(int client, int offset)
 		index += recordedRecentData[client].Length;
 	}
 	return index % recordedRecentData[client].Length;
+}
+
+static void RemoveFromRunningTimers(int client, Handle timerToRemove)
+{
+	int index = runningJumpstatTimers[client].FindValue(timerToRemove);
+	if (index != -1)
+	{
+		runningJumpstatTimers[client].Erase(index);
+	}
 }
