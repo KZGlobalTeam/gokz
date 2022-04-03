@@ -25,6 +25,7 @@ static int botCourse[RP_MAX_BOTS];
 static int botMode[RP_MAX_BOTS];
 static int botStyle[RP_MAX_BOTS];
 static float botTime[RP_MAX_BOTS];
+static int botTimeTicks[RP_MAX_BOTS];
 static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
 static bool botPaused[RP_MAX_BOTS];
 static bool botPlaybackPaused[RP_MAX_BOTS];
@@ -559,6 +560,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 			int timeAsInt;
 			file.ReadInt32(timeAsInt);
 			botTime[bot] = view_as<float>(timeAsInt);
+			botTimeTicks[bot] = RoundToNearest(botTime[bot] * tickrate);
 
 			// Course
 			file.ReadInt8(botCourse[bot]);
@@ -920,7 +922,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 			botCurrentTeleport[bot] = 0;
 		}
-		if (playbackTick[bot] == playbackTickData[bot].Length - preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
+		if (playbackTick[bot] == botTimeTicks[bot] + preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
 			EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		}
