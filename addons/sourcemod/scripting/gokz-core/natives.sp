@@ -469,7 +469,7 @@ public int Native_SetTeleportCount(Handle plugin, int numParams)
 
 public int Native_RegisterOption(Handle plugin, int numParams)
 {
-	char name[30];
+	char name[GOKZ_OPTION_MAX_NAME_LENGTH];
 	GetNativeString(1, name, sizeof(name));
 	char description[255];
 	GetNativeString(2, description, sizeof(description));
@@ -478,7 +478,7 @@ public int Native_RegisterOption(Handle plugin, int numParams)
 
 public int Native_GetOptionProp(Handle plugin, int numParams)
 {
-	char option[30];
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	GetNativeString(1, option, sizeof(option));
 	OptionProp prop = GetNativeCell(2);
 	any value = GetOptionProp(option, prop);
@@ -494,7 +494,7 @@ public int Native_GetOptionProp(Handle plugin, int numParams)
 
 public int Native_SetOptionProp(Handle plugin, int numParams)
 {
-	char option[30];
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	GetNativeString(1, option, sizeof(option));
 	OptionProp prop = GetNativeCell(2);
 	return SetOptionProp(option, prop, GetNativeCell(3));
@@ -502,14 +502,14 @@ public int Native_SetOptionProp(Handle plugin, int numParams)
 
 public int Native_GetOption(Handle plugin, int numParams)
 {
-	char option[30];
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	GetNativeString(2, option, sizeof(option));
 	return view_as<int>(GetOption(GetNativeCell(1), option));
 }
 
 public int Native_SetOption(Handle plugin, int numParams)
 {
-	char option[30];
+	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	GetNativeString(2, option, sizeof(option));
 	return view_as<int>(SetOption(GetNativeCell(1), option, GetNativeCell(3)));
 }
