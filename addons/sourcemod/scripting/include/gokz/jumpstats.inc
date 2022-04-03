@@ -186,9 +186,9 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 	"GOKZ JS - Failstats Console", 
 	"GOKZ JS - Failstats Chat", 
 	"GOKZ JS - Jumpstats Always", 
-	"GOKZ JS - Extended Chat Report",
-	"GOKZ JS - Minimal Chat Broadcast Tier",
-	"GOKZ JS - Minimal Sound Broadcast Tier"
+	"GOKZ JS - Ext Chat Report",
+	"GOKZ JS - Min Chat Broadcast",
+	"GOKZ JS - Min Sound Broadcast"
 };
 
 stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 
