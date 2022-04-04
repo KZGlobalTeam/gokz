@@ -25,6 +25,8 @@ enum HUDOption:
 	HUDOption_SpeedText, 
 	HUDOption_ShowWeapon,
 	HUDOption_ShowControls, 
+	HUDOption_SpectatorList,
+	HUDOption_SpectatorListPosition,
 	HUDOPTION_COUNT
 };
 
@@ -97,7 +99,20 @@ enum
 	REPLAYCONTROLS_COUNT
 };
 
+enum
+{
+	SpectatorList_Disabled = 0,
+	SpectatorList_Simple,
+	SpectatorList_Advanced,
+	SPECTATORLIST_COUNT
+};
 
+enum
+{
+	SpectatorListPosition_TPMenu = 0,
+	SpectatorListPosition_InfoPanel,
+	SPECTATORLISTPOSITION_COUNT
+}
 
 // =====[ STRUCTS ]======
 
@@ -140,7 +155,9 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Show Time Type",
 	"GOKZ HUD - Speed Text", 
 	"GOKZ HUD - Show Weapon",
-	"GOKZ HUD - Show Controls"
+	"GOKZ HUD - Show Controls",
+	"GOKZ HUD - Spectator List",
+	"GOKZ HUD - Spec List Pos",
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -153,7 +170,9 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Timer Type - 0 = Disabled, 1 = Enabled", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
-	"Replay Controls Display - 0 = Disbled, 1 = Enabled"
+	"Replay Controls Display - 0 = Disbled, 1 = Enabled",
+	"Spectator List - 0 = Disabled, 1 = Player count, 2 = Player count and names",
+	"Spectator List Position - 0 = Teleport Menu, 2 = Center Panel"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -166,7 +185,9 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Timer Type",
 	"Options Menu - Speed Text", 
 	"Options Menu - Show Weapon",
-	"Options Menu - Show Controls"
+	"Options Menu - Show Controls",
+	"Options Menu - Spectator List",
+	"Options Menu - Spectator List Position"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -179,7 +200,9 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	TIMERTYPE_COUNT, 
 	SPEEDTEXT_COUNT, 
 	SHOWWEAPON_COUNT,
-	REPLAYCONTROLS_COUNT
+	REPLAYCONTROLS_COUNT,
+	SPECTATORLIST_COUNT,
+	SPECTATORLISTPOSITION_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -237,7 +260,44 @@ stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
 	"Options Menu - Enabled"
 };
 
+stock char gC_SpectatorListPhrases[SPECTATORLIST_COUNT][] =
+{
+	"Options Menu - Disabled",
+	"Options Menu - Player Count",
+	"Options Menu - Player Count & Names"
+};
 
+stock char gC_SpectatorListPositionPhrases[SPECTATORLISTPOSITION_COUNT][] =
+{
+	"Options Menu - Teleport Menu",
+	"Options Menu - Info Panel"
+}
+
+// =====[ NATIVES ]=====
+
+/**
+ * Returns whether the GOKZ HUD menu is showing for a client.
+ *
+ * @param client		Client index.
+ * @return				Whether the GOKZ HUD menu is showing.
+ */
+native bool GOKZ_HUD_GetMenuShowing(int client);
+
+/**
+ * Sets whether the GOKZ HUD menu would be showing for a client.
+ *
+ * @param client		Client index.
+ * @param value			Whether the GOKZ HUD menu would be showing for a client.
+ */
+native void GOKZ_HUD_SetMenuShowing(int client, bool value);
+
+/**
+ * Gets the spectator text for the menu. Used by GOKZ-replays.
+ *
+ * @param client		Client index.
+ * @param value			Whether the GOKZ HUD menu would be showing for a client.
+ */
+native void GOKZ_HUD_GetMenuSpectatorText(int client, any[] info, char[] buffer, int size);
 
 // =====[ STOCKS ]=====
 
@@ -327,3 +387,12 @@ public SharedPlugin __pl_gokz_hud =
 	required = 0, 
 	#endif
 };
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_hud_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_HUD_GetMenuShowing");
+	MarkNativeAsOptional("GOKZ_HUD_SetMenuShowing");
+	MarkNativeAsOptional("GOKZ_HUD_GetMenuSpectatorText");
+}
+#endif

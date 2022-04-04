@@ -230,6 +230,14 @@
 	{
 		"en"		"Show replay controls"
 	}
+	"Options Menu - Spectator List"
+	{
+		"en"		"Spectator list"
+	}
+	"Options Menu - Spectator List Position"
+	{
+		"en"		"Spectator list position"
+	}
 
 
 	// =====[ RACING ]=====
@@ -242,5 +250,37 @@
 	{
 		"en"		"GO!"
 		"ru"		"НАЧАЛИ!"
+	}
+
+	// =====[ SPECTATOR LIST ]=====
+	"Spectator List - Menu (Simple)"
+	{
+		"#format"	"{1:d}"
+		"en"		"Specs: {1}"
+	}
+	"Spectator List - Menu (Advanced)"
+	{
+		"#format"	"{1:d},{2:s}"
+		"en"		"Specs ({1})\n{2}"
+	}
+	"Spectator List - Info Panel (Simple)"
+	{
+		// Specs: 2
+		"#format"	"{1:d}"
+		"en"		"Specs: <font color='#ffffff'>{1}</font>"
+	}
+	"Spectator List - Info Panel (Advanced)"
+	{
+		// Specs (2): P1, P2
+		"#format"	"{1:d},{2:s}"
+		"en"		"Specs ({1}): <font color='#ffffff'>{2}</font>"
+	}
+	"Options Menu - Player Count"
+	{
+		"en"		"Player count"
+	}
+	"Options Menu - Player Count & Names"
+	{
+		"en"		"Player count & names"
 	}
 }

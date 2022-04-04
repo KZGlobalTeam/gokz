@@ -421,6 +421,32 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
+	property int SpectatorList {
+		public get() {
+			return this.GetHUDOption(HUDOption_SpectatorList);
+		}
+		public set(int value){
+			this.SetHUDOption(HUDOption_SpectatorList, value);
+		}
+	}
+
+	property int SpectatorListPosition {
+		public get() {
+			return this.GetHUDOption(HUDOption_SpectatorListPosition);
+		}
+		public set(int value){
+			this.SetHUDOption(HUDOption_SpectatorListPosition, value);
+		}
+	}
+
+	property bool MenuShowing {
+		public get() {
+			return GOKZ_HUD_GetMenuShowing(this.ID);
+		}
+		public set(bool value) {
+			GOKZ_HUD_SetMenuShowing(this.ID, value);
+		}
+	}
 	#endif
 	// =====[ END HUD ]=====
 	

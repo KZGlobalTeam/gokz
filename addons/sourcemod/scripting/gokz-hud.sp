@@ -30,7 +30,10 @@ public Plugin myinfo =
 bool gB_GOKZRacing;
 bool gB_GOKZReplays;
 bool gB_MenuShowing[MAXPLAYERS + 1];
+int gI_ObserverTarget[MAXPLAYERS + 1];
 
+#include "gokz-hud/spectate_text.sp"
+#include "gokz-hud/natives.sp"
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
@@ -48,6 +51,7 @@ bool gB_MenuShowing[MAXPLAYERS + 1];
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
+	CreateNatives();
 	RegPluginLibrary("gokz-hud");
 	return APLRes_Success;
 }
@@ -60,9 +64,15 @@ public void OnPluginStart()
 	HookEvents();
 	RegisterCommands();
 	
+	UpdateSpectatorList();
 	OnPluginStart_RacingText();
 	OnPluginStart_SpeedText();
 	OnPluginStart_TimerText();
+}
+
+public void OnPluginEnd()
+{
+	OnPluginEnd_Menu();
 }
 
 public void OnAllPluginsLoaded()
@@ -102,6 +112,11 @@ public void OnLibraryRemoved(const char[] name)
 
 
 // =====[ CLIENT EVENTS ]=====
+
+public void OnClientDisconnect(int client)
+{
+	gI_ObserverTarget[client] = -1;
+}
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
@@ -223,6 +238,15 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 // =====[ OTHER EVENTS ]=====
 
+public void OnGameFrame()
+{
+	// Cache the spectator list every few ticks.
+	if (GetGameTickCount() % 4 == 0)
+	{
+		UpdateSpectatorList();
+	}
+}
+
 public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
 {
 	OnOptionsMenuCreated_OptionsMenu(topMenu);
@@ -267,4 +291,5 @@ static void SetHUDInfo(KZPlayer player, HUDInfo info, int cmdnum)
 	info.TakeoffSpeed = player.GOKZTakeoffSpeed;
 	info.IsTakeoff = Movement_GetTakeoffCmdNum(player.ID) == cmdnum;
 	info.Buttons = player.Buttons;
+	info.CurrentTeleport = player.TeleportCount;
 }
