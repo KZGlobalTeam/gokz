@@ -191,7 +191,14 @@ void OnPlayerRunCmd_MapTriggers(int client, int &buttons)
 		}
 		else if (touched.triggerType == TriggerType_Teleport)
 		{
-			TouchTeleportTrigger(client, touched, flags);
+			// Sometimes due to lag or whatever, the player can be
+			// teleported twice by the same trigger. This fixes that.
+			if (TouchTeleportTrigger(client, touched, flags))
+			{
+				RemoveTriggerFromTouchList(client, EntRefToEntIndex(touched.entRef));
+				i--;
+				triggerTouchListLength--;
+			}
 		}
 	}
 }
@@ -582,22 +589,24 @@ static void TouchAntibhopTrigger(TouchedTrigger touched, int &newButtons, int fl
 	}
 }
 
-static void TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
+static bool TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 {
+	bool shouldTeleport = false;
+	
 	char key[32];
 	GetEntityHammerIDString(touched.entRef, key, sizeof(key));
 	TeleportTrigger trigger;
 	if (!teleportTriggers.GetArray(key, trigger, sizeof(trigger)))
 	{
 		// Couldn't get the teleport trigger from the trigger array for some reason.
-		return;
+		return shouldTeleport;
 	}
 	
 	bool isBhopTrigger = IsBhopTrigger(trigger.type);
 	// NOTE: Player hasn't touched the ground inside this trigger yet.
 	if (touched.groundTouchTick == -1 && isBhopTrigger)
 	{
-		return;
+		return shouldTeleport;
 	}
 	
 	float destOrigin[3];
@@ -615,11 +624,10 @@ static void TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 		|| (!gotTriggerOrigin && trigger.relativeDestination))
 	{
 		PrintToConsole(client, "[KZ] Invalid teleport destination \"%s\" on trigger with hammerID %i.", trigger.tpDestination, trigger.hammerID);
-		return;
+		return shouldTeleport;
 	}
 	
 	// NOTE: Find out if we should actually teleport.
-	bool shouldTeleport = false;
 	if (isBhopTrigger && (flags & FL_ONGROUND))
 	{
 		float touchTime = CalculateGroundTouchTime(touched);
@@ -653,7 +661,7 @@ static void TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 	
 	if (!shouldTeleport)
 	{
-		return;
+		return shouldTeleport;
 	}
 	
 	bool shouldReorientPlayer = trigger.reorientPlayer
@@ -708,6 +716,8 @@ static void TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 	{
 		TeleportPlayer(client, finalOrigin, finalPlayerAngles, gotDestAngles && trigger.useDestAngles, trigger.resetSpeed);
 	}
+	
+	return shouldTeleport;
 }
 
 static float CalculateGroundTouchTime(TouchedTrigger touched)
