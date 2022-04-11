@@ -115,7 +115,12 @@ void MakeCheckpoint(int client)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Make Checkpoint", checkpointCount[client]);
 	}
-	
+
+	if (!GetTimerRunning(client) && AntiCpTriggerIsTouched(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Anti Checkpoint Area Warning");
+	}
+
 	// Call Post Forward
 	Call_GOKZ_OnMakeCheckpoint_Post(client);
 }
