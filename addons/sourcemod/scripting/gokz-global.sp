@@ -259,6 +259,21 @@ public void GlobalAPI_OnInitialized()
 	SetupAPI();
 }
 
+
+public Action GOKZ_OnTimerStart(int client, int course)
+{
+	KZPlayer player = KZPlayer(client);
+	int mode = player.Mode;
+
+	// We check the timer running to prevent spam when standing inside VB.
+	if (GlobalAPI_HasAPIKey() && !GlobalsEnabled(mode) && !GOKZ_GetTimerRunning(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Warn Player Not Global Run");
+	}
+
+	return Plugin_Continue;
+}
+
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	KZPlayer player = KZPlayer(client);
