@@ -54,6 +54,7 @@ int gI_MapFileSize;
 int gI_MapTier;
 
 ConVar gCV_gokz_settings_enforcer;
+ConVar gCV_gokz_warn_for_non_global_map;
 ConVar gCV_EnforcedCVar[ENFORCEDCVAR_COUNT];
 
 #include "gokz-global/api.sp"
@@ -266,7 +267,10 @@ public Action GOKZ_OnTimerStart(int client, int course)
 	int mode = player.Mode;
 
 	// We check the timer running to prevent spam when standing inside VB.
-	if (GlobalAPI_HasAPIKey() && !GlobalsEnabled(mode) && !GOKZ_GetTimerRunning(client))
+	if (gCV_gokz_warn_for_non_global_map.BoolValue
+		&& GlobalAPI_HasAPIKey()
+		&& !GlobalsEnabled(mode)
+		&& !GOKZ_GetTimerRunning(client))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Warn Player Not Global Run");
 	}
@@ -527,6 +531,7 @@ static void CreateConVars()
 	AutoExecConfig_SetCreateFile(true);
 	
 	gCV_gokz_settings_enforcer = AutoExecConfig_CreateConVar("gokz_settings_enforcer", "1", "Whether GOKZ enforces convars required for global records.", _, true, 0.0, true, 1.0);
+	gCV_gokz_warn_for_non_global_map = AutoExecConfig_CreateConVar("gokz_warn_for_non_global_map", "1", "Whether or not GOKZ should warn players if the global check does not pass.", _, true, 0.0, true, 1.0);
 	gCV_gokz_settings_enforcer.AddChangeHook(OnConVarChanged);
 	
 	AutoExecConfig_ExecuteFile();
