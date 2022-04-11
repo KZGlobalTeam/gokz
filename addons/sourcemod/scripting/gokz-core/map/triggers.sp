@@ -18,6 +18,7 @@ static int antiJumpstatTriggerTouchCount[MAXPLAYERS + 1];
 static int mapMappingApiVersion = GOKZ_MAPPING_API_VERSION_NONE;
 static int bhopTouchCount[MAXPLAYERS + 1];
 static ArrayList triggerTouchList[MAXPLAYERS + 1]; // arraylist of TouchedTrigger that the player is currently touching. this array won't ever get long (unless the mapper does something weird).
+static StringMap triggerTouchCounts[MAXPLAYERS + 1]; // stringmap of int touch counts with key being a string of the entity reference.
 static StringMap antiBhopTriggers; // stringmap of AntiBhopTrigger with key being a string of the m_iHammerID entprop.
 static StringMap teleportTriggers; // stringmap of TeleportTrigger with key being a string of the m_iHammerID entprop.
 static StringMap timerButtonTriggers; // stringmap of legacy timer zone triggers with key being a string of the m_iHammerID entprop.
@@ -141,6 +142,15 @@ void OnClientPutInServer_MapTriggers(int client)
 	else
 	{
 		triggerTouchList[client].Clear();
+	}
+	
+	if (triggerTouchCounts[client] == null)
+	{
+		triggerTouchCounts[client] = new StringMap();
+	}
+	else
+	{
+		triggerTouchCounts[client].Clear();
 	}
 	
 	bhopTouchCount[client] = 0;
@@ -306,6 +316,14 @@ public void OnAntiBhopTrigTouchStart_MapTriggers(const char[] output, int entity
 		return;
 	}
 	
+	int touchCount = IncrementTriggerTouchCount(other, entity);
+	if (touchCount <= 0)
+	{
+		// The trigger has fired a matching endtouch output before
+		// the starttouch output, so ignore it.
+		return;
+	}
+	
 	AddTriggerToTouchList(other, entity, TriggerType_Antibhop);
 }
 
@@ -316,6 +334,7 @@ public void OnAntiBhopTrigTouchEnd_MapTriggers(const char[] output, int entity, 
 		return;
 	}
 	
+	DecrementTriggerTouchCount(other, entity);
 	RemoveTriggerFromTouchList(other, entity);
 }
 
@@ -323,6 +342,14 @@ public void OnTeleportTrigTouchStart_MapTriggers(const char[] output, int entity
 {
 	if (!IsValidClient(other))
 	{
+		return;
+	}
+	
+	int touchCount = IncrementTriggerTouchCount(other, entity);
+	if (touchCount <= 0)
+	{
+		// The trigger has fired a matching endtouch output before
+		// the starttouch output, so ignore it.
 		return;
 	}
 	
@@ -344,6 +371,8 @@ public void OnTeleportTrigTouchEnd_MapTriggers(const char[] output, int entity, 
 	{
 		return;
 	}
+	
+	DecrementTriggerTouchCount(other, entity);
 	
 	char key[32];
 	GetEntityHammerIDString(entity, key, sizeof(key));
@@ -557,6 +586,34 @@ static void RemoveTriggerFromTouchList(int client, int trigger)
 			break;
 		}
 	}
+}
+
+static int IncrementTriggerTouchCount(int client, int trigger)
+{
+	int entref = EntIndexToEntRef(trigger);
+	char szEntref[64];
+	FormatEx(szEntref, sizeof(szEntref), "%i", entref);
+	
+	int value = 0;
+	triggerTouchCounts[client].GetValue(szEntref, value);
+	
+	value += 1;
+	triggerTouchCounts[client].SetValue(szEntref, value);
+	
+	return value;
+}
+
+static void DecrementTriggerTouchCount(int client, int trigger)
+{
+	int entref = EntIndexToEntRef(trigger);
+	char szEntref[64];
+	FormatEx(szEntref, sizeof(szEntref), "%i", entref);
+	
+	int value = 0;
+	triggerTouchCounts[client].GetValue(szEntref, value);
+	
+	value -= 1;
+	triggerTouchCounts[client].SetValue(szEntref, value);
 }
 
 static void TouchAntibhopTrigger(TouchedTrigger touched, int &newButtons, int flags)
