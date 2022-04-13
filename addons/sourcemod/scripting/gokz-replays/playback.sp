@@ -603,7 +603,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData));
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)));
 	}
 	else
 	{
