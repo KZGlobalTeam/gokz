@@ -106,7 +106,7 @@ char[] FormatSpectatorTextForInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 
 void UpdateSpectatorList()
 {
-	for (int client = 1; client < MaxClients; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && !IsFakeClient(client))
 		{
