@@ -33,7 +33,7 @@ char[] FormatTimerTextForMenu(KZPlayer player, HUDInfo info)
 		}
 		if (info.Paused)
 		{
-			Format(timerTextString, sizeof(timerTextString), "%s %T", timerTextString, "Info Panel Text - PAUSED");
+			Format(timerTextString, sizeof(timerTextString), "%s (%T)", timerTextString, "Info Panel Text - PAUSED", player.ID);
 		}
 	}
 	return timerTextString;
