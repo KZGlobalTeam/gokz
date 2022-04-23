@@ -53,6 +53,10 @@
 		"chi"		"{grey}你存储了一个存点 (#{default}{1}{grey})."
 		"ru"		"{grey}Вы поставили чекпойнт (#{default}{1}{grey})."
 	}
+	"Anti Checkpoint Area Warning"
+	{
+		"en"		"{yellow}Warning{grey}: Checkpoint created in checkpoint disabled area."
+	}
 	"Can't Checkpoint (Midair)"
 	{
 		"en"		"{darkred}You can't make a checkpoint mid-air."
