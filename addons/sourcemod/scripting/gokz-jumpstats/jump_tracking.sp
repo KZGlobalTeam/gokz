@@ -1289,6 +1289,15 @@ void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump, bool
 		return;
 	}
 
+	// Check if this change of move type is caused by ladder hopping in the air.
+	// If it is then this is not a valid jumpstat.	
+	int buttons = GetClientButtons(client);
+	float ignoreLadderJumpTime = GetEntPropFloat(client, Prop_Data, "m_ignoreLadderJumpTime");
+	if (ladderJump && buttons & IN_JUMP && ignoreLadderJumpTime <= GetGameTime())
+	{
+		return;
+	}
+
 	// Update: Takeoff speed should be always correct with the new MovementAPI.
 	if (jumped)
 	{
