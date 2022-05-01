@@ -116,6 +116,8 @@ enum struct JumpTracker
 		
 		// Reset pose history
 		this.poseIndex = 0;
+		// Update the first tick if it is a jumpbug.
+		this.UpdateOnGround();
 	}
 	
 	void Begin()
