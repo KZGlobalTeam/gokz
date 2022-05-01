@@ -311,8 +311,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 {
 	if (!FileExists(path))
 	{
-		// This can happen relatively frequently, e.g. for jumps without a replay,
-		// therefore we're not logging it for now to avoid clutter.
+		GOKZ_PrintToChat(client, true, "%t", "No Replay Found");
 		return false;
 	}
 
