@@ -254,7 +254,6 @@ void OnClientPutInServer_Playback(int client)
 		{
 			botInGame[bot] = true;
 			botClient[bot] = client;
-			ResetBotStuff(bot);
 			break;
 		}
 	}
@@ -715,7 +714,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
+				KickClient(botClient[bot]);
 			}
 		}
 	}
@@ -735,7 +734,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			ResetBotStuff(bot);
+			KickClient(botClient[bot]);
 			return;
 		}
 		
@@ -880,7 +879,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
+				KickClient(botClient[bot]);
 			}
 		}
 	}
@@ -900,7 +899,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			ResetBotStuff(bot);
+			KickClient(botClient[bot]);
 			return;
 		}
 		
@@ -1090,20 +1089,6 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 	}
 }
 
-// Reset the bot client's clan tag and name to the default, unused state
-static void ResetBotStuff(int bot)
-{
-	int client = botClient[bot];
-	
-	CS_SetClientClanTag(client, "!REPLAY");
-	char name[MAX_NAME_LENGTH];
-	FormatEx(name, sizeof(name), "%d", bot + 1);
-	gB_HideNameChange = true;
-	SetClientName(client, name);
-	
-	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-}
-
 // Set the bot client's GOKZ options, clan tag and name based on the loaded replay data
 static void SetBotStuff(int bot)
 {
@@ -1266,8 +1251,9 @@ static int GetUnusedBot()
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
-		if (botInGame[bot] && !botDataLoaded[bot])
+		if (!botInGame[bot])
 		{
+			CreateFakeClient("botName");
 			return bot;
 		}
 	}
