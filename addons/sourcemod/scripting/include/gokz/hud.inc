@@ -25,6 +25,7 @@ enum HUDOption:
 	HUDOption_SpeedText, 
 	HUDOption_ShowWeapon,
 	HUDOption_ShowControls, 
+	HUDOption_ShowSpectators,
 	HUDOPTION_COUNT
 };
 
@@ -97,6 +98,14 @@ enum
 	REPLAYCONTROLS_COUNT
 };
 
+enum
+{
+	ShowSpecs_Disabled = 0,
+	ShowSpecs_Number,
+	ShowSpecs_Full,
+	SHOWSPECS_COUNT
+};
+
 
 
 // =====[ STRUCTS ]======
@@ -140,7 +149,8 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Show Time Type",
 	"GOKZ HUD - Speed Text", 
 	"GOKZ HUD - Show Weapon",
-	"GOKZ HUD - Show Controls"
+	"GOKZ HUD - Show Controls",
+	"GOKZ HUD - Show Spectators"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -153,7 +163,8 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Timer Type - 0 = Disabled, 1 = Enabled", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
-	"Replay Controls Display - 0 = Disbled, 1 = Enabled"
+	"Replay Controls Display - 0 = Disabled, 1 = Enabled",
+	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -166,7 +177,8 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Timer Type",
 	"Options Menu - Speed Text", 
 	"Options Menu - Show Weapon",
-	"Options Menu - Show Controls"
+	"Options Menu - Show Controls",
+	"Options Menu - Show Spectators"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -179,7 +191,8 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	TIMERTYPE_COUNT, 
 	SPEEDTEXT_COUNT, 
 	SHOWWEAPON_COUNT,
-	REPLAYCONTROLS_COUNT
+	REPLAYCONTROLS_COUNT,
+	SHOWSPECS_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -192,7 +205,8 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	TimerType_Enabled,
 	SpeedText_InfoPanel, 
 	ShowWeapon_Enabled,
-	ReplayControls_Enabled
+	ReplayControls_Enabled,
+	ShowSpecs_Disabled
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -236,6 +250,13 @@ stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
 	"Options Menu - Disabled",
 	"Options Menu - Enabled"
 };
+
+stock char gC_ShowSpecsPhrases[SHOWSPECS_COUNT][] =
+{
+	"Options Menu - Disabled",
+	"Options Menu - Number",
+	"Options Menu - Number and Names"
+}
 
 
 
