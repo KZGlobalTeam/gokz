@@ -24,7 +24,8 @@ void OnPluginStart_SpeedText()
 
 void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 3 == 0 || info.IsTakeoff)
+	int updateSpeed = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast ? 3 : 6;
+	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateSpeedText(client, info);
 	}
@@ -69,47 +70,27 @@ static void ShowSpeedText(KZPlayer player, HUDInfo info)
 		return;
 	}
 	
-	int colour[4]; // RGBA
-	if (GOKZ_HUD_GetOption(player.ID, HUDOption_SpeedColor) == SpeedColor_Advanced)
+	int colour[4] = { 255, 255, 255, 0 }; // RGBA
+	float velZ = Movement_GetVerticalVelocity(info.ID);
+	if (!info.OnGround && !info.OnLadder && !info.Noclipping)
 	{
-		if (!info.OnGround && !info.OnLadder && !info.Noclipping)
+		if (GOKZ_HUD_GetOption(player.ID, HUDOption_DeadstrafeColor) == DeadstrafeColor_Enabled && velZ > 0.0 && velZ < 140.0)
 		{
-			if (info.HitPerf)
+			colour = { 255, 32, 32, 0 };
+		}
+		else if (info.HitPerf)
+		{
+			if (info.HitJB)
 			{
-				if (info.HitJB)
-				{
-					colour = { 255, 255, 32, 0 };
-				}
-				else
-				{
-					colour = { 64, 255, 64, 0 };
-				}
+				colour = { 255, 255, 32, 0 };
 			}
 			else
 			{
-				colour = { 255, 255, 255, 0 };
-			}
-			// During this period your airstrafe capacity is reduced by 4 times.
-			float velZ = Movement_GetVerticalVelocity(info.ID);
-			if (velZ > 0.0 && velZ < 140.0)
-			{
-				colour = { 255, 32, 32, 0 };
+				colour = { 64, 255, 64, 0 };
 			}
 		}
-		else
-		{
-			colour = { 255, 255, 255, 0 };
-		}
 	}
-	else if (info.HitPerf && !info.OnGround && !info.OnLadder && !info.Noclipping)
-	{
-		colour = { 64, 255, 64, 0 };
-	}
-	else
-	{
-		colour = { 255, 255, 255, 0 };
-	}
-	
+
 	switch (player.SpeedText)
 	{
 		case SpeedText_Bottom:

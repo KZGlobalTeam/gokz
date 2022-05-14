@@ -21,7 +21,8 @@
 
 void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 3)
+	int updateSpeed = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast ? 3 : 6;
+	if (cmdnum % updateSpeed == 2)
 	{
 		UpdateTPMenu(client, info);
 	}

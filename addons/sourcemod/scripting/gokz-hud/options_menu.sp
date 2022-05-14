@@ -114,17 +114,23 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 					gC_HUDOptionPhrases[option], param, 
 					gC_SpeedTextPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
-			case HUDOption_SpeedColor:
-			{
-				FormatEx(buffer, maxlength, "%T - %T", 
-					gC_HUDOptionPhrases[option], param, 
-					gC_SpeedColorPhrases[GOKZ_HUD_GetOption(param, option)], param);
-			}
 			case HUDOption_ShowControls:
 			{
 				FormatEx(buffer, maxlength, "%T - %T",
 					gC_HUDOptionPhrases[option], param,
 					gC_ShowControlsPhrases[GOKZ_HUD_GetOption(param, option)], param);
+			}
+			case HUDOption_DeadstrafeColor:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					gC_HUDOptionPhrases[option], param, 
+					gC_DeadstrafeColorPhrases[GOKZ_HUD_GetOption(param, option)], param);
+			}
+			case HUDOption_UpdateRate:
+			{
+				FormatEx(buffer, maxlength, "%T - %T",
+					gC_HUDOptionPhrases[option], param,
+					gC_HUDUpdateRatePhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}

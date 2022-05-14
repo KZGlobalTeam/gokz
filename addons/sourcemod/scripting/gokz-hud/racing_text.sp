@@ -21,7 +21,8 @@ void OnPluginStart_RacingText()
 
 void OnPlayerRunCmdPost_RacingText(int client, int cmdnum)
 {
-	if (gB_GOKZRacing && cmdnum % 6 == 3)
+	int updateSpeed = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast ? 3 : 6;
+	if (gB_GOKZRacing && cmdnum % updateSpeed == 2)
 	{
 		UpdateRacingText(client);
 	}

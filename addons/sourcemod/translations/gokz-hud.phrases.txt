@@ -71,7 +71,14 @@
 	{
 		"en"		"{grey}Replay controls are now hidden."
 	}
-
+	"Option - Dead Strafe - Enable"
+	{
+		"en"		"{grey}The speed text now indicates period with low airstrafe gain."
+	}
+	"Option - Dead Strafe - Disable"
+	{
+		"en"		"{grey}Dead strafe period indicator disabled."
+	}
 
 	// =====[ INFO PANEL ]=====
 	"Info Panel Text - Time"
@@ -220,9 +227,9 @@
 		"chi"		"空速文字"
 		"ru"		"Текст скорости"
 	}
-	"Options Menu - Speed Color"
+	"Options Menu - Dead Strafe Indicator"
 	{
-		"en"		"Speed color"
+		"en"		"Dead strafe period"
 	}
 	"Options Menu - Show Weapon"
 	{
@@ -234,7 +241,10 @@
 	{
 		"en"		"Show replay controls"
 	}
-
+	"Options Menu - Update Rate"
+	{
+		"en"		"Update rate"
+	}
 
 	// =====[ RACING ]=====
 	"Get Ready"

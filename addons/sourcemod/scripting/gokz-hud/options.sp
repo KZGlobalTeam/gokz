@@ -122,5 +122,19 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_DeadstrafeColor:
+		{
+			switch (newValue)
+			{
+				case DeadstrafeColor_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Dead Strafe - Disable");
+				}
+				case DeadstrafeColor_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Dead Strafe - Enable");
+				}
+			}
+		}
 	}
 } 

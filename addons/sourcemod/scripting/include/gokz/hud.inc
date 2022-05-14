@@ -23,9 +23,10 @@ enum HUDOption:
 	HUDOption_TimerStyle,
 	HUDOption_TimerType, 
 	HUDOption_SpeedText,
-	HUDOption_SpeedColor,
 	HUDOption_ShowWeapon,
-	HUDOption_ShowControls, 
+	HUDOption_ShowControls,
+	HUDOption_DeadstrafeColor,
+	HUDOption_UpdateRate,
 	HUDOPTION_COUNT
 };
 
@@ -86,13 +87,6 @@ enum
 
 enum
 {
-	SpeedColor_Simple = 0, 
-	SpeedColor_Advanced, 
-	SPEEDCOLOR_COUNT
-};
-
-enum
-{
 	ShowWeapon_Disabled = 0, 
 	ShowWeapon_Enabled, 
 	SHOWWEAPON_COUNT
@@ -105,7 +99,19 @@ enum
 	REPLAYCONTROLS_COUNT
 };
 
+enum
+{
+	DeadstrafeColor_Disabled = 0, 
+	DeadstrafeColor_Enabled, 
+	DEADSTRAFECOLOR_COUNT
+};
 
+enum
+{
+	UpdateRate_Slow = 0,
+	UpdateRate_Fast,
+	UPDATERATE_COUNT,
+};
 
 // =====[ STRUCTS ]======
 
@@ -148,9 +154,10 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Timer Style", 
 	"GOKZ HUD - Show Time Type",
 	"GOKZ HUD - Speed Text", 
-	"GOKZ HUD - Speed Color",
 	"GOKZ HUD - Show Weapon",
-	"GOKZ HUD - Show Controls"
+	"GOKZ HUD - Show Controls",
+	"GOKZ HUD - Dead Strafe",
+	"GOKZ HUD - Update Rate"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -162,9 +169,10 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Timer Style - 0 = Standard, 1 = Precise",
 	"Timer Type - 0 = Disabled, 1 = Enabled", 
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom",
-	"Speed Color - 0 = Simple, 1 = Advanced",
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
-	"Replay Controls Display - 0 = Disbled, 1 = Enabled"
+	"Replay Controls Display - 0 = Disbled, 1 = Enabled",
+	"Dead Strafe Indicator - 0 = Disabled, 1 = Enabled",
+	"HUD Update Rate - 0 = Slow, 1 = Fast"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -175,10 +183,11 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Timer Text", 
 	"Options Menu - Timer Style", 
 	"Options Menu - Timer Type",
-	"Options Menu - Speed Text", 
-	"Options Menu - Speed Color", 
+	"Options Menu - Speed Text",
 	"Options Menu - Show Weapon",
-	"Options Menu - Show Controls"
+	"Options Menu - Show Controls",
+	"Options Menu - Dead Strafe Indicator",
+	"Options Menu - Update Rate"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -189,10 +198,11 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	TIMERTEXT_COUNT, 
 	TIMERSTYLE_COUNT,
 	TIMERTYPE_COUNT, 
-	SPEEDTEXT_COUNT, 
-	SPEEDCOLOR_COUNT,
+	SPEEDTEXT_COUNT,
 	SHOWWEAPON_COUNT,
-	REPLAYCONTROLS_COUNT
+	REPLAYCONTROLS_COUNT,
+	DEADSTRAFECOLOR_COUNT,
+	UPDATERATE_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -203,10 +213,10 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	TimerText_InfoPanel, 
 	TimerStyle_Standard, 
 	TimerType_Enabled,
-	SpeedText_InfoPanel, 
-	SpeedColor_Simple,
+	SpeedText_InfoPanel,
 	ShowWeapon_Enabled,
-	ReplayControls_Enabled
+	ReplayControls_Enabled,
+	DeadstrafeColor_Disabled
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -245,19 +255,23 @@ stock char gC_SpeedTextPhrases[SPEEDTEXT_COUNT][] =
 	"Options Menu - Bottom"
 };
 
-stock char gC_SpeedColorPhrases[SPEEDCOLOR_COUNT][] = 
-{
-	"Options Menu - Simple", 
-	"Options Menu - Advanced"
-};
-
 stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
 {
 	"Options Menu - Disabled",
 	"Options Menu - Enabled"
 };
 
+stock char gC_DeadstrafeColorPhrases[DEADSTRAFECOLOR_COUNT][] = 
+{
+	"Options Menu - Disabled",
+	"Options Menu - Enabled"
+};
 
+stock char gC_HUDUpdateRatePhrases[UPDATERATE_COUNT][]=
+{
+	"Options Menu - Slow",
+	"Options Menu - Fast"
+}
 
 // =====[ STOCKS ]=====
 

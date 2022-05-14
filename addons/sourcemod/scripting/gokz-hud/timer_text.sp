@@ -43,7 +43,8 @@ void OnPluginStart_TimerText()
 
 void OnPlayerRunCmdPost_TimerText(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 3 == 1)
+	int updateSpeed = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast ? 3 : 6;
+	if (cmdnum % updateSpeed == 1)
 	{
 		UpdateTimerText(client, info);
 	}

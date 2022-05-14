@@ -110,4 +110,12 @@
 		"chi"		"高级"
 		"ru"		"Продвинутый"
 	}
+	"Options Menu - Slow"
+	{
+		"en"		"Slow"
+	}
+	"Options Menu - Fast"
+	{
+		"en"		"Fast"
+	}
 }

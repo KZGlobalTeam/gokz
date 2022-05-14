@@ -28,10 +28,14 @@ bool IsDrawingInfoPanel(int client)
 
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
-	// The hint text panel update speed depends on the client ping.
-	// To optimize resource usage, we scale the update speed with it.
-	// The fastest speed the client can get is around once every 2 ticks.
-	int updateSpeed = RoundToFloor(GetClientAvgLatency(client, NetFlow_Outgoing) / GetTickInterval());
+	int updateSpeed = 10;
+	if (GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast)
+	{
+		// The hint text panel update speed depends on the client ping.
+		// To optimize resource usage, we scale the update speed with it.
+		// The fastest speed the client can get is around once every 2 ticks.
+		updateSpeed = RoundToFloor(GetClientAvgLatency(client, NetFlow_Outgoing) / GetTickInterval());
+	}
 	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateInfoPanel(client, info);
@@ -163,14 +167,14 @@ static char[] GetSpeedString(KZPlayer player, HUDInfo info)
 		}
 		else
 		{
-			if (GOKZ_HUD_GetOption(player.ID, HUDOption_SpeedColor) == SpeedColor_Advanced
+			if (GOKZ_HUD_GetOption(player.ID, HUDOption_DeadstrafeColor) == DeadstrafeColor_Enabled
 			&& Movement_GetVerticalVelocity(info.ID) > 0.0 && Movement_GetVerticalVelocity(info.ID) < 140.0)
 			{
 				FormatEx(speedString, sizeof(speedString), 
 					"%T: <font color='#ff2020'>%.0f</font> %s\n", 
 					"Info Panel Text - Speed", player.ID, 
 					RoundToPowerOfTen(info.Speed, -2), 
-					GetTakeoffString(player, info));
+					GetTakeoffString(info));
 			}
 			else
 			{
@@ -178,14 +182,14 @@ static char[] GetSpeedString(KZPlayer player, HUDInfo info)
 					"%T: <font color='#ffffff'>%.0f</font> %s\n", 
 					"Info Panel Text - Speed", player.ID, 
 					RoundToPowerOfTen(info.Speed, -2), 
-					GetTakeoffString(player, info));
+					GetTakeoffString(info));
 			}
 		}
 	}
 	return speedString;
 }
 
-static char[] GetTakeoffString(KZPlayer player, HUDInfo info)
+static char[] GetTakeoffString(HUDInfo info)
 {
 	char takeoffString[96], duckString[32];
 	
@@ -206,7 +210,7 @@ static char[] GetTakeoffString(KZPlayer player, HUDInfo info)
 		infoPanelShowDuckString[info.ID] = false;
 	}
 
-	if (info.HitJB && GOKZ_HUD_GetOption(player.ID, HUDOption_SpeedColor) == SpeedColor_Advanced)
+	if (info.HitJB)
 	{
 		FormatEx(takeoffString, sizeof(takeoffString), 
 			"(<font color='#ffff20'>%.0f</font>)%s", 
