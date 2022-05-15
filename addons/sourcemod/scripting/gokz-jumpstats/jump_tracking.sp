@@ -289,7 +289,7 @@ enum struct JumpTracker
 			float ignoreLadderJumpTime = GetEntPropFloat(this.jumper, Prop_Data, "m_ignoreLadderJumpTime");
 			// Check if the ladder glide period is still active and if the player held jump in that period.
 			if (ignoreLadderJumpTime > curtime &&
-				ignoreLadderJumpTime - 0.2 < lastJumpButtonTime[this.jumper] && lastJumpButtonTime[this.jumper] < ignoreLadderJumpTime)
+				ignoreLadderJumpTime - IGNORE_JUMP_TIME < lastJumpButtonTime[this.jumper] && lastJumpButtonTime[this.jumper] < ignoreLadderJumpTime)
 			{
 				return JumpType_Invalid;
 			}
