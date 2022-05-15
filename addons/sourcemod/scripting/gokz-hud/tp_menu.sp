@@ -132,7 +132,7 @@ static void ShowPanel(KZPlayer player, HUDInfo info)
 {
 	char panelTitle[256];
 	// Spectator List
-	if (player.SpectatorList >= SpectatorList_Simple && player.SpectatorListPosition == SpectatorListPosition_TPMenu)
+	if (player.SpecList >= SpecList_Number && player.SpecListPosition == SpecListPosition_TPMenu)
 	{
 		Format(panelTitle, sizeof(panelTitle), "%s", FormatSpectatorTextForMenu(player, info));
 	}
@@ -179,7 +179,7 @@ static void ShowTPMenu(KZPlayer player, HUDInfo info)
 static void TPMenuSetTitle(KZPlayer player, Menu menu, HUDInfo info)
 {
 	char title[256];
-	if (player.SpectatorList >= SpectatorList_Simple && player.SpectatorListPosition == SpectatorListPosition_TPMenu)
+	if (player.SpecList >= SpecList_Number && player.SpecListPosition == SpecListPosition_TPMenu)
 	{
 		Format(title, sizeof(title), "%s", FormatSpectatorTextForMenu(player, info));
 	}

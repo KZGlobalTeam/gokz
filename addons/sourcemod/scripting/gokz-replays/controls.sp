@@ -71,13 +71,12 @@ void ShowReplayControlMenu(int client, int bot)
 	menu.ExitButton = true;
 	if (gB_GOKZHUD)
 	{
-		if (GOKZ_HUD_GetOption(client, HUDOption_SpectatorList) != SpectatorList_Disabled &&
-			GOKZ_HUD_GetOption(client, HUDOption_SpectatorListPosition) == SpectatorListPosition_TPMenu)
+		if (GOKZ_HUD_GetOption(client, HUDOption_SpecList) != SpecList_Disabled &&
+			GOKZ_HUD_GetOption(client, HUDOption_SpecListPosition) == SpecListPosition_TPMenu)
 		{
 			HUDInfo info;
 			GetPlaybackState(client, info);
 			GOKZ_HUD_GetMenuSpectatorText(client, info, text, sizeof(text));
-			PrintToConsole(client, text);
 		}
 		if (GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
 		{

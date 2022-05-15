@@ -64,7 +64,7 @@ public void OnPluginStart()
 	HookEvents();
 	RegisterCommands();
 	
-	UpdateSpectatorList();
+	UpdateSpecList();
 	OnPluginStart_RacingText();
 	OnPluginStart_SpeedText();
 	OnPluginStart_TimerText();
@@ -243,7 +243,7 @@ public void OnGameFrame()
 	// Cache the spectator list every few ticks.
 	if (GetGameTickCount() % 4 == 0)
 	{
-		UpdateSpectatorList();
+		UpdateSpecList();
 	}
 }
 

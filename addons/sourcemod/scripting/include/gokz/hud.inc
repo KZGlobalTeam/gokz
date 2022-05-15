@@ -25,8 +25,8 @@ enum HUDOption:
 	HUDOption_SpeedText, 
 	HUDOption_ShowWeapon,
 	HUDOption_ShowControls, 
-	HUDOption_SpectatorList,
-	HUDOption_SpectatorListPosition,
+	HUDOption_SpecList,
+	HUDOption_SpecListPosition,
 	HUDOPTION_COUNT
 };
 
@@ -101,17 +101,17 @@ enum
 
 enum
 {
-	SpectatorList_Disabled = 0,
-	SpectatorList_Simple,
-	SpectatorList_Advanced,
-	SPECTATORLIST_COUNT
+	SpecList_Disabled = 0,
+	SpecList_Number,
+	SpecList_Full,
+	SPECLIST_COUNT
 };
 
 enum
 {
-	SpectatorListPosition_TPMenu = 0,
-	SpectatorListPosition_InfoPanel,
-	SPECTATORLISTPOSITION_COUNT
+	SpecListPosition_TPMenu = 0,
+	SpecListPosition_InfoPanel,
+	SPECLISTPOSITION_COUNT
 }
 
 // =====[ STRUCTS ]======
@@ -201,8 +201,8 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	SPEEDTEXT_COUNT, 
 	SHOWWEAPON_COUNT,
 	REPLAYCONTROLS_COUNT,
-	SPECTATORLIST_COUNT,
-	SPECTATORLISTPOSITION_COUNT
+	SPECLIST_COUNT,
+	SPECLISTPOSITION_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -260,14 +260,14 @@ stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
 	"Options Menu - Enabled"
 };
 
-stock char gC_SpectatorListPhrases[SPECTATORLIST_COUNT][] =
+stock char gC_SpecListPhrases[SPECLIST_COUNT][] =
 {
 	"Options Menu - Disabled",
-	"Options Menu - Player Count",
-	"Options Menu - Player Count & Names"
+	"Options Menu - Number",
+	"Options Menu - Number & Names"
 };
 
-stock char gC_SpectatorListPositionPhrases[SPECTATORLISTPOSITION_COUNT][] =
+stock char gC_SpecListPositionPhrases[SPECLISTPOSITION_COUNT][] =
 {
 	"Options Menu - Teleport Menu",
 	"Options Menu - Info Panel"

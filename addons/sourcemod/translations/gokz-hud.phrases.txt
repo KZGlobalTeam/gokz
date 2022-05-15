@@ -71,7 +71,26 @@
 	{
 		"en"		"{grey}Replay controls are now hidden."
 	}
-
+	"Option - Spectator List - Disable"
+	{
+		"en"		"{grey}Spectator list is now hidden."
+	}
+	"Option - Spectator List - Number"
+	{
+		"en"		"{grey}Number of spectators is now shown."
+	}
+	"Option - Spectator List - Full"
+	{
+		"en"		"{grey}Number and names of spectators are now shown."
+	}
+	"Option - Spectator List Position - Info Panel"
+	{
+		"en"		"{grey}Spectator list now displays in the centre panel."
+	}
+	"Option - Spectator List Position - TP Menu"
+	{
+		"en"		"{grey}Spectator list now displays in the teleport menu."
+	}
 
 	// =====[ INFO PANEL ]=====
 	"Info Panel Text - Time"
@@ -253,34 +272,34 @@
 	}
 
 	// =====[ SPECTATOR LIST ]=====
-	"Spectator List - Menu (Simple)"
+	"Spectator List - Menu (Number)"
 	{
 		"#format"	"{1:d}"
 		"en"		"Specs: {1}"
 	}
-	"Spectator List - Menu (Advanced)"
+	"Spectator List - Menu (Full)"
 	{
 		"#format"	"{1:d},{2:s}"
 		"en"		"Specs ({1})\n{2}"
 	}
-	"Spectator List - Info Panel (Simple)"
+	"Spectator List - Info Panel (Number)"
 	{
 		// Specs: 2
 		"#format"	"{1:d}"
 		"en"		"Specs: <font color='#ffffff'>{1}</font>"
 	}
-	"Spectator List - Info Panel (Advanced)"
+	"Spectator List - Info Panel (Full)"
 	{
 		// Specs (2): P1, P2
 		"#format"	"{1:d},{2:s}"
 		"en"		"Specs ({1}): <font color='#ffffff'>{2}</font>"
 	}
-	"Options Menu - Player Count"
+	"Options Menu - Number"
 	{
-		"en"		"Player count"
+		"en"		"Number"
 	}
-	"Options Menu - Player Count & Names"
+	"Options Menu - Number & Names"
 	{
-		"en"		"Player count & names"
+		"en"		"Number & names"
 	}
 }

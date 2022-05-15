@@ -421,21 +421,30 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
-	property int SpectatorList {
+	property int ReplayControls {
 		public get() {
-			return this.GetHUDOption(HUDOption_SpectatorList);
+			return this.GetHUDOption(HUDOption_ShowControls);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_ShowControls, value);
+		}
+	}
+	
+	property int SpecList {
+		public get() {
+			return this.GetHUDOption(HUDOption_SpecList);
 		}
 		public set(int value){
-			this.SetHUDOption(HUDOption_SpectatorList, value);
+			this.SetHUDOption(HUDOption_SpecList, value);
 		}
 	}
 
-	property int SpectatorListPosition {
+	property int SpecListPosition {
 		public get() {
-			return this.GetHUDOption(HUDOption_SpectatorListPosition);
+			return this.GetHUDOption(HUDOption_SpecListPosition);
 		}
 		public set(int value){
-			this.SetHUDOption(HUDOption_SpectatorListPosition, value);
+			this.SetHUDOption(HUDOption_SpecListPosition, value);
 		}
 	}
 

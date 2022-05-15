@@ -120,17 +120,17 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 					gC_HUDOptionPhrases[option], param,
 					gC_ShowControlsPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
-			case HUDOption_SpectatorList:
+			case HUDOption_SpecList:
 			{
 				FormatEx(buffer, maxlength, "%T - %T",
 					gC_HUDOptionPhrases[option], param,
-					gC_SpectatorListPhrases[GOKZ_HUD_GetOption(param, option)], param);
+					gC_SpecListPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
-			case HUDOption_SpectatorListPosition:
+			case HUDOption_SpecListPosition:
 			{
 				FormatEx(buffer, maxlength, "%T - %T",
 					gC_HUDOptionPhrases[option], param,
-					gC_SpectatorListPositionPhrases[GOKZ_HUD_GetOption(param, option)], param);
+					gC_SpecListPositionPhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}

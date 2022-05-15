@@ -122,5 +122,37 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_SpecList:
+		{
+			switch (newValue)
+			{
+				case SpecList_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List - Disable");
+				}
+				case SpecList_Number:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List - Number");
+				}
+				case SpecList_Full:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List - Full");
+				}
+			}
+		}
+		case HUDOption_SpecListPosition:
+		{
+			switch (newValue)
+			{
+				case SpecListPosition_InfoPanel:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List Position - Info Panel");
+				}
+				case SpecListPosition_TPMenu:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List Position - TP Menu");
+				}
+			}
+		}
 	}
 } 

@@ -10,14 +10,14 @@ char[] FormatSpectatorTextForMenu(KZPlayer player, HUDInfo info)
 {
 	int specCount;
 	char spectatorTextString[224];
-	if (player.GetHUDOption(HUDOption_SpectatorList) >= SpectatorList_Simple)
+	if (player.GetHUDOption(HUDOption_SpecList) >= SpecList_Number)
 	{
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (gI_ObserverTarget[i] == info.ID)
 			{
 				specCount++;
-				if (player.GetHUDOption(HUDOption_SpectatorList) == SpectatorList_Advanced)
+				if (player.GetHUDOption(HUDOption_SpecList) == SpecList_Full)
 				{
 					char buffer[64];
 					if (specCount < SPECATATOR_LIST_MAX_COUNT)
@@ -34,13 +34,13 @@ char[] FormatSpectatorTextForMenu(KZPlayer player, HUDInfo info)
 		}
 		if (specCount > 0)
 		{			
-			if (player.GetHUDOption(HUDOption_SpectatorList) == SpectatorList_Advanced)
+			if (player.GetHUDOption(HUDOption_SpecList) == SpecList_Full)
 			{
-				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n ", "Spectator List - Menu (Advanced)", specCount, spectatorTextString);
+				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n ", "Spectator List - Menu (Full)", specCount, spectatorTextString);
 			}
 			else
 			{
-				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n ", "Spectator List - Menu (Simple)", specCount);
+				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n ", "Spectator List - Menu (Number)", specCount);
 			}
 		}
 		else
@@ -55,15 +55,14 @@ char[] FormatSpectatorTextForInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 {
 	int specCount;
 	char spectatorTextString[160];
-	if (player.GetHUDOption(HUDOption_SpectatorList) >= SpectatorList_Simple)
+	if (player.GetHUDOption(HUDOption_SpecList) >= SpecList_Number)
 	{
-		// TODO: Make faster logic
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (gI_ObserverTarget[i] == targetPlayer.ID)
 			{
 				specCount++;
-				if (player.GetHUDOption(HUDOption_SpectatorList) == SpectatorList_Advanced)
+				if (player.GetHUDOption(HUDOption_SpecList) == SpecList_Full)
 				{
 					char buffer[64];
 					if (specCount < SPECATATOR_LIST_MAX_COUNT)
@@ -87,13 +86,13 @@ char[] FormatSpectatorTextForInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 		}
 		if (specCount > 0)
 		{
-			if (player.GetHUDOption(HUDOption_SpectatorList) == SpectatorList_Advanced)
+			if (player.GetHUDOption(HUDOption_SpecList) == SpecList_Full)
 			{
-				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n", "Spectator List - Info Panel (Advanced)", specCount, spectatorTextString);
+				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n", "Spectator List - Info Panel (Full)", specCount, spectatorTextString);
 			}
 			else
 			{
-				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n", "Spectator List - Info Panel (Simple)", specCount);
+				Format(spectatorTextString, sizeof(spectatorTextString), "%t\n", "Spectator List - Info Panel (Number)", specCount);
 			}
 		}
 		else
@@ -104,7 +103,7 @@ char[] FormatSpectatorTextForInfoPanel(KZPlayer player, KZPlayer targetPlayer)
 	return spectatorTextString;
 }
 
-void UpdateSpectatorList()
+void UpdateSpecList()
 {
 	for (int client = 1; client <= MaxClients; client++)
 	{
