@@ -24,7 +24,7 @@ void OnPluginStart_SpeedText()
 
 void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum, HUDInfo info)
 {
-	int updateSpeed = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast ? 3 : 6;
+	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
 	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateSpeedText(client, info);

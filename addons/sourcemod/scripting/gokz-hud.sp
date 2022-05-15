@@ -32,6 +32,7 @@ bool gB_GOKZRacing;
 bool gB_GOKZReplays;
 bool gB_MenuShowing[MAXPLAYERS + 1];
 bool gB_JBTakeoff[MAXPLAYERS + 1];
+bool gB_FastUpdateRate[MAXPLAYERS + 1];
 
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
@@ -43,7 +44,6 @@ bool gB_JBTakeoff[MAXPLAYERS + 1];
 #include "gokz-hud/speed_text.sp"
 #include "gokz-hud/timer_text.sp"
 #include "gokz-hud/tp_menu.sp"
-
 
 
 // =====[ PLUGIN EVENTS ]=====
@@ -236,10 +236,17 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 		OnOptionChanged_Menu(client, hudOption);
 		OnOptionChanged_HideWeapon(client, hudOption);
 		OnOptionChanged_Options(client, hudOption, newValue);
+		if (hudOption == HUDOption_UpdateRate)
+		{
+			gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
+		}
 	}
 }
 
-
+public void GOKZ_OnOptionsLoaded(int client)
+{
+	gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
+}
 
 // =====[ OTHER EVENTS ]=====
 

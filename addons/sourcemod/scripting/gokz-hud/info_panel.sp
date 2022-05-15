@@ -12,7 +12,6 @@ static bool infoPanelOnGroundLast[MAXPLAYERS + 1];
 static bool infoPanelShowDuckString[MAXPLAYERS + 1];
 
 
-
 // =====[ PUBLIC ]=====
 
 bool IsDrawingInfoPanel(int client)
@@ -29,7 +28,7 @@ bool IsDrawingInfoPanel(int client)
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
 	int updateSpeed = 10;
-	if (GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast)
+	if (gB_FastUpdateRate[client])
 	{
 		// The hint text panel update speed depends on the client ping.
 		// To optimize resource usage, we scale the update speed with it.

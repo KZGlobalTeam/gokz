@@ -216,7 +216,8 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	SpeedText_InfoPanel,
 	ShowWeapon_Enabled,
 	ReplayControls_Enabled,
-	DeadstrafeColor_Disabled
+	DeadstrafeColor_Disabled,
+	UpdateRate_Slow
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
