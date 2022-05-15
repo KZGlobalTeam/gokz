@@ -421,6 +421,24 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
+	property int ReplayControls {
+		public get() {
+			return this.GetHUDOption(HUDOption_ShowControls);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_ShowControls, value);
+		}
+	}
+
+	property int ShowSpectators {
+		public get() {
+			return this.GetHUDOption(HUDOption_ShowSpectators);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_ShowSpectators, value);
+		}
+	}
+	
 	#endif
 	// =====[ END HUD ]=====
 	
