@@ -187,6 +187,42 @@ native void GOKZ_GL_GetFinishes(int client, int mode, int timeType);
  */
 native void GOKZ_GL_UpdatePoints(int client = -1, int mode = -1);
 
+/**
+ * Gets whether the Global API key is valid or not for global status.
+ *
+ * @return				True if the API key is valid, false otherwise or if there is no connection to the Global API.
+ */
+native bool GOKZ_GL_GetAPIKeyValid();
+
+/**
+ * Gets whether the running plugins are valid or not for global status.
+ *
+ * @return				True if the plugins are valid, false otherwise.
+ */
+native bool GOKZ_GL_GetPluginsValid();
+
+/**
+ * Gets whether the setting enforcer is valid or not for global status.
+ *
+ * @return				True if the setting enforcer is valid, false otherwise.
+ */
+native bool GOKZ_GL_GetSettingsEnforcerValid();
+
+/**
+ * Gets whether the current map is valid or not for global status.
+ *
+ * @return				True if the map is valid, false otherwise or if there is no connection to the Global API.
+ */
+native bool GOKZ_GL_GetMapValid();
+
+/**
+ * Gets whether the current player is valid or not for global status.
+ *
+ * @param client		Client index.
+ * @return				True if the player is valid, false otherwise or if there is no connection to the Global API.
+ */
+native bool GOKZ_GL_GetPlayerValid(int client);
+
 
 
 // =====[ STOCKS ]=====
@@ -265,6 +301,12 @@ public void __pl_gokz_global_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_GL_PrintRecords");
 	MarkNativeAsOptional("GOKZ_GL_DisplayMapTopMenu");
+	MarkNativeAsOptional("GOKZ_GL_UpdatePoints");
+	MarkNativeAsOptional("GOKZ_GL_GetAPIKeyValid");
+	MarkNativeAsOptional("GOKZ_GL_GetPluginsValid");
+	MarkNativeAsOptional("GOKZ_GL_GetSettingsEnforcerValid");
+	MarkNativeAsOptional("GOKZ_GL_GetMapValid");
+	MarkNativeAsOptional("GOKZ_GL_GetPlayerValid");
 	MarkNativeAsOptional("GOKZ_GL_GetPoints");
 	MarkNativeAsOptional("GOKZ_GL_GetMapPoints");
 	MarkNativeAsOptional("GOKZ_GL_GetRankPoints");

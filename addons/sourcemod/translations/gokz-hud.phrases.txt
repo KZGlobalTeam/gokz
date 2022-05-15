@@ -79,6 +79,19 @@
 	{
 		"en"		"{grey}Dead strafe period indicator disabled."
 	}
+	"Option - Show Spectators - Disable"
+	{
+		"en"		"{grey}Spectators are now not shown."
+	}
+	"Option - Show Spectators - Number"
+	{
+		"en"		"{grey}Number of spectators is now shown."
+	}
+	"Option - Show Spectators - Full"
+	{
+		"en"		"{grey}Number and names of spectators are now shown."
+	}
+
 
 	// =====[ INFO PANEL ]=====
 	"Info Panel Text - Time"
@@ -114,6 +127,16 @@
 
 
 	// =====[ TELEPORT MENU ]=====
+	"TP Menu - Spectators - Full"
+	{
+		"#format"	"{1:d},{2:s}"
+		"en"		"Specs ({1}):\n{2}"
+	}
+	"TP Menu - Spectators - Number"
+	{
+		"#format"	"{1:d}"
+		"en"		"Specs: {1}"
+	}
 	"TP Menu - Checkpoint"
 	{
 		"en"		"Checkpoint"
@@ -245,6 +268,19 @@
 	{
 		"en"		"Update rate"
 	}
+	"Options Menu - Show Spectators"
+	{
+		"en"		"Show spectators"
+	}
+	"Options Menu - Number"
+	{
+		"en"		"Number"
+	}
+	"Options Menu - Number and Names"
+	{
+		"en"		"Number and Names"
+	}
+
 
 	// =====[ RACING ]=====
 	"Get Ready"

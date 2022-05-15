@@ -132,6 +132,12 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 					gC_HUDOptionPhrases[option], param,
 					gC_HUDUpdateRatePhrases[GOKZ_HUD_GetOption(param, option)], param);
 			}
+			case HUDOption_ShowSpectators:
+			{
+				FormatEx(buffer, maxlength, "%T - %T",
+					gC_HUDOptionPhrases[option], param,
+					gC_ShowSpecsPhrases[GOKZ_HUD_GetOption(param, option)], param);
+			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}
 	}

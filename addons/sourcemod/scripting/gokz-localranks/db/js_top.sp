@@ -268,7 +268,6 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 				"%s/%d/%s/%d_%d_%s_%s.%s", 
 				RP_DIRECTORY_JUMPS, jumpInfo[param1][param2][0], RP_DIRECTORY_BLOCKJUMPS, jumpTopType[param1], blockNums[param1][param2], gC_ModeNamesShort[jumpInfo[param1][param2][2]], gC_StyleNamesShort[0], RP_FILE_EXTENSION);
 		}
-
 		GOKZ_RP_LoadJumpReplay(param1, path);
 	}
 

@@ -25,11 +25,15 @@ static int botCourse[RP_MAX_BOTS];
 static int botMode[RP_MAX_BOTS];
 static int botStyle[RP_MAX_BOTS];
 static float botTime[RP_MAX_BOTS];
+static int botTimeTicks[RP_MAX_BOTS];
 static char botAlias[RP_MAX_BOTS][MAX_NAME_LENGTH];
 static bool botPaused[RP_MAX_BOTS];
 static bool botPlaybackPaused[RP_MAX_BOTS];
 static int botKnife[RP_MAX_BOTS];
 static int botWeapon[RP_MAX_BOTS];
+static int botJumpType[RP_MAX_BOTS];
+static float botJumpDistance[RP_MAX_BOTS];
+static int botJumpBlockDistance[RP_MAX_BOTS];
 
 static int timeOnGround[RP_MAX_BOTS];
 static int timeInAir[RP_MAX_BOTS];
@@ -250,7 +254,6 @@ void OnClientPutInServer_Playback(int client)
 		{
 			botInGame[bot] = true;
 			botClient[bot] = client;
-			ResetBotStuff(bot);
 			break;
 		}
 	}
@@ -307,7 +310,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 {
 	if (!FileExists(path))
 	{
-		LogError("Failed to load file: \"%s\".", path);
+		GOKZ_PrintToChat(client, true, "%t", "No Replay Found");
 		return false;
 	}
 
@@ -331,7 +334,10 @@ static bool LoadPlayback(int client, int bot, char[] path)
 		case 1:
 		{
 			botReplayVersion[bot] = 1;
-			LoadFormatVersion1Replay(file, bot);
+			if (!LoadFormatVersion1Replay(file, bot))
+			{
+				return false;
+			}
 		}
 		case 2:
 		{
@@ -353,7 +359,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 	return true;
 }
 
-static void LoadFormatVersion1Replay(File file, int bot)
+static bool LoadFormatVersion1Replay(File file, int bot)
 {	
 	// Old replays only support runs, not jumps
 	botReplayType[bot] = ReplayType_Run;
@@ -376,6 +382,10 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	file.ReadInt32(botCourse[bot]);
 	file.ReadInt32(botMode[bot]);
 	file.ReadInt32(botStyle[bot]);
+	
+	// Old replays don't store the weapon information
+	botKnife[bot] = CS_WeaponIDToItemDefIndex(CSWeapon_KNIFE);
+	botWeapon[bot] = (botMode[bot] == Mode_Vanilla) ? -1 : CS_WeaponIDToItemDefIndex(CSWeapon_USP_SILENCER);
 	
 	// Time
 	int timeAsInt;
@@ -409,12 +419,20 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(RP_V1_TICK_DATA_BLOCKSIZE, length);
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)), length);
 	}
 	else
 	{  // Make sure it's all clear and the correct size
 		playbackTickData[bot].Clear();
 		playbackTickData[bot].Resize(length);
+	}
+
+	// The replay has no replay data, this shouldn't happen normally,
+	// but this would cause issues in other code, so we don't even try to load this.
+	if (length == 0)
+	{
+		delete file;
+		return false;
 	}
 	
 	any tickData[RP_V1_TICK_DATA_BLOCKSIZE];
@@ -434,6 +452,7 @@ static void LoadFormatVersion1Replay(File file, int bot)
 	botDataLoaded[bot] = true;
 	
 	delete file;
+	return true;
 }
 
 static bool LoadFormatVersion2Replay(File file, int client, int bot)
@@ -514,6 +533,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	int tickCount;
 	file.ReadInt32(tickCount);
 
+	// The replay has no replay data, this shouldn't happen normally,
+	// but this would cause issues in other code, so we don't even try to load this.
+	if (tickCount == 0)
+	{
+		delete file;
+		return false;
+	}
+
 	// Equipped Weapon
 	file.ReadInt32(botWeapon[bot]);
 	
@@ -531,6 +558,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 			int timeAsInt;
 			file.ReadInt32(timeAsInt);
 			botTime[bot] = view_as<float>(timeAsInt);
+			botTimeTicks[bot] = RoundToNearest(botTime[bot] * tickrate);
 
 			// Course
 			file.ReadInt8(botCourse[bot]);
@@ -559,16 +587,13 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		case ReplayType_Jump:
 		{
 			// Jump Type
-			int jumpType;
-			file.ReadInt8(jumpType);
+			file.ReadInt8(botJumpType[bot]);
 
 			// Distance
-			float distance;
-			file.ReadInt32(view_as<int>(distance));
+			file.ReadInt32(view_as<int>(botJumpDistance[bot]));
 
 			// Block Distance
-			int blockDistance;
-			file.ReadInt32(blockDistance);
+			file.ReadInt32(botJumpBlockDistance[bot]);
 
 			// Strafe Count
 			int strafeCount;
@@ -595,7 +620,7 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 
 			// Finish spit to console
 			PrintToConsole(client, "Jump Type: %s\nJump Distance: %f\nBlock Distance: %d\nStrafe Count: %d\nSync: %f\n Pre: %f\nMax: %f\nAirtime: %d", 
-				gC_JumpTypes[jumpType], distance, blockDistance, strafeCount, sync, pre, max, airtime);
+				gC_JumpTypes[botJumpType[bot]], botJumpDistance[bot], botJumpBlockDistance[bot], strafeCount, sync, pre, max, airtime);
 		}
 	}
 
@@ -603,10 +628,10 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(sizeof(ReplayTickData));
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)));
 	}
 	else
-	{  // Make sure it's all clear and the correct size
+	{
 		playbackTickData[bot].Clear();
 	}
 	
@@ -689,7 +714,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
+				KickClient(botClient[bot]);
 			}
 		}
 	}
@@ -709,7 +734,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			ResetBotStuff(bot);
+			KickClient(botClient[bot]);
 			return;
 		}
 		
@@ -854,7 +879,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
+				KickClient(botClient[bot]);
 			}
 		}
 	}
@@ -874,7 +899,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			ResetBotStuff(bot);
+			KickClient(botClient[bot]);
 			return;
 		}
 		
@@ -895,7 +920,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 			botCurrentTeleport[bot] = 0;
 		}
-		if (playbackTick[bot] == playbackTickData[bot].Length - preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
+		if (playbackTick[bot] == botTimeTicks[bot] + preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
 			EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		}
@@ -1064,20 +1089,6 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 	}
 }
 
-// Reset the bot client's clan tag and name to the default, unused state
-static void ResetBotStuff(int bot)
-{
-	int client = botClient[bot];
-	
-	CS_SetClientClanTag(client, "!REPLAY");
-	char name[MAX_NAME_LENGTH];
-	FormatEx(name, sizeof(name), "%d", bot + 1);
-	gB_HideNameChange = true;
-	SetClientName(client, name);
-	
-	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-}
-
 // Set the bot client's GOKZ options, clan tag and name based on the loaded replay data
 static void SetBotStuff(int bot)
 {
@@ -1092,28 +1103,13 @@ static void SetBotStuff(int bot)
 	GOKZ_SetCoreOption(client, Option_Mode, botMode[bot]);
 	GOKZ_SetCoreOption(client, Option_Style, botStyle[bot]);
 	
-	// Set bot clan tag
-	char tag[MAX_NAME_LENGTH];
-	if (botCourse[bot] == 0)
-	{  // Main course so tag "MODE NUB/PRO"
-		FormatEx(tag, sizeof(tag), "%s %s", 
-			gC_ModeNamesShort[botMode[bot]], gC_TimeTypeNames[GOKZ_GetTimeTypeEx(botTeleportsUsed[bot])]);
-	}
-	else
-	{  // Bonus course so tag "MODE B# NUB/PRO"
-		FormatEx(tag, sizeof(tag), "%s B%d %s", 
-			gC_ModeNamesShort[botMode[bot]], botCourse[bot], gC_TimeTypeNames[GOKZ_GetTimeTypeEx(botTeleportsUsed[bot])]);
-	}
-	CS_SetClientClanTag(client, tag);
-	
-	// Set bot name e.g. "DanZay (01:23.45)"
-	char name[MAX_NAME_LENGTH];
-	FormatEx(name, sizeof(name), "%s (%s)", botAlias[bot], GOKZ_FormatTime(botTime[bot]));
-	gB_HideNameChange = true;
-	SetClientName(client, name);
-	
+	// Clan tag and name
+	SetBotClanTag(bot);
+	SetBotName(bot);
+
 	// Set the bot's team based on if it's NUB or PRO
-	if (GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
+	if (botReplayType[bot] == ReplayType_Run 
+		&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
 	{
 		GOKZ_JoinTeam(client, CS_TEAM_CT);
 	}
@@ -1121,7 +1117,7 @@ static void SetBotStuff(int bot)
 	{
 		GOKZ_JoinTeam(client, CS_TEAM_T);
 	}
-	
+
 	// Set bot weapons
 	// Always start by removing the pistol and knife
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
@@ -1165,6 +1161,77 @@ static void SetBotStuff(int bot)
 	botCurrentTeleport[bot] = 0;
 }
 
+static void SetBotClanTag(int bot)
+{
+	char tag[MAX_NAME_LENGTH];
+
+	if (botReplayType[bot] == ReplayType_Run)
+	{
+		if (botCourse[bot] == 0)
+		{
+			// KZT PRO
+			FormatEx(tag, sizeof(tag), "%s %s", 
+				gC_ModeNamesShort[botMode[bot]], gC_TimeTypeNames[GOKZ_GetTimeTypeEx(botTeleportsUsed[bot])]);
+		}
+		else
+		{
+			// KZT B2 PRO
+			FormatEx(tag, sizeof(tag), "%s B%d %s", 
+				gC_ModeNamesShort[botMode[bot]], botCourse[bot], gC_TimeTypeNames[GOKZ_GetTimeTypeEx(botTeleportsUsed[bot])]);
+		}
+	}
+	else if (botReplayType[bot] == ReplayType_Jump)
+	{
+		// KZT LJ
+		FormatEx(tag, sizeof(tag), "%s %s",
+			gC_ModeNamesShort[botMode[bot]], gC_JumpTypesShort[botJumpType[bot]]);
+	}
+	else
+	{
+		// KZT
+		FormatEx(tag, sizeof(tag), "%s", 
+			gC_ModeNamesShort[botMode[bot]]);
+	}
+
+	CS_SetClientClanTag(botClient[bot], tag);
+}
+
+static void SetBotName(int bot)
+{
+	char name[MAX_NAME_LENGTH];
+
+	if (botReplayType[bot] == ReplayType_Run)
+	{
+		// DanZay (01:23.45)
+		FormatEx(name, sizeof(name), "%s (%s)", 
+			botAlias[bot], GOKZ_FormatTime(botTime[bot]));
+	}
+	else if (botReplayType[bot] == ReplayType_Jump)
+	{
+		if (botJumpBlockDistance[bot] == 0)
+		{
+			// DanZay (291.44)
+			FormatEx(name, sizeof(name), "%s (%.2f)", 
+				botAlias[bot], botJumpDistance[bot]);
+		}
+		else
+		{
+			// DanZay (291.44 on 289 block)
+			FormatEx(name, sizeof(name), "%s (%.2f on %d block)", 
+				botAlias[bot], botJumpDistance[bot], botJumpBlockDistance[bot]);
+		}
+	}
+	else
+	{
+		// DanZay
+		FormatEx(name, sizeof(name), "%s", 
+			botAlias[bot]);
+	}
+	
+	gB_HideNameChange = true;
+	SetClientName(botClient[bot], name);
+}
+
 // Returns the number of bots that are currently replaying
 static int GetBotsInUse()
 {
@@ -1184,8 +1251,9 @@ static int GetUnusedBot()
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
-		if (botInGame[bot] && !botDataLoaded[bot])
+		if (!botInGame[bot])
 		{
+			CreateFakeClient("botName");
 			return bot;
 		}
 	}

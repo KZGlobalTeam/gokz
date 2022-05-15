@@ -671,6 +671,17 @@ stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
 }
 
 /**
+ * Gets the current map's file size.
+ */
+stock int GetCurrentMapFileSize()
+{
+	char mapBuffer[PLATFORM_MAX_PATH];
+	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
+	Format(mapBuffer, sizeof(mapBuffer), "maps/%s.bsp", mapBuffer);
+	return FileSize(mapBuffer);
+}
+
+/**
  * Copies the elements of a source vector to a destination vector.
  *
  * @param src				Source vector.

@@ -52,7 +52,7 @@ void ToggleNoclip(int client)
 
 void EnableNoclip(int client)
 {
-	if (IsPlayerAlive(client))
+	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		GOKZ_StopTimer(client);
@@ -61,7 +61,7 @@ void EnableNoclip(int client)
 
 void DisableNoclip(int client)
 {
-	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	if (IsValidClient(client) && IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		noclipReleaseTime[client] = GetGameTickCount();
 		Movement_SetMovetype(client, MOVETYPE_WALK);
@@ -86,7 +86,7 @@ void ToggleNoclipNotrigger(int client)
 
 void EnableNoclipNotrigger(int client)
 {
-	if (IsPlayerAlive(client))
+	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
@@ -96,7 +96,7 @@ void EnableNoclipNotrigger(int client)
 
 void DisableNoclipNotrigger(int client)
 {
-	if (IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
+	if (IsValidClient(client) && IsPlayerAlive(client) && Movement_GetMovetype(client) == MOVETYPE_NOCLIP)
 	{
 		noclipReleaseTime[client] = GetGameTickCount();
 		Movement_SetMovetype(client, MOVETYPE_WALK);
@@ -211,13 +211,27 @@ static bool savedOnLadder[MAXPLAYERS + 1];
 
 void OnClientPutInServer_JoinTeam(int client)
 {
-	// After OnClientPutInServer, player is moved to the origin of a point_viewcontrol entity.
-	// We need to wait one tick before assign the player's team and teleport them to a valid spawn.
-	if (!IsFakeClient(client))
-	{
-		RequestFrame(AutoJoinTeam, client);
-	}
+	// Automatically put the player on a team if he doesn't choose one.
+	// The mp_force_pick_time convar is the built in way to do this, but that obviously
+	// does not call GOKZ_JoinTeam which includes a fix for spawning in the void when
+	// there is no valid spawns available. 
+	CreateTimer(12.0, Timer_ForceJoinTeam, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+
 	hasSavedPosition[client] = false;
+}
+
+public Action Timer_ForceJoinTeam(Handle timer, int userid)
+{
+    int client = GetClientOfUserId(userid);
+    if (IsValidClient(client))
+    {
+        int team = GetClientTeam(client);
+        if (team == CS_TEAM_NONE)
+        {
+            GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR, false);
+        }
+    }
+    return Plugin_Stop;
 }
 
 void OnTimerStart_JoinTeam(int client)
@@ -238,10 +252,14 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 	
 	if (newTeam == CS_TEAM_SPECTATOR && currentTeam != CS_TEAM_SPECTATOR)
 	{
-		player.GetOrigin(savedOrigin[client]);
-		player.GetEyeAngles(savedAngles[client]);
-		savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
-		hasSavedPosition[client] = true;
+		if (currentTeam != CS_TEAM_NONE)
+		{
+			player.GetOrigin(savedOrigin[client]);
+			player.GetEyeAngles(savedAngles[client]);
+			savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
+			hasSavedPosition[client] = true;
+		}
+
 		if (!player.Paused && !player.CanPause)
 		{
 			player.StopTimer();
@@ -510,10 +528,4 @@ void OnMapStart_FixMissingSpawns()
 			TeleportEntity(newSpawn, origin, angles, NULL_VECTOR);
 		}
 	}
-}
-
-static void AutoJoinTeam(int client)
-{
-	int team = GetRandomInt(CS_TEAM_T, CS_TEAM_CT);
-	JoinTeam(client, team, false);
 }

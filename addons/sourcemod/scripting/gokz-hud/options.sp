@@ -136,5 +136,23 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_ShowSpectators:
+		{
+			switch (newValue)
+			{
+				case ShowSpecs_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Spectators - Disable");
+				}
+				case ShowSpecs_Number:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Spectators - Number");
+				}
+				case ShowSpecs_Full:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Spectators - Full");
+				}
+			}
+		}
 	}
 } 

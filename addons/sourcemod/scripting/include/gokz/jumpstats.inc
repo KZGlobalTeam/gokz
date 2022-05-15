@@ -83,6 +83,7 @@ enum
 #define JS_OPTION_CATEGORY "Jumpstats"
 #define JS_MAX_LADDERJUMP_OFFSET 2.0
 #define JS_MAX_BHOP_GROUND_TICKS 5
+#define JS_MAX_DUCKBUG_RESET_TICKS 6
 #define JS_MAX_WEIRDJUMP_FALL_OFFSET 64.0
 #define JS_TOUCH_GRACE_TICKS 3
 #define JS_MAX_TRACKED_STRAFES 48
@@ -186,9 +187,9 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 	"GOKZ JS - Failstats Console", 
 	"GOKZ JS - Failstats Chat", 
 	"GOKZ JS - Jumpstats Always", 
-	"GOKZ JS - Extended Chat Report",
-	"GOKZ JS - Minimal Chat Broadcast Tier",
-	"GOKZ JS - Minimal Sound Broadcast Tier"
+	"GOKZ JS - Ext Chat Report",
+	"GOKZ JS - Min Chat Broadcast",
+	"GOKZ JS - Min Sound Broadcast"
 };
 
 stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] = 

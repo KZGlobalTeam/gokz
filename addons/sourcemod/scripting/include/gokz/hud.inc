@@ -27,6 +27,7 @@ enum HUDOption:
 	HUDOption_ShowControls,
 	HUDOption_DeadstrafeColor,
 	HUDOption_UpdateRate,
+	HUDOption_ShowSpectators,
 	HUDOPTION_COUNT
 };
 
@@ -108,6 +109,15 @@ enum
 
 enum
 {
+	ShowSpecs_Disabled = 0,
+	ShowSpecs_Number,
+	ShowSpecs_Full,
+	SHOWSPECS_COUNT
+};
+
+
+enum
+{
 	UpdateRate_Slow = 0,
 	UpdateRate_Fast,
 	UPDATERATE_COUNT,
@@ -157,7 +167,8 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Show Weapon",
 	"GOKZ HUD - Show Controls",
 	"GOKZ HUD - Dead Strafe",
-	"GOKZ HUD - Update Rate"
+	"GOKZ HUD - Update Rate",
+	"GOKZ HUD - Show Spectators"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -172,7 +183,8 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
 	"Replay Controls Display - 0 = Disbled, 1 = Enabled",
 	"Dead Strafe Indicator - 0 = Disabled, 1 = Enabled",
-	"HUD Update Rate - 0 = Slow, 1 = Fast"
+	"HUD Update Rate - 0 = Slow, 1 = Fast",
+	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -187,7 +199,8 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Show Weapon",
 	"Options Menu - Show Controls",
 	"Options Menu - Dead Strafe Indicator",
-	"Options Menu - Update Rate"
+	"Options Menu - Update Rate",
+	"Options Menu - Show Spectators"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -202,7 +215,8 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	SHOWWEAPON_COUNT,
 	REPLAYCONTROLS_COUNT,
 	DEADSTRAFECOLOR_COUNT,
-	UPDATERATE_COUNT
+	UPDATERATE_COUNT,
+	SHOWSPECS_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -217,7 +231,8 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	ShowWeapon_Enabled,
 	ReplayControls_Enabled,
 	DeadstrafeColor_Disabled,
-	UpdateRate_Slow
+	UpdateRate_Slow,
+	ShowSpecs_Disabled
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -267,6 +282,13 @@ stock char gC_DeadstrafeColorPhrases[DEADSTRAFECOLOR_COUNT][] =
 	"Options Menu - Disabled",
 	"Options Menu - Enabled"
 };
+stock char gC_ShowSpecsPhrases[SHOWSPECS_COUNT][] =
+{
+	"Options Menu - Disabled",
+	"Options Menu - Number",
+	"Options Menu - Number and Names"
+}
+
 
 stock char gC_HUDUpdateRatePhrases[UPDATERATE_COUNT][]=
 {

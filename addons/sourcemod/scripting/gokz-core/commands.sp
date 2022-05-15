@@ -75,6 +75,15 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	char teamString[4];
 	GetCmdArgString(teamString, sizeof(teamString));
 	int team = StringToInt(teamString);
+	
+	if (team == CS_TEAM_SPECTATOR)
+	{
+		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
+		{
+			return Plugin_Handled;
+		}
+	}
+	
 	GOKZ_JoinTeam(client, team);
 	return Plugin_Handled;
 }

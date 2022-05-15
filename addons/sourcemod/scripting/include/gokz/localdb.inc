@@ -128,7 +128,7 @@ enum
 
 stock char gC_DBOptionNames[DBOPTION_COUNT][] = 
 {
-	"GOKZ DB - Auto Load Timer Setup"
+	"GOKZ DB - Auto Load Setup"
 };
 
 stock char gC_DBOptionDescriptions[DBOPTION_COUNT][] = 
