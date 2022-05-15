@@ -282,19 +282,19 @@ stock char gC_DeadstrafeColorPhrases[DEADSTRAFECOLOR_COUNT][] =
 	"Options Menu - Disabled",
 	"Options Menu - Enabled"
 };
+
 stock char gC_ShowSpecsPhrases[SHOWSPECS_COUNT][] =
 {
 	"Options Menu - Disabled",
 	"Options Menu - Number",
 	"Options Menu - Number and Names"
-}
-
+};
 
 stock char gC_HUDUpdateRatePhrases[UPDATERATE_COUNT][]=
 {
 	"Options Menu - Slow",
 	"Options Menu - Fast"
-}
+};
 
 // =====[ STOCKS ]=====
 
