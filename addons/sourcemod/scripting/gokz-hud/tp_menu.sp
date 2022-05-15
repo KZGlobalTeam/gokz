@@ -120,7 +120,7 @@ static void UpdateTPMenu(int client, HUDInfo info)
 	}
 	else if (player.ObserverTarget != -1) // If the player is spectating someone else
 	{
-		// Check if the replay plugins wants to display the replay control menu.
+		// Check if the replay plugin wants to display the replay control menu.
 		if (!(IsFakeClient(player.ObserverTarget) && gB_GOKZReplays && GOKZ_RP_UpdateReplayControlMenu(client)))
 		{
 			ShowPanel(player, info);
@@ -147,7 +147,7 @@ static void ShowPanel(KZPlayer player, HUDInfo info)
 		{
 			Format(panelTitle, sizeof(panelTitle), "%s", FormatTimerTextForMenu(player, info));
 		}
-		if (info.TimeType == TimeType_Nub)
+		if (info.TimeType == TimeType_Nub && info.CurrentTeleport != 0)
 		{
 			Format(panelTitle, sizeof(panelTitle), "%s\n%t", panelTitle, "TP Menu - Spectator Teleports", info.CurrentTeleport);
 		}

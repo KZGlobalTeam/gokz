@@ -49,13 +49,17 @@ bool UpdateReplayControlMenu(int client)
 	}
 	
 	if (showReplayControls[client] &&	
-		GOKZ_HUD_GetOption(client, HUDOption_ShowControls) == ReplayControls_Enabled &&
-		(GetClientMenu(client) == MenuSource_None || 
-			GOKZ_HUD_GetMenuShowing(client) && GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
-			GOKZ_HUD_GetMenuShowing(client) && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu))
+		GOKZ_HUD_GetOption(client, HUDOption_ShowControls) == ReplayControls_Enabled)
 	{
-		botTeleports[bot] = PlaybackGetTeleports(bot);
-		ShowReplayControlMenu(client, bot);
+		// We have to update this often if bot uses teleports.
+		if (GetClientMenu(client) == MenuSource_None || 
+			GOKZ_HUD_GetMenuShowing(client) && GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
+			GOKZ_HUD_GetMenuShowing(client) && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu ||
+			GOKZ_HUD_GetMenuShowing(client) && PlaybackGetTeleports(bot) > 0)
+		{
+			botTeleports[bot] = PlaybackGetTeleports(bot);
+			ShowReplayControlMenu(client, bot);
+		}
 		return true;
 	}
 	return false;
@@ -94,10 +98,11 @@ void ShowReplayControlMenu(int client, int bot)
 	}
 
 
-	if(PlaybackGetTeleports(bot) > 0)
+	if (botTeleports[bot] > 0)
 	{
 		Format(text, sizeof(text), "%s\n%T", text, "Replay Controls - Teleports", client, botTeleports[bot]);
 	}
+
 	menu.SetTitle(text);
 	
 	if (PlaybackPaused(bot))
