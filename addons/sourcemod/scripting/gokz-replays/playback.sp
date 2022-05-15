@@ -311,8 +311,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 {
 	if (!FileExists(path))
 	{
-		// This can happen relatively frequently, e.g. for jumps without a replay,
-		// therefore we're not logging it for now to avoid clutter.
+		GOKZ_PrintToChat(client, true, "%t", "No Replay Found");
 		return false;
 	}
 
@@ -421,7 +420,7 @@ static bool LoadFormatVersion1Replay(File file, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(RP_V1_TICK_DATA_BLOCKSIZE, length);
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)), length);
 	}
 	else
 	{  // Make sure it's all clear and the correct size
@@ -630,10 +629,10 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(sizeof(ReplayTickData));
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)));
 	}
 	else
-	{  // Make sure it's all clear and the correct size
+	{
 		playbackTickData[bot].Clear();
 	}
 	
