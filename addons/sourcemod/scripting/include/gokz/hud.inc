@@ -25,7 +25,7 @@ enum HUDOption:
 	HUDOption_SpeedText, 
 	HUDOption_ShowWeapon,
 	HUDOption_ShowControls, 
-	HUDOption_SpecList,
+	HUDOption_ShowSpectators,
 	HUDOption_SpecListPosition,
 	HUDOPTION_COUNT
 };
@@ -101,11 +101,12 @@ enum
 
 enum
 {
-	SpecList_Disabled = 0,
-	SpecList_Number,
-	SpecList_Full,
-	SPECLIST_COUNT
+	ShowSpecs_Disabled = 0,
+	ShowSpecs_Number,
+	ShowSpecs_Full,
+	SHOWSPECS_COUNT
 };
+
 
 enum
 {
@@ -156,7 +157,7 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Speed Text", 
 	"GOKZ HUD - Show Weapon",
 	"GOKZ HUD - Show Controls",
-	"GOKZ HUD - Spectator List",
+	"GOKZ HUD - Show Spectators",
 	"GOKZ HUD - Spec List Pos",
 };
 
@@ -171,7 +172,7 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
 	"Replay Controls Display - 0 = Disbled, 1 = Enabled",
-	"Spectator List - 0 = Disabled, 1 = Player count, 2 = Player count and names",
+	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names",
 	"Spectator List Position - 0 = Teleport Menu, 2 = Center Panel"
 };
 
@@ -186,7 +187,7 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Speed Text", 
 	"Options Menu - Show Weapon",
 	"Options Menu - Show Controls",
-	"Options Menu - Spectator List",
+	"Options Menu - Show Spectators",
 	"Options Menu - Spectator List Position"
 };
 
@@ -201,7 +202,7 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	SPEEDTEXT_COUNT, 
 	SHOWWEAPON_COUNT,
 	REPLAYCONTROLS_COUNT,
-	SPECLIST_COUNT,
+	SHOWSPECS_COUNT,
 	SPECLISTPOSITION_COUNT
 };
 
@@ -215,7 +216,9 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	TimerType_Enabled,
 	SpeedText_InfoPanel, 
 	ShowWeapon_Enabled,
-	ReplayControls_Enabled
+	ReplayControls_Enabled,
+	ShowSpecs_Disabled,
+	SpecListPosition_TPMenu
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -260,18 +263,18 @@ stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
 	"Options Menu - Enabled"
 };
 
-stock char gC_SpecListPhrases[SPECLIST_COUNT][] =
+stock char gC_ShowSpecsPhrases[SHOWSPECS_COUNT][] =
 {
 	"Options Menu - Disabled",
 	"Options Menu - Number",
-	"Options Menu - Number & Names"
+	"Options Menu - Number and Names"
 };
 
 stock char gC_SpecListPositionPhrases[SPECLISTPOSITION_COUNT][] =
 {
 	"Options Menu - Teleport Menu",
 	"Options Menu - Info Panel"
-}
+};
 
 // =====[ NATIVES ]=====
 

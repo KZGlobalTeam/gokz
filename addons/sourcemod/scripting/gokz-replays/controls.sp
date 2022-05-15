@@ -75,7 +75,7 @@ void ShowReplayControlMenu(int client, int bot)
 	menu.ExitButton = true;
 	if (gB_GOKZHUD)
 	{
-		if (GOKZ_HUD_GetOption(client, HUDOption_SpecList) != SpecList_Disabled &&
+		if (GOKZ_HUD_GetOption(client, HUDOption_ShowSpectators) != ShowSpecs_Disabled &&
 			GOKZ_HUD_GetOption(client, HUDOption_SpecListPosition) == SpecListPosition_TPMenu)
 		{
 			HUDInfo info;

@@ -132,7 +132,7 @@ static void ShowPanel(KZPlayer player, HUDInfo info)
 {
 	char panelTitle[256];
 	// Spectator List
-	if (player.SpecList >= SpecList_Number && player.SpecListPosition == SpecListPosition_TPMenu)
+	if (player.ShowSpectators >= ShowSpecs_Number && player.SpecListPosition == SpecListPosition_TPMenu)
 	{
 		Format(panelTitle, sizeof(panelTitle), "%s", FormatSpectatorTextForMenu(player, info));
 	}
@@ -179,7 +179,7 @@ static void ShowTPMenu(KZPlayer player, HUDInfo info)
 static void TPMenuSetTitle(KZPlayer player, Menu menu, HUDInfo info)
 {
 	char title[256];
-	if (player.SpecList >= SpecList_Number && player.SpecListPosition == SpecListPosition_TPMenu)
+	if (player.ShowSpectators >= ShowSpecs_Number && player.SpecListPosition == SpecListPosition_TPMenu)
 	{
 		Format(title, sizeof(title), "%s", FormatSpectatorTextForMenu(player, info));
 	}
@@ -330,4 +330,4 @@ static void TPMenuAddItemStart(KZPlayer player, Menu menu)
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Start", player.ID);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
 	}
-} 
+}

@@ -122,21 +122,21 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
-		case HUDOption_SpecList:
+		case HUDOption_ShowSpectators:
 		{
 			switch (newValue)
 			{
-				case SpecList_Disabled:
+				case ShowSpecs_Disabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List - Disable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Spectators - Disable");
 				}
-				case SpecList_Number:
+				case ShowSpecs_Number:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List - Number");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Spectators - Number");
 				}
-				case SpecList_Full:
+				case ShowSpecs_Full:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List - Full");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Show Spectators - Full");
 				}
 			}
 		}

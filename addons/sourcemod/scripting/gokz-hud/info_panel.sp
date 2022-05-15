@@ -77,7 +77,7 @@ static char[] GetInfoPanel(KZPlayer player, HUDInfo info)
 static char[] GetSpectatorString(KZPlayer player, HUDInfo info)
 {
 	char spectatorString[255];
-	if (player.SpecListPosition != SpecListPosition_InfoPanel || player.SpecList == SpecList_Disabled)
+	if (player.SpecListPosition != SpecListPosition_InfoPanel || player.ShowSpectators == ShowSpecs_Disabled)
 	{
 		return spectatorString;
 	}

@@ -429,13 +429,13 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetHUDOption(HUDOption_ShowControls, value);
 		}
 	}
-	
-	property int SpecList {
+
+	property int ShowSpectators {
 		public get() {
-			return this.GetHUDOption(HUDOption_SpecList);
+			return this.GetHUDOption(HUDOption_ShowSpectators);
 		}
-		public set(int value){
-			this.SetHUDOption(HUDOption_SpecList, value);
+		public set(int value) {
+			this.SetHUDOption(HUDOption_ShowSpectators, value);
 		}
 	}
 
