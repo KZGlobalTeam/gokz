@@ -271,14 +271,6 @@
 	{
 		"en"		"Show spectators"
 	}
-	"Options Menu - Number"
-	{
-		"en"		"Number"
-	}
-	"Options Menu - Number and Names"
-	{
-		"en"		"Number and Names"
-	}
 
 
 	// =====[ RACING ]=====
