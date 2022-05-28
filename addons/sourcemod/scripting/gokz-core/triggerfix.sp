@@ -342,9 +342,9 @@ static bool DoTriggerFix(int client, bool filterFix = false)
 		{
 			char className[64];
 			GetEntityClassname(trigger, className, sizeof(className));
-			if (GetEntityFlags(client) & FL_BASEVELOCITY && StrEqual(className, "trigger_push"))
+			if (StrEqual(className, "trigger_push"))
 			{
-				// We are currently affected by a push trigger, do not try to touch it again to prevent double boost.
+				// Completely ignore push triggers.
 				continue;
 			}
 			// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
