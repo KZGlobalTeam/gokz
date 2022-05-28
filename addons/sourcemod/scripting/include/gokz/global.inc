@@ -301,6 +301,12 @@ public void __pl_gokz_global_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_GL_PrintRecords");
 	MarkNativeAsOptional("GOKZ_GL_DisplayMapTopMenu");
+	MarkNativeAsOptional("GOKZ_GL_UpdatePoints");
+	MarkNativeAsOptional("GOKZ_GL_GetAPIKeyValid");
+	MarkNativeAsOptional("GOKZ_GL_GetPluginsValid");
+	MarkNativeAsOptional("GOKZ_GL_GetSettingsEnforcerValid");
+	MarkNativeAsOptional("GOKZ_GL_GetMapValid");
+	MarkNativeAsOptional("GOKZ_GL_GetPlayerValid");
 	MarkNativeAsOptional("GOKZ_GL_GetPoints");
 	MarkNativeAsOptional("GOKZ_GL_GetMapPoints");
 	MarkNativeAsOptional("GOKZ_GL_GetRankPoints");

@@ -45,6 +45,11 @@ void CreateNatives()
 	CreateNative("GOKZ_GL_GetRankPoints", Native_GetRankPoints);
 	CreateNative("GOKZ_GL_GetFinishes", Native_GetFinishes);
 	CreateNative("GOKZ_GL_UpdatePoints", Native_UpdatePoints);
+	CreateNative("GOKZ_GL_GetAPIKeyValid", Native_GetAPIKeyValid);
+	CreateNative("GOKZ_GL_GetPluginsValid", Native_GetPluginsValid);
+	CreateNative("GOKZ_GL_GetSettingsEnforcerValid", Native_GetSettingsEnforcerValid);
+	CreateNative("GOKZ_GL_GetMapValid", Native_GetMapValid);
+	CreateNative("GOKZ_GL_GetPlayerValid", Native_GetPlayerValid);
 }
 
 public int Native_PrintRecords(Handle plugin, int numParams)
@@ -106,4 +111,29 @@ public int Native_UpdatePoints(Handle plugin, int numParams)
 {
 	// We're gonna always force an update here, cause otherwise the call doesn't really make sense
 	UpdatePoints(GetNativeCell(1), true, GetNativeCell(2));
+}
+
+public int Native_GetAPIKeyValid(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_APIKeyCheck);
+}
+
+public int Native_GetPluginsValid(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_BannedCommandsCheck);
+}
+
+public int Native_GetSettingsEnforcerValid(Handle plugin, int numParams)
+{
+	return view_as<int>(gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap);
+}
+
+public int Native_GetMapValid(Handle plugin, int numParams)
+{
+	return view_as<int>(MapCheck());
+}
+
+public int Native_GetPlayerValid(Handle plugin, int numParams)
+{
+	return view_as<int>(gB_GloballyVerified[GetNativeCell(1)]);
 }

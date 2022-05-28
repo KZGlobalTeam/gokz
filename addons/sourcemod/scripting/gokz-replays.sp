@@ -37,7 +37,7 @@ public Plugin myinfo =
 
 bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
-int gC_CurrentMapFileSize;
+int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
@@ -279,11 +279,7 @@ static void HookEvents()
 static void UpdateCurrentMap()
 {
 	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
-
-	char mapBuffer[PLATFORM_MAX_PATH];
-	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
-	Format(mapBuffer, sizeof(mapBuffer), "maps/%s.bsp", mapBuffer);
-	gC_CurrentMapFileSize = FileSize(mapBuffer);
+	gI_CurrentMapFileSize = GetCurrentMapFileSize();
 }
 
 
