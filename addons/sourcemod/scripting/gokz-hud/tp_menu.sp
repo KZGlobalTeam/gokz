@@ -21,7 +21,8 @@
 
 void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 3)
+	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
+	if (cmdnum % updateSpeed == 2)
 	{
 		UpdateTPMenu(client, info);
 	}

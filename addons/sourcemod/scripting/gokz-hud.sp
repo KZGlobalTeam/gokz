@@ -1,5 +1,6 @@
 #include <sourcemod>
 
+#include <sdkhooks>
 #include <gokz/core>
 #include <gokz/hud>
 
@@ -30,6 +31,8 @@ public Plugin myinfo =
 bool gB_GOKZRacing;
 bool gB_GOKZReplays;
 bool gB_MenuShowing[MAXPLAYERS + 1];
+bool gB_JBTakeoff[MAXPLAYERS + 1];
+bool gB_FastUpdateRate[MAXPLAYERS + 1];
 
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
@@ -41,7 +44,6 @@ bool gB_MenuShowing[MAXPLAYERS + 1];
 #include "gokz-hud/speed_text.sp"
 #include "gokz-hud/timer_text.sp"
 #include "gokz-hud/tp_menu.sp"
-
 
 
 // =====[ PLUGIN EVENTS ]=====
@@ -80,6 +82,13 @@ public void OnAllPluginsLoaded()
 	
 	gB_GOKZRacing = LibraryExists("gokz-racing");
 	gB_GOKZReplays = LibraryExists("gokz-replays");
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client))
+		{
+			OnClientPutInServer(client);
+		}
+	}
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -102,6 +111,17 @@ public void OnLibraryRemoved(const char[] name)
 
 
 // =====[ CLIENT EVENTS ]=====
+
+public void OnClientPutInServer(int client)
+{
+	SDKHook(client, SDKHook_PostThinkPost, OnPlayerPostThinkPost);
+}
+
+public void OnPlayerPostThinkPost(int client)
+{
+	KZPlayer player = KZPlayer(client);
+	gB_JBTakeoff[client] = (gB_JBTakeoff[client] && !player.OnGround && !player.OnLadder && !player.Noclipping) || Movement_GetJumpbugged(client);
+}
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
@@ -216,10 +236,17 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 		OnOptionChanged_Menu(client, hudOption);
 		OnOptionChanged_HideWeapon(client, hudOption);
 		OnOptionChanged_Options(client, hudOption, newValue);
+		if (hudOption == HUDOption_UpdateRate)
+		{
+			gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
+		}
 	}
 }
 
-
+public void GOKZ_OnOptionsLoaded(int client)
+{
+	gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
+}
 
 // =====[ OTHER EVENTS ]=====
 
@@ -264,6 +291,7 @@ static void SetHUDInfo(KZPlayer player, HUDInfo info, int cmdnum)
 	info.ID = player.ID;
 	info.Jumped = player.Jumped;
 	info.HitPerf = player.GOKZHitPerf;
+	info.HitJB = gB_JBTakeoff[info.ID];
 	info.TakeoffSpeed = player.GOKZTakeoffSpeed;
 	info.IsTakeoff = Movement_GetTakeoffCmdNum(player.ID) == cmdnum;
 	info.Buttons = player.Buttons;
