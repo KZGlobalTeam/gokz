@@ -40,6 +40,7 @@ enum ObsMode
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
+#define IGNORE_JUMP_TIME 0.2 
 stock float PLAYER_MINS[3] = {-16.0, -16.0, 0.0};
 stock float PLAYER_MAXS[3] = {16.0, 16.0, 72.0};
 stock float PLAYER_MAXS_DUCKED[3] = {16.0, 16.0, 54.0};

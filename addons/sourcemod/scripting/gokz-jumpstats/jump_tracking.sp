@@ -26,6 +26,7 @@ static int entityTouchCount[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
 static int lastNoclipTime[MAXPLAYERS + 1];
 static int lastDuckbugTime[MAXPLAYERS + 1];
+static float lastJumpButtonTime[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -283,21 +284,22 @@ enum struct JumpTracker
 		}
 		else if (ladderJump)
 		{
-			if (this.tickCount - this.lastJumpTick <= JS_MAX_BHOP_GROUND_TICKS)
+			// Check for ladder gliding.
+			float curtime = GetGameTime();
+			float ignoreLadderJumpTime = GetEntPropFloat(this.jumper, Prop_Data, "m_ignoreLadderJumpTime");
+			// Check if the ladder glide period is still active and if the player held jump in that period.
+			if (ignoreLadderJumpTime > curtime &&
+				ignoreLadderJumpTime - IGNORE_JUMP_TIME < lastJumpButtonTime[this.jumper] && lastJumpButtonTime[this.jumper] < ignoreLadderJumpTime)
 			{
-				return this.tickCount - this.ladderGrabTick > JS_MAX_BHOP_GROUND_TICKS ? JumpType_Ladderhop : JumpType_Invalid;
+				return JumpType_Invalid;
+			}
+			if (jumped)
+			{
+				return JumpType_Ladderhop;
 			}
 			else
 			{
-				// Check for ladder gliding.
-				if (GetClientButtons(this.jumper) & IN_JUMP)
-				{
-					return JumpType_Invalid;
-				}
-				else
-				{
-					return JumpType_LadderJump;
-				}
+				return JumpType_LadderJump;
 			}
 		}
 		else if (!jumped)
@@ -1274,6 +1276,7 @@ void OnClientPutInServer_JumpTracking(int client)
 	entityTouchCount[client] = 0;
 	lastNoclipTime[client] = 0;
 	lastDuckbugTime[client] = 0;
+	lastJumpButtonTime[client] = 0.0;
 	jumpTrackers[client].Init(client);
 }
 
@@ -1287,15 +1290,6 @@ void OnJumpInvalidated_JumpTracking(int client)
 void OnJumpValidated_JumpTracking(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
 	if (!validCmd[client])
-	{
-		return;
-	}
-
-	// Check if this change of move type is caused by ladder hopping in the air.
-	// If it is then this is not a valid jumpstat.	
-	int buttons = GetClientButtons(client);
-	float ignoreLadderJumpTime = GetEntPropFloat(client, Prop_Data, "m_ignoreLadderJumpTime");
-	if (ladderJump && buttons & IN_JUMP && ignoreLadderJumpTime <= GetGameTime())
 	{
 		return;
 	}
@@ -1354,6 +1348,11 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 	
 	jumpTrackers[client].tickCount = tickcount;
 	
+	if (GetClientButtons(client) & IN_JUMP)
+	{
+		lastJumpButtonTime[client] = GetGameTime();
+	}
+
 	if (CheckNoclip(client))
 	{
 		lastNoclipTime[client] = GetGameTickCount();
