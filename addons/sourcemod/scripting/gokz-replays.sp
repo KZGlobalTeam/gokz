@@ -41,7 +41,6 @@ int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
-ConVar gCV_bot_quota;
 
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
@@ -68,7 +67,6 @@ public void OnPluginStart()
 	LoadTranslations("gokz-replays.phrases");
 	
 	CreateGlobalForwards();
-	CreateConVars();
 	HookEvents();
 	RegisterCommands();
 }
@@ -126,7 +124,6 @@ public void OnConfigsExecuted()
 	FindConVar("bot_zombie").BoolValue = true;
 	FindConVar("bot_join_after_player").BoolValue = false;
 	FindConVar("bot_quota_mode").SetString("normal");
-	gCV_bot_quota.IntValue = RP_MAX_BOTS;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -173,15 +170,6 @@ public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int pl
 	}
 	
 	return Plugin_Continue;
-}
-
-public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] intValue)
-{
-	// Keep the bots in the server
-	if (convar == gCV_bot_quota)
-	{
-		gCV_bot_quota.IntValue = RP_MAX_BOTS;
-	}
 }
 
 
@@ -282,12 +270,6 @@ public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float dista
 
 // =====[ PRIVATE ]=====
 
-static void CreateConVars()
-{
-	gCV_bot_quota = FindConVar("bot_quota");
-	gCV_bot_quota.Flags &= ~FCVAR_NOTIFY;
-	gCV_bot_quota.AddChangeHook(OnConVarChanged);
-}
 
 static void HookEvents()
 {

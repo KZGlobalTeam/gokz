@@ -312,7 +312,7 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 
 static bool validJump[MAXPLAYERS + 1];
 static float validJumpTeleportOrigin[MAXPLAYERS + 1][3];
-
+static int lastInvalidatedTick[MAXPLAYERS + 1];
 bool GetValidJump(int client)
 {
 	return validJump[client];
@@ -320,6 +320,7 @@ bool GetValidJump(int client)
 
 static void InvalidateJump(int client)
 {
+	lastInvalidatedTick[client] = GetGameTickCount();
 	if (validJump[client])
 	{
 		validJump[client] = false;
@@ -329,7 +330,7 @@ static void InvalidateJump(int client)
 
 void OnStopTouchGround_ValidJump(int client, bool jumped, bool ladderJump, bool jumpbug)
 {
-	if (Movement_GetMovetype(client) == MOVETYPE_WALK)
+	if (Movement_GetMovetype(client) == MOVETYPE_WALK && lastInvalidatedTick[client] != GetGameTickCount())
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, jumped, ladderJump, jumpbug);
@@ -350,7 +351,7 @@ void OnPlayerRunCmdPost_ValidJump(int client)
 
 void OnChangeMovetype_ValidJump(int client, MoveType oldMovetype, MoveType newMovetype)
 {
-	if (oldMovetype == MOVETYPE_LADDER && newMovetype == MOVETYPE_WALK) // Ladderjump
+	if (oldMovetype == MOVETYPE_LADDER && newMovetype == MOVETYPE_WALK && lastInvalidatedTick[client] != GetGameTickCount()) // Ladderjump
 	{
 		validJump[client] = true;
 		Call_GOKZ_OnJumpValidated(client, false, true, false);

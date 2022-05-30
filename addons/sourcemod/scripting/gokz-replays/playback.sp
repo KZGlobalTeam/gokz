@@ -254,7 +254,6 @@ void OnClientPutInServer_Playback(int client)
 		{
 			botInGame[bot] = true;
 			botClient[bot] = client;
-			ResetBotStuff(bot);
 			break;
 		}
 	}
@@ -311,8 +310,7 @@ static bool LoadPlayback(int client, int bot, char[] path)
 {
 	if (!FileExists(path))
 	{
-		// This can happen relatively frequently, e.g. for jumps without a replay,
-		// therefore we're not logging it for now to avoid clutter.
+		GOKZ_PrintToChat(client, true, "%t", "No Replay Found");
 		return false;
 	}
 
@@ -421,7 +419,7 @@ static bool LoadFormatVersion1Replay(File file, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(RP_V1_TICK_DATA_BLOCKSIZE, length);
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)), length);
 	}
 	else
 	{  // Make sure it's all clear and the correct size
@@ -630,10 +628,10 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	// Setup playback tick data array list
 	if (playbackTickData[bot] == null)
 	{
-		playbackTickData[bot] = new ArrayList(sizeof(ReplayTickData));
+		playbackTickData[bot] = new ArrayList(IntMax(RP_V1_TICK_DATA_BLOCKSIZE, sizeof(ReplayTickData)));
 	}
 	else
-	{  // Make sure it's all clear and the correct size
+	{
 		playbackTickData[bot].Clear();
 	}
 	
@@ -716,7 +714,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
+				KickClient(botClient[bot]);
 			}
 		}
 	}
@@ -736,7 +734,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			ResetBotStuff(bot);
+			KickClient(botClient[bot]);
 			return;
 		}
 		
@@ -881,7 +879,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				ResetBotStuff(bot);
+				KickClient(botClient[bot]);
 			}
 		}
 	}
@@ -901,7 +899,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			ResetBotStuff(bot);
+			KickClient(botClient[bot]);
 			return;
 		}
 		
@@ -1091,20 +1089,6 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 	}
 }
 
-// Reset the bot client's clan tag and name to the default, unused state
-static void ResetBotStuff(int bot)
-{
-	int client = botClient[bot];
-	
-	CS_SetClientClanTag(client, "!REPLAY");
-	char name[MAX_NAME_LENGTH];
-	FormatEx(name, sizeof(name), "%d", bot + 1);
-	gB_HideNameChange = true;
-	SetClientName(client, name);
-	
-	GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-}
-
 // Set the bot client's GOKZ options, clan tag and name based on the loaded replay data
 static void SetBotStuff(int bot)
 {
@@ -1267,8 +1251,9 @@ static int GetUnusedBot()
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
-		if (botInGame[bot] && !botDataLoaded[bot])
+		if (!botInGame[bot])
 		{
+			CreateFakeClient("botName");
 			return bot;
 		}
 	}

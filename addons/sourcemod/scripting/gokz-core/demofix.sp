@@ -72,6 +72,11 @@ static void DoDemoFix()
 	{
 		case 0:
 		{
+			if (!mapRunning)
+			{
+				return;
+			}
+
 			GameRules_SetProp("m_bWarmupPeriod", 0);
 		}
 		case 1:

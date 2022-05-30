@@ -21,7 +21,8 @@
 
 void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 3)
+	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
+	if (cmdnum % updateSpeed == 2)
 	{
 		UpdateTPMenu(client, info);
 	}
@@ -112,9 +113,25 @@ static void ShowTPMenu(KZPlayer player, HUDInfo info)
 
 static void TPMenuSetTitle(KZPlayer player, Menu menu, HUDInfo info)
 {
+	switch (player.ShowSpectators)
+	{
+		case ShowSpecs_Number:
+		{
+			menu.SetTitle("%T\n \n", "TP Menu - Spectators - Number", player.ID, GetNumSpectators(player));
+		}
+		case ShowSpecs_Full:
+		{
+			char display[512];
+			FormatSpectatorNames(player, display);
+			menu.SetTitle("%T\n \n", "TP Menu - Spectators - Full", player.ID, GetNumSpectators(player), display);
+		}
+	}
+
 	if (player.TimerRunning && player.TimerText == TimerText_TPMenu)
 	{
-		menu.SetTitle(FormatTimerTextForMenu(player, info));
+		char display[512];
+		menu.GetTitle(display, sizeof(display));
+		menu.SetTitle("%s%s", display, FormatTimerTextForMenu(player,info));
 	}
 }
 
@@ -248,4 +265,60 @@ static void TPMenuAddItemStart(KZPlayer player, Menu menu)
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Start", player.ID);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
 	}
-} 
+}
+
+static int GetNumSpectators(KZPlayer player)
+{
+	int count;
+
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && !IsPlayerAlive(i))
+		{
+			int SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
+			if (SpecMode == 4 || SpecMode == 5)
+			{
+				int target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
+				if (target == player.ID)
+				{
+					count++;
+				}
+			}
+		}
+	}
+
+	return count;
+}
+
+static void FormatSpectatorNames(KZPlayer player, char display[512])
+{
+	int count;
+
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && !IsPlayerAlive(i))
+		{
+			int SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
+			if (SpecMode == 4 || SpecMode == 5)
+			{
+				int target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
+				if (target == player.ID)
+				{
+					count++;
+					//strip pound symbol from names
+					char cleanName[MAX_NAME_LENGTH];
+					GetClientName(i, cleanName, sizeof(cleanName));
+					ReplaceString(cleanName, sizeof(cleanName), "#", "", false);
+					if (count < 6)
+					{
+						Format(display, sizeof(display), "%s%s\n", display, cleanName);
+					}
+				}
+				if (count == 6)
+				{
+					Format(display, sizeof(display), "%s...", display);
+				}
+			}
+		}
+	}
+}
