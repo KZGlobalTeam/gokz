@@ -1,6 +1,6 @@
 /*	
 	Uses HUD text to show the race countdown and a start message.
-	
+
 	This is manually refreshed when a race starts to show the start message	as
 	soon as possible, improving responsiveness.
 */
@@ -21,7 +21,8 @@ void OnPluginStart_RacingText()
 
 void OnPlayerRunCmdPost_RacingText(int client, int cmdnum)
 {
-	if (gB_GOKZRacing && cmdnum % 6 == 3)
+	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
+	if (gB_GOKZRacing && cmdnum % updateSpeed == 2)
 	{
 		UpdateRacingText(client);
 	}
@@ -33,7 +34,7 @@ void OnRaceInfoChanged_RacingText(int raceID, RaceInfo prop, int newValue)
 	{
 		return;
 	}
-	
+
 	if (newValue == RaceStatus_Countdown)
 	{
 		for (int client = 1; client <= MaxClients; client++)
@@ -73,12 +74,12 @@ void OnRaceInfoChanged_RacingText(int raceID, RaceInfo prop, int newValue)
 static void UpdateRacingText(int client)
 {
 	KZPlayer player = KZPlayer(client);
-	
+
 	if (player.Fake)
 	{
 		return;
 	}
-	
+
 	if (player.Alive)
 	{
 		ShowRacingText(player, player);
@@ -104,7 +105,7 @@ static void ShowRacingText(KZPlayer player, KZPlayer targetPlayer)
 	{
 		return;
 	}
-	
+
 	int raceStatus = GOKZ_RC_GetRaceInfo(GOKZ_RC_GetRaceID(targetPlayer.ID), RaceInfo_Status);
 	if (raceStatus == RaceStatus_Countdown)
 	{
@@ -121,7 +122,7 @@ static void ShowCountdownText(KZPlayer player, KZPlayer targetPlayer)
 	float timeToStart = (countdownStartTime[targetPlayer.ID] + RC_COUNTDOWN_TIME) - GetGameTime();
 	int colour[4];
 	GetCountdownColour(timeToStart, colour);
-	
+
 	SetHudTextParams(-1.0, 0.3, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 	ShowSyncHudText(player.ID, racingHudSynchronizer, "%t\n\n%d", "Get Ready", IntMax(RoundToCeil(timeToStart), 1));
 }
@@ -149,7 +150,7 @@ static float[] GetCountdownColour(float timeToStart, int buffer[4])
 		buffer[0] = 0;
 		buffer[1] = 255;
 	}
-	
+
 	buffer[2] = 0;
 	buffer[3] = 255;
 }
@@ -160,7 +161,7 @@ static void ShowStartedText(KZPlayer player, KZPlayer targetPlayer)
 	{
 		return;
 	}
-	
+
 	SetHudTextParams(-1.0, 0.3, 1.0, 0, 255, 0, 255, 0, 1.0, 0.0, 0.0);
 	ShowSyncHudText(player.ID, racingHudSynchronizer, "%t", "Go!");
 } 

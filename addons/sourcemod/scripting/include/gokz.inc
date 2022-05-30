@@ -42,6 +42,7 @@ enum ObsMode
 #define SPEED_NO_WEAPON 260.0
 #define FLOAT_MAX view_as<float>(0x7F7FFFFF)
 #define SF_BUTTON_USE_ACTIVATES 1024
+#define IGNORE_JUMP_TIME 0.2 
 stock float PLAYER_MINS[3] = {-16.0, -16.0, 0.0};
 stock float PLAYER_MAXS[3] = {16.0, 16.0, 72.0};
 stock float PLAYER_MAXS_DUCKED[3] = {16.0, 16.0, 54.0};
@@ -429,6 +430,10 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
  */
 stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true)
 {
+	// Clear the player's parent before teleporting to fix being
+	// teleported into seemingly random places if the player has a parent.
+	AcceptEntityInput(client, "ClearParent");
+	
 	Movement_SetOrigin(client, origin);
 	if (setAngles)
 	{
@@ -666,6 +671,17 @@ stock void GetCurrentMapDisplayName(char[] buffer, int maxlength)
 	GetCurrentMap(map, sizeof(map));
 	GetMapDisplayName(map, map, sizeof(map));
 	String_ToLower(map, buffer, maxlength);
+}
+
+/**
+ * Gets the current map's file size.
+ */
+stock int GetCurrentMapFileSize()
+{
+	char mapBuffer[PLATFORM_MAX_PATH];
+	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
+	Format(mapBuffer, sizeof(mapBuffer), "maps/%s.bsp", mapBuffer);
+	return FileSize(mapBuffer);
 }
 
 /**

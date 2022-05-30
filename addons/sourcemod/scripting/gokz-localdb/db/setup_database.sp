@@ -12,7 +12,7 @@ void DB_SetupDatabase()
 	{
 		SetFailState("Database connection failed. Error: \"%s\".", error);
 	}
-	
+
 	char databaseType[8];
 	SQL_ReadDriver(gH_DB, databaseType, sizeof(databaseType));
 	if (strcmp(databaseType, "sqlite", false) == 0)
@@ -27,8 +27,8 @@ void DB_SetupDatabase()
 	{
 		SetFailState("Incompatible database driver. Use SQLite or MySQL.");
 	}
-	
+
 	DB_CreateTables();
-	
+
 	Call_OnDatabaseConnect();
 } 

@@ -43,7 +43,8 @@ void OnPluginStart_TimerText()
 
 void OnPlayerRunCmdPost_TimerText(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 3)
+	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
+	if (cmdnum % updateSpeed == 1)
 	{
 		UpdateTimerText(client, info);
 	}

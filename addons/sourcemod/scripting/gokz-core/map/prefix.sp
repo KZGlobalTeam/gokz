@@ -1,6 +1,6 @@
 /*
 	Mapping API - Prefix
-	
+
 	Detects the map's prefix.
 */
 
@@ -25,7 +25,7 @@ void OnMapStart_Prefix()
 {
 	char map[PLATFORM_MAX_PATH], mapPrefix[PLATFORM_MAX_PATH];
 	GetCurrentMapDisplayName(map, sizeof(map));
-	
+
 	// Get all characters before the first '_' character
 	for (int i = 0; i < sizeof(mapPrefix); i++)
 	{
@@ -33,10 +33,10 @@ void OnMapStart_Prefix()
 		{
 			break;
 		}
-		
+
 		mapPrefix[i] = map[i];
 	}
-	
+
 	if (StrEqual(mapPrefix[0], "kzpro", false))
 	{
 		currentMapPrefix = MapPrefix_KZPro;

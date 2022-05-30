@@ -228,7 +228,7 @@ static int MapTopSubmenuAddItems(Menu menu, JSON_Object records, int timeType)
 		{
 			case TimeType_Nub:
 			{
-				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP      %s", 
+				FormatEx(display, sizeof(display), "#%-2d   %11s  %3d TP	  %s", 
 					i + 1, GOKZ_FormatTime(record.Time), record.Teleports, playerName);
 			}
 			case TimeType_Pro:

@@ -61,14 +61,15 @@ public void OnAllPluginsLoaded()
 	}
 	gB_Localranks = LibraryExists("gokz-localranks");
 	gB_Chat = LibraryExists("gokz-chat");
-	for (int client = 1; client < MaxClients; client++)
+
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && !IsFakeClient(client))
 		{
 			UpdateRank(client, GOKZ_GetCoreOption(client, Option_Mode));
 		}
 	}
-	
+
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
@@ -96,6 +97,18 @@ public void OnLibraryRemoved(const char[] name)
 
 // =====[ EVENTS ]=====
 
+public void OnRebuildAdminCache(AdminCachePart part)
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && !IsFakeClient(client))
+		{
+			int mode = GOKZ_GetCoreOption(client, Option_Mode);
+			UpdateRank(client, mode);
+		}
+	}
+}
+
 public void GOKZ_OnOptionsMenuCreated(TopMenu topMenu)
 {
 	OnOptionsMenuCreated_OptionsMenu(topMenu);
@@ -120,7 +133,7 @@ public void OnClientConnected(int client)
 {
 	for (int mode = 0; mode < MODE_COUNT; mode++)
 	{
-		gI_Rank[client][mode] = -1;
+		gI_Rank[client][mode] = 0;
 	}
 	Profile_OnClientConnected(client);
 }
@@ -157,13 +170,13 @@ public void UpdateRank(int client, int mode)
 	{
 		return;
 	}
-	
-	int tagType = GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_TagType]);
-	
+
+	int tagType = GetAvailableTagTypeOrDefault(client);
+
 	if (tagType != ProfileTagType_Rank)
 	{
 		char clanTag[64], chatTag[32], color[64];
-		
+
 		if (tagType == ProfileTagType_Admin)
 		{
 			FormatEx(clanTag, sizeof(clanTag), "[%s %T]", gC_ModeNamesShort[mode], "Tag - Admin", client);
@@ -176,13 +189,13 @@ public void UpdateRank(int client, int mode)
 			FormatEx(chatTag, sizeof(chatTag), "%T", "Tag - VIP", client);
 			color = TAG_COLOR_VIP;
 		}
-		
+
 		if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) != ProfileOptionBool_Enabled)
 		{
 			FormatEx(clanTag, sizeof(clanTag), "[%s]", gC_ModeNamesShort[mode]);
 		}
 		CS_SetClientClanTag(client, clanTag);
-		
+
 		if (gB_Chat)
 		{
 			if (GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankChat]) == ProfileOptionBool_Enabled)
@@ -196,7 +209,7 @@ public void UpdateRank(int client, int mode)
 		}
 		return;
 	}
-	
+
 	int points = GOKZ_GL_GetRankPoints(client, mode);
 	int rank;
 	for (rank = 1; rank < RANK_COUNT; rank++)
@@ -207,7 +220,7 @@ public void UpdateRank(int client, int mode)
 		}
 	}
 	rank--;
-	
+
 	if (GOKZ_GetCoreOption(client, Option_Mode) == mode)
 	{
 		if (points == -1)
@@ -219,7 +232,7 @@ public void UpdateRank(int client, int mode)
 			UpdateTags(client, rank, mode);
 		}
 	}
-	
+
 	if (gI_Rank[client][mode] != rank)
 	{
 		gI_Rank[client][mode] = rank;
@@ -231,7 +244,7 @@ void UpdateTags(int client, int rank, int mode)
 {
 	char str[64];
 	if (rank != -1 &&
-	    GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
+		GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_ShowRankClanTag]) == ProfileOptionBool_Enabled)
 	{
 		FormatEx(str, sizeof(str), "[%s %s]", gC_ModeNamesShort[mode], gC_rankName[rank]);
 		CS_SetClientClanTag(client, str);
@@ -241,7 +254,7 @@ void UpdateTags(int client, int rank, int mode)
 		FormatEx(str, sizeof(str), "[%s]", gC_ModeNamesShort[mode]);
 		CS_SetClientClanTag(client, str);
 	}
-	
+
 	if (gB_Chat)
 	{
 		if (rank != -1 &&
@@ -256,7 +269,27 @@ void UpdateTags(int client, int rank, int mode)
 	}
 }
 
+bool CanUseTagType(int client, int tagType)
+{
+	switch (tagType)
+	{
+		case ProfileTagType_Rank: return true;
+		case ProfileTagType_VIP: return CheckCommandAccess(client, "gokz_flag_vip", ADMFLAG_CUSTOM1);
+		case ProfileTagType_Admin: return CheckCommandAccess(client, "gokz_flag_admin", ADMFLAG_GENERIC);
+		default: return false;
+	}
+}
 
+int GetAvailableTagTypeOrDefault(int client)
+{
+	int tagType = GOKZ_GetOption(client, gC_ProfileOptionNames[ProfileOption_TagType]);
+	if (!CanUseTagType(client, tagType))
+	{
+		return ProfileTagType_Rank;
+	}
+
+	return tagType;
+}
 
 // =====[ COMMANDS ]=====
 

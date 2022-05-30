@@ -35,4 +35,11 @@ public SharedPlugin __pl_gokz_chat =
 	#else
 	required = 0, 
 	#endif
-}; 
+};
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_chat_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_CH_SetChatTag");
+}
+#endif

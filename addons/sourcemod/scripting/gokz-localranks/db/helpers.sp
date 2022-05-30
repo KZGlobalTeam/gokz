@@ -87,5 +87,5 @@ void DB_FindPlayerAndMap(const char[] playerSearch, const char[] mapSearch, SQLT
 // Used to convert the Account ID to the SteamID we can use for a Global API query
 int GetSteam2FromAccountId(char[] result, int maxlen, int account_id)
 {
-    return Format(result, maxlen, "STEAM_1:%d:%d", view_as<bool>(account_id % 2), account_id / 2);
+	return Format(result, maxlen, "STEAM_1:%d:%d", view_as<bool>(account_id % 2), account_id / 2);
 }

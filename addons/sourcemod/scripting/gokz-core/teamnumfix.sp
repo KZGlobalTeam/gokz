@@ -23,7 +23,7 @@ void OnPluginStart_TeamNumber()
 
 void OnMapStart_TeamNumber()
 {
-    // Fetch the entity ID of team entities and store them.
+	// Fetch the entity ID of team entities and store them.
 	int team = FindEntityByClassname(MaxClients + 1, "cs_team_manager");
 	while (team != -1)
 	{
@@ -35,14 +35,14 @@ void OnMapStart_TeamNumber()
 
 void OnGameFrame_TeamNumber()
 {
-    for (int client = 1; client <= MaxClients; client++)
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (!IsClientInGame(client) || !IsPlayerAlive(client))
 		{
 			continue;
 		}
 		int team = GetEntProp(client, Prop_Data, "m_iTeamNum");
-        // If the entprop changed, remove the player from the old team, but make sure it's a valid team first
+		// If the entprop changed, remove the player from the old team, but make sure it's a valid team first
 		if (team != oldTeam[client] && oldTeam[client] < 4 && oldTeam[client] > 0)
 		{
 			SDKCall(H_RemovePlayer, teamEntID[oldTeam[client]], client);
@@ -53,7 +53,7 @@ void OnGameFrame_TeamNumber()
 
 void OnPlayerJoinTeam_TeamNumber(Event event, int client)
 {
-    // If the old team value is invalid, fix it.
+	// If the old team value is invalid, fix it.
 	if (event.GetInt("oldteam") > 4 || event.GetInt("oldteam") < 0)
 	{
 		event.SetInt("oldteam", 0);
@@ -63,6 +63,6 @@ void OnPlayerJoinTeam_TeamNumber(Event event, int client)
 
 void OnPlayerDeath_TeamNumber(int client)
 {
-    // Switch the client's team to a valid team to prevent crashes.
+	// Switch the client's team to a valid team to prevent crashes.
 	CS_SwitchTeam(client, realTeam[client]);
 }

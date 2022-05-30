@@ -25,6 +25,8 @@ enum struct Pose
 static int entityTouchCount[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
 static int lastNoclipTime[MAXPLAYERS + 1];
+static int lastDuckbugTime[MAXPLAYERS + 1];
+static float lastJumpButtonTime[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
@@ -116,6 +118,8 @@ enum struct JumpTracker
 		
 		// Reset pose history
 		this.poseIndex = 0;
+		// Update the first tick if it is a jumpbug.
+		this.UpdateOnGround();
 	}
 	
 	void Begin()
@@ -280,9 +284,18 @@ enum struct JumpTracker
 		}
 		else if (ladderJump)
 		{
-			if (this.tickCount - this.lastJumpTick <= JS_MAX_BHOP_GROUND_TICKS)
+			// Check for ladder gliding.
+			float curtime = GetGameTime();
+			float ignoreLadderJumpTime = GetEntPropFloat(this.jumper, Prop_Data, "m_ignoreLadderJumpTime");
+			// Check if the ladder glide period is still active and if the player held jump in that period.
+			if (ignoreLadderJumpTime > curtime &&
+				ignoreLadderJumpTime - IGNORE_JUMP_TIME < lastJumpButtonTime[this.jumper] && lastJumpButtonTime[this.jumper] < ignoreLadderJumpTime)
 			{
-				return this.tickCount - this.ladderGrabTick > JS_MAX_BHOP_GROUND_TICKS ? JumpType_Ladderhop : JumpType_Invalid;
+				return JumpType_Invalid;
+			}
+			if (jumped)
+			{
+				return JumpType_Ladderhop;
 			}
 			else
 			{
@@ -306,7 +319,7 @@ enum struct JumpTracker
 				return JumpType_Invalid;
 			}
 		}
-		else if (this.HitBhop())
+		else if (this.HitBhop() && !this.HitDuckbugRecently())
 		{
 			// Check for no offset
 			if (FloatAbs(this.jump.offset) < JS_OFFSET_EPSILON)
@@ -353,7 +366,10 @@ enum struct JumpTracker
 		return true;
 	}
 	
-	
+	bool HitDuckbugRecently()
+	{
+		return GetGameTickCount() - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+	}
 	
 	// =====[ UPDATE HELPERS ]====================================================
 	
@@ -664,16 +680,6 @@ enum struct JumpTracker
 	{
 		// Try to prevent a form of booster abuse
 		if (!this.IsValidAirtime())
-		{
-			this.Invalidate();
-		}
-		
-		// Prevent a form of bugged jumpbugs
-		if (GOKZ_GetCoreOption(this.jumper, Option_Mode) == Mode_Vanilla &&
-			(this.jump.type == JumpType_Bhop ||
-			this.jump.type == JumpType_MultiBhop ||
-			this.jump.type == JumpType_WeirdJump) &&
-			this.jump.height > 51.0)
 		{
 			this.Invalidate();
 		}
@@ -1269,6 +1275,8 @@ void OnClientPutInServer_JumpTracking(int client)
 {
 	entityTouchCount[client] = 0;
 	lastNoclipTime[client] = 0;
+	lastDuckbugTime[client] = 0;
+	lastJumpButtonTime[client] = 0.0;
 	jumpTrackers[client].Init(client);
 }
 
@@ -1340,6 +1348,11 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 	
 	jumpTrackers[client].tickCount = tickcount;
 	
+	if (GetClientButtons(client) & IN_JUMP)
+	{
+		lastJumpButtonTime[client] = GetGameTime();
+	}
+
 	if (CheckNoclip(client))
 	{
 		lastNoclipTime[client] = GetGameTickCount();
@@ -1389,6 +1402,11 @@ public void OnPlayerRunCmdPost_JumpTracking(int client)
 	
 	// We always have to track this, no matter if in the air or not
 	jumpTrackers[client].UpdateRelease();
+	
+	if (Movement_GetDuckbugged(client))
+	{
+		lastDuckbugTime[client] = GetGameTickCount();
+	}
 }
 
 public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, MoveType newMovetype)

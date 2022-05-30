@@ -37,11 +37,10 @@ public Plugin myinfo =
 
 bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
-int gC_CurrentMapFileSize;
+int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
-ConVar gCV_bot_quota;
 
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
@@ -68,7 +67,6 @@ public void OnPluginStart()
 	LoadTranslations("gokz-replays.phrases");
 	
 	CreateGlobalForwards();
-	CreateConVars();
 	HookEvents();
 	RegisterCommands();
 }
@@ -126,7 +124,6 @@ public void OnConfigsExecuted()
 	FindConVar("bot_zombie").BoolValue = true;
 	FindConVar("bot_join_after_player").BoolValue = false;
 	FindConVar("bot_quota_mode").SetString("normal");
-	gCV_bot_quota.IntValue = RP_MAX_BOTS;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -175,23 +172,14 @@ public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int pl
 	return Plugin_Continue;
 }
 
-public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] intValue)
-{
-	// Keep the bots in the server
-	if (convar == gCV_bot_quota)
-	{
-		gCV_bot_quota.IntValue = RP_MAX_BOTS;
-	}
-}
-
 
 
 // =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
-	OnClientPutInServer_Recording(client);
 	OnClientPutInServer_Playback(client);
+	OnClientPutInServer_Recording(client);
 }
 
 public void OnClientAuthorized(int client, const char[] auth)
@@ -202,6 +190,7 @@ public void OnClientAuthorized(int client, const char[] auth)
 public void OnClientDisconnect(int client)
 {
 	OnClientDisconnect_Playback(client);
+	OnClientDisconnect_Recording(client);
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -216,10 +205,21 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
 }
 
+public Action GOKZ_OnTimerStart(int client, int course)
+{
+	Action action = GOKZ_OnTimerStart_Recording(client);
+	if (action != Plugin_Continue)
+	{
+		return action;
+	}
+	
+	return Plugin_Continue;
+}
+
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
 	gB_NubRecordMissed[client] = false;
-	GOKZ_OnTimerStart_Recording(client);
+	GOKZ_OnTimerStart_Post_Recording(client);
 }
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
@@ -270,12 +270,6 @@ public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float dista
 
 // =====[ PRIVATE ]=====
 
-static void CreateConVars()
-{
-	gCV_bot_quota = FindConVar("bot_quota");
-	gCV_bot_quota.Flags &= ~FCVAR_NOTIFY;
-	gCV_bot_quota.AddChangeHook(OnConVarChanged);
-}
 
 static void HookEvents()
 {
@@ -285,11 +279,7 @@ static void HookEvents()
 static void UpdateCurrentMap()
 {
 	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
-
-	char mapBuffer[PLATFORM_MAX_PATH];
-	GetCurrentMap(mapBuffer, sizeof(mapBuffer));
-	Format(mapBuffer, sizeof(mapBuffer), "maps/%s.bsp", mapBuffer);
-	gC_CurrentMapFileSize = FileSize(mapBuffer);
+	gI_CurrentMapFileSize = GetCurrentMapFileSize();
 }
 
 

@@ -244,7 +244,7 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 	}
 	for (int strafe = 1; strafe <= jump.strafes && strafe < JS_MAX_TRACKED_STRAFES; strafe++)
 	{
-		PrintToConsole(client, 
+		PrintToConsole(client,
 			" %2d.  %3.0f%%      %5.2f     %5.2f     %3.0f%%      %5.1f°    %2d     %2d", 
 			strafe, 
 			GetStrafeSync(jump, strafe),

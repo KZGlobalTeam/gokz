@@ -24,7 +24,8 @@ void OnPluginStart_SpeedText()
 
 void OnPlayerRunCmdPost_SpeedText(int client, int cmdnum, HUDInfo info)
 {
-	if (cmdnum % 6 == 0 || info.IsTakeoff)
+	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
+	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateSpeedText(client, info);
 	}
@@ -69,16 +70,27 @@ static void ShowSpeedText(KZPlayer player, HUDInfo info)
 		return;
 	}
 	
-	int colour[4]; // RGBA
-	if (info.HitPerf && !info.OnGround && !info.OnLadder && !info.Noclipping)
+	int colour[4] = { 255, 255, 255, 0 }; // RGBA
+	float velZ = Movement_GetVerticalVelocity(info.ID);
+	if (!info.OnGround && !info.OnLadder && !info.Noclipping)
 	{
-		colour =  { 64, 255, 64, 0 };
+		if (GOKZ_HUD_GetOption(player.ID, HUDOption_DeadstrafeColor) == DeadstrafeColor_Enabled && velZ > 0.0 && velZ < 140.0)
+		{
+			colour = { 255, 32, 32, 0 };
+		}
+		else if (info.HitPerf)
+		{
+			if (info.HitJB)
+			{
+				colour = { 255, 255, 32, 0 };
+			}
+			else
+			{
+				colour = { 64, 255, 64, 0 };
+			}
+		}
 	}
-	else
-	{
-		colour =  { 255, 255, 255, 0 };
-	}
-	
+
 	switch (player.SpeedText)
 	{
 		case SpeedText_Bottom:
