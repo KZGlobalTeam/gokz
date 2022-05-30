@@ -22,9 +22,11 @@ enum HUDOption:
 	HUDOption_TimerText, 
 	HUDOption_TimerStyle,
 	HUDOption_TimerType, 
-	HUDOption_SpeedText, 
+	HUDOption_SpeedText,
 	HUDOption_ShowWeapon,
-	HUDOption_ShowControls, 
+	HUDOption_ShowControls,
+	HUDOption_DeadstrafeColor,
+	HUDOption_UpdateRate,
 	HUDOption_ShowSpectators,
 	HUDOption_SpecListPosition,
 	HUDOPTION_COUNT
@@ -101,6 +103,13 @@ enum
 
 enum
 {
+	DeadstrafeColor_Disabled = 0, 
+	DeadstrafeColor_Enabled, 
+	DEADSTRAFECOLOR_COUNT
+};
+
+enum
+{
 	ShowSpecs_Disabled = 0,
 	ShowSpecs_Number,
 	ShowSpecs_Full,
@@ -114,6 +123,13 @@ enum
 	SpecListPosition_InfoPanel,
 	SPECLISTPOSITION_COUNT
 }
+
+enum
+{
+	UpdateRate_Slow = 0,
+	UpdateRate_Fast,
+	UPDATERATE_COUNT,
+};
 
 // =====[ STRUCTS ]======
 
@@ -133,6 +149,7 @@ enum struct HUDInfo
 	int ID;
 	bool Jumped;
 	bool HitPerf;
+	bool HitJB;
 	float TakeoffSpeed;
 	int Buttons;
 	int CurrentTeleport;
@@ -159,6 +176,8 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Show Controls",
 	"GOKZ HUD - Show Spectators",
 	"GOKZ HUD - Spec List Pos",
+	"GOKZ HUD - Dead Strafe",
+	"GOKZ HUD - Update Rate"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -169,11 +188,13 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Timer Display - 0 = Disabled, 1 = Centre Panel, 2 = Teleport Menu, 3 = Bottom, 4 = Top", 
 	"Timer Style - 0 = Standard, 1 = Precise",
 	"Timer Type - 0 = Disabled, 1 = Enabled", 
-	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom", 
+	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom",
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
 	"Replay Controls Display - 0 = Disbled, 1 = Enabled",
 	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names",
-	"Spectator List Position - 0 = Teleport Menu, 2 = Center Panel"
+	"Spectator List Position - 0 = Teleport Menu, 2 = Center Panel",
+	"Dead Strafe Indicator - 0 = Disabled, 1 = Enabled",
+	"HUD Update Rate - 0 = Slow, 1 = Fast"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -184,11 +205,13 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Timer Text", 
 	"Options Menu - Timer Style", 
 	"Options Menu - Timer Type",
-	"Options Menu - Speed Text", 
+	"Options Menu - Speed Text",
 	"Options Menu - Show Weapon",
 	"Options Menu - Show Controls",
 	"Options Menu - Show Spectators",
-	"Options Menu - Spectator List Position"
+	"Options Menu - Spectator List Position",
+	"Options Menu - Dead Strafe Indicator",
+	"Options Menu - Update Rate"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -199,11 +222,13 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	TIMERTEXT_COUNT, 
 	TIMERSTYLE_COUNT,
 	TIMERTYPE_COUNT, 
-	SPEEDTEXT_COUNT, 
+	SPEEDTEXT_COUNT,
 	SHOWWEAPON_COUNT,
 	REPLAYCONTROLS_COUNT,
 	SHOWSPECS_COUNT,
-	SPECLISTPOSITION_COUNT
+	SPECLISTPOSITION_COUNT,
+	DEADSTRAFECOLOR_COUNT,
+	UPDATERATE_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -214,11 +239,13 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	TimerText_InfoPanel, 
 	TimerStyle_Standard, 
 	TimerType_Enabled,
-	SpeedText_InfoPanel, 
+	SpeedText_InfoPanel,
 	ShowWeapon_Enabled,
 	ReplayControls_Enabled,
 	ShowSpecs_Disabled,
-	SpecListPosition_TPMenu
+	SpecListPosition_TPMenu,
+	DeadstrafeColor_Disabled,
+	UpdateRate_Slow
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -263,6 +290,12 @@ stock char gC_ShowControlsPhrases[REPLAYCONTROLS_COUNT][] =
 	"Options Menu - Enabled"
 };
 
+stock char gC_DeadstrafeColorPhrases[DEADSTRAFECOLOR_COUNT][] = 
+{
+	"Options Menu - Disabled",
+	"Options Menu - Enabled"
+};
+
 stock char gC_ShowSpecsPhrases[SHOWSPECS_COUNT][] =
 {
 	"Options Menu - Disabled",
@@ -274,6 +307,12 @@ stock char gC_SpecListPositionPhrases[SPECLISTPOSITION_COUNT][] =
 {
 	"Options Menu - Teleport Menu",
 	"Options Menu - Info Panel"
+};
+
+stock char gC_HUDUpdateRatePhrases[UPDATERATE_COUNT][]=
+{
+	"Options Menu - Slow",
+	"Options Menu - Fast"
 };
 
 // =====[ NATIVES ]=====

@@ -71,6 +71,14 @@
 	{
 		"en"		"{grey}Replay controls are now hidden."
 	}
+	"Option - Dead Strafe - Enable"
+	{
+		"en"		"{grey}The speed text now indicates period with low airstrafe gain."
+	}
+	"Option - Dead Strafe - Disable"
+	{
+		"en"		"{grey}Dead strafe period indicator disabled."
+	}
 	"Option - Show Spectators - Disable"
 	{
 		"en"		"{grey}Spectators are now no longer shown."
@@ -249,6 +257,10 @@
 		"chi"		"空速文字"
 		"ru"		"Текст скорости"
 	}
+	"Options Menu - Dead Strafe Indicator"
+	{
+		"en"		"Dead strafe period"
+	}
 	"Options Menu - Show Weapon"
 	{
 		"en"		"Show weapon"
@@ -259,7 +271,11 @@
 	{
 		"en"		"Show replay controls"
 	}
-	"Options Menu - Spectator List"
+	"Options Menu - Update Rate"
+	{
+		"en"		"Update rate"
+	}
+	"Options Menu - Show Spectators"
 	{
 		"en"		"Spectator list"
 	}
