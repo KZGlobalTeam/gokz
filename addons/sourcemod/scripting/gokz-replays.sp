@@ -124,6 +124,8 @@ public void OnConfigsExecuted()
 	FindConVar("bot_zombie").BoolValue = true;
 	FindConVar("bot_join_after_player").BoolValue = false;
 	FindConVar("bot_quota_mode").SetString("normal");
+	FindConVar("bot_quota").Flags &= ~FCVAR_NOTIFY;
+	FindConVar("bot_quota").Flags &= ~FCVAR_REPLICATED;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
