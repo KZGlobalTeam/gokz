@@ -15,6 +15,10 @@ static ArrayList playbackTickData[RP_MAX_BOTS];
 static bool inBreather[RP_MAX_BOTS];
 static float breatherStartTime[RP_MAX_BOTS];
 
+// Original bot caller, needed for OnClientPutInServer callback
+static int botCaller[RP_MAX_BOTS];
+// Original bot name after creation by bot_add, needed for bot removal
+static char botName[RP_MAX_BOTS][MAX_NAME_LENGTH];
 static bool botInGame[RP_MAX_BOTS];
 static int botClient[RP_MAX_BOTS];
 static bool botDataLoaded[RP_MAX_BOTS];
@@ -81,9 +85,7 @@ int LoadReplayBot(int client, char[] path)
 		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
-
-	SetBotStuff(bot);
-	MakePlayerSpectate(client, botClient[bot]);
+	botCaller[bot] = client;
 	return botClient[bot];
 }
 
@@ -250,10 +252,18 @@ void OnClientPutInServer_Playback(int client)
 	// Check if an unassigned bot has joined, and assign it
 	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
-		if (!botInGame[bot])
+		// Also check if the bot was created by us.
+		if (!botInGame[bot] && botCaller[bot] != 0)
 		{
 			botInGame[bot] = true;
 			botClient[bot] = client;
+			GetClientName(client, botName[bot], sizeof(botName[]));
+			SetBotStuff(bot);
+			if (IsValidClient(botCaller[bot]))
+			{
+				MakePlayerSpectate(botCaller[bot], botClient[bot]);
+				botCaller[bot] = 0;
+			}
 			break;
 		}
 	}
@@ -714,7 +724,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				KickClient(botClient[bot]);
+				ServerCommand("bot_kick %s", botName[bot]);
 			}
 		}
 	}
@@ -734,7 +744,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			KickClient(botClient[bot]);
+			ServerCommand("bot_kick %s", botName[bot]);
 			return;
 		}
 		
@@ -879,7 +889,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				KickClient(botClient[bot]);
+				ServerCommand("bot_kick %s", botName[bot]);
 			}
 		}
 	}
@@ -899,7 +909,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			KickClient(botClient[bot]);
+			ServerCommand("bot_kick %s", botName[bot]);
 			return;
 		}
 		
@@ -1096,7 +1106,7 @@ static void SetBotStuff(int bot)
 	{
 		return;
 	}
-	
+
 	int client = botClient[bot];
 	
 	// Set its movement options just in case it could negatively affect the playback
@@ -1106,17 +1116,6 @@ static void SetBotStuff(int bot)
 	// Clan tag and name
 	SetBotClanTag(bot);
 	SetBotName(bot);
-
-	// Set the bot's team based on if it's NUB or PRO
-	if (botReplayType[bot] == ReplayType_Run 
-		&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_CT);
-	}
-	else
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_T);
-	}
 
 	// Set bot weapons
 	// Always start by removing the pistol and knife
@@ -1253,7 +1252,16 @@ static int GetUnusedBot()
 	{
 		if (!botInGame[bot])
 		{
-			CreateFakeClient("botName");
+			// Set the bot's team based on if it's NUB or PRO
+			if (botReplayType[bot] == ReplayType_Run 
+				&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
+			{
+				ServerCommand("bot_add_ct");
+			}
+			else
+			{
+				ServerCommand("bot_add_t");
+			}
 			return bot;
 		}
 	}
@@ -1344,33 +1352,13 @@ static void MakePlayerSpectate(int client, int bot)
 	DataPack data = new DataPack();
 	data.WriteCell(clientUserID);
 	data.WriteCell(GetClientUserId(bot));
-
-	CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
-	CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
+	CreateTimer(0.1, Timer_UpdateBotName, GetClientUserId(bot));
 	EnableReplayControls(client);
 }
 
-public Action Timer_ResetSpectate(Handle timer, int clientUID)
+public Action Timer_UpdateBotName(Handle timer, int botUID)
 {
-	int client = GetClientOfUserId(clientUID);
-	if (IsValidClient(client))
-	{
-		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
-	}
-}
-public Action Timer_SpectateBot(Handle timer, DataPack data)
-{
-	data.Reset();
-	int client = GetClientOfUserId(data.ReadCell());
-	int bot = GetClientOfUserId(data.ReadCell());
-	delete data;
-	
-	if (IsValidClient(client) && IsValidClient(bot))
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
-	}
-	return Plugin_Continue;
+	Event e = CreateEvent("spec_target_updated");
+	e.SetInt("userid", botUID);
+	e.Fire();
 }

@@ -224,12 +224,6 @@ public Action Timer_EndRecording(Handle timer, DataPack data)
 
 	runningRunBreatherTimer[client] = INVALID_HANDLE;
 	postRunRecording[client] = false;
-
-	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
-	{
-		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
-		return Plugin_Stop;
-	}
 	
 	char path[PLATFORM_MAX_PATH];
 	if (SaveRecordingOfRun(path, client, course, time, teleportsUsed))
