@@ -15,7 +15,14 @@
 #define ITEM_INFO_PAUSE "pause"
 #define ITEM_INFO_START "start"
 
-
+static bool oldCanMakeCP[MAXPLAYERS + 1];
+static bool oldCanTP[MAXPLAYERS + 1];
+static bool oldCanPrevCP[MAXPLAYERS + 1];
+static bool oldCanNextCP[MAXPLAYERS + 1];
+static bool oldCanUndoTP[MAXPLAYERS + 1];
+static bool oldCanPause[MAXPLAYERS + 1];
+static bool oldCanResume[MAXPLAYERS + 1];
+static bool forceRefresh[MAXPLAYERS + 1];
 
 // =====[ EVENTS ]=====
 
@@ -77,7 +84,11 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 	}
 }
 
-
+// =====[ PUBLIC ]=====
+void SetForceUpdateTPMenu(int client)
+{
+	forceRefresh[client] = true;
+}
 
 // =====[ PRIVATE ]=====
 
@@ -90,13 +101,32 @@ static void UpdateTPMenu(int client, HUDInfo info)
 		return;
 	}
 	
+	bool force = forceRefresh[client]
+		|| player.CanMakeCheckpoint != oldCanMakeCP[client]
+		|| player.CanTeleportToCheckpoint != oldCanTP[client]
+		|| player.CanPrevCheckpoint != oldCanPrevCP[client]
+		|| player.CanNextCheckpoint != oldCanNextCP[client]
+		|| player.CanUndoTeleport != oldCanUndoTP[client]
+		|| player.CanPause != oldCanPause[client]
+		|| player.CanResume != oldCanResume[client];
+
 	// If there is no menu showing, or if the TP menu is currently showing with timer text
 	if (GetClientMenu(client) == MenuSource_None
 		 || gB_MenuShowing[player.ID] && GetClientAvgLoss(player.ID, NetFlow_Both) > EPSILON
-		 || gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu)
+		 || gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu
+		 || gB_MenuShowing[player.ID] && force)
 	{
 		ShowTPMenu(player, info);
 	}
+	
+	oldCanMakeCP[client] = player.CanMakeCheckpoint;
+	oldCanTP[client] = player.CanTeleportToCheckpoint;
+	oldCanPrevCP[client] = player.CanPrevCheckpoint;
+	oldCanNextCP[client] = player.CanNextCheckpoint;
+	oldCanUndoTP[client] = player.CanUndoTeleport;
+	oldCanPause[client] = player.CanPause;
+	oldCanResume[client] = player.CanResume;
+	forceRefresh[client] = false;
 }
 
 static void ShowTPMenu(KZPlayer player, HUDInfo info)
@@ -168,7 +198,14 @@ static void TPMenuAddItemCheckpoint(KZPlayer player, Menu menu)
 		Format(display, sizeof(display), "%s #%d", display, player.CheckpointCount);
 	}
 	
-	menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+	if (player.CanMakeCheckpoint || !gB_DynamicMenu[player.ID])
+	{
+		menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+	}
+	else
+	{
+		menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DISABLED);
+	}
 }
 
 static void TPMenuAddItemTeleport(KZPlayer player, Menu menu)
@@ -180,7 +217,7 @@ static void TPMenuAddItemTeleport(KZPlayer player, Menu menu)
 		Format(display, sizeof(display), "%s #%d", display, player.TeleportCount);
 	}
 	
-	if (player.CanTeleportToCheckpoint)
+	if (player.CanTeleportToCheckpoint || !gB_DynamicMenu[player.ID])
 	{
 		menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DEFAULT);
 	}
@@ -194,7 +231,7 @@ static void TPMenuAddItemPrevCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", player.ID);
-	if (player.CanPrevCheckpoint)
+	if (player.CanPrevCheckpoint || !gB_DynamicMenu[player.ID])
 	{
 		menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DEFAULT);
 	}
@@ -208,7 +245,7 @@ static void TPMenuAddItemNextCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Next CP", player.ID);
-	if (player.CanNextCheckpoint)
+	if (player.CanNextCheckpoint || !gB_DynamicMenu[player.ID])
 	{
 		menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DEFAULT);
 	}
@@ -222,7 +259,7 @@ static void TPMenuAddItemUndo(KZPlayer player, Menu menu)
 {
 	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Undo TP", player.ID);
-	if (player.CanUndoTeleport)
+	if (player.CanUndoTeleport || !gB_DynamicMenu[player.ID])
 	{
 		menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DEFAULT);
 	}
@@ -238,12 +275,26 @@ static void TPMenuAddItemPause(KZPlayer player, Menu menu)
 	if (player.Paused)
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", player.ID);
-		menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
+		if (player.CanResume || !gB_DynamicMenu[player.ID])
+		{
+			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
+		}
+		else
+		{
+			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DISABLED);
+		}
 	}
 	else
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Pause", player.ID);
-		menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
+		if (player.CanPause || !gB_DynamicMenu[player.ID])
+		{
+			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
+		}
+		else
+		{
+			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DISABLED);
+		}
 	}
 }
 
