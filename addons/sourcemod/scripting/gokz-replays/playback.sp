@@ -778,6 +778,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 		CopyVector(repOrigin, botLastOrigin[bot]);
 		
 		botSpeed[bot] = GetVectorHorizontalLength(velocity);
+		buttons = repButtons;
 		botButtons[bot] = repButtons;
 
 		// Should the bot be ducking?!
@@ -945,54 +946,56 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
 		// Set buttons
+		int newButtons;
 		if (currentTickData.flags & RP_IN_ATTACK)
 		{
-			buttons |= IN_ATTACK;
+			newButtons |= IN_ATTACK;
 		}
 		if (currentTickData.flags & RP_IN_ATTACK2)
 		{
-			buttons |= IN_ATTACK2;
+			newButtons |= IN_ATTACK2;
 		}
 		if (currentTickData.flags & RP_IN_JUMP)
 		{
-			buttons |= IN_JUMP;
+			newButtons |= IN_JUMP;
 		}
 		if (currentTickData.flags & RP_IN_DUCK || currentTickData.flags & RP_FL_DUCKING)
 		{
-			buttons |= IN_DUCK;
+			newButtons |= IN_DUCK;
 		}
 		if (currentTickData.flags & RP_IN_FORWARD)
 		{
-			buttons |= IN_FORWARD;
+			newButtons |= IN_FORWARD;
 		}
 		if (currentTickData.flags & RP_IN_BACK)
 		{
-			buttons |= IN_BACK;
+			newButtons |= IN_BACK;
 		}
 		if (currentTickData.flags & RP_IN_LEFT)
 		{
-			buttons |= IN_LEFT;
+			newButtons |= IN_LEFT;
 		}
 		if (currentTickData.flags & RP_IN_RIGHT)
 		{
-			buttons |= IN_RIGHT;
+			newButtons |= IN_RIGHT;
 		}
 		if (currentTickData.flags & RP_IN_MOVELEFT)
 		{
-			buttons |= IN_MOVELEFT;
+			newButtons |= IN_MOVELEFT;
 		}
 		if (currentTickData.flags & RP_IN_MOVERIGHT)
 		{
-			buttons |= IN_MOVERIGHT;
+			newButtons |= IN_MOVERIGHT;
 		}
 		if (currentTickData.flags & RP_IN_RELOAD)
 		{
-			buttons |= IN_RELOAD;
+			newButtons |= IN_RELOAD;
 		}
 		if (currentTickData.flags & RP_IN_SPEED)
 		{
-			buttons |= IN_SPEED;
+			newButtons |= IN_SPEED;
 		}
+		buttons = newButtons;
 		botButtons[bot] = buttons;
 
 		int entityFlags = GetEntityFlags(client);
