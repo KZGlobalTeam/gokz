@@ -124,15 +124,24 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 	if (timerRunning[client])
 	{
 		int runTick = GetArraySize(recordedRunData[client]);
-		recordedRunData[client].Resize(runTick + 1);
-		recordedRunData[client].SetArray(runTick, tickData);
+		if (runTick < RP_MAX_DURATION)
+		{
+			// Resize might fail if the timer exceed the max duration,
+			// as it is not guaranteed to allocate more than 1GB of contiguous memory,
+			// causing mass lag spikes that kick everyone out of the server.
+			// We can still attempt to save the rest of the recording though.
+			recordedRunData[client].Resize(runTick + 1);
+			recordedRunData[client].SetArray(runTick, tickData);
+		}
 	}
-
 	if (postRunRecording[client])
 	{
 		int tick = GetArraySize(recordedPostRunData[client]);
-		recordedPostRunData[client].Resize(tick + 1);
-		recordedPostRunData[client].SetArray(tick, tickData);
+		if (tick < RP_MAX_DURATION)
+		{
+			recordedPostRunData[client].Resize(tick + 1);
+			recordedPostRunData[client].SetArray(tick, tickData);
+		}
 	}
 	
 	int tick = recordingIndex[client];
