@@ -130,7 +130,7 @@ enum struct ReplayTickData
 #define RP_NAV_FILE "maps/gokz-replays.nav"
 #define RP_V1_TICK_DATA_BLOCKSIZE 7
 #define RP_CACHE_BLOCKSIZE 4
-#define RP_MAX_BOTS 2
+#define RP_MAX_BOTS 4
 #define RP_PLAYBACK_BREATHER_TIME 2.0
 #define RP_MIN_CHEATER_REPLAY_LENGTH 30 // 30 seconds
 #define RP_MAX_CHEATER_REPLAY_LENGTH 120 // 2 minutes
