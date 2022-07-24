@@ -511,7 +511,7 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 
 	delete file;
 	// If there is no plugin that wants to take over the replay file, we will delete it ourselves.
-	if (Call_OnReplaySaved(client, ReplayType_Run, gC_CurrentMap, course, timeType, time, replayPath, temp) != Plugin_Continue && temp)
+	if (Call_OnReplaySaved(client, ReplayType_Run, gC_CurrentMap, course, timeType, time, replayPath, temp) == Plugin_Continue && temp)
 	{
 		DeleteFile(replayPath);
 	}
