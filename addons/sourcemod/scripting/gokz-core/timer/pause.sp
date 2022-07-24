@@ -27,6 +27,16 @@ void Pause(int client)
 	{
 		return;
 	}
+
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnPause(client, result);
+	if (result != Plugin_Continue)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Generic)");
+		GOKZ_PlayErrorSound(client);
+		return;
+	}
 	
 	// Pause
 	paused[client] = true;
@@ -94,19 +104,6 @@ bool CanPause(int client, bool showError = false)
 		}
 	}
 	
-	// Call Pre Forward
-	Action result;
-	Call_GOKZ_OnPause(client, result);
-	if (result != Plugin_Continue)
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Generic)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
-	
 	return true;
 }
 
@@ -120,6 +117,17 @@ void Resume(int client)
 	{
 		return;
 	}
+
+	// Call Pre Forward
+	Action result;
+	Call_GOKZ_OnResume(client, result);
+	if (result != Plugin_Continue)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Generic)");
+		GOKZ_PlayErrorSound(client);
+		return;
+	}
+
 	// Resume
 	if (pausedOnLadder[client])
 	{
@@ -153,19 +161,6 @@ bool CanResume(int client, bool showError = false)
 		if (showError)
 		{
 			GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Just Paused)");
-			GOKZ_PlayErrorSound(client);
-		}
-		return false;
-	}
-	
-	// Call Pre Forward
-	Action result;
-	Call_GOKZ_OnResume(client, result);
-	if (result != Plugin_Continue)
-	{
-		if (showError)
-		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Generic)");
 			GOKZ_PlayErrorSound(client);
 		}
 		return false;
