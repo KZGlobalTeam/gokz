@@ -29,6 +29,13 @@ enum
 	REPLAYTYPE_COUNT
 };
 
+enum ReplaySaveState
+{
+	ReplaySave_Local = 0,
+	ReplaySave_Temp,
+	ReplaySave_Disabled
+};
+
 // NOTE: Replays use delta compression for storage.
 // This enum is the indices of the ReplayTickData enum struct.
 // NOTE: This has to match the ReplayTickData enum struct!!!
@@ -121,6 +128,7 @@ enum struct ReplayTickData
 
 #define RP_DIRECTORY "data/gokz-replays" // In Path_SM
 #define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
+#define RP_DIRECTORY_RUNS_TEMP "data/gokz-replays/_tempRuns" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
 #define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM
 #define RP_DIRECTORY_BLOCKJUMPS "blocks"
@@ -178,8 +186,10 @@ enum struct ReplayTickData
  * @param timeType			The type of time (Pro/Nub).
  * @param time				The time the run was completed in.
  * @param filePath			Replay file path.
+ * @param tempReplay		Whether the replay file should only be temporaily stored. 
+ * @return					Plugin_Handled to take over the temporary replay deletion, Plugin_Continue to allow temporary replay deletion by the replay plugin.
  */
-forward void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath);
+forward Action GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath, bool tempReplay);
 
 /**
  * Called when a currently being recorded replay is discarded from
