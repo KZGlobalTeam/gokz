@@ -35,6 +35,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-replays.txt"
 
+bool gB_GOKZHUD;
 bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
 int gI_CurrentMapFileSize;
@@ -78,7 +79,8 @@ public void OnAllPluginsLoaded()
 		Updater_AddPlugin(UPDATER_URL);
 	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
-	
+	gB_GOKZHUD = LibraryExists("gokz-hud");
+
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
@@ -95,11 +97,13 @@ public void OnLibraryAdded(const char[] name)
 		Updater_AddPlugin(UPDATER_URL);
 	}
 	gB_GOKZLocalDB = gB_GOKZLocalDB || StrEqual(name, "gokz-localdb");
+	gB_GOKZHUD = gB_GOKZHUD || StrEqual(name, "gokz-hud");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
+	gB_GOKZHUD = gB_GOKZHUD && !StrEqual(name, "gokz-hud");
 }
 
 

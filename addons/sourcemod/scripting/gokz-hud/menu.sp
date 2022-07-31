@@ -74,4 +74,15 @@ void OnJoinTeam_Menu(int client)
 void OnStartPositionSet_Menu(int client)
 {
 	CancelGOKZHUDMenu(client);
-} 
+}
+
+void OnPluginEnd_Menu()
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client))
+		{
+			CancelGOKZHUDMenu(client);
+		}
+	}
+}

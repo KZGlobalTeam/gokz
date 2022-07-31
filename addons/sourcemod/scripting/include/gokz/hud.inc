@@ -28,6 +28,7 @@ enum HUDOption:
 	HUDOption_DeadstrafeColor,
 	HUDOption_UpdateRate,
 	HUDOption_ShowSpectators,
+	HUDOption_SpecListPosition,
 	HUDOPTION_COUNT
 };
 
@@ -118,6 +119,13 @@ enum
 
 enum
 {
+	SpecListPosition_TPMenu = 0,
+	SpecListPosition_InfoPanel,
+	SPECLISTPOSITION_COUNT
+}
+
+enum
+{
 	UpdateRate_Slow = 0,
 	UpdateRate_Fast,
 	UPDATERATE_COUNT,
@@ -166,9 +174,10 @@ stock char gC_HUDOptionNames[HUDOPTION_COUNT][] =
 	"GOKZ HUD - Speed Text", 
 	"GOKZ HUD - Show Weapon",
 	"GOKZ HUD - Show Controls",
+	"GOKZ HUD - Show Spectators",
+	"GOKZ HUD - Spec List Pos",
 	"GOKZ HUD - Dead Strafe",
-	"GOKZ HUD - Update Rate",
-	"GOKZ HUD - Show Spectators"
+	"GOKZ HUD - Update Rate"
 };
 
 stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] = 
@@ -182,9 +191,10 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Speed Display - 0 = Disabled, 1 = Centre Panel, 2 = Bottom",
 	"Weapon Viewmodel - 0 = Disabled, 1 = Enabled",
 	"Replay Controls Display - 0 = Disbled, 1 = Enabled",
+	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names",
+	"Spectator List Position - 0 = Teleport Menu, 2 = Center Panel",
 	"Dead Strafe Indicator - 0 = Disabled, 1 = Enabled",
-	"HUD Update Rate - 0 = Slow, 1 = Fast",
-	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names"
+	"HUD Update Rate - 0 = Slow, 1 = Fast"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -198,9 +208,10 @@ stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] =
 	"Options Menu - Speed Text",
 	"Options Menu - Show Weapon",
 	"Options Menu - Show Controls",
+	"Options Menu - Show Spectators",
+	"Options Menu - Spectator List Position",
 	"Options Menu - Dead Strafe Indicator",
-	"Options Menu - Update Rate",
-	"Options Menu - Show Spectators"
+	"Options Menu - Update Rate"
 };
 
 stock int gI_HUDOptionCounts[HUDOPTION_COUNT] = 
@@ -214,9 +225,10 @@ stock int gI_HUDOptionCounts[HUDOPTION_COUNT] =
 	SPEEDTEXT_COUNT,
 	SHOWWEAPON_COUNT,
 	REPLAYCONTROLS_COUNT,
+	SHOWSPECS_COUNT,
+	SPECLISTPOSITION_COUNT,
 	DEADSTRAFECOLOR_COUNT,
-	UPDATERATE_COUNT,
-	SHOWSPECS_COUNT
+	UPDATERATE_COUNT
 };
 
 stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] = 
@@ -230,9 +242,10 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	SpeedText_InfoPanel,
 	ShowWeapon_Enabled,
 	ReplayControls_Enabled,
+	ShowSpecs_Disabled,
+	SpecListPosition_TPMenu,
 	DeadstrafeColor_Disabled,
-	UpdateRate_Slow,
-	ShowSpecs_Disabled
+	UpdateRate_Slow
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -290,11 +303,43 @@ stock char gC_ShowSpecsPhrases[SHOWSPECS_COUNT][] =
 	"Options Menu - Number and Names"
 };
 
+stock char gC_SpecListPositionPhrases[SPECLISTPOSITION_COUNT][] =
+{
+	"Options Menu - Teleport Menu",
+	"Options Menu - Info Panel"
+};
+
 stock char gC_HUDUpdateRatePhrases[UPDATERATE_COUNT][]=
 {
 	"Options Menu - Slow",
 	"Options Menu - Fast"
 };
+
+// =====[ NATIVES ]=====
+
+/**
+ * Returns whether the GOKZ HUD menu is showing for a client.
+ *
+ * @param client		Client index.
+ * @return				Whether the GOKZ HUD menu is showing.
+ */
+native bool GOKZ_HUD_GetMenuShowing(int client);
+
+/**
+ * Sets whether the GOKZ HUD menu would be showing for a client.
+ *
+ * @param client		Client index.
+ * @param value			Whether the GOKZ HUD menu would be showing for a client.
+ */
+native void GOKZ_HUD_SetMenuShowing(int client, bool value);
+
+/**
+ * Gets the spectator text for the menu. Used by GOKZ-replays.
+ *
+ * @param client		Client index.
+ * @param value			Whether the GOKZ HUD menu would be showing for a client.
+ */
+native void GOKZ_HUD_GetMenuSpectatorText(int client, any[] info, char[] buffer, int size);
 
 // =====[ STOCKS ]=====
 
@@ -384,3 +429,12 @@ public SharedPlugin __pl_gokz_hud =
 	required = 0, 
 	#endif
 };
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_gokz_hud_SetNTVOptional()
+{
+	MarkNativeAsOptional("GOKZ_HUD_GetMenuShowing");
+	MarkNativeAsOptional("GOKZ_HUD_SetMenuShowing");
+	MarkNativeAsOptional("GOKZ_HUD_GetMenuSpectatorText");
+}
+#endif

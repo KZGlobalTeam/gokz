@@ -154,5 +154,19 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_SpecListPosition:
+		{
+			switch (newValue)
+			{
+				case SpecListPosition_InfoPanel:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List Position - Info Panel");
+				}
+				case SpecListPosition_TPMenu:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Spectator List Position - TP Menu");
+				}
+			}
+		}
 	}
 } 
