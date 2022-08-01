@@ -48,6 +48,7 @@ bool gB_EnforcerOnFreshMap;
 bool gB_JustLateLoaded;
 int gI_FPSMax[MAXPLAYERS + 1];
 bool gB_waitingForFPSKick[MAXPLAYERS + 1];
+float gF_lastValidYaw[MAXPLAYERS + 1];
 bool gB_MapValidated;
 int gI_MapID;
 int gI_MapFileSize;
@@ -236,6 +237,34 @@ Action FPSKickPlayer(Handle timer, int userid)
 
 
 // =====[ CLIENT EVENTS ]=====
+
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+{
+	if (!IsValidClient(client)
+		|| !IsPlayerAlive(client))
+	{
+		return Plugin_Continue;
+	}
+	
+	const int leftRightMask = (IN_LEFT | IN_RIGHT);
+	if (buttons & leftRightMask)
+	{
+		angles[1] = gF_lastValidYaw[client];
+		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
+		
+		int lastButtons = GetClientButtons(client);
+		if (!(lastButtons & leftRightMask))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Warn Player turnbinds");
+		}
+		return Plugin_Changed;
+	}
+	else
+	{
+		gF_lastValidYaw[client] = angles[1];
+		return Plugin_Continue;
+	}
+}
 
 public void OnClientPutInServer(int client)
 {
