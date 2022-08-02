@@ -33,6 +33,7 @@ bool gB_GOKZReplays;
 bool gB_MenuShowing[MAXPLAYERS + 1];
 bool gB_JBTakeoff[MAXPLAYERS + 1];
 bool gB_FastUpdateRate[MAXPLAYERS + 1];
+bool gB_DynamicMenu[MAXPLAYERS + 1];
 
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
@@ -44,13 +45,14 @@ bool gB_FastUpdateRate[MAXPLAYERS + 1];
 #include "gokz-hud/speed_text.sp"
 #include "gokz-hud/timer_text.sp"
 #include "gokz-hud/tp_menu.sp"
-
+#include "gokz-hud/natives.sp"
 
 // =====[ PLUGIN EVENTS ]=====
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("gokz-hud");
+	CreateNatives();
 	return APLRes_Success;
 }
 
@@ -240,12 +242,17 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 		{
 			gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
 		}
+		else if (hudOption == HUDOption_DynamicMenu)
+		{
+			gB_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu) == DynamicMenu_Enabled;
+		}
 	}
 }
 
 public void GOKZ_OnOptionsLoaded(int client)
 {
 	gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
+	gB_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu) == DynamicMenu_Enabled;
 }
 
 // =====[ OTHER EVENTS ]=====

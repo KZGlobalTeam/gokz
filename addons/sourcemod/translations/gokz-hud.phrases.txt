@@ -91,6 +91,14 @@
 	{
 		"en"		"{grey}Number and names of spectators are now shown."
 	}
+	"Option - Dynamic Menu - Disable"
+	{
+		"en"		"{grey}Dynamic menu disabled."
+	}
+	"Option - Dynamic Menu - Enable"
+	{
+		"en"		"{grey}Dynamic menu enabled. Unavailable options will be greyed out. This option is not recommended with high latency!"
+	}
 
 
 	// =====[ INFO PANEL ]=====
@@ -280,7 +288,10 @@
 	{
 		"en"		"Number and Names"
 	}
-
+	"Options Menu - Dynamic Menu"
+	{
+		"en"		"Dynamic menu"
+	}
 
 	// =====[ RACING ]=====
 	"Get Ready"
