@@ -157,6 +157,11 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 		return;
 	}
 
+	if (!IsValidClient(info.ID))
+	{
+		return;
+	}
+	
 	OnPlayerRunCmdPost_InfoPanel(client, cmdnum, info);
 	OnPlayerRunCmdPost_RacingText(client, cmdnum);
 	OnPlayerRunCmdPost_SpeedText(client, cmdnum, info);
