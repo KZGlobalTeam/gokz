@@ -44,6 +44,7 @@ static int timeInAir[RP_MAX_BOTS];
 static int botTeleportsUsed[RP_MAX_BOTS];
 static int botCurrentTeleport[RP_MAX_BOTS];
 static int botButtons[RP_MAX_BOTS];
+static MoveType botMoveType[RP_MAX_BOTS];
 static float botTakeoffSpeed[RP_MAX_BOTS];
 static float botSpeed[RP_MAX_BOTS];
 static float botLastOrigin[RP_MAX_BOTS][3];
@@ -58,12 +59,12 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadReplayBot(int client, char[] path)
+int LoadReplayBot(int client, char[] path, int timeType = -1)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
-		bot = GetUnusedBot();
+		bot = GetUnusedBot(timeType);
 	}
 	else
 	{
@@ -127,7 +128,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
 	info.Paused = false;
-	info.OnLadder = false;
+	info.OnLadder = (botMoveType[bot] == MOVETYPE_LADDER);
 	info.Noclipping = false;
 	info.OnGround = Movement_GetOnGround(client);
 	info.Ducking = botButtons[bot] & IN_DUCK > 0;
@@ -1001,6 +1002,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
 		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
+		botMoveType[bot] = replayMoveType;
 		if (Movement_GetSpeed(client) > SPEED_NORMAL * 2)
 		{
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
@@ -1266,15 +1268,14 @@ static int GetBotsInUse()
 }
 
 // Returns a bot that isn't currently replaying, or -1 if no unused bots found
-static int GetUnusedBot()
+static int GetUnusedBot(int timeType = -1)
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
 		if (!botInGame[bot])
 		{
 			// Set the bot's team based on if it's NUB or PRO
-			if (botReplayType[bot] == ReplayType_Run 
-				&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
+			if (timeType == TimeType_Pro)
 			{
 				ServerCommand("bot_add_ct");
 			}
