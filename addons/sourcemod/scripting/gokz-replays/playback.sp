@@ -1010,6 +1010,23 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			botPaused[bot] = false;
 			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
+			// The bot is on the ground, so there must be a ground entity attributed to the bot.
+			int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+			if (groundEnt == -1)
+			{
+				float endPosition[3], mins[3], maxs[3];
+				GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
+				GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
+				endPosition = currentTickData.origin;
+				endPosition[2] -= 2.0;
+				TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+				// This should always hit.
+				if (TR_DidHit())
+				{
+					groundEnt = TR_GetEntityIndex();
+					SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+				}
+			}
 		}
 		else if (replayMoveType == MOVETYPE_LADDER)
 		{
