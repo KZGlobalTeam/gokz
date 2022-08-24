@@ -1,0 +1,14 @@
+"Games"
+{
+	"csgo"
+	{
+		"Offsets"
+		{
+			"CCSPlayer::PlayJumpSound"
+			{
+				"windows"	"411"
+				"linux"		"412"
+			}
+		}
+	}
+}

@@ -52,6 +52,7 @@ static bool hitBhop[RP_MAX_BOTS];
 static bool hitPerf[RP_MAX_BOTS];
 static bool botJumped[RP_MAX_BOTS];
 static bool botIsTakeoff[RP_MAX_BOTS];
+static bool botJustTeleported[RP_MAX_BOTS];
 static float botLandingSpeed[RP_MAX_BOTS];
 
 
@@ -937,12 +938,15 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
 		}
 
-		// Set velocity to travel from current origin to recorded origin
-		float currentOrigin[3], velocity[3];
-		Movement_GetOrigin(client, currentOrigin);
-		MakeVectorFromPoints(currentOrigin, currentTickData.origin, velocity);
-		ScaleVector(velocity, 1.0 / GetTickInterval());
-		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, velocity);
+		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, currentTickData.velocity);
+		// TeleportEntity does not set the absolute origin and velocity so we need to do it
+		// to prevent inaccurate eye position interpolation.
+		SetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", currentTickData.velocity);
+		
+		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", currentTickData.origin);
+
+		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[0]", currentTickData.angles[0]);
+		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[1]", currentTickData.angles[1]);
 		
 		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
@@ -1007,27 +1011,51 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		{
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		}
-		else if (replayMoveType == MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
+		else if (replayMoveType == MOVETYPE_WALK)
 		{
-			botPaused[bot] = false;
-			SetEntityFlags(client, entityFlags | FL_ONGROUND);
-			Movement_SetMovetype(client, MOVETYPE_WALK);
-			// The bot is on the ground, so there must be a ground entity attributed to the bot.
-			int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
-			if (groundEnt == -1)
+			if (currentTickData.flags & RP_FL_ONGROUND)
 			{
-				float endPosition[3], mins[3], maxs[3];
-				GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
-				GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
-				endPosition = currentTickData.origin;
-				endPosition[2] -= 2.0;
-				TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-				// This should always hit.
-				if (TR_DidHit())
+				botPaused[bot] = false;
+				SetEntityFlags(client, entityFlags | FL_ONGROUND);
+				Movement_SetMovetype(client, MOVETYPE_WALK);
+				// Required to have accurate landing sound.
+				if (!(prevTickData.flags & RP_FL_ONGROUND) && !botJustTeleported[bot])
 				{
-					groundEnt = TR_GetEntityIndex();
-					SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+					SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", currentTickData.velocity[2] * -1);
 				}
+				// The bot is on the ground, so there must be a ground entity attributed to the bot.
+				int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+				if (groundEnt == -1 && botJustTeleported[bot])
+				{
+					SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", 0.0);
+					float endPosition[3], mins[3], maxs[3];
+					GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
+					GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
+					endPosition = currentTickData.origin;
+					endPosition[2] -= 2.0;
+					TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+					
+					// This should always hit.
+					if (TR_DidHit())
+					{
+						groundEnt = TR_GetEntityIndex();
+						SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+					}
+				}
+			}
+			else
+			{
+				// No longer on the ground, and the player has a valid jump input, this must mean the player jumped.
+				// Since the bot does not really "jump", we play the jumping sound ourselves.
+				if (prevTickData.flags & RP_FL_ONGROUND 
+					&& !(prevTickData.flags & RP_IN_JUMP) && currentTickData.flags & RP_IN_JUMP
+					&& currentTickData.flags & RP_TAKEOFF_TICK)
+				{
+					SDKCall(gH_PlayJumpSound_SDKCall, client);
+				}
+				// Update the fall velocity accordingly.
+				SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", currentTickData.velocity[2] * -1);
+				botJustTeleported[bot] = false;
 			}
 		}
 		else if (replayMoveType == MOVETYPE_LADDER)
@@ -1048,6 +1076,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		// Set some variables
 		if (currentTickData.flags & RP_TELEPORT_TICK)
 		{
+			botJustTeleported[bot] = true;
 			botCurrentTeleport[bot]++;
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		}

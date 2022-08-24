@@ -41,6 +41,7 @@ int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
+Handle gH_PlayJumpSound_SDKCall;
 
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
@@ -276,6 +277,11 @@ public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float dista
 static void HookEvents()
 {
 	HookUserMessage(GetUserMessageId("SayText2"), Hook_SayText2, true);
+	GameData gameData = LoadGameConfigFile("gokz-replays.games");
+
+	StartPrepSDKCall(SDKCall_Player);
+	PrepSDKCall_SetFromConf(gameData, SDKConf_Virtual, "CCSPlayer::PlayJumpSound");
+	gH_PlayJumpSound_SDKCall = EndPrepSDKCall();
 }
 
 static void UpdateCurrentMap()
