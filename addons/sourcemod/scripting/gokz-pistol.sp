@@ -198,6 +198,7 @@ public int MenuHandler_Pistol(Menu menu, MenuAction action, int param1, int para
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 void PistolMenuAddItems(int client, Menu menu)
