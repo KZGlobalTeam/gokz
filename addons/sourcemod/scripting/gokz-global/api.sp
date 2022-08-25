@@ -66,6 +66,7 @@ public int Native_PrintRecords(Handle plugin, int numParams)
 	{
 		PrintRecords(GetNativeCell(1), map, GetNativeCell(3), GetNativeCell(4), steamid);
 	}
+	return 0;
 }
 
 public int Native_DisplayMapTopMenu(Handle plugin, int numParams)
@@ -85,6 +86,7 @@ public int Native_DisplayMapTopMenu(Handle plugin, int numParams)
 	{
 		DisplayMapTopSubmenu(GetNativeCell(1), map, GetNativeCell(3), GetNativeCell(4), GetNativeCell(5), localRanksCall);
 	}
+	return 0;
 }
 
 public int Native_GetPoints(Handle plugin, int numParams)
@@ -111,6 +113,7 @@ public int Native_UpdatePoints(Handle plugin, int numParams)
 {
 	// We're gonna always force an update here, cause otherwise the call doesn't really make sense
 	UpdatePoints(GetNativeCell(1), true, GetNativeCell(2));
+	return 0;
 }
 
 public int Native_GetAPIKeyValid(Handle plugin, int numParams)
