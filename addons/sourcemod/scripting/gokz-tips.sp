@@ -253,6 +253,7 @@ public Action Timer_PrintTip(Handle timer)
 	}
 
 	gI_CurrentTip = NextIndex(gI_CurrentTip, g_TipPhrases.Length);
+	return Plugin_Continue;
 }
 
 
