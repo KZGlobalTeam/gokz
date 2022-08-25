@@ -91,13 +91,17 @@
 	{
 		"en"		"{grey}Number and names of spectators are now shown."
 	}
+	"Option - Dynamic Menu - Legacy"
+	{
+		"en"		"{grey}Dynamic menu is set to legacy mode."
+	}
 	"Option - Dynamic Menu - Disable"
 	{
-		"en"		"{grey}Dynamic menu disabled."
+		"en"		"{grey}Dynamic menu disabled. Every menu option is now selectable."
 	}
 	"Option - Dynamic Menu - Enable"
 	{
-		"en"		"{grey}Dynamic menu enabled. Unavailable options will be greyed out. This option is not recommended with high latency!"
+		"en"		"{grey}Dynamic menu enabled. Unavailable options are now unselectable. This option is not recommended with high latency!"
 	}
 
 

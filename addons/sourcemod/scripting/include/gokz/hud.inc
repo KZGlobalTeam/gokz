@@ -126,7 +126,8 @@ enum
 
 enum
 {
-	DynamicMenu_Disabled = 0,
+	DynamicMenu_Legacy = 0,
+	DynamicMenu_Disabled,
 	DynamicMenu_Enabled,
 	DYNAMICMENU_COUNT
 };
@@ -194,7 +195,7 @@ stock char gC_HUDOptionDescriptions[HUDOPTION_COUNT][] =
 	"Dead Strafe Indicator - 0 = Disabled, 1 = Enabled",
 	"HUD Update Rate - 0 = Slow, 1 = Fast",
 	"Show Spectators - 0 = Disabled, 1 = Number Only, 2 = Number and Names",
-	"Dynamic Menu - 0 = Disabled, 1 = Enabled"
+	"Dynamic Menu - 0 = Legacy, 1 = Disabled, 2 = Enabled"
 };
 
 stock char gC_HUDOptionPhrases[HUDOPTION_COUNT][] = 
@@ -245,7 +246,7 @@ stock int gI_HUDOptionDefaults[HUDOPTION_COUNT] =
 	DeadstrafeColor_Disabled,
 	UpdateRate_Slow,
 	ShowSpecs_Disabled,
-	DynamicMenu_Disabled
+	DynamicMenu_Legacy
 };
 
 stock char gC_TPMenuPhrases[TPMENU_COUNT][] = 
@@ -309,8 +310,9 @@ stock char gC_HUDUpdateRatePhrases[UPDATERATE_COUNT][]=
 	"Options Menu - Fast"
 };
 
-stock char gC_DynamicMenuPhrases[UPDATERATE_COUNT][]=
+stock char gC_DynamicMenuPhrases[DYNAMICMENU_COUNT][]=
 {
+	"Options Menu - Legacy",
 	"Options Menu - Disabled",
 	"Options Menu - Enabled"
 };
@@ -318,7 +320,7 @@ stock char gC_DynamicMenuPhrases[UPDATERATE_COUNT][]=
 // =====[ NATIVES ]=====
 
 /**
- * Force the client's TP menu to update.
+ * Forces the client's TP menu to update.
  *
  * @param client		Client index.
  */

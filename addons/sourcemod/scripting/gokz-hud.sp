@@ -33,7 +33,7 @@ bool gB_GOKZReplays;
 bool gB_MenuShowing[MAXPLAYERS + 1];
 bool gB_JBTakeoff[MAXPLAYERS + 1];
 bool gB_FastUpdateRate[MAXPLAYERS + 1];
-bool gB_DynamicMenu[MAXPLAYERS + 1];
+int gI_DynamicMenu[MAXPLAYERS + 1];
 
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
@@ -244,7 +244,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 		}
 		else if (hudOption == HUDOption_DynamicMenu)
 		{
-			gB_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu) == DynamicMenu_Enabled;
+			gI_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu);
 		}
 	}
 }
@@ -252,7 +252,7 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 public void GOKZ_OnOptionsLoaded(int client)
 {
 	gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
-	gB_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu) == DynamicMenu_Enabled;
+	gI_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu);
 }
 
 // =====[ OTHER EVENTS ]=====

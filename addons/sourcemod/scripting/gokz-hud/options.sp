@@ -158,6 +158,10 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 		{
 			switch (newValue)
 			{
+				case DynamicMenu_Legacy:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Dynamic Menu - Legacy");
+				}
 				case DynamicMenu_Disabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Dynamic Menu - Disable");

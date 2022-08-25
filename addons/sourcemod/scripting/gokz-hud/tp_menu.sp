@@ -197,14 +197,23 @@ static void TPMenuAddItemCheckpoint(KZPlayer player, Menu menu)
 	{
 		Format(display, sizeof(display), "%s #%d", display, player.CheckpointCount);
 	}
-	
-	if (player.CanMakeCheckpoint || !gB_DynamicMenu[player.ID])
+	switch (gI_DynamicMenu[player.ID])
 	{
-		menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
-	}
-	else
-	{
-		menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DISABLED);
+		case DynamicMenu_Enabled:
+		{
+			if (player.CanMakeCheckpoint)
+			{
+				menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DISABLED);
+			}
+		}
+		default:
+		{
+			menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+		}
 	}
 }
 
@@ -216,14 +225,23 @@ static void TPMenuAddItemTeleport(KZPlayer player, Menu menu)
 	{
 		Format(display, sizeof(display), "%s #%d", display, player.TeleportCount);
 	}
-	
-	if (player.CanTeleportToCheckpoint || !gB_DynamicMenu[player.ID])
+	switch (gI_DynamicMenu[player.ID])
 	{
-		menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DEFAULT);
-	}
-	else
-	{
-		menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DISABLED);
+		case DynamicMenu_Disabled:
+		{
+			menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+		}
+		default:
+		{
+			if (player.CanTeleportToCheckpoint)
+			{
+				menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem(ITEM_INFO_TELEPORT, display, ITEMDRAW_DISABLED);
+			}
+		}
 	}
 }
 
@@ -231,13 +249,23 @@ static void TPMenuAddItemPrevCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Prev CP", player.ID);
-	if (player.CanPrevCheckpoint || !gB_DynamicMenu[player.ID])
+	switch (gI_DynamicMenu[player.ID])
 	{
-		menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DEFAULT);
-	}
-	else
-	{
-		menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DISABLED);
+		case DynamicMenu_Disabled:
+		{
+			menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+		}
+		default:
+		{
+			if (player.CanPrevCheckpoint)
+			{
+				menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem(ITEM_INFO_PREV, display, ITEMDRAW_DISABLED);
+			}
+		}
 	}
 }
 
@@ -245,13 +273,23 @@ static void TPMenuAddItemNextCheckpoint(KZPlayer player, Menu menu)
 {
 	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Next CP", player.ID);
-	if (player.CanNextCheckpoint || !gB_DynamicMenu[player.ID])
+	switch (gI_DynamicMenu[player.ID])
 	{
-		menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DEFAULT);
-	}
-	else
-	{
-		menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DISABLED);
+		case DynamicMenu_Disabled:
+		{
+			menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+		}
+		default:
+		{
+			if (player.CanNextCheckpoint)
+			{
+				menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem(ITEM_INFO_NEXT, display, ITEMDRAW_DISABLED);
+			}
+		}
 	}
 }
 
@@ -259,41 +297,69 @@ static void TPMenuAddItemUndo(KZPlayer player, Menu menu)
 {
 	char display[24];
 	FormatEx(display, sizeof(display), "%T", "TP Menu - Undo TP", player.ID);
-	if (player.CanUndoTeleport || !gB_DynamicMenu[player.ID])
+	switch (gI_DynamicMenu[player.ID])
 	{
-		menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DEFAULT);
-	}
-	else
-	{
-		menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DISABLED);
+		case DynamicMenu_Disabled:
+		{
+			menu.AddItem(ITEM_INFO_CHECKPOINT, display, ITEMDRAW_DEFAULT);
+		}
+		default:
+		{
+			if (player.CanUndoTeleport)
+			{
+				menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem(ITEM_INFO_UNDO, display, ITEMDRAW_DISABLED);
+			}
+		}
 	}
 }
 
 static void TPMenuAddItemPause(KZPlayer player, Menu menu)
 {
 	char display[24];
-	if (player.Paused)
+	switch (gI_DynamicMenu[player.ID])
 	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", player.ID);
-		if (player.CanResume || !gB_DynamicMenu[player.ID])
+		case DynamicMenu_Enabled:
 		{
+			if (player.Paused)
+			{
+				FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", player.ID);
+				if (player.CanResume)
+				{
+					menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
+				}
+				else
+				{
+					menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DISABLED);
+				}
+			}
+			else
+			{
+				FormatEx(display, sizeof(display), "%T", "TP Menu - Pause", player.ID);
+				if (player.CanPause)
+				{
+					menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
+				}
+				else
+				{
+					menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DISABLED);
+				}
+			}
+		}
+		default:
+		{
+			if (player.Paused)
+			{
+				FormatEx(display, sizeof(display), "%T", "TP Menu - Resume", player.ID);
+			}
+			else
+			{
+				FormatEx(display, sizeof(display), "%T", "TP Menu - Pause", player.ID);
+			}
 			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
-		}
-		else
-		{
-			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DISABLED);
-		}
-	}
-	else
-	{
-		FormatEx(display, sizeof(display), "%T", "TP Menu - Pause", player.ID);
-		if (player.CanPause || !gB_DynamicMenu[player.ID])
-		{
-			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DEFAULT);
-		}
-		else
-		{
-			menu.AddItem(ITEM_INFO_PAUSE, display, ITEMDRAW_DISABLED);
 		}
 	}
 }
