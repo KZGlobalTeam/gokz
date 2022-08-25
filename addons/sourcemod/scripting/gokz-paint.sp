@@ -26,23 +26,23 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-paint.txt"
 
-char gC_PaintColors[][16] =
+char gC_PaintColors[][32] =
 {
-	{ "paint_red" },
-	{ "paint_white" },
-	{ "paint_black" },
-	{ "paint_blue" },
-	{ "paint_brown" },
-	{ "paint_green" },
-	{ "paint_yellow" },
-	{ "paint_purple" }
+	"paint_red",
+	"paint_white",
+	"paint_black",
+	"paint_blue",
+	"paint_brown",
+	"paint_green",
+	"paint_yellow",
+	"paint_purple"
 };
 
 char gC_PaintSizePostfix[][8] =
 {
-	{ "_small" },
-	{ "_med" },
-	{ "_large" }
+	"_small",
+	"_med",
+	"_large"
 };
 
 int gI_Decals[sizeof(gC_PaintColors)][sizeof(gC_PaintSizePostfix)];
@@ -161,6 +161,7 @@ public Action Timer_Paint(Handle timer)
 			Paint(client);
 		}
 	}
+	return Plugin_Continue;
 }
 
 void TE_SetupWorldDecal(const float origin[3], int index)
