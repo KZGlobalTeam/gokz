@@ -75,6 +75,7 @@ public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int para
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
