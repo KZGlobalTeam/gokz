@@ -941,9 +941,11 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, currentTickData.velocity);
 		// TeleportEntity does not set the absolute origin and velocity so we need to do it
 		// to prevent inaccurate eye position interpolation.
+		SetEntPropVector(client, Prop_Data, "m_vecVelocity", currentTickData.velocity);
 		SetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", currentTickData.velocity);
 		
 		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", currentTickData.origin);
+		SetEntPropVector(client, Prop_Data, "m_vecOrigin", currentTickData.origin);
 
 		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[0]", currentTickData.angles[0]);
 		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[1]", currentTickData.angles[1]);
