@@ -17,6 +17,9 @@ static int antiPauseTriggerTouchCount[MAXPLAYERS + 1];
 static int antiJumpstatTriggerTouchCount[MAXPLAYERS + 1];
 static int mapMappingApiVersion = GOKZ_MAPPING_API_VERSION_NONE;
 static int bhopTouchCount[MAXPLAYERS + 1];
+static bool jumpedThisTick[MAXPLAYERS + 1];
+static float jumpOrigin[MAXPLAYERS + 1][3];
+static float jumpVelocity[MAXPLAYERS + 1][3];
 static ArrayList triggerTouchList[MAXPLAYERS + 1]; // arraylist of TouchedTrigger that the player is currently touching. this array won't ever get long (unless the mapper does something weird).
 static StringMap triggerTouchCounts[MAXPLAYERS + 1]; // stringmap of int touch counts with key being a string of the entity reference.
 static StringMap antiBhopTriggers; // stringmap of AntiBhopTrigger with key being a string of the m_iHammerID entprop.
@@ -211,6 +214,7 @@ void OnPlayerRunCmd_MapTriggers(int client, int &buttons)
 			}
 		}
 	}
+	jumpedThisTick[client] = false;
 }
 
 void OnPlayerSpawn_MapTriggers(int client)
@@ -234,6 +238,13 @@ void OnPlayerSpawn_MapTriggers(int client)
 		}
 		CPrintToChat(client, "{red}If the errors get clipped off in the chat, then look in your developer console!\n");
 	}
+}
+
+public void OnPlayerJump_Triggers(int client)
+{
+	jumpedThisTick[client] = true;
+	GetClientAbsOrigin(client, jumpOrigin[client]);
+	Movement_GetVelocity(client, jumpVelocity[client]);
 }
 
 void OnEntitySpawned_MapTriggers(int entity)
@@ -322,6 +333,11 @@ public void OnAntiBhopTrigTouchStart_MapTriggers(const char[] output, int entity
 		// The trigger has fired a matching endtouch output before
 		// the starttouch output, so ignore it.
 		return;
+	}
+	
+	if (jumpedThisTick[other])
+	{
+		TeleportEntity(other, jumpOrigin[other], NULL_VECTOR, jumpVelocity[other]);
 	}
 	
 	AddTriggerToTouchList(other, entity, TriggerType_Antibhop);

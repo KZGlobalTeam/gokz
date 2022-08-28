@@ -248,6 +248,12 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 	return Plugin_Continue;
 }
 
+public void OnPlayerJump(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	OnPlayerJump_Triggers(client);
+}
+
 public MRESReturn DHooks_OnTeleport(int client, Handle params)
 {
 	gB_OriginTeleported[client] = !DHookIsNullParam(params, 1); // Origin affected
@@ -475,6 +481,7 @@ static void HookEvents()
 	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_team", OnPlayerJoinTeam, EventHookMode_Pre);
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
+	HookEvent("player_jump", OnPlayerJump);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
 	
