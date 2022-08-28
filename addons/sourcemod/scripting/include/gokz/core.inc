@@ -215,6 +215,7 @@ enum TriggerType
 #define GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
+#define GOKZ_TURNBIND_COOLDOWN 64
 
 #define GOKZ_MAPPING_API_VERSION_NONE 0 // the map doesn't have a mapping api version
 #define GOKZ_MAPPING_API_VERSION 1
@@ -1206,6 +1207,13 @@ native void GOKZ_TeleportToEnd(int client, int course);
 native void GOKZ_MakeCheckpoint(int client);
 
 /**
+ * Gets whether a player can make a new checkpoint.
+ * @param client		Client index.
+ * @return				Whether player can set a checkpoint.
+ */
+native bool GOKZ_GetCanMakeCheckpoint(int client);
+
+/**
  * Teleports a player to their last checkpoint.
  *
  * @param client    	Client index.
@@ -1290,6 +1298,14 @@ native bool GOKZ_GetCanPause(int client);
  * @param client    	Client index.
  */
 native void GOKZ_Resume(int client);
+
+/**
+ * Gets whether a player can resume. Resuming is not allowed
+ * under some circumstance when the timer is running.
+ *
+ * @param client    	Client index.
+ */
+native bool GOKZ_GetCanResume(int client);
 
 /**
  * Toggles the paused state of a player.
@@ -1737,6 +1753,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetStartPositionToMapStart");
 	MarkNativeAsOptional("GOKZ_TeleportToEnd");
 	MarkNativeAsOptional("GOKZ_MakeCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanMakeCheckpoint");
 	MarkNativeAsOptional("GOKZ_TeleportToCheckpoint");
 	MarkNativeAsOptional("GOKZ_GetCanTeleportToCheckpoint");
 	MarkNativeAsOptional("GOKZ_PrevCheckpoint");
@@ -1748,6 +1765,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_Pause");
 	MarkNativeAsOptional("GOKZ_GetCanPause");
 	MarkNativeAsOptional("GOKZ_Resume");
+	MarkNativeAsOptional("GOKZ_GetCanResume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");

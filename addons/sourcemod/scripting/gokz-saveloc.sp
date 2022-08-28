@@ -9,7 +9,7 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <updater>
-
+#include <gokz/hud>
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -41,6 +41,7 @@ enum struct Location {
 	ArrayList undoTeleportData;
 
 	// Movement related states
+	int groundEnt;
 	int flags;
 	float position[3];
 	float angles[3];
@@ -61,6 +62,7 @@ enum struct Location {
 	void Create(int client, int target)
 	{
 		GetClientName(client, this.locationCreator, sizeof(Location::locationCreator));
+		this.groundEnt = GetEntPropEnt(target, Prop_Data, "m_hGroundEntity");
 		this.flags = GetEntityFlags(target);
 		this.mode = GOKZ_GetCoreOption(target, Option_Mode);
 		this.course = GOKZ_GetCourse(target);
@@ -110,6 +112,7 @@ enum struct Location {
 		GOKZ_SetTeleportCount(client, this.teleportCount);
 		GOKZ_SetUndoTeleportData(client, this.undoTeleportData, GOKZ_CHECKPOINT_VERSION);
 
+		SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", this.groundEnt);
 		SetEntityFlags(client, this.flags);
 		TeleportEntity(client, this.position, this.angles, this.velocity);
 		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", this.duckAmount);
@@ -135,7 +138,7 @@ bool gB_LocMenuOpen[MAXPLAYERS + 1];
 bool gB_UsedLoc[MAXPLAYERS + 1];
 int gI_MostRecentLocation[MAXPLAYERS + 1];
 
-
+bool gB_GOKZHUD;
 
 // =====[ PLUGIN EVENTS ]=====
 
@@ -160,6 +163,7 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
+	gB_GOKZHUD = LibraryExists("gokz-hud");
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -168,6 +172,12 @@ public void OnLibraryAdded(const char[] name)
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
+	gB_GOKZHUD = gB_GOKZHUD || StrEqual(name, "gokz-hud");
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	gB_GOKZHUD = gB_GOKZHUD && !StrEqual(name, "gokz-hud");
 }
 
 public void OnMapStart()
@@ -605,6 +615,10 @@ bool LoadLocation(int client, int id)
 	if (loc.Load(client))
 	{
 		gB_UsedLoc[client] = true;
+		if (gB_GOKZHUD)
+		{
+			GOKZ_HUD_ForceUpdateTPMenu(client);
+		}
 	}
 	// print message if loading new location
 	if (gI_MostRecentLocation[client] != id)

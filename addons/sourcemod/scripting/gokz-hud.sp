@@ -34,9 +34,9 @@ bool gB_MenuShowing[MAXPLAYERS + 1];
 int gI_ObserverTarget[MAXPLAYERS + 1];
 bool gB_JBTakeoff[MAXPLAYERS + 1];
 bool gB_FastUpdateRate[MAXPLAYERS + 1];
+int gI_DynamicMenu[MAXPLAYERS + 1];
 
 #include "gokz-hud/spectate_text.sp"
-#include "gokz-hud/natives.sp"
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
 #include "gokz-hud/info_panel.sp"
@@ -47,7 +47,7 @@ bool gB_FastUpdateRate[MAXPLAYERS + 1];
 #include "gokz-hud/speed_text.sp"
 #include "gokz-hud/timer_text.sp"
 #include "gokz-hud/tp_menu.sp"
-
+#include "gokz-hud/natives.sp"
 
 // =====[ PLUGIN EVENTS ]=====
 
@@ -172,6 +172,11 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 		return;
 	}
 
+	if (!IsValidClient(info.ID))
+	{
+		return;
+	}
+	
 	OnPlayerRunCmdPost_InfoPanel(client, cmdnum, info);
 	OnPlayerRunCmdPost_RacingText(client, cmdnum);
 	OnPlayerRunCmdPost_SpeedText(client, cmdnum, info);
@@ -255,12 +260,17 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 		{
 			gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
 		}
+		else if (hudOption == HUDOption_DynamicMenu)
+		{
+			gI_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu);
+		}
 	}
 }
 
 public void GOKZ_OnOptionsLoaded(int client)
 {
 	gB_FastUpdateRate[client] = GOKZ_HUD_GetOption(client, HUDOption_UpdateRate) == UpdateRate_Fast;
+	gI_DynamicMenu[client] = GOKZ_HUD_GetOption(client, HUDOption_DynamicMenu);
 }
 
 // =====[ OTHER EVENTS ]=====

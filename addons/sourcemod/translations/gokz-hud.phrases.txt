@@ -91,6 +91,18 @@
 	{
 		"en"		"{grey}Number and names of spectators are now shown."
 	}
+	"Option - Dynamic Menu - Legacy"
+	{
+		"en"		"{grey}Dynamic menu is set to legacy mode."
+	}
+	"Option - Dynamic Menu - Disable"
+	{
+		"en"		"{grey}Dynamic menu disabled. Every menu option is now selectable."
+	}
+	"Option - Dynamic Menu - Enable"
+	{
+		"en"		"{grey}Dynamic menu enabled. Unavailable options are now unselectable. This option is not recommended with high latency!"
+	}
 	"Option - Spectator List Position - Info Panel"
 	{
 		"en"		"{grey}Spectator list now displays in the centre panel."
@@ -277,17 +289,16 @@
 	}
 	"Options Menu - Show Spectators"
 	{
-		"en"		"Spectator list"
+		"en"		"Show spectators"
 	}
 	"Options Menu - Spectator List Position"
 	{
 		"en"		"Spectator list position"
 	}
-	"Options Menu - Show Spectators"
+	"Options Menu - Dynamic Menu"
 	{
-		"en"		"Show spectators"
+		"en"		"Dynamic menu"
 	}
-
 
 	// =====[ RACING ]=====
 	"Get Ready"

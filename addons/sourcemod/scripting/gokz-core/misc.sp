@@ -139,6 +139,47 @@ void OnClientPutInServer_Noclip(int client)
 	noclipReleaseTime[client] = 0;
 }
 
+// =====[ TURNBINDS ]=====
+
+int turnbindsLastLeftStart[MAXPLAYERS + 1];
+int turnbindsLastRightStart[MAXPLAYERS + 1];
+float turnbindsLastValidYaw[MAXPLAYERS + 1];
+int turnbindsOldButtons[MAXPLAYERS + 1];
+
+// Ensures that there is a minimum time between starting to turnbind in one direction
+// and then starting to turnbind in the other direction
+void OnPlayerRunCmd_Turnbinds(int client, int buttons, int tickcount, float angles[3])
+{
+	if (buttons & IN_LEFT && tickcount < turnbindsLastRightStart[client] + GOKZ_TURNBIND_COOLDOWN)
+	{
+		angles[1] = turnbindsLastValidYaw[client];
+		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
+		buttons = 0;
+	}
+	else if (buttons & IN_RIGHT && tickcount < turnbindsLastLeftStart[client] + GOKZ_TURNBIND_COOLDOWN)
+	{
+		angles[1] = turnbindsLastValidYaw[client];
+		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
+		buttons = 0;
+	}
+	else
+	{
+		turnbindsLastValidYaw[client] = angles[1];
+		
+		if (!(turnbindsOldButtons[client] & IN_LEFT) && (buttons & IN_LEFT))
+		{
+			turnbindsLastLeftStart[client] = tickcount;
+		}
+		
+		if (!(turnbindsOldButtons[client] & IN_RIGHT) && (buttons & IN_RIGHT))
+		{
+			turnbindsLastRightStart[client] = tickcount;
+		}
+		
+		turnbindsOldButtons[client] = buttons;
+	}
+}
+
 
 
 // =====[ PLAYER COLLISION ]=====

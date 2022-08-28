@@ -29,6 +29,13 @@ enum
 	REPLAYTYPE_COUNT
 };
 
+enum ReplaySaveState
+{
+	ReplaySave_Local = 0,
+	ReplaySave_Temp,
+	ReplaySave_Disabled
+};
+
 // NOTE: Replays use delta compression for storage.
 // This enum is the indices of the ReplayTickData enum struct.
 // NOTE: This has to match the ReplayTickData enum struct!!!
@@ -121,6 +128,7 @@ enum struct ReplayTickData
 
 #define RP_DIRECTORY "data/gokz-replays" // In Path_SM
 #define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
+#define RP_DIRECTORY_RUNS_TEMP "data/gokz-replays/_tempRuns" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
 #define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM
 #define RP_DIRECTORY_BLOCKJUMPS "blocks"
@@ -130,13 +138,13 @@ enum struct ReplayTickData
 #define RP_NAV_FILE "maps/gokz-replays.nav"
 #define RP_V1_TICK_DATA_BLOCKSIZE 7
 #define RP_CACHE_BLOCKSIZE 4
-#define RP_MAX_BOTS 2
+#define RP_MAX_BOTS 4
 #define RP_PLAYBACK_BREATHER_TIME 2.0
 #define RP_MIN_CHEATER_REPLAY_LENGTH 30 // 30 seconds
 #define RP_MAX_CHEATER_REPLAY_LENGTH 120 // 2 minutes
 #define RP_MAX_BHOP_GROUND_TICKS 5
 #define RP_SKIP_TIME 10 // 10 seconds
-
+#define RP_MAX_DURATION 6451200 // 14 hours on 128 tick
 
 #define RP_MOVETYPE_MASK		(0xF)
 #define RP_IN_ATTACK			(1 << 4)
@@ -178,8 +186,10 @@ enum struct ReplayTickData
  * @param timeType			The type of time (Pro/Nub).
  * @param time				The time the run was completed in.
  * @param filePath			Replay file path.
+ * @param tempReplay		Whether the replay file should only be temporaily stored. 
+ * @return					Plugin_Handled to take over the temporary replay deletion, Plugin_Continue to allow temporary replay deletion by the replay plugin.
  */
-forward void GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath);
+forward Action GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath, bool tempReplay);
 
 /**
  * Called when a currently being recorded replay is discarded from

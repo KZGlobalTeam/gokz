@@ -179,6 +179,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	gI_CmdNum[client] = cmdnum;
 	OnPlayerRunCmd_MapTriggers(client, buttons);
+	OnPlayerRunCmd_Turnbinds(client, buttons, tickcount, angles);
 	return Plugin_Continue;
 }
 
