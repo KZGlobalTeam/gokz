@@ -3,6 +3,7 @@
 #include <cstrike>
 #include <sdkhooks>
 #include <sdktools>
+#include <dhooks>
 
 #include <movementapi>
 
@@ -42,6 +43,7 @@ bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
 Handle gH_PlayJumpSound_SDKCall;
+DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
@@ -269,7 +271,13 @@ public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float dista
 	GOKZ_DB_OnJumpstatPB_Recording(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
 }
 
-
+public void GOKZ_OnOptionsLoaded(int client)
+{
+	if (IsFakeClient(client))
+	{
+		GOKZ_OnOptionsLoaded_Playback(client);
+	}
+}
 
 // =====[ PRIVATE ]=====
 
@@ -282,6 +290,18 @@ static void HookEvents()
 	StartPrepSDKCall(SDKCall_Player);
 	PrepSDKCall_SetFromConf(gameData, SDKConf_Virtual, "CCSPlayer::PlayJumpSound");
 	gH_PlayJumpSound_SDKCall = EndPrepSDKCall();
+	
+	gameData = new GameData("gokz-replays.games");
+	gH_DHooks_TeamFull = DynamicDetour.FromConf(gameData, "CCSGameRules::TeamFull");
+	if (gH_DHooks_TeamFull == INVALID_HANDLE)
+	{
+		SetFailState("Failed to find CCSGameRules::TeamFull function signature");
+	}
+	
+	if (!gH_DHooks_TeamFull.Enable(Hook_Pre, DHooks_OnTeamFull_Pre))
+	{
+		SetFailState("Failed to enable detour on CCSGameRules::TeamFull");
+	}
 }
 
 static void UpdateCurrentMap()
@@ -291,6 +311,11 @@ static void UpdateCurrentMap()
 }
 
 
+public MRESReturn DHooks_OnTeamFull_Pre(Address pThis, DHookReturn hReturn, DHookParam hParams)
+{
+	DHookSetReturn(hReturn, false);
+	return MRES_Supercede;
+}
 
 // =====[ PUBLIC ]=====
 

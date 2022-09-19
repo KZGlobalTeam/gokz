@@ -69,7 +69,7 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 			}
 		}
 		
-		LoadReplayBot(param1, path, replayInfo[3]);
+		LoadReplayBot(param1, path);
 	}
 	else if (action == MenuAction_Cancel)
 	{

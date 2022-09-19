@@ -60,12 +60,12 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadReplayBot(int client, char[] path, int timeType = -1)
+int LoadReplayBot(int client, char[] path)
 {
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
-		bot = GetUnusedBot(timeType);
+		bot = GetUnusedBot();
 	}
 	else
 	{
@@ -281,6 +281,7 @@ void OnClientDisconnect_Playback(int client)
 		}
 		
 		botInGame[bot] = false;
+		botClient[bot] = -1;
 		if (playbackTickData[bot] != null)
 		{
 			playbackTickData[bot].Clear(); // Clear it all out
@@ -313,7 +314,18 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 	}
 }
 
-
+void GOKZ_OnOptionsLoaded_Playback(int client)
+{
+	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
+	{
+		if (botClient[bot] == client)
+		{
+			// Reset its movement options as it might be wrongfully changed
+			GOKZ_SetCoreOption(client, Option_Mode, botMode[bot]);
+			GOKZ_SetCoreOption(client, Option_Style, botStyle[bot]);
+		}
+	}
+}
 
 // =====[ PRIVATE ]=====
 
@@ -587,14 +599,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		case ReplayType_Cheater:
 		{
 			// Reason
-			int ACReason;
-			file.ReadInt8(ACReason);
+			int reason;
+			file.ReadInt8(reason);
 			
 			// Type
 			botReplayType[bot] = ReplayType_Cheater;
 
 			// Finish spit to console
-			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[ACReason]);
+			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[reason]);
 		}
 		case ReplayType_Jump:
 		{
@@ -878,6 +890,13 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			// Start the breather period
 			inBreather[bot] = true;
 			breatherStartTime[bot] = GetEngineTime();
+
+			// You can pause and press the end timer. Doing so will prevent the end timer sound from playing,
+			// so we need to play it here.
+			if (playbackTick[bot] == (size - 1) && playbackTick[bot] < botTimeTicks[bot] + preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
+			{
+				EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			}
 		}
 		else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
 		{
@@ -1170,6 +1189,39 @@ static void SetBotStuff(int bot)
 	SetBotClanTag(bot);
 	SetBotName(bot);
 
+	// Bot takes one tick after being put in server to be able to respawn.
+	RequestFrame(RequestFrame_SetBotStuff, GetClientUserId(client));
+}
+
+public void RequestFrame_SetBotStuff(int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (!client)
+	{
+		return;
+	}
+	int bot;
+	for (bot = 0; bot <= RP_MAX_BOTS; bot++)
+	{
+		if (botClient[bot] == client)
+		{
+			break;
+		}
+		else if (bot == RP_MAX_BOTS)
+		{
+			return;
+		}
+	}
+	// Set the bot's team based on if it's NUB or PRO
+	if (botReplayType[bot] == ReplayType_Run 
+		&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
+	{
+		GOKZ_JoinTeam(client, CS_TEAM_CT);
+	}
+	else
+	{
+		GOKZ_JoinTeam(client, CS_TEAM_T);
+	}
 	// Set bot weapons
 	// Always start by removing the pistol and knife
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
@@ -1299,21 +1351,13 @@ static int GetBotsInUse()
 }
 
 // Returns a bot that isn't currently replaying, or -1 if no unused bots found
-static int GetUnusedBot(int timeType = -1)
+static int GetUnusedBot()
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
 		if (!botInGame[bot])
 		{
-			// Set the bot's team based on if it's NUB or PRO
-			if (timeType == TimeType_Pro)
-			{
-				ServerCommand("bot_add_ct");
-			}
-			else
-			{
-				ServerCommand("bot_add_t");
-			}
+			ServerCommand("bot_add");
 			return bot;
 		}
 	}
@@ -1413,4 +1457,5 @@ public Action Timer_UpdateBotName(Handle timer, int botUID)
 	Event e = CreateEvent("spec_target_updated");
 	e.SetInt("userid", botUID);
 	e.Fire();
+	return Plugin_Continue;
 }
