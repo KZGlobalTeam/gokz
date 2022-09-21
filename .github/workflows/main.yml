@@ -51,7 +51,6 @@ jobs:
             !.github*
             !.git*
             !LICENSE
-            !addons/sourcemod/scripting*
             !*.zip
             !*.fgd
           
@@ -66,7 +65,6 @@ jobs:
             !.github*
             !.git*
             !LICENSE
-            !addons/sourcemod/scripting*
             !cfg*
             !*.zip
             !*.fgd
