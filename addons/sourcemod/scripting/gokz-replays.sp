@@ -42,7 +42,7 @@ int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
-Handle gH_PlayJumpSound_SDKCall;
+Handle gH_EmitSound_SDKCall;
 DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
@@ -287,9 +287,12 @@ static void HookEvents()
 	HookUserMessage(GetUserMessageId("SayText2"), Hook_SayText2, true);
 	GameData gameData = LoadGameConfigFile("gokz-replays.games");
 
-	StartPrepSDKCall(SDKCall_Player);
-	PrepSDKCall_SetFromConf(gameData, SDKConf_Virtual, "CCSPlayer::PlayJumpSound");
-	gH_PlayJumpSound_SDKCall = EndPrepSDKCall();
+	StartPrepSDKCall(SDKCall_Entity);
+	PrepSDKCall_SetFromConf(gameData, SDKConf_Signature, "CBaseEntity::EmitSound");
+	PrepSDKCall_AddParameter(SDKType_String, SDKPass_Pointer);
+	PrepSDKCall_AddParameter(SDKType_Float, SDKPass_ByValue);
+	PrepSDKCall_AddParameter(SDKType_Float, SDKPass_Pointer);
+	gH_EmitSound_SDKCall = EndPrepSDKCall();
 	
 	gameData = new GameData("gokz-replays.games");
 	gH_DHooks_TeamFull = DynamicDetour.FromConf(gameData, "CCSGameRules::TeamFull");

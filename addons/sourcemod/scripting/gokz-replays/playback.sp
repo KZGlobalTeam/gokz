@@ -1072,7 +1072,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 					&& !(prevTickData.flags & RP_IN_JUMP) && currentTickData.flags & RP_IN_JUMP
 					&& currentTickData.flags & RP_TAKEOFF_TICK)
 				{
-					SDKCall(gH_PlayJumpSound_SDKCall, client);
+					SDKCall(gH_EmitSound_SDKCall, client, "Default.WalkJump", 0.0, 0.0);
 				}
 				// Update the fall velocity accordingly.
 				SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", currentTickData.velocity[2] * -1);
