@@ -1068,11 +1068,11 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			{
 				// No longer on the ground, and the player has a valid jump input, this must mean the player jumped.
 				// Since the bot does not really "jump", we play the jumping sound ourselves.
-				if (prevTickData.flags & RP_FL_ONGROUND 
+				if (prevTickData.flags & RP_FL_ONGROUND
 					&& !(prevTickData.flags & RP_IN_JUMP) && currentTickData.flags & RP_IN_JUMP
 					&& currentTickData.flags & RP_TAKEOFF_TICK)
 				{
-					SDKCall(gH_EmitSound_SDKCall, client, "Default.WalkJump", 0.0, 0.0);
+					SDKCall(gH_EmitSound_SDKCall, client, "Default.WalkJump", 0.0, 0);
 				}
 				// Update the fall velocity accordingly.
 				SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", currentTickData.velocity[2] * -1);
