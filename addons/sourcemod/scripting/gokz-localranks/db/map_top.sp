@@ -338,6 +338,7 @@ public int MenuHandler_MapTopMode(Menu menu, MenuAction action, int param1, int 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int param2)
@@ -369,6 +370,7 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, int param2)
@@ -382,4 +384,5 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 	{
 		delete menu;
 	}
+	return 0;
 } 

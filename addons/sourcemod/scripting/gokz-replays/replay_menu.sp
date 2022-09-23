@@ -40,6 +40,7 @@ public int MenuHandler_ReplayMode(Menu menu, MenuAction action, int param1, int 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int param2)
@@ -65,11 +66,11 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 			{
 				LogError("Failed to load file: \"%s\".", path);
 				GOKZ_PrintToChat(param1, true, "%t", "Replay Menu - No File");
-				return;
+				return 0;
 			}
 		}
 		
-		LoadReplayBot(param1, path);
+		LoadReplayBot(param1, path, replayInfo[3]);
 	}
 	else if (action == MenuAction_Cancel)
 	{
@@ -79,6 +80,7 @@ public int MenuHandler_Replay(Menu menu, MenuAction action, int param1, int para
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 

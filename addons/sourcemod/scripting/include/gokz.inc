@@ -8,7 +8,7 @@
 #endinput
 #endif
 #define _gokz_included_
-
+#include <cstrike>
 #include <movement>
 
 #include <gokz/version>

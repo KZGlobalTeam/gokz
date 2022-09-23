@@ -98,6 +98,7 @@ public int MenuHandler_Race(Menu menu, MenuAction action, int param1, int param2
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 void RaceMenuAddItems(int client, Menu menu)
@@ -162,6 +163,7 @@ public int MenuHandler_RaceMode(Menu menu, MenuAction action, int param1, int pa
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -214,6 +216,7 @@ public int MenuHandler_RaceCheckpoint(Menu menu, MenuAction action, int param1, 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 void RaceCheckpointMenuAddItems(int client, Menu menu)
@@ -322,7 +325,7 @@ public int MenuHandler_RaceCheckpointLimit(Menu menu, MenuAction action, int par
 		{
 			raceMenuCheckpointLimit[param1] = -1;
 			DisplayRaceCheckpointMenu(param1);
-			return;
+			return 0;
 		}
 
 		raceMenuCheckpointLimit[param1] = raceMenuCheckpointLimit[param1] < 0 ? 0 : raceMenuCheckpointLimit[param1];
@@ -336,6 +339,7 @@ public int MenuHandler_RaceCheckpointLimit(Menu menu, MenuAction action, int par
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -411,7 +415,7 @@ public int MenuHandler_RaceCPCooldown(Menu menu, MenuAction action, int param1, 
 		{
 			raceMenuCheckpointCooldown[param1] = 0;
 			DisplayRaceCheckpointMenu(param1);
-			return;
+			return 0;
 		}
 
 		raceMenuCheckpointCooldown[param1] = raceMenuCheckpointCooldown[param1] < 0 ? 0 : raceMenuCheckpointCooldown[param1];
@@ -425,6 +429,7 @@ public int MenuHandler_RaceCPCooldown(Menu menu, MenuAction action, int param1, 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 

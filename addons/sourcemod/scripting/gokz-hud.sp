@@ -157,6 +157,11 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 		return;
 	}
 
+	if (!IsValidClient(info.ID))
+	{
+		return;
+	}
+	
 	OnPlayerRunCmdPost_InfoPanel(client, cmdnum, info);
 	OnPlayerRunCmdPost_RacingText(client, cmdnum);
 	OnPlayerRunCmdPost_SpeedText(client, cmdnum, info);
@@ -177,6 +182,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
 	event.BroadcastDisabled = true; // Block death notices
+	return Plugin_Continue;
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)

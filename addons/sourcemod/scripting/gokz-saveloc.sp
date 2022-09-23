@@ -41,6 +41,7 @@ enum struct Location {
 	ArrayList undoTeleportData;
 
 	// Movement related states
+	int groundEnt;
 	int flags;
 	float position[3];
 	float angles[3];
@@ -61,6 +62,7 @@ enum struct Location {
 	void Create(int client, int target)
 	{
 		GetClientName(client, this.locationCreator, sizeof(Location::locationCreator));
+		this.groundEnt = GetEntPropEnt(target, Prop_Data, "m_hGroundEntity");
 		this.flags = GetEntityFlags(target);
 		this.mode = GOKZ_GetCoreOption(target, Option_Mode);
 		this.course = GOKZ_GetCourse(target);
@@ -110,6 +112,7 @@ enum struct Location {
 		GOKZ_SetTeleportCount(client, this.teleportCount);
 		GOKZ_SetUndoTeleportData(client, this.undoTeleportData, GOKZ_CHECKPOINT_VERSION);
 
+		SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", this.groundEnt);
 		SetEntityFlags(client, this.flags);
 		TeleportEntity(client, this.position, this.angles, this.velocity);
 		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", this.duckAmount);
@@ -201,6 +204,7 @@ public Action GOKZ_OnTimerStart(int client, int course)
 {
 	CloseLocMenu(client);
 	gB_UsedLoc[client] = false;
+	return Plugin_Continue;
 }
 
 public Action GOKZ_OnTimerEnd(int client, int course, float time)

@@ -59,6 +59,7 @@ public int MenuHandler_Measure(Menu menu, MenuAction action, int param1, int par
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
