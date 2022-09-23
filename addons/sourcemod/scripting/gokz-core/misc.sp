@@ -577,7 +577,7 @@ void OnMapStart_FixMissingSpawns()
 
 void OnClientPreThinkPost_UseButtons(int client)
 {
-	if (GetEntProp(client, Prop_Data, "m_afButtonPressed") & IN_USE)
+	if (GOKZ_GetCoreOption(client, Option_ButtonThroughPlayers) == ButtonThroughPlayers_Enabled && GetEntProp(client, Prop_Data, "m_afButtonPressed") & IN_USE)
 	{
 		int entity = FindUseEntity(client);
 		if (entity != -1)
@@ -657,18 +657,19 @@ static int FindUseEntity(int client)
 			}
 		}
 	}
-	// This is 1.11 only.
-	/*
+	
+	int nearestEntity;
 	float nearestPoint[3];
 	float nearestDist = FLOAT_MAX;
-	ArrayList entities;
-	TR_EnumerateEntitiesSphere(eyeOrigin, 80.0, 0, AddEntities, entities);
+	ArrayList entities = new ArrayList();
+	TR_EnumerateEntitiesSphere(eyeOrigin, 80.0, 1<<5, AddEntities, entities);
 	for (int i = 0; i < entities.Length; i++)
 	{
 		char buffer[64];
 		int ent = entities.Get(i);
 		GetEntityClassname(ent, buffer, sizeof(buffer));
-		if (StrEqual("func_button", buffer, false) && GetEntProp(entity, Prop_Data, "m_spawnflags") & SF_BUTTON_USE_ACTIVATES)
+		// Check if the entity is a button and it is pressable.
+		if (StrEqual("func_button", buffer, false) && GetEntProp(ent, Prop_Data, "m_spawnflags") & SF_BUTTON_USE_ACTIVATES)
 		{
 			float point[3];
 			CalcNearestPoint(ent, eyeOrigin, point);
@@ -678,8 +679,9 @@ static int FindUseEntity(int client)
 			{
 				dir[j] = point[j] - eyeOrigin[2];
 			}
-
+			// Check the maximum angle the player can be away from the button.
 			float minimumDot = GetEntPropFloat(ent, Prop_Send, "m_flUseLookAtAngle");
+			NormalizeVector(dir, dir);
 			float dot = GetVectorDotProduct(dir, fwd);
 			if (dot < minimumDot)
 			{
@@ -693,8 +695,8 @@ static int FindUseEntity(int client)
 				if (TR_GetFraction(trace) == 1.0 || TR_GetEntityIndex(trace) == ent)
 				{
 					CopyVector(point, nearestPoint);
-					entity = ent;
 					nearestDist = dist;
+					nearestEntity = ent;
 				}
 			}
 		}
@@ -707,9 +709,8 @@ static int FindUseEntity(int client)
 	trace = TR_TraceRayFilterEx(eyeOrigin, nearestPoint, useableContents, RayType_EndPoint, TRFOtherPlayersOnly);
 	if (TR_DidHit(trace))
 	{
-		return -1;
+		return nearestEntity;
 	}
-	*/
 	return -1; 
 }
 
