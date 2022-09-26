@@ -82,7 +82,7 @@ enum struct JumpTracker
 		this.jumper = jumper;
 		this.jump.jumper = jumper;
 		this.nextCrouchRelease = 100;
-		this.tickCount = GetGameTickCount();
+		this.tickCount = 0;
 	}
 	
 	
@@ -1355,7 +1355,7 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 
 	if (CheckNoclip(client))
 	{
-		lastNoclipTime[client] = GetGameTickCount();
+		lastNoclipTime[client] = tickcount;
 	}
 	
 	// Don't bother checking if player is already in air and jumpstat is already invalid
@@ -1436,7 +1436,7 @@ static void UpdateValidCmd(int client, int buttons)
 		validCmd[client] = true;
 	}
 	
-	if (GetGameTickCount() - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
+	if (jumpTrackers[client].tickCount - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
