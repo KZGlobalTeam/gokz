@@ -278,7 +278,7 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		if (gB_SpeedJustModifiedExternally[this.jumper] || this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
+		if (gB_SpeedJustModifiedExternally[this.jumper] || this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY || this.HitDuckbugRecently())
 		{
 			return JumpType_Invalid;
 		}
@@ -368,7 +368,7 @@ enum struct JumpTracker
 	
 	bool HitDuckbugRecently()
 	{
-		return GetGameTickCount() - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+		return jumpTrackers[this.jumper].tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
 	}
 	
 	// =====[ UPDATE HELPERS ]====================================================
@@ -1405,7 +1405,7 @@ public void OnPlayerRunCmdPost_JumpTracking(int client)
 	
 	if (Movement_GetDuckbugged(client))
 	{
-		lastDuckbugTime[client] = GetGameTickCount();
+		lastDuckbugTime[client] = jumpTrackers[client].tickCount;
 	}
 }
 
