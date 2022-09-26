@@ -368,7 +368,7 @@ enum struct JumpTracker
 	
 	bool HitDuckbugRecently()
 	{
-		return jumpTrackers[this.jumper].tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+		return this.tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
 	}
 	
 	// =====[ UPDATE HELPERS ]====================================================
