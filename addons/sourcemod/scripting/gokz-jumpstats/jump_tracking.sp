@@ -278,7 +278,7 @@ enum struct JumpTracker
 	
 	int DetermineType(bool jumped, bool ladderJump, bool jumpbug)
 	{
-		if (gB_SpeedJustModifiedExternally[this.jumper] || this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY || this.HitDuckbugRecently())
+		if (gB_SpeedJustModifiedExternally[this.jumper] || this.tickCount - this.lastTeleportTick < JS_MIN_TELEPORT_DELAY)
 		{
 			return JumpType_Invalid;
 		}
@@ -344,7 +344,7 @@ enum struct JumpTracker
 				return JumpType_Other;
 			}
 		}
-		return JumpType_LongJump;
+		return this.HitDuckbugRecently() ? JumpType_Invalid : JumpType_LongJump;
 	}
 	
 	bool HitBhop()
