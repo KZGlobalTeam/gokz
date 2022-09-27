@@ -39,6 +39,8 @@ void CreateNatives()
 	CreateNative("GOKZ_Resume", Native_Resume);
 	CreateNative("GOKZ_GetCanResume", Native_GetCanResume);
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
+	CreateNative("GOKZ_GetCanTeleportToStart", Native_GetCanTeleportToStart);
+	CreateNative("GOKZ_GetCanTeleportToEnd", Native_GetCanTeleportToEnd);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
 	CreateNative("GOKZ_SetValidJumpOrigin", Native_SetValidJumpOrigin);
 	
@@ -342,6 +344,16 @@ public int Native_GetCanResume(Handle plugin, int numParams)
 public int Native_TogglePause(Handle plugin, int numParams)
 {
 	TogglePause(GetNativeCell(1));
+}
+
+public int Native_GetCanTeleportToStart(Handle plugin, int numParams)
+{
+	return CanTeleportToStart(GetNativeCell(1));
+}
+
+public int Native_GetCanTeleportToEnd(Handle plugin, int numParams)
+{
+	return CanTeleportToEnd(GetNativeCell(1));
 }
 
 public int Native_PlayErrorSound(Handle plugin, int numParams)

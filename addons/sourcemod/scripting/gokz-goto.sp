@@ -67,6 +67,15 @@ public void OnLibraryAdded(const char[] name)
 // Returns whether teleport to target was successful
 bool GotoPlayer(int client, int target, bool printMessage = true)
 {
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	if (target == client)
 	{
 		if (printMessage)
