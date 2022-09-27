@@ -87,6 +87,8 @@ int LoadReplayBot(int client, char[] path)
 		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
+	
+	ServerCommand("bot_add");
 	botCaller[bot] = client;
 	return botClient[bot];
 }
@@ -1357,7 +1359,6 @@ static int GetUnusedBot()
 	{
 		if (!botInGame[bot])
 		{
-			ServerCommand("bot_add");
 			return bot;
 		}
 	}
