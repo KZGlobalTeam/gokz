@@ -189,9 +189,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	{
 		return;
 	}
-	
-	OnPlayerRunCmdPost_VirtualButtons(client, buttons, cmdnum); // Emulate buttons first
-	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
+	OnPlayerRunCmdPost_VirtualButtons(client, cmdnum);
 	OnPlayerRunCmdPost_ValidJump(client);
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
 }
@@ -270,12 +268,23 @@ public MRESReturn DHooks_OnSetModel(int client, Handle params)
 	return MRES_Handled;
 }
 
-public void OnCSPlayerSpawnPost(int client)
+public void Hook_PlayerSpawnPost(int client)
 {
 	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") == -1)
 	{
 		SetEntityFlags(client, GetEntityFlags(client) & ~FL_ONGROUND);
 	}
+}
+
+public void Hook_PlayerPostThink(int client)
+{
+	Hook_PlayerPostThink_Triggerfix(client);
+}
+
+public void Hook_PlayerPostThinkPost(int client)
+{
+	Hook_PlayerPostThinkPost_VirtualButtons(client);
+	Hook_PlayerPostThinkPost_Timer(client); // This should be first after emulating buttons
 }
 
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -509,7 +518,9 @@ static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 	DHookEntity(gH_DHooks_SetModel, true, client);
-	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
+	SDKHook(client, SDKHook_PostThink, Hook_PlayerPostThink);
+	SDKHook(client, SDKHook_PostThinkPost, Hook_PlayerPostThinkPost);
+	SDKHook(client, SDKHook_SpawnPost, Hook_PlayerSpawnPost);
 }
 
 static void UpdateTrackingVariables(int client, int cmdnum, int buttons)

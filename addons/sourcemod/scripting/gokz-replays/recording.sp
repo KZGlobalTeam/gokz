@@ -30,6 +30,7 @@ static ArrayList recordedRunData[MAXPLAYERS + 1];
 static ArrayList recordedPostRunData[MAXPLAYERS + 1];
 static Handle runningRunBreatherTimer[MAXPLAYERS + 1];
 static ArrayList runningJumpstatTimers[MAXPLAYERS + 1];
+static bool movementProcessed[MAXPLAYERS + 1];
 
 // =====[ EVENTS ]=====
 
@@ -97,9 +98,29 @@ void OnClientDisconnect_Recording(int client)
 	ClearClientRecordingState(client);
 }
 
-void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const float vel[3], const int mouse[2])
+void OnPlayerRunCmd_Recording(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
+	{
+		return;
+	}
+	movementProcessed[client] = false;
+}
+
+void Hook_PlayerPostThinkPost_Recording(int client)
+{
+	if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client])
+	{
+		return;
+	}
+	// If movement is processed, then this function will be called.
+	// We don't record ticks where no movement processing happens.
+	movementProcessed[client] = true;
+}
+
+void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const float vel[3], const int mouse[2])
+{
+	if (!IsValidClient(client) || IsFakeClient(client) || !IsPlayerAlive(client) || recordingPaused[client] || !movementProcessed[client])
 	{
 		return;
 	}

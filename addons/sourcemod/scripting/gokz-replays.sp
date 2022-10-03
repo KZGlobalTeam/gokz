@@ -175,13 +175,13 @@ public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int pl
 }
 
 
-
 // =====[ CLIENT EVENTS ]=====
 
 public void OnClientPutInServer(int client)
 {
 	OnClientPutInServer_Playback(client);
 	OnClientPutInServer_Recording(client);
+	HookClientEvents(client);
 }
 
 public void OnClientAuthorized(int client, const char[] auth)
@@ -197,8 +197,14 @@ public void OnClientDisconnect(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+	OnPlayerRunCmd_Recording(client);
 	OnPlayerRunCmd_Playback(client, buttons);
 	return Plugin_Continue;
+}
+
+public void Hook_PlayerPostThinkPost(int client)
+{
+	Hook_PlayerPostThinkPost_Recording(client);
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
@@ -276,6 +282,11 @@ public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float dista
 static void HookEvents()
 {
 	HookUserMessage(GetUserMessageId("SayText2"), Hook_SayText2, true);
+}
+
+static void HookClientEvents(int client)
+{
+	SDKHook(client, SDKHook_PostThinkPost, Hook_PlayerPostThinkPost);
 }
 
 static void UpdateCurrentMap()
