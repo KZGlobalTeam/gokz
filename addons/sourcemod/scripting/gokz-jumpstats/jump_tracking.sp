@@ -22,12 +22,12 @@ enum struct Pose
 
 // =====[ GLOBAL VARIABLES ]===================================================
 
-static int entityTouchCount[MAXPLAYERS + 1];
+static ArrayList entityTouchList[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
 static int lastNoclipTime[MAXPLAYERS + 1];
 static int lastDuckbugTime[MAXPLAYERS + 1];
 static float lastJumpButtonTime[MAXPLAYERS + 1];
-static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
+static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
 static const float playerMinsEx[3] = { -20.0, -20.0, 0.0 };
@@ -1273,7 +1273,11 @@ void OnOptionChanged_JumpTracking(int client, const char[] option)
 
 void OnClientPutInServer_JumpTracking(int client)
 {
-	entityTouchCount[client] = 0;
+	if (entityTouchList[client] != INVALID_HANDLE)
+	{
+		delete entityTouchList[client];
+	}
+	entityTouchList[client] = new ArrayList();
 	lastNoclipTime[client] = 0;
 	lastDuckbugTime[client] = 0;
 	lastJumpButtonTime[client] = 0.0;
@@ -1311,16 +1315,19 @@ void OnStartTouchGround_JumpTracking(int client)
 	}
 }
 
-void OnStartTouch_JumpTracking(int client)
+void OnStartTouch_JumpTracking(int client, int touched)
 {
-	entityTouchCount[client]++;
-	// Do not immediately invalidate jumps upon collision.
-	// Give the player a few ticks of leniency for late ducking.
+	if (entityTouchList[client] != INVALID_HANDLE)
+	{
+		entityTouchList[client].Push(touched);
+		// Do not immediately invalidate jumps upon collision.
+		// Give the player a few ticks of leniency for late ducking.
+	}
 }
 
 void OnTouch_JumpTracking(int client)
 {
-	if (entityTouchCount[client] > 0)
+	if (entityTouchList[client] != INVALID_HANDLE && entityTouchList[client].Length > 0)
 	{
 		entityTouchDuration[client]++;
 	}
@@ -1330,12 +1337,19 @@ void OnTouch_JumpTracking(int client)
 	}
 }
 
-void OnEndTouch_JumpTracking(int client)
+void OnEndTouch_JumpTracking(int client, int touched)
 {
-	entityTouchCount[client]--;
-	if (entityTouchCount[client] == 0)
+	if (entityTouchList[client] != INVALID_HANDLE)
 	{
-		entityTouchDuration[client] = 0;
+		int index = entityTouchList[client].FindValue(touched);
+		if (index != -1)
+		{
+			entityTouchList[client].Erase(index);
+		}
+		if (entityTouchList[client].Length == 0)
+		{
+			entityTouchDuration[client] = 0;
+		}
 	}
 }
 
