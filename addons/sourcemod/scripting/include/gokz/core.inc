@@ -201,7 +201,7 @@ enum TriggerType
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_CHECKPOINT_VERSION 1
+#define GOKZ_CHECKPOINT_VERSION 2
 #define GOKZ_MAX_CHECKPOINTS 2048
 #define GOKZ_MAX_COURSES 100
 
@@ -442,6 +442,7 @@ enum struct Checkpoint
 	float angles[3];
 	float ladderNormal[3];
 	bool onLadder;
+	int groundEnt;
 
 	void Create(int client)
 	{
@@ -449,6 +450,7 @@ enum struct Checkpoint
 		Movement_GetEyeAngles(client, this.angles);
 		GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
 		this.onLadder = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+		this.groundEnt = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
 	}
 }
 
@@ -457,7 +459,7 @@ enum struct UndoTeleportData
 	float tempOrigin[3];
 	float tempAngles[3];
 	float origin[3];
-	float angles[3];	
+	float angles[3];
 	// Undo TP properties
 	bool lastTeleportOnGround;
 	bool lastTeleportInBhopTrigger;
