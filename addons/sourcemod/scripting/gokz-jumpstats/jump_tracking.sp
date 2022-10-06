@@ -82,7 +82,7 @@ enum struct JumpTracker
 		this.jumper = jumper;
 		this.jump.jumper = jumper;
 		this.nextCrouchRelease = 100;
-		this.tickCount = GetGameTickCount();
+		this.tickCount = 0;
 	}
 	
 	
@@ -344,7 +344,7 @@ enum struct JumpTracker
 				return JumpType_Other;
 			}
 		}
-		return JumpType_LongJump;
+		return this.HitDuckbugRecently() ? JumpType_Invalid : JumpType_LongJump;
 	}
 	
 	bool HitBhop()
@@ -368,7 +368,7 @@ enum struct JumpTracker
 	
 	bool HitDuckbugRecently()
 	{
-		return GetGameTickCount() - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+		return this.tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
 	}
 	
 	// =====[ UPDATE HELPERS ]====================================================
@@ -1355,7 +1355,7 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 
 	if (CheckNoclip(client))
 	{
-		lastNoclipTime[client] = GetGameTickCount();
+		lastNoclipTime[client] = tickcount;
 	}
 	
 	// Don't bother checking if player is already in air and jumpstat is already invalid
@@ -1405,7 +1405,7 @@ public void OnPlayerRunCmdPost_JumpTracking(int client)
 	
 	if (Movement_GetDuckbugged(client))
 	{
-		lastDuckbugTime[client] = GetGameTickCount();
+		lastDuckbugTime[client] = jumpTrackers[client].tickCount;
 	}
 }
 
@@ -1436,7 +1436,7 @@ static void UpdateValidCmd(int client, int buttons)
 		validCmd[client] = true;
 	}
 	
-	if (GetGameTickCount() - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
+	if (jumpTrackers[client].tickCount - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
