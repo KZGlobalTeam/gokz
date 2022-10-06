@@ -489,14 +489,6 @@ void TeleportToSearchStart(int client, int course)
 		return;
 	}
 
-	// Safeguard Check
-	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
-		GOKZ_PlayErrorSound(client);
-		return;
-	}
-
 	float origin[3], angles[3];
 	if (!GetSearchStartPosition(course, origin, angles))
 	{
