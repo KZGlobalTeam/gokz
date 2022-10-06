@@ -573,12 +573,6 @@ void OnMapStart_FixMissingSpawns()
 	}
 }
 
-static void AutoJoinTeam(int client)
-{
-	int team = GetRandomInt(CS_TEAM_T, CS_TEAM_CT);
-	JoinTeam(client, team, false);
-}
-
 // =====[ BUTTONS ]=====
 
 void OnClientPreThinkPost_UseButtons(int client)
