@@ -13,7 +13,7 @@
  * @param plugin				Plugin handle to retrieve name from
  * @return						String representation of the plugin name
  */
-stock char GetPluginDisplayName(Handle plugin)
+stock char[] GetPluginDisplayName(Handle plugin)
 {
 	char pluginName[GlobalAPI_Max_PluginName_Length] = "Unknown";
 	GetPluginInfo(plugin, PlInfo_Name, pluginName, sizeof(pluginName));
@@ -27,7 +27,7 @@ stock char GetPluginDisplayName(Handle plugin)
  * @param plugin				Plugin handle to retrieve version from
  * @return						String representation of the plugin version
  */
-stock char GetPluginVersion(Handle plugin)
+stock char[] GetPluginVersion(Handle plugin)
 {
 	char pluginVersion[GlobalAPI_Max_PluginVersion_Length] = "Unknown";
 	GetPluginInfo(plugin, PlInfo_Version, pluginVersion, sizeof(pluginVersion));

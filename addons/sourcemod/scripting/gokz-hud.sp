@@ -184,6 +184,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
 	event.BroadcastDisabled = true; // Block death notices
+	return Plugin_Continue;
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)

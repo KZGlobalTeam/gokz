@@ -53,8 +53,6 @@ ConVar gCV_gokz_chat_prefix;
 ConVar gCV_sv_full_alltalk;
 
 #include "gokz-core/commands.sp"
-#include "gokz-core/forwards.sp"
-#include "gokz-core/natives.sp"
 #include "gokz-core/modes.sp"
 #include "gokz-core/misc.sp"
 #include "gokz-core/options.sp"
@@ -77,6 +75,9 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/timer/pause.sp"
 #include "gokz-core/timer/timer.sp"
 #include "gokz-core/timer/virtual_buttons.sp"
+
+#include "gokz-core/forwards.sp"
+#include "gokz-core/natives.sp"
 
 
 
@@ -372,7 +373,7 @@ public void OnConfigsExecuted()
 	OnConfigsExecuted_OptionsMenu();
 }
 
-public Action OnNormalSound(int[] clients, int &numClients, char[] sample, int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char[] soundEntry, int &seed)
+public Action OnNormalSound(int clients[MAXPLAYERS], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char soundEntry[PLATFORM_MAX_PATH], int &seed)
 {
 	if (OnNormalSound_StopSounds(entity) == Plugin_Handled)
 	{
@@ -486,7 +487,7 @@ static void HookEvents()
 	HookEvent("player_death", OnPlayerDeath, EventHookMode_Pre);
 	HookEvent("player_jump", OnPlayerJump);
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
-	AddNormalSoundHook(view_as<NormalSHook>(OnNormalSound));
+	AddNormalSoundHook(OnNormalSound);
 	
 	GameData gameData = new GameData("sdktools.games");
 	int offset;

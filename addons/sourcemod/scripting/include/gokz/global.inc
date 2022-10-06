@@ -46,6 +46,7 @@ enum
 
 enum GlobalMode
 {
+	GlobalMode_Invalid = -1,
 	GlobalMode_KZTimer = 200,
 	GlobalMode_KZSimple,
 	GlobalMode_Vanilla
@@ -241,7 +242,7 @@ stock GlobalMode GOKZ_GL_GetGlobalMode(int mode)
 		case Mode_SimpleKZ:return GlobalMode_KZSimple;
 		case Mode_KZTimer:return GlobalMode_KZTimer;
 	}
-	return GlobalMode;
+	return GlobalMode_Invalid;
 }
 
 /**

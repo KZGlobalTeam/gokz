@@ -534,7 +534,7 @@ float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 
 // =====[ JUMPING ]=====
 
-Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
+Action TweakJump(KZPlayer player, float origin[3], float velocity[3])
 {
 	// TakeoffCmdnum and TakeoffSpeed is not defined here because the player technically hasn't taken off yet.
 	int cmdsSinceLanding = gI_Cmdnum[player.ID] - player.LandingCmdNum;

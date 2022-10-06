@@ -756,16 +756,6 @@ void OnStartZoneStartTouch_Teleports(int client, int course)
 
 // =====[ PRIVATE ]=====
 
-static int NextIndex(int current, int maximum)
-{
-	int next = current + 1;
-	if (next >= maximum)
-	{
-		return 0;
-	}
-	return next;
-}
-
 static int PrevIndex(int current, int maximum)
 {
 	int prev = current - 1;

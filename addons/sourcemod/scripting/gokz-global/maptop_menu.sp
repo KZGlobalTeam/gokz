@@ -71,6 +71,7 @@ public int MenuHandler_MapTopModeMenu(Menu menu, MenuAction action, int param1, 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int param2)
@@ -90,6 +91,7 @@ public int MenuHandler_MapTopMenu(Menu menu, MenuAction action, int param1, int 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, int param2)
@@ -109,6 +111,7 @@ public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, i
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -159,18 +162,18 @@ public int DisplayMapTopSubmenuCallback(JSON_Object top, GlobalAPIRequestData re
 	if (request.Failure)
 	{
 		LogError("Failed to get top records with Global API.");
-		return;
+		return 0;
 	}
 	
 	if (!top.IsArray)
 	{
 		LogError("GlobalAPI returned a malformed response while looking up the top records.");
-		return;
+		return 0;
 	}
 	
 	if (!IsValidClient(client))
 	{
-		return;
+		return 0;
 	}
 	
 	Menu menu = new Menu(MenuHandler_MapTopSubmenu);
@@ -210,6 +213,7 @@ public int DisplayMapTopSubmenuCallback(JSON_Object top, GlobalAPIRequestData re
 		menu.Pagination = 5;
 		menu.Display(client, MENU_TIME_FOREVER);
 	}
+	return 0;
 }
 
 // Returns number of record times added to the menu

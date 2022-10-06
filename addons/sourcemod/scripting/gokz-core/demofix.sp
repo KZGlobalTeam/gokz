@@ -34,6 +34,7 @@ void OnRoundStart_Demofix()
 public Action Command_Demorestart(int client, const char[] command, int argc)
 {
 	FixRecord(client);
+	return Plugin_Continue;
 }
 
 static void FixRecord(int client)

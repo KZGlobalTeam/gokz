@@ -560,7 +560,7 @@ enum struct JumpTracker
 		// at least the middle of the gap.
 		CopyVector(this.takeoffOrigin, block);
 		block[coordDist] = 2 * failstatPosition[coordDist] - this.takeoffOrigin[coordDist];
-		block[!coordDist] = failstatPosition[!coordDist]; 
+		block[view_as<int>(!coordDist)] = failstatPosition[view_as<int>(!coordDist)]; 
 		block[2] = this.failstatBlockHeight;
 		
 		// Calculate block stats

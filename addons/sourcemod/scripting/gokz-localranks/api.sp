@@ -116,4 +116,5 @@ public int Native_GetPBMissed(Handle plugin, int numParams)
 public int Native_ReopenMapTopMenu(Handle plugin, int numParams)
 {
 	ReopenMapTopMenu(GetNativeCell(1));
+	return 0;
 } 
