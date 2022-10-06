@@ -74,6 +74,10 @@
 		"chi"		"关闭"
 		"ru"		"Выключено"
 	}
+	"Options Menu - Legacy"
+	{
+		"en"		"Legacy"
+	}
 	"Options Menu - Top"
 	{
 		"en"		"Top"

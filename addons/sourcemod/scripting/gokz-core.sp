@@ -41,6 +41,7 @@ Handle gH_DHooks_OnTeleport;
 Handle gH_DHooks_SetModel;
 
 int gI_CmdNum[MAXPLAYERS + 1];
+int gI_TickCount[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_TeleportCmdNum[MAXPLAYERS + 1];
@@ -179,6 +180,7 @@ public void OnClientDisconnect(int client)
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	gI_CmdNum[client] = cmdnum;
+	gI_TickCount[client] = tickcount;
 	OnPlayerRunCmd_MapTriggers(client, buttons);
 	OnPlayerRunCmd_Turnbinds(client, buttons, tickcount, angles);
 	return Plugin_Continue;

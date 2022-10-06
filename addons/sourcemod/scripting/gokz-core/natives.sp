@@ -25,6 +25,7 @@ void CreateNatives()
 	CreateNative("GOKZ_GetStartPositionType", Native_GetStartPositionType);
 	CreateNative("GOKZ_SetStartPositionToMapStart", Native_SetStartPositionToMapStart);
 	CreateNative("GOKZ_MakeCheckpoint", Native_MakeCheckpoint);
+	CreateNative("GOKZ_GetCanMakeCheckpoint", Native_GetCanMakeCheckpoint);
 	CreateNative("GOKZ_TeleportToCheckpoint", Native_TeleportToCheckpoint);
 	CreateNative("GOKZ_GetCanTeleportToCheckpoint", Native_GetCanTeleportToCheckpoint);
 	CreateNative("GOKZ_PrevCheckpoint", Native_PrevCheckpoint);
@@ -36,6 +37,7 @@ void CreateNatives()
 	CreateNative("GOKZ_Pause", Native_Pause);
 	CreateNative("GOKZ_GetCanPause", Native_GetCanPause);
 	CreateNative("GOKZ_Resume", Native_Resume);
+	CreateNative("GOKZ_GetCanResume", Native_GetCanResume);
 	CreateNative("GOKZ_TogglePause", Native_TogglePause);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
 	CreateNative("GOKZ_SetValidJumpOrigin", Native_SetValidJumpOrigin);
@@ -284,6 +286,11 @@ public int Native_MakeCheckpoint(Handle plugin, int numParams)
 	return 0;
 }
 
+public int Native_GetCanMakeCheckpoint(Handle plugin, int numParams)
+{
+	return CanMakeCheckpoint(GetNativeCell(1));
+}
+
 public int Native_TeleportToCheckpoint(Handle plugin, int numParams)
 {
 	TeleportToCheckpoint(GetNativeCell(1));
@@ -343,6 +350,11 @@ public int Native_Resume(Handle plugin, int numParams)
 {
 	Resume(GetNativeCell(1));
 	return 0;
+}
+
+public int Native_GetCanResume(Handle plugin, int numParams)
+{
+	return CanResume(GetNativeCell(1));
 }
 
 public int Native_TogglePause(Handle plugin, int numParams)
