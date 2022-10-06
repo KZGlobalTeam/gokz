@@ -289,7 +289,10 @@
 	{
 		"en"		"Timer button/zone type"
 	}
-
+	"Options Menu - Button Through Players"
+	{
+		"en"		"Press button through players"
+	}
 
 	// =====[ OPTION PHRASES ]=====
 	"Timer Button Zone Type - Both Buttons"

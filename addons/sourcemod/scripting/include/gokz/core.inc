@@ -79,6 +79,7 @@ enum Option:
 	Option_ErrorSounds, 
 	Option_VirtualButtonIndicators, 
 	Option_TimerButtonZoneType,
+	Option_ButtonThroughPlayers,
 	OPTION_COUNT
 };
 
@@ -138,6 +139,13 @@ enum
 	TimerButtonZoneType_BothZones,
 	TIMERBUTTONZONETYPE_COUNT
 };
+
+enum
+{
+	ButtonThroughPlayers_Disabled = 0,
+	ButtonThroughPlayers_Enabled,
+	BUTTONTHROUGHPLAYERS_COUNT
+}
 
 enum
 {
@@ -347,7 +355,8 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Teleport Sounds", 
 	"GOKZ - Error Sounds", 
 	"GOKZ - VB Indicators",
-	"GOKZ - Timer Button Zone Type"
+	"GOKZ - Timer Button Zone Type",
+	"GOKZ - Button Through Players"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
@@ -359,7 +368,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
 	"Error Sounds - 0 = Disabled, 1 = Enabled", 
 	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled",
-	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones"
+	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones",
+	"Button Through Players - 0 = Disabled, 1 = Enabled"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -371,7 +381,8 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Teleport Sounds", 
 	"Options Menu - Error Sounds", 
 	"Options Menu - Virtual Button Indicators",
-	"Options Menu - Timer Button Zone Type"
+	"Options Menu - Timer Button Zone Type",
+	"Options Menu - Button Through Players"
 };
 
 stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] = 
@@ -390,7 +401,8 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
 	VIRTUALBUTTONINDICATORS_COUNT,
-	TIMERBUTTONZONETYPE_COUNT
+	TIMERBUTTONZONETYPE_COUNT,
+	BUTTONTHROUGHPLAYERS_COUNT
 };
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
@@ -402,7 +414,8 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	TeleportSounds_Disabled, 
 	ErrorSounds_Enabled, 
 	VirtualButtonIndicators_Disabled,
-	TimerButtonZoneType_BothButtons
+	TimerButtonZoneType_BothButtons,
+	ButtonThroughPlayers_Enabled
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
