@@ -587,14 +587,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		case ReplayType_Cheater:
 		{
 			// Reason
-			int ACReason;
-			file.ReadInt8(ACReason);
+			int reason;
+			file.ReadInt8(reason);
 			
 			// Type
 			botReplayType[bot] = ReplayType_Cheater;
 
 			// Finish spit to console
-			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[ACReason]);
+			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[reason]);
 		}
 		case ReplayType_Jump:
 		{
@@ -1383,4 +1383,5 @@ public Action Timer_UpdateBotName(Handle timer, int botUID)
 	Event e = CreateEvent("spec_target_updated");
 	e.SetInt("userid", botUID);
 	e.Fire();
+	return Plugin_Continue;
 }

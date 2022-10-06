@@ -309,7 +309,7 @@ static bool JustLanded(int client, int cmdnum)
 }
 
 // Records current button inputs
-static int RecordButtons(int client, int buttons)
+static void RecordButtons(int client, int buttons)
 {
 	gI_ButtonsIndex[client] = NextIndex(gI_ButtonsIndex[client], AC_MAX_BUTTON_SAMPLES);
 	gI_Buttons[client][gI_ButtonsIndex[client]] = buttons;

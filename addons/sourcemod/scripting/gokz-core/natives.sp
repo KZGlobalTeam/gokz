@@ -84,6 +84,7 @@ public int Native_GetModeVersion(Handle plugin, int numParams)
 public int Native_SetModeLoaded(Handle plugin, int numParams)
 {
 	SetModeLoaded(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3));
+	return 0;
 }
 
 public int Native_GetLoadedModeCount(Handle plugin, int numParams)
@@ -99,11 +100,13 @@ public int Native_SetMode(Handle plugin, int numParams)
 public int Native_PrintToChatAndLog(Handle plugin, int numParams)
 {
 	NativeHelper_PrintToChatOrLog(true);
+	return 0;
 }
 
 public int Native_PrintToChat(Handle plugin, int numParams)
 {
 	NativeHelper_PrintToChatOrLog(false);
+	return 0;
 }
 
 static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
@@ -157,6 +160,7 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 
 		CPrintToChat(client, "%s", buffer);
 	}
+	return 0;
 }
 
 public int Native_GetOptionsTopMenu(Handle plugin, int numParams)
@@ -197,16 +201,19 @@ public int Native_StopTimer(Handle plugin, int numParams)
 public int Native_StopTimerAll(Handle plugin, int numParams)
 {
 	TimerStopAll(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_TeleportToStart(Handle plugin, int numParams)
 {
 	TeleportToStart(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_TeleportToSearchStart(Handle plugin, int numParams)
 {
 	TeleportToSearchStart(GetNativeCell(1), GetNativeCell(2));
+	return 0;
 }
 
 public int Native_GetVirtualButtonPosition(Handle plugin, int numParams)
@@ -226,11 +233,13 @@ public int Native_SetVirtualButtonPosition(Handle plugin, int numParams)
 	
 	GetNativeArray(2, position, sizeof(position));
 	SetVirtualButtonPosition(GetNativeCell(1), position, GetNativeCell(3), view_as<bool>(GetNativeCell(4)));
+	return 0;
 }
 
 public int Native_LockVirtualButtons(Handle plugin, int numParams)
 {
 	LockVirtualButtons(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetStartPosition(Handle plugin, int numParams)
@@ -252,11 +261,13 @@ public int Native_SetStartPosition(Handle plugin, int numParams)
 	GetNativeArray(3, position, sizeof(position));
 	GetNativeArray(4, angles, sizeof(angles));
 	SetStartPosition(GetNativeCell(1), GetNativeCell(2), position, angles);
+	return 0;
 }
 
 public int Native_TeleportToEnd(Handle plugin, int numParams)
 {
 	TeleportToEnd(GetNativeCell(1), GetNativeCell(2));
+	return 0;
 }
 
 public int Native_GetStartPositionType(Handle plugin, int numParams)
@@ -272,6 +283,7 @@ public int Native_SetStartPositionToMapStart(Handle plugin, int numParams)
 public int Native_MakeCheckpoint(Handle plugin, int numParams)
 {
 	MakeCheckpoint(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanMakeCheckpoint(Handle plugin, int numParams)
@@ -282,6 +294,7 @@ public int Native_GetCanMakeCheckpoint(Handle plugin, int numParams)
 public int Native_TeleportToCheckpoint(Handle plugin, int numParams)
 {
 	TeleportToCheckpoint(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanTeleportToCheckpoint(Handle plugin, int numParams)
@@ -292,6 +305,7 @@ public int Native_GetCanTeleportToCheckpoint(Handle plugin, int numParams)
 public int Native_PrevCheckpoint(Handle plugin, int numParams)
 {
 	PrevCheckpoint(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanPrevCheckpoint(Handle plugin, int numParams)
@@ -302,6 +316,7 @@ public int Native_GetCanPrevCheckpoint(Handle plugin, int numParams)
 public int Native_NextCheckpoint(Handle plugin, int numParams)
 {
 	NextCheckpoint(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanNextCheckpoint(Handle plugin, int numParams)
@@ -312,6 +327,7 @@ public int Native_GetCanNextCheckpoint(Handle plugin, int numParams)
 public int Native_UndoTeleport(Handle plugin, int numParams)
 {
 	UndoTeleport(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanUndoTeleport(Handle plugin, int numParams)
@@ -322,6 +338,7 @@ public int Native_GetCanUndoTeleport(Handle plugin, int numParams)
 public int Native_Pause(Handle plugin, int numParams)
 {
 	Pause(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanPause(Handle plugin, int numParams)
@@ -332,6 +349,7 @@ public int Native_GetCanPause(Handle plugin, int numParams)
 public int Native_Resume(Handle plugin, int numParams)
 {
 	Resume(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_GetCanResume(Handle plugin, int numParams)
@@ -342,11 +360,13 @@ public int Native_GetCanResume(Handle plugin, int numParams)
 public int Native_TogglePause(Handle plugin, int numParams)
 {
 	TogglePause(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_PlayErrorSound(Handle plugin, int numParams)
 {
 	PlayErrorSound(GetNativeCell(1));
+	return 0;
 }
 
 public int Native_SetValidJumpOrigin(Handle plugin, int numParams)
@@ -360,6 +380,7 @@ public int Native_SetValidJumpOrigin(Handle plugin, int numParams)
 	
 	// Using Movement_SetOrigin instead causes considerable lag for spectators
 	SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
+	return 0;
 }
 
 public int Native_GetTimerRunning(Handle plugin, int numParams)
@@ -534,6 +555,7 @@ public int Native_GetHitPerf(Handle plugin, int numParams)
 public int Native_SetHitPerf(Handle plugin, int numParams)
 {
 	SetGOKZHitPerf(GetNativeCell(1), view_as<bool>(GetNativeCell(2)));
+	return 0;
 }
 
 public int Native_GetTakeoffSpeed(Handle plugin, int numParams)
@@ -544,6 +566,7 @@ public int Native_GetTakeoffSpeed(Handle plugin, int numParams)
 public int Native_SetTakeoffSpeed(Handle plugin, int numParams)
 {
 	SetGOKZTakeoffSpeed(GetNativeCell(1), view_as<float>(GetNativeCell(2)));
+	return 0;
 }
 
 public int Native_GetValidJump(Handle plugin, int numParams)
@@ -554,6 +577,7 @@ public int Native_GetValidJump(Handle plugin, int numParams)
 public int Native_JoinTeam(Handle plugin, int numParams)
 {
 	JoinTeam(GetNativeCell(1), GetNativeCell(2), GetNativeCell(3));
+	return 0;
 }
 
 

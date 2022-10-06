@@ -38,4 +38,5 @@ public int BanPlayerCallback(JSON_Object response, GlobalAPIRequestData request,
 	{
 		LogError("Failed to globally ban %s (%s).", playerName, steamid);
 	}
+	return 0;
 }

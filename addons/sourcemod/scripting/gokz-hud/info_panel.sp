@@ -33,7 +33,7 @@ void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 		// The hint text panel update speed depends on the client ping.
 		// To optimize resource usage, we scale the update speed with it.
 		// The fastest speed the client can get is around once every 2 ticks.
-		updateSpeed = RoundToFloor(GetClientAvgLatency(client, NetFlow_Outgoing) / GetTickInterval());
+		updateSpeed = IntMax(1, RoundToFloor(GetClientAvgLatency(client, NetFlow_Outgoing) / GetTickInterval()));
 	}
 	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
