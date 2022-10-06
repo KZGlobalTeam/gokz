@@ -215,6 +215,7 @@ public int MenuHandler_JumpTopMode(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpTopType(Menu menu, MenuAction action, int param1, int param2)
@@ -232,6 +233,7 @@ public int MenuHandler_JumpTopType(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpTopBlockType(Menu menu, MenuAction action, int param1, int param2)
@@ -249,6 +251,7 @@ public int MenuHandler_JumpTopBlockType(Menu menu, MenuAction action, int param1
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int param2)
@@ -279,4 +282,5 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
+	return 0;
 }

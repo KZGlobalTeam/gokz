@@ -285,7 +285,7 @@ static bool IsValueInRange(OptionType type, any value, any minValue, any maxValu
 	}
 }
 
-static bool LoadOption(int client, const char[] option)
+static void LoadOption(int client, const char[] option)
 {
 	char valueString[100];
 	Cookie cookie = GetOptionProp(option, OptionProp_Cookie);

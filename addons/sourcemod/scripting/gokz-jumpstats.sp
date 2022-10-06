@@ -164,7 +164,7 @@ public void GOKZ_JS_OnFailstatAlways(Jump jump)
 
 public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost
 {
-	OnStartTouch_JumpTracking(client);
+	OnStartTouch_JumpTracking(client, touched);
 }
 
 public void SDKHook_Touch_CallBack(int client, int touched)
@@ -174,7 +174,7 @@ public void SDKHook_Touch_CallBack(int client, int touched)
 
 public void SDKHook_EndTouch_Callback(int client, int touched) // SDKHook_EndTouchPost
 {
-	OnEndTouch_JumpTracking(client);
+	OnEndTouch_JumpTracking(client, touched);
 }
 
 public void GOKZ_OnTeleport(int client)

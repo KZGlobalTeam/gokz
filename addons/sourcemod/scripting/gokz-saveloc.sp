@@ -219,6 +219,7 @@ public Action GOKZ_OnTimerStart(int client, int course)
 {
 	CloseLocMenu(client);
 	gB_UsedLoc[client] = false;
+	return Plugin_Continue;
 }
 
 public Action GOKZ_OnTimerEnd(int client, int course, float time)

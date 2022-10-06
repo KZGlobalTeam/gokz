@@ -144,7 +144,7 @@
 	{
 		"en"		"{darkred}You can't pause because pausing is disabled in this area."
 	}
-	"Can't Pause (Generic)"
+	"Can't Resume (Generic)"
 	{
 		"en"		"{darkred}You can't resume right now."
 	}

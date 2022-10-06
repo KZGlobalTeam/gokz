@@ -85,6 +85,7 @@ public int MenuHandler_Duel(Menu menu, MenuAction action, int param1, int param2
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 void DuelMenuAddItems(int client, Menu menu)
@@ -145,6 +146,7 @@ public int MenuHandler_DuelMode(Menu menu, MenuAction action, int param1, int pa
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -197,6 +199,7 @@ public int MenuHandler_DuelCheckpoint(Menu menu, MenuAction action, int param1, 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 void DuelCheckpointMenuAddItems(int client, Menu menu)
@@ -305,7 +308,7 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 		{
 			duelMenuCheckpointLimit[param1] = -1;
 			DisplayDuelCheckpointMenu(param1);
-			return;
+			return 0;
 		}
 
 		duelMenuCheckpointLimit[param1] = duelMenuCheckpointLimit[param1] < 0 ? 0 : duelMenuCheckpointLimit[param1];
@@ -319,6 +322,7 @@ public int MenuHandler_DuelCheckpointLimit(Menu menu, MenuAction action, int par
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -394,7 +398,7 @@ public int MenuHandler_DuelCPCooldown(Menu menu, MenuAction action, int param1, 
 		{
 			duelMenuCheckpointCooldown[param1] = 0;
 			DisplayDuelCheckpointMenu(param1);
-			return;
+			return 0;
 		}
 
 		duelMenuCheckpointCooldown[param1] = duelMenuCheckpointCooldown[param1] < 0 ? 0 : duelMenuCheckpointCooldown[param1];
@@ -408,6 +412,7 @@ public int MenuHandler_DuelCPCooldown(Menu menu, MenuAction action, int param1, 
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -481,6 +486,7 @@ public int MenuHandler_DuelOpponent(Menu menu, MenuAction action, int param1, in
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 static bool SendDuelRequest(int host, int target)
