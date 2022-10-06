@@ -11,7 +11,7 @@ public void OnLanding_SaveJumpstat(Jump jump)
 	// No tiers given for 'Invalid' jumps.
 	if (jump.type == JumpType_Invalid || jump.type == JumpType_FullInvalid
 		 || jump.type == JumpType_Fall || jump.type == JumpType_Other
-		 || jump.type != JumpType_LadderJump && jump.offset < -EPSILON
+		 || jump.type != JumpType_LadderJump && jump.offset < -JS_OFFSET_EPSILON
 		 || jump.distance > JS_MAX_JUMP_DISTANCE
 		 || jump.type == JumpType_LadderJump && jump.distance < JS_MIN_LAJ_BLOCK_DISTANCE
 		 || jump.type != JumpType_LadderJump && jump.distance < JS_MIN_BLOCK_DISTANCE)

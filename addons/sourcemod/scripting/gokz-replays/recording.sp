@@ -924,6 +924,21 @@ static void CreateReplaysDirectory(const char[] map)
 		CreateDirectory(path, 511);
 	}
 
+	// Create maps parent replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_RUNS_TEMP);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+
+
+	// Create maps replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS_TEMP, map);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+
 	// Create cheaters replay directory
 	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_CHEATERS);
 	if (!DirExists(path))
