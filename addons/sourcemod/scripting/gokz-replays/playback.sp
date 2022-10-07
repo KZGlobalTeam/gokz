@@ -269,7 +269,8 @@ void OnClientPutInServer_Playback(int client)
 			botInGame[bot] = true;
 			botClient[bot] = client;
 			GetClientName(client, botName[bot], sizeof(botName[]));
-			SetBotStuff(bot);
+			// The bot won't receive its weapons properly if we don't wait a frame
+			RequestFrame(SetBotStuff, bot);
 			if (IsValidClient(botCaller[bot]))
 			{
 				MakePlayerSpectate(botCaller[bot], botClient[bot]);
