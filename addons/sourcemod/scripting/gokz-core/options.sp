@@ -416,5 +416,23 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 				}
 			}
 		}
+		case Option_Safeguard:
+		{
+			switch (newValue)
+			{
+				case Safeguard_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Safeguard - Disable");
+				}
+				case Safeguard_EnabledNUB:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Safeguard - Enable (NUB)");
+				}
+				case Safeguard_EnabledPRO:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Safeguard - Enable (PRO)");
+				}
+			}
+		}
 	}
 } 

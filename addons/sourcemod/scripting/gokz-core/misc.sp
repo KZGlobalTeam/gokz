@@ -54,6 +54,12 @@ void EnableNoclip(int client)
 {
 	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
+		if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return;
+		}
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		GOKZ_StopTimer(client);
 	}
@@ -88,6 +94,12 @@ void EnableNoclipNotrigger(int client)
 {
 	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
+		if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return;
+		}
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
 		GOKZ_StopTimer(client);
@@ -337,7 +349,14 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 	}
 }
 
-
+void SendFakeTeamEvent(int client)
+{
+	// Send a fake event to close the team menu
+	Event event = CreateEvent("player_team");
+	event.SetInt("userid", GetClientUserId(client));
+	event.FireToClient(client);
+	event.Cancel();
+}
 
 // =====[ VALID JUMP TRACKING ]=====
 
@@ -742,4 +761,23 @@ static float IntervalDistance(float x, float x0, float x1)
 public bool TRFOtherPlayersOnly(int entity, int contentmask, int client)
 {
 	return (0 < entity <= MaxClients) && (entity != client);
+}
+
+// =====[ SAFE MODE ]=====
+
+void ToggleSafeGuard(int client)
+{
+	GOKZ_SetCoreOption(client, Option_Safeguard, (GOKZ_GetCoreOption(client, Option_Safeguard) + 1) % SAFEGUARD_COUNT);
+}
+
+void ToggleProSafeGuard(int client)
+{
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) == Safeguard_EnabledPRO)
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_Disabled);
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_EnabledPRO);
+	}
 }

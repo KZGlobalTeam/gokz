@@ -98,6 +98,13 @@ enum struct Location {
 
 	bool Load(int client)
 	{
+		// Safeguard Check
+		if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return false;
+		}
 		if (!GOKZ_SetMode(client, this.mode))
 		{
 			GOKZ_PrintToChat(client, true, "%t", "LoadLoc - Mode Not Available");
@@ -150,6 +157,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
+	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-saveloc.phrases");
 	
 	HookEvents();
@@ -620,6 +628,10 @@ bool LoadLocation(int client, int id)
 		{
 			GOKZ_HUD_ForceUpdateTPMenu(client);
 		}
+	}
+	else
+	{
+		return false;
 	}
 	// print message if loading new location
 	if (gI_MostRecentLocation[client] != id)

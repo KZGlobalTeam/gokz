@@ -222,7 +222,18 @@
 		"en"		"{grey}You have unlocked your virtual buttons."
 		"ru"		"{grey}Вы разблокировали свои виртуальные кнопки начала и окончания."
 	}
-
+	"Option - Safeguard - Disable"
+	{
+		"en"		"{grey}Safeguard disabled."
+	}
+	"Option - Safeguard - Enable (NUB)"
+	{
+		"en"		"{grey}Safeguard for {yellow}NUB {grey}runs enabled. You can no longer issue any command that would stop your timer during a valid run."
+	}
+	"Option - Safeguard - Enable (PRO)"
+	{
+		"en"		"{grey}Safeguard for {blue}PRO {grey}runs enabled. You can no longer use teleports or issue any command that would stop your timer during a valid run."
+	}
 
 	// =====[ MODE MENU ]=====
 	"Mode Menu - Title"
@@ -293,6 +304,12 @@
 	{
 		"en"		"Press button through players"
 	}
+	"Options Menu - Safeguard"
+	{
+		"en"		"Run safeguard"
+	}
+
+
 
 	// =====[ OPTION PHRASES ]=====
 	"Timer Button Zone Type - Both Buttons"
@@ -306,5 +323,13 @@
 	"Timer Button Zone Type - Both Zones"
 	{
 		"en"		"Both zones"
+	}
+	"Safeguard - Enabled NUB"
+	{
+		"en"		"Enabled (NUB)"
+	}
+	"Safeguard - Enabled PRO"
+	{
+		"en"		"Enabled (PRO)"
 	}
 }

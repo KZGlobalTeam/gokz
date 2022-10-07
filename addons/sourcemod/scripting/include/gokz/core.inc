@@ -80,6 +80,7 @@ enum Option:
 	Option_VirtualButtonIndicators, 
 	Option_TimerButtonZoneType,
 	Option_ButtonThroughPlayers,
+	Option_Safeguard,
 	OPTION_COUNT
 };
 
@@ -145,7 +146,15 @@ enum
 	ButtonThroughPlayers_Disabled = 0,
 	ButtonThroughPlayers_Enabled,
 	BUTTONTHROUGHPLAYERS_COUNT
-}
+};
+
+enum
+{
+	Safeguard_Disabled = 0,
+	Safeguard_EnabledNUB,
+	Safeguard_EnabledPRO,
+	SAFEGUARD_COUNT
+};
 
 enum
 {
@@ -281,6 +290,9 @@ enum TriggerType
 
 #define CHAR_ESCAPE view_as<char>(27)
 
+#define GOKZ_SAFEGUARD_RESTART_MIN_DELAY 0.6
+#define GOKZ_SAFEGUARD_RESTART_MAX_DELAY 5.0
+
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
 	"NUB", 
@@ -356,7 +368,8 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Error Sounds", 
 	"GOKZ - VB Indicators",
 	"GOKZ - Timer Button Zone Type",
-	"GOKZ - Button Through Players"
+	"GOKZ - Button Through Players",
+	"GOKZ - Safeguard"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
@@ -369,7 +382,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Error Sounds - 0 = Disabled, 1 = Enabled", 
 	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled",
 	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones",
-	"Button Through Players - 0 = Disabled, 1 = Enabled"
+	"Button Through Players - 0 = Disabled, 1 = Enabled",
+	"Safeguard - 0 = Disabled, 1 = Enabled (NUB), 2 = Enabled (PRO)"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -382,7 +396,8 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Error Sounds", 
 	"Options Menu - Virtual Button Indicators",
 	"Options Menu - Timer Button Zone Type",
-	"Options Menu - Button Through Players"
+	"Options Menu - Button Through Players",
+	"Options Menu - Safeguard"
 };
 
 stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] = 
@@ -391,6 +406,13 @@ stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] =
 	"Timer Button Zone Type - Only End Zone",
 	"Timer Button Zone Type - Both Zones"
 };
+
+stock char gC_SafeGuardPhrases[SAFEGUARD_COUNT][] =
+{
+	"Options Menu - Disabled",
+	"Safeguard - Enabled NUB",
+	"Safeguard - Enabled PRO"
+}
 
 stock int gI_CoreOptionCounts[OPTION_COUNT] = 
 {
@@ -402,7 +424,8 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	ERRORSOUNDS_COUNT, 
 	VIRTUALBUTTONINDICATORS_COUNT,
 	TIMERBUTTONZONETYPE_COUNT,
-	BUTTONTHROUGHPLAYERS_COUNT
+	BUTTONTHROUGHPLAYERS_COUNT,
+	SAFEGUARD_COUNT
 };
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
@@ -415,7 +438,8 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	ErrorSounds_Enabled, 
 	VirtualButtonIndicators_Disabled,
 	TimerButtonZoneType_BothButtons,
-	ButtonThroughPlayers_Enabled
+	ButtonThroughPlayers_Enabled,
+	Safeguard_Disabled
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
@@ -1328,6 +1352,14 @@ native bool GOKZ_GetCanResume(int client);
 native void GOKZ_TogglePause(int client);
 
 /**
+ * Gets whether a player can teleport to start.
+ *
+ * @param client		Client index.
+ * @return				Whether player can teleport to start.
+ */
+native bool GOKZ_GetCanTeleportToStartOrEnd(int client);
+
+/**
  * Plays the error sound to a player if they have the option enabled.
  *
  * @param client		Client index.
@@ -1780,6 +1812,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_Resume");
 	MarkNativeAsOptional("GOKZ_GetCanResume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
+	MarkNativeAsOptional("GOKZ_GetCanTeleportToStartOrEnd");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
