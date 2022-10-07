@@ -284,31 +284,3 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 	}
 	return 0;
 }
-
-// =====[ UTILITY ]=====
-
-public Action Timer_ResetSpectate(Handle timer, int clientUID)
-{
-	int client = GetClientOfUserId(clientUID);
-	if (IsValidClient(client))
-	{
-		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
-	}
-	return Plugin_Continue;
-}
-public Action Timer_SpectateBot(Handle timer, DataPack data)
-{
-	data.Reset();
-	int client = GetClientOfUserId(data.ReadCell());
-	int botClient = GetClientOfUserId(data.ReadCell());
-	delete data;
-	
-	if (IsValidClient(client) && IsValidClient(botClient))
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", botClient);
-	}
-	return Plugin_Continue;
-}

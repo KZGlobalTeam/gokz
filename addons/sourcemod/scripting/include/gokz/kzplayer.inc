@@ -206,6 +206,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
+	property bool CanTeleportToStart {
+		public get() {
+			return GOKZ_GetCanTeleportToStartOrEnd(this.ID);
+		}
+	}
+	
 	property float Time {
 		public get() {
 			return GOKZ_GetTime(this.ID);
