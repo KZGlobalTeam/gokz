@@ -804,6 +804,7 @@ bool CanUndoTeleport(int client, bool showError = false)
 
 void OnClientPutInServer_Teleports(int client)
 {
+	checkpointCount[client] = 0;
 	checkpointIndex[client] = -1;
 	checkpointIndexStart[client] = -1;
 	checkpointIndexEnd[client] = -1;
