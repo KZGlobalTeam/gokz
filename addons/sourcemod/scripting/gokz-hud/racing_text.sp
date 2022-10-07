@@ -127,7 +127,7 @@ static void ShowCountdownText(KZPlayer player, KZPlayer targetPlayer)
 	ShowSyncHudText(player.ID, racingHudSynchronizer, "%t\n\n%d", "Get Ready", IntMax(RoundToCeil(timeToStart), 1));
 }
 
-static float[] GetCountdownColour(float timeToStart, int buffer[4])
+static void GetCountdownColour(float timeToStart, int buffer[4])
 {
 	// From red to green
 	if (timeToStart >= RC_COUNTDOWN_TIME)

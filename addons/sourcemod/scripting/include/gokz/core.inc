@@ -79,6 +79,7 @@ enum Option:
 	Option_ErrorSounds, 
 	Option_VirtualButtonIndicators, 
 	Option_TimerButtonZoneType,
+	Option_Safeguard,
 	OPTION_COUNT
 };
 
@@ -138,6 +139,14 @@ enum
 	TimerButtonZoneType_BothZones,
 	TIMERBUTTONZONETYPE_COUNT
 };
+
+enum
+{
+	Safeguard_Disabled = 0,
+	Safeguard_EnabledNUB,
+	Safeguard_EnabledPRO,
+	SAFEGUARD_COUNT
+}
 
 enum
 {
@@ -215,6 +224,7 @@ enum TriggerType
 #define GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
+#define GOKZ_TURNBIND_COOLDOWN 64
 
 #define GOKZ_MAPPING_API_VERSION_NONE 0 // the map doesn't have a mapping api version
 #define GOKZ_MAPPING_API_VERSION 1
@@ -271,6 +281,9 @@ enum TriggerType
 #define GOKZ_MAX_MAPTRIGGERS_ERROR_LENGTH 256
 
 #define CHAR_ESCAPE view_as<char>(27)
+
+#define GOKZ_SAFEGUARD_RESTART_MIN_DELAY 0.6
+#define GOKZ_SAFEGUARD_RESTART_MAX_DELAY 5.0
 
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
@@ -346,7 +359,8 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Teleport Sounds", 
 	"GOKZ - Error Sounds", 
 	"GOKZ - VB Indicators",
-	"GOKZ - Timer Button Zone Type"
+	"GOKZ - Timer Button Zone Type",
+	"GOKZ - Safeguard"
 };
 
 stock char gC_CoreOptionDescriptions[OPTION_COUNT][] = 
@@ -358,7 +372,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Teleport Sounds - 0 = Disabled, 1 = Enabled", 
 	"Error Sounds - 0 = Disabled, 1 = Enabled", 
 	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled",
-	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones"
+	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones",
+	"GOKZ - Safeguard - 0 = Disabled, 1 = Enabled (NUB), 2 = Enabled (PRO)"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -370,7 +385,8 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Teleport Sounds", 
 	"Options Menu - Error Sounds", 
 	"Options Menu - Virtual Button Indicators",
-	"Options Menu - Timer Button Zone Type"
+	"Options Menu - Timer Button Zone Type",
+	"Options Menu - Safeguard"
 };
 
 stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] = 
@@ -379,6 +395,13 @@ stock char gC_TimerButtonZoneTypePhrases[TIMERBUTTONZONETYPE_COUNT][] =
 	"Timer Button Zone Type - Only End Zone",
 	"Timer Button Zone Type - Both Zones"
 };
+
+stock char gC_SafeGuardPhrases[SAFEGUARD_COUNT][] =
+{
+	"Options Menu - Disabled",
+	"Safeguard - Enabled NUB",
+	"Safeguard - Enabled PRO"
+}
 
 stock int gI_CoreOptionCounts[OPTION_COUNT] = 
 {
@@ -389,7 +412,8 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	TELEPORTSOUNDS_COUNT, 
 	ERRORSOUNDS_COUNT, 
 	VIRTUALBUTTONINDICATORS_COUNT,
-	TIMERBUTTONZONETYPE_COUNT
+	TIMERBUTTONZONETYPE_COUNT,
+	SAFEGUARD_COUNT
 };
 
 stock int gI_CoreOptionDefaults[OPTION_COUNT] = 
@@ -401,7 +425,8 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	TeleportSounds_Disabled, 
 	ErrorSounds_Enabled, 
 	VirtualButtonIndicators_Disabled,
-	TimerButtonZoneType_BothButtons
+	TimerButtonZoneType_BothButtons,
+	Safeguard_Disabled
 };
 
 stock char gC_ModeCVars[MODECVAR_COUNT][] = 
@@ -1206,6 +1231,13 @@ native void GOKZ_TeleportToEnd(int client, int course);
 native void GOKZ_MakeCheckpoint(int client);
 
 /**
+ * Gets whether a player can make a new checkpoint.
+ * @param client		Client index.
+ * @return				Whether player can set a checkpoint.
+ */
+native bool GOKZ_GetCanMakeCheckpoint(int client);
+
+/**
  * Teleports a player to their last checkpoint.
  *
  * @param client    	Client index.
@@ -1292,11 +1324,27 @@ native bool GOKZ_GetCanPause(int client);
 native void GOKZ_Resume(int client);
 
 /**
+ * Gets whether a player can resume. Resuming is not allowed
+ * under some circumstance when the timer is running.
+ *
+ * @param client    	Client index.
+ */
+native bool GOKZ_GetCanResume(int client);
+
+/**
  * Toggles the paused state of a player.
  *
  * @param client    	Client index.
  */
 native void GOKZ_TogglePause(int client);
+
+/**
+ * Gets whether a player can teleport to start.
+ *
+ * @param client		Client index.
+ * @return				Whether player can teleport to start.
+ */
+native bool GOKZ_GetCanTeleportToStartOrEnd(int client);
 
 /**
  * Plays the error sound to a player if they have the option enabled.
@@ -1737,6 +1785,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetStartPositionToMapStart");
 	MarkNativeAsOptional("GOKZ_TeleportToEnd");
 	MarkNativeAsOptional("GOKZ_MakeCheckpoint");
+	MarkNativeAsOptional("GOKZ_GetCanMakeCheckpoint");
 	MarkNativeAsOptional("GOKZ_TeleportToCheckpoint");
 	MarkNativeAsOptional("GOKZ_GetCanTeleportToCheckpoint");
 	MarkNativeAsOptional("GOKZ_PrevCheckpoint");
@@ -1748,7 +1797,9 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_Pause");
 	MarkNativeAsOptional("GOKZ_GetCanPause");
 	MarkNativeAsOptional("GOKZ_Resume");
+	MarkNativeAsOptional("GOKZ_GetCanResume");
 	MarkNativeAsOptional("GOKZ_TogglePause");
+	MarkNativeAsOptional("GOKZ_GetCanTeleportToStartOrEnd");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");

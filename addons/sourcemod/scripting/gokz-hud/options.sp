@@ -154,5 +154,23 @@ static void PrintOptionChangeMessage(int client, HUDOption option, any newValue)
 				}
 			}
 		}
+		case HUDOption_DynamicMenu:
+		{
+			switch (newValue)
+			{
+				case DynamicMenu_Legacy:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Dynamic Menu - Legacy");
+				}
+				case DynamicMenu_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Dynamic Menu - Disable");
+				}
+				case DynamicMenu_Enabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Dynamic Menu - Enable");
+				}
+			}
+		}
 	}
 } 

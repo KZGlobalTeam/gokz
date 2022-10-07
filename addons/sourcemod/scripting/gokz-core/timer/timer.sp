@@ -59,7 +59,8 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool playSound
 		 || JustNoclipped(client)
 		 || !IsPlayerValidMoveType(client)
 		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
-		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client)))
+		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client))
+		 || (GOKZ_GetTimerRunning(client) && GOKZ_GetCourse(client) != course))
 	{
 		return false;
 	}
@@ -72,12 +73,6 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool playSound
 		return false;
 	}
 
-	// Unpause the player, if they're paused
-	if (GOKZ_GetPaused(client))
-	{
-		GOKZ_Resume(client);
-	}
-	
 	// Prevent noclip exploit
 	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 

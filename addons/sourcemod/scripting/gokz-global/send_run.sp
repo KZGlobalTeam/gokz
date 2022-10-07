@@ -1,5 +1,5 @@
 /*
-	Sends a run to the global API.
+	Sends a run to the global API and delete the replay if it is a temporary replay.
 */
 
 
@@ -7,6 +7,7 @@
 char storedReplayPath[MAXPLAYERS + 1][512];
 int lastRecordId[MAXPLAYERS + 1], storedCourse[MAXPLAYERS + 1], storedTimeType[MAXPLAYERS + 1], storedUserId[MAXPLAYERS + 1];
 float storedTime[MAXPLAYERS + 1];
+bool deleteRecord[MAXPLAYERS + 1];
 
 // =====[ PUBLIC ]=====
 
@@ -44,13 +45,13 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	
 	if (!IsValidClient(client))
 	{
-		return;
+		return 0;
 	}
 	
 	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
-		return;
+		return 0;
 	}
 	
 	int top_place = response.GetInt("top_100");
@@ -77,10 +78,10 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 		storedTimeType[client] = timeType;
 		storedTime[client] = time;
 	}
-	
+	return 0;
 }
 
-public void OnReplaySaved_SendReplay(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath)
+public void OnReplaySaved_SendReplay(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath, bool tempReplay)
 {
 	strcopy(storedReplayPath[client], sizeof(storedReplayPath[]), filePath);
 	if (IsReplayReadyToSend(client, course, timeType, time))
@@ -94,6 +95,7 @@ public void OnReplaySaved_SendReplay(int client, int replayType, const char[] ma
 		storedCourse[client] = course;
 		storedTimeType[client] = timeType;
 		storedTime[client] = time;
+		deleteRecord[client] = tempReplay;
 	}
 }
 
@@ -119,12 +121,23 @@ bool IsReplayReadyToSend(int client, int course, int timeType, float time)
 
 public void SendReplay(int client)
 {
-	GlobalAPI_CreateReplayForRecordId(SendReplayCallback, DEFAULT_DATA, lastRecordId[client], storedReplayPath[client]);
+	DataPack dp;
+	dp.WriteString(deleteRecord[client] ? storedReplayPath[client] : "");
+	GlobalAPI_CreateReplayForRecordId(SendReplayCallback, dp, lastRecordId[client], storedReplayPath[client]);
 	lastRecordId[client] = -1;
 	storedReplayPath[client] = "";
 }
 
 public int SendReplayCallback(JSON_Object response, GlobalAPIRequestData request, DataPack dp)
 {
-
+	// Delete the temporary replay file if needed.
+	dp.Reset();
+	char replayPath[PLATFORM_MAX_PATH];
+	dp.ReadString(replayPath, sizeof(replayPath));
+	if (replayPath[0] != '\0')
+	{
+		DeleteFile(replayPath);
+	}
+	delete dp;
+	return 0;
 }

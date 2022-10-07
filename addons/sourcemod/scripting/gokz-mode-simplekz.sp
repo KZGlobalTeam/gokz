@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 16
+#define MODE_VERSION 17
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units
@@ -534,7 +534,7 @@ float CalcPreRewardSpeed(float yawDiff, float baseSpeed)
 
 // =====[ JUMPING ]=====
 
-Action TweakJump(KZPlayer player, float[3] origin, float[3] velocity)
+Action TweakJump(KZPlayer player, float origin[3], float velocity[3])
 {
 	// TakeoffCmdnum and TakeoffSpeed is not defined here because the player technically hasn't taken off yet.
 	int cmdsSinceLanding = gI_Cmdnum[player.ID] - player.LandingCmdNum;

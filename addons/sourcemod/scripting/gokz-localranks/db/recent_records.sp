@@ -136,6 +136,7 @@ public int MenuHandler_RecentRecordsMode(Menu menu, MenuAction action, int param
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_RecentRecordsTimeType(Menu menu, MenuAction action, int param1, int param2)
@@ -152,6 +153,7 @@ public int MenuHandler_RecentRecordsTimeType(Menu menu, MenuAction action, int p
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_RecentRecordsSubmenu(Menu menu, MenuAction action, int param1, int param2)
@@ -165,4 +167,5 @@ public int MenuHandler_RecentRecordsSubmenu(Menu menu, MenuAction action, int pa
 	{
 		delete menu;
 	}
+	return 0;
 } 

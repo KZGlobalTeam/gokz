@@ -83,6 +83,7 @@ public Action Timer_P2PRed(Handle timer, int userid)
 	{
 		P2PXBeam(client, 0);
 	}
+	return Plugin_Continue;
 }
 
 public Action Timer_P2PGreen(Handle timer, int userid)
@@ -92,6 +93,7 @@ public Action Timer_P2PGreen(Handle timer, int userid)
 	{
 		P2PXBeam(client, 1);
 	}
+	return Plugin_Continue;
 }
 
 public Action Timer_DeletePoints(Handle timer, int userid)
@@ -101,6 +103,7 @@ public Action Timer_DeletePoints(Handle timer, int userid)
 	{
 		MeasureResetPos(client);
 	}
+	return Plugin_Continue;
 }
 
 

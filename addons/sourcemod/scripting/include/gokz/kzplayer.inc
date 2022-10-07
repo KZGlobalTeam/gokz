@@ -106,6 +106,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_MakeCheckpoint(this.ID);
 	}
 	
+	property bool CanMakeCheckpoint {
+		public get() {
+			return GOKZ_GetCanMakeCheckpoint(this.ID);
+		}
+	}
+
 	public void TeleportToCheckpoint() {
 		GOKZ_TeleportToCheckpoint(this.ID);
 	}
@@ -160,6 +166,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 		GOKZ_Resume(this.ID);
 	}
 	
+	property bool CanResume {
+		public get() {
+			return GOKZ_GetCanResume(this.ID);
+		}
+	}
+	
 	public void TogglePause() {
 		GOKZ_TogglePause(this.ID);
 	}
@@ -191,6 +203,12 @@ methodmap KZPlayer < MovementAPIPlayer {
 			else {
 				this.Resume();
 			}
+		}
+	}
+	
+	property bool CanTeleportToStart {
+		public get() {
+			return GOKZ_GetCanTeleportToStartOrEnd(this.ID);
 		}
 	}
 	
@@ -439,6 +457,14 @@ methodmap KZPlayer < MovementAPIPlayer {
 		}
 	}
 	
+	property int DynamicMenu {
+		public get() {
+			return this.GetHUDOption(HUDOption_DynamicMenu);
+		}
+		public set(int value) {
+			this.SetHUDOption(HUDOption_DynamicMenu, value);
+		}
+	}
 	#endif
 	// =====[ END HUD ]=====
 	

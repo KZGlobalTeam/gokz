@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  SM_VERSION: "1.10"
+  SM_VERSION: "1.11"
 
 on:
   push:

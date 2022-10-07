@@ -305,4 +305,5 @@ public int Native_SetChatTag(Handle plugin, int numParams)
 	}
 	
 	GetNativeString(3, gC_PlayerTagColors[client], sizeof(gC_PlayerTagColors[]));
+	return 0;
 }
