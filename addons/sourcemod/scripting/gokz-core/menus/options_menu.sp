@@ -117,6 +117,12 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 					gC_CoreOptionPhrases[option], param, 
 					gC_TimerButtonZoneTypePhrases[GOKZ_GetCoreOption(param, option)], param);
 			}
+			case Option_Safeguard:
+			{
+				FormatEx(buffer, maxlength, "%T - %T", 
+					gC_CoreOptionPhrases[option], param, 
+					gC_SafeGuardPhrases[GOKZ_GetCoreOption(param, option)], param);
+			}
 			default:FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 		}
 	}

@@ -54,6 +54,12 @@ void EnableNoclip(int client)
 {
 	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
+		if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return;
+		}
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		GOKZ_StopTimer(client);
 	}
@@ -88,6 +94,12 @@ void EnableNoclipNotrigger(int client)
 {
 	if (IsValidClient(client) && IsPlayerAlive(client))
 	{
+		if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return;
+		}
 		Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_NOTRIGGER);
 		GOKZ_StopTimer(client);
@@ -137,6 +149,47 @@ bool JustNoclipped(int client)
 void OnClientPutInServer_Noclip(int client)
 {
 	noclipReleaseTime[client] = 0;
+}
+
+// =====[ TURNBINDS ]=====
+
+int turnbindsLastLeftStart[MAXPLAYERS + 1];
+int turnbindsLastRightStart[MAXPLAYERS + 1];
+float turnbindsLastValidYaw[MAXPLAYERS + 1];
+int turnbindsOldButtons[MAXPLAYERS + 1];
+
+// Ensures that there is a minimum time between starting to turnbind in one direction
+// and then starting to turnbind in the other direction
+void OnPlayerRunCmd_Turnbinds(int client, int buttons, int tickcount, float angles[3])
+{
+	if (buttons & IN_LEFT && tickcount < turnbindsLastRightStart[client] + GOKZ_TURNBIND_COOLDOWN)
+	{
+		angles[1] = turnbindsLastValidYaw[client];
+		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
+		buttons = 0;
+	}
+	else if (buttons & IN_RIGHT && tickcount < turnbindsLastLeftStart[client] + GOKZ_TURNBIND_COOLDOWN)
+	{
+		angles[1] = turnbindsLastValidYaw[client];
+		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
+		buttons = 0;
+	}
+	else
+	{
+		turnbindsLastValidYaw[client] = angles[1];
+		
+		if (!(turnbindsOldButtons[client] & IN_LEFT) && (buttons & IN_LEFT))
+		{
+			turnbindsLastLeftStart[client] = tickcount;
+		}
+		
+		if (!(turnbindsOldButtons[client] & IN_RIGHT) && (buttons & IN_RIGHT))
+		{
+			turnbindsLastRightStart[client] = tickcount;
+		}
+		
+		turnbindsOldButtons[client] = buttons;
+	}
 }
 
 
@@ -296,7 +349,14 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 	}
 }
 
-
+void SendFakeTeamEvent(int client)
+{
+	// Send a fake event to close the team menu
+	Event event = CreateEvent("player_team");
+	event.SetInt("userid", GetClientUserId(client));
+	event.FireToClient(client);
+	event.Cancel();
+}
 
 // =====[ VALID JUMP TRACKING ]=====
 
@@ -459,6 +519,7 @@ public Action Timer_TimeLimit(Handle timer)
 public Action Timer_EndRound(Handle timer)
 {
 	CS_TerminateRound(1.0, CSRoundEnd_Draw, true);
+	return Plugin_Continue;
 }
 
 
@@ -528,5 +589,25 @@ void OnMapStart_FixMissingSpawns()
 		{
 			TeleportEntity(newSpawn, origin, angles, NULL_VECTOR);
 		}
+	}
+}
+
+
+// =====[ SAFE MODE ]=====
+
+void ToggleSafeGuard(int client)
+{
+	GOKZ_SetCoreOption(client, Option_Safeguard, (GOKZ_GetCoreOption(client, Option_Safeguard) + 1) % SAFEGUARD_COUNT);
+}
+
+void ToggleProSafeGuard(int client)
+{
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) == Safeguard_EnabledPRO)
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_Disabled);
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_EnabledPRO);
 	}
 }

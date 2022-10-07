@@ -15,6 +15,10 @@ static ArrayList playbackTickData[RP_MAX_BOTS];
 static bool inBreather[RP_MAX_BOTS];
 static float breatherStartTime[RP_MAX_BOTS];
 
+// Original bot caller, needed for OnClientPutInServer callback
+static int botCaller[RP_MAX_BOTS];
+// Original bot name after creation by bot_add, needed for bot removal
+static char botName[RP_MAX_BOTS][MAX_NAME_LENGTH];
 static bool botInGame[RP_MAX_BOTS];
 static int botClient[RP_MAX_BOTS];
 static bool botDataLoaded[RP_MAX_BOTS];
@@ -40,6 +44,7 @@ static int timeInAir[RP_MAX_BOTS];
 static int botTeleportsUsed[RP_MAX_BOTS];
 static int botCurrentTeleport[RP_MAX_BOTS];
 static int botButtons[RP_MAX_BOTS];
+static MoveType botMoveType[RP_MAX_BOTS];
 static float botTakeoffSpeed[RP_MAX_BOTS];
 static float botSpeed[RP_MAX_BOTS];
 static float botLastOrigin[RP_MAX_BOTS][3];
@@ -54,12 +59,22 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadReplayBot(int client, char[] path)
+int LoadReplayBot(int client, char[] path, int timeType = -1)
 {
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return -1;
+		}
+	}
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
-		bot = GetUnusedBot();
+		bot = GetUnusedBot(timeType);
 	}
 	else
 	{
@@ -81,9 +96,7 @@ int LoadReplayBot(int client, char[] path)
 		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
-
-	SetBotStuff(bot);
-	MakePlayerSpectate(client, botClient[bot]);
+	botCaller[bot] = client;
 	return botClient[bot];
 }
 
@@ -125,7 +138,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
 	info.Paused = false;
-	info.OnLadder = false;
+	info.OnLadder = (botMoveType[bot] == MOVETYPE_LADDER);
 	info.Noclipping = false;
 	info.OnGround = Movement_GetOnGround(client);
 	info.Ducking = botButtons[bot] & IN_DUCK > 0;
@@ -250,10 +263,19 @@ void OnClientPutInServer_Playback(int client)
 	// Check if an unassigned bot has joined, and assign it
 	for (int bot; bot < RP_MAX_BOTS; bot++)
 	{
-		if (!botInGame[bot])
+		// Also check if the bot was created by us.
+		if (!botInGame[bot] && botCaller[bot] != 0)
 		{
 			botInGame[bot] = true;
 			botClient[bot] = client;
+			GetClientName(client, botName[bot], sizeof(botName[]));
+			// The bot won't receive its weapons properly if we don't wait a frame
+			RequestFrame(SetBotStuff, bot);
+			if (IsValidClient(botCaller[bot]))
+			{
+				MakePlayerSpectate(botCaller[bot], botClient[bot]);
+				botCaller[bot] = 0;
+			}
 			break;
 		}
 	}
@@ -575,14 +597,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		case ReplayType_Cheater:
 		{
 			// Reason
-			int ACReason;
-			file.ReadInt8(ACReason);
+			int reason;
+			file.ReadInt8(reason);
 			
 			// Type
 			botReplayType[bot] = ReplayType_Cheater;
 
 			// Finish spit to console
-			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[ACReason]);
+			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[reason]);
 		}
 		case ReplayType_Jump:
 		{
@@ -714,7 +736,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				KickClient(botClient[bot]);
+				ServerCommand("bot_kick %s", botName[bot]);
 			}
 		}
 	}
@@ -734,7 +756,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			KickClient(botClient[bot]);
+			ServerCommand("bot_kick %s", botName[bot]);
 			return;
 		}
 		
@@ -768,6 +790,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 		CopyVector(repOrigin, botLastOrigin[bot]);
 		
 		botSpeed[bot] = GetVectorHorizontalLength(velocity);
+		buttons = repButtons;
 		botButtons[bot] = repButtons;
 
 		// Should the bot be ducking?!
@@ -879,7 +902,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 				playbackTickData[bot].Clear(); // Clear it all out
 				botDataLoaded[bot] = false;
 				CancelReplayControlsForBot(bot);
-				KickClient(botClient[bot]);
+				ServerCommand("bot_kick %s", botName[bot]);
 			}
 		}
 	}
@@ -899,7 +922,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			playbackTickData[bot].Clear();
 			botDataLoaded[bot] = false;
 			CancelReplayControlsForBot(bot);
-			KickClient(botClient[bot]);
+			ServerCommand("bot_kick %s", botName[bot]);
 			return;
 		}
 		
@@ -935,59 +958,62 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
 		// Set buttons
+		int newButtons;
 		if (currentTickData.flags & RP_IN_ATTACK)
 		{
-			buttons |= IN_ATTACK;
+			newButtons |= IN_ATTACK;
 		}
 		if (currentTickData.flags & RP_IN_ATTACK2)
 		{
-			buttons |= IN_ATTACK2;
+			newButtons |= IN_ATTACK2;
 		}
 		if (currentTickData.flags & RP_IN_JUMP)
 		{
-			buttons |= IN_JUMP;
+			newButtons |= IN_JUMP;
 		}
 		if (currentTickData.flags & RP_IN_DUCK || currentTickData.flags & RP_FL_DUCKING)
 		{
-			buttons |= IN_DUCK;
+			newButtons |= IN_DUCK;
 		}
 		if (currentTickData.flags & RP_IN_FORWARD)
 		{
-			buttons |= IN_FORWARD;
+			newButtons |= IN_FORWARD;
 		}
 		if (currentTickData.flags & RP_IN_BACK)
 		{
-			buttons |= IN_BACK;
+			newButtons |= IN_BACK;
 		}
 		if (currentTickData.flags & RP_IN_LEFT)
 		{
-			buttons |= IN_LEFT;
+			newButtons |= IN_LEFT;
 		}
 		if (currentTickData.flags & RP_IN_RIGHT)
 		{
-			buttons |= IN_RIGHT;
+			newButtons |= IN_RIGHT;
 		}
 		if (currentTickData.flags & RP_IN_MOVELEFT)
 		{
-			buttons |= IN_MOVELEFT;
+			newButtons |= IN_MOVELEFT;
 		}
 		if (currentTickData.flags & RP_IN_MOVERIGHT)
 		{
-			buttons |= IN_MOVERIGHT;
+			newButtons |= IN_MOVERIGHT;
 		}
 		if (currentTickData.flags & RP_IN_RELOAD)
 		{
-			buttons |= IN_RELOAD;
+			newButtons |= IN_RELOAD;
 		}
 		if (currentTickData.flags & RP_IN_SPEED)
 		{
-			buttons |= IN_SPEED;
+			newButtons |= IN_SPEED;
 		}
+		buttons = newButtons;
 		botButtons[bot] = buttons;
 
 		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
 		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
+		botMoveType[bot] = replayMoveType;
 		if (Movement_GetSpeed(client) > SPEED_NORMAL * 2)
 		{
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
@@ -997,6 +1023,23 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			botPaused[bot] = false;
 			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
+			// The bot is on the ground, so there must be a ground entity attributed to the bot.
+			int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+			if (groundEnt == -1)
+			{
+				float endPosition[3], mins[3], maxs[3];
+				GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
+				GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
+				endPosition = currentTickData.origin;
+				endPosition[2] -= 2.0;
+				TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+				// This should always hit.
+				if (TR_DidHit())
+				{
+					groundEnt = TR_GetEntityIndex();
+					SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+				}
+			}
 		}
 		else if (replayMoveType == MOVETYPE_LADDER)
 		{
@@ -1096,7 +1139,7 @@ static void SetBotStuff(int bot)
 	{
 		return;
 	}
-	
+
 	int client = botClient[bot];
 	
 	// Set its movement options just in case it could negatively affect the playback
@@ -1106,17 +1149,6 @@ static void SetBotStuff(int bot)
 	// Clan tag and name
 	SetBotClanTag(bot);
 	SetBotName(bot);
-
-	// Set the bot's team based on if it's NUB or PRO
-	if (botReplayType[bot] == ReplayType_Run 
-		&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_CT);
-	}
-	else
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_T);
-	}
 
 	// Set bot weapons
 	// Always start by removing the pistol and knife
@@ -1247,13 +1279,21 @@ static int GetBotsInUse()
 }
 
 // Returns a bot that isn't currently replaying, or -1 if no unused bots found
-static int GetUnusedBot()
+static int GetUnusedBot(int timeType = -1)
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
 		if (!botInGame[bot])
 		{
-			CreateFakeClient("botName");
+			// Set the bot's team based on if it's NUB or PRO
+			if (timeType == TimeType_Pro)
+			{
+				ServerCommand("bot_add_ct");
+			}
+			else
+			{
+				ServerCommand("bot_add_t");
+			}
 			return bot;
 		}
 	}
@@ -1344,33 +1384,14 @@ static void MakePlayerSpectate(int client, int bot)
 	DataPack data = new DataPack();
 	data.WriteCell(clientUserID);
 	data.WriteCell(GetClientUserId(bot));
-
-	CreateTimer(0.2, Timer_ResetSpectate, clientUserID);
-	CreateTimer(0.3, Timer_SpectateBot, data); // After delay so name is correctly updated in client's HUD
+	CreateTimer(0.1, Timer_UpdateBotName, GetClientUserId(bot));
 	EnableReplayControls(client);
 }
 
-public Action Timer_ResetSpectate(Handle timer, int clientUID)
+public Action Timer_UpdateBotName(Handle timer, int botUID)
 {
-	int client = GetClientOfUserId(clientUID);
-	if (IsValidClient(client))
-	{
-		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
-	}
-}
-public Action Timer_SpectateBot(Handle timer, DataPack data)
-{
-	data.Reset();
-	int client = GetClientOfUserId(data.ReadCell());
-	int bot = GetClientOfUserId(data.ReadCell());
-	delete data;
-	
-	if (IsValidClient(client) && IsValidClient(bot))
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
-	}
+	Event e = CreateEvent("spec_target_updated");
+	e.SetInt("userid", botUID);
+	e.Fire();
 	return Plugin_Continue;
 }

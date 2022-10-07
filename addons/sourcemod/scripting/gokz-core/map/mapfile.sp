@@ -209,7 +209,7 @@ static int EntlumpGetString(char[] result, int maxLength, int copyCount, char[] 
 	return finalLength;
 }
 
-static EntlumpToken[] EntlumpGetToken(char[] entityLump, int &entlumpIndex)
+static EntlumpToken EntlumpGetToken(char[] entityLump, int &entlumpIndex)
 {
 	EntlumpToken result;
 	

@@ -23,16 +23,18 @@ void SetPausedOnLadder(int client, bool onLadder)
 
 void Pause(int client)
 {
-	if (!CanPause(client))
+	if (!CanPause(client, true))
 	{
 		return;
 	}
-	
+
 	// Call Pre Forward
 	Action result;
 	Call_GOKZ_OnPause(client, result);
 	if (result != Plugin_Continue)
 	{
+		GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Generic)");
+		GOKZ_PlayErrorSound(client);
 		return;
 	}
 	
@@ -53,7 +55,7 @@ void Pause(int client)
 	Call_GOKZ_OnPause_Post(client);
 }
 
-bool CanPause(int client)
+bool CanPause(int client, bool showError = false)
 {
 	if (paused[client])
 	{
@@ -65,27 +67,39 @@ bool CanPause(int client)
 		if (hasResumedInThisRun[client]
 			 && GetEngineTime() - lastResumeTime[client] < GOKZ_PAUSE_COOLDOWN)
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
-			GOKZ_PlayErrorSound(client);
+			if (showError)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Resumed)");
+				GOKZ_PlayErrorSound(client);
+			}
 			return false;
 		}
 		else if (!Movement_GetOnGround(client)
 			 && !(Movement_GetSpeed(client) == 0 && Movement_GetVerticalVelocity(client) == 0))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Midair)");
-			GOKZ_PlayErrorSound(client);
+			if (showError)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Midair)");
+				GOKZ_PlayErrorSound(client);
+			}
 			return false;
 		}
 		else if (BhopTriggersJustTouched(client))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Landed)");
-			GOKZ_PlayErrorSound(client);
+			if (showError)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Just Landed)");
+				GOKZ_PlayErrorSound(client);
+			}
 			return false;
 		}
 		else if (AntiPauseTriggerIsTouched(client))
 		{
-			GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Anti Pause Area)");
-			GOKZ_PlayErrorSound(client);
+			if (showError)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Anti Pause Area)");
+				GOKZ_PlayErrorSound(client);
+			}
 			return false;
 		}
 	}
@@ -93,28 +107,27 @@ bool CanPause(int client)
 	return true;
 }
 
-void Resume(int client)
+void Resume(int client, bool force = false)
 {
 	if (!paused[client])
 	{
 		return;
 	}
-	if (GetTimerRunning(client) && hasPausedInThisRun[client]
-		 && GetEngineTime() - lastPauseTime[client] < GOKZ_PAUSE_COOLDOWN)
+	if (!force && !CanResume(client, true))
 	{
-		GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Just Paused)");
-		GOKZ_PlayErrorSound(client);
 		return;
 	}
-	
+
 	// Call Pre Forward
 	Action result;
 	Call_GOKZ_OnResume(client, result);
 	if (result != Plugin_Continue)
 	{
+		GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Generic)");
+		GOKZ_PlayErrorSound(client);
 		return;
 	}
-	
+
 	// Resume
 	if (pausedOnLadder[client])
 	{
@@ -138,6 +151,21 @@ void Resume(int client)
 	
 	// Call Post Forward
 	Call_GOKZ_OnResume_Post(client);
+}
+
+bool CanResume(int client, bool showError = false)
+{
+	if (GetTimerRunning(client) && hasPausedInThisRun[client]
+		 && GetEngineTime() - lastPauseTime[client] < GOKZ_PAUSE_COOLDOWN)
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Resume (Just Paused)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	return true;
 }
 
 void TogglePause(int client)
@@ -165,7 +193,7 @@ void OnTimerStart_Pause(int client)
 {
 	hasPausedInThisRun[client] = false;
 	hasResumedInThisRun[client] = false;
-	GOKZ_Resume(client);
+	Resume(client, true);
 }
 
 void OnChangeMovetype_Pause(int client, MoveType newMovetype)

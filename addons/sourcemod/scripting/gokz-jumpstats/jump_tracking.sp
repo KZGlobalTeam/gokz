@@ -22,12 +22,12 @@ enum struct Pose
 
 // =====[ GLOBAL VARIABLES ]===================================================
 
-static int entityTouchCount[MAXPLAYERS + 1];
+static ArrayList entityTouchList[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
 static int lastNoclipTime[MAXPLAYERS + 1];
 static int lastDuckbugTime[MAXPLAYERS + 1];
 static float lastJumpButtonTime[MAXPLAYERS + 1];
-static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected	
+static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
 static const float playerMinsEx[3] = { -20.0, -20.0, 0.0 };
@@ -82,7 +82,7 @@ enum struct JumpTracker
 		this.jumper = jumper;
 		this.jump.jumper = jumper;
 		this.nextCrouchRelease = 100;
-		this.tickCount = GetGameTickCount();
+		this.tickCount = 0;
 	}
 	
 	
@@ -344,7 +344,7 @@ enum struct JumpTracker
 				return JumpType_Other;
 			}
 		}
-		return JumpType_LongJump;
+		return this.HitDuckbugRecently() ? JumpType_Invalid : JumpType_LongJump;
 	}
 	
 	bool HitBhop()
@@ -368,7 +368,7 @@ enum struct JumpTracker
 	
 	bool HitDuckbugRecently()
 	{
-		return GetGameTickCount() - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+		return this.tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
 	}
 	
 	// =====[ UPDATE HELPERS ]====================================================
@@ -560,7 +560,7 @@ enum struct JumpTracker
 		// at least the middle of the gap.
 		CopyVector(this.takeoffOrigin, block);
 		block[coordDist] = 2 * failstatPosition[coordDist] - this.takeoffOrigin[coordDist];
-		block[!coordDist] = failstatPosition[!coordDist]; 
+		block[view_as<int>(!coordDist)] = failstatPosition[view_as<int>(!coordDist)]; 
 		block[2] = this.failstatBlockHeight;
 		
 		// Calculate block stats
@@ -1273,7 +1273,11 @@ void OnOptionChanged_JumpTracking(int client, const char[] option)
 
 void OnClientPutInServer_JumpTracking(int client)
 {
-	entityTouchCount[client] = 0;
+	if (entityTouchList[client] != INVALID_HANDLE)
+	{
+		delete entityTouchList[client];
+	}
+	entityTouchList[client] = new ArrayList();
 	lastNoclipTime[client] = 0;
 	lastDuckbugTime[client] = 0;
 	lastJumpButtonTime[client] = 0.0;
@@ -1311,16 +1315,19 @@ void OnStartTouchGround_JumpTracking(int client)
 	}
 }
 
-void OnStartTouch_JumpTracking(int client)
+void OnStartTouch_JumpTracking(int client, int touched)
 {
-	entityTouchCount[client]++;
-	// Do not immediately invalidate jumps upon collision.
-	// Give the player a few ticks of leniency for late ducking.
+	if (entityTouchList[client] != INVALID_HANDLE)
+	{
+		entityTouchList[client].Push(touched);
+		// Do not immediately invalidate jumps upon collision.
+		// Give the player a few ticks of leniency for late ducking.
+	}
 }
 
 void OnTouch_JumpTracking(int client)
 {
-	if (entityTouchCount[client] > 0)
+	if (entityTouchList[client] != INVALID_HANDLE && entityTouchList[client].Length > 0)
 	{
 		entityTouchDuration[client]++;
 	}
@@ -1330,12 +1337,19 @@ void OnTouch_JumpTracking(int client)
 	}
 }
 
-void OnEndTouch_JumpTracking(int client)
+void OnEndTouch_JumpTracking(int client, int touched)
 {
-	entityTouchCount[client]--;
-	if (entityTouchCount[client] == 0)
+	if (entityTouchList[client] != INVALID_HANDLE)
 	{
-		entityTouchDuration[client] = 0;
+		int index = entityTouchList[client].FindValue(touched);
+		if (index != -1)
+		{
+			entityTouchList[client].Erase(index);
+		}
+		if (entityTouchList[client].Length == 0)
+		{
+			entityTouchDuration[client] = 0;
+		}
 	}
 }
 
@@ -1355,7 +1369,7 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 
 	if (CheckNoclip(client))
 	{
-		lastNoclipTime[client] = GetGameTickCount();
+		lastNoclipTime[client] = tickcount;
 	}
 	
 	// Don't bother checking if player is already in air and jumpstat is already invalid
@@ -1405,7 +1419,7 @@ public void OnPlayerRunCmdPost_JumpTracking(int client)
 	
 	if (Movement_GetDuckbugged(client))
 	{
-		lastDuckbugTime[client] = GetGameTickCount();
+		lastDuckbugTime[client] = jumpTrackers[client].tickCount;
 	}
 }
 
@@ -1436,7 +1450,7 @@ static void UpdateValidCmd(int client, int buttons)
 		validCmd[client] = true;
 	}
 	
-	if (GetGameTickCount() - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
+	if (jumpTrackers[client].tickCount - lastNoclipTime[client] < GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS)
 	{
 		jumpTrackers[client].jump.type = JumpType_FullInvalid;
 	}
