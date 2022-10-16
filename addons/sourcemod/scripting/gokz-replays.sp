@@ -44,6 +44,8 @@ bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
 Handle gH_EmitSound_SDKCall;
 DynamicDetour gH_DHooks_TeamFull;
+int gI_SurfaceDataOffset;
+Handle gH_PlayStepSound_SDKCall;
 
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
@@ -177,7 +179,11 @@ public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int pl
 	return Plugin_Continue;
 }
 
-
+public MRESReturn DHooks_OnTeamFull_Pre(Address pThis, DHookReturn hReturn, DHookParam hParams)
+{
+	DHookSetReturn(hReturn, false);
+	return MRES_Supercede;
+}
 
 // =====[ CLIENT EVENTS ]=====
 
@@ -281,7 +287,6 @@ public void GOKZ_OnOptionsLoaded(int client)
 
 // =====[ PRIVATE ]=====
 
-
 static void HookEvents()
 {
 	HookUserMessage(GetUserMessageId("SayText2"), Hook_SayText2, true);
@@ -294,7 +299,22 @@ static void HookEvents()
 	PrepSDKCall_AddParameter(SDKType_Float, SDKPass_Pointer);
 	gH_EmitSound_SDKCall = EndPrepSDKCall();
 	
-	gameData = new GameData("gokz-replays.games");
+	StartPrepSDKCall(SDKCall_Player);
+	PrepSDKCall_SetFromConf(gameData, SDKConf_Virtual, "CCSPlayer::PlayStepSound");
+	PrepSDKCall_AddParameter(SDKType_Vector, SDKPass_ByRef);
+	PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
+	PrepSDKCall_AddParameter(SDKType_Float, SDKPass_Plain);
+	PrepSDKCall_AddParameter(SDKType_Bool, SDKPass_Plain);
+	PrepSDKCall_AddParameter(SDKType_Bool, SDKPass_Plain);
+	gH_PlayStepSound_SDKCall = EndPrepSDKCall();
+
+	int offset = gameData.GetOffset("CBasePlayer::m_pSurfaceData");
+	if (offset == -1)
+	{
+		SetFailState("Failed to find CBasePlayer::m_pSurfaceData offset");
+	}
+	gI_SurfaceDataOffset = FindSendPropInfo("CBasePlayer", "m_ubEFNoInterpParity") - offset;
+
 	gH_DHooks_TeamFull = DynamicDetour.FromConf(gameData, "CCSGameRules::TeamFull");
 	if (gH_DHooks_TeamFull == INVALID_HANDLE)
 	{
@@ -305,6 +325,7 @@ static void HookEvents()
 	{
 		SetFailState("Failed to enable detour on CCSGameRules::TeamFull");
 	}
+	delete gameData;
 }
 
 static void UpdateCurrentMap()
@@ -313,12 +334,6 @@ static void UpdateCurrentMap()
 	gI_CurrentMapFileSize = GetCurrentMapFileSize();
 }
 
-
-public MRESReturn DHooks_OnTeamFull_Pre(Address pThis, DHookReturn hReturn, DHookParam hParams)
-{
-	DHookSetReturn(hReturn, false);
-	return MRES_Supercede;
-}
 
 // =====[ PUBLIC ]=====
 
