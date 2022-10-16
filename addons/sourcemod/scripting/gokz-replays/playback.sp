@@ -1064,10 +1064,14 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 					&& !(prevTickData.flags & RP_IN_JUMP) && currentTickData.flags & RP_IN_JUMP
 					&& currentTickData.flags & RP_TAKEOFF_TICK)
 				{
-					SDKCall(gH_EmitSound_SDKCall, client, "Default.WalkJump", 0.0, 0);
 					if (botSpeed[bot] > RP_JUMP_STEP_SOUND_THRESHOLD)
 					{
 						BotPlayJumpStepSound(botClient[bot], currentTickData.origin);
+					}
+					else
+					{
+						// Still jumped, but not fast enough for extra sounds.
+						SDKCall(gH_EmitSound_SDKCall, client, "Default.WalkJump", 0.0, 0);
 					}
 				}
 				botJustTeleported[bot] = false;
