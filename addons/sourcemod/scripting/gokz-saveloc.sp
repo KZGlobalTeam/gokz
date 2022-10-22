@@ -198,6 +198,11 @@ public void OnMapStart()
 
 // =====[ CLIENT EVENTS ]=====
 
+public void OnClientPutInServer(int client)
+{
+	gF_LastLoadlocTime[client] = 0.0;
+}
+
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
