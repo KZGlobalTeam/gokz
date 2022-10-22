@@ -220,19 +220,19 @@ methodmap Ray_t < AllocatableBase
 	property Address m_pWorldAxisTransform
 	{
 		public get() { return view_as<Address>(LoadFromAddress(this.Address + offsets.rtoffsets.m_pWorldAxisTransform, NumberType_Int32)); }
-		public set(Address _worldaxistransform) { StoreToAddressCustom(this.Address + offsets.rtoffsets.m_pWorldAxisTransform, view_as<int>(_worldaxistransform), NumberType_Int32); }
+		public set(Address _worldaxistransform) { StoreToAddress(this.Address + offsets.rtoffsets.m_pWorldAxisTransform, view_as<int>(_worldaxistransform), NumberType_Int32, false); }
 	}
 	
 	property bool m_IsRay
 	{
 		public get() { return view_as<bool>(LoadFromAddress(this.Address + offsets.rtoffsets.m_IsRay, NumberType_Int8)); }
-		public set(bool _isray) { StoreToAddressCustom(this.Address + offsets.rtoffsets.m_IsRay, _isray, NumberType_Int8); }
+		public set(bool _isray) { StoreToAddress(this.Address + offsets.rtoffsets.m_IsRay, _isray, NumberType_Int8, false); }
 	}
 	
 	property bool m_IsSwept
 	{
 		public get() { return view_as<bool>(LoadFromAddress(this.Address + offsets.rtoffsets.m_IsSwept, NumberType_Int8)); }
-		public set(bool _isswept) { StoreToAddressCustom(this.Address + offsets.rtoffsets.m_IsSwept, _isswept, NumberType_Int8); }
+		public set(bool _isswept) { StoreToAddress(this.Address + offsets.rtoffsets.m_IsSwept, _isswept, NumberType_Int8, false); }
 	}
 	
 	public Ray_t()
@@ -279,25 +279,25 @@ methodmap CTraceFilterSimple < AllocatableBase
 	property Address vptr
 	{
 		public get() { return view_as<Address>(LoadFromAddress(this.Address + offsets.ctfsoffsets.vptr, NumberType_Int32)); }
-		public set(Address _vtbladdr) { StoreToAddressCustom(this.Address + offsets.ctfsoffsets.vptr, view_as<int>(_vtbladdr), NumberType_Int32); }
+		public set(Address _vtbladdr) { StoreToAddress(this.Address + offsets.ctfsoffsets.vptr, view_as<int>(_vtbladdr), NumberType_Int32, false); }
 	}
 	
 	property CBaseHandle m_pPassEnt
 	{
 		public get() { return view_as<CBaseHandle>(LoadFromAddress(this.Address + offsets.ctfsoffsets.m_pPassEnt, NumberType_Int32)); }
-		public set(CBaseHandle _passent) { StoreToAddressCustom(this.Address + offsets.ctfsoffsets.m_pPassEnt, view_as<int>(_passent), NumberType_Int32); }
+		public set(CBaseHandle _passent) { StoreToAddress(this.Address + offsets.ctfsoffsets.m_pPassEnt, view_as<int>(_passent), NumberType_Int32, false); }
 	}
 	
 	property int m_collisionGroup
 	{
 		public get() { return LoadFromAddress(this.Address + offsets.ctfsoffsets.m_collisionGroup, NumberType_Int32); }
-		public set(int _collisiongroup) { StoreToAddressCustom(this.Address + offsets.ctfsoffsets.m_collisionGroup, _collisiongroup, NumberType_Int32); }
+		public set(int _collisiongroup) { StoreToAddress(this.Address + offsets.ctfsoffsets.m_collisionGroup, _collisiongroup, NumberType_Int32, false); }
 	}
 	
 	property Address m_pExtraShouldHitCheckFunction
 	{
 		public get() { return view_as<Address>(LoadFromAddress(this.Address + offsets.ctfsoffsets.m_pExtraShouldHitCheckFunction, NumberType_Int32)); }
-		public set(Address _checkfnc) { StoreToAddressCustom(this.Address + offsets.ctfsoffsets.m_pExtraShouldHitCheckFunction, view_as<int>(_checkfnc), NumberType_Int32); }
+		public set(Address _checkfnc) { StoreToAddress(this.Address + offsets.ctfsoffsets.m_pExtraShouldHitCheckFunction, view_as<int>(_checkfnc), NumberType_Int32), false; }
 	}
 	
 	public CTraceFilterSimple()
@@ -421,7 +421,7 @@ stock void InitGameTrace(GameData gd)
 	if(gEngineVersion == Engine_CSS)
 	{
 		offsets.ctfsoffsets.vtable = gd.GetAddress("CTraceFilterSimple::vtable");
-		ASSERT_MSG(offsets.ctfsoffsets.vtable != Address_Null, "Can't get \"CTraceFilterSimple::vtable\" address from gamedata.");
+		ASSERT_MSG(offsets.ctfsoffsets.vtable != Address_Null, "Can't get \"CTraceFilterSimple::vtable\" address from gamedata. Gamedata needs an update.");
 	}
 	
 	//enginetrace
