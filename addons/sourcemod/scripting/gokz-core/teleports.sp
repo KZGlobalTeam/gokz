@@ -4,7 +4,6 @@
 */
 
 
-
 static ArrayList checkpoints[MAXPLAYERS + 1];
 static int checkpointCount[MAXPLAYERS + 1];
 static int checkpointIndex[MAXPLAYERS + 1];
@@ -20,7 +19,7 @@ static float customStartAngles[MAXPLAYERS + 1][3];
 static float endOrigin[MAXPLAYERS + 1][3];
 static float endAngles[MAXPLAYERS + 1][3];
 static UndoTeleportData undoTeleportData[MAXPLAYERS + 1];
-
+static float lastRestartAttemptTime[MAXPLAYERS + 1];
 
 // =====[ PUBLIC ]=====
 
@@ -259,6 +258,16 @@ void TeleportToCheckpoint(int client)
 
 bool CanTeleportToCheckpoint(int client, bool showError = false)
 {
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) == Safeguard_EnabledPRO && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client) && GOKZ_GetTeleportCount(client) == 0)
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
 	{
 		if (showError)
@@ -307,6 +316,16 @@ void PrevCheckpoint(int client)
 
 bool CanPrevCheckpoint(int client, bool showError = false)
 {
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) == Safeguard_EnabledPRO && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	if (GetCurrentMapPrefix() == MapPrefix_KZPro && GetTimerRunning(client))
 	{
 		if (showError)
@@ -378,8 +397,46 @@ bool CanNextCheckpoint(int client, bool showError = false)
 
 // RESTART & RESPAWN
 
+bool CanTeleportToStart(int client, bool showError = false)
+{
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		float currentTime = GetEngineTime();
+		float timeSinceLastAttempt = currentTime - lastRestartAttemptTime[client];
+		float cooldown;
+		// If the client restarts for the first time or the last attempt is too long ago, restart the cooldown.
+		if (lastRestartAttemptTime[client] == 0.0 || timeSinceLastAttempt > GOKZ_SAFEGUARD_RESTART_MAX_DELAY)
+		{
+			lastRestartAttemptTime[client] = currentTime;
+			cooldown = GOKZ_SAFEGUARD_RESTART_MIN_DELAY;
+		}
+		else
+		{
+			cooldown = GOKZ_SAFEGUARD_RESTART_MIN_DELAY - timeSinceLastAttempt;
+		}
+		if (cooldown <= 0.0)
+		{
+			lastRestartAttemptTime[client] = 0.0;
+			return true;
+		}
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked (Temp)", cooldown);
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	return true;
+}
+
 void TeleportToStart(int client)
 {
+	if (!CanTeleportToStart(client, true))
+	{
+		return;
+	}
+
 	// Call Pre Forward
 	Action result;
 	Call_GOKZ_OnTeleportToStart(client, GetCurrentCourse(client), result);
@@ -387,9 +444,8 @@ void TeleportToStart(int client)
 	{
 		return;
 	}
-	
+
 	// Teleport to Start
-	
 	if (startType[client] == StartPositionType_Spawn)
 	{
 		GOKZ_RespawnPlayer(client, .restorePos = false);
@@ -420,6 +476,11 @@ void TeleportToStart(int client)
 
 void TeleportToSearchStart(int client, int course)
 {
+	if (!CanTeleportToStart(client, true))
+	{
+		return;
+	}
+
 	// Call Pre Forward
 	Action result;
 	Call_GOKZ_OnTeleportToStart(client, course, result);
@@ -427,6 +488,7 @@ void TeleportToSearchStart(int client, int course)
 	{
 		return;
 	}
+
 	float origin[3], angles[3];
 	if (!GetSearchStartPosition(course, origin, angles))
 	{
@@ -465,19 +527,32 @@ StartPositionType GetStartPosition(int client, float position[3], float angles[3
 
 bool TeleportToCourseStart(int client, int course)
 {
+	if (!CanTeleportToStart(client, true))
+	{
+		return false;
+	}
+
 	// Call Pre Forward
 	Action result;
 	Call_GOKZ_OnTeleportToStart(client, course, result);
 	if (result != Plugin_Continue)
 	{
 		return false;
-	}	
+	}
 	float origin[3], angles[3];
 	
 	if (!GetMapStartPosition(course, origin, angles))
 	{
 		if (!GetSearchStartPosition(course, origin, angles))
 		{
+			if (course == 0)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "No Start Found");
+			}
+			else
+			{
+				GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", course);
+			}
 			return false;
 		}
 	}
@@ -581,8 +656,28 @@ bool ClearCustomStartPosition(int client)
 
 // TELEPORT TO END
 
+bool CanTeleportToEnd(int client, bool showError = false)
+{
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
+	return true;
+}
+
 void TeleportToEnd(int client, int course)
 {
+	if (!CanTeleportToEnd(client, true))
+	{
+		return;
+	}
+
 	// Call Pre Forward
 	Action result;
 	Call_GOKZ_OnTeleportToEnd(client, course, result);
@@ -709,12 +804,14 @@ bool CanUndoTeleport(int client, bool showError = false)
 
 void OnClientPutInServer_Teleports(int client)
 {
+	checkpointCount[client] = 0;
 	checkpointIndex[client] = -1;
 	checkpointIndexStart[client] = -1;
 	checkpointIndexEnd[client] = -1;
 	teleportCount[client] = 0;
 	startType[client] = StartPositionType_Spawn;
 	nonCustomStartType[client] = StartPositionType_Spawn;
+	lastRestartAttemptTime[client] = 0.0;
 	if (checkpoints[client] != INVALID_HANDLE)
 	{
 		checkpoints[client].Clear();
@@ -755,16 +852,6 @@ void OnStartZoneStartTouch_Teleports(int client, int course)
 
 
 // =====[ PRIVATE ]=====
-
-static int NextIndex(int current, int maximum)
-{
-	int next = current + 1;
-	if (next >= maximum)
-	{
-		return 0;
-	}
-	return next;
-}
 
 static int PrevIndex(int current, int maximum)
 {

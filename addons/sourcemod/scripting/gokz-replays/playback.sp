@@ -61,6 +61,16 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // Returns the client index of the replay bot, or -1 otherwise
 int LoadReplayBot(int client, char[] path, int timeType = -1)
 {
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return -1;
+		}
+	}
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
@@ -259,7 +269,8 @@ void OnClientPutInServer_Playback(int client)
 			botInGame[bot] = true;
 			botClient[bot] = client;
 			GetClientName(client, botName[bot], sizeof(botName[]));
-			SetBotStuff(bot);
+			// The bot won't receive its weapons properly if we don't wait a frame
+			RequestFrame(SetBotStuff, bot);
 			if (IsValidClient(botCaller[bot]))
 			{
 				MakePlayerSpectate(botCaller[bot], botClient[bot]);
@@ -586,14 +597,14 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 		case ReplayType_Cheater:
 		{
 			// Reason
-			int ACReason;
-			file.ReadInt8(ACReason);
+			int reason;
+			file.ReadInt8(reason);
 			
 			// Type
 			botReplayType[bot] = ReplayType_Cheater;
 
 			// Finish spit to console
-			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[ACReason]);
+			PrintToConsole(client, "AC Reason: %s", gC_ACReasons[reason]);
 		}
 		case ReplayType_Jump:
 		{
@@ -1382,4 +1393,5 @@ public Action Timer_UpdateBotName(Handle timer, int botUID)
 	Event e = CreateEvent("spec_target_updated");
 	e.SetInt("userid", botUID);
 	e.Fire();
+	return Plugin_Continue;
 }

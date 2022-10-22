@@ -45,13 +45,13 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	
 	if (!IsValidClient(client))
 	{
-		return;
+		return 0;
 	}
 	
 	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
-		return;
+		return 0;
 	}
 	
 	int top_place = response.GetInt("top_100");
@@ -78,7 +78,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 		storedTimeType[client] = timeType;
 		storedTime[client] = time;
 	}
-	
+	return 0;
 }
 
 public void OnReplaySaved_SendReplay(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath, bool tempReplay)
@@ -139,4 +139,5 @@ public int SendReplayCallback(JSON_Object response, GlobalAPIRequestData request
 		DeleteFile(replayPath);
 	}
 	delete dp;
+	return 0;
 }

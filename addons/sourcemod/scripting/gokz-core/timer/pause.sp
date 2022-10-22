@@ -107,13 +107,13 @@ bool CanPause(int client, bool showError = false)
 	return true;
 }
 
-void Resume(int client)
+void Resume(int client, bool force = false)
 {
 	if (!paused[client])
 	{
 		return;
 	}
-	if (!CanResume(client, true))
+	if (!force && !CanResume(client, true))
 	{
 		return;
 	}
@@ -193,7 +193,7 @@ void OnTimerStart_Pause(int client)
 {
 	hasPausedInThisRun[client] = false;
 	hasResumedInThisRun[client] = false;
-	GOKZ_Resume(client);
+	Resume(client, true);
 }
 
 void OnChangeMovetype_Pause(int client, MoveType newMovetype)

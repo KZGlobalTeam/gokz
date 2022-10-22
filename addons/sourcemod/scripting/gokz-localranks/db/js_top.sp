@@ -215,6 +215,7 @@ public int MenuHandler_JumpTopMode(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpTopType(Menu menu, MenuAction action, int param1, int param2)
@@ -232,6 +233,7 @@ public int MenuHandler_JumpTopType(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpTopBlockType(Menu menu, MenuAction action, int param1, int param2)
@@ -249,6 +251,7 @@ public int MenuHandler_JumpTopBlockType(Menu menu, MenuAction action, int param1
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int param2)
@@ -279,31 +282,5 @@ public int MenuHandler_JumpTopList(Menu menu, MenuAction action, int param1, int
 	{
 		delete menu;
 	}
-}
-
-// =====[ UTILITY ]=====
-
-public Action Timer_ResetSpectate(Handle timer, int clientUID)
-{
-	int client = GetClientOfUserId(clientUID);
-	if (IsValidClient(client))
-	{
-		SetEntProp(client, Prop_Send, "m_iObserverMode", -1);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", -1);
-	}
-}
-public Action Timer_SpectateBot(Handle timer, DataPack data)
-{
-	data.Reset();
-	int client = GetClientOfUserId(data.ReadCell());
-	int botClient = GetClientOfUserId(data.ReadCell());
-	delete data;
-	
-	if (IsValidClient(client) && IsValidClient(botClient))
-	{
-		GOKZ_JoinTeam(client, CS_TEAM_SPECTATOR);
-		SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
-		SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", botClient);
-	}
-	return Plugin_Continue;
+	return 0;
 }

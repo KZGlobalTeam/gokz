@@ -67,6 +67,15 @@ public void OnLibraryAdded(const char[] name)
 // Returns whether teleport to target was successful
 bool GotoPlayer(int client, int target, bool printMessage = true)
 {
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (printMessage)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	if (target == client)
 	{
 		if (printMessage)
@@ -153,6 +162,7 @@ public int MenuHandler_Goto(Menu menu, MenuAction action, int param1, int param2
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 // Returns number of items added to the menu
