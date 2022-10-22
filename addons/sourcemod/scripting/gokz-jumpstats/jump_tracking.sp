@@ -94,7 +94,7 @@ enum struct JumpTracker
 		// We need to do that before we reset the jump cause we need the
 		// offset and type of the previous jump
 		this.lastType = this.DetermineType(jumped, ladderJump, jumpbug);
-		
+
 		// We need this for weirdjump w-release
 		int releaseWTemp = this.jump.releaseW;
 		
@@ -151,10 +151,10 @@ enum struct JumpTracker
 			We check for speed reduction for abuse; while prop abuses increase speed,
 			wall collision will very likely (if not always) result in a speed reduction.
 		*/
-		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) * 128;
+		float actualSpeed = GetVectorHorizontalDistance(this.position, pose(-1).position) / GetTickInterval();
 		if (FloatAbs(speed - actualSpeed) > JS_SPEED_MODIFICATION_TOLERANCE && this.jump.duration != 0)
 		{
-			if (actualSpeed <= pose(-1).speed) 
+			if (actualSpeed <= pose(-1).speed)
 			{
 				pose(0).speed = actualSpeed;
 			}
@@ -164,7 +164,13 @@ enum struct JumpTracker
 				this.Invalidate();
 			}
 		}
-		
+		// You shouldn't gain any vertical velocity during a jump. 
+		// This would only happen if you get boosted back up somehow, or you edgebugged.
+		if (!Movement_GetOnGround(this.jumper) && pose(0).velocity[2] > pose(-1).velocity[2])
+		{
+			this.Invalidate();
+		}
+
 		this.jump.height = FloatMax(this.jump.height, this.position[2] - this.takeoffOrigin[2]);
 		this.jump.maxSpeed = FloatMax(this.jump.maxSpeed, speed);
 		this.jump.crouchTicks += Movement_GetDucking(this.jumper) ? 1 : 0;
@@ -965,7 +971,7 @@ enum struct JumpTracker
 		endBlock[coordDev] = middle[coordDev];
 		startBlock[2] = middle[2];
 		endBlock[2] = middle[2];
-		
+
 		// Search for the blocks
 		if (!TraceHullPosition(middle, startBlock, sweepBoxMin, sweepBoxMax, startBlock)
 			|| !TraceHullPosition(middle, endBlock, sweepBoxMin, sweepBoxMax, endBlock))
@@ -976,6 +982,8 @@ enum struct JumpTracker
 		// Make sure the edges of the blocks are parallel.
 		if (!this.BlockAreEdgesParallel(startBlock, endBlock, this.jump.deviation + 32.0, coordDist, coordDev))
 		{
+			this.jump.block = 0;
+			this.jump.edge = -1.0;
 			return;
 		}
 		
