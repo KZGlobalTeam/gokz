@@ -58,6 +58,7 @@ enum struct Location {
 	float waterJumpTime;
 	bool hasWalkMovedSinceLastJump;
 	float ignoreLadderJumpTimeOffset;
+	float lastPositionAtFullCrouchSpeed[2];
 
 	void Create(int client, int target)
 	{
@@ -81,7 +82,8 @@ enum struct Location {
 		this.waterJumpTime = GetEntPropFloat(target, Prop_Data, "m_flWaterJumpTime");
 		this.hasWalkMovedSinceLastJump = !!GetEntProp(target, Prop_Data, "m_bHasWalkMovedSinceLastJump");
 		this.ignoreLadderJumpTimeOffset = GetEntPropFloat(target, Prop_Data, "m_ignoreLadderJumpTime") - GetGameTime();
-
+		GetLastPositionAtFullCrouchSpeed(target, this.lastPositionAtFullCrouchSpeed);
+		
 		if (GOKZ_GetTimerRunning(target))
 		{
 			this.currentTime = GOKZ_GetTime(target);
@@ -134,6 +136,7 @@ enum struct Location {
 		SetEntPropFloat(client, Prop_Data, "m_flWaterJumpTime", this.waterJumpTime);
 		SetEntProp(client, Prop_Data, "m_bHasWalkMovedSinceLastJump", this.hasWalkMovedSinceLastJump);
 		SetEntPropFloat(client, Prop_Data, "m_ignoreLadderJumpTime", this.ignoreLadderJumpTimeOffset + GetGameTime());
+		SetLastPositionAtFullCrouchSpeed(client, this.lastPositionAtFullCrouchSpeed);
 
 		GOKZ_InvalidateRun(client);
 		return true;
@@ -741,6 +744,21 @@ bool IsClientLocationCreator(int client, int id)
 	
 	return StrEqual(clientName, loc.locationCreator);
 } 
+
+void GetLastPositionAtFullCrouchSpeed(int client, float origin[2])
+{
+	// m_vecLastPositionAtFullCrouchSpeed is right after m_flDuckSpeed.
+	int baseOffset = FindSendPropInfo("CBasePlayer", "m_flDuckSpeed");
+	origin[0] = GetEntDataFloat(client, baseOffset + 4);
+	origin[1] = GetEntDataFloat(client, baseOffset + 8);
+}
+
+void SetLastPositionAtFullCrouchSpeed(int client, float origin[2])
+{
+	int baseOffset = FindSendPropInfo("CBasePlayer", "m_flDuckSpeed");
+	SetEntDataFloat(client, baseOffset + 4, origin[0]);
+	SetEntDataFloat(client, baseOffset + 8, origin[1]);
+}
 
 // ====[ PRIVATE ]====
 
