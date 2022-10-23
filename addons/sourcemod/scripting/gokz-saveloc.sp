@@ -23,7 +23,7 @@ public Plugin myinfo =
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-saveloc.txt"
-
+#define LOADLOC_INVALIDATE_DURATION 1.0
 #define MAX_LOCATION_NAME_LENGTH 32
 
 enum struct Location {
@@ -147,6 +147,7 @@ ArrayList gA_Locations;
 bool gB_LocMenuOpen[MAXPLAYERS + 1];
 bool gB_UsedLoc[MAXPLAYERS + 1];
 int gI_MostRecentLocation[MAXPLAYERS + 1];
+float gF_LastLoadlocTime[MAXPLAYERS + 1];
 
 bool gB_GOKZHUD;
 
@@ -200,6 +201,11 @@ public void OnMapStart()
 
 // =====[ CLIENT EVENTS ]=====
 
+public void OnClientPutInServer(int client)
+{
+	gF_LastLoadlocTime[client] = 0.0;
+}
+
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
@@ -222,6 +228,10 @@ public Action GOKZ_OnTimerStart(int client, int course)
 {
 	CloseLocMenu(client);
 	gB_UsedLoc[client] = false;
+	if (GetGameTime() < gF_LastLoadlocTime[client] + LOADLOC_INVALIDATE_DURATION)
+	{
+		return Plugin_Stop;
+	}
 	return Plugin_Continue;
 }
 
@@ -347,7 +357,10 @@ public Action Command_LoadLoc(int client, int args)
 		
 		if (IsValidLocationId(id))
 		{
-			LoadLocation(client, id);
+			if (LoadLocation(client, id))
+			{
+				gF_LastLoadlocTime[client] = GetGameTime();
+			}
 		}
 		else
 		{
