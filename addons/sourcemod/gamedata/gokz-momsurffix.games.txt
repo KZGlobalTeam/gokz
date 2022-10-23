@@ -47,22 +47,6 @@
 			"CTraceFilterSimple::size"								"16"
 		}
 		
-		"Addresses"
-		{
-			"CGameMovement::TryPlayerMove_Start"
-			{
-				"windows"
-				{
-					"signature"	"CGameMovement::TryPlayerMove"
-				}
-				"linux"
-				{
-					"signature" "CGameMovement::TryPlayerMove"
-				}
-				"offset" "0"
-			}
-		}
-		
 		"Offsets"
 		{
 			"OSType"
@@ -340,7 +324,7 @@
 				"windows"
 				{
 					"signature"	"CGameMovement::TryPlayerMove"
-					"read" "700"
+					"read" "718"
 				}
 				"linux"
 				{
