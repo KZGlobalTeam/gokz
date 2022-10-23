@@ -280,7 +280,7 @@ void OnTimerStart_JoinTeam(int client)
 	hasSavedPosition[client] = false;
 }
 
-void JoinTeam(int client, int newTeam, bool restorePos)
+void JoinTeam(int client, int newTeam, bool restorePos, bool forceBroadcast = false)
 {
 	KZPlayer player = KZPlayer(client);
 	int currentTeam = GetClientTeam(client);
@@ -333,6 +333,10 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 			TeleportPlayer(client, spawnOrigin, spawnAngles);
 		}
 		hasSavedPosition[client] = false;
+		Call_GOKZ_OnJoinTeam(client, newTeam);
+	}
+	else if (forceBroadcast)
+	{
 		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
 }

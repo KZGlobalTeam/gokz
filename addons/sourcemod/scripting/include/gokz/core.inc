@@ -1434,11 +1434,12 @@ native bool GOKZ_GetValidJump(int client);
 /**
  * Has a player switch to a team via GOKZ Core.
  *
- * @param client		Client index.
- * @param team			Which team to switch to.
- * @param restorePos	Whether to restore saved position if leaving spectators.
+ * @param client			Client index.
+ * @param team				Which team to switch to.
+ * @param restorePos		Whether to restore saved position if leaving spectators.
+ * @param forceBroadcast	Force JoinTeam forward calling even if client's team did not change.
  */
-native void GOKZ_JoinTeam(int client, int team, bool restorePos = true);
+native void GOKZ_JoinTeam(int client, int team, bool restorePos = true, bool forceBroadcast = false);
 
 
 
