@@ -30,7 +30,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Records runs to disk and allows playback using bots", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-replays.txt"

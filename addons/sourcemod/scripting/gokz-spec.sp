@@ -19,7 +19,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides easy ways to spectate players", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-spec.txt"
