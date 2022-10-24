@@ -595,9 +595,16 @@ void OnMapStart_FixMissingSpawns()
 
 // =====[ SAFE MODE ]=====
 
-void ToggleSafeGuard(int client)
+void ToggleNubSafeGuard(int client)
 {
-	GOKZ_SetCoreOption(client, Option_Safeguard, (GOKZ_GetCoreOption(client, Option_Safeguard) + 1) % SAFEGUARD_COUNT);
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) == Safeguard_EnabledNUB)
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_Disabled);
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_EnabledNUB);
+	}
 }
 
 void ToggleProSafeGuard(int client)
