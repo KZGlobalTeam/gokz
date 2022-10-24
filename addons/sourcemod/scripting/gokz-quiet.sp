@@ -28,6 +28,7 @@ public Plugin myinfo =
 
 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 #define BLANK_SOUNDSCAPEINDEX 482
+#define EFFECT_IMPACT 8
 
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
@@ -47,11 +48,20 @@ public void OnPluginStart()
 {
 	AddNormalSoundHook(Hook_NormalSound);
 	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
+	AddTempEntHook("EffectDispatch", Hook_EffectDispatch);
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
 	
 	RegisterCommands();
+
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client))
+		{
+			OnJoinTeam_HidePlayers(client, GetClientTeam(client));
+		}
+	}
 }
 
 public void OnAllPluginsLoaded()
@@ -162,18 +172,34 @@ public Action OnSetTransmitClient(int entity, int client)
 
 public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sample[PLATFORM_MAX_PATH], int& entity, int& channel, float& volume, int& level, int& pitch, int& flags, char soundEntry[PLATFORM_MAX_PATH], int& seed)
 {
-	if (entity > MAXPLAYERS)
+	if (StrContains(sample, "Player.EquipArmor") != -1 || StrContains(sample, "BaseCombatCharacter.AmmoPickup") != -1)
 	{
-		return Plugin_Continue;
+		// When the sound is emitted, the owner of these entities are not set yet.
+		// Hence we cannot do the entity parent stuff below.
+		// In that case, we just straight up block armor and ammo pickup sounds.
+		return Plugin_Stop;
 	}
-
+	int ent = entity;
+	while (ent > MAXPLAYERS)
+	{
+		// Block some gun and knife sounds by trying to find its parent entity. 
+		ent = GetEntPropEnt(ent, Prop_Send, "moveparent");
+		if (ent < MAXPLAYERS)
+		{
+			break;
+		}
+		else if (ent == -1)
+		{
+			return Plugin_Continue;
+		}
+	}
 	int numNewClients = 0;
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = clients[i];
 		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
-			|| entity == client
-			|| entity == GetObserverTarget(client))
+			|| ent == client
+			|| ent == GetObserverTarget(client))
 		{
 			clients[numNewClients] = client;
 			numNewClients++;
@@ -251,6 +277,64 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 	return Plugin_Stop;
 }
 
+public Action Hook_EffectDispatch(const char[] te_name, const int[] players, int numClients, float delay)
+{
+	// Block bullet impact effects.
+	int effIndex = TE_ReadNum("m_iEffectName");
+	if (effIndex != EFFECT_IMPACT)
+	{
+		return Plugin_Continue;
+	}
+	int newClients[MAXPLAYERS], newTotal = 0;
+	for (int i = 0; i < numClients; i++)
+	{
+		int client = players[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
+		{
+			newClients[newTotal] = client;
+			newTotal++;
+		}
+	}
+	// Noone wants the sound
+	if (newTotal == 0)
+	{
+		return Plugin_Stop;
+	}
+
+	// Nothing's changed, let the engine handle it.
+	if (newTotal == numClients)
+	{
+		return Plugin_Continue;
+	}
+	float origin[3], start[3];
+	origin[0] = TE_ReadFloat("m_vOrigin.x");
+	origin[1] = TE_ReadFloat("m_vOrigin.y");
+	origin[2] = TE_ReadFloat("m_vOrigin.z");
+	start[0] = TE_ReadFloat("m_vStart.x");
+	start[1] = TE_ReadFloat("m_vStart.y");
+	start[2] = TE_ReadFloat("m_vStart.z");
+	int flags = TE_ReadNum("m_fFlags");
+	float scale = TE_ReadFloat("m_flScale");
+	int surfaceProp = TE_ReadNum("m_nSurfaceProp");
+	int damageType = TE_ReadNum("m_nDamageType");
+	int entindex = TE_ReadNum("entindex");
+	int positionsAreRelativeToEntity = TE_ReadNum("m_bPositionsAreRelativeToEntity");
+	
+	TE_Start("EffectDispatch");
+	TE_WriteNum("m_iEffectName", effIndex);
+	TE_WriteFloatArray("m_vOrigin.x", origin, 3);
+	TE_WriteFloatArray("m_vStart.x", start, 3);
+	TE_WriteFloat("m_flScale", scale);
+	TE_WriteNum("m_nSurfaceProp", surfaceProp);
+	TE_WriteNum("m_nDamageType", damageType);
+	TE_WriteNum("entindex", entindex);
+	TE_WriteNum("m_bPositionsAreRelativeToEntity", positionsAreRelativeToEntity);
+	TE_WriteNum("m_fFlags", flags);
+	
+	// Send the TE and stop the engine from processing its own.
+	TE_Send(newClients, newTotal, delay);
+	return Plugin_Stop;
+}
 
 
 // =====[ STOP SOUNDS ]=====
