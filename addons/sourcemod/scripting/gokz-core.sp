@@ -384,6 +384,13 @@ public Action OnNormalSound(int clients[MAXPLAYERS], int &numClients, char sampl
 
 public void OnEntityCreated(int entity, const char[] classname)
 {
+	// Don't react to player related entities
+	if (StrEqual(classname, "predicted_viewmodel") || StrEqual(classname, "item_assaultsuit")
+		|| StrEqual(classname, "cs_bot") || StrEqual(classname, "player")
+		|| StrContains(classname, "weapon") != -1)
+	{
+		return;
+	}
 	SDKHook(entity, SDKHook_Spawn, OnEntitySpawned);
 	SDKHook(entity, SDKHook_SpawnPost, OnEntitySpawnedPost);
 	OnEntityCreated_Triggerfix(entity, classname);

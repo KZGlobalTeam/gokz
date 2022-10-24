@@ -11,6 +11,7 @@ public int Native_ForceUpdateTPMenu(Handle plugin, int numParams)
 	SetForceUpdateTPMenu(GetNativeCell(1));
 	return 0;
 }
+
 public int Native_GetMenuShowing(Handle plugin, int numParams)
 {
 	return view_as<int>(gB_MenuShowing[GetNativeCell(1)]);

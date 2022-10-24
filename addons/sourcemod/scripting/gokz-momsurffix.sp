@@ -37,9 +37,11 @@ enum OSType
 OSType gOSType;
 EngineVersion gEngineVersion;
 
-#define CUSTOM_ASSERTION_FAILSTATE
-#define FAILSTATE_FUNC SetFailStateCustom
+#define ASSERTUTILS_FAILSTATE_FUNC SetFailStateCustom
+#define MEMUTILS_PLUGINENDCALL
 #include "glib/memutils"
+#undef MEMUTILS_PLUGINENDCALL
+
 #include "momsurffix/utils.sp"
 #include "momsurffix/baseplayer.sp"
 #include "momsurffix/gametrace.sp"
@@ -50,22 +52,27 @@ ConVar gBounce;
 float vec3_origin[3] = {0.0, 0.0, 0.0};
 bool gBasePlayerLoadedTooEarly;
 
-PatchHandler gASMPatch;
-Handle gStoreToAddressFast;
-Address gTryPlayerMoveStart;
-
 #if defined DEBUG_PROFILE
 #include "profiler"
-#define PROF_START() if(gProf) gProf.Start()
-#define PROF_STOP(%1)%2; if(gProf)\
-{\
-	gProf.Stop();\
-	Prof_Check(%1);\
-}
-
 Profiler gProf;
 ArrayList gProfData;
 float gProfTime;
+
+void PROF_START()
+{
+	if(gProf)
+		gProf.Start();
+}
+
+void PROF_STOP(int idx)
+{
+	if(gProf)
+	{
+		gProf.Stop();
+		Prof_Check(idx);
+	}
+}
+
 #else
 #define PROF_START%1;
 #define PROF_STOP%1;
@@ -100,7 +107,6 @@ public void OnPluginStart()
 	InitGameMovement(gd);
 	
 	SetupDhooks(gd);
-	SetupASMOptimizations(gd);
 	
 	delete gd;
 }
@@ -189,48 +195,6 @@ public Action Prof_Check_Timer(Handle timer, int client)
 	delete gProfData;
 }
 #endif
-
-void SetupASMOptimizations(GameData gd)
-{
-	//CGameMovement::TryPlayerMove_Start
-	gTryPlayerMoveStart = gd.GetAddress("CGameMovement::TryPlayerMove_Start");
-	ASSERT_MSG(gTryPlayerMoveStart, "Can't find start of the \"CGameMovement::TryPlayerMove\" function.");
-	
-	gASMPatch = PatchHandler(gTryPlayerMoveStart + ASM_START_OFFSET);
-	gASMPatch.Save(ASM_PATCH_LEN);
-	
-	Address start = gASMPatch.Address;
-	
-	/*StoreToAddressFast asm:
-	*	push ebp
-	*	mov ebp, esp
-	*	
-	*	mov eax, [ebp + 12]
-	*	mov ecx, [ebp + 8]
-	*	mov [ecx], eax
-	*	
-	*	mov esp, ebp
-	*	pop ebp
-	*	ret 8
-	*/
-	
-	StoreToAddress(start, 0x8B_EC_8B_55, NumberType_Int32);
-	StoreToAddress(start + 4, 0x4D_8B_0C_45, NumberType_Int32);
-	StoreToAddress(start + 8, 0x8B_01_89_08, NumberType_Int32);
-	StoreToAddress(start + 12, 0x08_C2_5D_E5, NumberType_Int32);
-	StoreToAddress(start + 16, 0x00, NumberType_Int8);
-	
-	//StoreToAddressFast
-	StartPrepSDKCall(SDKCall_Static);
-	
-	PrepSDKCall_SetAddress(start);
-	PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
-	PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
-	PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
-	
-	gStoreToAddressFast = EndPrepSDKCall();
-	ASSERT(gStoreToAddressFast);
-}
 
 void ValidateGameAndOS(GameData gd)
 {
@@ -345,7 +309,13 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 				VectorCopy(view_as<float>({0.0, 0.0, 0.0}), valid_plane);
 				
 				float offset[3], offset_mins[3], offset_maxs[3], buff[3];
-				Ray_t ray = Ray_t();
+				static Ray_t ray;
+
+				// Keep this variable allocated only once
+				// since ray.Init should take care of removing any left garbage values
+				if(ray.Address == Address_Null)
+					ray = Ray_t();
+
 				for(i = 0; i < 3; i++)
 				{
 					for(j = 0; j < 3; j++)
@@ -413,7 +383,6 @@ int TryPlayerMove(CGameMovement pThis, Vector pFirstDest, CGameTrace pFirstTrace
 						}
 					}
 				}
-				ray.Free();
 				
 				if(valid_planes != 0 && !CloseEnough(valid_plane, view_as<float>({0.0, 0.0, 0.0})))
 				{
@@ -669,12 +638,20 @@ stock bool CloseEnoughFloat(float a, float b, float eps = FLT_EPSILON)
 
 public void SetFailStateCustom(const char[] fmt, any ...)
 {
-	char buff[ASSERT_FMT_STRING_LEN];
+	char buff[512];
 	VFormat(buff, sizeof(buff), fmt, 2);
 	
 	CleanUpUtils();
 	
-	SetFailState(buff);
+	char ostype[32];
+	switch(gOSType)
+	{
+		case OSLinux:	ostype = "LIN";
+		case OSWindows:	ostype = "WIN";
+		default:		ostype = "UNK";
+	}
+
+	SetFailState("[%s | %i] %s", ostype, gEngineVersion, buff);
 }
 
 // 0-2 are axial planes
@@ -706,7 +683,7 @@ stock bool IsValidMovementTrace(CGameMovement pThis, CGameTrace tr)
 	
 	CGameTrace stuck = CGameTrace();
 	
-	TracePlayerBBox(pThis, tr.endpos, tr.endpos, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, stuck)
+	TracePlayerBBox(pThis, tr.endpos, tr.endpos, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, stuck);
 	if(stuck.startsolid || !CloseEnoughFloat(stuck.fraction, 1.0))
 	{
 		stuck.Free();
@@ -741,26 +718,5 @@ stock void UTIL_TraceRay(Ray_t ray, int mask, CGameMovement gm, int collisionGro
 		TraceRay(ray, mask, filter, trace);
 		
 		filter.Free();
-	}
-}
-
-//Faster then native StoreToAddress by ~45 times.
-stock void StoreToAddressFast(Address addr, any data)
-{
-	ASSERT(gStoreToAddressFast);
-	
-	int ret = SDKCall(gStoreToAddressFast, addr, data);
-	ASSERT(ret == data);
-}
-
-stock void StoreToAddressCustom(Address addr, any data, NumberType type)
-{
-	if (gStoreToAddressFast && type == NumberType_Int32)
-	{
-		StoreToAddressFast(addr, data);
-	}
-	else
-	{
-		StoreToAddress(addr, view_as<int>(data), type);
 	}
 }

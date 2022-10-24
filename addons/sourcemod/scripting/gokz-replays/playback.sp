@@ -61,6 +61,16 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // Returns the client index of the replay bot, or -1 otherwise
 int LoadReplayBot(int client, char[] path, int timeType = -1)
 {
+	// Safeguard Check
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return -1;
+		}
+	}
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
@@ -260,7 +270,8 @@ void OnClientPutInServer_Playback(int client)
 			botInGame[bot] = true;
 			botClient[bot] = client;
 			GetClientName(client, botName[bot], sizeof(botName[]));
-			SetBotStuff(bot);
+			// The bot won't receive its weapons properly if we don't wait a frame
+			RequestFrame(SetBotStuff, bot);
 			if (IsValidClient(botCaller[bot]))
 			{
 				MakePlayerSpectate(botCaller[bot], botClient[bot]);

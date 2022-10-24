@@ -121,7 +121,7 @@ bool IsReplayReadyToSend(int client, int course, int timeType, float time)
 
 public void SendReplay(int client)
 {
-	DataPack dp;
+	DataPack dp = new DataPack();
 	dp.WriteString(deleteRecord[client] ? storedReplayPath[client] : "");
 	GlobalAPI_CreateReplayForRecordId(SendReplayCallback, dp, lastRecordId[client], storedReplayPath[client]);
 	lastRecordId[client] = -1;
