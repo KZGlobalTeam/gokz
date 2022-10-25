@@ -168,6 +168,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_MapTriggers(client);
 	OnClientPutInServer_Triggerfix(client);
 	OnClientPutInServer_Noclip(client);
+	OnClientPutInServer_Turnbinds(client);
 	HookClientEvents(client);
 }
 
