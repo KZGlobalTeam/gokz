@@ -61,6 +61,7 @@ public void OnPluginStart()
 	CreateGlobalForwards();
 	RegisterCommands();
 	
+	OnPluginStart_JumpTracking();
 	OnPluginStart_JumpValidating();
 }
 
@@ -217,4 +218,4 @@ static void HookClientEvents(int client)
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
 	SDKHook(client, SDKHook_TouchPost, SDKHook_Touch_CallBack);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
-} 
+}
