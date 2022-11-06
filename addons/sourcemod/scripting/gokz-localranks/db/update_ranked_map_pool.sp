@@ -30,7 +30,7 @@ void DB_UpdateRankedMapPool(int client)
 		return;
 	}
 
-	char map[33];
+	char map[256];
 	int mapsCount = 0;
 
 	Transaction txn = new Transaction();
@@ -56,10 +56,10 @@ void DB_UpdateRankedMapPool(int client)
 		{
 			case DatabaseType_SQLite:
 			{
-				char updateQuery[256];
+				char updateQuery[512];
 				gH_DB.Format(updateQuery, sizeof(updateQuery), sqlite_maps_updateranked, 1, map);
 
-				char insertQuery[256];
+				char insertQuery[512];
 				gH_DB.Format(insertQuery, sizeof(insertQuery), sqlite_maps_insertranked, 1, map);
 
 				txn.AddQuery(updateQuery);
@@ -67,7 +67,7 @@ void DB_UpdateRankedMapPool(int client)
 			}
 			case DatabaseType_MySQL:
 			{
-				char query[256];
+				char query[512];
 				gH_DB.Format(query, sizeof(query), mysql_maps_upsertranked, 1, map);
 
 				txn.AddQuery(query);
