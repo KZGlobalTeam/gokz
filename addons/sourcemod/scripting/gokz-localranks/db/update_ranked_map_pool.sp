@@ -7,7 +7,18 @@
 
 void DB_UpdateRankedMapPool(int client)
 {
-	Handle file = OpenFile(LR_CFG_MAP_POOL, "r");
+	if (g_DBType != DatabaseType_SQLite && g_DBType != DatabaseType_MySQL)
+	{
+		LogError("Unsupported database type, cannot update map pool");
+		if (IsValidClient(client))
+		{
+			// TODO Translation phrases?
+			GOKZ_PrintToChat(client, true, "{grey}There was a problem updating the map pool.", LR_CFG_MAP_POOL);
+		}
+		return;
+	}
+
+	File file = OpenFile(LR_CFG_MAP_POOL, "r");
 	if (file == null)
 	{
 		LogError("Failed to load file: \"%s\".", LR_CFG_MAP_POOL);
@@ -20,82 +31,63 @@ void DB_UpdateRankedMapPool(int client)
 	}
 
 	char map[33];
-	ArrayList maps = new ArrayList(33, 0);
+	int mapsCount = 0;
+
+	Transaction txn = new Transaction();
+
+	// Reset all maps to be unranked
+	txn.AddQuery(sql_maps_reset_mappool);
 
 	// Insert/Update maps in gokz-localranks-mappool.cfg to be ranked
-	while (ReadFileLine(file, map, sizeof(map)))
+	while (file.ReadLine(map, sizeof(map)))
 	{
 		TrimString(map);
+		String_ToLower(map, map, sizeof(map));
+
+		// Ignore blank lines and comments
 		if (map[0] == '\0' || map[0] == ';' || (map[0] == '/' && map[1] == '/'))
 		{
 			continue;
 		}
-		String_ToLower(map, map, sizeof(map));
-		maps.PushString(map);
+
+		mapsCount++;
+
+		switch (g_DBType)
+		{
+			case DatabaseType_SQLite:
+			{
+				char updateQuery[256];
+				gH_DB.Format(updateQuery, sizeof(updateQuery), sqlite_maps_updateranked, 1, map);
+
+				char insertQuery[256];
+				gH_DB.Format(insertQuery, sizeof(insertQuery), sqlite_maps_insertranked, 1, map);
+
+				txn.AddQuery(updateQuery);
+				txn.AddQuery(insertQuery);
+			}
+			case DatabaseType_MySQL:
+			{
+				char query[256];
+				gH_DB.Format(query, sizeof(query), mysql_maps_upsertranked, 1, map);
+
+				txn.AddQuery(query);
+			}
+		}
 	}
+
 	delete file;
 
-	if (maps.Length == 0)
+	if (mapsCount == 0)
 	{
-		if (client == 0)
+		GOKZ_PrintToChatAndLog(client, true, "{darkred}No maps found in file '%s'.", LR_CFG_MAP_POOL);
+
+		if (IsValidClient(client))
 		{
-			PrintToServer("No maps found in file '%s'.", LR_CFG_MAP_POOL);
-		}
-		else
-		{
-			// TODO Translation phrases?
-			GOKZ_PrintToChat(client, true, "{darkred}No maps found in file '%s'.", LR_CFG_MAP_POOL);
 			GOKZ_PlayErrorSound(client);
 		}
+
+		delete txn;
 		return;
-	}
-
-	// Create VALUES e.g. (1,'kz_map1'),(1,'kz_map2')
-	int valuesSize = maps.Length * 40;
-	char[] values = new char[valuesSize];
-	maps.GetString(0, map, sizeof(map));
-	FormatEx(values, valuesSize, "(1,'%s')", map);
-	for (int i = 1; i < maps.Length; i++)
-	{
-		maps.GetString(i, map, sizeof(map));
-		Format(values, valuesSize, "%s,(1,'%s')", values, map);
-	}
-
-	// Create query
-	int querySize = valuesSize + 128;
-	char[] query = new char[querySize];
-
-	Transaction txn = SQL_CreateTransaction();
-	// Reset all maps to be unranked
-	txn.AddQuery(sql_maps_reset_mappool);
-
-	switch (g_DBType)
-	{
-		case DatabaseType_SQLite:
-		{
-			// Create list of maps e.g. 'kz_map1','kz_map2'
-			int mapListSize = maps.Length * 36;
-			char[] mapList = new char[mapListSize];
-			maps.GetString(0, map, sizeof(map));
-			FormatEx(mapList, mapListSize, "'%s'", map);
-			for (int i = 1; i < maps.Length; i++)
-			{
-				maps.GetString(i, map, sizeof(map));
-				Format(mapList, mapListSize, "%s,'%s'", mapList, map);
-			}
-
-			// UPDATE OR IGNORE
-			FormatEx(query, querySize, sqlite_maps_updateranked, 1, mapList);
-			txn.AddQuery(query);
-			// INSERT OR IGNORE
-			FormatEx(query, querySize, sqlite_maps_insertranked, values);
-			txn.AddQuery(query);
-		}
-		case DatabaseType_MySQL:
-		{
-			FormatEx(query, querySize, mysql_maps_upsertranked, values);
-			txn.AddQuery(query);
-		}
 	}
 
 	// Pass client user ID (or -1) as data
@@ -105,9 +97,7 @@ void DB_UpdateRankedMapPool(int client)
 		data = GetClientUserId(client);
 	}
 
-	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_UpdateRankedMapPool, DB_TxnFailure_Generic, data, DBPrio_Low);
-
-	delete maps;
+	gH_DB.Execute(txn, DB_TxnSuccess_UpdateRankedMapPool, DB_TxnFailure_Generic, data);
 }
 
 public void DB_TxnSuccess_UpdateRankedMapPool(Handle db, int userid, int numQueries, Handle[] results, any[] queryData)
