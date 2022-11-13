@@ -23,7 +23,7 @@ public Plugin myinfo =
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-saveloc.txt"
-#define LOADLOC_INVALIDATE_DURATION 1.0
+#define LOADLOC_INVALIDATE_DURATION 0.12
 #define MAX_LOCATION_NAME_LENGTH 32
 
 enum struct Location {
