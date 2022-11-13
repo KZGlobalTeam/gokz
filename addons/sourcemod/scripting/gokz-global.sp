@@ -2,6 +2,7 @@
 
 #include <sdktools>
 
+#include <SteamWorks>
 #include <GlobalAPI>
 #include <gokz/anticheat>
 #include <gokz/core>
@@ -83,7 +84,10 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-global currently only supports 128 tickrate servers.");
 	}
-	
+	if (!SteamWorks_IsVACEnabled())
+	{
+		SetFailState("gokz-global currently only supports VAC-secured servers.");
+	}
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-global.phrases");
 	
