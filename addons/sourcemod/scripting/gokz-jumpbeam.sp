@@ -22,7 +22,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides option to leave behind a trail when in midair", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-jumpbeam.txt"
