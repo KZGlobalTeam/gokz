@@ -43,10 +43,14 @@ void RegisterCommands()
 	RegConsoleCmd("sm_ncnt", CommandToggleNoclipNotrigger, "[KZ] Toggle noclip-notrigger.");
 	RegConsoleCmd("+noclipnt", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
 	RegConsoleCmd("-noclipnt", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
-	RegConsoleCmd("sm_sg", CommandSafeGuard, "[KZ] Toggle safeguard.");
-	RegConsoleCmd("sm_safe", CommandSafeGuard, "[KZ] Toggle safeguard.");
-	RegConsoleCmd("sm_safeguard", CommandSafeGuard, "[KZ] Toggle safeguard.");
+	RegConsoleCmd("sm_sg", CommandNubSafeGuard, "[KZ] Toggle NUB safeguard.");
+	RegConsoleCmd("sm_safe", CommandNubSafeGuard, "[KZ] Toggle NUB safeguard.");
+	RegConsoleCmd("sm_safeguard", CommandNubSafeGuard, "[KZ] Toggle NUB safeguard.");
 	RegConsoleCmd("sm_pro", CommandProSafeGuard, "[KZ] Toggle PRO safeguard.");
+	RegConsoleCmd("kill", CommandKill);
+	RegConsoleCmd("killvector", CommandKill);
+	RegConsoleCmd("explode", CommandKill);
+	RegConsoleCmd("explodevector", CommandKill);
 }
 
 void AddCommandsListeners()
@@ -73,6 +77,17 @@ bool SwitchToModeIfAvailable(int client, int mode)
 		GOKZ_SetCoreOption(client, Option_Mode, mode);
 		return true;
 	}
+}
+
+public Action CommandKill(int client, int args)
+{
+	if (IsPlayerAlive(client) && GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+		GOKZ_PlayErrorSound(client);
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
 }
 
 public Action CommandOptions(int client, int args)
@@ -357,9 +372,9 @@ public Action CommandDisableNoclipNotrigger(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action CommandSafeGuard(int client, int args)
+public Action CommandNubSafeGuard(int client, int args)
 {
-	ToggleSafeGuard(client);
+	ToggleNubSafeGuard(client);
 	return Plugin_Handled;
 }
 
