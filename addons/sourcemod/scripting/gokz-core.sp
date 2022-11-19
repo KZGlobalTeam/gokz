@@ -200,17 +200,6 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
 }
 
-public Action OnClientCommandKeyValues(int client, KeyValues kv)
-{
-	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
-	char cmd[16];
-	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
-	{
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
 public void OnClientCookiesCached(int client)
 {
 	OnClientCookiesCached_Options(client);
