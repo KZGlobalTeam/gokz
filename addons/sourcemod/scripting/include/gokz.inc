@@ -828,12 +828,25 @@ stock bool IsSpawnValid(float origin[3])
  */
 stock void GetEntityPositions(int entity, float origin[3], float center[3], float angles[3], float distFromCenter[3])
 {
+	int ent = entity;
 	float maxs[3], mins[3];
-	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
-	GetEntPropVector(entity, Prop_Data, "m_angRotation", angles);
+	GetEntPropVector(ent, Prop_Send, "m_vecOrigin", origin);
+	// Take parent entities into account.
+	while (GetEntPropEnt(ent, Prop_Send, "moveparent") != -1)
+	{
+		ent = GetEntPropEnt(ent, Prop_Send, "moveparent");
+		float tempOrigin[3];
+		GetEntPropVector(ent, Prop_Send, "m_vecOrigin", tempOrigin);
+		for (int i = 0; i < 3; i++)
+		{
+			origin[i] += tempOrigin[i];
+		}
+	}
 	
-	GetEntPropVector(entity, Prop_Send, "m_vecMaxs", maxs);
-	GetEntPropVector(entity, Prop_Send, "m_vecMins", mins);
+	GetEntPropVector(ent, Prop_Data, "m_angRotation", angles);
+	
+	GetEntPropVector(ent, Prop_Send, "m_vecMaxs", maxs);
+	GetEntPropVector(ent, Prop_Send, "m_vecMins", mins);
 	for (int i = 0; i < 3; i++)
 	{
 		center[i] = origin[i] + (maxs[i] + mins[i]) / 2;
