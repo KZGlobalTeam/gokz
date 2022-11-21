@@ -386,6 +386,7 @@ public Action CommandRecentRecords(int client, int args)
 public Action CommandUpdateMapPool(int client, int args)
 {
 	DB_UpdateRankedMapPool(client);
+	return Plugin_Handled;
 }
 
 public Action CommandLJPB(int client, int args)

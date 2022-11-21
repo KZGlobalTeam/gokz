@@ -25,7 +25,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Tracks and outputs movement statistics", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-jumpstats.txt"
@@ -61,6 +61,7 @@ public void OnPluginStart()
 	CreateGlobalForwards();
 	RegisterCommands();
 	
+	OnPluginStart_JumpTracking();
 	OnPluginStart_JumpValidating();
 }
 
@@ -164,7 +165,7 @@ public void GOKZ_JS_OnFailstatAlways(Jump jump)
 
 public void SDKHook_StartTouch_Callback(int client, int touched) // SDKHook_StartTouchPost
 {
-	OnStartTouch_JumpTracking(client);
+	OnStartTouch_JumpTracking(client, touched);
 }
 
 public void SDKHook_Touch_CallBack(int client, int touched)
@@ -174,7 +175,7 @@ public void SDKHook_Touch_CallBack(int client, int touched)
 
 public void SDKHook_EndTouch_Callback(int client, int touched) // SDKHook_EndTouchPost
 {
-	OnEndTouch_JumpTracking(client);
+	OnEndTouch_JumpTracking(client, touched);
 }
 
 public void GOKZ_OnTeleport(int client)
@@ -217,4 +218,4 @@ static void HookClientEvents(int client)
 	SDKHook(client, SDKHook_StartTouchPost, SDKHook_StartTouch_Callback);
 	SDKHook(client, SDKHook_TouchPost, SDKHook_Touch_CallBack);
 	SDKHook(client, SDKHook_EndTouchPost, SDKHook_EndTouch_Callback);
-} 
+}

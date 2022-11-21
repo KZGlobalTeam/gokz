@@ -33,7 +33,11 @@ void OnOptionChanged_Menu(int client, HUDOption option)
 
 void OnTimerStart_Menu(int client)
 {
-	CancelGOKZHUDMenu(client);
+	// Prevent the menu from getting cancelled every tick if player use start timer button zone.
+	if (GOKZ_GetTime(client) > 0.0)
+	{
+		CancelGOKZHUDMenu(client);
+	}
 }
 
 void OnTimerEnd_Menu(int client)
@@ -73,5 +77,9 @@ void OnJoinTeam_Menu(int client)
 
 void OnStartPositionSet_Menu(int client)
 {
-	CancelGOKZHUDMenu(client);
+	// Prevent the menu from getting cancelled every tick if player use start timer button zone.
+	if (GOKZ_GetTime(client) > 0.0)
+	{
+		CancelGOKZHUDMenu(client);
+	}
 } 

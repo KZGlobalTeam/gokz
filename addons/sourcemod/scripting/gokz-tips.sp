@@ -22,7 +22,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Prints tips to chat periodically based on loaded plugins", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-tips.txt"
@@ -253,6 +253,7 @@ public Action Timer_PrintTip(Handle timer)
 	}
 
 	gI_CurrentTip = NextIndex(gI_CurrentTip, g_TipPhrases.Length);
+	return Plugin_Continue;
 }
 
 

@@ -285,7 +285,7 @@ static bool IsValueInRange(OptionType type, any value, any minValue, any maxValu
 	}
 }
 
-static bool LoadOption(int client, const char[] option)
+static void LoadOption(int client, const char[] option)
 {
 	char valueString[100];
 	Cookie cookie = GetOptionProp(option, OptionProp_Cookie);
@@ -413,6 +413,24 @@ static void PrintOptionChangeMessage(int client, Option option, int newValue)
 				case VirtualButtonIndicators_Enabled:
 				{
 					GOKZ_PrintToChat(client, true, "%t", "Option - Virtual Button Indicators - Enable");
+				}
+			}
+		}
+		case Option_Safeguard:
+		{
+			switch (newValue)
+			{
+				case Safeguard_Disabled:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Safeguard - Disable");
+				}
+				case Safeguard_EnabledNUB:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Safeguard - Enable (NUB)");
+				}
+				case Safeguard_EnabledPRO:
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Option - Safeguard - Enable (PRO)");
 				}
 			}
 		}

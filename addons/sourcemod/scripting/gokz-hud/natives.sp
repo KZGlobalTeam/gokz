@@ -6,4 +6,5 @@ void CreateNatives()
 public int Native_ForceUpdateTPMenu(Handle plugin, int numParams)
 {
 	SetForceUpdateTPMenu(GetNativeCell(1));
+	return 0;
 }

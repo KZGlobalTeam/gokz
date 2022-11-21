@@ -73,12 +73,6 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool playSound
 		return false;
 	}
 
-	// Unpause the player, if they're paused
-	if (GOKZ_GetPaused(client))
-	{
-		GOKZ_Resume(client);
-	}
-	
 	// Prevent noclip exploit
 	SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 

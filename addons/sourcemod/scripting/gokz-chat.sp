@@ -23,7 +23,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Handles client-triggered chat messages", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-chat.txt"
@@ -305,4 +305,5 @@ public int Native_SetChatTag(Handle plugin, int numParams)
 	}
 	
 	GetNativeString(3, gC_PlayerTagColors[client], sizeof(gC_PlayerTagColors[]));
+	return 0;
 }

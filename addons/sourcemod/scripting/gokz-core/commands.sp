@@ -43,6 +43,14 @@ void RegisterCommands()
 	RegConsoleCmd("sm_ncnt", CommandToggleNoclipNotrigger, "[KZ] Toggle noclip-notrigger.");
 	RegConsoleCmd("+noclipnt", CommandEnableNoclipNotrigger, "[KZ] Noclip-notrigger on.");
 	RegConsoleCmd("-noclipnt", CommandDisableNoclipNotrigger, "[KZ] Noclip-notrigger off.");
+	RegConsoleCmd("sm_sg", CommandNubSafeGuard, "[KZ] Toggle NUB safeguard.");
+	RegConsoleCmd("sm_safe", CommandNubSafeGuard, "[KZ] Toggle NUB safeguard.");
+	RegConsoleCmd("sm_safeguard", CommandNubSafeGuard, "[KZ] Toggle NUB safeguard.");
+	RegConsoleCmd("sm_pro", CommandProSafeGuard, "[KZ] Toggle PRO safeguard.");
+	RegConsoleCmd("kill", CommandKill);
+	RegConsoleCmd("killvector", CommandKill);
+	RegConsoleCmd("explode", CommandKill);
+	RegConsoleCmd("explodevector", CommandKill);
 }
 
 void AddCommandsListeners()
@@ -59,9 +67,27 @@ bool SwitchToModeIfAvailable(int client, int mode)
 	}
 	else
 	{
+		// Safeguard Check
+		if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+			GOKZ_PlayErrorSound(client);
+			return false;
+		}
 		GOKZ_SetCoreOption(client, Option_Mode, mode);
 		return true;
 	}
+}
+
+public Action CommandKill(int client, int args)
+{
+	if (IsPlayerAlive(client) && GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+		GOKZ_PlayErrorSound(client);
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
 }
 
 public Action CommandOptions(int client, int args)
@@ -80,10 +106,17 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	{
 		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
 		{
+			SendFakeTeamEvent(client);
 			return Plugin_Handled;
 		}
 	}
-	
+	else if (IsPlayerAlive(client) && GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Safeguard - Blocked");
+		GOKZ_PlayErrorSound(client);
+		SendFakeTeamEvent(client);
+		return Plugin_Handled;
+	}
 	GOKZ_JoinTeam(client, team);
 	return Plugin_Handled;
 }
@@ -204,10 +237,7 @@ public Action CommandClearStartPos(int client, int args)
 
 public Action CommandMain(int client, int args)
 {
-	if (!TeleportToCourseStart(client, 0))
-	{
-		GOKZ_PrintToChat(client, true, "%t", "No Start Found");
-	}
+	TeleportToCourseStart(client, 0);
 	return Plugin_Handled;
 }
 
@@ -215,10 +245,7 @@ public Action CommandBonus(int client, int args)
 {
 	if (args == 0)
 	{  // Go to Bonus 1
-		if (!TeleportToCourseStart(client, 1))
-		{
-			GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", 1);
-		}
+		TeleportToCourseStart(client, 1);
 	}
 	else
 	{  // Go to specified Bonus #
@@ -227,10 +254,7 @@ public Action CommandBonus(int client, int args)
 		int bonus = StringToInt(argBonus);
 		if (GOKZ_IsValidCourse(bonus, true))
 		{
-			if (!TeleportToCourseStart(client, bonus))
-			{
-				GOKZ_PrintToChat(client, true, "%t", "No Start Found (Bonus)", bonus);
-			}
+			TeleportToCourseStart(client, bonus);
 		}
 		else
 		{
@@ -348,3 +372,14 @@ public Action CommandDisableNoclipNotrigger(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action CommandNubSafeGuard(int client, int args)
+{
+	ToggleNubSafeGuard(client);
+	return Plugin_Handled;
+}
+
+public Action CommandProSafeGuard(int client, int args)
+{
+	ToggleProSafeGuard(client);
+	return Plugin_Handled;
+}

@@ -23,7 +23,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides HUD and UI features", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-hud.txt"
@@ -184,6 +184,7 @@ public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) //
 public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast) // player_death pre hook
 {
 	event.BroadcastDisabled = true; // Block death notices
+	return Plugin_Continue;
 }
 
 public void GOKZ_OnJoinTeam(int client, int team)

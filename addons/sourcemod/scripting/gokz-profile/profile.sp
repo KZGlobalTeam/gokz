@@ -83,12 +83,12 @@ public int MenuHandler_Profile(Menu menu, MenuAction action, int param1, int par
 		else if (StrEqual(info, ITEM_INFO_RANK, false))
 		{
 			ShowRankInfo(param1);
-			return;
+			return 0;
 		}
 		else if (StrEqual(info, ITEM_INFO_POINTS, false))
 		{
 			ShowPointsInfo(param1);
-			return;
+			return 0;
 		}
 		
 		ShowProfile(param1);
@@ -97,6 +97,7 @@ public int MenuHandler_Profile(Menu menu, MenuAction action, int param1, int par
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 
@@ -173,6 +174,7 @@ static int MenuHandler_RankInfo(Menu menu, MenuAction action, int param1, int pa
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 static void ShowPointsInfo(int client)
@@ -216,4 +218,5 @@ static int MenuHandler_PointsInfo(Menu menu, MenuAction action, int param1, int 
 	{
 		delete menu;
 	}
+	return 0;
 }

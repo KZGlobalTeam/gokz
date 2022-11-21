@@ -18,7 +18,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Lets players race against each other", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-racing.txt"

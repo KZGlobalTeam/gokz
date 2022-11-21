@@ -119,7 +119,7 @@ stock bool InitBasePlayer(GameData gd)
 	{
 		//g_pEntityList
 		g_pEntityList = view_as<CBaseEntityList>(gd.GetAddress("g_pEntityList"));
-		ASSERT_MSG(g_pEntityList.Address != Address_Null, "Can't get \"g_pEntityList\" address from gamedata.");
+		ASSERT_MSG(g_pEntityList.Address != Address_Null, "Can't get \"g_pEntityList\" address from gamedata. Gamedata needs an update.");
 		
 		//CBaseEntityList
 		ASSERT_FMT(gd.GetKeyValue("CBaseEntityList::m_EntPtrArray", buff, sizeof(buff)), "Can't get \"CBaseEntityList::m_EntPtrArray\" offset from gamedata.");

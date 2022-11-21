@@ -43,7 +43,7 @@ bool ToggleVirtualButtonsLock(int client)
 	return virtualButtonsLocked[client];
 }
 
-bool LockVirtualButtons(int client)
+void LockVirtualButtons(int client)
 {
 	virtualButtonsLocked[client] = true;
 }

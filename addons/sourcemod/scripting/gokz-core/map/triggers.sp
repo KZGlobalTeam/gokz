@@ -200,7 +200,7 @@ void OnPlayerRunCmd_MapTriggers(int client, int &buttons)
 		
 		if (touched.triggerType == TriggerType_Antibhop)
 		{
-			TouchAntibhopTrigger(touched, buttons, flags);
+			TouchAntibhopTrigger(client, touched, buttons, flags);
 		}
 		else if (touched.triggerType == TriggerType_Teleport)
 		{
@@ -523,7 +523,7 @@ void OnStartTouchGround_MapTriggers(int client)
 		TouchedTrigger touched;
 		triggerTouchList[client].GetArray(i, touched);
 		// set the touched tick to the tick that the player touches the ground.
-		touched.groundTouchTick = GetGameTickCount();
+		touched.groundTouchTick = gI_TickCount[client];
 		triggerTouchList[client].SetArray(i, touched);
 	}
 }
@@ -579,11 +579,11 @@ static void AddTriggerToTouchList(int client, int trigger, TriggerType triggerTy
 	TouchedTrigger touched;
 	touched.triggerType = triggerType;
 	touched.entRef = triggerEntRef;
-	touched.startTouchTick = GetGameTickCount();
+	touched.startTouchTick = gI_TickCount[client];
 	touched.groundTouchTick = -1;
 	if (GetEntityFlags(client) & FL_ONGROUND)
 	{
-		touched.groundTouchTick = GetGameTickCount();
+		touched.groundTouchTick = gI_TickCount[client];
 	}
 	
 	triggerTouchList[client].PushArray(touched);
@@ -632,7 +632,7 @@ static void DecrementTriggerTouchCount(int client, int trigger)
 	triggerTouchCounts[client].SetValue(szEntref, value);
 }
 
-static void TouchAntibhopTrigger(TouchedTrigger touched, int &newButtons, int flags)
+static void TouchAntibhopTrigger(int client, TouchedTrigger touched, int &newButtons, int flags)
 {
 	if (!(flags & FL_ONGROUND))
 	{
@@ -653,7 +653,7 @@ static void TouchAntibhopTrigger(TouchedTrigger touched, int &newButtons, int fl
 	AntiBhopTrigger trigger;
 	if (antiBhopTriggers.GetArray(key, trigger, sizeof(trigger)))
 	{
-		float touchTime = CalculateGroundTouchTime(touched);
+		float touchTime = CalculateGroundTouchTime(client, touched);
 		if (trigger.time == 0.0 || touchTime <= trigger.time)
 		{
 			// disable jump
@@ -703,7 +703,7 @@ static bool TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 	// NOTE: Find out if we should actually teleport.
 	if (isBhopTrigger && (flags & FL_ONGROUND))
 	{
-		float touchTime = CalculateGroundTouchTime(touched);
+		float touchTime = CalculateGroundTouchTime(client, touched);
 		if (touchTime > trigger.delay)
 		{
 			shouldTeleport = true;
@@ -728,7 +728,7 @@ static bool TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 	}
 	else if (trigger.type == TeleportType_Normal)
 	{
-		float touchTime = CalculateStartTouchTime(touched);
+		float touchTime = CalculateStartTouchTime(client, touched);
 		shouldTeleport = touchTime > trigger.delay || (trigger.delay == 0.0);
 	}
 	
@@ -793,15 +793,15 @@ static bool TouchTeleportTrigger(int client, TouchedTrigger touched, int flags)
 	return shouldTeleport;
 }
 
-static float CalculateGroundTouchTime(TouchedTrigger touched)
+static float CalculateGroundTouchTime(int client, TouchedTrigger touched)
 {
-	float result = float(GetGameTickCount() - touched.groundTouchTick) * GetTickInterval();
+	float result = float(gI_TickCount[client] - touched.groundTouchTick) * GetTickInterval();
 	return result;
 }
 
-static float CalculateStartTouchTime(TouchedTrigger touched)
+static float CalculateStartTouchTime(int client, TouchedTrigger touched)
 {
-	float result = float(GetGameTickCount() - touched.startTouchTick) * GetTickInterval();
+	float result = float(gI_TickCount[client] - touched.startTouchTick) * GetTickInterval();
 	return result;
 }
 

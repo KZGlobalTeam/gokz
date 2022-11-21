@@ -8,7 +8,7 @@
 #endinput
 #endif
 #define _gokz_included_
-
+#include <cstrike>
 #include <movement>
 
 #include <gokz/version>
@@ -32,6 +32,7 @@ enum ObsMode
 
 // =====[ CONSTANTS ]=====
 
+#define GOKZ_SOURCE_URL "https://github.com/KZGlobalTeam/gokz"
 #define GOKZ_UPDATER_BASE_URL "http://updater.gokz.org/v2/"
 #define GOKZ_COLLISION_GROUP_STANDARD 2
 #define GOKZ_COLLISION_GROUP_NOTRIGGER 1

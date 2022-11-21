@@ -290,6 +290,7 @@ public int MenuHandler_JumpStatsMode(Menu menu, MenuAction action, int param1, i
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpStatsBlockType(Menu menu, MenuAction action, int param1, int param2)
@@ -307,6 +308,7 @@ public int MenuHandler_JumpStatsBlockType(Menu menu, MenuAction action, int para
 	{
 		delete menu;
 	}
+	return 0;
 }
 
 public int MenuHandler_JumpStatsSubmenu(Menu menu, MenuAction action, int param1, int param2)
@@ -319,4 +321,5 @@ public int MenuHandler_JumpStatsSubmenu(Menu menu, MenuAction action, int param1
 	{
 		delete menu;
 	}
+	return 0;
 }

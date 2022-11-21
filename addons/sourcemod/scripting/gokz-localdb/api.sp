@@ -122,4 +122,5 @@ public int Native_IsCheater(Handle plugin, int numParams)
 public int Native_SetCheater(Handle plugin, int numParams)
 {
 	DB_SetCheater(GetNativeCell(1), GetNativeCell(2));
+	return 0;
 } 
