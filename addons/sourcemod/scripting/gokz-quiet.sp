@@ -29,6 +29,7 @@ public Plugin myinfo =
 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 #define BLANK_SOUNDSCAPEINDEX 482
 #define EFFECT_IMPACT 8
+#define EFFECT_KNIFESLASH 2
 
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
@@ -281,7 +282,7 @@ public Action Hook_EffectDispatch(const char[] te_name, const int[] players, int
 {
 	// Block bullet impact effects.
 	int effIndex = TE_ReadNum("m_iEffectName");
-	if (effIndex != EFFECT_IMPACT)
+	if (effIndex != EFFECT_IMPACT && effIndex != EFFECT_KNIFESLASH)
 	{
 		return Plugin_Continue;
 	}
