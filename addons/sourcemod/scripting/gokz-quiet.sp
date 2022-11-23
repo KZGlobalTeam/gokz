@@ -50,6 +50,7 @@ public void OnPluginStart()
 	AddNormalSoundHook(Hook_NormalSound);
 	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
 	AddTempEntHook("EffectDispatch", Hook_EffectDispatch);
+	HookUserMessage(GetUserMessageId("WeaponSound"), Hook_WeaponSound, true);
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
@@ -169,6 +170,83 @@ public Action OnSetTransmitClient(int entity, int client)
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public Action Hook_WeaponSound(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
+{
+	int newClients[MAXPLAYERS], newTotal = 0;
+	int entidx = msg.ReadInt("entidx");
+	for (int i = 0; i < playersNum; i++)
+	{
+		int client = players[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
+			|| entidx == client
+			|| entidx == GetObserverTarget(client))
+		{
+			newClients[newTotal] = client;
+			newTotal++;
+		}
+	}
+
+	// Nothing's changed, let the engine handle it.
+	if (newTotal == playersNum)
+	{
+		return Plugin_Continue;
+	}
+
+	// Only way to modify the recipient list is to RequestFrame and create our own user message.
+	char path[PLATFORM_MAX_PATH];
+	msg.ReadString("sound", path, sizeof(path));
+	int flags = USERMSG_BLOCKHOOKS;
+	if (reliable)
+	{
+		flags |= USERMSG_RELIABLE;
+	}
+	if (init)
+	{
+		flags |= USERMSG_INITMSG;
+	}
+
+	DataPack dp = new DataPack();
+	dp.WriteCell(msg_id);
+	dp.WriteCell(newTotal);
+	dp.WriteCellArray(newClients, newTotal);
+	dp.WriteCell(flags);
+	dp.WriteCell(entidx);
+	dp.WriteFloat(msg.ReadFloat("origin_x"));
+	dp.WriteFloat(msg.ReadFloat("origin_y"));
+	dp.WriteFloat(msg.ReadFloat("origin_z"));
+	dp.WriteString(path);
+	dp.WriteFloat(msg.ReadFloat("timestamp"));
+
+	RequestFrame(RequestFrame_WeaponSound, dp);
+	return Plugin_Handled;
+}
+
+public void RequestFrame_WeaponSound(DataPack dp)
+{
+	dp.Reset();
+
+	UserMsg msg_id = dp.ReadCell();
+	int newTotal = dp.ReadCell();
+	int newClients[MAXPLAYERS];	
+	dp.ReadCellArray(newClients, newTotal);
+	int flags = dp.ReadCell();
+
+	Protobuf newMsg = view_as<Protobuf>(StartMessageEx(msg_id, newClients, newTotal, flags));
+
+	newMsg.AddInt("entidx", dp.ReadCell());
+	newMsg.AddFloat("origin_x", dp.ReadFloat());
+	newMsg.AddFloat("origin_y", dp.ReadFloat());
+	newMsg.AddFloat("origin_z", dp.ReadFloat());
+	char path[PLATFORM_MAX_PATH];
+	dp.ReadString(path, sizeof(path));
+	newMsg.AddString("sound", path);
+	newMsg.AddFloat("timestamp", dp.ReadFloat());
+
+	EndMessage();
+
+	delete dp;
 }
 
 public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sample[PLATFORM_MAX_PATH], int& entity, int& channel, float& volume, int& level, int& pitch, int& flags, char soundEntry[PLATFORM_MAX_PATH], int& seed)
