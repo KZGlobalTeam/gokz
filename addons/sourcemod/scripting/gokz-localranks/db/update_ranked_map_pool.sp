@@ -10,11 +10,10 @@ void DB_UpdateRankedMapPool(int client)
 	File file = OpenFile(LR_CFG_MAP_POOL, "r");
 	if (file == null)
 	{
-		LogError("Failed to load file: \"%s\".", LR_CFG_MAP_POOL);
+		LogError("Failed to load file: '%s'.", LR_CFG_MAP_POOL);
 		if (IsValidClient(client))
 		{
-			// TODO Translation phrases?
-			GOKZ_PrintToChat(client, true, "{grey}There was a problem opening file '%s'.", LR_CFG_MAP_POOL);
+			GOKZ_PrintToChat(client, true, "%t", "Ranked Map Pool - Error");
 		}
 		return;
 	}
@@ -68,10 +67,11 @@ void DB_UpdateRankedMapPool(int client)
 
 	if (mapsCount == 0)
 	{
-		GOKZ_PrintToChatAndLog(client, true, "{darkred}No maps found in file '%s'.", LR_CFG_MAP_POOL);
+		LogError("No maps found in file: '%s'.", LR_CFG_MAP_POOL);
 
 		if (IsValidClient(client))
 		{
+			GOKZ_PrintToChat(client, true, "%t", "Ranked Map Pool - No Maps In File");
 			GOKZ_PlayErrorSound(client);
 		}
 
@@ -95,8 +95,7 @@ public void DB_TxnSuccess_UpdateRankedMapPool(Handle db, int userid, int numQuer
 	if (IsValidClient(client))
 	{
 		LogMessage("The ranked map pool was updated by %L.", client);
-		// TODO Translation phrases?
-		GOKZ_PrintToChat(client, true, "{grey}The ranked map pool was updated.");
+		GOKZ_PrintToChat(client, true, "%t", "Ranked Map Pool - Success");
 	}
 	else
 	{
