@@ -7,17 +7,6 @@
 
 void DB_UpdateRankedMapPool(int client)
 {
-	if (g_DBType != DatabaseType_SQLite && g_DBType != DatabaseType_MySQL)
-	{
-		LogError("Unsupported database type, cannot update map pool");
-		if (IsValidClient(client))
-		{
-			// TODO Translation phrases?
-			GOKZ_PrintToChat(client, true, "{grey}There was a problem updating the map pool.", LR_CFG_MAP_POOL);
-		}
-		return;
-	}
-
 	File file = OpenFile(LR_CFG_MAP_POOL, "r");
 	if (file == null)
 	{
