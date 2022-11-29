@@ -3,94 +3,19 @@
 #endif
 #define _memutils_included
 
-#if !defined SNAME
-#define __SNAME ""
-#else
-#define __SNAME SNAME
-#endif
+#include "glib/assertutils"
+#include "glib/addressutils"
+
+/* Compile time settings for this include. Should be defined before including this file.
+*  #define MEMUTILS_PLUGINENDCALL //This should be defined if main plugin has OnPluginEnd() forward used.
+*/
 
 #define MEM_LEN_SAFE_THRESHOLD 2000
-
-//-==ASSERTS
-#define ASSERT_FMT_STRING_LEN 512
-
-#if defined DISABLE_ASSERTION
-#define ASSERT(%1)%2;
-#define ASSERT_MSG(%1,%2)%3;
-#define ASSERT_FINAL(%1)%2;
-#define ASSERT_FINAL_MSG(%1,%2)%3;
-#elseif defined CUSTOM_ASSERTION_FAILSTATE && defined FAILSTATE_FUNC
-#define ASSERT(%1) if(!(%1)) FAILSTATE_FUNC(__SNAME..."Assertion failed: \""...#%1..."\"")
-#define ASSERT_MSG(%1,%2) if(!(%1)) FAILSTATE_FUNC(__SNAME...%2)
-#define ASSERT_FINAL(%1) if(!(%1)) SetFailState(__SNAME..."Assertion failed: \""...#%1..."\"")
-#define ASSERT_FINAL_MSG(%1,%2) if(!(%1)) SetFailState(__SNAME...%2)
-#else
-#define ASSERT(%1) if(!(%1)) SetFailState(__SNAME..."Assertion failed: \""...#%1..."\"")
-#define ASSERT_MSG(%1,%2) if(!(%1)) SetFailState(__SNAME...%2)
-#define ASSERT_FINAL(%1) ASSERT(%1)
-#define ASSERT_FINAL_MSG(%1,%2) ASSERT_MSG(%1,%2)
-#endif
-
-stock void ASSERT_FMT(bool result, char[] fmt, any ...)
-{
-#if !defined DISABLE_ASSERTION
-	if(!result)
-	{
-		char buff[ASSERT_FMT_STRING_LEN];
-		VFormat(buff, sizeof(buff), fmt, 3);
-		
-		SetFailState(__SNAME..."%s", buff);
-	}
-#endif
-}
-//ASSERS END==-
-
-//-==Operator overloadings
-stock Address operator+(Address l, int r)
-{
-	return l + view_as<Address>(r);
-}
-
-stock Address operator+(int l, Address r)
-{
-	return view_as<Address>(l) + r;
-}
-
-stock Address operator-(Address l, int r)
-{
-	return l - view_as<Address>(r);
-}
-
-stock Address operator-(int l, Address r)
-{
-	return view_as<Address>(l) - r;
-}
-
-stock Address operator*(Address l, int r)
-{
-	return l * view_as<Address>(r);
-}
-
-stock Address operator*(int l, Address r)
-{
-	return view_as<Address>(l) * r;
-}
-
-stock Address operator/(Address l, int r)
-{
-	return l / view_as<Address>(r);
-}
-
-stock Address operator/(int l, Address r)
-{
-	return view_as<Address>(l) / r;
-}
-//Operator overloadings==-
 
 //-==PatchHandling methodmap
 static StringMap gPatchStack;
 
-methodmap PatchHandler
+methodmap PatchHandler < AddressBase
 {
 	public PatchHandler(Address addr)
 	{
@@ -100,11 +25,6 @@ methodmap PatchHandler
 			gPatchStack = new StringMap();
 		
 		return view_as<PatchHandler>(addr);
-	}
-	
-	property Address Address
-	{
-		public get() { return view_as<Address>(this); }
 	}
 	
 	property any Any
@@ -144,6 +64,27 @@ methodmap PatchHandler
 		{
 			arr[i + 1] = LoadFromAddress(this.Address + i, NumberType_Int8);
 			StoreToAddress(this.Address + i, byte, NumberType_Int8);
+		}
+		
+		char buff[32];
+		IntToString(this.Any, buff, sizeof(buff));
+		gPatchStack.SetArray(buff, arr, len);
+	}
+	
+	public void PatchNSaveSeq(const char[] data, int len)
+	{
+		ASSERT(gPatchStack);
+		ASSERT(len > 0 && len < MEM_LEN_SAFE_THRESHOLD);
+		
+		len++;
+		
+		int[] arr = new int[len];
+		arr[0] = len;
+		
+		for(int i = 0; i < len - 1; i++)
+		{
+			arr[i + 1] = LoadFromAddress(this.Address + i, NumberType_Int8);
+			StoreToAddress(this.Address + i, data[i], NumberType_Int8);
 		}
 		
 		char buff[32];
@@ -191,15 +132,28 @@ public void OnPluginEnd()
 		}
 	}
 	
-#if !defined MEMUTILS_NOPLENDCALL
+#if defined MEMUTILS_PLUGINENDCALL
 	OnPluginEnd_MemUtilsRedefined();
 #endif
 }
 #undef OnPluginEnd
+#if defined MEMUTILS_PLUGINENDCALL
 #define OnPluginEnd OnPluginEnd_MemUtilsRedefined
+#else
+#define OnPluginEnd OnPluginEnd_Redifined(){}\
+void MEMUTILS_INCLUDE_WARNING_OnPluginEnd_REDIFINITION
+#endif
 //PatchHandling methodmap==-
 
 //-==Other util functions
+stock int LoadStringFromAddress(Address addr, char[] buff, int length)
+{
+	int i;
+	for(i = 0; i < length && (buff[i] = LoadFromAddress(addr + i, NumberType_Int8)) != '\0'; i++) { }
+	buff[i == length ? i - 1 : i] = '\0';
+	return i;
+}
+
 stock void DumpOnAddress(Address addr, int len, int columns = 10)
 {
 	char buff[128], buff2[128];
