@@ -31,7 +31,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Core plugin of the GOKZ plugin set", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-core.txt"
@@ -168,6 +168,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_MapTriggers(client);
 	OnClientPutInServer_Triggerfix(client);
 	OnClientPutInServer_Noclip(client);
+	OnClientPutInServer_Turnbinds(client);
 	HookClientEvents(client);
 }
 
@@ -197,17 +198,6 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
 	OnPlayerRunCmdPost_ValidJump(client);
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
-}
-
-public Action OnClientCommandKeyValues(int client, KeyValues kv)
-{
-	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
-	char cmd[16];
-	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
-	{
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
 }
 
 public void OnClientCookiesCached(int client)

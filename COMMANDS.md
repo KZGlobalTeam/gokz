@@ -27,6 +27,8 @@
  * `!ncnt` - Toggle noclip-notrigger that ignores triggers.
  * `+noclip` - Noclip (bind a key to it).
  * `+noclipnt` - Noclip-notrigger that ignores triggers (bind a key to it).
+ * `!sg`/`!safe`/`!safeguard` - Toggle safeguard.
+ * `!pro` - Toggle safeguard for PRO runs.
 
 ### gokz-hud
 
@@ -53,7 +55,7 @@
 
 ### gokz-measure
 
- * `!measure` - Open the distance measurement menu.
+ * `!measure`/`!measuremenu` - Open the distance measurement menu.
  * `+measure` - Start measuring (bind to a key)
  * `!measureblock` - Measure the gap of a block you're currently aiming at.
 
@@ -65,6 +67,8 @@
 
  * `!saveloc` - Save location. Usage: `!saveloc <name>`
  * `!loadloc` - Load location. Usage: `!loadloc <#id OR name>`
+ * `!prevloc` - Go back to the previous location.
+ * `!nextloc` - Go forward to the next location.
  * `!locmenu` - Open location menu.
  * `!nameloc` - Name location. Usage: `!nameloc <#id> <name>`
 
@@ -106,7 +110,7 @@ Many of these commands return results for your currently selected mode.
 
  * `!top` - Open a menu showing the top record holders
  * `!maptop` - Open a menu showing the top main course times of a map. Usage: `!maptop <map>`
- * `!bmaptop` - Open a menu showing the top bonus times of a map. Usage: `!btop <#bonus> <map>`
+ * `!bmaptop`/`!bonustop`/`!btop` - Open a menu showing the top bonus times of a map. Usage: `!btop <#bonus> <map>`
  * `!pb` - Show PB main course times and ranks in chat. Usage: `!pb <map> <player>`
  * `!bpb` - Show PB bonus times and ranks in chat. Usage: `!bpb <#bonus> <map> <player>`
  * `!wr` - Show main course record times in chat. Usage: `!wr <map>`

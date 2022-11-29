@@ -21,13 +21,15 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides options for a quieter KZ experience", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-quiet.txt"
 
 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 #define BLANK_SOUNDSCAPEINDEX 482
+#define EFFECT_IMPACT 8
+#define EFFECT_KNIFESLASH 2
 
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
@@ -47,11 +49,21 @@ public void OnPluginStart()
 {
 	AddNormalSoundHook(Hook_NormalSound);
 	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
+	AddTempEntHook("EffectDispatch", Hook_EffectDispatch);
+	HookUserMessage(GetUserMessageId("WeaponSound"), Hook_WeaponSound, true);
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
 	
 	RegisterCommands();
+
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client))
+		{
+			OnJoinTeam_HidePlayers(client, GetClientTeam(client));
+		}
+	}
 }
 
 public void OnAllPluginsLoaded()
@@ -160,20 +172,113 @@ public Action OnSetTransmitClient(int entity, int client)
 	return Plugin_Continue;
 }
 
-public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sample[PLATFORM_MAX_PATH], int& entity, int& channel, float& volume, int& level, int& pitch, int& flags, char soundEntry[PLATFORM_MAX_PATH], int& seed)
+public Action Hook_WeaponSound(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
 {
-	if (entity > MAXPLAYERS)
+	int newClients[MAXPLAYERS], newTotal = 0;
+	int entidx = msg.ReadInt("entidx");
+	for (int i = 0; i < playersNum; i++)
+	{
+		int client = players[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
+			|| entidx == client
+			|| entidx == GetObserverTarget(client))
+		{
+			newClients[newTotal] = client;
+			newTotal++;
+		}
+	}
+
+	// Nothing's changed, let the engine handle it.
+	if (newTotal == playersNum)
 	{
 		return Plugin_Continue;
 	}
 
+	// Only way to modify the recipient list is to RequestFrame and create our own user message.
+	char path[PLATFORM_MAX_PATH];
+	msg.ReadString("sound", path, sizeof(path));
+	int flags = USERMSG_BLOCKHOOKS;
+	if (reliable)
+	{
+		flags |= USERMSG_RELIABLE;
+	}
+	if (init)
+	{
+		flags |= USERMSG_INITMSG;
+	}
+
+	DataPack dp = new DataPack();
+	dp.WriteCell(msg_id);
+	dp.WriteCell(newTotal);
+	dp.WriteCellArray(newClients, newTotal);
+	dp.WriteCell(flags);
+	dp.WriteCell(entidx);
+	dp.WriteFloat(msg.ReadFloat("origin_x"));
+	dp.WriteFloat(msg.ReadFloat("origin_y"));
+	dp.WriteFloat(msg.ReadFloat("origin_z"));
+	dp.WriteString(path);
+	dp.WriteFloat(msg.ReadFloat("timestamp"));
+
+	RequestFrame(RequestFrame_WeaponSound, dp);
+	return Plugin_Handled;
+}
+
+public void RequestFrame_WeaponSound(DataPack dp)
+{
+	dp.Reset();
+
+	UserMsg msg_id = dp.ReadCell();
+	int newTotal = dp.ReadCell();
+	int newClients[MAXPLAYERS];	
+	dp.ReadCellArray(newClients, newTotal);
+	int flags = dp.ReadCell();
+
+	Protobuf newMsg = view_as<Protobuf>(StartMessageEx(msg_id, newClients, newTotal, flags));
+
+	newMsg.AddInt("entidx", dp.ReadCell());
+	newMsg.AddFloat("origin_x", dp.ReadFloat());
+	newMsg.AddFloat("origin_y", dp.ReadFloat());
+	newMsg.AddFloat("origin_z", dp.ReadFloat());
+	char path[PLATFORM_MAX_PATH];
+	dp.ReadString(path, sizeof(path));
+	newMsg.AddString("sound", path);
+	newMsg.AddFloat("timestamp", dp.ReadFloat());
+
+	EndMessage();
+
+	delete dp;
+}
+
+public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sample[PLATFORM_MAX_PATH], int& entity, int& channel, float& volume, int& level, int& pitch, int& flags, char soundEntry[PLATFORM_MAX_PATH], int& seed)
+{
+	if (StrContains(sample, "Player.EquipArmor") != -1 || StrContains(sample, "BaseCombatCharacter.AmmoPickup") != -1)
+	{
+		// When the sound is emitted, the owner of these entities are not set yet.
+		// Hence we cannot do the entity parent stuff below.
+		// In that case, we just straight up block armor and ammo pickup sounds.
+		return Plugin_Stop;
+	}
+	int ent = entity;
+	while (ent > MAXPLAYERS)
+	{
+		// Block some gun and knife sounds by trying to find its parent entity. 
+		ent = GetEntPropEnt(ent, Prop_Send, "moveparent");
+		if (ent < MAXPLAYERS)
+		{
+			break;
+		}
+		else if (ent == -1)
+		{
+			return Plugin_Continue;
+		}
+	}
 	int numNewClients = 0;
 	for (int i = 0; i < numClients; i++)
 	{
 		int client = clients[i];
 		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled
-			|| entity == client
-			|| entity == GetObserverTarget(client))
+			|| ent == client
+			|| ent == GetObserverTarget(client))
 		{
 			clients[numNewClients] = client;
 			numNewClients++;
@@ -251,6 +356,64 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 	return Plugin_Stop;
 }
 
+public Action Hook_EffectDispatch(const char[] te_name, const int[] players, int numClients, float delay)
+{
+	// Block bullet impact effects.
+	int effIndex = TE_ReadNum("m_iEffectName");
+	if (effIndex != EFFECT_IMPACT && effIndex != EFFECT_KNIFESLASH)
+	{
+		return Plugin_Continue;
+	}
+	int newClients[MAXPLAYERS], newTotal = 0;
+	for (int i = 0; i < numClients; i++)
+	{
+		int client = players[i];
+		if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_ShowPlayers]) == ShowPlayers_Enabled)
+		{
+			newClients[newTotal] = client;
+			newTotal++;
+		}
+	}
+	// Noone wants the sound
+	if (newTotal == 0)
+	{
+		return Plugin_Stop;
+	}
+
+	// Nothing's changed, let the engine handle it.
+	if (newTotal == numClients)
+	{
+		return Plugin_Continue;
+	}
+	float origin[3], start[3];
+	origin[0] = TE_ReadFloat("m_vOrigin.x");
+	origin[1] = TE_ReadFloat("m_vOrigin.y");
+	origin[2] = TE_ReadFloat("m_vOrigin.z");
+	start[0] = TE_ReadFloat("m_vStart.x");
+	start[1] = TE_ReadFloat("m_vStart.y");
+	start[2] = TE_ReadFloat("m_vStart.z");
+	int flags = TE_ReadNum("m_fFlags");
+	float scale = TE_ReadFloat("m_flScale");
+	int surfaceProp = TE_ReadNum("m_nSurfaceProp");
+	int damageType = TE_ReadNum("m_nDamageType");
+	int entindex = TE_ReadNum("entindex");
+	int positionsAreRelativeToEntity = TE_ReadNum("m_bPositionsAreRelativeToEntity");
+	
+	TE_Start("EffectDispatch");
+	TE_WriteNum("m_iEffectName", effIndex);
+	TE_WriteFloatArray("m_vOrigin.x", origin, 3);
+	TE_WriteFloatArray("m_vStart.x", start, 3);
+	TE_WriteFloat("m_flScale", scale);
+	TE_WriteNum("m_nSurfaceProp", surfaceProp);
+	TE_WriteNum("m_nDamageType", damageType);
+	TE_WriteNum("entindex", entindex);
+	TE_WriteNum("m_bPositionsAreRelativeToEntity", positionsAreRelativeToEntity);
+	TE_WriteNum("m_fFlags", flags);
+	
+	// Send the TE and stop the engine from processing its own.
+	TE_Send(newClients, newTotal, delay);
+	return Plugin_Stop;
+}
 
 
 // =====[ STOP SOUNDS ]=====

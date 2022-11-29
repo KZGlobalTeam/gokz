@@ -22,7 +22,7 @@ public Plugin myinfo =
 	author = "zealain", 
 	description = "Player profiles and ranks based on local and global data.", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-profile.txt"
@@ -96,6 +96,17 @@ public void OnLibraryRemoved(const char[] name)
 
 
 // =====[ EVENTS ]=====
+
+public Action OnClientCommandKeyValues(int client, KeyValues kv)
+{
+	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
+	char cmd[16];
+	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
+	{
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
+}
 
 public void OnRebuildAdminCache(AdminCachePart part)
 {

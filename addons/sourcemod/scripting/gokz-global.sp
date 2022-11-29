@@ -2,6 +2,7 @@
 
 #include <sdktools>
 
+#include <SteamWorks>
 #include <GlobalAPI>
 #include <gokz/anticheat>
 #include <gokz/core>
@@ -30,7 +31,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides centralised records and bans via GlobalAPI", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-global.txt"
@@ -83,7 +84,10 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-global currently only supports 128 tickrate servers.");
 	}
-	
+	if (!SteamWorks_IsVACEnabled())
+	{
+		SetFailState("gokz-global currently only supports VAC-secured servers.");
+	}
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-global.phrases");
 	
