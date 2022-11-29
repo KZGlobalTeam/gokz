@@ -1179,11 +1179,11 @@ public void RequestFrame_SetBotStuff(int userid)
 	if (botReplayType[bot] == ReplayType_Run 
 		&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
 	{
-		GOKZ_JoinTeam(client, CS_TEAM_CT);
+		GOKZ_JoinTeam(client, CS_TEAM_CT, .forceBroadcast = true);
 	}
 	else
 	{
-		GOKZ_JoinTeam(client, CS_TEAM_T);
+		GOKZ_JoinTeam(client, CS_TEAM_CT, .forceBroadcast = true);
 	}
 	// Set bot weapons
 	// Always start by removing the pistol and knife
