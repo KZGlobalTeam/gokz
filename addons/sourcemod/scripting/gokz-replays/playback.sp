@@ -323,7 +323,18 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 	}
 }
 
-
+void GOKZ_OnOptionsLoaded_Playback(int client)
+{
+	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
+	{
+		if (botClient[bot] == client)
+		{
+			// Reset its movement options as it might be wrongfully changed
+			GOKZ_SetCoreOption(client, Option_Mode, botMode[bot]);
+			GOKZ_SetCoreOption(client, Option_Style, botStyle[bot]);
+		}
+	}
+}
 
 // =====[ PRIVATE ]=====
 
