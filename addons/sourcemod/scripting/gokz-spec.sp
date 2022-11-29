@@ -126,7 +126,7 @@ bool SpectatePlayer(int client, int target, bool printMessage = true)
 
 bool CanSpectate(int client)
 {
-	return GOKZ_GetPaused(client) || GOKZ_GetCanPause(client);
+	return !IsPlayerAlive(client) || GOKZ_GetPaused(client) || GOKZ_GetCanPause(client);
 }
 
 public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2)
