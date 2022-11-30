@@ -3,6 +3,7 @@
 #include <cstrike>
 #include <sdkhooks>
 #include <sdktools>
+#include <dhooks>
 
 #include <movementapi>
 
@@ -41,6 +42,7 @@ int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
+DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
 #include "gokz-replays/nav.sp"
@@ -175,7 +177,11 @@ public Action Hook_SayText2(UserMsg msg_id, any msg, const int[] players, int pl
 	return Plugin_Continue;
 }
 
-
+public MRESReturn DHooks_OnTeamFull_Pre(Address pThis, DHookReturn hReturn, DHookParam hParams)
+{
+	DHookSetReturn(hReturn, false);
+	return MRES_Supercede;
+}
 
 // =====[ CLIENT EVENTS ]=====
 
@@ -279,10 +285,22 @@ public void GOKZ_OnOptionsLoaded(int client)
 
 // =====[ PRIVATE ]=====
 
-
 static void HookEvents()
 {
 	HookUserMessage(GetUserMessageId("SayText2"), Hook_SayText2, true);
+	GameData gameData = LoadGameConfigFile("gokz-replays.games");
+
+	gH_DHooks_TeamFull = DynamicDetour.FromConf(gameData, "CCSGameRules::TeamFull");
+	if (gH_DHooks_TeamFull == INVALID_HANDLE)
+	{
+		SetFailState("Failed to find CCSGameRules::TeamFull function signature");
+	}
+	
+	if (!gH_DHooks_TeamFull.Enable(Hook_Pre, DHooks_OnTeamFull_Pre))
+	{
+		SetFailState("Failed to enable detour on CCSGameRules::TeamFull");
+	}
+	delete gameData;
 }
 
 static void UpdateCurrentMap()
@@ -290,7 +308,6 @@ static void UpdateCurrentMap()
 	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
 	gI_CurrentMapFileSize = GetCurrentMapFileSize();
 }
-
 
 
 // =====[ PUBLIC ]=====
