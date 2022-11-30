@@ -269,7 +269,13 @@ public void GOKZ_DB_OnJumpstatPB(int client, int jumptype, int mode, float dista
 	GOKZ_DB_OnJumpstatPB_Recording(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
 }
 
-
+public void GOKZ_OnOptionsLoaded(int client)
+{
+	if (IsFakeClient(client))
+	{
+		GOKZ_OnOptionsLoaded_Playback(client);
+	}
+}
 
 // =====[ PRIVATE ]=====
 
