@@ -42,6 +42,7 @@ int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
+Address gA_SetDuckUntilOnGroundAddr;
 DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
@@ -105,7 +106,11 @@ public void OnLibraryRemoved(const char[] name)
 	gB_GOKZLocalDB = gB_GOKZLocalDB && !StrEqual(name, "gokz-localdb");
 }
 
-
+public void OnPluginEnd()
+{
+	// Restore bot auto duck behavior.
+	StoreToAddress(gA_SetDuckUntilOnGroundAddr, 1, NumberType_Int8);
+}
 
 // =====[ OTHER EVENTS ]=====
 
@@ -204,12 +209,17 @@ public void OnClientDisconnect(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	OnPlayerRunCmd_Playback(client, buttons);
-	return Plugin_Continue;
+	if (!IsFakeClient(client))
+	{
+		return Plugin_Continue;
+	}
+	OnPlayerRunCmd_Playback(client, buttons, vel, angles);
+	return Plugin_Changed;
 }
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
+	OnPlayerRunCmdPost_Playback(client);
 	OnPlayerRunCmdPost_Recording(client, buttons, tickcount, vel, mouse);
 	OnPlayerRunCmdPost_ReplayControls(client, cmdnum);
 }
@@ -300,6 +310,10 @@ static void HookEvents()
 	{
 		SetFailState("Failed to enable detour on CCSGameRules::TeamFull");
 	}
+
+	// Remove bot auto duck behavior.
+	gA_SetDuckUntilOnGroundAddr = gameData.GetAddress("SetDuckUntilOnGround") + view_as<Address>(gameData.GetOffset("SetDuckUntilOnGroundOffset"));
+	StoreToAddress(gA_SetDuckUntilOnGroundAddr, 0, NumberType_Int8);
 	delete gameData;
 }
 
