@@ -42,7 +42,10 @@ int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
-Address gA_SetDuckUntilOnGroundAddr;
+Address gA_BotDuckAddr;
+int gI_BotDuckPatchRestore[24]; // Size of patched section in gamedata
+int gI_BotDuckPatchLength;
+
 DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
@@ -109,7 +112,14 @@ public void OnLibraryRemoved(const char[] name)
 public void OnPluginEnd()
 {
 	// Restore bot auto duck behavior.
-	StoreToAddress(gA_SetDuckUntilOnGroundAddr, 1, NumberType_Int8);
+	if (gA_BotDuckAddr == Address_Null)
+	{
+		return;
+	}
+	for (int i = 0; i < gI_BotDuckPatchLength; i++)
+	{
+		StoreToAddress(gA_BotDuckAddr + view_as<Address>(i), gI_BotDuckPatchRestore[i], NumberType_Int8);
+	}
 }
 
 // =====[ OTHER EVENTS ]=====
@@ -312,8 +322,13 @@ static void HookEvents()
 	}
 
 	// Remove bot auto duck behavior.
-	gA_SetDuckUntilOnGroundAddr = gameData.GetAddress("SetDuckUntilOnGround") + view_as<Address>(gameData.GetOffset("SetDuckUntilOnGroundOffset"));
-	StoreToAddress(gA_SetDuckUntilOnGroundAddr, 0, NumberType_Int8);
+	gA_BotDuckAddr = gameData.GetAddress("BotDuck");
+	gI_BotDuckPatchLength = gameData.GetOffset("BotDuckPatchLength");
+	for (int i = 0; i < gI_BotDuckPatchLength; i++)
+	{
+		gI_BotDuckPatchRestore[i] = LoadFromAddress(gA_BotDuckAddr + view_as<Address>(i), NumberType_Int8);
+		StoreToAddress(gA_BotDuckAddr + view_as<Address>(i), 0x90, NumberType_Int8);
+	}
 	delete gameData;
 }
 

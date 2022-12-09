@@ -4,9 +4,9 @@
 	{
 		"Addresses"
 		{
-			"SetDuckUntilOnGround"
+			"BotDuck"
 			{
-				"signature" "SetDuckUntilOnGroundSig"
+				"signature" "BotDuckSig"
 			}
 		}
 		"Functions"
@@ -33,18 +33,18 @@
 				"windows"	"\x55\x8B\xEC\x56\x8B\xF1\xE8\x2A\x2A\x2A\x2A\x8B\x45\x08\x83\xE8\x01"
 				"linux"		"\x55\x89\xE5\x83\xEC\x18\x89\x5D\xF8\x8B\x5D\x08\x89\x75\xFC\x8B\x75\x0C\x89\x1C\x24\xE8\x2A\x2A\x2A\x2A\x83\xFE\x02"
 			}
-			"SetDuckUntilOnGroundSig"
+			"BotDuckSig"
 			{
-				"windows"	"\xC6\x80\x6C\x2C\x00\x00\x01\x8B\x06"
-				"linux"		"\xC6\x80\x84\x2C\x00\x00\x01\x8B\x03"
+				"windows"	"\x8B\x86\x54\x0E\x00\x00\x8B\xCE"
+				"linux"		"\x8B\x83\x54\x0E\x00\x00\xC6\x80\x84\x2C\x00\x00\x01\x8B\x03"
 			}
 		}
 		"Offsets"
 		{
-			"SetDuckUntilOnGroundOffset"
+			"BotDuckPatchLength"
 			{
-				"windows"	"6"
-				"linux"	"6"
+				"windows"	"23"
+				"linux"		"24"
 			}
 		}
 	}
