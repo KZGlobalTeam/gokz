@@ -97,6 +97,17 @@ public void OnLibraryRemoved(const char[] name)
 
 // =====[ EVENTS ]=====
 
+public Action OnClientCommandKeyValues(int client, KeyValues kv)
+{
+	// Block clan tag changes - Credit: GoD-Tony (https://forums.alliedmods.net/showpost.php?p=2337679&postcount=6)
+	char cmd[16];
+	if (kv.GetSectionName(cmd, sizeof(cmd)) && StrEqual(cmd, "ClanTagChanged", false))
+	{
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
+}
+
 public void OnRebuildAdminCache(AdminCachePart part)
 {
 	for (int client = 1; client <= MaxClients; client++)
