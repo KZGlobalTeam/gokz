@@ -216,25 +216,25 @@
 	"Option - Virtual Button Indicators - Enable"
 	{
 		"en"		"{grey}Your virtual start and end buttons are now indicated by circles."
-		"chi"		"{grey}你已开启虚拟按钮显示."
+		"chi"		"{grey}你已开启虚拟计时器."
 		"ru"		"{grey}Кнопки начала и окончания теперь обозначены кругами."
 	}
 	"Option - Virtual Button Indicators - Disable"
 	{
 		"en"		"{grey}Your virtual start and end buttons are no longer indicated."
-		"chi"		"{grey}你已关闭虚拟按钮显示."	
+		"chi"		"{grey}你已关闭虚拟计时器."	
 		"ru"		"{grey}Кнопки начала и окончания теперь не обозначены кругами."
 	}
 	"Locked Virtual Buttons"
 	{
 		"en"		"{grey}You have locked your virtual buttons."
-		"chi"		"{grey}你已锁定虚拟按钮."
+		"chi"		"{grey}你已锁定虚拟计时器."
 		"ru"		"{grey}Вы заблокировали свои виртуальные кнопки начала и окончания."
 	}
 	"Unlocked Virtual Buttons"
 	{
 		"en"		"{grey}You have unlocked your virtual buttons."
-		"chi"		"{grey}你已解锁虚拟按钮."
+		"chi"		"{grey}你已解锁虚拟计时器."
 		"ru"		"{grey}Вы разблокировали свои виртуальные кнопки начала и окончания."
 	}
 	"Option - Safeguard - Disable"
@@ -319,7 +319,7 @@
 	"Options Menu - Timer Button Zone Type"
 	{
 		"en"		"Timer button/zone type"
-		"chi"		"计时器模式"
+		"chi"		"计时器模式手动/自动"
 	}
 	"Options Menu - Safeguard"
 	{
