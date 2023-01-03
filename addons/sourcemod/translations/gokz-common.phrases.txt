@@ -88,6 +88,7 @@
 	"Options Menu - Legacy"
 	{
 		"en"		"Legacy"
+		"chi"		"传统"
 	}
 	"Options Menu - Top"
 	{
