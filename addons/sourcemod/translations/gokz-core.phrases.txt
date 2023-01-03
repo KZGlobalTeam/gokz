@@ -342,7 +342,8 @@
 	}
 	"Timer Button Zone Type - Both Zones"
 	{
-		"en"		"都为自动"
+		"en"		"Both Zones"
+		"chi"		"都为自动"	
 	}
 	"Safeguard - Enabled NUB"
 	{
