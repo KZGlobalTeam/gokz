@@ -73,7 +73,7 @@
 	"Can't Checkpoint (Anti Checkpoint Area)"
 	{
 		"en"		"{darkred}You can't checkpoint because checkpoints are disabled in this area."
-		"en"		"{darkred}此区域禁止存点."
+		"chi"		"{darkred}此区域禁止存点."
 	}
 	"Can't Teleport (No Checkpoints)"
 	{
@@ -250,7 +250,7 @@
 	"Option - Safeguard - Enable (PRO)"
 	{
 		"en"		"{grey}Safeguard for {blue}PRO {grey}runs enabled. You can no longer use teleports or issue any command that would stop your timer during a valid run."
-		"en"		"{blue}裸跳 {grey}保护模式已开启. 你不能再使用传送和会导致计时停止的命令."
+		"chi"		"{blue}裸跳 {grey}保护模式已开启. 你不能再使用传送和会导致计时停止的命令."
 	}
 
 	// =====[ MODE MENU ]=====
@@ -271,7 +271,7 @@
 	}
 	"Options Menu - General"
 	{
-		"en"		"General"	
+		"en"		"General"
 		"ru"		"Общее"
 	}
 	"Options Menu - Mode"
@@ -342,7 +342,7 @@
 	}
 	"Timer Button Zone Type - Both Zones"
 	{
-		"en"		"Both Zones"
+		"en"		"Both zones"
 		"chi"		"都为自动"	
 	}
 	"Safeguard - Enabled NUB"
