@@ -22,11 +22,13 @@ Phrases
 	"Option - Map Sounds - Enable"
 	{
 		"en"		"{grey}Map sounds are now enabled."
+		"chi"		"{grey}地图音乐已开启."
 		"ru"		"{grey}Звуки карты теперь включены."
 	}
 	"Option - Map Sounds - Disable"
 	{
 		"en"		"{grey}Map sounds are now disabled."
+		"chi"		"{grey}地图音乐已关闭."
 		"ru"		"{grey}Звуки карты теперь выключены."
 	}
 
@@ -41,6 +43,7 @@ Phrases
 	"Options Menu - Map Sounds"
 	{
 		"en"		"Play map sounds"
+		"chi"		"播放地图音乐"
 		"ru"		"Play map sounds"
 	}
 }

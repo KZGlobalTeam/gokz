@@ -272,6 +272,7 @@
 	"Options Menu - General"
 	{
 		"en"		"General"
+		"chi"		"一般选项"
 		"ru"		"Общее"
 	}
 	"Options Menu - Mode"
