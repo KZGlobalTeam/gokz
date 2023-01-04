@@ -91,7 +91,7 @@
 	}
 	"NameLoc - Not Creator"
 	{
-		"en"		"{darkred}Location name must start with a letter and be unique."
+		"en"		"{darkred}You can't name another player's location."
 		"chi"		"{darkred}位置名称必须以字母开头且唯一."
 		"ru"		"{darkred}Вы не можете назвать местоположение именемдругого игрока."
 	}
