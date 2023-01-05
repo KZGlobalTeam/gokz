@@ -91,8 +91,8 @@
 	}
 	"NameLoc - Not Creator"
 	{
-		"en"		"{darkred}Location name must start with a letter and be unique."
-		"chi"		"{darkred}位置名称必须以字母开头且唯一."
+		"en"		"{darkred}You can't name another player's location."
+		"chi"		"{darkred}你不能命名其他玩家的位置."
 		"ru"		"{darkred}Вы не можете назвать местоположение именемдругого игрока."
 	}
 
@@ -121,7 +121,7 @@
 	}
 	"No Locations Found"
 	{
-		"en"		"{darkred}No saved locations found."
+		"en"		"{darkred}Location not found."
 		"chi"		"{darkred}找不到位置."
 		"ru"		"{darkred}Не найдено сохраненных локаций."
 	}
