@@ -98,6 +98,7 @@
 	"Deviation"
 	{
 		"en"		"Deviation"
+		"chi"		"偏移"
 		"ru"		"Отклонение"
 	}
 	"W Release"
@@ -108,6 +109,7 @@
 	"Width"
 	{
 		"en"		"Width"
+		"chi"		"幅度"
 		"ru"		"Ширина"
 	}
 	"Speed"
@@ -157,13 +159,13 @@
 	"Jumpstats Option - Jumpstats Always - Enable"
 	{
 		"en"		"{grey}You have enabled the always-on jumpstats."
-		"chi"		"{grey}你已{green}开启 总是显示跳跃数据."
+		"chi"		"{grey}你已开启 总是显示跳跃数据."
 		"ru"		"{grey}Вы включили постоянные отчеты по прыжкам."
 	}
 	"Jumpstats Option - Jumpstats Always - Disable"
 	{
 		"en"		"{grey}You have disabled the always-on jumpstats."
-		"chi"		"{grey}你已{darkred}关闭 总是显示跳跃数据."
+		"chi"		"{grey}你已关闭 总是显示跳跃数据."
 		"ru"		"{grey}Вы отключили постоянные отчеты по прыжкам."
 	}
 	"Broadcast Jumpstat Chat Report"
@@ -220,6 +222,7 @@
 	"Width (Table)"
 	{
 		"en"		"Width     "
+		"chi"		"加速幅度     "
 		"ru"		"Width     "
 	}
 	"Overlap (Table)"

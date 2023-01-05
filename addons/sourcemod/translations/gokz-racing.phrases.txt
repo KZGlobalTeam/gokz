@@ -70,7 +70,7 @@
 	"Rule Summary - No Checkpoints"
 	{
 		"en"		"No checkpoints"
-		"chi"		"无存点"
+		"chi"		"裸跳"
 		"ru"		"Нет чекпойнтов"
 	}
 	"No Start Found"
@@ -168,7 +168,7 @@
 		// Rules [SimpleKZ | No checkpoints]
 		"#format"	"{1:s},{2:s}"
 		"en"		"{grey}Rules - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}No checkpoints"
-		"chi"		"{grey}规则 - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}无存点"
+		"chi"		"{grey}规则 - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}裸跳"
 		"ru"		"{grey}Правила - {purple}{1}{grey} | {lime}{2}{grey} | {yellow}Без чекпойнтов"
 	}
 	"Race Rules - Unlimited"
