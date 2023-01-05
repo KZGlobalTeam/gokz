@@ -121,8 +121,8 @@
 	}
 	"No Locations Found"
 	{
-		"en"		"{darkred}Location not found."
-		"chi"		"{darkred}找不到位置."
+		"en"		"{darkred}No saved locations found."
+		"chi"		"{darkred}没有找到已储存的位置."
 		"ru"		"{darkred}Не найдено сохраненных локаций."
 	}
 
