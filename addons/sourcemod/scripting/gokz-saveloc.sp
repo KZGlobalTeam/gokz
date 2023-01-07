@@ -19,11 +19,11 @@ public Plugin myinfo =
 	author = "JWL", 
 	description = "Allows players to save/load locations that preserve position, angles, and velocity", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-saveloc.txt"
-#define LOADLOC_INVALIDATE_DURATION 1.0
+#define LOADLOC_INVALIDATE_DURATION 0.12
 #define MAX_LOCATION_NAME_LENGTH 32
 
 enum struct Location {

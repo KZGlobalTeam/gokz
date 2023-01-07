@@ -153,22 +153,31 @@ void OnClientPutInServer_Noclip(int client)
 
 // =====[ TURNBINDS ]=====
 
-int turnbindsLastLeftStart[MAXPLAYERS + 1];
-int turnbindsLastRightStart[MAXPLAYERS + 1];
-float turnbindsLastValidYaw[MAXPLAYERS + 1];
-int turnbindsOldButtons[MAXPLAYERS + 1];
+static int turnbindsLastLeftStart[MAXPLAYERS + 1];
+static int turnbindsLastRightStart[MAXPLAYERS + 1];
+static float turnbindsLastValidYaw[MAXPLAYERS + 1];
+static int turnbindsOldButtons[MAXPLAYERS + 1];
 
+void OnClientPutInServer_Turnbinds(int client)
+{
+	turnbindsLastLeftStart[client] = 0;
+	turnbindsLastRightStart[client] = 0;
+}
 // Ensures that there is a minimum time between starting to turnbind in one direction
 // and then starting to turnbind in the other direction
 void OnPlayerRunCmd_Turnbinds(int client, int buttons, int tickcount, float angles[3])
 {
-	if (buttons & IN_LEFT && tickcount < turnbindsLastRightStart[client] + GOKZ_TURNBIND_COOLDOWN)
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+	if (buttons & IN_LEFT && tickcount < turnbindsLastRightStart[client] + RoundToNearest(GOKZ_TURNBIND_COOLDOWN / GetTickInterval()))
 	{
 		angles[1] = turnbindsLastValidYaw[client];
 		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
 		buttons = 0;
 	}
-	else if (buttons & IN_RIGHT && tickcount < turnbindsLastLeftStart[client] + GOKZ_TURNBIND_COOLDOWN)
+	else if (buttons & IN_RIGHT && tickcount < turnbindsLastLeftStart[client] + RoundToNearest(GOKZ_TURNBIND_COOLDOWN / GetTickInterval()))
 	{
 		angles[1] = turnbindsLastValidYaw[client];
 		TeleportEntity(client, NULL_VECTOR, angles, NULL_VECTOR);
@@ -292,7 +301,7 @@ void OnTimerStart_JoinTeam(int client)
 	hasSavedPosition[client] = false;
 }
 
-void JoinTeam(int client, int newTeam, bool restorePos)
+void JoinTeam(int client, int newTeam, bool restorePos, bool forceBroadcast = false)
 {
 	KZPlayer player = KZPlayer(client);
 	int currentTeam = GetClientTeam(client);
@@ -345,6 +354,10 @@ void JoinTeam(int client, int newTeam, bool restorePos)
 			TeleportPlayer(client, spawnOrigin, spawnAngles);
 		}
 		hasSavedPosition[client] = false;
+		Call_GOKZ_OnJoinTeam(client, newTeam);
+	}
+	else if (forceBroadcast)
+	{
 		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
 }
@@ -595,9 +608,16 @@ void OnMapStart_FixMissingSpawns()
 
 // =====[ SAFE MODE ]=====
 
-void ToggleSafeGuard(int client)
+void ToggleNubSafeGuard(int client)
 {
-	GOKZ_SetCoreOption(client, Option_Safeguard, (GOKZ_GetCoreOption(client, Option_Safeguard) + 1) % SAFEGUARD_COUNT);
+	if (GOKZ_GetCoreOption(client, Option_Safeguard) == Safeguard_EnabledNUB)
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_Disabled);
+	}
+	else
+	{
+		GOKZ_SetCoreOption(client, Option_Safeguard, Safeguard_EnabledNUB);
+	}
 }
 
 void ToggleProSafeGuard(int client)

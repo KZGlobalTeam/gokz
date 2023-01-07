@@ -224,7 +224,7 @@ enum TriggerType
 #define GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
-#define GOKZ_TURNBIND_COOLDOWN 64
+#define GOKZ_TURNBIND_COOLDOWN 0.3
 
 #define GOKZ_MAPPING_API_VERSION_NONE 0 // the map doesn't have a mapping api version
 #define GOKZ_MAPPING_API_VERSION 1
@@ -1466,11 +1466,12 @@ native bool GOKZ_GetValidJump(int client);
 /**
  * Has a player switch to a team via GOKZ Core.
  *
- * @param client		Client index.
- * @param team			Which team to switch to.
- * @param restorePos	Whether to restore saved position if leaving spectators.
+ * @param client			Client index.
+ * @param team				Which team to switch to.
+ * @param restorePos		Whether to restore saved position if leaving spectators.
+ * @param forceBroadcast	Force JoinTeam forward calling even if client's team did not change.
  */
-native void GOKZ_JoinTeam(int client, int team, bool restorePos = true);
+native void GOKZ_JoinTeam(int client, int team, bool restorePos = true, bool forceBroadcast = false);
 
 
 
