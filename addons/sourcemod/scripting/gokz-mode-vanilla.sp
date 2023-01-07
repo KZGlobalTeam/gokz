@@ -24,12 +24,12 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Vanilla mode for GOKZ", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-vanilla.txt"
 
-#define MODE_VERSION 13
+#define MODE_VERSION 14
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {

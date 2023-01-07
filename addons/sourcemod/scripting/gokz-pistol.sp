@@ -21,7 +21,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Allows players to pick a pistol to KZ with", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-pistols.txt"

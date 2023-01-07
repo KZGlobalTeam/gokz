@@ -19,7 +19,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides easy ways to spectate players", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-spec.txt"
@@ -126,7 +126,7 @@ bool SpectatePlayer(int client, int target, bool printMessage = true)
 
 bool CanSpectate(int client)
 {
-	return GOKZ_GetPaused(client) || GOKZ_GetCanPause(client);
+	return !IsPlayerAlive(client) || GOKZ_GetPaused(client) || GOKZ_GetCanPause(client);
 }
 
 public int MenuHandler_Spec(Menu menu, MenuAction action, int param1, int param2)

@@ -59,7 +59,7 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // =====[ PUBLIC ]=====
 
 // Returns the client index of the replay bot, or -1 otherwise
-int LoadReplayBot(int client, char[] path, int timeType = -1)
+int LoadReplayBot(int client, char[] path)
 {
 	// Safeguard Check
 	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
@@ -74,7 +74,7 @@ int LoadReplayBot(int client, char[] path, int timeType = -1)
 	int bot;
 	if (GetBotsInUse() < RP_MAX_BOTS)
 	{
-		bot = GetUnusedBot(timeType);
+		bot = GetUnusedBot();
 	}
 	else
 	{
@@ -96,6 +96,8 @@ int LoadReplayBot(int client, char[] path, int timeType = -1)
 		GOKZ_PlayErrorSound(client);
 		return -1;
 	}
+	
+	ServerCommand("bot_add");
 	botCaller[bot] = client;
 	return botClient[bot];
 }
@@ -323,7 +325,18 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 	}
 }
 
-
+void GOKZ_OnOptionsLoaded_Playback(int client)
+{
+	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
+	{
+		if (botClient[bot] == client)
+		{
+			// Reset its movement options as it might be wrongfully changed
+			GOKZ_SetCoreOption(client, Option_Mode, botMode[bot]);
+			GOKZ_SetCoreOption(client, Option_Style, botStyle[bot]);
+		}
+	}
+}
 
 // =====[ PRIVATE ]=====
 
@@ -1150,6 +1163,39 @@ static void SetBotStuff(int bot)
 	SetBotClanTag(bot);
 	SetBotName(bot);
 
+	// Bot takes one tick after being put in server to be able to respawn.
+	RequestFrame(RequestFrame_SetBotStuff, GetClientUserId(client));
+}
+
+public void RequestFrame_SetBotStuff(int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (!client)
+	{
+		return;
+	}
+	int bot;
+	for (bot = 0; bot <= RP_MAX_BOTS; bot++)
+	{
+		if (botClient[bot] == client)
+		{
+			break;
+		}
+		else if (bot == RP_MAX_BOTS)
+		{
+			return;
+		}
+	}
+	// Set the bot's team based on if it's NUB or PRO
+	if (botReplayType[bot] == ReplayType_Run 
+		&& GOKZ_GetTimeTypeEx(botTeleportsUsed[bot]) == TimeType_Pro)
+	{
+		GOKZ_JoinTeam(client, CS_TEAM_CT, .forceBroadcast = true);
+	}
+	else
+	{
+		GOKZ_JoinTeam(client, CS_TEAM_CT, .forceBroadcast = true);
+	}
 	// Set bot weapons
 	// Always start by removing the pistol and knife
 	int currentPistol = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
@@ -1279,21 +1325,12 @@ static int GetBotsInUse()
 }
 
 // Returns a bot that isn't currently replaying, or -1 if no unused bots found
-static int GetUnusedBot(int timeType = -1)
+static int GetUnusedBot()
 {
 	for (int bot = 0; bot < RP_MAX_BOTS; bot++)
 	{
 		if (!botInGame[bot])
 		{
-			// Set the bot's team based on if it's NUB or PRO
-			if (timeType == TimeType_Pro)
-			{
-				ServerCommand("bot_add_ct");
-			}
-			else
-			{
-				ServerCommand("bot_add_t");
-			}
 			return bot;
 		}
 	}
