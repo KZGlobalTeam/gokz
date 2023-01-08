@@ -82,7 +82,7 @@ void CreateGlobalForwards()
 	H_OnOptionsMenuReady = new GlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
 	H_OnCourseRegistered = new GlobalForward("GOKZ_OnCourseRegistered", ET_Ignore, Param_Cell);
 	H_OnRunInvalidated = new GlobalForward("GOKZ_OnRunInvalidated", ET_Ignore, Param_Cell);
-	H_OnEmitSoundToClient = new GlobalForward("GOKZ_OnEmitSoundToClient", ET_Hook, Param_Cell, Param_String, Param_FloatByRef);
+	H_OnEmitSoundToClient = new GlobalForward("GOKZ_OnEmitSoundToClient", ET_Hook, Param_Cell, Param_String, Param_FloatByRef, Param_String);
 }
 
 void Call_GOKZ_OnOptionsLoaded(int client)
