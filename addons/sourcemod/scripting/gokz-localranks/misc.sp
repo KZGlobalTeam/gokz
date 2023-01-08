@@ -55,7 +55,7 @@ static bool LoadSounds()
 
 static void PlayBeatRecordSound()
 {
-	EmitSoundToAll(gC_BeatRecordSound);
+	GOKZ_EmitSoundToAll(gC_BeatRecordSound, _, "Server Record");
 }
 
 void AnnounceNewTime(
@@ -315,5 +315,5 @@ void DoPBMissedReport(int client, float pbTime, int recordType)
 		case RecordType_Pro:GOKZ_PrintToChat(client, true, "%t", "Missed PB (PRO)", GOKZ_FormatTime(pbTime));
 		case RecordType_NubAndPro:GOKZ_PrintToChat(client, true, "%t", "Missed PB (NUB and PRO)", GOKZ_FormatTime(pbTime));
 	}
-	EmitSoundToClient(client, MISSED_PB_SOUND);
+	GOKZ_EmitSoundToClient(client, MISSED_PB_SOUND, _, "Missed PB");
 } 

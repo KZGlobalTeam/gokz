@@ -16,7 +16,7 @@ void PlayJumpstatSound(int client, int tier)
 		return;
 	}
 	
-	EmitSoundToClient(client, sounds[tier]);
+	GOKZ_EmitSoundToClient(client, sounds[tier], _, "Jumpstats");
 }
 
 
