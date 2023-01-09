@@ -244,6 +244,10 @@ stock ObsMode GetObserverMode(int client)
  */
 stock int GetObserverTarget(int client)
 {
+	if (!IsValidClient(client))
+	{
+		return -1;
+	}
 	ObsMode mode = GetObserverMode(client);
 	if (mode == ObsMode_InEye || mode == ObsMode_Chase)
 	{
