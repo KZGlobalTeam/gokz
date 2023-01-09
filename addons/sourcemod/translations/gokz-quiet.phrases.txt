@@ -49,4 +49,8 @@ Phrases
 		"en"		"Play map sounds"
 		"chi"		"播放地图音乐"
 	}
+	"Options Menu - Fall Damage Sounds"
+	{
+		"en"		"Fall damage sounds"
+	}
 }

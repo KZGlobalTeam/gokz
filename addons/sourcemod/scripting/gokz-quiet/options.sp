@@ -136,6 +136,10 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 			{
 				FormatToggleableOptionDisplay(param, QTOption_MapSounds, buffer, maxlength);
 			}
+			case QTOption_FallDamageSound:
+			{
+				FormatVolumeOptionDisplay(param, QTOption_FallDamageSound, buffer, maxlength);
+			}
 		}
 	}
 	else if (action == TopMenuAction_SelectOption)
@@ -159,4 +163,12 @@ void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, i
 			gC_QTOptionPhrases[option], client, 
 			"Options Menu - Enabled", client);
 	}
+}
+
+void FormatVolumeOptionDisplay(int client, QTOption option, char[] buffer, int maxlength)
+{
+	// Assume 10% volume steps.
+	FormatEx(buffer, maxlength, "%T - %i%", 
+		gC_QTOptionPhrases[option], client, 
+		GOKZ_QT_GetOption(client, option) * 10);
 }
