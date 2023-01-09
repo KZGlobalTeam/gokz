@@ -198,6 +198,11 @@ public Action Hook_WeaponSound(UserMsg msg_id, Protobuf msg, const int[] players
 		return Plugin_Continue;
 	}
 
+	// No one to send to so it doesn't matter if we block or not. We block just to end the function early.
+	if (newTotal == 0)
+	{
+		return Plugin_Handled;
+	}
 	// Only way to modify the recipient list is to RequestFrame and create our own user message.
 	char path[PLATFORM_MAX_PATH];
 	msg.ReadString("sound", path, sizeof(path));
