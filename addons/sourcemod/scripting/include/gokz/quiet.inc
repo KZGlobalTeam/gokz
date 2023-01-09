@@ -1,6 +1,6 @@
 /*
 	gokz-quiet Plugin Include
-	
+
 	Website: https://bitbucket.org/kztimerglobalteam/gokz
 */
 
@@ -15,9 +15,10 @@
 
 enum QTOption:
 {
-	QTOPTION_INVALID = -1, 
-	QTOption_ShowPlayers, 
-	QTOption_MapSounds, 
+	QTOPTION_INVALID = -1,
+	QTOption_ShowPlayers,
+	QTOption_MapSounds,
+	QTOption_FallDamageSound,
 	QTOPTION_COUNT
 };
 
@@ -38,39 +39,46 @@ enum
 // =====[ CONSTANTS ]=====
 
 #define QUIET_OPTION_CATEGORY "Quiet"
+#define DEFAULT_VOLUME 10
+#define VOLUME_COUNT 21 // Maximum of 200%
 
 #define EFFECT_IMPACT 8
 #define EFFECT_KNIFESLASH 2
 #define BLANK_SOUNDSCAPEINDEX 482 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 
-stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
+stock char gC_QTOptionNames[QTOPTION_COUNT][] =
 {
 	"GOKZ QT - Show Players",
-	"GOKZ QT - Map Sounds"
+	"GOKZ QT - Map Sounds",
+	"GOKZ QT - Fall Damage Sound"
 };
 
-stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
+stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] =
 {
 	"Visibility of Other Players - 0 = Disabled, 1 = Enabled",
-	"Play Ambient Map Sounds/Music - 0 = Disabled, 1 = Enabled"
+	"Play Ambient Map Sounds/Music - 0 = Disabled, 1 = Enabled",
+	"Play Fall Damage Sound - 0 to 20 = 0% to 200%"
 };
 
-stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 
+stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] =
 {
 	ShowPlayers_Enabled,
-	MapSounds_Enabled
+	MapSounds_Enabled,
+	DEFAULT_VOLUME, // Fall damage volume
 };
 
-stock int gI_QTOptionCounts[QTOPTION_COUNT] = 
+stock int gI_QTOptionCounts[QTOPTION_COUNT] =
 {
 	SHOWPLAYERS_COUNT,
-	MAPSOUNDS_COUNT
+	MAPSOUNDS_COUNT,
+	VOLUME_COUNT, // Fall damage volume
 };
 
-stock char gC_QTOptionPhrases[QTOPTION_COUNT][] = 
+stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
 {
 	"Options Menu - Show Players",
-	"Options Menu - Map Sounds"
+	"Options Menu - Map Sounds",
+	"Options Menu - Fall Damage Sounds"
 };
 
 // =====[ STOCKS ]=====
@@ -137,13 +145,13 @@ stock bool GOKZ_QT_CycleOption(int client, QTOption option)
 
 // =====[ DEPENDENCY ]=====
 
-public SharedPlugin __pl_gokz_quiet = 
+public SharedPlugin __pl_gokz_quiet =
 {
-	name = "gokz-quiet", 
-	file = "gokz-quiet.smx", 
+	name = "gokz-quiet",
+	file = "gokz-quiet.smx",
 	#if defined REQUIRE_PLUGIN
-	required = 1, 
+	required = 1,
 	#else
-	required = 0, 
+	required = 0,
 	#endif
-}; 
+};
