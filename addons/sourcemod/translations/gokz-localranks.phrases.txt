@@ -457,7 +457,7 @@
 		// Global Top PRO
 		"#format"	"{1:s}"
 		"en"		"Global Top {1}"
-		"en"		"全球排行 {1}"
+		"chi"		"全球排行 {1}"
 		"ru"		"Глобальный топ {1}"
 	}
 	"Map Top Submenu - Title"
