@@ -2,15 +2,13 @@
 	Toggle soundscapes.
 */
 
-// Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
-#define BLANK_SOUNDSCAPEINDEX 482
-int gI_CurrentSoundscapeIndex[MAXPLAYERS + 1] = {BLANK_SOUNDSCAPEINDEX, ...};
+static int currentSoundscapeIndex[MAXPLAYERS + 1] = {BLANK_SOUNDSCAPEINDEX, ...};
 
 void EnableSoundscape(int client)
 {
-	if (gI_CurrentSoundscapeIndex[client] != BLANK_SOUNDSCAPEINDEX)
+	if (currentSoundscapeIndex[client] != BLANK_SOUNDSCAPEINDEX)
 	{
-		SetEntProp(client, Prop_Data, "soundscapeIndex", gI_CurrentSoundscapeIndex[client]);
+		SetEntProp(client, Prop_Data, "soundscapeIndex", currentSoundscapeIndex[client]);
 	}
 }
 
@@ -21,12 +19,12 @@ void OnPlayerRunCmdPost_Soundscape(int client)
 	{
 		if (soundscapeIndex != BLANK_SOUNDSCAPEINDEX)
 		{
-			gI_CurrentSoundscapeIndex[client] = soundscapeIndex;
+			currentSoundscapeIndex[client] = soundscapeIndex;
 		}
 		SetEntProp(client, Prop_Data, "soundscapeIndex", BLANK_SOUNDSCAPEINDEX);
 	}
 	else
 	{
-		gI_CurrentSoundscapeIndex[client] = soundscapeIndex;
+		currentSoundscapeIndex[client] = soundscapeIndex;
 	}
 }
