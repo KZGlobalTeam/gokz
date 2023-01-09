@@ -26,8 +26,6 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-quiet.txt"
 
-#define EFFECT_IMPACT 8
-#define EFFECT_KNIFESLASH 2
 
 #include "gokz-quiet/soundscape.sp"
 #include "gokz-quiet/hideplayers.sp"

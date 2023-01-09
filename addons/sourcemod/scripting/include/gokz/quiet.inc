@@ -35,9 +35,13 @@ enum
 	MAPSOUNDS_COUNT
 };
 
-
-
 // =====[ CONSTANTS ]=====
+
+#define QUIET_OPTION_CATEGORY "Quiet"
+
+#define EFFECT_IMPACT 8
+#define EFFECT_KNIFESLASH 2
+#define BLANK_SOUNDSCAPEINDEX 482 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 
 stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
@@ -68,12 +72,6 @@ stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
 	"Options Menu - Show Players",
 	"Options Menu - Map Sounds"
 };
-
-
-#define QUIET_OPTION_CATEGORY "Quiet"
-#define EFFECT_IMPACT 8
-#define EFFECT_KNIFESLASH 2
-#define BLANK_SOUNDSCAPEINDEX 482 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 
 // =====[ STOCKS ]=====
 
