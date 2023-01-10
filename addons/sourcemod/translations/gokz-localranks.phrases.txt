@@ -51,6 +51,18 @@
 		"chi"		"{grey}本服务器没有设定可排名的地图."
 		"ru"		"{grey}На этом сервере нет ранжирования по картам."
 	}
+	"Ranked Map Pool - Error"
+	{
+		"en"		"{darkred}There was a problem updating the ranked map pool."
+	}
+	"Ranked Map Pool - Success"
+	{
+		"en"		"{grey}The ranked map pool was updated."
+	}
+        "Ranked Map Pool - No Maps In File"
+	{
+		"en"		"{darkred}No maps found in the ranked map pool file."
+	}
 	"New Record (NUB)"
 	{
 		// Bill set a new NUB RECORD [Mode]
@@ -457,7 +469,7 @@
 		// Global Top PRO
 		"#format"	"{1:s}"
 		"en"		"Global Top {1}"
-		"en"		"全球排行 {1}"
+		"chi"		"全球排行 {1}"
 		"ru"		"Глобальный топ {1}"
 	}
 	"Map Top Submenu - Title"

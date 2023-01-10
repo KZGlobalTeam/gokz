@@ -460,7 +460,7 @@
 	}
 	"Checkpoint Limit Menu - Unlimited"
 	{
-		"en"		"Remove five"
+		"en"		"Unlimited"
 		"chi"		"无限制"
 		"ru"		"Неограниченно"
 	}
@@ -470,7 +470,7 @@
 	// =====[ CP COOLDOWN MENU ]=====
 	"Checkpoint Cooldown Menu - Title None"
 	{
-		"en"		"Remove five"
+		"en"		"Cooldown between CPs: None"
 		"chi"		"移除所有"
 		"ru"		"Перезарядка ЧП: Нет"
 	}
@@ -483,13 +483,13 @@
 	}
 	"Checkpoint Cooldown Menu - Add One Second"
 	{
-		"en"		"Add One Second"
+		"en"		"Add 1s"
 		"chi"		"存点冷却 增加 1 秒"
 		"ru"		"Добавить 1с"
 	}
 	"Checkpoint Cooldown Menu - Add Five Seconds"
 	{
-		"en"		"Add Five Seconds"
+		"en"		"Add 5s"
 		"chi"		"存点冷却 增加 5 秒"
 		"ru"		"Добавить 5с"
 	}

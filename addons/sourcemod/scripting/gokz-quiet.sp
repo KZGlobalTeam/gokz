@@ -15,12 +15,12 @@
 
 
 
-public Plugin myinfo = 
+public Plugin myinfo =
 {
-	name = "GOKZ Quiet", 
-	author = "DanZay", 
-	description = "Provides options for a quieter KZ experience", 
-	version = GOKZ_VERSION, 
+	name = "GOKZ Quiet",
+	author = "DanZay",
+	description = "Provides options for a quieter KZ experience",
+	version = GOKZ_VERSION,
 	url = GOKZ_SOURCE_URL
 };
 
@@ -54,7 +54,7 @@ public void OnPluginStart()
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
-	
+
 	RegisterCommands();
 
 	for (int client = 1; client <= MaxClients; client++)
@@ -72,13 +72,13 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	
+
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
 		GOKZ_OnOptionsMenuReady(topMenu);
 	}
-	
+
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
@@ -111,7 +111,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	{
 		return;
 	}
-	
+
 	int soundscapeIndex = GetEntProp(client, Prop_Data, "soundscapeIndex");
 	if (GOKZ_GetOption(client, gC_QTOptionNames[QTOption_MapSounds]) == MapSounds_Disabled)
 	{
@@ -154,7 +154,7 @@ void OnJoinTeam_HidePlayers(int client, int team)
 {
 	// Make sure client is only ever hooked once
 	SDKUnhook(client, SDKHook_SetTransmit, OnSetTransmitClient);
-	
+
 	if (team == CS_TEAM_T || team == CS_TEAM_CT)
 	{
 		SDKHook(client, SDKHook_SetTransmit, OnSetTransmitClient);
@@ -198,6 +198,11 @@ public Action Hook_WeaponSound(UserMsg msg_id, Protobuf msg, const int[] players
 		return Plugin_Continue;
 	}
 
+	// No one to send to so it doesn't matter if we block or not. We block just to end the function early.
+	if (newTotal == 0)
+	{
+		return Plugin_Handled;
+	}
 	// Only way to modify the recipient list is to RequestFrame and create our own user message.
 	char path[PLATFORM_MAX_PATH];
 	msg.ReadString("sound", path, sizeof(path));
@@ -233,7 +238,7 @@ public void RequestFrame_WeaponSound(DataPack dp)
 
 	UserMsg msg_id = dp.ReadCell();
 	int newTotal = dp.ReadCell();
-	int newClients[MAXPLAYERS];	
+	int newClients[MAXPLAYERS];
 	dp.ReadCellArray(newClients, newTotal);
 	int flags = dp.ReadCell();
 
@@ -265,7 +270,7 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 	int ent = entity;
 	while (ent > MAXPLAYERS)
 	{
-		// Block some gun and knife sounds by trying to find its parent entity. 
+		// Block some gun and knife sounds by trying to find its parent entity.
 		ent = GetEntPropEnt(ent, Prop_Send, "moveparent");
 		if (ent < MAXPLAYERS)
 		{
@@ -288,8 +293,8 @@ public Action Hook_NormalSound(int clients[MAXPLAYERS], int& numClients, char sa
 			numNewClients++;
 		}
 	}
-	
-	if (numNewClients != numClients) 
+
+	if (numNewClients != numClients)
 	{
 		numClients = numNewClients;
 		return Plugin_Changed;
@@ -402,7 +407,7 @@ public Action Hook_EffectDispatch(const char[] te_name, const int[] players, int
 	int damageType = TE_ReadNum("m_nDamageType");
 	int entindex = TE_ReadNum("entindex");
 	int positionsAreRelativeToEntity = TE_ReadNum("m_bPositionsAreRelativeToEntity");
-	
+
 	TE_Start("EffectDispatch");
 	TE_WriteNum("m_iEffectName", effIndex);
 	TE_WriteFloatArray("m_vOrigin.x", origin, 3);
@@ -413,7 +418,7 @@ public Action Hook_EffectDispatch(const char[] te_name, const int[] players, int
 	TE_WriteNum("entindex", entindex);
 	TE_WriteNum("m_bPositionsAreRelativeToEntity", positionsAreRelativeToEntity);
 	TE_WriteNum("m_fFlags", flags);
-	
+
 	// Send the TE and stop the engine from processing its own.
 	TE_Send(newClients, newTotal, delay);
 	return Plugin_Stop;
@@ -488,7 +493,7 @@ void RegisterOptions()
 {
 	for (QTOption option; option < QTOPTION_COUNT; option++)
 	{
-		GOKZ_RegisterOption(gC_QTOptionNames[option], gC_QTOptionDescriptions[option], 
+		GOKZ_RegisterOption(gC_QTOptionNames[option], gC_QTOptionDescriptions[option],
 			OptionType_Int, gI_QTOptionDefaultValues[option], 0, gI_QTOptionCounts[option] - 1);
 	}
 }
@@ -503,11 +508,11 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	{
 		return;
 	}
-	
+
 	gTM_Options = topMenu;
 	gTMO_CatGeneral = gTM_Options.FindCategory(GENERAL_OPTION_CATEGORY);
-	
-	// Add gokz-quiet option items	
+
+	// Add gokz-quiet option items
 	for (int option = 0; option < view_as<int>(QTOPTION_COUNT); option++)
 	{
 		gTMO_ItemsQuiet[option] = gTM_Options.AddItem(gC_QTOptionNames[option], TopMenuHandler_QT, gTMO_CatGeneral);
@@ -526,12 +531,12 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 			break;
 		}
 	}
-	
+
 	if (option == QTOPTION_INVALID)
 	{
 		return;
 	}
-	
+
 	if (action == TopMenuAction_DisplayOption)
 	{
 		switch (option)
@@ -557,14 +562,14 @@ void FormatToggleableOptionDisplay(int client, QTOption option, char[] buffer, i
 {
 	if (GOKZ_GetOption(client, gC_QTOptionNames[option]) == MapSounds_Disabled)
 	{
-		FormatEx(buffer, maxlength, "%T - %T", 
-			gC_QTOptionPhrases[option], client, 
+		FormatEx(buffer, maxlength, "%T - %T",
+			gC_QTOptionPhrases[option], client,
 			"Options Menu - Disabled", client);
 	}
 	else
 	{
-		FormatEx(buffer, maxlength, "%T - %T", 
-			gC_QTOptionPhrases[option], client, 
+		FormatEx(buffer, maxlength, "%T - %T",
+			gC_QTOptionPhrases[option], client,
 			"Options Menu - Enabled", client);
 	}
 }
@@ -596,4 +601,4 @@ public Action CommandStopSound(int client, int args)
 {
 	StopSounds(client);
 	return Plugin_Handled;
-} 
+}
