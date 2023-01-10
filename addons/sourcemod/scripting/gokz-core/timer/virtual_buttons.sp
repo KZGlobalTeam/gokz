@@ -37,7 +37,7 @@ bool GetHasVirtualEndButton(int client)
 	return hasVirtualEndButton[client];
 }
 
-bool GetVirtualStartCourse(int client)
+int GetVirtualStartCourse(int client)
 {
 	return virtualStartCourse[client];
 }
