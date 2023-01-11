@@ -1029,5 +1029,5 @@ stock int GOKZGetClientFromGameMovementAddress(Address addr, int offsetCGameMove
  */
 stock float GetTextHoldTime(int interval)
 {
-    return 2.5 * interval * GetTickInterval();
+    return 3 * interval * GetTickInterval();
 }
