@@ -15,12 +15,12 @@
 
 
 
-public Plugin myinfo = 
+public Plugin myinfo =
 {
-	name = "GOKZ Quiet", 
-	author = "DanZay", 
-	description = "Provides options for a quieter KZ experience", 
-	version = GOKZ_VERSION, 
+	name = "GOKZ Quiet",
+	author = "DanZay",
+	description = "Provides options for a quieter KZ experience",
+	version = GOKZ_VERSION,
 	url = GOKZ_SOURCE_URL
 };
 
@@ -47,7 +47,7 @@ public void OnPluginStart()
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
-	
+
 	RegisterCommands();
 }
 
@@ -57,13 +57,13 @@ public void OnAllPluginsLoaded()
 	{
 		Updater_AddPlugin(UPDATER_URL);
 	}
-	
+
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
 		GOKZ_OnOptionsMenuReady(topMenu);
 	}
-	
+
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsClientInGame(client))
@@ -144,4 +144,4 @@ public Action CommandStopSound(int client, int args)
 {
 	StopSounds(client);
 	return Plugin_Handled;
-} 
+}
