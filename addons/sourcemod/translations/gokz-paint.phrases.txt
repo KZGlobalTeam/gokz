@@ -22,7 +22,7 @@
 	"Paint Color Menu - Title"
 	{
 		"en"		"Paint Color"
-		"en"		"喷涂颜色"
+		"chi"		"喷涂颜色"
 		"ru"		"Цвет краски"
 	}
 

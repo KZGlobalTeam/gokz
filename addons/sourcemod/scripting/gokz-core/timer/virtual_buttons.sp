@@ -37,6 +37,11 @@ bool GetHasVirtualEndButton(int client)
 	return hasVirtualEndButton[client];
 }
 
+int GetVirtualStartCourse(int client)
+{
+	return virtualStartCourse[client];
+}
+
 bool ToggleVirtualButtonsLock(int client)
 {
 	virtualButtonsLocked[client] = !virtualButtonsLocked[client];
