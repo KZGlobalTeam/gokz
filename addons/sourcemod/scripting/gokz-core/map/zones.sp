@@ -163,11 +163,13 @@ static void ProcessStartZoneEndTouch(int client, int course)
 	}
 
 	GOKZ_StartTimer(client, course, true);
+	GOKZ_ResetVirtualButtonPosition(client, true);
 }
 
 static void ProcessEndZoneStartTouch(int client, int course)
 {
 	GOKZ_EndTimer(client, course);
+	GOKZ_ResetVirtualButtonPosition(client, false);
 }
 
 static int GetStartZoneBonusNumber(int entity)

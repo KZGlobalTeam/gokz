@@ -60,7 +60,7 @@ bool TimerStart(int client, int course, bool allowMidair = false, bool playSound
 		 || !IsPlayerValidMoveType(client)
 		 || !allowMidair && (!Movement_GetOnGround(client) || JustLanded(client))
 		 || allowMidair && !Movement_GetOnGround(client) && (!GOKZ_GetValidJump(client) || GOKZ_GetHitPerf(client))
-		 || (GOKZ_GetTimerRunning(client) && GOKZ_GetCourse(client) != course && GetVirtualStartCourse(client) != course))
+		 || (GOKZ_GetTimerRunning(client) && GOKZ_GetCourse(client) != course))
 	{
 		return false;
 	}
