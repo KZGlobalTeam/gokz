@@ -1170,6 +1170,14 @@ native int GOKZ_GetVirtualButtonPosition(int client, float position[3], bool isS
 native void GOKZ_SetVirtualButtonPosition(int client, const float position[3], int course, bool isStart);
 
 /**
+ * Resets the player's virtual button.
+ *
+ * @param client    	Client index.
+ * @param isStart		True to get the start button position, false for the end button.
+ */
+native void GOKZ_ResetVirtualButtonPosition(int client, bool isStart);
+
+/**
  * Locks the virtual button position of a player.
  *
  * @param client    	Client index.
@@ -1779,6 +1787,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_TeleportToSearchStart");
 	MarkNativeAsOptional("GOKZ_GetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_SetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_ResetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_LockVirtualButtons");
 	MarkNativeAsOptional("GOKZ_GetStartPosition");
 	MarkNativeAsOptional("GOKZ_SetStartPosition");

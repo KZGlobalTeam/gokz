@@ -18,6 +18,7 @@ void CreateNatives()
 	CreateNative("GOKZ_TeleportToSearchStart", Native_TeleportToSearchStart);
 	CreateNative("GOKZ_GetVirtualButtonPosition", Native_GetVirtualButtonPosition);
 	CreateNative("GOKZ_SetVirtualButtonPosition", Native_SetVirtualButtonPosition);
+	CreateNative("GOKZ_ResetVirtualButtonPosition", Native_ResetVirtualButtonPosition);	
 	CreateNative("GOKZ_LockVirtualButtons", Native_LockVirtualButtons);
 	CreateNative("GOKZ_GetStartPosition", Native_GetStartPosition);
 	CreateNative("GOKZ_SetStartPosition", Native_SetStartPosition);
@@ -235,6 +236,12 @@ public int Native_SetVirtualButtonPosition(Handle plugin, int numParams)
 	
 	GetNativeArray(2, position, sizeof(position));
 	SetVirtualButtonPosition(GetNativeCell(1), position, GetNativeCell(3), view_as<bool>(GetNativeCell(4)));
+	return 0;
+}
+
+public int Native_ResetVirtualButtonPosition(Handle plugin, int numParams)
+{
+	ResetVirtualButtonPosition(GetNativeCell(1), GetNativeCell(2));
 	return 0;
 }
 
