@@ -187,6 +187,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gI_OldButtons[player.ID] = buttons;
 	gI_OldFlags[player.ID] = GetEntityFlags(player.ID);
 	gB_OldOnGround[player.ID] = player.OnGround;
+	gI_TickCount[player.ID] = tickcount;
 	player.GetOrigin(gF_OldOrigin[player.ID]);
 	player.GetEyeAngles(gF_OldAngles[player.ID]);
 	player.GetVelocity(gF_OldVelocity[player.ID]);
