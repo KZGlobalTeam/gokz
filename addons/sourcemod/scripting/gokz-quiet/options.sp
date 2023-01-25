@@ -16,7 +16,7 @@ void RegisterOptions()
 
 void OnOptionChanged_Options(int client, QTOption option, any newValue)
 {
-	if (option == QTOption_MapSounds && newValue == MapSounds_Enabled)
+	if (option == QTOption_Soundscapes && newValue == Soundscapes_Enabled)
 	{
 		EnableSoundscape(client);
 	}
@@ -41,17 +41,17 @@ void PrintOptionChangeMessage(int client, QTOption option, any newValue)
 				}
 			}
 		}
-		case QTOption_MapSounds:
+		case QTOption_Soundscapes:
 		{
 			switch (newValue)
 			{
-				case MapSounds_Disabled:
+				case Soundscapes_Disabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Disable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Soundscapes - Disable");
 				}
-				case MapSounds_Enabled:
+				case Soundscapes_Enabled:
 				{
-					GOKZ_PrintToChat(client, true, "%t", "Option - Map Sounds - Enable");
+					GOKZ_PrintToChat(client, true, "%t", "Option - Soundscapes - Enable");
 				}
 			}
 		}
@@ -132,13 +132,17 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 			{
 				FormatToggleableOptionDisplay(param, QTOption_ShowPlayers, buffer, maxlength);
 			}
-			case QTOption_MapSounds:
+			case QTOption_Soundscapes:
 			{
-				FormatToggleableOptionDisplay(param, QTOption_MapSounds, buffer, maxlength);
+				FormatToggleableOptionDisplay(param, QTOption_Soundscapes, buffer, maxlength);
 			}
 			case QTOption_FallDamageSound:
 			{
 				FormatVolumeOptionDisplay(param, QTOption_FallDamageSound, buffer, maxlength);
+			}
+			case QTOption_AmbientSounds:
+			{
+				FormatVolumeOptionDisplay(param, QTOption_AmbientSounds, buffer, maxlength);
 			}
 		}
 	}

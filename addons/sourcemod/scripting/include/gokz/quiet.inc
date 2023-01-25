@@ -17,8 +17,9 @@ enum QTOption:
 {
 	QTOPTION_INVALID = -1,
 	QTOption_ShowPlayers,
-	QTOption_MapSounds,
+	QTOption_Soundscapes,
 	QTOption_FallDamageSound,
+	QTOption_AmbientSounds,
 	QTOPTION_COUNT
 };
 
@@ -31,9 +32,9 @@ enum
 
 enum
 {
-	MapSounds_Disabled = 0,
-	MapSounds_Enabled,
-	MAPSOUNDS_COUNT
+	Soundscapes_Disabled = 0,
+	Soundscapes_Enabled,
+	SOUNDSCAPES_COUNT
 };
 
 // =====[ CONSTANTS ]=====
@@ -49,36 +50,41 @@ enum
 stock char gC_QTOptionNames[QTOPTION_COUNT][] =
 {
 	"GOKZ QT - Show Players",
-	"GOKZ QT - Map Sounds",
-	"GOKZ QT - Fall Damage Sound"
+	"GOKZ QT - Soundscapes",
+	"GOKZ QT - Fall Damage Sound",
+	"GOKZ QT - Ambient Sounds"
 };
 
 stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] =
 {
 	"Visibility of Other Players - 0 = Disabled, 1 = Enabled",
-	"Play Ambient Map Sounds/Music - 0 = Disabled, 1 = Enabled",
-	"Play Fall Damage Sound - 0 to 20 = 0% to 200%"
+	"Play Soundscapes - 0 = Disabled, 1 = Enabled",
+	"Play Fall Damage Sound - 0 to 20 = 0% to 200%",
+	"Play Ambient Sounds - 0 to 20 = 0% to 200%"
 };
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] =
 {
 	ShowPlayers_Enabled,
-	MapSounds_Enabled,
+	Soundscapes_Enabled,
 	DEFAULT_VOLUME, // Fall damage volume
+	DEFAULT_VOLUME // Ambient volume
 };
 
 stock int gI_QTOptionCounts[QTOPTION_COUNT] =
 {
 	SHOWPLAYERS_COUNT,
-	MAPSOUNDS_COUNT,
+	SOUNDSCAPES_COUNT,
 	VOLUME_COUNT, // Fall damage volume
+	VOLUME_COUNT // Ambient volume
 };
 
 stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
 {
 	"Options Menu - Show Players",
-	"Options Menu - Map Sounds",
-	"Options Menu - Fall Damage Sounds"
+	"Options Menu - Soundscapes",
+	"Options Menu - Fall Damage Sounds",
+	"Options Menu - Ambient Sounds"
 };
 
 // =====[ STOCKS ]=====
