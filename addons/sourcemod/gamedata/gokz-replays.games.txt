@@ -36,7 +36,7 @@
 			"BotDuckSig"
 			{
 				"windows"	"\x8B\x86\x54\x0E\x00\x00\x8B\xCE"
-				"linux"		"\x8B\x83\x54\x0E\x00\x00\xC6\x80\x84\x2C\x00\x00\x01\x8B\x03"
+				"linux"		"\x8B\x83\x54\x0E\x00\x00\x83\xEC\x0C"
 			}
 		}
 		"Offsets"
@@ -44,7 +44,7 @@
 			"BotDuckPatchLength"
 			{
 				"windows"	"23"
-				"linux"		"24"
+				"linux"		"38"
 			}
 		}
 	}
