@@ -30,7 +30,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Provides centralised records and bans via GlobalAPI", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-global.txt"
@@ -83,7 +83,10 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-global currently only supports 128 tickrate servers.");
 	}
-	
+	if (FindCommandLineParam("-insecure") || FindCommandLineParam("-tools"))
+	{
+		SetFailState("gokz-global currently only supports VAC-secured servers.");
+	}
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-global.phrases");
 	
@@ -239,6 +242,7 @@ Action FPSKickPlayer(Handle timer, int userid)
 
 public void OnClientPutInServer(int client)
 {
+	gB_GloballyVerified[client] = false;
 	gB_waitingForFPSKick[client] = false;
 	OnClientPutInServer_PrintRecords(client);
 }

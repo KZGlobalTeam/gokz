@@ -7,14 +7,6 @@ enum struct MemoryPoolEntry
 	char name[MEMORYPOOL_NAME_MAX];
 }
 
-methodmap AddressBase
-{
-	property Address Address
-	{
-		public get() { return view_as<Address>(this); }
-	}
-}
-
 methodmap AllocatableBase < AddressBase
 {
 	public static Address _malloc(int size, const char[] name)
@@ -71,19 +63,19 @@ methodmap Vector < AllocatableBase
 	
 	property float x
 	{
-		public set(float _x) { StoreToAddressCustom(this.Address, view_as<int>(_x), NumberType_Int32); }
+		public set(float _x) { StoreToAddress(this.Address, view_as<int>(_x), NumberType_Int32, false); }
 		public get() { return view_as<float>(LoadFromAddress(this.Address, NumberType_Int32)); }
 	}
 	
 	property float y
 	{
-		public set(float _y) { StoreToAddressCustom(this.Address + 4, view_as<int>(_y), NumberType_Int32); }
+		public set(float _y) { StoreToAddress(this.Address + 4, view_as<int>(_y), NumberType_Int32, false); }
 		public get() { return view_as<float>(LoadFromAddress(this.Address + 4, NumberType_Int32)); }
 	}
 	
 	property float z
 	{
-		public set(float _z) { StoreToAddressCustom(this.Address + 8, view_as<int>(_z), NumberType_Int32); }
+		public set(float _z) { StoreToAddress(this.Address + 8, view_as<int>(_z), NumberType_Int32, false); }
 		public get() { return view_as<float>(LoadFromAddress(this.Address + 8, NumberType_Int32)); }
 	}
 	
@@ -135,7 +127,7 @@ stock void InitUtils(GameData gd)
 	//CreateInterface
 	StartPrepSDKCall(SDKCall_Static);
 	
-	ASSERT_MSG(PrepSDKCall_SetFromConf(gd, SDKConf_Signature, "CreateInterface"), "Failed to get \"CreateInterface\" signature.");
+	ASSERT_MSG(PrepSDKCall_SetFromConf(gd, SDKConf_Signature, "CreateInterface"), "Failed to get \"CreateInterface\" signature. Gamedata needs an update.");
 	
 	PrepSDKCall_AddParameter(SDKType_String, SDKPass_Pointer);
 	PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
@@ -149,7 +141,7 @@ stock void InitUtils(GameData gd)
 	{
 		//g_pMemAlloc
 		g_pMemAlloc = gd.GetAddress("g_pMemAlloc");
-		ASSERT_MSG(g_pMemAlloc != Address_Null, "Can't get \"g_pMemAlloc\" address from gamedata.");
+		ASSERT_MSG(g_pMemAlloc != Address_Null, "Can't get \"g_pMemAlloc\" address from gamedata. Gamedata needs an update.");
 		
 		//Malloc
 		StartPrepSDKCall(SDKCall_Raw);
@@ -176,7 +168,7 @@ stock void InitUtils(GameData gd)
 	{
 		//Malloc
 		StartPrepSDKCall(SDKCall_Static);
-		ASSERT_MSG(PrepSDKCall_SetFromConf(gd, SDKConf_Signature, "malloc"), "Failed to get \"malloc\" signature.");
+		ASSERT_MSG(PrepSDKCall_SetFromConf(gd, SDKConf_Signature, "malloc"), "Failed to get \"malloc\" signature. Gamedata needs an update.");
 		
 		PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
 		PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
@@ -188,7 +180,7 @@ stock void InitUtils(GameData gd)
 		
 		//Free
 		StartPrepSDKCall(SDKCall_Static);
-		ASSERT_MSG(PrepSDKCall_SetFromConf(gd, SDKConf_Signature, "free"), "Failed to get \"free\" signature.");
+		ASSERT_MSG(PrepSDKCall_SetFromConf(gd, SDKConf_Signature, "free"), "Failed to get \"free\" signature. Gamedata needs an update.");
 		
 		PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
 		PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);

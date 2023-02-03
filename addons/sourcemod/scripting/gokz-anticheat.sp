@@ -25,7 +25,7 @@ public Plugin myinfo =
 	author = "DanZay", 
 	description = "Detects basic player movement cheats", 
 	version = GOKZ_VERSION, 
-	url = "https://bitbucket.org/kztimerglobalteam/gokz"
+	url = GOKZ_SOURCE_URL
 };
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-anticheat.txt"

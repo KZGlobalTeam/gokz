@@ -232,7 +232,7 @@ enum TriggerType
 #define GOKZ_JUMPSTATS_NOCLIP_RESET_TICKS 4
 #define GOKZ_TIMER_SOUND_COOLDOWN 0.15
 #define GOKZ_VIRTUAL_BUTTON_USE_DETECTION_TIME 2.0
-#define GOKZ_TURNBIND_COOLDOWN 64
+#define GOKZ_TURNBIND_COOLDOWN 0.3
 
 #define GOKZ_MAPPING_API_VERSION_NONE 0 // the map doesn't have a mapping api version
 #define GOKZ_MAPPING_API_VERSION 1
@@ -1183,6 +1183,14 @@ native int GOKZ_GetVirtualButtonPosition(int client, float position[3], bool isS
 native void GOKZ_SetVirtualButtonPosition(int client, const float position[3], int course, bool isStart);
 
 /**
+ * Resets the player's virtual button.
+ *
+ * @param client    	Client index.
+ * @param isStart		True to get the start button position, false for the end button.
+ */
+native void GOKZ_ResetVirtualButtonPosition(int client, bool isStart);
+
+/**
  * Locks the virtual button position of a player.
  *
  * @param client    	Client index.
@@ -1479,11 +1487,12 @@ native bool GOKZ_GetValidJump(int client);
 /**
  * Has a player switch to a team via GOKZ Core.
  *
- * @param client		Client index.
- * @param team			Which team to switch to.
- * @param restorePos	Whether to restore saved position if leaving spectators.
+ * @param client			Client index.
+ * @param team				Which team to switch to.
+ * @param restorePos		Whether to restore saved position if leaving spectators.
+ * @param forceBroadcast	Force JoinTeam forward calling even if client's team did not change.
  */
-native void GOKZ_JoinTeam(int client, int team, bool restorePos = true);
+native void GOKZ_JoinTeam(int client, int team, bool restorePos = true, bool forceBroadcast = false);
 
 
 
@@ -1791,6 +1800,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_TeleportToSearchStart");
 	MarkNativeAsOptional("GOKZ_GetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_SetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_ResetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_LockVirtualButtons");
 	MarkNativeAsOptional("GOKZ_GetStartPosition");
 	MarkNativeAsOptional("GOKZ_SetStartPosition");
