@@ -35,7 +35,7 @@ static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
 static const Jump emptyJump;
-
+static Handle acceptInputHook;
 
 
 // =====[ DEFINITIONS ]========================================================
@@ -1271,6 +1271,25 @@ static bool TraceHullPosition(const float traceStart[3], const float traceEnd[3]
 
 // =====[ EVENTS ]=============================================================
 
+void OnPluginStart_JumpTracking()
+{
+	GameData gd = LoadGameConfigFile("sdktools.games/engine.csgo");
+	int offset = gd.GetOffset("AcceptInput");
+	if (offset == -1)
+	{
+		SetFailState("Failed to get AcceptInput offset");
+	}
+
+	acceptInputHook = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, DHooks_AcceptInput);
+	DHookAddParam(acceptInputHook, HookParamType_CharPtr);
+	DHookAddParam(acceptInputHook, HookParamType_CBaseEntity);
+	DHookAddParam(acceptInputHook, HookParamType_CBaseEntity);
+	//varaint_t is a union of 12 (float[3]) plus two int type params 12 + 8 = 20
+	DHookAddParam(acceptInputHook, HookParamType_Object, 20, DHookPass_ByVal|DHookPass_ODTOR|DHookPass_OCTOR|DHookPass_OASSIGNOP);
+	DHookAddParam(acceptInputHook, HookParamType_Int);
+	delete gd;
+}
+
 void OnOptionChanged_JumpTracking(int client, const char[] option)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode]))
@@ -1290,6 +1309,7 @@ void OnClientPutInServer_JumpTracking(int client)
 	lastDuckbugTime[client] = 0;
 	lastJumpButtonTime[client] = 0.0;
 	jumpTrackers[client].Init(client);
+	DHookEntity(acceptInputHook, true, client);
 }
 
 
@@ -1439,7 +1459,32 @@ public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, Move
 	}
 }
 
+static MRESReturn DHooks_AcceptInput(int client, DHookReturn hReturn, DHookParam hParams)
+{
+	if (!IsValidClient(client) || !IsPlayerAlive(client))
+	{
+		return MRES_Ignored;
+	}
 
+	// Get args
+	static char param[64];
+	static char command[64];
+	DHookGetParamString(hParams, 1, command, sizeof(command));
+	if (StrEqual(command, "AddOutput"))
+	{
+		DHookGetParamObjectPtrString(hParams, 4, 0, ObjectValueType_String, param, sizeof(param));
+		char kv[16];
+		SplitString(param, " ", kv, sizeof(kv));
+		// KVs are case insensitive.
+		if (StrEqual(kv[0], "origin", false))
+		{
+			// The player technically did not get "teleported" but the origin gets changed regardless,
+			// which effectively is a teleport.
+			OnTeleport_FailstatAlways(client);
+		}
+	}
+	return MRES_Ignored;
+}
 
 // =====[ CHECKS ]=====
 

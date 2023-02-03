@@ -328,7 +328,13 @@ static bool DoTriggerFix(int client, bool filterFix = false)
 			// Normally this wouldn't happen, because the trigger should be colliding with the player's hull if it gets here.
 			continue;
 		}
-
+		char className[64];
+		GetEntityClassname(trigger, className, sizeof(className));
+		if (StrEqual(className, "trigger_push"))
+		{
+			// Completely ignore push triggers.
+			continue;
+		}
 		if (filterFix && SDKCall(passesTriggerFilters, trigger, client))
 		{
 			// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
@@ -340,13 +346,6 @@ static bool DoTriggerFix(int client, bool filterFix = false)
 		}
 		else if (!triggerTouchFired[client][trigger])
 		{
-			char className[64];
-			GetEntityClassname(trigger, className, sizeof(className));
-			if (StrEqual(className, "trigger_push"))
-			{
-				// Completely ignore push triggers.
-				continue;
-			}
 			// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
 			// in the last tick, we make sure that it is called now.
 			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
