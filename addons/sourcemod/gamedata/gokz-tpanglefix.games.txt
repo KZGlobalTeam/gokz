@@ -37,7 +37,7 @@
 			"ClientIndexOffset"
 			{
 				"linux"		"116"
-				"windows"	"116"
+				"windows"	"112"
 			}
 		}
 
