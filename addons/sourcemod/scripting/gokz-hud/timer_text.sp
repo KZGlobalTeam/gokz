@@ -154,11 +154,11 @@ static void ShowTimerText(KZPlayer player, HUDInfo info)
 		{
 			case TimerText_Top:
 			{
-				SetHudTextParams(-1.0, 0.07, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.07, GetTextHoldTime(gB_FastUpdateRate[player.ID] ? 3 : 6), colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 			case TimerText_Bottom:
 			{
-				SetHudTextParams(-1.0, 0.9, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.9, GetTextHoldTime(gB_FastUpdateRate[player.ID] ? 3 : 6), colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 		}
 		

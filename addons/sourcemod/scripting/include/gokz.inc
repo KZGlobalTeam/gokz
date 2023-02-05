@@ -1019,3 +1019,19 @@ stock int GOKZGetClientFromGameMovementAddress(Address addr, int offsetCGameMove
 	Address playerAddr = view_as<Address>(LoadFromAddress(view_as<Address>(view_as<int>(addr) + offsetCGameMovement_player), NumberType_Int32));
 	return GOKZGetEntityFromAddress(playerAddr);
 }
+
+/**
+ * Gets the ideal amount of time the text should be held for HUD messages.
+ * 
+ * The message buffer is only 16 slots long, and it is shared between 6 channels maximum.
+ * Assuming a message is sent every game frame, each channel used should be only taking around 2.5 slots on average.
+ * This also assumes all channels are used equally (so no other plugin taking all the channel buffer for itself).
+ * We want to use as much of the message buffer as possible to take into account latency variances.
+ * 
+ * @param interval						HUD message update interval, in tick intervals.
+ * @return								How long the text should be held for.
+ */
+stock float GetTextHoldTime(int interval)
+{
+    return 3 * interval * GetTickInterval();
+}
