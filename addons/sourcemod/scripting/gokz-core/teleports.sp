@@ -108,7 +108,7 @@ void MakeCheckpoint(int client)
 	
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
+		GOKZ_EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT, _, "Checkpoint");
 	}
 	if (GOKZ_GetCoreOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
@@ -879,7 +879,7 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	undoTeleportData[client].Update();
 	if (GOKZ_GetCoreOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
 	{
-		EmitSoundToClient(client, GOKZ_SOUND_TELEPORT);
+		GOKZ_EmitSoundToClient(client, GOKZ_SOUND_TELEPORT, _, "Teleport");
 	}
 	
 	// Call Post Foward

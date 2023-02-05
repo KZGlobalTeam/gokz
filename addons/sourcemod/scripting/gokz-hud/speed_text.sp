@@ -98,11 +98,11 @@ static void ShowSpeedText(KZPlayer player, HUDInfo info)
 			// Set params based on the available screen space at max scaling HUD
 			if (!IsDrawingInfoPanel(player.ID))
 			{
-				SetHudTextParams(-1.0, 0.75, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.75, GetTextHoldTime(gB_FastUpdateRate[player.ID] ? 3 : 6), colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 			else
 			{
-				SetHudTextParams(-1.0, 0.65, 1.0, colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.65, GetTextHoldTime(gB_FastUpdateRate[player.ID] ? 3 : 6), colour[0], colour[1], colour[2], colour[3], 0, 1.0, 0.0, 0.0);
 			}
 		}
 	}

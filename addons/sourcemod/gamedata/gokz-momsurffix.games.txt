@@ -35,9 +35,6 @@
 			"CGameTrace::surface"				"60"
 			"CGameTrace::hitgroup"				"68"
 			"CGameTrace::physicsbone"			"72"
-			"CGameTrace::m_pEnt"				"74"
-			"CGameTrace::hitbox"				"80"
-			"CGameTrace::size"					"84"
 			
 			//CTraceFilterSimple
 			"CTraceFilterSimple::vptr"								"0"
@@ -79,6 +76,11 @@
 			"CMoveData::m_vecVelocity"			"64"
 			//...
 			"CMoveData::m_vecAbsOrigin"			"152"
+			
+			//CGameTrace
+			"CGameTrace::m_pEnt"				"74"
+			"CGameTrace::hitbox"				"80"
+			"CGameTrace::size"					"84"
 			
 			//CBaseHandle
 			"CBaseHandle::m_Index"				"0"
@@ -124,12 +126,12 @@
 				"windows"
 				{
 					"signature"	"CGameMovement::TracePlayerBBox"
-					"read" "83"
+					"read" "82"
 				}
 				"linux"
 				{
 					"signature"	"CGameMovement::TracePlayerBBox"
-					"read"	"579"
+					"read"	"598"
 				}
 			}
 			
@@ -285,6 +287,11 @@
 			//...
 			"CMoveData::m_vecAbsOrigin"			"172"
 			
+			//CGameTrace
+			"CGameTrace::m_pEnt"				"76"
+			"CGameTrace::hitbox"				"82"
+			"CGameTrace::size"					"86"
+			
 			//CBasePlayer
 			//Offset is relative to m_ubEFNoInterpParity netprop and will be substracted from it
 			"CBasePlayer::m_surfaceFriction"	"8"
@@ -313,7 +320,7 @@
 				"linux"
 				{
 					"signature" "g_pMemAllocFunc"
-					"read" "142"
+					"read" "191"
 				}
 				
 				"read"	"0"
@@ -329,7 +336,7 @@
 				"linux"
 				{
 					"signature"	"CGameMovement::TryPlayerMove"
-					"read" "596"
+					"read" "483"
 				}
 				
 				"read" "0"
@@ -342,21 +349,23 @@
 			{
 				"library"		"server"
 				"windows"		"\x55\x8B\xEC\x83\xE4\xF0\x83\xEC\x5C"
-				"linux"			"\x55\x89\xE5\x57\x56\x53\x81\xEC\x8C\x00\x00\x00\x8B\x5D\x08\x8B\x7D\x10"
+				// Look for string CGameMovement::TracePlayerBBox
+				"linux"			"\x55\x89\xE5\x57\x56\x53\x83\xEC\x7C\x8B\x5D\x08\x8B\x7D\x10"
 			}
 			
 			"CGameMovement::TryPlayerMove"
 			{
 				"library"		"server"
 				"windows"		"\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x38\x01\x00\x00\xF3\x0F\x10\x35\x2A\x2A\x2A\x2A"
-				"linux"			"\x55\x89\xE5\x57\x56\x31\xF6\x53\x81\xEC\x2A\x2A\x2A\x2A\xC7\x85\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\xC7\x85"
+				// Look for vtable with CGameMovement__TracePlayerBBox and count 29 entries down. Look for a very long function if that doesn't work
+				"linux"			"\x55\x66\x0F\xEF\xDB\x89\xE5\x57\x56\x53\x81\xEC\x2A\x2A\x2A\x2A\x8B\x7D\x08"
 			}
 			
 			"g_pMemAllocFunc"
 			{
 				"library"		"server"
 				"windows"		"\x55\x8B\xEC\x56\x8B\xF1\x83\x4E\x30\x04"
-				"linux"			"\x55\x89\xE5\x57\x56\x53\x81\xEC\x6C\x03\x00\x00\x8B\x55\x08"
+				"linux"			"\x55\x89\xE5\x57\x56\x53\x81\xEC\x3C\x01\x00\x00\x8B\x45\x08\x65\x8B\x0D\x14\x00\x00\x00\x89\x4D\xE4\x31\xC9\x89\xC1"
 			}
 		}
 		
