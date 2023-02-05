@@ -243,7 +243,7 @@ void PlayErrorSound(int client)
 {
 	if (GOKZ_GetCoreOption(client, Option_ErrorSounds) == ErrorSounds_Enabled)
 	{
-		EmitSoundToClient(client, SOUND_ERROR);
+		GOKZ_EmitSoundToClient(client, SOUND_ERROR, _, "Error");
 	}
 }
 
