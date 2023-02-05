@@ -38,7 +38,7 @@ static GlobalForward H_OnOptionsMenuCreated;
 static GlobalForward H_OnOptionsMenuReady;
 static GlobalForward H_OnCourseRegistered;
 static GlobalForward H_OnRunInvalidated;
-
+static GlobalForward H_OnEmitSoundToClient;
 
 void CreateGlobalForwards()
 {
@@ -82,6 +82,7 @@ void CreateGlobalForwards()
 	H_OnOptionsMenuReady = new GlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
 	H_OnCourseRegistered = new GlobalForward("GOKZ_OnCourseRegistered", ET_Ignore, Param_Cell);
 	H_OnRunInvalidated = new GlobalForward("GOKZ_OnRunInvalidated", ET_Ignore, Param_Cell);
+	H_OnEmitSoundToClient = new GlobalForward("GOKZ_OnEmitSoundToClient", ET_Hook, Param_Cell, Param_String, Param_FloatByRef, Param_String);
 }
 
 void Call_GOKZ_OnOptionsLoaded(int client)
@@ -387,4 +388,14 @@ void Call_GOKZ_OnRunInvalidated(int client)
 	Call_StartForward(H_OnRunInvalidated);
 	Call_PushCell(client);
 	Call_Finish();
+}
+
+void Call_GOKZ_OnEmitSoundToClient(int client, const char[] sample, float &volume, const char[] description, Action &result)
+{
+	Call_StartForward(H_OnEmitSoundToClient);
+	Call_PushCell(client);
+	Call_PushString(sample);
+	Call_PushFloatRef(volume);
+	Call_PushString(description);
+	Call_Finish(result);
 }
