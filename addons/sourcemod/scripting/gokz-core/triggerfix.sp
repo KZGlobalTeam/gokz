@@ -207,6 +207,17 @@ public void OnGameFrame_Triggerfix()
 	}
 }
 
+void OnPlayerRunCmd_Triggerfix(int client)
+{
+	// Reset the Touch tracking. 
+	// While this is mostly unnecessary, it can also happen that the server runs multiple ticks of player movement at once, 
+	// therefore the triggers need to be checked again.
+	for (int trigger = 0; trigger < sizeof(triggerTouchFired[]); trigger++)
+	{
+		triggerTouchFired[client][trigger] = 0;
+	}
+}
+
 static void Event_PlayerJump(Event event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(event.GetInt("userid"));
