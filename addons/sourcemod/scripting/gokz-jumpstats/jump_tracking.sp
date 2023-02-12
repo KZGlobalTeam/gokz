@@ -26,6 +26,8 @@ static ArrayList entityTouchList[MAXPLAYERS + 1];
 static int entityTouchDuration[MAXPLAYERS + 1];
 static int lastNoclipTime[MAXPLAYERS + 1];
 static int lastDuckbugTime[MAXPLAYERS + 1];
+static int lastGroundSpeedCappedTime[MAXPLAYERS + 1];
+static int lastMovementProcessedTime[MAXPLAYERS + 1];
 static float lastJumpButtonTime[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
@@ -349,7 +351,11 @@ enum struct JumpTracker
 				return JumpType_Other;
 			}
 		}
-		return this.HitDuckbugRecently() ? JumpType_Invalid : JumpType_LongJump;
+		if (this.HitDuckbugRecently() || !this.GroundSpeedCappedRecently())
+		{
+			return JumpType_Invalid;
+		}
+		return JumpType_LongJump;
 	}
 	
 	bool HitBhop()
@@ -376,6 +382,12 @@ enum struct JumpTracker
 		return this.tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
 	}
 	
+	bool GroundSpeedCappedRecently()
+	{
+		// A valid longjump needs to have their ground speed capped the tick right before.
+		return lastGroundSpeedCappedTime[this.jumper] == lastMovementProcessedTime[this.jumper];
+	}
+
 	// =====[ UPDATE HELPERS ]====================================================
 	
 	// We split that up in two functions to get a reference to the pose so we
@@ -1405,6 +1417,18 @@ void OnPlayerRunCmd_JumpTracking(int client, int buttons, int tickcount)
 	{
 		UpdateValidCmd(client, buttons);
 	}
+}
+
+public Action Movement_OnWalkMovePost(int client)
+{
+	lastGroundSpeedCappedTime[client] = jumpTrackers[client].tickCount;
+	return Plugin_Continue;
+}
+
+public Action Movement_OnPlayerMovePost(int client)
+{
+	lastMovementProcessedTime[client] = jumpTrackers[client].tickCount;
+	return Plugin_Continue;
 }
 
 public void OnPlayerRunCmdPost_JumpTracking(int client)
