@@ -60,7 +60,6 @@ enum struct JumpTracker
 	int jumpoffTick;
 	int poseIndex;
 	int strafeDirection;
-	int ladderGrabTick;
 	int lastJumpTick;
 	int lastTeleportTick;
 	int lastType;
@@ -1448,14 +1447,6 @@ public void OnPlayerRunCmdPost_JumpTracking(int client)
 	if (Movement_GetDuckbugged(client))
 	{
 		lastDuckbugTime[client] = jumpTrackers[client].tickCount;
-	}
-}
-
-public void OnChangeMovetype_JumpTracking(int client, MoveType oldMovetype, MoveType newMovetype)
-{
-	if (newMovetype == MOVETYPE_LADDER)
-	{
-		jumpTrackers[client].ladderGrabTick = jumpTrackers[client].tickCount;
 	}
 }
 
