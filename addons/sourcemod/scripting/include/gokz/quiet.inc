@@ -23,21 +23,25 @@ enum QTOption:
 
 enum
 {
-	ShowPlayers_Disabled = 0, 
-	ShowPlayers_Enabled, 
+	ShowPlayers_Disabled = 0,
+	ShowPlayers_Enabled,
 	SHOWPLAYERS_COUNT
 };
 
 enum
 {
-	MapSounds_Enabled = 0,
-	MapSounds_Disabled,
+	MapSounds_Disabled = 0,
+	MapSounds_Enabled,
 	MAPSOUNDS_COUNT
 };
 
-
-
 // =====[ CONSTANTS ]=====
+
+#define QUIET_OPTION_CATEGORY "Quiet"
+
+#define EFFECT_IMPACT 8
+#define EFFECT_KNIFESLASH 2
+#define BLANK_SOUNDSCAPEINDEX 482 // Search for "coopcementplant.missionselect_blank" id with sv_soundscape_printdebuginfo.
 
 stock char gC_QTOptionNames[QTOPTION_COUNT][] = 
 {
@@ -48,7 +52,7 @@ stock char gC_QTOptionNames[QTOPTION_COUNT][] =
 stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] = 
 {
 	"Visibility of Other Players - 0 = Disabled, 1 = Enabled",
-	"Play Ambient Map Sounds/Music - 0 = Enabled, 1 = Disabled"
+	"Play Ambient Map Sounds/Music - 0 = Disabled, 1 = Enabled"
 };
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] = 
@@ -68,8 +72,6 @@ stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
 	"Options Menu - Show Players",
 	"Options Menu - Map Sounds"
 };
-
-
 
 // =====[ STOCKS ]=====
 

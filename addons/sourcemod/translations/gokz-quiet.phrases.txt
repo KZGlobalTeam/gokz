@@ -34,6 +34,10 @@ Phrases
 
 
 	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Quiet"
+	{
+		"en"		"Quiet"
+	}
 	"Options Menu - Show Players"
 	{
 		"en"		"Show players"
@@ -44,6 +48,5 @@ Phrases
 	{
 		"en"		"Play map sounds"
 		"chi"		"播放地图音乐"
-		"ru"		"Play map sounds"
 	}
 }
