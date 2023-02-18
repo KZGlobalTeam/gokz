@@ -2,6 +2,17 @@
 {
 	"#default"
 	{
+		"Functions"
+		{
+			"CCSGameMovement::CanUnduck"
+			{
+				"signature" "CCSGameMovement::CanUnduck"
+				"callconv" 	"thiscall"
+				"this" 		"address"
+				"return" 	"bool"
+			}
+		}
+
 		"Keys"
 		{
 			"IGameMovement"		"GameMovement001"
@@ -16,6 +27,12 @@
 				"library"		"server"
 				"windows"		"@CreateInterface"
 				"linux"			"@CreateInterface"
+			}
+			"CCSGameMovement::CanUnduck"
+			{
+				"library"	"server"
+				"windows"	"\x55\x8B\xEC\x81\xEC\x8C\x00\x00\x00\x57\x8B\xF9\x8B\x87\x54\x0E\x00\x00"
+				"linux"		"\x55\x89\xE5\x57\x56\x53\x81\xEC\xFC\x00\x00\x00\x8B\x5D\x08\x8B\x83\x54\x0E\x00\x00"
 			}
 		}
 
