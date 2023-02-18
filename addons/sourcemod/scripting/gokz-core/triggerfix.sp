@@ -12,7 +12,7 @@ static int processMovementTicks[MAXPLAYERS+1];
 static float playerFrameTime[MAXPLAYERS+1];
 
 static bool touchingTrigger[MAXPLAYERS+1][2048];
-static bool triggerTouchFired[MAXPLAYERS+1][2048];
+static int triggerTouchFired[MAXPLAYERS+1][2048];
 static int lastGroundEnt[MAXPLAYERS + 1];
 static bool duckedLastTick[MAXPLAYERS + 1];
 static bool mapTeleportedSequentialTicks[MAXPLAYERS+1];
@@ -171,7 +171,7 @@ public void OnClientConnected_Triggerfix(int client)
 	for (int i = 0; i < sizeof(touchingTrigger[]); i++)
 	{
 		touchingTrigger[client][i] = false;
-		triggerTouchFired[client][i] = false;
+		triggerTouchFired[client][i] = 0;
 	}
 }
 
@@ -201,9 +201,20 @@ public void OnGameFrame_Triggerfix()
 			// so this should not be a big problem.
 			for (int trigger = 0; trigger < sizeof(triggerTouchFired[]); trigger++)
 			{
-				triggerTouchFired[client][trigger] = false;
+				triggerTouchFired[client][trigger] = 0;
 			}
 		}
+	}
+}
+
+void OnPlayerRunCmd_Triggerfix(int client)
+{
+	// Reset the Touch tracking. 
+	// While this is mostly unnecessary, it can also happen that the server runs multiple ticks of player movement at once, 
+	// therefore the triggers need to be checked again.
+	for (int trigger = 0; trigger < sizeof(triggerTouchFired[]); trigger++)
+	{
+		triggerTouchFired[client][trigger] = 0;
 	}
 }
 
@@ -246,7 +257,7 @@ static Action Hook_TriggerTouch(int entity, int other)
 {
 	if (1 <= other <= MaxClients)
 	{
-	 	triggerTouchFired[other][entity] = true;
+	 	triggerTouchFired[other][entity]++;
 	}
 	return Plugin_Continue;	
 }
@@ -335,13 +346,14 @@ static bool DoTriggerFix(int client, bool filterFix = false)
 			// Completely ignore push triggers.
 			continue;
 		}
-		if (filterFix && SDKCall(passesTriggerFilters, trigger, client))
+		if (filterFix && SDKCall(passesTriggerFilters, trigger, client) && triggerTouchFired[client][trigger] < GOKZ_MAX_RETOUCH_TRIGGER_COUNT)
 		{
 			// MarkEntitiesAsTouching always fires the Touch function even if it was already fired this tick.
 			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
 			
 			// Player properties might be changed right after this so it will need to be triggered again.
-			triggerTouchFired[client][trigger] = false;
+			// Triggers changing this filter will loop onto itself infintely so we need to avoid that.
+			triggerTouchFired[client][trigger]++;
 			didSomething = true;
 		}
 		else if (!triggerTouchFired[client][trigger])
@@ -349,6 +361,7 @@ static bool DoTriggerFix(int client, bool filterFix = false)
 			// If the player is still touching the trigger on this tick, and Touch was not called for whatever reason
 			// in the last tick, we make sure that it is called now.
 			SDKCall(markEntitiesAsTouching, serverGameEnts, client, trigger);
+			triggerTouchFired[client][trigger]++;
 			didSomething = true;
 		}
 	}
