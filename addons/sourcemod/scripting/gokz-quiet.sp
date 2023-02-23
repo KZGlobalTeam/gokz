@@ -29,6 +29,7 @@ public Plugin myinfo =
 
 #include "gokz-quiet/soundscape.sp"
 #include "gokz-quiet/hideplayers.sp"
+#include "gokz-quiet/falldamage.sp"
 #include "gokz-quiet/options.sp"
 
 // =====[ PLUGIN EVENTS ]=====
@@ -42,6 +43,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
 	OnPluginStart_HidePlayers();
+	OnPluginStart_FallDamage();
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
