@@ -27,7 +27,7 @@ bool IsDrawingInfoPanel(int client)
 
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
-	int updateSpeed = gB_FastUpdateRate[client] ? 3 : 6;
+	int updateSpeed = gB_FastUpdateRate[client] ? 1 : 10;
 	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateInfoPanel(client, info);
