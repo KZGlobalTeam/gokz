@@ -52,6 +52,7 @@ static bool hitBhop[RP_MAX_BOTS];
 static bool hitPerf[RP_MAX_BOTS];
 static bool botJumped[RP_MAX_BOTS];
 static bool botIsTakeoff[RP_MAX_BOTS];
+static bool botJustTeleported[RP_MAX_BOTS];
 static float botLandingSpeed[RP_MAX_BOTS];
 
 
@@ -120,7 +121,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
 	if (botReplayVersion[bot] == 1)
 	{
-		info.Time = botTime[bot];
+		info.Time = playbackTick[bot]  * GetTickInterval();
 	}
 	else if (botReplayVersion[bot] == 2)
 	{
@@ -137,6 +138,7 @@ void GetPlaybackState(int client, HUDInfo info)
 			info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
 		}
 	}
+	info.TimerRunning = true;
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
 	info.Paused = false;
@@ -220,7 +222,7 @@ void TrySkipToTime(int client, int seconds)
 		return;
 	}
 	
-	int tick = seconds * 128;
+	int tick = seconds * 128 + preAndPostRunTickCount;
 	int bot = GetBotFromClient(GetObserverTarget(client));
 	
 	if (tick >= 0 && tick < playbackTickData[bot].Length)
@@ -239,7 +241,7 @@ float GetPlaybackTime(int bot)
 	{
 		return 0.0;
 	}
-	if (playbackTick[bot] >= playbackTickData[bot].Length - (preAndPostRunTickCount * 2))
+	if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
 	{
 		return botTime[bot];
 	}
@@ -961,12 +963,17 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			GOKZ_EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)], _, "Timer End");
 		}
 
-		// Set velocity to travel from current origin to recorded origin
-		float currentOrigin[3], velocity[3];
-		Movement_GetOrigin(client, currentOrigin);
-		MakeVectorFromPoints(currentOrigin, currentTickData.origin, velocity);
-		ScaleVector(velocity, 1.0 / GetTickInterval());
-		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, velocity);
+		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, currentTickData.velocity);
+		// TeleportEntity does not set the absolute origin and velocity so we need to do it
+		// to prevent inaccurate eye position interpolation.
+		SetEntPropVector(client, Prop_Data, "m_vecVelocity", currentTickData.velocity);
+		SetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", currentTickData.velocity);
+		
+		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", currentTickData.origin);
+		SetEntPropVector(client, Prop_Data, "m_vecOrigin", currentTickData.origin);
+
+		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[0]", currentTickData.angles[0]);
+		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[1]", currentTickData.angles[1]);
 		
 		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
@@ -1027,31 +1034,35 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		// Set the bot's MoveType
 		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
 		botMoveType[bot] = replayMoveType;
-		if (Movement_GetSpeed(client) > SPEED_NORMAL * 2)
+		if (replayMoveType == MOVETYPE_WALK)
 		{
-			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
-		}
-		else if (replayMoveType == MOVETYPE_WALK && currentTickData.flags & RP_FL_ONGROUND)
-		{
-			botPaused[bot] = false;
-			SetEntityFlags(client, entityFlags | FL_ONGROUND);
 			Movement_SetMovetype(client, MOVETYPE_WALK);
-			// The bot is on the ground, so there must be a ground entity attributed to the bot.
-			int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
-			if (groundEnt == -1)
+			if (currentTickData.flags & RP_FL_ONGROUND)
 			{
-				float endPosition[3], mins[3], maxs[3];
-				GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
-				GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
-				endPosition = currentTickData.origin;
-				endPosition[2] -= 2.0;
-				TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-				// This should always hit.
-				if (TR_DidHit())
+				botPaused[bot] = false;
+				SetEntityFlags(client, entityFlags | FL_ONGROUND);
+				// The bot is on the ground, so there must be a ground entity attributed to the bot.
+				int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+				if (groundEnt == -1 && botJustTeleported[bot])
 				{
-					groundEnt = TR_GetEntityIndex();
-					SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+					SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", 0.0);
+					float endPosition[3], mins[3], maxs[3];
+					GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
+					GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
+					endPosition = currentTickData.origin;
+					endPosition[2] -= 2.0;
+					TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+					// This should always hit.
+					if (TR_DidHit())
+					{
+						groundEnt = TR_GetEntityIndex();
+						SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+					}
 				}
+			}
+			else
+			{
+				botJustTeleported[bot] = false;
 			}
 		}
 		else if (replayMoveType == MOVETYPE_LADDER)
@@ -1072,6 +1083,7 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		// Set some variables
 		if (currentTickData.flags & RP_TELEPORT_TICK)
 		{
+			botJustTeleported[bot] = true;
 			botCurrentTeleport[bot]++;
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		}

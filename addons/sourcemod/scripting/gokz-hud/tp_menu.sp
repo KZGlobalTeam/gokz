@@ -35,6 +35,15 @@ void OnPlayerRunCmdPost_TPMenu(int client, int cmdnum, HUDInfo info)
 	}
 }
 
+public int PanelHandler_Menu(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Cancel)
+	{
+		gB_MenuShowing[param1] = false;
+	}
+	return 0;
+}
+
 public int MenuHandler_TPMenu(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
@@ -97,7 +106,7 @@ static void UpdateTPMenu(int client, HUDInfo info)
 {
 	KZPlayer player = KZPlayer(client);
 	
-	if (player.Fake || !player.Alive || player.TPMenu == TPMenu_Disabled)
+	if (player.Fake)
 	{
 		return;
 	}
@@ -111,13 +120,36 @@ static void UpdateTPMenu(int client, HUDInfo info)
 		|| player.CanPause != oldCanPause[client]
 		|| player.CanResume != oldCanResume[client];
 
-	// If there is no menu showing, or if the TP menu is currently showing with timer text
-	if (GetClientMenu(client) == MenuSource_None
-		 || gB_MenuShowing[player.ID] && GetClientAvgLoss(player.ID, NetFlow_Both) > EPSILON
-		 || gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu
-		 || gB_MenuShowing[player.ID] && force)
+	
+	if (player.Alive)
 	{
-		ShowTPMenu(player, info);
+		if (player.TPMenu != TPMenu_Disabled)
+		{
+			if (GetClientMenu(client) == MenuSource_None
+				|| gB_MenuShowing[player.ID] && GetClientAvgLoss(player.ID, NetFlow_Both) > EPSILON
+				|| gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu
+				|| gB_MenuShowing[player.ID] && force)
+			{
+				ShowTPMenu(player, info);
+			}
+		}
+		else
+		{
+			// There is no need to update this very often as there's no menu selection to be done here.
+			if (GetClientMenu(client) == MenuSource_None
+				|| gB_MenuShowing[player.ID] && player.TimerRunning && !player.Paused && player.TimerText == TimerText_TPMenu)
+			{
+				ShowPanel(player, info);
+			}
+		}
+	}
+	else if (player.ObserverTarget != -1) // If the player is spectating someone else
+	{
+		// Check if the replay plugin wants to display the replay control menu.
+		if (!(IsFakeClient(player.ObserverTarget) && gB_GOKZReplays && GOKZ_RP_UpdateReplayControlMenu(client)))
+		{
+			ShowPanel(player, info);
+		}
 	}
 	
 	oldCanMakeCP[client] = player.CanMakeCheckpoint;
@@ -128,6 +160,42 @@ static void UpdateTPMenu(int client, HUDInfo info)
 	oldCanPause[client] = player.CanPause;
 	oldCanResume[client] = player.CanResume;
 	forceRefresh[client] = false;
+}
+
+static void ShowPanel(KZPlayer player, HUDInfo info)
+{
+	char panelTitle[256];
+	// Spectator List
+	if (player.ShowSpectators >= ShowSpecs_Number && player.SpecListPosition == SpecListPosition_TPMenu)
+	{
+		Format(panelTitle, sizeof(panelTitle), "%s", FormatSpectatorTextForMenu(player, info));
+	}
+	// Timer panel
+	if (player.TimerText == TimerText_TPMenu && info.TimerRunning)
+	{
+		if (panelTitle[0] != '\0')
+		{
+			Format(panelTitle, sizeof(panelTitle), "%s \n%s", panelTitle, FormatTimerTextForMenu(player, info));
+		}
+		else
+		{
+			Format(panelTitle, sizeof(panelTitle), "%s", FormatTimerTextForMenu(player, info));
+		}
+		if (info.TimeType == TimeType_Nub && info.CurrentTeleport != 0)
+		{
+			Format(panelTitle, sizeof(panelTitle), "%s\n%t", panelTitle, "TP Menu - Spectator Teleports", info.CurrentTeleport);
+		}
+	}
+
+	if (panelTitle[0] != '\0' && GetClientMenu(player.ID) == MenuSource_None || gB_MenuShowing[player.ID])
+	{
+		Panel panel = new Panel(null);
+		panel.SetTitle(panelTitle);
+		panel.Send(player.ID, PanelHandler_Menu, MENU_TIME_FOREVER);
+		
+		delete panel;
+		gB_MenuShowing[player.ID] = true;
+	}
 }
 
 static void ShowTPMenu(KZPlayer player, HUDInfo info)
@@ -144,25 +212,25 @@ static void ShowTPMenu(KZPlayer player, HUDInfo info)
 
 static void TPMenuSetTitle(KZPlayer player, Menu menu, HUDInfo info)
 {
-	switch (player.ShowSpectators)
+	char title[256];
+	if (player.ShowSpectators >= ShowSpecs_Number && player.SpecListPosition == SpecListPosition_TPMenu)
 	{
-		case ShowSpecs_Number:
-		{
-			menu.SetTitle("%T\n \n", "TP Menu - Spectators - Number", player.ID, GetNumSpectators(player));
-		}
-		case ShowSpecs_Full:
-		{
-			char display[512];
-			FormatSpectatorNames(player, display);
-			menu.SetTitle("%T\n \n", "TP Menu - Spectators - Full", player.ID, GetNumSpectators(player), display);
-		}
+		Format(title, sizeof(title), "%s", FormatSpectatorTextForMenu(player, info));
 	}
-
 	if (player.TimerRunning && player.TimerText == TimerText_TPMenu)
 	{
-		char display[512];
-		menu.GetTitle(display, sizeof(display));
-		menu.SetTitle("%s%s", display, FormatTimerTextForMenu(player,info));
+		if (title[0] != '\0')
+		{
+			Format(title, sizeof(title), "%s \n%s", title, FormatTimerTextForMenu(player, info));
+		}
+		else
+		{
+			Format(title, sizeof(title), "%s", FormatTimerTextForMenu(player, info));
+		}
+	}
+	if (title[0] != '\0')
+	{
+		menu.SetTitle(title);
 	}
 }
 
@@ -343,61 +411,5 @@ static void TPMenuAddItemStart(KZPlayer player, Menu menu)
 	{
 		FormatEx(display, sizeof(display), "%T", "TP Menu - Start", player.ID);
 		menu.AddItem(ITEM_INFO_START, display, ITEMDRAW_DEFAULT);
-	}
-}
-
-static int GetNumSpectators(KZPlayer player)
-{
-	int count;
-
-	for(int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i) && !IsPlayerAlive(i))
-		{
-			int SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-				if (target == player.ID)
-				{
-					count++;
-				}
-			}
-		}
-	}
-
-	return count;
-}
-
-static void FormatSpectatorNames(KZPlayer player, char display[512])
-{
-	int count;
-
-	for(int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i) && !IsPlayerAlive(i))
-		{
-			int SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-				if (target == player.ID)
-				{
-					count++;
-					//strip pound symbol from names
-					char cleanName[MAX_NAME_LENGTH];
-					GetClientName(i, cleanName, sizeof(cleanName));
-					ReplaceString(cleanName, sizeof(cleanName), "#", "", false);
-					if (count < 6)
-					{
-						Format(display, sizeof(display), "%s%s\n", display, cleanName);
-					}
-				}
-				if (count == 6)
-				{
-					Format(display, sizeof(display), "%s...", display);
-				}
-			}
-		}
 	}
 }
