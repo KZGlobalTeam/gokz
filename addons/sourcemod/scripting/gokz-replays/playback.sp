@@ -121,7 +121,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
 	if (botReplayVersion[bot] == 1)
 	{
-		info.Time = botTime[bot];
+		info.Time = playbackTick[bot]  * GetTickInterval();
 	}
 	else if (botReplayVersion[bot] == 2)
 	{
@@ -138,6 +138,7 @@ void GetPlaybackState(int client, HUDInfo info)
 			info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
 		}
 	}
+	info.TimerRunning = true;
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
 	info.Paused = false;
@@ -221,7 +222,7 @@ void TrySkipToTime(int client, int seconds)
 		return;
 	}
 	
-	int tick = seconds * 128;
+	int tick = seconds * 128 + preAndPostRunTickCount;
 	int bot = GetBotFromClient(GetObserverTarget(client));
 	
 	if (tick >= 0 && tick < playbackTickData[bot].Length)
@@ -240,7 +241,7 @@ float GetPlaybackTime(int bot)
 	{
 		return 0.0;
 	}
-	if (playbackTick[bot] >= playbackTickData[bot].Length - (preAndPostRunTickCount * 2))
+	if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
 	{
 		return botTime[bot];
 	}

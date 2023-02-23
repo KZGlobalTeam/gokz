@@ -16,18 +16,25 @@ static Handle timerHudSynchronizer;
 char[] FormatTimerTextForMenu(KZPlayer player, HUDInfo info)
 {
 	char timerTextString[32];
-	if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
+	if (info.TimerRunning)
 	{
-		FormatEx(timerTextString, sizeof(timerTextString), 
-			"%s %s", 
-			gC_TimeTypeNames[info.TimeType], 
-			GOKZ_HUD_FormatTime(player.ID, info.Time));
-	}
-	else
-	{
-		FormatEx(timerTextString, sizeof(timerTextString), 
-			"%s", 
-			GOKZ_HUD_FormatTime(player.ID, info.Time));
+		if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
+		{
+			FormatEx(timerTextString, sizeof(timerTextString), 
+				"%s %s", 
+				gC_TimeTypeNames[info.TimeType], 
+				GOKZ_HUD_FormatTime(player.ID, info.Time));
+		}
+		else
+		{
+			FormatEx(timerTextString, sizeof(timerTextString), 
+				"%s", 
+				GOKZ_HUD_FormatTime(player.ID, info.Time));
+		}
+		if (info.Paused)
+		{
+			Format(timerTextString, sizeof(timerTextString), "%s (%T)", timerTextString, "Info Panel Text - PAUSED", player.ID);
+		}
 	}
 	return timerTextString;
 }
@@ -68,16 +75,6 @@ void OnTimerStopped_TimerText(int client)
 	ClearTimerText(client);
 }
 
-public int PanelHandler_Menu(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Cancel)
-	{
-		gB_MenuShowing[param1] = false;
-	}
-	return 0;
-}
-
-
 
 // =====[ PRIVATE ]=====
 
@@ -108,36 +105,7 @@ static void ShowTimerText(KZPlayer player, HUDInfo info)
 		}
 		return;
 	}
-	
-	if (player.TimerText == TimerText_TPMenu)
-	{
-		// If there is no menu showing, or if the TP menu is currently showing;
-		// and if player is spectating, or is alive with TP menu disabled and not paused
-		
-		// Note that we don't mind if player we're spectating is paused etc. as there are too
-		// many variables to track whether we need to update the timer text for the spectator.
-		
-		if ((gB_MenuShowing[player.ID] || GetClientMenu(player.ID) == MenuSource_None)
-			 && (player.ID != info.ID || player.TPMenu == TPMenu_Disabled && !player.Paused))
-		{
-			// Use a Panel if want to show ONLY timer text (not TP menu)
-			// as it doesn't seem to be possible to display a Menu with no items.
-			Panel panel = new Panel(null);
-			panel.SetTitle(FormatTimerTextForMenu(player, info));
-			int observerTarget = GetObserverTarget(player.ID);
-			if (observerTarget != -1 && IsFakeClient(observerTarget)
-				 && info.TimeType == TimeType_Nub)
-			{
-				char text[32];
-				FormatEx(text, sizeof(text), "%t", "TP Menu - Spectator Teleports", info.CurrentTeleport);
-				panel.DrawItem(text, ITEMDRAW_RAWLINE);
-			}
-			panel.Send(player.ID, PanelHandler_Menu, MENU_TIME_FOREVER);
-			delete panel;
-			gB_MenuShowing[player.ID] = true;
-		}
-	}
-	else if (player.TimerText == TimerText_Top || player.TimerText == TimerText_Bottom)
+	if (player.TimerText == TimerText_Top || player.TimerText == TimerText_Bottom)
 	{
 		int colour[4]; // RGBA
 		if (player.GetHUDOption(HUDOption_TimerType) == TimerType_Enabled)
