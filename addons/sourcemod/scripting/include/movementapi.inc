@@ -108,6 +108,28 @@ forward void Movement_OnStopDucking(int client);
 forward void Movement_OnPlayerJump(int client, bool jumpbug);
 
 /**
+ * Called before PlayerMove movement function is called.
+ * Modifying origin or velocity parameters will change player's origin and velocity accordingly.
+ *
+ * @param client       Client index.
+ * @param origin       Player origin.
+ * @param velocity     Player velocity.
+ * @return             Plugin_Changed if origin or velocity is changed, Plugin_Continue otherwise.
+ */
+forward Action Movement_OnPlayerMovePre(int client, float origin[3], float velocity[3]);
+
+/**
+ * Called after PlayerMove movement function is called.
+ * Modifying origin or velocity parameters will change player's origin and velocity accordingly.
+ *
+ * @param client       Client index.
+ * @param origin       Player origin.
+ * @param velocity     Player velocity.
+ * @return             Plugin_Changed if origin or velocity is changed, Plugin_Continue otherwise.
+ */
+forward Action Movement_OnPlayerMovePost(int client, float origin[3], float velocity[3]);
+
+/**
  * Called before Duck movement function is called.
  * Modifying origin or velocity parameters will change player's origin and velocity accordingly.
  *

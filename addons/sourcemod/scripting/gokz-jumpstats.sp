@@ -122,11 +122,6 @@ public void Movement_OnStartTouchGround(int client)
 	OnStartTouchGround_JumpTracking(client);
 }
 
-public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
-{
-	OnChangeMovetype_JumpTracking(client, oldMovetype, newMovetype);
-}
-
 public void GOKZ_OnJumpInvalidated(int client)
 {
 	OnJumpInvalidated_JumpTracking(client);

@@ -70,14 +70,30 @@ static bool NothingEnabledInInfoPanel(KZPlayer player)
 
 static char[] GetInfoPanel(KZPlayer player, HUDInfo info)
 {
-	char infoPanelText[320];
+	char infoPanelText[512];
 	FormatEx(infoPanelText, sizeof(infoPanelText), 
-		"<font color='#ffffff08'>%s%s%s", 
+		"<font color='#ffffff08'>%s%s%s%s",
+		GetSpectatorString(player, info),
 		GetTimeString(player, info), 
 		GetSpeedString(player, info), 
 		GetKeysString(player, info));
 	TrimString(infoPanelText);
 	return infoPanelText;
+}
+
+static char[] GetSpectatorString(KZPlayer player, HUDInfo info)
+{
+	char spectatorString[255];
+	if (player.SpecListPosition != SpecListPosition_InfoPanel || player.ShowSpectators == ShowSpecs_Disabled)
+	{
+		return spectatorString;
+	}
+	// Only return something if the player is alive or observing someone else
+	if (player.Alive || player.ObserverTarget != -1)
+	{
+		FormatEx(spectatorString, sizeof(spectatorString), "%s", FormatSpectatorTextForInfoPanel(player, KZPlayer(info.ID)));
+	}
+	return spectatorString;
 }
 
 static char[] GetTimeString(KZPlayer player, HUDInfo info)

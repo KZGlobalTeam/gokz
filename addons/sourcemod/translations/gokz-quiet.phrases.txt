@@ -22,16 +22,22 @@ Phrases
 	"Option - Map Sounds - Enable"
 	{
 		"en"		"{grey}Map sounds are now enabled."
+		"chi"		"{grey}地图音乐已开启."
 		"ru"		"{grey}Звуки карты теперь включены."
 	}
 	"Option - Map Sounds - Disable"
 	{
 		"en"		"{grey}Map sounds are now disabled."
+		"chi"		"{grey}地图音乐已关闭."
 		"ru"		"{grey}Звуки карты теперь выключены."
 	}
 
 
 	// =====[ OPTIONS MENU ]=====
+	"Options Menu - Quiet"
+	{
+		"en"		"Quiet"
+	}
 	"Options Menu - Show Players"
 	{
 		"en"		"Show players"
@@ -41,6 +47,10 @@ Phrases
 	"Options Menu - Map Sounds"
 	{
 		"en"		"Play map sounds"
-		"ru"		"Play map sounds"
+		"chi"		"播放地图音乐"
+	}
+	"Options Menu - Fall Damage Sounds"
+	{
+		"en"		"Fall damage sounds"
 	}
 }

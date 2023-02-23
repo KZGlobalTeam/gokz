@@ -121,7 +121,7 @@ void GetPlaybackState(int client, HUDInfo info)
 	info.TimerRunning = botReplayType[bot] == ReplayType_Jump ? false : true;
 	if (botReplayVersion[bot] == 1)
 	{
-		info.Time = botTime[bot];
+		info.Time = playbackTick[bot]  * GetTickInterval();
 	}
 	else if (botReplayVersion[bot] == 2)
 	{
@@ -138,6 +138,7 @@ void GetPlaybackState(int client, HUDInfo info)
 			info.Time = (playbackTick[bot] - preAndPostRunTickCount) * GetTickInterval();
 		}
 	}
+	info.TimerRunning = true;
 	info.TimeType = botTeleportsUsed[bot] > 0 ? TimeType_Nub : TimeType_Pro;
 	info.Speed = botSpeed[bot];
 	info.Paused = false;
@@ -221,7 +222,7 @@ void TrySkipToTime(int client, int seconds)
 		return;
 	}
 	
-	int tick = seconds * 128;
+	int tick = seconds * 128 + preAndPostRunTickCount;
 	int bot = GetBotFromClient(GetObserverTarget(client));
 	
 	if (tick >= 0 && tick < playbackTickData[bot].Length)
@@ -240,7 +241,7 @@ float GetPlaybackTime(int bot)
 	{
 		return 0.0;
 	}
-	if (playbackTick[bot] >= playbackTickData[bot].Length - (preAndPostRunTickCount * 2))
+	if (playbackTick[bot] >= playbackTickData[bot].Length - preAndPostRunTickCount)
 	{
 		return botTime[bot];
 	}
@@ -747,7 +748,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			breatherStartTime[bot] = GetEngineTime();
 			if (playbackTick[bot] == (size - 1)) 
 			{
-				EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+				GOKZ_EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)], _, "Timer End");
 			}
 		}
 		else if (GetEngineTime() > breatherStartTime[bot] + RP_PLAYBACK_BREATHER_TIME)
@@ -757,7 +758,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 			botPlaybackPaused[bot] = false;
 			if (playbackTick[bot] == 0)
 			{
-				EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+				GOKZ_EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)], _, "Timer Start");
 			}
 			// Start the bot if first tick. Clear bot if last tick.
 			playbackTick[bot]++;
@@ -970,12 +971,12 @@ void PlaybackVersion2(int client, int bot, int &buttons, float vel[3], float ang
 		// Play timer start/end sound, if necessary. Reset teleports
 		if (playbackTick[bot] == preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
-			EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			GOKZ_EmitSoundToClientSpectators(client, gC_ModeStartSounds[GOKZ_GetCoreOption(client, Option_Mode)], _, "Timer Start");
 			botCurrentTeleport[bot] = 0;
 		}
 		if (playbackTick[bot] == botTimeTicks[bot] + preAndPostRunTickCount && botReplayType[bot] == ReplayType_Run)
 		{
-			EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)]);
+			GOKZ_EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)], _, "Timer End");
 		}
 		// We use the previous position/velocity data to recreate sounds accurately.
 		// This might not be necessary as we already did do this in OnPlayerRunCmdPost of last tick,

@@ -219,7 +219,7 @@ public Action CommandSetStartPos(int client, int args)
 	GOKZ_PrintToChat(client, true, "%t", "Set Custom Start Position");
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
+		GOKZ_EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT, _, "Set Start Position");
 	}
 	
 	return Plugin_Handled;

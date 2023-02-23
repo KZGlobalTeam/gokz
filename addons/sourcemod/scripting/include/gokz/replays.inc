@@ -244,6 +244,12 @@ native int GOKZ_RP_GetPlaybackInfo(int client, any[] info);
  */
 native int GOKZ_RP_LoadJumpReplay(int client, char[] path);
 
+/**
+ * Called by the HUD to show the replay control menu.
+ *
+ * @param client			Client index.
+ */
+native bool GOKZ_RP_UpdateReplayControlMenu(int client);
 
 
 // =====[ DEPENDENCY ]=====
@@ -264,5 +270,6 @@ public void __pl_gokz_replays_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_RP_GetPlaybackInfo");
 	MarkNativeAsOptional("GOKZ_RP_LoadJumpReplay");
+	MarkNativeAsOptional("GOKZ_RP_UpdateReplayControlMenu");
 }
 #endif
