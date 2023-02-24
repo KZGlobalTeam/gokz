@@ -892,7 +892,11 @@ static void CheckpointTeleportDo(int client)
 	checkpoints[client].GetArray(checkpointIndex[client], cp);
 	
 	TeleportDo(client, cp.origin, cp.angles);
-	
+	if (cp.groundEnt != INVALID_ENT_REFERENCE)
+	{
+		SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", cp.groundEnt);
+		SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
+	}
 	// Handle ladder stuff
 	if (cp.onLadder)
 	{

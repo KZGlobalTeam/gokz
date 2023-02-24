@@ -438,6 +438,8 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 	AcceptEntityInput(client, "ClearParent");
 
 	Movement_SetOrigin(client, origin);
+	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 	if (setAngles)
 	{
 		// NOTE: changing angles with TeleportEntity can fail due to packet loss!!!
