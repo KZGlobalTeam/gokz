@@ -2,6 +2,13 @@
 {
 	"csgo"
 	{
+		"Addresses"
+		{
+			"BotDuck"
+			{
+				"signature" "BotDuckSig"
+			}
+		}
 		"Functions"
 		{
 			"CCSGameRules::TeamFull"
@@ -25,6 +32,19 @@
 			{
 				"windows"	"\x55\x8B\xEC\x56\x8B\xF1\xE8\x2A\x2A\x2A\x2A\x8B\x45\x08\x83\xE8\x01"
 				"linux"		"\x55\x89\xE5\x56\x53\x8B\x5D\x08\x8B\x75\x0C\x80\xBB\xAD\x0E\x00\x00\x00"
+			}
+			"BotDuckSig"
+			{
+				"windows"	"\x8B\x86\x54\x0E\x00\x00\x8B\xCE"
+				"linux"		"\x8B\x83\x54\x0E\x00\x00\x83\xEC\x0C"
+			}
+		}
+		"Offsets"
+		{
+			"BotDuckPatchLength"
+			{
+				"windows"	"23"
+				"linux"		"38"
 			}
 		}
 	}

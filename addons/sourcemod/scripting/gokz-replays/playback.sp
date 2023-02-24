@@ -303,7 +303,7 @@ void OnClientDisconnect_Playback(int client)
 	}
 }
 
-void OnPlayerRunCmd_Playback(int client, int &buttons)
+void OnPlayerRunCmd_Playback(int client, int &buttons, float vel[3], float angles[3])
 {
 	if (!IsFakeClient(client))
 	{
@@ -321,7 +321,24 @@ void OnPlayerRunCmd_Playback(int client, int &buttons)
 		switch (botReplayVersion[bot])
 		{
 			case 1: PlaybackVersion1(client, bot, buttons);
-			case 2: PlaybackVersion2(client, bot, buttons);
+			case 2: PlaybackVersion2(client, bot, buttons, vel, angles);
+		}
+		break;
+	}
+}
+
+void OnPlayerRunCmdPost_Playback(int client)
+{
+	for (int bot; bot < RP_MAX_BOTS; bot++)
+	{
+		// Check if not the bot we're looking for
+		if (!botInGame[bot] || botClient[bot] != client || !botDataLoaded[bot])
+		{
+			continue;
+		}
+		if (botReplayVersion[bot] == 2)
+		{
+			PlaybackVersion2Post(client, bot);
 		}
 		break;
 	}
@@ -339,7 +356,6 @@ void GOKZ_OnOptionsLoaded_Playback(int client)
 		}
 	}
 }
-
 // =====[ PRIVATE ]=====
 
 // Returns false if there was a problem loading the playback e.g. doesn't exist
@@ -884,7 +900,7 @@ static void PlaybackVersion1(int client, int bot, int &buttons)
 		playbackTick[bot]++;
 	}
 }
-void PlaybackVersion2(int client, int bot, int &buttons)
+void PlaybackVersion2(int client, int bot, int &buttons, float vel[3], float angles[3])
 {
 	int size = playbackTickData[bot].Length;
 	ReplayTickData prevTickData;
@@ -962,22 +978,20 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		{
 			GOKZ_EmitSoundToClientSpectators(client, gC_ModeEndSounds[GOKZ_GetCoreOption(client, Option_Mode)], _, "Timer End");
 		}
-
-		TeleportEntity(client, NULL_VECTOR, currentTickData.angles, currentTickData.velocity);
+		// We use the previous position/velocity data to recreate sounds accurately.
+		// This might not be necessary as we already did do this in OnPlayerRunCmdPost of last tick,
+		// but we do it again just in case the values don't match up somehow (eg. collision with moving objects?)
+		TeleportEntity(client, NULL_VECTOR, prevTickData.angles, prevTickData.velocity);
 		// TeleportEntity does not set the absolute origin and velocity so we need to do it
 		// to prevent inaccurate eye position interpolation.
-		SetEntPropVector(client, Prop_Data, "m_vecVelocity", currentTickData.velocity);
-		SetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", currentTickData.velocity);
+		SetEntPropVector(client, Prop_Data, "m_vecVelocity", prevTickData.velocity);
+		SetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", prevTickData.velocity);
 		
-		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", currentTickData.origin);
-		SetEntPropVector(client, Prop_Data, "m_vecOrigin", currentTickData.origin);
+		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", prevTickData.origin);
+		SetEntPropVector(client, Prop_Data, "m_vecOrigin", prevTickData.origin);
 
-		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[0]", currentTickData.angles[0]);
-		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[1]", currentTickData.angles[1]);
-		
-		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 
-		// Set buttons
+		// Set buttons and potential inputs.
 		int newButtons;
 		if (currentTickData.flags & RP_IN_ATTACK)
 		{
@@ -995,13 +1009,27 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		{
 			newButtons |= IN_DUCK;
 		}
+		// Few assumptions here because the replay doesn't track them: Player doesn't use +klook or +strafe.
+		// If the assumptions are wrong we will just end up with wrong sound prediction, no big deal.
 		if (currentTickData.flags & RP_IN_FORWARD)
 		{
 			newButtons |= IN_FORWARD;
+			vel[0] += RP_PLAYER_ACCELSPEED;
 		}
 		if (currentTickData.flags & RP_IN_BACK)
 		{
 			newButtons |= IN_BACK;
+			vel[0] -= RP_PLAYER_ACCELSPEED;
+		}
+		if (currentTickData.flags & RP_IN_MOVELEFT)
+		{
+			newButtons |= IN_MOVELEFT;
+			vel[1] -= RP_PLAYER_ACCELSPEED;
+		}
+		if (currentTickData.flags & RP_IN_MOVERIGHT)
+		{
+			newButtons |= IN_MOVERIGHT;
+			vel[1] += RP_PLAYER_ACCELSPEED;
 		}
 		if (currentTickData.flags & RP_IN_LEFT)
 		{
@@ -1010,14 +1038,6 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		if (currentTickData.flags & RP_IN_RIGHT)
 		{
 			newButtons |= IN_RIGHT;
-		}
-		if (currentTickData.flags & RP_IN_MOVELEFT)
-		{
-			newButtons |= IN_MOVELEFT;
-		}
-		if (currentTickData.flags & RP_IN_MOVERIGHT)
-		{
-			newButtons |= IN_MOVERIGHT;
 		}
 		if (currentTickData.flags & RP_IN_RELOAD)
 		{
@@ -1029,41 +1049,15 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		}
 		buttons = newButtons;
 		botButtons[bot] = buttons;
+		// The angles might be wrong if the player teleports, but this should only affect sound prediction.
+		angles = currentTickData.angles;
 
-		int entityFlags = GetEntityFlags(client);
 		// Set the bot's MoveType
-		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
+		MoveType replayMoveType = view_as<MoveType>(prevTickData.flags & RP_MOVETYPE_MASK);
 		botMoveType[bot] = replayMoveType;
 		if (replayMoveType == MOVETYPE_WALK)
 		{
 			Movement_SetMovetype(client, MOVETYPE_WALK);
-			if (currentTickData.flags & RP_FL_ONGROUND)
-			{
-				botPaused[bot] = false;
-				SetEntityFlags(client, entityFlags | FL_ONGROUND);
-				// The bot is on the ground, so there must be a ground entity attributed to the bot.
-				int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
-				if (groundEnt == -1 && botJustTeleported[bot])
-				{
-					SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", 0.0);
-					float endPosition[3], mins[3], maxs[3];
-					GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
-					GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
-					endPosition = currentTickData.origin;
-					endPosition[2] -= 2.0;
-					TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
-					// This should always hit.
-					if (TR_DidHit())
-					{
-						groundEnt = TR_GetEntityIndex();
-						SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
-					}
-				}
-			}
-			else
-			{
-				botJustTeleported[bot] = false;
-			}
 		}
 		else if (replayMoveType == MOVETYPE_LADDER)
 		{
@@ -1074,18 +1068,11 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 		{
 			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		}
-		
-		if (currentTickData.flags & RP_UNDER_WATER)
-		{
-			SetEntityFlags(client, entityFlags | FL_INWATER);
-		}
-
 		// Set some variables
 		if (currentTickData.flags & RP_TELEPORT_TICK)
 		{
 			botJustTeleported[bot] = true;
 			botCurrentTeleport[bot]++;
-			Movement_SetMovetype(client, MOVETYPE_NOCLIP);
 		}
 
 		if (currentTickData.flags & RP_TAKEOFF_TICK)
@@ -1152,7 +1139,75 @@ void PlaybackVersion2(int client, int bot, int &buttons)
 			PrintToServer("==============================================================");
 		}
 		#endif
+	}
+}
 
+void PlaybackVersion2Post(int client, int bot)
+{
+	if (botPlaybackPaused[bot])
+	{
+		return;
+	}
+	int size = playbackTickData[bot].Length;
+	if (playbackTick[bot] != 0 && playbackTick[bot] != (size - 1))
+	{
+		ReplayTickData currentTickData;
+		ReplayTickData prevTickData;
+		playbackTickData[bot].GetArray(playbackTick[bot], currentTickData);
+		playbackTickData[bot].GetArray(IntMax(playbackTick[bot] - 1, 0), prevTickData);
+
+		// TeleportEntity does not set the absolute origin and velocity so we need to do it
+		// to prevent inaccurate eye position interpolation.
+		SetEntPropVector(client, Prop_Data, "m_vecVelocity", currentTickData.velocity);
+		SetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", currentTickData.velocity);
+		
+		SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", currentTickData.origin);
+		SetEntPropVector(client, Prop_Data, "m_vecOrigin", currentTickData.origin);
+
+		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[0]", currentTickData.angles[0]);
+		SetEntPropFloat(client, Prop_Send, "m_angEyeAngles[1]", currentTickData.angles[1]);
+
+		MoveType replayMoveType = view_as<MoveType>(currentTickData.flags & RP_MOVETYPE_MASK);
+		botMoveType[bot] = replayMoveType;
+		int entityFlags = GetEntityFlags(client);
+		if (replayMoveType == MOVETYPE_WALK)
+		{
+			if (currentTickData.flags & RP_FL_ONGROUND)
+			{
+				SetEntityFlags(client, entityFlags | FL_ONGROUND);
+				botPaused[bot] = false;
+				// The bot is on the ground, so there must be a ground entity attributed to the bot.
+				int groundEnt = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+				if (groundEnt == -1 && botJustTeleported[bot])
+				{
+					SetEntPropFloat(client, Prop_Send, "m_flFallVelocity", 0.0);
+					float endPosition[3], mins[3], maxs[3];
+					GetEntPropVector(client, Prop_Send, "m_vecMaxs", maxs);
+					GetEntPropVector(client, Prop_Send, "m_vecMins", mins);
+					endPosition = currentTickData.origin;
+					endPosition[2] -= 2.0;
+					TR_TraceHullFilter(currentTickData.origin, endPosition, mins, maxs, MASK_PLAYERSOLID, TraceEntityFilterPlayers);
+
+					// This should always hit.
+					if (TR_DidHit())
+					{
+						groundEnt = TR_GetEntityIndex();
+						SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", groundEnt);
+					}
+				}
+			}
+			else
+			{
+				botJustTeleported[bot] = false;
+			}
+		}
+		
+		if (currentTickData.flags & RP_UNDER_WATER)
+		{
+			SetEntityFlags(client, entityFlags | FL_INWATER);
+		}
+
+		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);
 		playbackTick[bot]++;
 	}
 }
