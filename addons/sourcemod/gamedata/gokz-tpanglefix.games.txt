@@ -1,0 +1,55 @@
+"Games"
+{
+	"csgo"
+	{
+		"Functions"
+		{
+			"CGameClient::WriteViewAngleUpdate"
+			{
+				"signature" "CGameClient::WriteViewAngleUpdate"
+				"callconv"	"thiscall"
+				"this"		"address"
+				"return"	"void"
+			}
+		}
+		"Addresses"
+		{
+			"WriteViewAngleUpdate"
+			{
+				"windows"
+				{
+					"signature" "CGameClient::WriteViewAngleUpdate"
+				}
+				"linux"
+				{
+					"signature" "CGameClient::WriteViewAngleUpdate"
+				}
+			}
+		}
+
+		"Offsets"
+		{
+			"WriteViewAngleUpdateReliableOffset"
+			{
+				"windows"	"363"
+				"linux"		"290"
+			}
+			"ClientIndexOffset"
+			{
+				"linux"		"116"
+				"windows"	"112"
+			}
+		}
+
+		"Signatures"
+		{
+			//A few functions after "%c00000000000000" string
+			"CGameClient::WriteViewAngleUpdate"
+			{
+				"library"	"engine"
+				"windows"	"\x55\x8B\xEC\x83\xEC\x40\x56\x57"
+				"linux"		"\x55\x89\xE5\x57\x56\x53\x83\xEC\x4C\x8B\x5D\x08\x8B\x03"
+			}
+		}
+	}
+}

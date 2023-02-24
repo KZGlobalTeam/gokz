@@ -154,6 +154,8 @@ enum struct ReplayTickData
 #define RP_MAX_BHOP_GROUND_TICKS 5
 #define RP_SKIP_TIME 10 // 10 seconds
 #define RP_MAX_DURATION 6451200 // 14 hours on 128 tick
+#define RP_JUMP_STEP_SOUND_THRESHOLD 140.0
+#define RP_PLAYER_ACCELSPEED 450.0
 
 #define RP_MOVETYPE_MASK		(0xF)
 #define RP_IN_ATTACK			(1 << 4)
@@ -242,6 +244,12 @@ native int GOKZ_RP_GetPlaybackInfo(int client, any[] info);
  */
 native int GOKZ_RP_LoadJumpReplay(int client, char[] path);
 
+/**
+ * Called by the HUD to show the replay control menu.
+ *
+ * @param client			Client index.
+ */
+native bool GOKZ_RP_UpdateReplayControlMenu(int client);
 
 
 // =====[ DEPENDENCY ]=====
@@ -262,5 +270,6 @@ public void __pl_gokz_replays_SetNTVOptional()
 {
 	MarkNativeAsOptional("GOKZ_RP_GetPlaybackInfo");
 	MarkNativeAsOptional("GOKZ_RP_LoadJumpReplay");
+	MarkNativeAsOptional("GOKZ_RP_UpdateReplayControlMenu");
 }
 #endif

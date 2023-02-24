@@ -1,0 +1,24 @@
+"Games"
+{
+	"csgo"
+	{
+		"Signatures"
+		{
+			"CGameClient::SendSound"
+			{
+				"library"		"engine"
+				"windows"		"\x55\x8B\xEC\x51\x56\x8B\xF1\x8B\x46\x04"
+				"linux"			"\x55\x89\xE5\x57\x56\x53\x83\xEC\x2C\x8B\x5D\x08\x8B\x75\x10\x8B\x03"
+			}
+		}
+
+		"Offsets"
+		{
+			"CBaseClient::GetPlayerSlot"
+			{
+				"windows"		"16"
+				"linux"			"17"
+			}
+		}
+	}
+}

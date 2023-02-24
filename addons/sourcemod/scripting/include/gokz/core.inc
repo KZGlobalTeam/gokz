@@ -210,7 +210,7 @@ enum TriggerType
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_CHECKPOINT_VERSION 1
+#define GOKZ_CHECKPOINT_VERSION 2
 #define GOKZ_MAX_CHECKPOINTS 2048
 #define GOKZ_MAX_COURSES 100
 
@@ -284,6 +284,9 @@ enum TriggerType
 
 #define GOKZ_SAFEGUARD_RESTART_MIN_DELAY 0.6
 #define GOKZ_SAFEGUARD_RESTART_MAX_DELAY 5.0
+
+// Prevents the player from retouching a trigger too often.
+#define GOKZ_MAX_RETOUCH_TRIGGER_COUNT 4
 
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
@@ -466,6 +469,7 @@ enum struct Checkpoint
 	float angles[3];
 	float ladderNormal[3];
 	bool onLadder;
+	int groundEnt;
 
 	void Create(int client)
 	{
@@ -473,6 +477,7 @@ enum struct Checkpoint
 		Movement_GetEyeAngles(client, this.angles);
 		GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
 		this.onLadder = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+		this.groundEnt = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
 	}
 }
 
@@ -481,7 +486,7 @@ enum struct UndoTeleportData
 	float tempOrigin[3];
 	float tempAngles[3];
 	float origin[3];
-	float angles[3];	
+	float angles[3];
 	// Undo TP properties
 	bool lastTeleportOnGround;
 	bool lastTeleportInBhopTrigger;
@@ -869,6 +874,18 @@ forward void GOKZ_OnCourseRegistered(int course);
  */
 forward void GOKZ_OnRunInvalidated(int client);
 
+/**
+ * Called when a sound is emitted to the client via GOKZ Core.
+ *
+ * @param client			Client index.
+ * @param sample			Sound file name relative to the "sound" folder.
+ * @param volume			Sound volume.
+ * @param description		Optional description.
+ * @return					Plugin_Continue to allow the sound to be played, Plugin_Stop to block it, 
+ *							Plugin_Changed when any parameter has been modified.
+ */
+forward Action GOKZ_OnEmitSoundToClient(int client, const char[] sample, float &volume, const char[] description);
+
 
 // =====[ NATIVES ]=====
 
@@ -1168,6 +1185,14 @@ native int GOKZ_GetVirtualButtonPosition(int client, float position[3], bool isS
  * @param isStart		True to get the start button position, false for the end button.
  */
 native void GOKZ_SetVirtualButtonPosition(int client, const float position[3], int course, bool isStart);
+
+/**
+ * Resets the player's virtual button.
+ *
+ * @param client    	Client index.
+ * @param isStart		True to get the start button position, false for the end button.
+ */
+native void GOKZ_ResetVirtualButtonPosition(int client, bool isStart);
 
 /**
  * Locks the virtual button position of a player.
@@ -1473,6 +1498,16 @@ native bool GOKZ_GetValidJump(int client);
  */
 native void GOKZ_JoinTeam(int client, int team, bool restorePos = true, bool forceBroadcast = false);
 
+/**
+ * Emit a sound to a player via GOKZ Core.
+ * Sounds emitted by this native will call GOKZ_OnEmitSoundToClient forward.
+ * 
+ * @param client			Client index.
+ * @param sample			Sound file name relative to the "sound" folder.
+ * @param volume			Sound volume.
+ * @param description		Optional description.
+ */
+native void GOKZ_EmitSoundToClient(int client, const char[] sample, float volume = SNDVOL_NORMAL, const char[] description = "");
 
 
 // =====[ STOCKS ]=====
@@ -1744,7 +1779,44 @@ stock int GOKZ_MatchIntFromEntityName(int entity, Regex re, int substringID)
 	return num;
 }
 
+/**
+ * Emits a sound to other players that are spectating the client.
+ * Sounds emitted by this function will call GOKZ_OnEmitSoundToClient forward.
+ *
+ * @param sample			Sound file name relative to the "sound" folder.
+ * @param volume			Sound volume.
+ * @param description		Optional description.
+ */
+stock void GOKZ_EmitSoundToAll(const char[] sample, float volume = SNDVOL_NORMAL, const char[] description = "")
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client))
+		{
+			GOKZ_EmitSoundToClient(client, sample, volume, description);
+		}
+	}
+}
 
+/**
+ * Emits a sound to other players that are spectating the client.
+ * Sounds emitted by this function will call GOKZ_OnEmitSoundToClient forward.
+ *
+ * @param client			Client being spectated.
+ * @param sample			Sound file name relative to the "sound" folder.
+ * @param volume			Sound volume.
+ * @param description		Optional description.
+ */
+stock void GOKZ_EmitSoundToClientSpectators(int client, const char[] sample, float volume = SNDVOL_NORMAL, const char[] description = "")
+{
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && GetObserverTarget(i) == client)
+		{
+			GOKZ_EmitSoundToClient(i, sample, volume);
+		}
+	}
+}
 
 // =====[ DEPENDENCY ]=====
 
@@ -1779,6 +1851,7 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_TeleportToSearchStart");
 	MarkNativeAsOptional("GOKZ_GetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_SetVirtualButtonPosition");
+	MarkNativeAsOptional("GOKZ_ResetVirtualButtonPosition");
 	MarkNativeAsOptional("GOKZ_LockVirtualButtons");
 	MarkNativeAsOptional("GOKZ_GetStartPosition");
 	MarkNativeAsOptional("GOKZ_SetStartPosition");
@@ -1829,5 +1902,6 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_SetTakeoffSpeed");
 	MarkNativeAsOptional("GOKZ_GetValidJump");
 	MarkNativeAsOptional("GOKZ_JoinTeam");
+	MarkNativeAsOptional("GOKZ_EmitSoundToClient");
 }
 #endif

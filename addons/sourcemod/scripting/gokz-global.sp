@@ -2,7 +2,6 @@
 
 #include <sdktools>
 
-#include <SteamWorks>
 #include <GlobalAPI>
 #include <gokz/anticheat>
 #include <gokz/core>
@@ -84,7 +83,7 @@ public void OnPluginStart()
 	{
 		SetFailState("gokz-global currently only supports 128 tickrate servers.");
 	}
-	if (!SteamWorks_IsVACEnabled())
+	if (FindCommandLineParam("-insecure") || FindCommandLineParam("-tools"))
 	{
 		SetFailState("gokz-global currently only supports VAC-secured servers.");
 	}
@@ -207,7 +206,7 @@ public void FPSCheck(QueryCookie cookie, int client, ConVarQueryResult result, c
 				}
 				else
 				{
-					EmitSoundToClient(client, GOKZ_SOUND_TIMER_STOP);
+					GOKZ_EmitSoundToClient(client, GOKZ_SOUND_TIMER_STOP, _, "Timer Stop");
 				}
 			}
 		}
@@ -243,6 +242,7 @@ Action FPSKickPlayer(Handle timer, int userid)
 
 public void OnClientPutInServer(int client)
 {
+	gB_GloballyVerified[client] = false;
 	gB_waitingForFPSKick[client] = false;
 	OnClientPutInServer_PrintRecords(client);
 }
@@ -524,7 +524,7 @@ void AnnounceNewTopTime(int client, int course, int mode, int timeType, int rank
 
 void PlayBeatRecordSound()
 {
-	EmitSoundToAll(GL_SOUND_NEW_RECORD);
+	GOKZ_EmitSoundToAll(GL_SOUND_NEW_RECORD, _, "World Record");
 }
 
 

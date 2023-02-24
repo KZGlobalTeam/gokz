@@ -17,16 +17,16 @@ ALTER TABLE Maps \
 char sqlite_maps_insertranked[] = "\
 INSERT OR IGNORE INTO Maps \
     (InRankedPool, Name) \
-    VALUES %s";
+    VALUES (%d, '%s')";
 
 char sqlite_maps_updateranked[] = "\
 UPDATE OR IGNORE Maps \
     SET InRankedPool=%d \
-    WHERE Name IN (%s)";
+    WHERE Name = '%s'";
 
 char mysql_maps_upsertranked[] = "\
 INSERT INTO Maps (InRankedPool, Name) \
-    VALUES %s \
+    VALUES (%d, '%s') \
     ON DUPLICATE KEY UPDATE \
     InRankedPool=VALUES(InRankedPool)";
 

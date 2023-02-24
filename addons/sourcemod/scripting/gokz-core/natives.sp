@@ -18,6 +18,7 @@ void CreateNatives()
 	CreateNative("GOKZ_TeleportToSearchStart", Native_TeleportToSearchStart);
 	CreateNative("GOKZ_GetVirtualButtonPosition", Native_GetVirtualButtonPosition);
 	CreateNative("GOKZ_SetVirtualButtonPosition", Native_SetVirtualButtonPosition);
+	CreateNative("GOKZ_ResetVirtualButtonPosition", Native_ResetVirtualButtonPosition);	
 	CreateNative("GOKZ_LockVirtualButtons", Native_LockVirtualButtons);
 	CreateNative("GOKZ_GetStartPosition", Native_GetStartPosition);
 	CreateNative("GOKZ_SetStartPosition", Native_SetStartPosition);
@@ -71,6 +72,8 @@ void CreateNatives()
 	CreateNative("GOKZ_SetTakeoffSpeed", Native_SetTakeoffSpeed);
 	CreateNative("GOKZ_GetValidJump", Native_GetValidJump);
 	CreateNative("GOKZ_JoinTeam", Native_JoinTeam);
+
+	CreateNative("GOKZ_EmitSoundToClient", Native_EmitSoundToClient);
 }
 
 public int Native_GetModeLoaded(Handle plugin, int numParams)
@@ -235,6 +238,12 @@ public int Native_SetVirtualButtonPosition(Handle plugin, int numParams)
 	
 	GetNativeArray(2, position, sizeof(position));
 	SetVirtualButtonPosition(GetNativeCell(1), position, GetNativeCell(3), view_as<bool>(GetNativeCell(4)));
+	return 0;
+}
+
+public int Native_ResetVirtualButtonPosition(Handle plugin, int numParams)
+{
+	ResetVirtualButtonPosition(GetNativeCell(1), GetNativeCell(2));
 	return 0;
 }
 
@@ -592,7 +601,34 @@ public int Native_JoinTeam(Handle plugin, int numParams)
 	return 0;
 }
 
+public int Native_EmitSoundToClient(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char sample[PLATFORM_MAX_PATH];
+	GetNativeString(2, sample, sizeof(sample));
+	
+	float volume = GetNativeCell(3);
+	float newVolume = volume;
 
+	char description[64];
+	GetNativeString(4, description, sizeof(description));
+
+	Action result;
+	
+	Call_GOKZ_OnEmitSoundToClient(client, sample, newVolume, description, result);
+	if (result == Plugin_Stop)
+	{
+		return 0;
+	}
+	if (result == Plugin_Changed)
+	{
+		EmitSoundToClient(client, sample, _, _, _, _, newVolume);
+		return 0;
+	}
+	EmitSoundToClient(client, sample, _, _, _, _, volume);
+	return 0;
+}
 
 // =====[ PRIVATE ]=====
 

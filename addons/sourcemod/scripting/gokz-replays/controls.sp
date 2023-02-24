@@ -2,6 +2,10 @@
 	Lets player control the replay bot.
 */
 
+#define ITEM_INFO_PAUSE "pause"
+#define ITEM_INFO_SKIP "skip"
+#define ITEM_INFO_REWIND "rewind"
+#define ITEM_INFO_FREECAM "freecam"
 
 static int controllingPlayer[RP_MAX_BOTS];
 static int botTeleports[RP_MAX_BOTS];
@@ -13,24 +17,25 @@ static bool showReplayControls[MAXPLAYERS + 1];
 
 void OnPlayerRunCmdPost_ReplayControls(int client, int cmdnum)
 {
-	if (cmdnum % 6 == 3)
+	// Let the HUD plugin takes care of this if possible.
+	if (cmdnum % 6 == 3 && !gB_GOKZHUD)
 	{
 		UpdateReplayControlMenu(client);
 	}
 }
 
-void UpdateReplayControlMenu(int client)
+bool UpdateReplayControlMenu(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client))
 	{
-		return;
+		return false;
 	}
 	
 	int botClient = GetObserverTarget(client);
 	int bot = GetBotFromClient(botClient);
 	if (bot == -1)
 	{
-		return;
+		return false;
 	}
 	
 	if (!IsReplayBotControlled(bot, botClient) && !InBreather(bot))
@@ -40,73 +45,92 @@ void UpdateReplayControlMenu(int client)
 	}
 	else if (controllingPlayer[bot] != client)
 	{
-		return;
+		return false;
 	}
 	
-	if (showReplayControls[client] &&
-		GOKZ_HUD_GetOption(client, HUDOption_ShowControls) == ReplayControls_Enabled &&
-		(GetClientMenu(client) == MenuSource_None ||
-		 GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
-		 GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu))
+	if (showReplayControls[client] &&	
+		GOKZ_HUD_GetOption(client, HUDOption_ShowControls) == ReplayControls_Enabled)
 	{
-		botTeleports[bot] = PlaybackGetTeleports(bot);
-		ShowReplayControlMenu(client, bot);
+		// We have to update this often if bot uses teleports.
+		if (GetClientMenu(client) == MenuSource_None || 
+			GOKZ_HUD_GetMenuShowing(client) && GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
+			GOKZ_HUD_GetMenuShowing(client) && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu ||
+			GOKZ_HUD_GetMenuShowing(client) && PlaybackGetTeleports(bot) > 0)
+		{
+			botTeleports[bot] = PlaybackGetTeleports(bot);
+			ShowReplayControlMenu(client, bot);
+		}
+		return true;
 	}
+	return false;
 }
 
 void ShowReplayControlMenu(int client, int bot)
 {
-	char text[32];
+	char text[256];
 	
-	Panel panel = new Panel();
-	
-	if (GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+	Menu menu = new Menu(MenuHandler_ReplayControls);
+	menu.OptionFlags = MENUFLAG_NO_SOUND;
+	menu.Pagination = MENU_NO_PAGINATION;
+	menu.ExitButton = true;
+	if (gB_GOKZHUD)
 	{
-		FormatEx(text, sizeof(text), "%T - %s", "Replay Controls - Title", client,
-			GOKZ_FormatTime(GetPlaybackTime(bot), GOKZ_HUD_GetOption(client, HUDOption_TimerStyle) == TimerStyle_Precise));
-		panel.SetTitle(text);
+		if (GOKZ_HUD_GetOption(client, HUDOption_ShowSpectators) != ShowSpecs_Disabled &&
+			GOKZ_HUD_GetOption(client, HUDOption_SpecListPosition) == SpecListPosition_TPMenu)
+		{
+			HUDInfo info;
+			GetPlaybackState(client, info);
+			GOKZ_HUD_GetMenuSpectatorText(client, info, text, sizeof(text));
+		}
+		if (GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu)
+		{
+			Format(text, sizeof(text), "%s\n%T - %s", text, "Replay Controls - Title", client,
+				GOKZ_FormatTime(GetPlaybackTime(bot), GOKZ_HUD_GetOption(client, HUDOption_TimerStyle) == TimerStyle_Precise));
+		}
+		else
+		{
+			Format(text, sizeof(text), "%s%T", text, "Replay Controls - Title", client);
+		}
 	}
 	else
 	{
-		FormatEx(text, sizeof(text), "%T", "Replay Controls - Title", client);
-		panel.SetTitle(text);
+		Format(text, sizeof(text), "%s%T", text, "Replay Controls - Title", client);
 	}
 
-	if(PlaybackGetTeleports(bot) > 0)
+
+	if (botTeleports[bot] > 0)
 	{
-		FormatEx(text, sizeof(text), "%T", "Replay Controls - Teleports", client, botTeleports[bot]);
-		panel.DrawItem(text, ITEMDRAW_RAWLINE);
+		Format(text, sizeof(text), "%s\n%T", text, "Replay Controls - Teleports", client, botTeleports[bot]);
 	}
+
+	menu.SetTitle(text);
 	
 	if (PlaybackPaused(bot))
 	{
 		FormatEx(text, sizeof(text), "%T", "Replay Controls - Resume", client);
-		panel.DrawItem(text);
+		menu.AddItem(ITEM_INFO_PAUSE, text);
 	}
 	else
 	{
 		FormatEx(text, sizeof(text), "%T", "Replay Controls - Pause", client);
-		panel.DrawItem(text);
+		menu.AddItem(ITEM_INFO_PAUSE, text);
 	}
 	
 	FormatEx(text, sizeof(text), "%T", "Replay Controls - Skip", client);
-	panel.DrawItem(text);
+	menu.AddItem(ITEM_INFO_SKIP, text);
 	
-	FormatEx(text, sizeof(text), "%T", "Replay Controls - Rewind", client);
-	panel.DrawItem(text);
-	
-	panel.DrawItem("", ITEMDRAW_SPACER);
+	FormatEx(text, sizeof(text), "%T\n ", "Replay Controls - Rewind", client);
+	menu.AddItem(ITEM_INFO_REWIND, text);
 	
 	FormatEx(text, sizeof(text), "%T", "Replay Controls - Freecam", client);
-	panel.DrawItem(text);
-
-	panel.DrawItem("", ITEMDRAW_SPACER);
-
-	FormatEx(text, sizeof(text), "%T", "Replay Controls - Exit", client);
-	panel.DrawItem(text);
+	menu.AddItem(ITEM_INFO_FREECAM, text);
 	
-	panel.Send(client, PanelHandler_ReplayControls, MENU_TIME_FOREVER);
-	delete panel;
+	menu.Display(client, MENU_TIME_FOREVER);
+
+	if (gB_GOKZHUD)
+	{
+		GOKZ_HUD_SetMenuShowing(client, true);
+	}
 }
 
 void ToggleReplayControls(int client)
@@ -133,7 +157,7 @@ bool IsReplayBotControlled(int bot, int botClient)
 				GetEntProp(controllingPlayer[bot], Prop_Send, "m_iObserverMode") == 6);
 }
 
-int PanelHandler_ReplayControls(Menu menu, MenuAction action, int param1, int param2)
+int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -141,45 +165,48 @@ int PanelHandler_ReplayControls(Menu menu, MenuAction action, int param1, int pa
 		{
 			if (!IsValidClient(param1))
 			{
-				return 0;
+				return;
 			}
 
 			int bot = GetBotFromClient(GetObserverTarget(param1));
 			if (bot == -1 || controllingPlayer[bot] != param1)
 			{
-				return 0;
+				return;
 			}
 			
-			// Pause/Resume
-			if (param2 == 1)
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
+			if (StrEqual(info, ITEM_INFO_PAUSE, false))
 			{
 				PlaybackTogglePause(bot);
-				ShowReplayControlMenu(param1, bot);
 			}
-			// Forward
-			else if (param2 == 2)
+			else if (StrEqual(info, ITEM_INFO_SKIP, false))
 			{
 				PlaybackSkipForward(bot);
 			}
-			// Rewind
-			else if (param2 == 3)
+			else if (StrEqual(info, ITEM_INFO_REWIND, false))
 			{
 				PlaybackSkipBack(bot);
 			}
-			// Freecam
-			else if (param2 == 4)
+			else if (StrEqual(info, ITEM_INFO_FREECAM, false))
 			{
 				SetEntProp(param1, Prop_Send, "m_iObserverMode", 6);
 			}
-			// Exit
-			else if (param2 == 7)
+			GOKZ_HUD_SetMenuShowing(param1, false);
+		}
+		case MenuAction_Cancel:
+		{
+			GOKZ_HUD_SetMenuShowing(param1, false);
+			if (param2 == MenuCancel_Exit)
 			{
 				CancelReplayControls(param1);
-				delete menu;
 			}
 		}
+		case MenuAction_End:
+		{
+			delete menu;
+		}
 	}
-	return 0;
 }
 
 void CancelReplayControls(int client)

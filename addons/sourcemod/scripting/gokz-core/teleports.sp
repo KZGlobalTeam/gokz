@@ -108,7 +108,7 @@ void MakeCheckpoint(int client)
 	
 	if (GOKZ_GetCoreOption(client, Option_CheckpointSounds) == CheckpointSounds_Enabled)
 	{
-		EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT);
+		GOKZ_EmitSoundToClient(client, GOKZ_SOUND_CHECKPOINT, _, "Checkpoint");
 	}
 	if (GOKZ_GetCoreOption(client, Option_CheckpointMessages) == CheckpointMessages_Enabled)
 	{
@@ -879,7 +879,7 @@ static void TeleportDo(int client, const float destOrigin[3], const float destAn
 	undoTeleportData[client].Update();
 	if (GOKZ_GetCoreOption(client, Option_TeleportSounds) == TeleportSounds_Enabled)
 	{
-		EmitSoundToClient(client, GOKZ_SOUND_TELEPORT);
+		GOKZ_EmitSoundToClient(client, GOKZ_SOUND_TELEPORT, _, "Teleport");
 	}
 	
 	// Call Post Foward
@@ -892,7 +892,11 @@ static void CheckpointTeleportDo(int client)
 	checkpoints[client].GetArray(checkpointIndex[client], cp);
 	
 	TeleportDo(client, cp.origin, cp.angles);
-	
+	if (cp.groundEnt != INVALID_ENT_REFERENCE)
+	{
+		SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", cp.groundEnt);
+		SetEntityFlags(client, GetEntityFlags(client) | FL_ONGROUND);
+	}
 	// Handle ladder stuff
 	if (cp.onLadder)
 	{
