@@ -130,19 +130,47 @@ public void TopMenuHandler_QT(TopMenu topmenu, TopMenuAction action, TopMenuObje
 		{
 			case QTOption_ShowPlayers:
 			{
-				FormatToggleableOptionDisplay(param, QTOption_ShowPlayers, buffer, maxlength);
+				FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 			}
 			case QTOption_Soundscapes:
 			{
-				FormatToggleableOptionDisplay(param, QTOption_Soundscapes, buffer, maxlength);
+				FormatToggleableOptionDisplay(param, option, buffer, maxlength);
 			}
 			case QTOption_FallDamageSound:
 			{
-				FormatVolumeOptionDisplay(param, QTOption_FallDamageSound, buffer, maxlength);
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
 			}
 			case QTOption_AmbientSounds:
 			{
-				FormatVolumeOptionDisplay(param, QTOption_AmbientSounds, buffer, maxlength);
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_CheckpointVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_TeleportVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_TimerVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_ErrorVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_ServerRecordVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_WorldRecordVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
+			}
+			case QTOption_JumpstatsVolume:
+			{
+				FormatVolumeOptionDisplay(param, option, buffer, maxlength);
 			}
 		}
 	}
