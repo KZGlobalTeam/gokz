@@ -52,4 +52,32 @@ Phrases
 	{
 		"en"		"Ambient sounds"
 	}
+	"Options Menu - Checkpoint Volume"
+	{
+		"en"		"Checkpoint volume"
+	}
+	"Options Menu - Teleport Volume"
+	{
+		"en"		"Teleport volume"
+	}
+	"Options Menu - Timer Volume"
+	{
+		"en"		"Timer volume"
+	}
+	"Options Menu - Error Volume"
+	{
+		"en"		"Error volume"
+	}
+	"Options Menu - Server Record Volume"
+	{
+		"en"		"Server record volume"
+	}
+	"Options Menu - World Record Volume"
+	{
+		"en"		"World record volume"
+	}
+	"Options Menu - Jumpstats Volume"
+	{
+		"en"		"Jumpstats volume"
+	}
 }

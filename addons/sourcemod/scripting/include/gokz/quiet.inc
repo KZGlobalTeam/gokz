@@ -20,6 +20,13 @@ enum QTOption:
 	QTOption_Soundscapes,
 	QTOption_FallDamageSound,
 	QTOption_AmbientSounds,
+	QTOption_CheckpointVolume,
+	QTOption_TeleportVolume,
+	QTOption_TimerVolume,
+	QTOption_ErrorVolume,
+	QTOption_ServerRecordVolume,
+	QTOption_WorldRecordVolume,
+	QTOption_JumpstatsVolume,
 	QTOPTION_COUNT
 };
 
@@ -52,7 +59,14 @@ stock char gC_QTOptionNames[QTOPTION_COUNT][] =
 	"GOKZ QT - Show Players",
 	"GOKZ QT - Soundscapes",
 	"GOKZ QT - Fall Damage Sound",
-	"GOKZ QT - Ambient Sounds"
+	"GOKZ QT - Ambient Sounds",
+	"GOKZ QT - Checkpoint Volume",
+	"GOKZ QT - Teleport Volume",
+	"GOKZ QT - Timer Volume",
+	"GOKZ QT - Error Volume",
+	"GOKZ QT - Server Record Volume",
+	"GOKZ QT - World Record Volume",
+	"GOKZ QT - Jumpstats Volume"
 };
 
 stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] =
@@ -60,7 +74,14 @@ stock char gC_QTOptionDescriptions[QTOPTION_COUNT][] =
 	"Visibility of Other Players - 0 = Disabled, 1 = Enabled",
 	"Play Soundscapes - 0 = Disabled, 1 = Enabled",
 	"Play Fall Damage Sound - 0 to 20 = 0% to 200%",
-	"Play Ambient Sounds - 0 to 20 = 0% to 200%"
+	"Play Ambient Sounds - 0 to 20 = 0% to 200%",
+	"Checkpoint Volume - 0 to 20 = 0% to 200%",
+	"Teleport Volume - 0 to 20 = 0% to 200%",
+	"Timer Volume - 0 to 20 = 0% to 200%",
+	"Error Volume - 0 to 20 = 0% to 200%",
+	"Server Record Volume - 0 to 20 = 0% to 200%",
+	"World Record Volume - 0 to 20 = 0% to 200%",
+	"Jumpstats Volume - 0 to 20 = 0% to 200%"
 };
 
 stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] =
@@ -68,7 +89,14 @@ stock int gI_QTOptionDefaultValues[QTOPTION_COUNT] =
 	ShowPlayers_Enabled,
 	Soundscapes_Enabled,
 	DEFAULT_VOLUME, // Fall damage volume
-	DEFAULT_VOLUME // Ambient volume
+	DEFAULT_VOLUME, // Ambient volume
+	DEFAULT_VOLUME,	// Checkpoint volume
+	DEFAULT_VOLUME, // Teleport volume
+	DEFAULT_VOLUME, // Timer volume
+	DEFAULT_VOLUME, // Error volume
+	DEFAULT_VOLUME, // Server Record Volume
+	DEFAULT_VOLUME, // World Record Volume
+	DEFAULT_VOLUME // Jumpstats Volume
 };
 
 stock int gI_QTOptionCounts[QTOPTION_COUNT] =
@@ -76,7 +104,14 @@ stock int gI_QTOptionCounts[QTOPTION_COUNT] =
 	SHOWPLAYERS_COUNT,
 	SOUNDSCAPES_COUNT,
 	VOLUME_COUNT, // Fall damage volume
-	VOLUME_COUNT // Ambient volume
+	VOLUME_COUNT, // Ambient volume
+	VOLUME_COUNT, // Checkpoint volume
+	VOLUME_COUNT, // Teleport volume
+	VOLUME_COUNT, // Timer volume
+	VOLUME_COUNT, // Error volume
+	VOLUME_COUNT, // Server Record volume
+	VOLUME_COUNT, // World Record volume
+	VOLUME_COUNT // Jumpstats volume
 };
 
 stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
@@ -84,7 +119,14 @@ stock char gC_QTOptionPhrases[QTOPTION_COUNT][] =
 	"Options Menu - Show Players",
 	"Options Menu - Soundscapes",
 	"Options Menu - Fall Damage Sounds",
-	"Options Menu - Ambient Sounds"
+	"Options Menu - Ambient Sounds",
+	"Options Menu - Checkpoint Volume",
+	"Options Menu - Teleport Volume",
+	"Options Menu - Timer Volume",
+	"Options Menu - Error Volume",
+	"Options Menu - Server Record Volume",
+	"Options Menu - World Record Volume",
+	"Options Menu - Jumpstats Volume"
 };
 
 // =====[ STOCKS ]=====

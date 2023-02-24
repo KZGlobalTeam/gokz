@@ -32,6 +32,7 @@ public Plugin myinfo =
 #include "gokz-quiet/soundscape.sp"
 #include "gokz-quiet/hideplayers.sp"
 #include "gokz-quiet/falldamage.sp"
+#include "gokz-quiet/gokz-sounds.sp"
 #include "gokz-quiet/options.sp"
 
 // =====[ PLUGIN EVENTS ]=====
