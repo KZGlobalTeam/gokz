@@ -27,14 +27,7 @@ bool IsDrawingInfoPanel(int client)
 
 void OnPlayerRunCmdPost_InfoPanel(int client, int cmdnum, HUDInfo info)
 {
-	int updateSpeed = 10;
-	if (gB_FastUpdateRate[client])
-	{
-		// The hint text panel update speed depends on the client ping.
-		// To optimize resource usage, we scale the update speed with it.
-		// The fastest speed the client can get is around once every 2 ticks.
-		updateSpeed = IntMax(1, RoundToFloor(GetClientAvgLatency(client, NetFlow_Outgoing) / GetTickInterval()));
-	}
+	int updateSpeed = gB_FastUpdateRate[client] ? 1 : 10;
 	if (cmdnum % updateSpeed == 0 || info.IsTakeoff)
 	{
 		UpdateInfoPanel(client, info);
@@ -289,7 +282,7 @@ void PrintCSGOHUDText(int client, const char[] format)
 
 	buff[sizeof(buff) - 1] = '\0';
 
-	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE | USERMSG_BLOCKHOOKS));
+	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_BLOCKHOOKS));
 	pb.SetInt("msg_dst", 4);
 	pb.AddString("params", "#SFUI_ContractKillStart");
 	pb.AddString("params", buff);
