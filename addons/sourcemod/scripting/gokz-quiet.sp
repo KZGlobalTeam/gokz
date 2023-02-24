@@ -2,6 +2,7 @@
 
 #include <cstrike>
 #include <sdkhooks>
+#include <dhooks>
 
 #include <gokz/core>
 #include <gokz/quiet>
@@ -27,6 +28,7 @@ public Plugin myinfo =
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-quiet.txt"
 
 
+#include "gokz-quiet/ambient.sp"
 #include "gokz-quiet/soundscape.sp"
 #include "gokz-quiet/hideplayers.sp"
 #include "gokz-quiet/falldamage.sp"
@@ -44,6 +46,7 @@ public void OnPluginStart()
 {
 	OnPluginStart_HidePlayers();
 	OnPluginStart_FallDamage();
+	OnPluginStart_Ambient();
 
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-quiet.phrases");
