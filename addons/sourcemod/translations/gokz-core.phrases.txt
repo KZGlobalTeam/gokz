@@ -322,6 +322,10 @@
 		"en"		"Timer button/zone type"
 		"chi"		"计时器模式手动/自动"
 	}
+	"Options Menu - Button Through Players"
+	{
+		"en"		"Press button through players"
+	}
 	"Options Menu - Safeguard"
 	{
 		"en"		"Run safeguard"
