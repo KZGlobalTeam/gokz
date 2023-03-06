@@ -22,7 +22,7 @@ public Plugin myinfo = {
 #define FLT_EPSILON 1.192092896e-07
 #define MAX_CLIP_PLANES 5
 
-#define ASM_PATCH_LEN 24
+#define ASM_PATCH_LEN 17
 #define ASM_START_OFFSET 100
 
 #define WALKABLE_PLANE_NORMAL 0.7
@@ -151,7 +151,7 @@ public Action SM_Prof(int client, int args)
 	
 	if(gProfTime <= 0.1)
 	{
-		ReplyToCommand(client, SNAME..."Time should be higher then 0.1 seconds.")
+		ReplyToCommand(client, SNAME..."Time should be higher then 0.1 seconds.");
 		return Plugin_Handled;
 	}
 	
@@ -193,6 +193,8 @@ public Action Prof_Check_Timer(Handle timer, int client)
 	
 	delete gProf;
 	delete gProfData;
+
+	return Plugin_Handled;
 }
 #endif
 

@@ -75,7 +75,7 @@ methodmap Cplane_t < AddressBase
 	
 	property float dist
 	{
-		public get() { return view_as<float>(LoadFromAddress(this.Address + offsets.cptoffsets.normal, NumberType_Int32)); }
+		public get() { return view_as<float>(LoadFromAddress(this.Address + offsets.cptoffsets.dist, NumberType_Int32)); }
 	}
 	
 	property char type
