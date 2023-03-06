@@ -297,7 +297,7 @@ methodmap CTraceFilterSimple < AllocatableBase
 	property Address m_pExtraShouldHitCheckFunction
 	{
 		public get() { return view_as<Address>(LoadFromAddress(this.Address + offsets.ctfsoffsets.m_pExtraShouldHitCheckFunction, NumberType_Int32)); }
-		public set(Address _checkfnc) { StoreToAddress(this.Address + offsets.ctfsoffsets.m_pExtraShouldHitCheckFunction, view_as<int>(_checkfnc), NumberType_Int32), false; }
+		public set(Address _checkfnc) { StoreToAddress(this.Address + offsets.ctfsoffsets.m_pExtraShouldHitCheckFunction, view_as<int>(_checkfnc), NumberType_Int32, false); }
 	}
 	
 	public CTraceFilterSimple()
