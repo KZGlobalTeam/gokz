@@ -44,7 +44,7 @@ bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
 ArrayList g_ReplayInfoCache;
 Address gA_BotDuckAddr;
-int gI_BotDuckPatchRestore[24]; // Size of patched section in gamedata
+int gI_BotDuckPatchRestore[40]; // Size of patched section in gamedata
 int gI_BotDuckPatchLength;
 
 DynamicDetour gH_DHooks_TeamFull;
