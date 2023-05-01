@@ -48,8 +48,12 @@ static void UpdateInfoPanel(int client, HUDInfo info)
 	{
 		return;
 	}
-	
-	PrintCSGOHUDText(player.ID, GetInfoPanel(player, info));
+	char infoPanelText[512];
+	FormatEx(infoPanelText, sizeof(infoPanelText), GetInfoPanel(player, info));
+	if (infoPanelText[0] != '\0')
+	{
+		PrintCSGOHUDText(player.ID, infoPanelText);
+	}
 }
 
 static bool NothingEnabledInInfoPanel(KZPlayer player)
@@ -65,11 +69,19 @@ static char[] GetInfoPanel(KZPlayer player, HUDInfo info)
 {
 	char infoPanelText[512];
 	FormatEx(infoPanelText, sizeof(infoPanelText), 
-		"<font color='#ffffff08'>%s%s%s%s",
+		"%s%s%s%s",
 		GetSpectatorString(player, info),
 		GetTimeString(player, info), 
 		GetSpeedString(player, info), 
 		GetKeysString(player, info));
+	if (infoPanelText[0] == '\0')
+	{
+		return infoPanelText;
+	}
+	else
+	{
+		Format(infoPanelText, sizeof(infoPanelText), "<font color='#ffffff08'>%s", infoPanelText);
+	}
 	TrimString(infoPanelText);
 	return infoPanelText;
 }
