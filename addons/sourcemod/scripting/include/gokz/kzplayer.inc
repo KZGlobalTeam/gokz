@@ -456,7 +456,24 @@ methodmap KZPlayer < MovementAPIPlayer {
 			this.SetHUDOption(HUDOption_ShowSpectators, value);
 		}
 	}
-	
+
+	property int SpecListPosition {
+		public get() {
+			return this.GetHUDOption(HUDOption_SpecListPosition);
+		}
+		public set(int value){
+			this.SetHUDOption(HUDOption_SpecListPosition, value);
+		}
+	}
+
+	property bool MenuShowing {
+		public get() {
+			return GOKZ_HUD_GetMenuShowing(this.ID);
+		}
+		public set(bool value) {
+			GOKZ_HUD_SetMenuShowing(this.ID, value);
+		}
+	}
 	property int DynamicMenu {
 		public get() {
 			return this.GetHUDOption(HUDOption_DynamicMenu);

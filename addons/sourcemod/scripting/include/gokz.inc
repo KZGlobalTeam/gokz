@@ -41,6 +41,8 @@ enum ObsMode
 #define PI 3.14159265359
 #define SPEED_NORMAL 250.0
 #define SPEED_NO_WEAPON 260.0
+#define FLOAT_MAX view_as<float>(0x7F7FFFFF)
+#define SF_BUTTON_USE_ACTIVATES 1024
 #define IGNORE_JUMP_TIME 0.2
 stock float PLAYER_MINS[3] = {-16.0, -16.0, 0.0};
 stock float PLAYER_MAXS[3] = {16.0, 16.0, 72.0};
@@ -438,6 +440,8 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 	AcceptEntityInput(client, "ClearParent");
 
 	Movement_SetOrigin(client, origin);
+	Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
+	Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 	if (setAngles)
 	{
 		// NOTE: changing angles with TeleportEntity can fail due to packet loss!!!
@@ -548,7 +552,8 @@ stock void ForcePlayerDuck(int client)
 {
 	// these are both necessary, because on their own the player will sometimes still be in a state that isn't fully ducked.
 	SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
-	SetEntProp(client, Prop_Send, "m_bDucking", true);
+	SetEntProp(client, Prop_Send, "m_bDucking", false);
+	SetEntProp(client, Prop_Send, "m_bDucked", true);
 }
 
 /**
@@ -1018,6 +1023,61 @@ stock int GOKZGetClientFromGameMovementAddress(Address addr, int offsetCGameMove
 {
 	Address playerAddr = view_as<Address>(LoadFromAddress(view_as<Address>(view_as<int>(addr) + offsetCGameMovement_player), NumberType_Int32));
 	return GOKZGetEntityFromAddress(playerAddr);
+}
+
+/**
+ * Gets the nearest point in the oriented bounding box of an entity to a point.
+ *
+ * @param entity			Entity index.
+ * @param origin			Point's origin.
+ * @param result			Result point.
+ */
+stock void CalcNearestPoint(int entity, float origin[3], float result[3])
+{
+	float entOrigin[3], entMins[3], entMaxs[3], trueMins[3], trueMaxs[3];
+	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", entOrigin);
+	GetEntPropVector(entity, Prop_Send, "m_vecMaxs", entMaxs);
+	GetEntPropVector(entity, Prop_Send, "m_vecMins", entMins);
+
+	AddVectors(entOrigin, entMins, trueMins);
+	AddVectors(entOrigin, entMaxs, trueMaxs);
+
+	for (int i = 0; i < 3; i++)
+	{
+		result[i] = FloatClamp(origin[i], trueMins[i], trueMaxs[i]);
+	}
+}
+
+/**
+ * Get the shortest distance from P to the (infinite) line through vLineA and vLineB.
+ *
+ * @param P				Point's origin.
+ * @param vLineA		Origin of the first point of the line.
+ * @param vLineB		Origin of the first point of the line.
+ * @return				The shortest distance from the point to the line.
+ */
+stock float CalcDistanceToLine(float P[3], float vLineA[3], float vLineB[3])
+{
+	float vClosest[3];
+	float vDir[3];
+	float t;
+	float delta[3];	
+	SubtractVectors(vLineB, vLineA, vDir);
+	float div = GetVectorDotProduct(vDir, vDir);
+	if (div < EPSILON)
+	{
+		t = 0.0;
+	}
+	else
+	{
+		t = (GetVectorDotProduct(vDir, P) - GetVectorDotProduct(vDir, vLineA)) / div;
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		vClosest[i] = vLineA[i] + vDir[i]*t;
+	}
+	SubtractVectors(P, vClosest, delta);
+	return GetVectorLength(delta);
 }
 
 /**

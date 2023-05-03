@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-simplekz.txt"
 
-#define MODE_VERSION 20
+#define MODE_VERSION 21
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units
@@ -78,6 +78,8 @@ bool gB_PSTurningLeft[MAXPLAYERS + 1];
 float gF_PSTurnRate[MAXPLAYERS + 1];
 int gI_PSTicksSinceIncrement[MAXPLAYERS + 1];
 Handle gH_GetPlayerMaxSpeed;
+DynamicDetour gH_CanUnduck;
+int gI_TickCount[MAXPLAYERS + 1];
 DynamicDetour gH_AirAccelerate;
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_OldFlags[MAXPLAYERS + 1];
@@ -185,6 +187,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gI_OldButtons[player.ID] = buttons;
 	gI_OldFlags[player.ID] = GetEntityFlags(player.ID);
 	gB_OldOnGround[player.ID] = player.OnGround;
+	gI_TickCount[player.ID] = tickcount;
 	player.GetOrigin(gF_OldOrigin[player.ID]);
 	player.GetEyeAngles(gF_OldAngles[player.ID]);
 	player.GetVelocity(gF_OldVelocity[player.ID]);
@@ -221,6 +224,22 @@ public MRESReturn DHooks_OnAirAccelerate_Pre(Address pThis, DHookParam hParams)
 		return MRES_ChangedHandled;
 	}
 	
+	return MRES_Ignored;
+}
+
+public MRESReturn DHooks_OnCanUnduck_Pre(Address pThis, DHookReturn hReturn)
+{
+	int client = GOKZGetClientFromGameMovementAddress(pThis, gI_OffsetCGameMovement_player);
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return MRES_Ignored;
+	}
+	// Just landed fully ducked, you can't unduck.
+	if (Movement_GetLandingTick(client) == (gI_TickCount[client] - 1) && GetEntPropFloat(client, Prop_Send, "m_flDuckAmount") >= 1.0 && GetEntProp(client, Prop_Send, "m_bDucked"))
+	{
+		hReturn.Value = false;
+		return MRES_Supercede;
+	}
 	return MRES_Ignored;
 }
 
@@ -358,6 +377,19 @@ void HookEvents()
 		SetFailState("Failed to get CGameMovement::player offset.");
 	}
 	gI_OffsetCGameMovement_player = StringToInt(buffer);
+	
+	gameData = LoadGameConfigFile("gokz-core.games");
+	gH_CanUnduck = DynamicDetour.FromConf(gameData, "CCSGameMovement::CanUnduck");
+	if (gH_CanUnduck == INVALID_HANDLE)
+	{
+		SetFailState("Failed to find CCSGameMovement::CanUnduck function signature");
+	}
+	
+	if (!gH_CanUnduck.Enable(Hook_Pre, DHooks_OnCanUnduck_Pre))
+	{
+		SetFailState("Failed to enable detour on CCSGameMovement::CanUnduck");
+	}
+	delete gameData;
 }
 
 // =====[ CONVARS ]=====

@@ -182,6 +182,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	gI_CmdNum[client] = cmdnum;
 	gI_TickCount[client] = tickcount;
+	OnPlayerRunCmd_Triggerfix(client);
 	OnPlayerRunCmd_MapTriggers(client, buttons);
 	OnPlayerRunCmd_Turnbinds(client, buttons, tickcount, angles);
 	return Plugin_Continue;
@@ -269,6 +270,11 @@ public void OnCSPlayerSpawnPost(int client)
 	{
 		SetEntityFlags(client, GetEntityFlags(client) & ~FL_ONGROUND);
 	}
+}
+
+public void OnClientPreThinkPost(int client)
+{
+	OnClientPreThinkPost_UseButtons(client);
 }
 
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -510,6 +516,7 @@ static void HookClientEvents(int client)
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 	DHookEntity(gH_DHooks_SetModel, true, client);
 	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
+	SDKHook(client, SDKHook_PreThinkPost, OnClientPreThinkPost);
 }
 
 static void UpdateTrackingVariables(int client, int cmdnum, int buttons)

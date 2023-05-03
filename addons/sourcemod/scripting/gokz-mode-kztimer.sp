@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-kztimer.txt"
 
-#define MODE_VERSION 216
+#define MODE_VERSION 217
 #define DUCK_SPEED_NORMAL 8.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
@@ -69,11 +69,12 @@ float gF_PreVelModLastChange[MAXPLAYERS + 1];
 float gF_RealPreVelMod[MAXPLAYERS + 1];
 int gI_PreTickCounter[MAXPLAYERS + 1];
 Handle gH_GetPlayerMaxSpeed;
+DynamicDetour gH_CanUnduck;
+int gI_TickCount[MAXPLAYERS + 1];
 DynamicDetour gH_AirAccelerate;
 int gI_OldButtons[MAXPLAYERS + 1];
 int gI_OldFlags[MAXPLAYERS + 1];
 bool gB_OldOnGround[MAXPLAYERS + 1];
-float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
 bool gB_Jumpbugged[MAXPLAYERS + 1];
 int gI_OffsetCGameMovement_player;
@@ -173,9 +174,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	gI_OldButtons[player.ID] = buttons;
 	gI_OldFlags[player.ID] = GetEntityFlags(client);
 	gB_OldOnGround[player.ID] = Movement_GetOnGround(client);
-	gF_OldAngles[player.ID] = angles;
+	gI_TickCount[player.ID] = tickcount;
 	Movement_GetVelocity(client, gF_OldVelocity[client]);
-	
 	return Plugin_Continue;
 }
 
@@ -209,6 +209,22 @@ public MRESReturn DHooks_OnAirAccelerate_Pre(Address pThis, DHookParam hParams)
 		return MRES_ChangedHandled;
 	}
 	
+	return MRES_Ignored;
+}
+
+public MRESReturn DHooks_OnCanUnduck_Pre(Address pThis, DHookReturn hReturn)
+{
+	int client = GOKZGetClientFromGameMovementAddress(pThis, gI_OffsetCGameMovement_player);
+	if (!IsPlayerAlive(client) || !IsUsingMode(client))
+	{
+		return MRES_Ignored;
+	}
+	// Just landed fully ducked, you can't unduck.
+	if (Movement_GetLandingTick(client) == (gI_TickCount[client] - 1) && GetEntPropFloat(client, Prop_Send, "m_flDuckAmount") >= 1.0 && GetEntProp(client, Prop_Send, "m_bDucked"))
+	{
+		hReturn.Value = false;
+		return MRES_Supercede;
+	}
 	return MRES_Ignored;
 }
 
@@ -348,6 +364,19 @@ void HookEvents()
 		SetFailState("Failed to get CGameMovement::player offset.");
 	}
 	gI_OffsetCGameMovement_player = StringToInt(buffer);
+
+	gameData = LoadGameConfigFile("gokz-core.games");
+	gH_CanUnduck = DynamicDetour.FromConf(gameData, "CCSGameMovement::CanUnduck");
+	if (gH_CanUnduck == INVALID_HANDLE)
+	{
+		SetFailState("Failed to find CCSGameMovement::CanUnduck function signature");
+	}
+	
+	if (!gH_CanUnduck.Enable(Hook_Pre, DHooks_OnCanUnduck_Pre))
+	{
+		SetFailState("Failed to enable detour on CCSGameMovement::CanUnduck");
+	}
+	delete gameData;
 }
 
 // =====[ CONVARS ]=====

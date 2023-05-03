@@ -89,7 +89,7 @@
 	}
 	"Option - Show Spectators - Disable"
 	{
-		"en"		"{grey}Spectators are now not shown."
+		"en"		"{grey}Spectators are no longer shown."
 		"chi"		"{grey}已隐藏观察者."
 	}
 	"Option - Show Spectators - Number"
@@ -117,7 +117,14 @@
 		"en"		"{grey}Dynamic menu enabled. Unavailable options are now unselectable. This option is not recommended with high latency!"
 		"chi"		"{grey}已启用动态菜单。不可用选项现在不可选择。对于高延迟，不建议使用此选项！"
 	}
-
+	"Option - Spectator List Position - Info Panel"
+	{
+		"en"		"{grey}Spectator list now displays in the centre panel."
+	}
+	"Option - Spectator List Position - TP Menu"
+	{
+		"en"		"{grey}Spectator list now displays in the teleport menu."
+	}
 
 	// =====[ INFO PANEL ]=====
 	"Info Panel Text - Time"
@@ -317,6 +324,10 @@
 		"en"		"Number and Names"
 		"chi"		"人数和名称"
 	}
+	"Options Menu - Spectator List Position"
+	{
+		"en"		"Spectator list position"
+	}
 	"Options Menu - Dynamic Menu"
 	{
 		"en"		"Dynamic menu"
@@ -335,5 +346,37 @@
 		"en"		"GO!"
 		"chi"		"开始!"
 		"ru"		"НАЧАЛИ!"
+	}
+
+	// =====[ SPECTATOR LIST ]=====
+	"Spectator List - Menu (Number)"
+	{
+		"#format"	"{1:d}"
+		"en"		"Specs: {1}"
+	}
+	"Spectator List - Menu (Full)"
+	{
+		"#format"	"{1:d},{2:s}"
+		"en"		"Specs ({1})\n{2}"
+	}
+	"Spectator List - Info Panel (Number)"
+	{
+		// Specs: 2
+		"#format"	"{1:d}"
+		"en"		"Specs: <font color='#ffffff'>{1}</font>"
+	}
+	"Spectator List - Info Panel (Full)"
+	{
+		// Specs (2): P1, P2
+		"#format"	"{1:d},{2:s}"
+		"en"		"Specs ({1}): <font color='#ffffff'>{2}</font>"
+	}
+	"Options Menu - Number"
+	{
+		"en"		"Number"
+	}
+	"Options Menu - Number & Names"
+	{
+		"en"		"Number & names"
 	}
 }

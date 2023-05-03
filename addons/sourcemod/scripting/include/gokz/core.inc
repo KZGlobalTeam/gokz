@@ -79,6 +79,7 @@ enum Option:
 	Option_ErrorSounds, 
 	Option_VirtualButtonIndicators, 
 	Option_TimerButtonZoneType,
+	Option_ButtonThroughPlayers,
 	Option_Safeguard,
 	OPTION_COUNT
 };
@@ -142,11 +143,18 @@ enum
 
 enum
 {
+	ButtonThroughPlayers_Disabled = 0,
+	ButtonThroughPlayers_Enabled,
+	BUTTONTHROUGHPLAYERS_COUNT
+};
+
+enum
+{
 	Safeguard_Disabled = 0,
 	Safeguard_EnabledNUB,
 	Safeguard_EnabledPRO,
 	SAFEGUARD_COUNT
-}
+};
 
 enum
 {
@@ -210,7 +218,7 @@ enum TriggerType
 
 // =====[ CONSTANTS ]=====
 
-#define GOKZ_CHECKPOINT_VERSION 1
+#define GOKZ_CHECKPOINT_VERSION 2
 #define GOKZ_MAX_CHECKPOINTS 2048
 #define GOKZ_MAX_COURSES 100
 
@@ -284,6 +292,9 @@ enum TriggerType
 
 #define GOKZ_SAFEGUARD_RESTART_MIN_DELAY 0.6
 #define GOKZ_SAFEGUARD_RESTART_MAX_DELAY 5.0
+
+// Prevents the player from retouching a trigger too often.
+#define GOKZ_MAX_RETOUCH_TRIGGER_COUNT 4
 
 stock char gC_TimeTypeNames[TIMETYPE_COUNT][] = 
 {
@@ -360,6 +371,7 @@ stock char gC_CoreOptionNames[OPTION_COUNT][] =
 	"GOKZ - Error Sounds", 
 	"GOKZ - VB Indicators",
 	"GOKZ - Timer Button Zone Type",
+	"GOKZ - Button Through Players",
 	"GOKZ - Safeguard"
 };
 
@@ -373,7 +385,8 @@ stock char gC_CoreOptionDescriptions[OPTION_COUNT][] =
 	"Error Sounds - 0 = Disabled, 1 = Enabled", 
 	"Virtual Button Indicators - 0 = Disabled, 1 = Enabled",
 	"Timer Button Zone Type - 0 = Both buttons, 1 = Only end zone, 2 = Both zones",
-	"GOKZ - Safeguard - 0 = Disabled, 1 = Enabled (NUB), 2 = Enabled (PRO)"
+	"Button Through Players - 0 = Disabled, 1 = Enabled",
+	"Safeguard - 0 = Disabled, 1 = Enabled (NUB), 2 = Enabled (PRO)"
 };
 
 stock char gC_CoreOptionPhrases[OPTION_COUNT][] = 
@@ -386,6 +399,7 @@ stock char gC_CoreOptionPhrases[OPTION_COUNT][] =
 	"Options Menu - Error Sounds", 
 	"Options Menu - Virtual Button Indicators",
 	"Options Menu - Timer Button Zone Type",
+	"Options Menu - Button Through Players",
 	"Options Menu - Safeguard"
 };
 
@@ -413,6 +427,7 @@ stock int gI_CoreOptionCounts[OPTION_COUNT] =
 	ERRORSOUNDS_COUNT, 
 	VIRTUALBUTTONINDICATORS_COUNT,
 	TIMERBUTTONZONETYPE_COUNT,
+	BUTTONTHROUGHPLAYERS_COUNT,
 	SAFEGUARD_COUNT
 };
 
@@ -426,6 +441,7 @@ stock int gI_CoreOptionDefaults[OPTION_COUNT] =
 	ErrorSounds_Enabled, 
 	VirtualButtonIndicators_Disabled,
 	TimerButtonZoneType_BothButtons,
+	ButtonThroughPlayers_Enabled,
 	Safeguard_Disabled
 };
 
@@ -466,6 +482,7 @@ enum struct Checkpoint
 	float angles[3];
 	float ladderNormal[3];
 	bool onLadder;
+	int groundEnt;
 
 	void Create(int client)
 	{
@@ -473,6 +490,7 @@ enum struct Checkpoint
 		Movement_GetEyeAngles(client, this.angles);
 		GetEntPropVector(client, Prop_Send, "m_vecLadderNormal", this.ladderNormal);
 		this.onLadder = Movement_GetMovetype(client) == MOVETYPE_LADDER;
+		this.groundEnt = GetEntPropEnt(client, Prop_Data, "m_hGroundEntity");
 	}
 }
 
@@ -481,7 +499,7 @@ enum struct UndoTeleportData
 	float tempOrigin[3];
 	float tempAngles[3];
 	float origin[3];
-	float angles[3];	
+	float angles[3];
 	// Undo TP properties
 	bool lastTeleportOnGround;
 	bool lastTeleportInBhopTrigger;
