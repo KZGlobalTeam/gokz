@@ -552,7 +552,8 @@ stock void ForcePlayerDuck(int client)
 {
 	// these are both necessary, because on their own the player will sometimes still be in a state that isn't fully ducked.
 	SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0, 0);
-	SetEntProp(client, Prop_Send, "m_bDucking", true);
+	SetEntProp(client, Prop_Send, "m_bDucking", false);
+	SetEntProp(client, Prop_Send, "m_bDucked", true);
 }
 
 /**
