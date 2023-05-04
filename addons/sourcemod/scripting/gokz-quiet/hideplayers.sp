@@ -125,14 +125,14 @@ static void RequestFrame_WeaponSound(DataPack dp)
 
 	Protobuf newMsg = view_as<Protobuf>(StartMessageEx(msg_id, newClients, newTotal, flags));
 
-	newMsg.AddInt("entidx", dp.ReadCell());
-	newMsg.AddFloat("origin_x", dp.ReadFloat());
-	newMsg.AddFloat("origin_y", dp.ReadFloat());
-	newMsg.AddFloat("origin_z", dp.ReadFloat());
+	newMsg.SetInt("entidx", dp.ReadCell());
+	newMsg.SetFloat("origin_x", dp.ReadFloat());
+	newMsg.SetFloat("origin_y", dp.ReadFloat());
+	newMsg.SetFloat("origin_z", dp.ReadFloat());
 	char path[PLATFORM_MAX_PATH];
 	dp.ReadString(path, sizeof(path));
-	newMsg.AddString("sound", path);
-	newMsg.AddFloat("timestamp", dp.ReadFloat());
+	newMsg.SetString("sound", path);
+	newMsg.SetFloat("timestamp", dp.ReadFloat());
 
 	EndMessage();
 
