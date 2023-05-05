@@ -32,7 +32,7 @@
 			"WriteViewAngleUpdateReliableOffset"
 			{
 				"windows"	"363"
-				"linux"		"290"
+				"linux"		"294"
 			}
 			"ClientIndexOffset"
 			{
