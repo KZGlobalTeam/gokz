@@ -112,9 +112,10 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
-public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
+public Action Movement_OnPlayerMovePost(int client)
 {
-	OnPlayerRunCmdPost_JumpTracking(client);
+	Movement_OnPlayerMovePost_JumpTracking(client);
+	return Plugin_Continue;
 }
 
 public void Movement_OnStartTouchGround(int client)

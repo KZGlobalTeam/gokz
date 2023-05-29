@@ -1425,19 +1425,15 @@ public Action Movement_OnWalkMovePost(int client)
 	return Plugin_Continue;
 }
 
-public Action Movement_OnPlayerMovePost(int client)
-{
-	lastMovementProcessedTime[client] = jumpTrackers[client].tickCount;
-	return Plugin_Continue;
-}
 
-public void OnPlayerRunCmdPost_JumpTracking(int client)
+public void Movement_OnPlayerMovePost_JumpTracking(int client)
 {
 	if (!IsValidClient(client) || !IsPlayerAlive(client))
 	{
 		return;
 	}
 	
+	lastMovementProcessedTime[client] = jumpTrackers[client].tickCount;
 	// Check for always failstats
 	if (doFailstatAlways[client])
 	{
