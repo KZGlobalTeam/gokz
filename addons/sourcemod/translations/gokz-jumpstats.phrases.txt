@@ -133,6 +133,10 @@
 		"en"		"Miss"
 		"ru"		"Miss"
 	}
+	"Estimated Crouch Distance"
+	{
+		"en"		"ECD"
+	}
 
 
 	// =====[ CHAT MESSAGES ]=====
