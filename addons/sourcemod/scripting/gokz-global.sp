@@ -374,7 +374,7 @@ public void OnMapEnd()
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode])
-		&& GlobalAPI_IsInit())
+		&& GlobalAPI_IsInit() && IsClientAuthorized(client))
 	{
 		UpdatePoints(client);
 	}

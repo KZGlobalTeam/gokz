@@ -131,7 +131,7 @@ void PatchAngleFix()
 {
 	if (LoadFromAddress(gA_ViewAnglePatchAddress, NumberType_Int8) == 0)
 	{
-		StoreToAddress(gA_ViewAnglePatchAddress, 1, NumberType_Int8);
+		StoreToAddress(gA_ViewAnglePatchAddress, 1, NumberType_Int8, false);
 	}
 }
 
@@ -139,7 +139,7 @@ void RestoreAngleFix()
 {
 	if (LoadFromAddress(gA_ViewAnglePatchAddress, NumberType_Int8) == 1)
 	{
-		StoreToAddress(gA_ViewAnglePatchAddress, 0, NumberType_Int8);
+		StoreToAddress(gA_ViewAnglePatchAddress, 0, NumberType_Int8, false);
 	}
 }
 

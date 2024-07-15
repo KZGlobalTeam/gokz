@@ -677,9 +677,9 @@ static int FindUseEntity(int client)
 				float m_vecMins[3];
 				float m_vecMaxs[3];
 				float m_vecOrigin[3];
-				GetEntPropVector(ent, Prop_Send, "m_vecOrigin", m_vecOrigin);
-				GetEntPropVector(ent, Prop_Send, "m_vecMins", m_vecMins);
-				GetEntPropVector(ent, Prop_Send, "m_vecMaxs", m_vecMaxs);
+				GetEntPropVector(client, Prop_Send, "m_vecOrigin", m_vecOrigin);
+				GetEntPropVector(client, Prop_Send, "m_vecMins", m_vecMins);
+				GetEntPropVector(client, Prop_Send, "m_vecMaxs", m_vecMaxs);
 
 				delta[2] = IntervalDistance(endpos[2], m_vecOrigin[2] + m_vecMins[2], m_vecOrigin[2] + m_vecMaxs[2]);
 				if (GetVectorLength(delta) < 80.0)

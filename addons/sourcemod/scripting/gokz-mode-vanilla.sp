@@ -29,7 +29,7 @@ public Plugin myinfo =
 
 #define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-vanilla.txt"
 
-#define MODE_VERSION 17
+#define MODE_VERSION 170
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {
