@@ -41,7 +41,7 @@ jobs:
           mv sm/addons/sourcemod/scripting/gokz-*.smx addons/sourcemod/plugins
           
       - name: upload-full
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: GOKZ-v${{ env.GOKZ_VERSION }}
           path: |
@@ -56,7 +56,7 @@ jobs:
             !*.fgd
           
       - name: upload-upgrade
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: GOKZ-v${{ env.GOKZ_VERSION }}-upgrade
           path: |
