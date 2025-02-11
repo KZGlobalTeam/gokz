@@ -121,8 +121,10 @@ enum struct Location {
 		GOKZ_SetTeleportCount(client, this.teleportCount);
 		GOKZ_SetUndoTeleportData(client, this.undoTeleportData, GOKZ_CHECKPOINT_VERSION);
 
+		int flagsMask = ~(FL_CLIENT | FL_FAKECLIENT | FL_GODMODE | FL_NOTARGET | FL_AIMTARGET);
+		SetEntityFlags(client, (this.flags & flagsMask) | (GetEntityFlags(client) & ~flagsMask));
+
 		SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", this.groundEnt);
-		SetEntityFlags(client, this.flags);
 		TeleportEntity(client, this.position, this.angles, this.velocity);
 		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", this.duckAmount);
 		SetEntProp(client, Prop_Send, "m_bDucking", this.ducking);
