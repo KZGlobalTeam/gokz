@@ -7,10 +7,6 @@
 
 #include <autoexecconfig>
 
-#undef REQUIRE_EXTENSIONS
-#undef REQUIRE_PLUGIN
-#include <updater>
-
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -24,8 +20,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION,
 	url = "https://github.com/KZGlobalTeam/gokz"
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-tpanglefix.txt"
 
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
@@ -151,25 +145,11 @@ bool ToggleAngleFix(int client)
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
 		GOKZ_OnOptionsMenuReady(topMenu);
 	}
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-
 }
 
 // =====[ CLIENT EVENTS ]=====

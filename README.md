@@ -29,7 +29,6 @@ For more information about what each plugin does, please see [PLUGINS.md](PLUGIN
  * [MovementAPI Plugin ^2.4.2](https://github.com/danzayau/MovementAPI)
  * Optional - [GlobalAPI Plugin](https://bitbucket.org/kztimerglobalteam/globalapi-smplugin) (required for gokz-globals plugin)
  * Optional - A "console cleaner" extension to prevent `Datatable warning` server console spam
- * Optional - [Updater Plugin](https://forums.alliedmods.net/showthread.php?t=169095) (automatically install minor GOKZ updates)
 
 ### Installing
 

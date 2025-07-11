@@ -12,7 +12,6 @@
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
 #include <sourcebanspp>
-#include <updater>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -27,8 +26,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = GOKZ_SOURCE_URL
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-anticheat.txt"
 
 bool gB_GOKZLocalDB;
 bool gB_SourceBansPP;
@@ -90,10 +87,6 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 	gB_SourceBansPP = LibraryExists("sourcebans++");
 	gB_SourceBans = LibraryExists("sourcebans");
@@ -110,10 +103,6 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_GOKZLocalDB = gB_GOKZLocalDB || StrEqual(name, "gokz-localdb");
 	gB_SourceBansPP = gB_SourceBansPP || StrEqual(name, "sourcebans++");
 	gB_SourceBans = gB_SourceBans || StrEqual(name, "sourcebans");
