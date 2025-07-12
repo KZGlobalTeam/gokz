@@ -9,7 +9,6 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/core>
-#include <updater>
 
 #include <gokz/kzplayer>
 
@@ -26,8 +25,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = GOKZ_SOURCE_URL
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-mode-kztimer.txt"
 
 #define MODE_VERSION 2171
 #define DUCK_SPEED_NORMAL 8.0
@@ -95,10 +92,6 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	if (LibraryExists("gokz-core"))
 	{
 		gB_GOKZCore = true;
@@ -124,11 +117,7 @@ public void OnPluginEnd()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-	else if (StrEqual(name, "gokz-core"))
+	if (StrEqual(name, "gokz-core"))
 	{
 		gB_GOKZCore = true;
 		GOKZ_SetModeLoaded(Mode_KZTimer, true, MODE_VERSION);
