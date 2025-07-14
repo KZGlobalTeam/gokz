@@ -29,13 +29,6 @@ enum
 	REPLAYTYPE_COUNT
 };
 
-enum ReplaySaveState
-{
-	ReplaySave_Local = 0,
-	ReplaySave_Temp,
-	ReplaySave_Disabled
-};
-
 // NOTE: Replays use delta compression for storage.
 // This enum is the indices of the ReplayTickData enum struct.
 // NOTE: This has to match the ReplayTickData enum struct!!!
@@ -137,7 +130,6 @@ enum struct ReplayTickData
 
 #define RP_DIRECTORY "data/gokz-replays" // In Path_SM
 #define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
-#define RP_DIRECTORY_RUNS_TEMP "data/gokz-replays/_tempRuns" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
 #define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM
 #define RP_DIRECTORY_BLOCKJUMPS "blocks"
@@ -180,47 +172,6 @@ enum struct ReplayTickData
 #define RP_TAKEOFF_TICK			(1 << 23)
 #define RP_HIT_PERF				(1 << 24)
 #define RP_SECONDARY_EQUIPPED	(1 << 25)
-
-
-
-// =====[ FORWARDS ]=====
-
-/**
- * Called when a replay of a player is written to disk.
- * This includes replays of cheaters which are saved if
- * the player is marked as a cheater by gokz-localdb.
- *
- * @param client			The client ID of the player who completed the run.
- * @param replayType		The type of the replay (Run/Jump/Cheater).
- * @param map				The name of the map the run was completed on.
- * @param course			The specific course on the map the run was completed on.
- * @param timeType			The type of time (Pro/Nub).
- * @param time				The time the run was completed in.
- * @param filePath			Replay file path.
- * @param tempReplay		Whether the replay file should only be temporaily stored. 
- * @return					Plugin_Handled to take over the temporary replay deletion, Plugin_Continue to allow temporary replay deletion by the replay plugin.
- */
-forward Action GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath, bool tempReplay);
-
-/**
- * Called when a currently being recorded replay is discarded from
- * memory and recording has been stopped (without writing it to disk).
- *
- * @param client			Client index.
- */
-forward void GOKZ_RP_OnReplayDiscarded(int client);
-
-/**
- * Called when a player has ended their timer, and gokz-replays has
- * processed the time and has possibly written a replay to disk.
- *
- * @param client			Client index.
- * @param filePath			Replay file path, or "" if no replay saved.
- * @param course    		Course number.
- * @param time				Player's end time.
- * @param teleportsUsed		Number of teleports used by player.
- */
-forward void GOKZ_RP_OnTimerEnd_Post(int client, const char[] filePath, int course, float time, int teleportsUsed);
 
 
 

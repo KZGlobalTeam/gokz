@@ -39,7 +39,6 @@ char gC_CurrentMap[64];
 int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
 bool gB_NubRecordMissed[MAXPLAYERS + 1];
-ArrayList g_ReplayInfoCache;
 Address gA_BotDuckAddr;
 int gI_BotDuckPatchRestore[40]; // Size of patched section in gamedata
 int gI_BotDuckPatchLength;
@@ -50,8 +49,6 @@ DynamicDetour gH_DHooks_TeamFull;
 #include "gokz-replays/nav.sp"
 #include "gokz-replays/playback.sp"
 #include "gokz-replays/recording.sp"
-#include "gokz-replays/replay_cache.sp"
-#include "gokz-replays/replay_menu.sp"
 #include "gokz-replays/api.sp"
 #include "gokz-replays/controls.sp"
 
@@ -71,7 +68,6 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-replays.phrases");
 	
-	CreateGlobalForwards();
 	HookEvents();
 	RegisterCommands();
 }
@@ -122,7 +118,6 @@ public void OnMapStart()
 	UpdateCurrentMap(); // Do first
 	OnMapStart_Nav();
 	OnMapStart_Recording();
-	OnMapStart_ReplayCache();
 }
 
 public void OnConfigsExecuted()

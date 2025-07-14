@@ -119,6 +119,8 @@ enum
 
 // =====[ CONSTANTS ]=====
 
+#define GOKZ_DB_TIME_GUID_MAX 45
+
 #define GOKZ_DB_JS_DISTANCE_PRECISION 10000
 #define GOKZ_DB_JS_SYNC_PRECISION 100
 #define GOKZ_DB_JS_PRE_PRECISION 100
@@ -206,6 +208,7 @@ forward void GOKZ_DB_OnMapSetup(int mapID);
  * @param style				Player's movement style.
  * @param runTimeMS			Player's end time in milliseconds.
  * @param teleportsUsed		Number of teleports used by player.
+ * @param guid              Globally unique ID of the run.
  */
 forward void GOKZ_DB_OnTimeInserted(
 	int client, 
@@ -215,7 +218,8 @@ forward void GOKZ_DB_OnTimeInserted(
 	int mode, 
 	int style, 
 	int runTimeMS, 
-	int teleportsUsed);
+	int teleportsUsed,
+	const char[] guid);
 
 /**
  * Called when jumpstat PB has been achieved.
@@ -297,6 +301,16 @@ native bool GOKZ_DB_IsCheater(int client);
  * @param cheater		Whether to mark the player as a cheater.
  */
 native void GOKZ_DB_SetCheater(int client, bool cheater);
+
+/**
+ * Gets the last known run's global unique ID.
+ * Do not call this before GOKZ_OnTimerStart_Post.
+ *
+ * @param client		Client index.
+ * @param guid			The output string.
+ * @return				Bytes written to the output string (0 only if player never started the timer).
+ */
+native int GOKZ_DB_GetRunGUID(int client, char guid[GOKZ_DB_TIME_GUID_MAX]);
 
 
 

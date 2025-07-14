@@ -8,11 +8,9 @@
 	If the player has their timer running, the recording is done from
 	the beginning of the run. If the player can no longer beat their PB,
 	then the recording goes back to only keeping track of the last
-	two minutes. Upon beating their PB, a temporary binary file will be 
+	two minutes. Upon beating the server record, a binary file will be 
 	written with a 'header' containing information about the run,
 	followed by the recorded tick data from OnPlayerRunCmdPost.
-	The binary file will be permanently locally saved on the server
-	if the run beats the server record.
 */
 
 static float tickrate;
@@ -22,7 +20,7 @@ static int recordingIndex[MAXPLAYERS + 1];
 static float playerSensitivity[MAXPLAYERS + 1];
 static float playerMYaw[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
-static ReplaySaveState replaySaveState[MAXPLAYERS + 1];
+static bool isRecordingRun[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
 static bool postRunRecording[MAXPLAYERS + 1];
 static ArrayList recordedRecentData[MAXPLAYERS + 1];
@@ -35,7 +33,7 @@ static ArrayList runningJumpstatTimers[MAXPLAYERS + 1];
 
 void OnMapStart_Recording()
 {
-	CreateReplaysDirectory(gC_CurrentMap);
+	CreateReplaysDirectory();
 	tickrate = 1/GetTickInterval();
 	preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME * tickrate);
 	maxCheaterReplayTicks = RoundToCeil(RP_MAX_CHEATER_REPLAY_LENGTH * tickrate);
@@ -123,7 +121,7 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 		isTeleportTick[client] = false;
 	}
 	
-	if (replaySaveState[client] != ReplaySave_Disabled)
+	if (isRecordingRun[client])
 	{
 		int runTick = GetArraySize(recordedRunData[client]);
 		if (runTick < RP_MAX_DURATION)
@@ -174,23 +172,26 @@ Action GOKZ_OnTimerStart_Recording(int client)
 
 void GOKZ_OnTimerStart_Post_Recording(int client)
 {
-	replaySaveState[client] = ReplaySave_Local;
+	isRecordingRun[client] = true;
 	StartRunRecording(client);
 }
 
 void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleportsUsed)
 {
-	if (replaySaveState[client] == ReplaySave_Disabled)
+	if (!isRecordingRun[client])
 	{
 		return;
 	}
+
+	char guid[GOKZ_DB_TIME_GUID_MAX];
+	GOKZ_DB_GetRunGUID(client, guid);
 
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(course);
 	data.WriteFloat(time);
 	data.WriteCell(teleportsUsed);
-	data.WriteCell(replaySaveState[client]);
+	data.WriteString(guid);
 	// The previous run breather still did not finish, end it now or
 	// we will start overwriting the data.
 	if (runningRunBreatherTimer[client] != INVALID_HANDLE)
@@ -198,7 +199,7 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 		TriggerTimer(runningRunBreatherTimer[client], false);
 	}
 
-	replaySaveState[client] = ReplaySave_Disabled;
+	isRecordingRun[client] = false;
 	postRunRecording[client] = true;
 
 	// Swap recordedRunData and recordedPostRunData.
@@ -218,12 +219,14 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 
 public Action Timer_EndRecording(Handle timer, DataPack data)
 {
+	char guid[GOKZ_DB_TIME_GUID_MAX];
+
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int course = data.ReadCell();
 	float time = data.ReadFloat();
 	int teleportsUsed = data.ReadCell();
-	ReplaySaveState saveState = data.ReadCell();
+	data.ReadString(guid, sizeof(guid));
 	delete data;
 
 	// The client left after the run was done but before the post-run
@@ -236,22 +239,8 @@ public Action Timer_EndRecording(Handle timer, DataPack data)
 
 	runningRunBreatherTimer[client] = INVALID_HANDLE;
 	postRunRecording[client] = false;
-
-	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
-	{
-		// Replay might be submitted globally, but will not be saved locally.
-		saveState = ReplaySave_Temp;
-	}
 	
-	char path[PLATFORM_MAX_PATH];
-	if (SaveRecordingOfRun(path, client, course, time, teleportsUsed, saveState == ReplaySave_Temp))
-	{
-		Call_OnTimerEnd_Post(client, path, course, time, teleportsUsed);
-	}
-	else
-	{
-		Call_OnTimerEnd_Post(client, "", course, time, teleportsUsed);
-	}
+	SaveRecordingOfRun(client, course, time, teleportsUsed, guid);
 
 	return Plugin_Stop;
 }
@@ -268,14 +257,14 @@ void GOKZ_OnResume_Recording(int client)
 
 void GOKZ_OnTimerStopped_Recording(int client)
 {
-	replaySaveState[client] = ReplaySave_Disabled;
+	isRecordingRun[client] = false;
 }
 
 void GOKZ_OnCountedTeleport_Recording(int client)
 {
 	if (gB_NubRecordMissed[client])
 	{
-		replaySaveState[client] = ReplaySave_Disabled;
+		isRecordingRun[client] = false;
 	}
 
 	isTeleportTick[client] = true;
@@ -283,14 +272,10 @@ void GOKZ_OnCountedTeleport_Recording(int client)
 
 void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 {
-	if (replaySaveState[client] == ReplaySave_Disabled)
-	{
-		return;
-	}
 	// If missed PRO record or both records, then can no longer beat a server record
 	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
 	{
-		replaySaveState[client] = ReplaySave_Temp;
+		isRecordingRun[client] = false;
 	}
 
 	// If on a NUB run and missed NUB record, then can no longer beat a server record
@@ -299,21 +284,17 @@ void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
 	{
 		if (GOKZ_GetTeleportCount(client) > 0)
 		{
-			replaySaveState[client] = ReplaySave_Temp;
+			isRecordingRun[client] = false;
 		}
 	}
 }
 
 public void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, int style, int recordType)
 {
-	if (replaySaveState[client] == ReplaySave_Disabled)
-	{
-		return;
-	}
 	// If missed PRO record or both records, then can no longer beat PB
 	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
 	{
-		replaySaveState[client] = ReplaySave_Disabled;
+		isRecordingRun[client] = false;
 	}
 
 	// If on a NUB run and missed NUB record, then can no longer beat PB
@@ -322,7 +303,7 @@ public void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, i
 	{
 		if (GOKZ_GetTeleportCount(client) > 0)
 		{
-			replaySaveState[client] = ReplaySave_Disabled;
+			isRecordingRun[client] = false;
 		}
 	}
 }
@@ -394,7 +375,7 @@ static void ClearClientRecordingState(int client)
 	playerSensitivity[client] = -1.0;
 	playerMYaw[client] = -1.0;
 	isTeleportTick[client] = false;
-	replaySaveState[client] = ReplaySave_Disabled;
+	isRecordingRun[client] = false;
 	recordingPaused[client] = false;
 	postRunRecording[client] = false;
 	runningRunBreatherTimer[client] = INVALID_HANDLE;
@@ -462,7 +443,6 @@ static void StartRunRecording(int client)
 static void DiscardRecording(int client)
 {
 	recordedRunData[client].Clear();
-	Call_OnReplayDiscarded(client);
 }
 
 static void PauseRecording(int client)
@@ -475,11 +455,8 @@ static void ResumeRecording(int client)
 	recordingPaused[client] = false;
 }
 
-static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, int course, float time, int teleportsUsed, bool temp)
+static bool SaveRecordingOfRun(int client, int course, float time, int teleportsUsed, const char[] guid)
 {
-	// Prepare data
-	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
-
 	// Create and fill General Header
 	GeneralReplayHeader generalHeader;
 	FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedPostRunData[client].Length);
@@ -491,15 +468,11 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 	runHeader.teleportsUsed = teleportsUsed;
 
 	// Build path and create/overwrite associated file
-	FormatRunReplayPath(replayPath, sizeof(replayPath), course, generalHeader.mode, generalHeader.style, timeType, temp);
-	if (FileExists(replayPath))
+	char replayPath[PLATFORM_MAX_PATH];
+	FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
+	if (FileExists(replayPath)) // This is the coldest branch in the history of cold branches.
 	{
 		DeleteFile(replayPath);
-	}
-	else if (!temp)
-	{
-		AddToReplayInfoCache(course, generalHeader.mode, generalHeader.style, timeType);
-		SortReplayInfoCache();
 	}
 
 	File file = OpenFile(replayPath, "wb");
@@ -519,11 +492,6 @@ static bool SaveRecordingOfRun(char replayPath[PLATFORM_MAX_PATH], int client, i
 	WriteTickData(file, client, ReplayType_Run);
 
 	delete file;
-	// If there is no plugin that wants to take over the replay file, we will delete it ourselves.
-	if (Call_OnReplaySaved(client, ReplayType_Run, gC_CurrentMap, course, timeType, time, replayPath, temp) == Plugin_Continue && temp)
-	{
-		DeleteFile(replayPath);
-	}
 
 	return true;
 }
@@ -770,24 +738,12 @@ static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tick
 	}
 }
 
-static void FormatRunReplayPath(char[] buffer, int maxlength, int course, int mode, int style, int timeType, bool tempPath)
+static void FormatRunReplayPath(char[] buffer, int maxlength, const char[] guid)
 {
-	// Use GetEngineTime to prevent accidental replay overrides.
-	// Technically it would still be possible to override this file by accident,
-	// if somehow the server restarts to this exact map and course, 
-	// and this function is run at the exact same time, but that is extremely unlikely.
-	// Also by then this file should have already been deleted.
-	char tempTimeString[32];
-	Format(tempTimeString, sizeof(tempTimeString), "%f_", GetEngineTime());
 	BuildPath(Path_SM, buffer, maxlength,
-		"%s/%s/%s%d_%s_%s_%s.%s",
-		tempPath ? RP_DIRECTORY_RUNS_TEMP : RP_DIRECTORY_RUNS,
-		gC_CurrentMap,
-		tempPath ? tempTimeString : "",
-		course,
-		gC_ModeNamesShort[mode], 
-		gC_StyleNamesShort[style], 
-		gC_TimeTypeNames[timeType], 
+		"%s/%s.%s",
+		RP_DIRECTORY_RUNS,
+		guid,
 		RP_FILE_EXTENSION);
 }
 
@@ -898,60 +854,25 @@ static bool IsCurrentWeaponSecondary(int client)
 	return activeWeaponEnt == secondaryEnt;
 }
 
-static void CreateReplaysDirectory(const char[] map)
+static void CreateReplaysDirectory()
 {
 	char path[PLATFORM_MAX_PATH];
 
 	// Create parent replay directory
 	BuildPath(Path_SM, path, sizeof(path), RP_DIRECTORY);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
+	CreateDirectory(path, 511);
 
-	// Create maps parent replay directory
+	// Create runs replay directory
 	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_RUNS);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
-
-
-	// Create maps replay directory
-	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS, map);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
-
-	// Create maps parent replay directory
-	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_RUNS_TEMP);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
-
-
-	// Create maps replay directory
-	BuildPath(Path_SM, path, sizeof(path), "%s/%s", RP_DIRECTORY_RUNS_TEMP, map);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
+	CreateDirectory(path, 511);
 
 	// Create cheaters replay directory
 	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_CHEATERS);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
+	CreateDirectory(path, 511);
 
 	// Create jumps parent replay directory
 	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_JUMPS);
-	if (!DirExists(path))
-	{
-		CreateDirectory(path, 511);
-	}
+	CreateDirectory(path, 511);
 }
 
 public void MYAWCheck(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)

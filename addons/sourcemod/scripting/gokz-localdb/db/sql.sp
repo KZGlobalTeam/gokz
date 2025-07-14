@@ -167,14 +167,18 @@ CREATE TABLE IF NOT EXISTS Times ( \
     ON UPDATE CASCADE ON DELETE CASCADE)";
 
 char sql_times_insert[] = "\
-INSERT INTO Times (SteamID32, MapCourseID, Mode, Style, RunTime, Teleports) \
-    SELECT %d, MapCourseID, %d, %d, %d, %d \
+INSERT INTO Times (SteamID32, MapCourseID, Mode, Style, RunTime, Teleports, TimeGUID) \
+    SELECT %d, MapCourseID, %d, %d, %d, %d, '%s' \
     FROM MapCourses \
     WHERE MapID=%d AND Course=%d";
 
 char sql_times_delete[] = "\
 DELETE FROM Times \
     WHERE TimeID=%d";
+
+char sql_times_alter_add_guid[] = "\
+ALTER TABLE Times \
+    ADD TimeGUID VARCHAR(255)";
 
 
 

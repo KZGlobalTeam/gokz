@@ -5,6 +5,7 @@ static float lastCommandTime[MAXPLAYERS + 1];
 void RegisterCommands()
 {
 	RegConsoleCmd("sm_top", CommandTop, "[KZ] Open a menu showing the top record holders.");
+	RegConsoleCmd("sm_replay", CommandReplay, "[KZ] Open a menu showing the top course times of a map. Usage: !replay <#course>");
 	RegConsoleCmd("sm_maptop", CommandMapTop, "[KZ] Open a menu showing the top main course times of a map. Usage: !maptop <map>");
 	RegConsoleCmd("sm_bmaptop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !bmaptop <#bonus> <map>");
 	RegConsoleCmd("sm_bonustop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !bonustop <#bonus> <map>");
@@ -44,6 +45,34 @@ public Action CommandTop(int client, int args)
 	}
 
 	DisplayPlayerTopModeMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandReplay(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+
+	if (args == 0)
+	{  // Open map top for current map
+		DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), 0);
+	}
+	else if (args == 1)
+	{  // Open specified Bonus # top for current map
+		char argBonus[4];
+		GetCmdArg(1, argBonus, sizeof(argBonus));
+		int bonus;
+		if (StringToIntEx(argBonus, bonus) > 0 && GOKZ_IsValidCourse(bonus, false))
+		{
+			DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), bonus);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Course Number", argBonus);
+		}
+	}
 	return Plugin_Handled;
 }
 
