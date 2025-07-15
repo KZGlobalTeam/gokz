@@ -264,10 +264,17 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 			}
 		}
 		
-		FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
-		if (FileExists(replayPath))
+		if (guid[0] != 0)
 		{
-			menu.AddItem(replayPath, display, ITEMDRAW_DEFAULT);
+			FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
+			if (FileExists(replayPath))
+			{
+				menu.AddItem(replayPath, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem("", display, ITEMDRAW_DISABLED);
+			}
 		}
 		else
 		{
