@@ -269,31 +269,7 @@ void GOKZ_OnTimerStopped_Recording(int client)
 
 void GOKZ_OnCountedTeleport_Recording(int client)
 {
-	if (gB_NubRecordMissed[client])
-	{
-		isRecordingRun[client] = false;
-	}
-
 	isTeleportTick[client] = true;
-}
-
-void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
-{
-	// If missed PRO record or both records, then can no longer beat a server record
-	if (recordType == RecordType_NubAndPro || recordType == RecordType_Pro)
-	{
-		isRecordingRun[client] = false;
-	}
-
-	// If on a NUB run and missed NUB record, then can no longer beat a server record
-	// Otherwise wait to see if they teleport before stopping the recording
-	if (recordType == RecordType_Nub)
-	{
-		if (GOKZ_GetTeleportCount(client) > 0)
-		{
-			isRecordingRun[client] = false;
-		}
-	}
 }
 
 public void GOKZ_LR_OnPBMissed(int client, float pbTime, int course, int mode, int style, int recordType)

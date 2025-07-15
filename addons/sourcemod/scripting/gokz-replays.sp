@@ -38,7 +38,6 @@ bool gB_GOKZLocalDB;
 char gC_CurrentMap[64];
 int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
-bool gB_NubRecordMissed[MAXPLAYERS + 1];
 Address gA_BotDuckAddr;
 int gI_BotDuckPatchRestore[40]; // Size of patched section in gamedata
 int gI_BotDuckPatchLength;
@@ -235,7 +234,6 @@ public Action GOKZ_OnTimerStart(int client, int course)
 
 public void GOKZ_OnTimerStart_Post(int client, int course)
 {
-	gB_NubRecordMissed[client] = false;
 	GOKZ_OnTimerStart_Post_Recording(client);
 }
 
@@ -262,15 +260,6 @@ public void GOKZ_OnTimerStopped(int client)
 public void GOKZ_OnCountedTeleport_Post(int client)
 {
 	GOKZ_OnCountedTeleport_Recording(client);
-}
-
-public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int mode, int style, int recordType)
-{
-	if (recordType == RecordType_Nub)
-	{
-		gB_NubRecordMissed[client] = true;
-	}
-	GOKZ_LR_OnRecordMissed_Recording(client, recordType);
 }
 
 public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason)
