@@ -320,10 +320,10 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
 	SaveRecordingOfCheater(client, reason);
 }
 
-void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
+void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, int mode, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
-	int mode = GOKZ_GetCoreOption(client, Option_Mode);
-	int style = GOKZ_GetCoreOption(client, Option_Style);
+	// Do NOT call GOKZ_GetCoreOption here, this is many ticks after the PB actually happened.
+	int style = Style_Normal;
 
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
