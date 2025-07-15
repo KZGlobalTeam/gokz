@@ -183,11 +183,16 @@ void GOKZ_OnTimerEnd_Recording(int client, int course, float time, int teleports
 		return;
 	}
 
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
+
 	char guid[GOKZ_DB_TIME_GUID_MAX];
 	GOKZ_DB_GetRunGUID(client, guid);
 
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(mode);
+	data.WriteCell(style);
 	data.WriteCell(course);
 	data.WriteFloat(time);
 	data.WriteCell(teleportsUsed);
@@ -223,6 +228,8 @@ public Action Timer_EndRecording(Handle timer, DataPack data)
 
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
+	int mode = data.ReadCell();
+	int style = data.ReadCell();
 	int course = data.ReadCell();
 	float time = data.ReadFloat();
 	int teleportsUsed = data.ReadCell();
@@ -240,7 +247,7 @@ public Action Timer_EndRecording(Handle timer, DataPack data)
 	runningRunBreatherTimer[client] = INVALID_HANDLE;
 	postRunRecording[client] = false;
 	
-	SaveRecordingOfRun(client, course, time, teleportsUsed, guid);
+	SaveRecordingOfRun(client, mode, style, course, time, teleportsUsed, guid);
 
 	return Plugin_Stop;
 }
@@ -315,8 +322,13 @@ void GOKZ_AC_OnPlayerSuspected_Recording(int client, ACReason reason)
 
 void GOKZ_DB_OnJumpstatPB_Recording(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
+
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
+	data.WriteCell(mode);
+	data.WriteCell(style);
 	data.WriteCell(jumptype);
 	data.WriteFloat(distance);
 	data.WriteCell(block);
@@ -341,6 +353,8 @@ public Action SaveJump(Handle timer, DataPack data)
 {
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
+	int mode = data.ReadCell();
+	int style = data.ReadCell();
 	int jumptype = data.ReadCell();
 	float distance = data.ReadFloat();
 	int block = data.ReadCell();
@@ -361,7 +375,7 @@ public Action SaveJump(Handle timer, DataPack data)
 
 	RemoveFromRunningTimers(client, timer);
 
-	SaveRecordingOfJump(client, jumptype, distance, block, strafes, sync, pre, max, airtime);
+	SaveRecordingOfJump(client, mode, style, jumptype, distance, block, strafes, sync, pre, max, airtime);
 	return Plugin_Stop;
 }
 
@@ -455,11 +469,11 @@ static void ResumeRecording(int client)
 	recordingPaused[client] = false;
 }
 
-static bool SaveRecordingOfRun(int client, int course, float time, int teleportsUsed, const char[] guid)
+static bool SaveRecordingOfRun(int client, int mode, int style, int course, float time, int teleportsUsed, const char[] guid)
 {
 	// Create and fill General Header
 	GeneralReplayHeader generalHeader;
-	FillGeneralHeader(generalHeader, client, ReplayType_Run, recordedPostRunData[client].Length);
+	FillGeneralHeader(generalHeader, client, ReplayType_Run, mode, style, recordedPostRunData[client].Length);
 
 	// Create and fill Run Header
 	RunReplayHeader runHeader;
@@ -498,9 +512,12 @@ static bool SaveRecordingOfRun(int client, int course, float time, int teleports
 
 static bool SaveRecordingOfCheater(int client, ACReason reason)
 {
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int style = GOKZ_GetCoreOption(client, Option_Style);
+
 	// Create and fill general header
 	GeneralReplayHeader generalHeader;
-	FillGeneralHeader(generalHeader, client, ReplayType_Cheater, recordedRecentData[client].Length);
+	FillGeneralHeader(generalHeader, client, ReplayType_Cheater, mode, style, recordedRecentData[client].Length);
 
 	// Create and fill cheater header
 	CheaterReplayHeader cheaterHeader;
@@ -526,7 +543,7 @@ static bool SaveRecordingOfCheater(int client, ACReason reason)
 	return true;
 }
 
-static bool SaveRecordingOfJump(int client, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
+static bool SaveRecordingOfJump(int client, int mode, int style, int jumptype, float distance, int block, int strafes, float sync, float pre, float max, int airtime)
 {
 	// Just cause I know how buggy jumpstats can be
 	int airtimeTicks = RoundToNearest((float(airtime) / GOKZ_DB_JS_AIRTIME_PRECISION) * tickrate);
@@ -538,7 +555,7 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
 	
 	// Create and fill general header
 	GeneralReplayHeader generalHeader;
-	FillGeneralHeader(generalHeader, client, ReplayType_Jump, 2 * preAndPostRunTickCount + airtimeTicks);
+	FillGeneralHeader(generalHeader, client, ReplayType_Jump, mode, style, 2 * preAndPostRunTickCount + airtimeTicks);
 
 	// Create and fill jump header
 	JumpReplayHeader jumpHeader;
@@ -579,12 +596,8 @@ static bool SaveRecordingOfJump(int client, int jumptype, float distance, int bl
 	return true;
 }
 
-static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int replayType, int tickCount)
+static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int replayType, int mode, int style, int tickCount)
 {
-	// Prepare data
-	int mode = GOKZ_GetCoreOption(client, Option_Mode);
-	int style = GOKZ_GetCoreOption(client, Option_Style);
-
 	// Fill general header
 	generalHeader.magicNumber = RP_MAGIC_NUMBER;
 	generalHeader.formatVersion = RP_FORMAT_VERSION;
