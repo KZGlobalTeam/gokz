@@ -690,26 +690,25 @@ static bool LoadFormatVersion2Replay(File file, int client, int bot)
 	
 	// Read tick data
 	preAndPostRunTickCount = RoundToZero(RP_PLAYBACK_BREATHER_TIME / GetTickInterval());
-	any tickDataArray[RP_V2_TICK_DATA_BLOCKSIZE];
+	any tickData[RP_V2_TICK_DATA_BLOCKSIZE];
 	for (int i = 0; i < tickCount; i++)
 	{
-		file.ReadInt32(tickDataArray[RPDELTA_DELTAFLAGS]);
+		file.ReadInt32(tickData[RPDELTA_DELTAFLAGS]);
 		
-		for (int index = 1; index < sizeof(tickDataArray); index++)
+		for (int index = 1; index < sizeof(tickData); index++)
 		{
 			int currentFlag = (1 << index);
-			if (tickDataArray[RPDELTA_DELTAFLAGS] & currentFlag)
+			if (tickData[RPDELTA_DELTAFLAGS] & currentFlag)
 			{
-				file.ReadInt32(tickDataArray[index]);
+				file.ReadInt32(tickData[index]);
 			}
 		}
 		
-		ReplayTickData tickData;
-		TickDataFromArray(tickDataArray, tickData);
 		// HACK: Jump replays don't record proper length sometimes. I don't know why.
 		//		 This leads to oversized replays full of 0s at the end.
 		// 		 So, we do this horrible check to dodge that issue.
-		if (tickData.origin[0] == 0 && tickData.origin[1] == 0 && tickData.origin[2] == 0 && tickData.angles[0] == 0 && tickData.angles[1] == 0)
+		if (tickData[RPDELTA_ORIGIN_X] == 0 && tickData[RPDELTA_ORIGIN_Y] == 0 && tickData[RPDELTA_ORIGIN_Z] == 0 
+			&& tickData[RPDELTA_ANGLES_X] == 0 && tickData[RPDELTA_ANGLES_Y] == 0)
 		{
 			break;
 		}

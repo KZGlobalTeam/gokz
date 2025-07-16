@@ -314,33 +314,3 @@ static void UpdateCurrentMap()
 	GetCurrentMapDisplayName(gC_CurrentMap, sizeof(gC_CurrentMap));
 	gI_CurrentMapFileSize = GetCurrentMapFileSize();
 }
-
-
-// =====[ PUBLIC ]=====
-
-// NOTE: These serialisation functions were made because the internal data layout of enum structs can change.
-
-void TickDataFromArray(any array[RP_V2_TICK_DATA_BLOCKSIZE], ReplayTickData result)
-{
-	// NOTE: HAS to match ReplayTickData exactly!
-	result.deltaFlags          = array[0];
-	result.deltaFlags2         = array[1];
-	result.vel[0]              = array[2];
-	result.vel[1]              = array[3];
-	result.vel[2]              = array[4];
-	result.mouse[0]            = array[5];
-	result.mouse[1]            = array[6];
-	result.origin[0]           = array[7];
-	result.origin[1]           = array[8];
-	result.origin[2]           = array[9];
-	result.angles[0]           = array[10];
-	result.angles[1]           = array[11];
-	result.angles[2]           = array[12];
-	result.velocity[0]         = array[13];
-	result.velocity[1]         = array[14];
-	result.velocity[2]         = array[15];
-	result.flags               = array[16];
-	result.packetsPerSecond    = array[17];
-	result.laggedMovementValue = array[18];
-	result.buttonsForced       = array[19];
-}

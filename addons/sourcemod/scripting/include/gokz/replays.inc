@@ -108,7 +108,7 @@ enum struct RunReplayHeader
 	int teleportsUsed;
 }
 
-// NOTE: Make sure to change the RPDELTA_* enum, TickDataToArray() and TickDataFromArray() when adding/removing stuff from this!!!
+// NOTE: Make sure to change the RPDELTA_* enum when adding/removing stuff from this!!!
 enum struct ReplayTickData
 {
 	int deltaFlags;
