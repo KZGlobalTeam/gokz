@@ -319,30 +319,6 @@ static void UpdateCurrentMap()
 // =====[ PUBLIC ]=====
 
 // NOTE: These serialisation functions were made because the internal data layout of enum structs can change.
-void TickDataToArray(ReplayTickData tickData, any result[RP_V2_TICK_DATA_BLOCKSIZE])
-{
-	// NOTE: HAS to match ReplayTickData exactly!
-	result[0]  = tickData.deltaFlags;
-	result[1]  = tickData.deltaFlags2;
-	result[2]  = tickData.vel[0];
-	result[3]  = tickData.vel[1];
-	result[4]  = tickData.vel[2];
-	result[5]  = tickData.mouse[0];
-	result[6]  = tickData.mouse[1];
-	result[7]  = tickData.origin[0];
-	result[8]  = tickData.origin[1];
-	result[9]  = tickData.origin[2];
-	result[10] = tickData.angles[0];
-	result[11] = tickData.angles[1];
-	result[12] = tickData.angles[2];
-	result[13] = tickData.velocity[0];
-	result[14] = tickData.velocity[1];
-	result[15] = tickData.velocity[2];
-	result[16] = tickData.flags;
-	result[17] = tickData.packetsPerSecond;
-	result[18] = tickData.laggedMovementValue;
-	result[19] = tickData.buttonsForced;
-}
 
 void TickDataFromArray(any array[RP_V2_TICK_DATA_BLOCKSIZE], ReplayTickData result)
 {

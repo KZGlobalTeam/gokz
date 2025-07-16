@@ -646,29 +646,34 @@ static void WriteJumpHeader(File file, JumpReplayHeader jumpHeader)
 
 static void WriteTickData(File file, int client, int replayType, int airtime = 0)
 {
-	ReplayTickData tickData;
-	ReplayTickData prevTickData;
+	// Do NOT use file.Write functions here or write cache will write out of order!!!
+	WriteCache_SetFile(file);
+
+	any tickData[2][RP_V2_TICK_DATA_BLOCKSIZE];
+	int currentTickData = 0;
 	bool isFirstTick = true;
 	switch(replayType)
 	{
 		case ReplayType_Run:
 		{
-			for (int i = 0; i < recordedPostRunData[client].Length; i++)
+			int replayLength = recordedPostRunData[client].Length;
+			for (int i = 0; i < replayLength; i++)
 			{
-				recordedPostRunData[client].GetArray(i, tickData);
-				recordedPostRunData[client].GetArray(IntMax(0, i-1), prevTickData);
-				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+				recordedPostRunData[client].GetArray(i, tickData[currentTickData]);
+				WriteTickDataThroughWriteCache(isFirstTick, tickData[currentTickData], tickData[currentTickData ^ 1]);
+				currentTickData ^= 1;
 				isFirstTick = false;
 			}
 		}
 		case ReplayType_Cheater:
 		{
-			for (int i = 0; i < recordedRecentData[client].Length; i++)
+			int replayLength = recordedRecentData[client].Length;
+			for (int i = 0; i < replayLength; i++)
 			{
 				int rollingI = RecordingIndexAdd(client, i);
-				recordedRecentData[client].GetArray(rollingI, tickData);
-				recordedRecentData[client].GetArray(IntMax(0, i-1), prevTickData);
-				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+				recordedRecentData[client].GetArray(rollingI, tickData[currentTickData]);
+				WriteTickDataThroughWriteCache(isFirstTick, tickData[currentTickData], tickData[currentTickData ^ 1]);
+				currentTickData ^= 1;
 				isFirstTick = false;
 			}
 			
@@ -679,22 +684,19 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 			for (int i = 0; i < replayLength; i++)
 			{
 				int rollingI = RecordingIndexAdd(client, i - replayLength);
-				recordedRecentData[client].GetArray(rollingI, tickData);
-				recordedRecentData[client].GetArray(IntMax(0, i-1), prevTickData);
-				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
+				recordedRecentData[client].GetArray(rollingI, tickData[currentTickData]);
+				WriteTickDataThroughWriteCache(isFirstTick, tickData[currentTickData], tickData[currentTickData ^ 1]);
+				currentTickData ^= 1;
 				isFirstTick = false;
 			}
 		}
 	}
+
+	WriteCache_Flush();
 }
 
-static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tickDataStruct, ReplayTickData prevTickDataStruct)
+static void WriteTickDataThroughWriteCache(bool isFirstTick, const any tickData[RP_V2_TICK_DATA_BLOCKSIZE], const any prevTickData[RP_V2_TICK_DATA_BLOCKSIZE])
 {
-	any tickData[RP_V2_TICK_DATA_BLOCKSIZE];
-	any prevTickData[RP_V2_TICK_DATA_BLOCKSIZE];
-	TickDataToArray(tickDataStruct, tickData);
-	TickDataToArray(prevTickDataStruct, prevTickData);
-	
 	int deltaFlags = (1 << RPDELTA_DELTAFLAGS);
 	if (isFirstTick)
 	{
@@ -704,7 +706,7 @@ static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tick
 	else
 	{
 		// NOTE: Test tickData against prevTickData for differences.
-		for (int i = 1; i < sizeof(tickData); i++)
+		for (int i = 1; i < RP_V2_TICK_DATA_BLOCKSIZE; i++)
 		{
 			// If the bits in tickData[i] are different to prevTickData[i], then
 			// set the corresponding bitflag.
@@ -715,14 +717,14 @@ static void WriteTickDataToFile(File file, bool isFirstTick, ReplayTickData tick
 		}
 	}
 
-	file.WriteInt32(deltaFlags);
+	WriteCache_WriteData(deltaFlags);
 	// NOTE: write only data that has changed since the previous tick.
-	for (int i = 1; i < sizeof(tickData); i++)
+	for (int i = 1; deltaFlags; i++)
 	{
-		int currentFlag = (1 << i);
-		if (deltaFlags & currentFlag)
+		deltaFlags >>= 1;
+		if (deltaFlags & 1)
 		{
-			file.WriteInt32(tickData[i]);
+			WriteCache_WriteData(tickData[i]);
 		}
 	}
 }
@@ -897,4 +899,31 @@ static void RemoveFromRunningTimers(int client, Handle timerToRemove)
 	{
 		runningJumpstatTimers[client].Erase(index);
 	}
+}
+
+
+
+// =====[ WRITE CACHE HACK ]=====
+
+static File writeCacheFile;
+static int writeCacheNext = 0;
+static any writeCache[4096];
+static void WriteCache_SetFile(File file)
+{
+	writeCacheFile = file;
+	writeCacheNext = 0;
+}
+static void WriteCache_WriteData(any data)
+{
+	if (writeCacheNext == sizeof(writeCache))
+	{
+		WriteCache_Flush();
+	}
+	writeCache[writeCacheNext] = data;
+	writeCacheNext++;
+}
+static void WriteCache_Flush()
+{
+	writeCacheFile.Write(writeCache, writeCacheNext, 4);
+	writeCacheNext = 0;
 }
