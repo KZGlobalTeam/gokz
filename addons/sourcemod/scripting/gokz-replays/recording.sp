@@ -483,6 +483,9 @@ static bool SaveRecordingOfRun(int client, int mode, int style, int course, floa
 
 	delete file;
 
+	LogMessage("Saved run replay '%s' (player: %d, map: %s, course: %d, time: %f, teleports: %d)",
+		guid, generalHeader.mapName, course, time, teleportsUsed);
+
 	return true;
 }
 
