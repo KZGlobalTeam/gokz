@@ -405,6 +405,11 @@
 		"en"		"{1} block {2} record of {3}: {4} block ({5} jump)"
 		"ru"		"{1} блок {2} поставил рекорд на {3}: {4} блок ({5} прыжок)"
 	}
+	"No Replay Found"
+	{
+		"en"		"{grey}No replay found!"
+		"chi"		"{grey}本地未找到回放!"
+	}
 
 
 	// =====[ MAP TOP MENU ]=====
@@ -681,6 +686,18 @@
 		"chi"		"板子跳跃数据排行\n \n模式 - {1}\n类别 - {2}\n "
 	}
 
+
+	// =====[ PB REPLAY MENU ]=====
+	"PB Replay Run Type Menu - Title"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"PB Replay\n \nMap - {1}\nMode - {2}\nPlayer - {3}\n "
+	}
+	"PB Replay Run Type Menu - Title (Bonus)"
+	{
+		"#format"	"{1:s},{2:d},{3:s},{4:s}"
+		"en"		"PB Replay\n \nMap - {1} (Bonus {2})\nMode - {3}\nPlayer - {4}\n "
+	}
 
 	// =====[ JUMPSTAT PHRASES ]=====
 	"Strafes"

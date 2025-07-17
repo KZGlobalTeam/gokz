@@ -76,7 +76,7 @@ SELECT MapCourseID \
 // =====[ GENERAL ]=====
 
 char sql_getpb[] = "\
-SELECT Times.RunTime, Times.Teleports \
+SELECT Times.RunTime, Times.Teleports, Times.TimeGUID \
     FROM Times \
     INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID \
     WHERE Times.SteamID32=%d AND MapCourses.MapID=%d \
@@ -85,7 +85,7 @@ SELECT Times.RunTime, Times.Teleports \
     LIMIT %d";
 
 char sql_getpbpro[] = "\
-SELECT Times.RunTime \
+SELECT Times.RunTime, Times.TimeGUID \
     FROM Times \
     INNER JOIN MapCourses ON MapCourses.MapCourseID=Times.MapCourseID \
     WHERE Times.SteamID32=%d AND MapCourses.MapID=%d \

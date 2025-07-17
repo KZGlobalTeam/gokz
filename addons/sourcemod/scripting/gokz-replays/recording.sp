@@ -459,7 +459,7 @@ static bool SaveRecordingOfRun(int client, int mode, int style, int course, floa
 
 	// Build path and create/overwrite associated file
 	char replayPath[PLATFORM_MAX_PATH];
-	FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
+	GOKZ_RP_FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
 	if (FileExists(replayPath)) // This is the coldest branch in the history of cold branches.
 	{
 		DeleteFile(replayPath);
@@ -730,15 +730,6 @@ static void WriteTickDataThroughWriteCache(bool isFirstTick, const any tickData[
 			WriteCache_WriteData(tickData[i]);
 		}
 	}
-}
-
-static void FormatRunReplayPath(char[] buffer, int maxlength, const char[] guid)
-{
-	BuildPath(Path_SM, buffer, maxlength,
-		"%s/%s.%s",
-		RP_DIRECTORY_RUNS,
-		guid,
-		RP_FILE_EXTENSION);
 }
 
 static void FormatCheaterReplayPath(char[] buffer, int maxlength, int client, int mode, int style)

@@ -203,6 +203,20 @@ native int GOKZ_RP_LoadJumpReplay(int client, char[] path);
 native bool GOKZ_RP_UpdateReplayControlMenu(int client);
 
 
+
+// =====[ STOCKS ]=====
+
+stock void GOKZ_RP_FormatRunReplayPath(char[] buffer, int maxlength, const char[] guid)
+{
+	BuildPath(Path_SM, buffer, maxlength,
+		"%s/%s.%s",
+		RP_DIRECTORY_RUNS,
+		guid,
+		RP_FILE_EXTENSION);
+}
+
+
+
 // =====[ DEPENDENCY ]=====
 
 public SharedPlugin __pl_gokz_replays = 

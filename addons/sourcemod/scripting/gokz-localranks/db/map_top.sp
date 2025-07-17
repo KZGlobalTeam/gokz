@@ -143,16 +143,6 @@ void DB_OpenMapTop(int client, int mapID, int course, int mode, int timeType)
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_OpenMapTop, DB_TxnFailure_Generic_DataPack, data, DBPrio_Low);
 }
 
-// Copied from gokz-replays/recording
-static void FormatRunReplayPath(char[] buffer, int maxlength, const char[] guid)
-{
-	BuildPath(Path_SM, buffer, maxlength,
-		"%s/%s.%s",
-		RP_DIRECTORY_RUNS,
-		guid,
-		RP_FILE_EXTENSION);
-}
-
 public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
@@ -266,7 +256,7 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 		
 		if (guid[0] != 0)
 		{
-			FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
+			GOKZ_RP_FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
 			if (FileExists(replayPath))
 			{
 				menu.AddItem(replayPath, display, ITEMDRAW_DEFAULT);

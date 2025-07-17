@@ -1353,9 +1353,12 @@ static void SetBotName(int bot)
 
 	if (botReplayType[bot] == ReplayType_Run)
 	{
+		// Convert to database format and back so the formatting is consistent...
+		float time = GOKZ_DB_TimeIntToFloat(GOKZ_DB_TimeFloatToInt(botTime[bot]));
+
 		// DanZay (01:23.45)
 		FormatEx(name, sizeof(name), "%s (%s)", 
-			botAlias[bot], GOKZ_FormatTime(botTime[bot]));
+			botAlias[bot], GOKZ_FormatTime(time));
 	}
 	else if (botReplayType[bot] == ReplayType_Jump)
 	{
