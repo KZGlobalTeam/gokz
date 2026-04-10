@@ -293,6 +293,8 @@ enum TriggerType
 #define GOKZ_SAFEGUARD_RESTART_MIN_DELAY 0.6
 #define GOKZ_SAFEGUARD_RESTART_MAX_DELAY 5.0
 
+#define GOKZ_NAV_FILE "maps/gokz-replays.nav"
+
 // Prevents the player from retouching a trigger too often.
 #define GOKZ_MAX_RETOUCH_TRIGGER_COUNT 4
 

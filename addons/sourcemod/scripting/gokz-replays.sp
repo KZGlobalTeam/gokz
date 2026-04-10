@@ -47,7 +47,6 @@ int gI_BotDuckPatchLength;
 DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
-#include "gokz-replays/nav.sp"
 #include "gokz-replays/playback.sp"
 #include "gokz-replays/recording.sp"
 #include "gokz-replays/replay_cache.sp"
@@ -120,7 +119,6 @@ public void OnPluginEnd()
 public void OnMapStart()
 {
 	UpdateCurrentMap(); // Do first
-	OnMapStart_Nav();
 	OnMapStart_Recording();
 	OnMapStart_ReplayCache();
 }
