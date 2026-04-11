@@ -1,4 +1,4 @@
-Phrases
+"Phrases"
 {
 	// =====[ CHAT MESSAGES ]=====
 	"Stopped Sounds"
