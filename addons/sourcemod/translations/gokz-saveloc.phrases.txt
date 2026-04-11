@@ -107,12 +107,6 @@
 
 
 	// ====[ GENERAL ]====
-	"Must Be Alive"
-	{
-		"en"		"{darkred}You must be alive to use that command."
-		"chi"		"{darkred}你必须活着才能使用此命令."
-		"ru"		"{darkred}Вы должны быть живы, чтобы использовать эту команду."
-	}
 	"Location Not Found"
 	{
 		"en"		"{darkred}Location not found."
