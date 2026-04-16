@@ -399,6 +399,35 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 			GetFloatChatString(client, "Height", jump.height),
 			missString);
 	}
+	
+	if (GOKZ_JS_GetOption(client, JSOption_StrafeSyncChat) == JSToggleOption_Enabled
+		&& jump.strafes >= 1 && jump.strafes <= JS_MAX_TRACKED_STRAFES)
+	{
+		char strafeSyncMsg[512];
+		char strafeEntry[32];
+		
+		FormatEx(strafeSyncMsg, sizeof(strafeSyncMsg), "{grey}%T:", "Sync", client);
+		
+		for (int i = 1; i <= jump.strafes && i < JS_MAX_TRACKED_STRAFES; i++)
+		{
+			float strafeSync = GetStrafeSync(jump, i);
+			
+			if (i == 1)
+			{
+				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}%d. {lime}%.0f%%%%", i, strafeSync);
+			}
+			else
+			{
+				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}- %d. {lime}%.0f%%%%", i, strafeSync);
+			}
+			StrCat(strafeSyncMsg, sizeof(strafeSyncMsg), strafeEntry);
+		}
+		
+		FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}[{purple}%.0f%%%%{grey}]", jump.sync);
+		StrCat(strafeSyncMsg, sizeof(strafeSyncMsg), strafeEntry);
+		
+		GOKZ_PrintToChat(client, false, "%s", strafeSyncMsg);
+	}
 }
 
 static char[] GetStrafesSyncChatString(int client, int strafes, float sync)

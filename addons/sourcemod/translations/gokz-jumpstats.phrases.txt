@@ -276,6 +276,10 @@
 		"chi"		"更多数据显示在聊天栏"
 		"ru"		"Расширенные оповещения в чат"
 	}
+	"Options Menu - Strafe Sync Chat"
+	{
+		"en"		"Strafe Sync Chat"
+	}
 	"Options Menu - Failstats Console Report"
 	{
 		"en"		"Failstats Console Report"
