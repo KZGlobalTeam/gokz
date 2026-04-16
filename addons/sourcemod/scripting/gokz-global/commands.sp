@@ -87,7 +87,7 @@ public int FilterCheckCallback(JSON_Object filters_json, GlobalAPIRequestData re
 	{
 		for (int i = 0; i < filters_json.Length; i++)
 		{
-			APIRecordFilter filter = view_as<APIRecordFilter>(filters_json.GetObjectIndexed(i));
+			APIRecordFilter filter = view_as<APIRecordFilter>(view_as<JSON_Array>(filters_json).GetObject(i));
 			int mode = GOKZ_GL_FromGlobalMode(view_as<GlobalMode>(filter.ModeId));
 			if (mode == -1)
 			{
