@@ -269,21 +269,6 @@ void ApplyBeamOffset(float pos[3], const float offset[3])
 	pos[2] += offset[2];
 }
 
-float ClampFloat(float value, float min, float max)
-{
-	if (value < min)
-	{
-		return min;
-	}
-	if (value > max)
-	{
-		return max;
-	}
-	return value;
-}
-
-
-
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
 {
 	if (!gB_WaitingForOffset[client])
@@ -300,53 +285,18 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	char parts[3][16];
 	int count = ExplodeString(trimmed, " ", parts, 3, 16);
 	
-	if (count < 3 || !IsNumericString(parts[0]) || !IsNumericString(parts[1]) || !IsNumericString(parts[2]))
+	if (count < 3)
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Beam Offset Invalid");
 		return Plugin_Stop;
 	}
 	
-	float x = ClampFloat(StringToFloat(parts[0]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
-	float y = ClampFloat(StringToFloat(parts[1]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
-	float z = ClampFloat(StringToFloat(parts[2]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float x = FloatClamp(StringToFloat(parts[0]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float y = FloatClamp(StringToFloat(parts[1]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float z = FloatClamp(StringToFloat(parts[2]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
 	
 	SetBeamOffset(client, x, y, z);
 	return Plugin_Stop;
-}
-
-bool IsNumericString(const char[] str)
-{
-	int i = 0;
-	if (str[0] == '-' || str[0] == '+')
-	{
-		i = 1;
-	}
-	
-	bool hasDigit = false;
-	bool hasDot = false;
-	
-	while (str[i] != '\0')
-	{
-		if (str[i] == '.')
-		{
-			if (hasDot)
-			{
-				return false;
-			}
-			hasDot = true;
-		}
-		else if (str[i] < '0' || str[i] > '9')
-		{
-			return false;
-		}
-		else
-		{
-			hasDigit = true;
-		}
-		i++;
-	}
-	
-	return hasDigit;
 }
 
 
@@ -371,13 +321,13 @@ public Action CommandBeamOffset(int client, int args)
 	char arg[16];
 	
 	GetCmdArg(1, arg, sizeof(arg));
-	float x = ClampFloat(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float x = FloatClamp(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
 	
 	GetCmdArg(2, arg, sizeof(arg));
-	float y = ClampFloat(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float y = FloatClamp(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
 	
 	GetCmdArg(3, arg, sizeof(arg));
-	float z = ClampFloat(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float z = FloatClamp(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
 	
 	SetBeamOffset(client, x, y, z);
 	return Plugin_Handled;
