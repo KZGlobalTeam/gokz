@@ -222,7 +222,7 @@
 	{
 		// KZTimer: Pro ✓ Nub ✓
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{purple}{1}{grey}: {darkred}Pro {2}{grey} | {red}Nub {3}"
+		"en"		"{purple}{1}{grey}: {blue}PRO {2}{grey} | {yellow}NUB {3}"
 	}
 	"Filter Check - No Map"
 	{
