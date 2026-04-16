@@ -22,6 +22,7 @@ static int recordingIndex[MAXPLAYERS + 1];
 static float playerSensitivity[MAXPLAYERS + 1];
 static float playerMYaw[MAXPLAYERS + 1];
 static bool isTeleportTick[MAXPLAYERS + 1];
+static int pendingTeleportTicks[MAXPLAYERS + 1];
 static ReplaySaveState replaySaveState[MAXPLAYERS + 1];
 static bool recordingPaused[MAXPLAYERS + 1];
 static bool postRunRecording[MAXPLAYERS + 1];
@@ -121,6 +122,10 @@ void OnPlayerRunCmdPost_Recording(int client, int buttons, int tickCount, const 
 	if (isTeleportTick[client])
 	{
 		isTeleportTick[client] = false;
+	}
+	if (pendingTeleportTicks[client] > 0)
+	{
+		pendingTeleportTicks[client]--;
 	}
 	
 	if (replaySaveState[client] != ReplaySave_Disabled)
@@ -278,7 +283,14 @@ void GOKZ_OnCountedTeleport_Recording(int client)
 		replaySaveState[client] = ReplaySave_Disabled;
 	}
 
-	isTeleportTick[client] = true;
+	if (recordingPaused[client])
+	{
+		pendingTeleportTicks[client]++;
+	}
+	else
+	{
+		isTeleportTick[client] = true;
+	}
 }
 
 void GOKZ_LR_OnRecordMissed_Recording(int client, int recordType)
@@ -394,6 +406,7 @@ static void ClearClientRecordingState(int client)
 	playerSensitivity[client] = -1.0;
 	playerMYaw[client] = -1.0;
 	isTeleportTick[client] = false;
+	pendingTeleportTicks[client] = 0;
 	replaySaveState[client] = ReplaySave_Disabled;
 	recordingPaused[client] = false;
 	postRunRecording[client] = false;
@@ -858,7 +871,7 @@ static int EncodePlayerFlags(int client, int buttons, int tickCount)
 
 	SetKthBit(flags, 21, GetEntProp(client, Prop_Data, "m_nWaterLevel") != 0);
 
-	SetKthBit(flags, 22, isTeleportTick[client]);
+	SetKthBit(flags, 22, isTeleportTick[client] || pendingTeleportTicks[client] > 0);
 	SetKthBit(flags, 23, Movement_GetTakeoffTick(client) == tickCount);
 	SetKthBit(flags, 24, GOKZ_GetHitPerf(client));
 	SetKthBit(flags, 25, IsCurrentWeaponSecondary(client));
