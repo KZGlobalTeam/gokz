@@ -4,10 +4,10 @@
 
 #include <gokz/core>
 #include <gokz/profile>
-#include <gokz/global>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
+#include <gokz/global>
 #include <gokz/chat>
 
 #pragma newdecls required
@@ -27,6 +27,7 @@ public Plugin myinfo =
 int gI_Rank[MAXPLAYERS + 1][MODE_COUNT];
 bool gB_Localranks;
 bool gB_Chat;
+bool gB_Global;
 
 #include "gokz-profile/options.sp"
 #include "gokz-profile/profile.sp"
@@ -47,6 +48,7 @@ public void OnPluginStart()
 	LoadTranslations("common.phrases");
 	LoadTranslations("gokz-profile.phrases");
 	CreateGlobalForwards();
+	HookEvents();
 	RegisterCommands();
 }
 
@@ -54,6 +56,7 @@ public void OnAllPluginsLoaded()
 {
 	gB_Localranks = LibraryExists("gokz-localranks");
 	gB_Chat = LibraryExists("gokz-chat");
+	gB_Global = LibraryExists("gokz-global");
 
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -74,12 +77,14 @@ public void OnLibraryAdded(const char[] name)
 {
 	gB_Localranks = gB_Localranks || StrEqual(name, "gokz-localranks");
 	gB_Chat = gB_Chat || StrEqual(name, "gokz-chat");
+	gB_Global = gB_Global || StrEqual(name, "gokz-global");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
 	gB_Localranks = gB_Localranks && !StrEqual(name, "gokz-localranks");
 	gB_Chat = gB_Chat && !StrEqual(name, "gokz-chat");
+	gB_Global = gB_Global && !StrEqual(name, "gokz-global");
 }
 
 
@@ -138,6 +143,16 @@ public void OnClientConnected(int client)
 	Profile_OnClientConnected(client);
 }
 
+public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		int mode = GOKZ_GetCoreOption(client, Option_Mode);
+		UpdateRank(client, mode);
+	}
+}
+
 public void OnClientDisconnect(int client)
 {
 	Profile_OnClientDisconnect(client);
@@ -160,6 +175,11 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 public void GOKZ_GL_OnPointsUpdated(int client, int mode)
 {
+	if (!gB_Global)
+    {
+        return;
+    }
+
 	UpdateRank(client, mode);
 	Profile_OnPointsUpdated(client, mode);
 }
@@ -209,6 +229,13 @@ public void UpdateRank(int client, int mode)
 		}
 		return;
 	}
+
+	// If gokz-global is not loaded, just set basic tags without rank
+    if (!gB_Global)
+    {
+        UpdateTags(client, -1, mode);
+        return;
+    }
 
 	int points = GOKZ_GL_GetRankPoints(client, mode);
 	int rank;
@@ -290,6 +317,15 @@ int GetAvailableTagTypeOrDefault(int client)
 
 	return tagType;
 }
+
+
+// =====[ GENERAL ]=====
+
+void HookEvents()
+{
+	HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
+}
+
 
 // =====[ COMMANDS ]=====
 
