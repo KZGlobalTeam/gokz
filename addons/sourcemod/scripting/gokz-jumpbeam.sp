@@ -1,6 +1,7 @@
 #include <sourcemod>
 
 #include <sdktools>
+#include <clientprefs>
 
 #include <gokz/core>
 #include <gokz/jumpbeam>
@@ -26,10 +27,14 @@ public Plugin myinfo =
 
 float gF_OldOrigin[MAXPLAYERS + 1][3];
 bool gB_OldDucking[MAXPLAYERS + 1];
+float gF_BeamOffset[MAXPLAYERS + 1][3];
+bool gB_WaitingForOffset[MAXPLAYERS + 1];
+Cookie gH_BeamOffsetCookie;
 int gI_BeamModel;
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
 TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
+TopMenuObject gTMO_ItemBeamOffset;
 
 
 
@@ -45,6 +50,34 @@ public void OnPluginStart()
 {
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-jumpbeam.phrases");
+	
+	gH_BeamOffsetCookie = new Cookie("gokz-jb-offset", "Jump Beam Offset (x y z)", CookieAccess_Private);
+	
+	RegConsoleCmd("sm_beamoffset", CommandBeamOffset, "[KZ] Set jump beam offset. Usage: !beamoffset <x> <y> <z>");
+}
+
+public void OnClientDisconnect(int client)
+{
+	gB_WaitingForOffset[client] = false;
+}
+
+public void OnClientCookiesCached(int client)
+{
+	char value[64];
+	gH_BeamOffsetCookie.Get(client, value, sizeof(value));
+	
+	if (value[0] == '\0')
+	{
+		gF_BeamOffset[client] = view_as<float>({0.0, 0.0, 0.0});
+	}
+	else
+	{
+		char parts[3][16];
+		ExplodeString(value, " ", parts, 3, 16);
+		gF_BeamOffset[client][0] = StringToFloat(parts[0]);
+		gF_BeamOffset[client][1] = StringToFloat(parts[1]);
+		gF_BeamOffset[client][2] = StringToFloat(parts[2]);
+	}
 }
 
 public void OnAllPluginsLoaded()
@@ -158,6 +191,8 @@ void SendFeetJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	
 	beamStart = gF_OldOrigin[targetPlayer.ID];
 	beamEnd = origin;
+	ApplyBeamOffset(beamStart, gF_BeamOffset[player.ID]);
+	ApplyBeamOffset(beamEnd, gF_BeamOffset[player.ID]);
 	GetJumpBeamColour(targetPlayer, beamColour);
 	
 	TE_SetupBeamPoints(beamStart, beamEnd, gI_BeamModel, 0, 0, 0, JB_BEAM_LIFETIME, 0.25, 0.25, 10, 0.0, beamColour, 0);
@@ -172,6 +207,8 @@ void SendHeadJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	
 	beamStart = gF_OldOrigin[targetPlayer.ID];
 	beamEnd = origin;
+	ApplyBeamOffset(beamStart, gF_BeamOffset[player.ID]);
+	ApplyBeamOffset(beamEnd, gF_BeamOffset[player.ID]);
 	if (gB_OldDucking[targetPlayer.ID])
 	{
 		beamStart[2] = beamStart[2] + 54.0;
@@ -203,6 +240,8 @@ void SendGroundJumpBeam(KZPlayer player, KZPlayer targetPlayer)
 	
 	beamStart = gF_OldOrigin[targetPlayer.ID];
 	beamEnd = origin;
+	ApplyBeamOffset(beamStart, gF_BeamOffset[player.ID]);
+	ApplyBeamOffset(beamEnd, gF_BeamOffset[player.ID]);
 	beamStart[2] = takeoffOrigin[2] + 0.1;
 	beamEnd[2] = takeoffOrigin[2] + 0.1;
 	GetJumpBeamColour(targetPlayer, beamColour);
@@ -221,6 +260,140 @@ void GetJumpBeamColour(KZPlayer targetPlayer, int colour[4])
 	{
 		colour =  { 0, 255, 0, 110 }; // Green
 	}
+}
+
+void ApplyBeamOffset(float pos[3], const float offset[3])
+{
+	pos[0] += offset[0];
+	pos[1] += offset[1];
+	pos[2] += offset[2];
+}
+
+float ClampFloat(float value, float min, float max)
+{
+	if (value < min)
+	{
+		return min;
+	}
+	if (value > max)
+	{
+		return max;
+	}
+	return value;
+}
+
+
+
+public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
+{
+	if (!gB_WaitingForOffset[client])
+	{
+		return Plugin_Continue;
+	}
+	
+	gB_WaitingForOffset[client] = false;
+	
+	char trimmed[64];
+	strcopy(trimmed, sizeof(trimmed), sArgs);
+	TrimString(trimmed);
+	
+	char parts[3][16];
+	int count = ExplodeString(trimmed, " ", parts, 3, 16);
+	
+	if (count < 3 || !IsNumericString(parts[0]) || !IsNumericString(parts[1]) || !IsNumericString(parts[2]))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Beam Offset Invalid");
+		return Plugin_Stop;
+	}
+	
+	float x = ClampFloat(StringToFloat(parts[0]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float y = ClampFloat(StringToFloat(parts[1]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	float z = ClampFloat(StringToFloat(parts[2]), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	
+	SetBeamOffset(client, x, y, z);
+	return Plugin_Stop;
+}
+
+bool IsNumericString(const char[] str)
+{
+	int i = 0;
+	if (str[0] == '-' || str[0] == '+')
+	{
+		i = 1;
+	}
+	
+	bool hasDigit = false;
+	bool hasDot = false;
+	
+	while (str[i] != '\0')
+	{
+		if (str[i] == '.')
+		{
+			if (hasDot)
+			{
+				return false;
+			}
+			hasDot = true;
+		}
+		else if (str[i] < '0' || str[i] > '9')
+		{
+			return false;
+		}
+		else
+		{
+			hasDigit = true;
+		}
+		i++;
+	}
+	
+	return hasDigit;
+}
+
+
+
+// =====[ COMMANDS ]=====
+
+public Action CommandBeamOffset(int client, int args)
+{
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
+	
+	if (args < 3)
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Beam Offset Usage");
+		GOKZ_PrintToChat(client, true, "%t", "Current Beam Offset", 
+			gF_BeamOffset[client][0], gF_BeamOffset[client][1], gF_BeamOffset[client][2]);
+		return Plugin_Handled;
+	}
+	
+	char arg[16];
+	
+	GetCmdArg(1, arg, sizeof(arg));
+	float x = ClampFloat(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	
+	GetCmdArg(2, arg, sizeof(arg));
+	float y = ClampFloat(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	
+	GetCmdArg(3, arg, sizeof(arg));
+	float z = ClampFloat(StringToFloat(arg), -JB_OFFSET_MAX, JB_OFFSET_MAX);
+	
+	SetBeamOffset(client, x, y, z);
+	return Plugin_Handled;
+}
+
+void SetBeamOffset(int client, float x, float y, float z)
+{
+	gF_BeamOffset[client][0] = x;
+	gF_BeamOffset[client][1] = y;
+	gF_BeamOffset[client][2] = z;
+	
+	char value[64];
+	FormatEx(value, sizeof(value), "%.1f %.1f %.1f", x, y, z);
+	gH_BeamOffsetCookie.Set(client, value);
+	
+	GOKZ_PrintToChat(client, true, "%t", "Current Beam Offset", x, y, z);
 }
 
 
@@ -259,6 +432,8 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 	{
 		gTMO_ItemsJB[option] = gTM_Options.AddItem(gC_JBOptionNames[option], TopMenuHandler_General, gTMO_CatGeneral);
 	}
+	
+	gTMO_ItemBeamOffset = gTM_Options.AddItem("GOKZ JB - Beam Offset", TopMenuHandler_BeamOffset, gTMO_CatGeneral);
 }
 
 public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
@@ -301,4 +476,30 @@ public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMen
 			}
 		}
 	}
+} 
+
+public void TopMenuHandler_BeamOffset(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
+{
+	if (action == TopMenuAction_DisplayOption)
+	{
+		FormatEx(buffer, maxlength, "%T - %.1f %.1f %.1f", 
+			"Options Menu - Beam Offset", param, 
+			gF_BeamOffset[param][0], gF_BeamOffset[param][1], gF_BeamOffset[param][2]);
+	}
+	else if (action == TopMenuAction_SelectOption)
+	{
+		gB_WaitingForOffset[param] = true;
+		CreateTimer(15.0, Timer_BeamOffsetTimeout, GetClientUserId(param), TIMER_FLAG_NO_MAPCHANGE);
+		GOKZ_PrintToChat(param, true, "%t", "Beam Offset Prompt");
+	}
+}
+
+public Action Timer_BeamOffsetTimeout(Handle timer, int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (client != 0 && gB_WaitingForOffset[client])
+	{
+		gB_WaitingForOffset[client] = false;
+	}
+	return Plugin_Stop;
 } 
