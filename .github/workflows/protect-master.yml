@@ -6,10 +6,10 @@ on:
 
 jobs:
   protect-master-pr:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     if: ${{ github.base_ref == 'master' && (github.repository != 'KZGlobalTeam/gokz' || github.head_ref != 'dev') }}
     steps:
-    - uses: actions/github-script@v6
+    - uses: actions/github-script@v9
       with:
         script: core.setFailed('Trying to merge a branch into master that is not dev!')
 
