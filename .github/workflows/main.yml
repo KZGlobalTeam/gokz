@@ -103,7 +103,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ env.GOKZ_VERSION }} \
-            --title "GOKZ ${{ env.GOKZ_VERSION }}" \
+            --title "GOKZ v${{ env.GOKZ_VERSION }}" \
             --generate-notes \
             GOKZ-v${{ env.GOKZ_VERSION }}.zip \
             GOKZ-v${{ env.GOKZ_VERSION }}-upgrade.zip
