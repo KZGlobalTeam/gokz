@@ -175,11 +175,6 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 
 public void GOKZ_GL_OnPointsUpdated(int client, int mode)
 {
-	if (!gB_Global)
-    {
-        return;
-    }
-
 	UpdateRank(client, mode);
 	Profile_OnPointsUpdated(client, mode);
 }
