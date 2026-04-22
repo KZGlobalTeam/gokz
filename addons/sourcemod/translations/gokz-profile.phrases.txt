@@ -46,7 +46,7 @@
 		"en"		"VIP"
 		"chi"		"会员"
 	}
-	
+
 	//=====[ PROFILE ]=====
 	"Profile Menu - Title"
 	{
@@ -118,7 +118,7 @@
 		"en"		"Pro runs"
 		"chi"		"裸跳"
 	}
-	
+
 	//=====[ TAGS ]=====
 	"Tag - Admin"
 	{

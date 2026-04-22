@@ -142,7 +142,7 @@
 	"Can't Pause (Just Landed)"
 	{
 		"en"		"{darkred}You can't pause because you just landed."
-		"chi"		"{darkred}你不能暂停，因为你还没有站稳."	
+		"chi"		"{darkred}你不能暂停，因为你还没有站稳."
 		"ru"		"{darkred}Вы не можете поставить паузу после приземления."
 	}
 	"Can't Pause (Anti Pause Area)"
@@ -153,7 +153,7 @@
 	"Can't Resume (Generic)"
 	{
 		"en"		"{darkred}You can't resume right now."
-		"chi"		"{darkred}你现在不能恢复计时."	
+		"chi"		"{darkred}你现在不能恢复计时."
 	}
 	"Can't Resume (Just Paused)"
 	{
@@ -201,7 +201,7 @@
 		"en"		"{grey}The start of {bluegrey}Bonus {1} {grey}was not found."
 		"chi"		"{grey}未找到 {bluegrey}奖励关 {1} {grey}的起点."
 		"ru"		"{grey}Начало {bluegrey}Bonus {1} {grey}не найдено."
-	}	
+	}
 	"No End Found"
 	{
 		"en"		"{grey}The end of the {bluegrey}Main Course {grey}was not found."
@@ -222,7 +222,7 @@
 	"Option - Virtual Button Indicators - Disable"
 	{
 		"en"		"{grey}Your virtual start and end buttons are no longer indicated."
-		"chi"		"{grey}你已关闭虚拟计时器."	
+		"chi"		"{grey}你已关闭虚拟计时器."
 		"ru"		"{grey}Кнопки начала и окончания теперь не обозначены кругами."
 	}
 	"Locked Virtual Buttons"
@@ -348,7 +348,7 @@
 	"Timer Button Zone Type - Both Zones"
 	{
 		"en"		"Both zones"
-		"chi"		"都为自动"	
+		"chi"		"都为自动"
 	}
 	"Safeguard - Enabled NUB"
 	{
