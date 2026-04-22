@@ -71,7 +71,7 @@ public int PrintRecordsCallback(JSON_Object records, GlobalAPIRequestData reques
 	}
 	else
 	{
-		APIRecord record = view_as<APIRecord>(records.GetObjectIndexed(0));
+		APIRecord record = view_as<APIRecord>(view_as<JSON_Array>(records).GetObject(0));
 		printRecordsTimeExists[client][timeType] = true;
 		printRecordsTimes[client][timeType] = record.Time;
 		record.GetPlayerName(printRecordsPlayerNames[client][timeType], sizeof(printRecordsPlayerNames[][]));
