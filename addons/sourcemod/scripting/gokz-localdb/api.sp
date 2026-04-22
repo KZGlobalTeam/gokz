@@ -13,7 +13,7 @@ void CreateGlobalForwards()
 	H_OnDatabaseConnect = new GlobalForward("GOKZ_DB_OnDatabaseConnect", ET_Ignore, Param_Cell);
 	H_OnClientSetup = new GlobalForward("GOKZ_DB_OnClientSetup", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	H_OnMapSetup = new GlobalForward("GOKZ_DB_OnMapSetup", ET_Ignore, Param_Cell);
-	H_OnTimeInserted = new GlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	H_OnTimeInserted = new GlobalForward("GOKZ_DB_OnTimeInserted", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String);
 	H_OnJumpstatPB = new GlobalForward("GOKZ_DB_OnJumpstatPB", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 }
 
@@ -40,7 +40,7 @@ void Call_OnMapSetup()
 	Call_Finish();
 }
 
-void Call_OnTimeInserted(int client, int steamID, int mapID, int course, int mode, int style, int runTimeMS, int teleportsUsed)
+void Call_OnTimeInserted(int client, int steamID, int mapID, int course, int mode, int style, int runTimeMS, int teleportsUsed, const char[] guid)
 {
 	Call_StartForward(H_OnTimeInserted);
 	Call_PushCell(client);
@@ -51,6 +51,7 @@ void Call_OnTimeInserted(int client, int steamID, int mapID, int course, int mod
 	Call_PushCell(style);
 	Call_PushCell(runTimeMS);
 	Call_PushCell(teleportsUsed);
+	Call_PushString(guid);
 	Call_Finish();
 }
 
@@ -83,6 +84,7 @@ void CreateNatives()
 	CreateNative("GOKZ_DB_GetCurrentMapID", Native_GetCurrentMapID);
 	CreateNative("GOKZ_DB_IsCheater", Native_IsCheater);
 	CreateNative("GOKZ_DB_SetCheater", Native_SetCheater);
+	CreateNative("GOKZ_DB_GetRunGUID", Native_GetRunGUID);
 }
 
 public int Native_GetDatabase(Handle plugin, int numParams)
@@ -124,3 +126,10 @@ public int Native_SetCheater(Handle plugin, int numParams)
 	DB_SetCheater(GetNativeCell(1), GetNativeCell(2));
 	return 0;
 } 
+
+public int Native_GetRunGUID(Handle plugin, int numParams)
+{
+	int bytes = 0;
+	SetNativeString(2, gC_RunGUID[GetNativeCell(1)], GOKZ_DB_TIME_GUID_MAX, _, bytes);
+	return bytes;
+}

@@ -209,6 +209,7 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 	char playerName[MAX_NAME_LENGTH];
 	float runTime;
 	int timeid, steamid, teleports, rank = 0;
+	char guid[GOKZ_DB_TIME_GUID_MAX], replayPath[PLATFORM_MAX_PATH];
 
 	bool clientIsAdmin = CheckCommandAccess(client, "sm_deletetime", ADMFLAG_ROOT, false);
 
@@ -225,6 +226,7 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 		steamid = SQL_FetchInt(results[2], 1);
 		SQL_FetchString(results[2], 2, playerName, sizeof(playerName));
 		runTime = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[2], 3));
+		SQL_FetchString(results[2], 5, guid, sizeof(guid));
 
 		if (clientIsAdmin)
 		{
@@ -251,7 +253,23 @@ public void DB_TxnSuccess_OpenMapTop(Handle db, DataPack data, int numQueries, H
 					rank, GOKZ_FormatTime(runTime), playerName, steamid & 1, steamid >> 1, admin);
 			}
 		}
-		menu.AddItem("", display, ITEMDRAW_DISABLED);
+		
+		if (guid[0] != 0)
+		{
+			GOKZ_RP_FormatRunReplayPath(replayPath, sizeof(replayPath), guid);
+			if (FileExists(replayPath))
+			{
+				menu.AddItem(replayPath, display, ITEMDRAW_DEFAULT);
+			}
+			else
+			{
+				menu.AddItem("", display, ITEMDRAW_DISABLED);
+			}
+		}
+		else
+		{
+			menu.AddItem("", display, ITEMDRAW_DISABLED);
+		}
 	}
 	
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -375,8 +393,13 @@ public int MenuHandler_MapTop(Menu menu, MenuAction action, int param1, int para
 
 public int MenuHandler_MapTopSubmenu(Menu menu, MenuAction action, int param1, int param2)
 {
-	// TODO Menu item info is player's SteamID32, but is currently not used
-	if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
+	if (action == MenuAction_Select)
+	{
+		char replayPath[PLATFORM_MAX_PATH];
+		menu.GetItem(param2, replayPath, sizeof(replayPath));
+		GOKZ_RP_LoadJumpReplay(param1, replayPath);
+	}
+	else if (action == MenuAction_Cancel && param2 == MenuCancel_Exit)
 	{
 		ReopenMapTopMenu(param1);
 	}

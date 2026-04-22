@@ -31,6 +31,8 @@ bool gB_Cheater[MAXPLAYERS + 1];
 int gI_PBJSCache[MAXPLAYERS + 1][MODE_COUNT][JUMPTYPE_COUNT][JUMPSTATDB_CACHE_COUNT];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
+char gC_RunGUID[MAXPLAYERS + 1][GOKZ_DB_TIME_GUID_MAX];
+int gI_RunCounter = 0;
 
 #include "gokz-localdb/api.sp"
 #include "gokz-localdb/commands.sp"
@@ -110,6 +112,11 @@ public void OnMapEnd()
 	gB_MapSetUp = false;
 }
 
+public void OnClientConnected(int client)
+{
+	gC_RunGUID[client][0] = 0;
+}
+
 public void OnClientAuthorized(int client, const char[] auth)
 {
 	DB_SetupClient(client);
@@ -159,11 +166,28 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
+public Action GOKZ_OnTimerStart(int client, int course)
+{
+	// Initialize the run GUID.
+	// NOTE(Szwagi): It's definitely overdone.
+	// It'd be nice to use a battle tested UUID implementation but it's not feasable from SourceMod.
+	// Something like UUIDv4 looks doable but I don't trust the RNG SourceMod provides.
+	gI_RunCounter++;
+	FormatEx(gC_RunGUID[client], sizeof(gC_RunGUID[]), "%x-%x-%x-%x-%x", 
+		GetSteamAccountID(client), 
+		GetTime(), 
+		GetSysTickCount(),
+		GetURandomInt(), 
+		gI_RunCounter);
+
+	return Plugin_Continue;
+}
+
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
 	int style = GOKZ_GetCoreOption(client, Option_Style);
-	DB_SaveTime(client, course, mode, style, time, teleportsUsed);
+	DB_SaveTime(client, course, mode, style, time, teleportsUsed, gC_RunGUID[client]);
 }
 
 public void GOKZ_JS_OnLanding(Jump jump)

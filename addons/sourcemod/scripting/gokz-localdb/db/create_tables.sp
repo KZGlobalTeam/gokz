@@ -31,6 +31,10 @@ void DB_CreateTables()
 			txn.AddQuery(mysql_startpos_create);
 		}
 	}
+
+	txn.AddQuery(sql_times_alter_add_guid);
 	
-	SQL_ExecuteTransaction(gH_DB, txn, _, DB_TxnFailure_Generic, _, DBPrio_High);
+	// No error logs for this transaction as it will always throw an error
+	// if the column already exists, which is more annoying than helpful.
+	SQL_ExecuteTransaction(gH_DB, txn, _, _, _, DBPrio_High);
 } 

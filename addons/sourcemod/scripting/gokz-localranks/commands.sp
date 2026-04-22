@@ -5,6 +5,9 @@ static float lastCommandTime[MAXPLAYERS + 1];
 void RegisterCommands()
 {
 	RegConsoleCmd("sm_top", CommandTop, "[KZ] Open a menu showing the top record holders.");
+	RegConsoleCmd("sm_replay", CommandReplay, "[KZ] Open a menu showing the top course times of a map. Usage: !replay <#course>");
+	RegConsoleCmd("sm_pbreplay", CommandPBReplay, "[KZ] Play the replay of a main course PB time. Usage: !pbreplay <player>");
+	RegConsoleCmd("sm_bpbreplay", CommandBPBReplay, "[KZ] Play the replay of a bonus course PB time. Usage: !bpbreplay <#course> <player>");
 	RegConsoleCmd("sm_maptop", CommandMapTop, "[KZ] Open a menu showing the top main course times of a map. Usage: !maptop <map>");
 	RegConsoleCmd("sm_bmaptop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !bmaptop <#bonus> <map>");
 	RegConsoleCmd("sm_bonustop", CommandBMapTop, "[KZ] Open a menu showing the top bonus times of a map. Usage: !bonustop <#bonus> <map>");
@@ -44,6 +47,99 @@ public Action CommandTop(int client, int args)
 	}
 
 	DisplayPlayerTopModeMenu(client);
+	return Plugin_Handled;
+}
+
+public Action CommandReplay(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+
+	if (args == 0)
+	{  // Open map top for current map
+		DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), 0);
+	}
+	else if (args == 1)
+	{  // Open specified Bonus # top for current map
+		char argBonus[4];
+		GetCmdArg(1, argBonus, sizeof(argBonus));
+		int bonus;
+		if (StringToIntEx(argBonus, bonus) > 0 && GOKZ_IsValidCourse(bonus, false))
+		{
+			DB_OpenMapTopModeMenu(client, GOKZ_DB_GetCurrentMapID(), bonus);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Course Number", argBonus);
+		}
+	}
+	return Plugin_Handled;
+}
+
+public Action CommandPBReplay(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int mapID = GOKZ_DB_GetCurrentMapID();
+	
+	if (args <= 0)
+	{
+		DB_PlayPBReplay(client, GetSteamAccountID(client), mapID, 0, mode);
+	}
+	else
+	{
+		char playerName[MAX_NAME_LENGTH];
+		GetCmdArg(1, playerName, sizeof(playerName));
+		DB_PlayPBReplay_FindPlayer(client, playerName, mapID, 0, mode);
+	}
+
+	return Plugin_Handled;
+}
+
+public Action CommandBPBReplay(int client, int args)
+{
+	if (IsSpammingCommands(client))
+	{
+		return Plugin_Handled;
+	}
+
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	int mapID = GOKZ_DB_GetCurrentMapID();
+	
+	if (args <= 0)
+	{
+		DB_PlayPBReplay(client, GetSteamAccountID(client), mapID, 1, mode);
+	}
+	else
+	{
+		char argBonus[4];
+		GetCmdArg(1, argBonus, sizeof(argBonus));
+		int bonus;
+		if (StringToIntEx(argBonus, bonus) <= 0 || !GOKZ_IsValidCourse(bonus, true))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Invalid Bonus Number", argBonus);
+		}
+		else
+		{
+			if (args == 1)
+			{
+				DB_PlayPBReplay(client, GetSteamAccountID(client), mapID, bonus, mode);
+			}
+			else
+			{
+				char playerName[MAX_NAME_LENGTH];
+				GetCmdArg(2, playerName, sizeof(playerName));
+				DB_PlayPBReplay_FindPlayer(client, playerName, mapID, bonus, mode);
+			}
+		}
+	}
+
 	return Plugin_Handled;
 }
 

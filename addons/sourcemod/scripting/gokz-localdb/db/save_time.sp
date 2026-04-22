@@ -4,7 +4,7 @@
 
 
 
-void DB_SaveTime(int client, int course, int mode, int style, float runTime, int teleportsUsed)
+void DB_SaveTime(int client, int course, int mode, int style, float runTime, int teleportsUsed, const char[] guid)
 {
 	if (IsFakeClient(client))
 	{
@@ -25,11 +25,12 @@ void DB_SaveTime(int client, int course, int mode, int style, float runTime, int
 	data.WriteCell(style);
 	data.WriteCell(runTimeMS);
 	data.WriteCell(teleportsUsed);
+	data.WriteString(guid);
 	
 	Transaction txn = SQL_CreateTransaction();
 	
 	// Save runTime to DB
-	FormatEx(query, sizeof(query), sql_times_insert, steamID, mode, style, runTimeMS, teleportsUsed, mapID, course);
+	FormatEx(query, sizeof(query), sql_times_insert, steamID, mode, style, runTimeMS, teleportsUsed, guid, mapID, course);
 	txn.AddQuery(query);
 	
 	SQL_ExecuteTransaction(gH_DB, txn, DB_TxnSuccess_SaveTime, DB_TxnFailure_Generic_DataPack, data, DBPrio_Normal);
@@ -37,6 +38,8 @@ void DB_SaveTime(int client, int course, int mode, int style, float runTime, int
 
 public void DB_TxnSuccess_SaveTime(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
+	char guid[GOKZ_DB_TIME_GUID_MAX];
+
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int steamID = data.ReadCell();
@@ -46,6 +49,7 @@ public void DB_TxnSuccess_SaveTime(Handle db, DataPack data, int numQueries, Han
 	int style = data.ReadCell();
 	int runTimeMS = data.ReadCell();
 	int teleportsUsed = data.ReadCell();
+	data.ReadString(guid, sizeof(guid));
 	delete data;
 	
 	if (!IsValidClient(client))
@@ -53,7 +57,7 @@ public void DB_TxnSuccess_SaveTime(Handle db, DataPack data, int numQueries, Han
 		return;
 	}
 	
-	Call_OnTimeInserted(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed);
+	Call_OnTimeInserted(client, steamID, mapID, course, mode, style, runTimeMS, teleportsUsed, guid);
 } 
 
 public void DB_DeleteTime(int client, int timeID)
