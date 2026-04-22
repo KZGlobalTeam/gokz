@@ -383,7 +383,7 @@ stock int NextIndex(int index, int max)
  * @param bufferSize	Size of buffer.
  * @param index			Index of current/most recent value of input array.
  */
-stock void SortByRecent(const int[] input, int inputSize, int[] buffer, int bufferSize, int index)
+stock void SortByRecent(const any[] input, int inputSize, any[] buffer, int bufferSize, int index)
 {
 	int reorderedIndex = 0;
 	for (int i = index; reorderedIndex < bufferSize && i >= 0; i--)
