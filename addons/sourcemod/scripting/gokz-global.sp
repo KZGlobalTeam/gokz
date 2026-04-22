@@ -233,14 +233,13 @@ public void OnClientPutInServer(int client)
 {
 	gB_GloballyVerified[client] = false;
 	gB_waitingForFPSKick[client] = false;
+	ResetPoints(client);
 	OnClientPutInServer_PrintRecords(client);
 }
 
 // OnClientAuthorized is apparently too early
 public void OnClientPostAdminCheck(int client)
 {
-	ResetPoints(client);
-	
 	if (GlobalAPI_IsInit() && !IsFakeClient(client))
 	{
 		CheckClientGlobalBan(client);
