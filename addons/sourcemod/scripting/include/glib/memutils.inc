@@ -162,7 +162,7 @@ stock void DumpOnAddress(Address addr, int len, int columns = 10)
 	ASSERT(len > 0 && len < MEM_LEN_SAFE_THRESHOLD);
 	
 	Format(buff, sizeof(buff), "[0x%08X]", addr);
-	char chr;
+	int chr;
 	for(int i = 0; i < len; i++)
 	{
 		chr = LoadFromAddress(addr + i, NumberType_Int8);

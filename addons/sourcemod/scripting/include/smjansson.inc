@@ -34,7 +34,7 @@ enum json_type {
  *
  * @return                  json_type of the value.
  */
-native json_type:json_typeof(Handle:hObj);
+native json_type json_typeof(Handle hObj);
 
 /**
  * The type of a JSON value is queried and tested using these macros
@@ -63,7 +63,7 @@ native json_type:json_typeof(Handle:hObj);
  *
  * @return                  False if the type does not exist.
  */
-stock bool:Stringify_json_type(json_type:input, String:output[], maxlength) {
+stock bool Stringify_json_type(json_type input, char[] output, int maxlength) {
 	switch(input) {
 		case JSON_OBJECT:		strcopy(output, maxlength, "Object");
 		case JSON_ARRAY:		strcopy(output, maxlength, "Array");
@@ -109,7 +109,7 @@ stock bool:Stringify_json_type(json_type:input, String:output[], maxlength) {
  * @return                  Returns false if they are inequal or one
  *                          or both of the pointers are NULL.
  */
-native bool:json_equal(Handle:hObj, Handle:hOther);
+native bool json_equal(Handle hObj, Handle hOther);
 
 
 
@@ -136,7 +136,7 @@ native bool:json_equal(Handle:hObj, Handle:hOther);
  * @return                  Returns a shallow copy of the object,
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_copy(Handle:hObj);
+native Handle json_copy(Handle hObj);
 
 /**
  * Get a deep copy of the passed object
@@ -146,7 +146,7 @@ native Handle:json_copy(Handle:hObj);
  * @return                  Returns a deep copy of the object,
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_deep_copy(Handle:hObj);
+native Handle json_deep_copy(Handle hObj);
 
 
 
@@ -165,7 +165,7 @@ native Handle:json_deep_copy(Handle:hObj);
  *
  * @return                  Handle to a new JSON object.
  */
-native Handle:json_object();
+native Handle json_object();
 
 /**
  * Returns the number of elements in hObj
@@ -175,7 +175,7 @@ native Handle:json_object();
  * @return                  Number of elements in hObj,
  *                          or 0 if hObj is not a JSON object.
  */
-native json_object_size(Handle:hObj);
+native int json_object_size(Handle hObj);
 
 /**
  * Get a value corresponding to sKey from hObj
@@ -186,7 +186,7 @@ native json_object_size(Handle:hObj);
  * @return                  Handle to a the JSON object or
  *                          INVALID_HANDLE on error.
  */
-native Handle:json_object_get(Handle:hObj, const String:sKey[]);
+native Handle json_object_get(Handle hObj, const char[] sKey);
 
 /**
  * Set the value of sKey to hValue in hObj.
@@ -200,7 +200,7 @@ native Handle:json_object_get(Handle:hObj, const String:sKey[]);
  *
  * @return					True on success.
  */
-native bool:json_object_set(Handle:hObj, const String:sKey[], Handle:hValue);
+native bool json_object_set(Handle hObj, const char[] sKey, Handle hValue);
 
 /**
  * Set the value of sKey to hValue in hObj.
@@ -215,7 +215,7 @@ native bool:json_object_set(Handle:hObj, const String:sKey[], Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_object_set_new(Handle:hObj, const String:sKey[], Handle:hValue);
+native bool json_object_set_new(Handle hObj, const char[] sKey, Handle hValue);
 
 /**
  * Delete sKey from hObj if it exists.
@@ -225,7 +225,7 @@ native bool:json_object_set_new(Handle:hObj, const String:sKey[], Handle:hValue)
  *
  * @return                  True on success.
  */
-native bool:json_object_del(Handle:hObj, const String:sKey[]);
+native bool json_object_del(Handle hObj, const char[] sKey);
 
 /**
  * Remove all elements from hObj.
@@ -235,7 +235,7 @@ native bool:json_object_del(Handle:hObj, const String:sKey[]);
  *
  * @return                  True on success.
  */
-native bool:json_object_clear(Handle:hObj);
+native bool json_object_clear(Handle hObj);
 
 /**
  * Update hObj with the key-value pairs from hOther, overwriting
@@ -247,7 +247,7 @@ native bool:json_object_clear(Handle:hObj);
  *
  * @return                  True on success.
  */
-native bool:json_object_update(Handle:hObj, Handle:hOther);
+native bool json_object_update(Handle hObj, Handle hOther);
 
 /**
  * Like json_object_update(), but only the values of existing keys
@@ -259,7 +259,7 @@ native bool:json_object_update(Handle:hObj, Handle:hOther);
  *
  * @return                  True on success.
  */
-native bool:json_object_update_existing(Handle:hObj, Handle:hOther);
+native bool json_object_update_existing(Handle hObj, Handle hOther);
 
 /**
  * Like json_object_update(), but only new keys are created.
@@ -271,7 +271,7 @@ native bool:json_object_update_existing(Handle:hObj, Handle:hOther);
  *
  * @return                  True on success.
  */
-native bool:json_object_update_missing(Handle:hObj, Handle:hOther);
+native bool json_object_update_missing(Handle hObj, Handle hOther);
 
 
 
@@ -283,13 +283,13 @@ native bool:json_object_update_missing(Handle:hObj, Handle:hOther);
  *  - We assume hObj is a Handle to a valid JSON object.
  *
  *
- * new Handle:hIterator = json_object_iter(hObj);
+ * new Handle hIterator = json_object_iter(hObj);
  * while(hIterator != INVALID_HANDLE)
  * {
  *     	new String:sKey[128];
  *      json_object_iter_key(hIterator, sKey, sizeof(sKey));
  *
- *      new Handle:hValue = json_object_iter_value(hIterator);
+ *      new Handle hValue = json_object_iter_value(hIterator);
  *
  *      // Do something with sKey and hValue
  *
@@ -312,7 +312,7 @@ native bool:json_object_update_missing(Handle:hObj, Handle:hOther);
  * @return                  Handle to JSON object iterator,
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_object_iter(Handle:hObj);
+native Handle json_object_iter(Handle hObj);
 
 /**
  * Like json_object_iter(), but returns an iterator to the key-value
@@ -328,7 +328,7 @@ native Handle:json_object_iter(Handle:hObj);
  * @return                  Handle to JSON object iterator,
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_object_iter_at(Handle:hObj, const String:key[]);
+native Handle json_object_iter_at(Handle hObj, const char[] key);
 
 /**
  * Returns an iterator pointing to the next key-value pair in object.
@@ -341,7 +341,7 @@ native Handle:json_object_iter_at(Handle:hObj, const String:key[]);
  *                          or INVALID_HANDLE on error, or if the
  *                          whole object has been iterated through.
  */
-native Handle:json_object_iter_next(Handle:hObj, Handle:hIter);
+native Handle json_object_iter_next(Handle hObj, Handle hIter);
 
 /**
  * Extracts the associated key of hIter as a null terminated UTF-8
@@ -353,7 +353,7 @@ native Handle:json_object_iter_next(Handle:hObj, Handle:hIter);
  * @error                   Invalid JSON Object Iterator.
  * @return                  Length of the returned string or -1 on error.
  */
-native json_object_iter_key(Handle:hIter, String:sKeyBuffer[], maxlength);
+native int json_object_iter_key(Handle hIter, char[] sKeyBuffer, int maxlength);
 
 /**
  * Returns a handle to the value hIter is pointing at.
@@ -362,7 +362,7 @@ native json_object_iter_key(Handle:hIter, String:sKeyBuffer[], maxlength);
  *
  * @return                  Handle to value or INVALID_HANDLE on error.
  */
-native Handle:json_object_iter_value(Handle:hIter);
+native Handle json_object_iter_value(Handle hIter);
 
 /**
  * Set the value of the key-value pair in hObj, that is pointed to
@@ -374,7 +374,7 @@ native Handle:json_object_iter_value(Handle:hIter);
  *
  * @return                  True on success.
  */
-native bool:json_object_iter_set(Handle:hObj, Handle:hIter, Handle:hValue);
+native bool json_object_iter_set(Handle hObj, Handle hIter, Handle hValue);
 
 /**
  * Set the value of the key-value pair in hObj, that is pointed to
@@ -387,7 +387,7 @@ native bool:json_object_iter_set(Handle:hObj, Handle:hIter, Handle:hValue);
  *
  * @return                  True on success.
  */
-native bool:json_object_iter_set_new(Handle:hObj, Handle:hIter, Handle:hValue);
+native bool json_object_iter_set_new(Handle hObj, Handle hIter, Handle hValue);
 
 
 
@@ -404,7 +404,7 @@ native bool:json_object_iter_set_new(Handle:hObj, Handle:hIter, Handle:hValue);
  *
  * @return                  Handle to the new JSON array
  */
-native Handle:json_array();
+native Handle json_array();
 
 /**
  * Returns the number of elements in hArray
@@ -414,7 +414,7 @@ native Handle:json_array();
  * @return                  Number of elements in hArray,
  *                          or 0 if hObj is not a JSON array.
  */
-native json_array_size(Handle:hArray);
+native int json_array_size(Handle hArray);
 
 /**
  * Returns the element in hArray at position iIndex.
@@ -425,7 +425,7 @@ native json_array_size(Handle:hArray);
  * @return                  Handle to a the JSON object or
  *                          INVALID_HANDLE on error.
  */
-native Handle:json_array_get(Handle:hArray, iIndex);
+native Handle json_array_get(Handle hArray, int iIndex);
 
 /**
  * Replaces the element in array at position iIndex with hValue.
@@ -438,7 +438,7 @@ native Handle:json_array_get(Handle:hArray, iIndex);
  *
  * @return					True on success.
  */
-native bool:json_array_set(Handle:hArray, iIndex, Handle:hValue);
+native bool json_array_set(Handle hArray, int iIndex, Handle hValue);
 
 /**
  * Replaces the element in array at position iIndex with hValue.
@@ -452,7 +452,7 @@ native bool:json_array_set(Handle:hArray, iIndex, Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_array_set_new(Handle:hArray, iIndex, Handle:hValue);
+native bool json_array_set_new(Handle hArray, int iIndex, Handle hValue);
 
 /**
  * Appends value to the end of array, growing the size of array by 1.
@@ -462,7 +462,7 @@ native bool:json_array_set_new(Handle:hArray, iIndex, Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_array_append(Handle:hArray, Handle:hValue);
+native bool json_array_append(Handle hArray, Handle hValue);
 
 /**
  * Appends value to the end of array, growing the size of array by 1.
@@ -473,7 +473,7 @@ native bool:json_array_append(Handle:hArray, Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_array_append_new(Handle:hArray, Handle:hValue);
+native bool json_array_append_new(Handle hArray, Handle hValue);
 
 /**
  * Inserts value to hArray at position iIndex, shifting the elements at
@@ -485,7 +485,7 @@ native bool:json_array_append_new(Handle:hArray, Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_array_insert(Handle:hArray, iIndex, Handle:hValue);
+native bool json_array_insert(Handle hArray, int iIndex, Handle hValue);
 
 /**
  * Inserts value to hArray at position iIndex, shifting the elements at
@@ -498,7 +498,7 @@ native bool:json_array_insert(Handle:hArray, iIndex, Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_array_insert_new(Handle:hArray, iIndex, Handle:hValue);
+native bool json_array_insert_new(Handle hArray, int iIndex, Handle hValue);
 
 /**
  * Removes the element in hArray at position iIndex, shifting the
@@ -509,7 +509,7 @@ native bool:json_array_insert_new(Handle:hArray, iIndex, Handle:hValue);
  *
  * @return					True on success.
  */
-native bool:json_array_remove(Handle:hArray, iIndex);
+native bool json_array_remove(Handle hArray, int iIndex);
 
 /**
  * Removes all elements from hArray.
@@ -518,7 +518,7 @@ native bool:json_array_remove(Handle:hArray, iIndex);
  *
  * @return					True on success.
  */
-native bool:json_array_clear(Handle:hArray);
+native bool json_array_clear(Handle hArray);
 
 /**
  * Appends all elements in hOther to the end of hArray.
@@ -528,7 +528,7 @@ native bool:json_array_clear(Handle:hArray);
  *
  * @return					True on success.
  */
-native bool:json_array_extend(Handle:hArray, Handle:hOther);
+native bool json_array_extend(Handle hArray, Handle hOther);
 
 
 
@@ -544,7 +544,7 @@ native bool:json_array_extend(Handle:hArray, Handle:hOther);
  *
  * @return                  Handle to the new Boolean object
  */
-native Handle:json_true();
+native Handle json_true();
 
 /**
  * Returns a handle to a new JSON Boolean with value false,
@@ -552,7 +552,7 @@ native Handle:json_true();
  *
  * @return                  Handle to the new Boolean object
  */
-native Handle:json_false();
+native Handle json_false();
 
 /**
  * Returns a handle to a new JSON Boolean with the value passed
@@ -561,14 +561,14 @@ native Handle:json_false();
  * @param bState            Value for the new Boolean object
  * @return                  Handle to the new Boolean object
  */
-native Handle:json_boolean(bool:bState);
+native Handle json_boolean(bool bState);
 
 /**
  * Returns a handle to a new JSON NULL or INVALID_HANDLE on error.
  *
  * @return                  Handle to the new NULL object
  */
-native Handle:json_null();
+native Handle json_null();
 
 
 
@@ -590,7 +590,7 @@ native Handle:json_null();
  *							Must be a valid UTF-8 encoded Unicode string.
  * @return                  Handle to the new String object
  */
-native Handle:json_string(const String:sValue[]);
+native Handle json_string(const char[] sValue);
 
 /**
  * Saves the associated value of hString as a null terminated UTF-8
@@ -602,7 +602,7 @@ native Handle:json_string(const String:sValue[]);
  * @error                   Invalid JSON String Object.
  * @return                  Length of the returned string or -1 on error.
  */
-native json_string_value(Handle:hString, String:sValueBuffer[], maxlength);
+native int json_string_value(Handle hString, char[] sValueBuffer, int maxlength);
 
 /**
  * Sets the associated value of JSON String object to value.
@@ -613,7 +613,7 @@ native json_string_value(Handle:hString, String:sValueBuffer[], maxlength);
  * @error                   Invalid JSON String Object.
  * @return                  True on success.
  */
-native bool:json_string_set(Handle:hString, String:sValue[]);
+native bool json_string_set(Handle hString, char[] sValue);
 
 
 
@@ -637,7 +637,7 @@ native bool:json_string_set(Handle:hString, String:sValue[]);
  * @param iValue            Value for the new Integer object
  * @return                  Handle to the new Integer object
  */
-native Handle:json_integer(iValue);
+native Handle json_integer(int iValue);
 
 /**
  * Returns the associated value of a JSON Integer Object.
@@ -647,7 +647,7 @@ native Handle:json_integer(iValue);
  * @return                  Value of the hInteger,
  *                          or 0 if hInteger is not a JSON integer.
  */
-native json_integer_value(Handle:hInteger);
+native int json_integer_value(Handle hInteger);
 
 /**
  * Sets the associated value of JSON Integer to value.
@@ -657,7 +657,7 @@ native json_integer_value(Handle:hInteger);
  * @error                   Invalid JSON Integer Object.
  * @return                  True on success.
  */
-native bool:json_integer_set(Handle:hInteger, iValue);
+native bool json_integer_set(Handle hInteger, int iValue);
 
 /**
  * Returns a handle to a new JSON real, or INVALID_HANDLE on error.
@@ -665,7 +665,7 @@ native bool:json_integer_set(Handle:hInteger, iValue);
  * @param fValue            Value for the new Real object
  * @return                  Handle to the new String object
  */
-native Handle:json_real(Float:fValue);
+native Handle json_real(float fValue);
 
 /**
  * Returns the associated value of a JSON Real.
@@ -675,7 +675,7 @@ native Handle:json_real(Float:fValue);
  * @return                  Float value of hReal,
  *                          or 0.0 if hReal is not a JSON Real.
  */
-native Float:json_real_value(Handle:hReal);
+native float json_real_value(Handle hReal);
 
 /**
  * Sets the associated value of JSON Real to fValue.
@@ -685,7 +685,7 @@ native Float:json_real_value(Handle:hReal);
  * @error                   Invalid JSON Real handle.
  * @return                  True on success.
  */
-native bool:json_real_set(Handle:hReal, Float:value);
+native bool json_real_set(Handle hReal, float value);
 
 /**
  * Returns the associated value of a JSON integer or a
@@ -696,7 +696,7 @@ native bool:json_real_set(Handle:hReal, Float:value);
  * @return                  Float value of hNumber,
  *                          or 0.0 on error.
  */
-native Float:json_number_value(Handle:hNumber);
+native float json_number_value(Handle hNumber);
 
 
 
@@ -722,7 +722,7 @@ native Float:json_number_value(Handle:hNumber);
  * @return                  Handle to JSON object or array.
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_load(const String:sJSON[]);
+native Handle json_load(const char[] sJSON);
 
 /**
  * Decodes the JSON string sJSON and returns the array or object it contains.
@@ -739,7 +739,7 @@ native Handle:json_load(const String:sJSON[]);
  * @return                  Handle to JSON object or array.
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_load_ex(const String:sJSON[], String:sErrorText[], maxlen, &iLine, &iColumn);
+native Handle json_load_ex(const char[] sJSON, char[] sErrorText, int maxlen, int &iLine, int &iColumn);
 
 /**
  * Decodes the JSON text in file sFilePath and returns the array or object
@@ -751,7 +751,7 @@ native Handle:json_load_ex(const String:sJSON[], String:sErrorText[], maxlen, &i
  * @return                  Handle to JSON object or array.
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_load_file(const String:sFilePath[PLATFORM_MAX_PATH]);
+native Handle json_load_file(const char sFilePath[PLATFORM_MAX_PATH]);
 
 /**
  * Decodes the JSON text in file sFilePath and returns the array or object
@@ -769,7 +769,7 @@ native Handle:json_load_file(const String:sFilePath[PLATFORM_MAX_PATH]);
  * @return                  Handle to JSON object or array.
  *                          or INVALID_HANDLE on error.
  */
-native Handle:json_load_file_ex(const String:sFilePath[PLATFORM_MAX_PATH], String:sErrorText[], maxlen, &iLine, &iColumn);
+native Handle json_load_file_ex(const char sFilePath[PLATFORM_MAX_PATH], char[] sErrorText, int maxlen, int &iLine, int &iColumn);
 
 
 
@@ -804,7 +804,7 @@ native Handle:json_load_file_ex(const String:sFilePath[PLATFORM_MAX_PATH], Strin
  *                          encoding with this flag preserves the order of object keys.
  * @return                  Length of the returned string or -1 on error.
  */
-native json_dump(Handle:hObject, String:sJSON[], maxlength, iIndentWidth = 4, bool:bEnsureAscii = false, bool:bSortKeys = false, bool:bPreserveOrder = false);
+native int json_dump(Handle hObject, char[] sJSON, int maxlength, int iIndentWidth = 4, bool bEnsureAscii = false, bool bSortKeys = false, bool bPreserveOrder = false);
 
 /**
  * Write the JSON representation of hObject to the file sFilePath.
@@ -828,7 +828,7 @@ native json_dump(Handle:hObject, String:sJSON[], maxlength, iIndentWidth = 4, bo
  *                          encoding with this flag preserves the order of object keys.
  * @return                  Length of the returned string or -1 on error.
  */
-native bool:json_dump_file(Handle:hObject, const String:sFilePath[], iIndentWidth = 4, bool:bEnsureAscii = false, bool:bSortKeys = false, bool:bPreserveOrder = false);
+native bool json_dump_file(Handle hObject, const char[] sFilePath, int iIndentWidth = 4, bool bEnsureAscii = false, bool bSortKeys = false, bool bPreserveOrder = false);
 
 
 
@@ -849,8 +849,8 @@ native bool:json_dump_file(Handle:hObject, const String:sFilePath[], iIndentWidt
  * @param ...			    Variable number of format parameters.
  * @return                  Handle to the new String object
  */
-stock Handle:json_string_format(const String:sFormat[], any:...) {
-	new String:sTmp[4096];
+stock Handle json_string_format(const char[] sFormat, any ...) {
+	char sTmp[4096];
 	VFormat(sTmp, sizeof(sTmp), sFormat, 2);
 
 	return json_string(sTmp);
@@ -869,9 +869,9 @@ stock Handle:json_string_format(const String:sFormat[], any:...) {
  * @param ...			    Variable number of format parameters.
  * @return                  Handle to the new String object
  */
-stock Handle:json_string_format_ex(tmpBufferLength, const String:sFormat[], any:...) {
-	new String:sTmp[tmpBufferLength];
-	VFormat(sTmp, sizeof(sTmp), sFormat, 3);
+stock Handle json_string_format_ex(int tmpBufferLength, const char[] sFormat, any ...) {
+	char[] sTmp = new char[tmpBufferLength];
+	VFormat(sTmp, tmpBufferLength, sFormat, 3);
 
 	return json_string(sTmp);
 }
@@ -886,12 +886,12 @@ stock Handle:json_string_format_ex(tmpBufferLength, const String:sFormat[], any:
  * @return                  True if it's a boolean and TRUE,
  *                          false otherwise.
  */
-stock bool:json_array_get_bool(Handle:hArray, iIndex) {
-	new Handle:hElement = json_array_get(hArray, iIndex);
+stock bool json_array_get_bool(Handle hArray, int iIndex) {
+	Handle hElement = json_array_get(hArray, iIndex);
 
-	new bool:bResult = (json_is_true(hElement) ? true : false);
+	bool bResult = (json_is_true(hElement) ? true : false);
 
-	CloseHandle(hElement);
+	delete hElement;
 	return bResult;
 }
 
@@ -904,12 +904,12 @@ stock bool:json_array_get_bool(Handle:hArray, iIndex) {
  * @return                  Float value,
  *                          or 0.0 if element is not a JSON Real.
  */
-stock Float:json_array_get_float(Handle:hArray, iIndex) {
-	new Handle:hElement = json_array_get(hArray, iIndex);
+stock float json_array_get_float(Handle hArray, int iIndex) {
+	Handle hElement = json_array_get(hArray, iIndex);
 
-	new Float:fResult = (json_is_number(hElement) ? json_number_value(hElement) : 0.0);
+	float fResult = (json_is_number(hElement) ? json_number_value(hElement) : 0.0);
 
-	CloseHandle(hElement);
+	delete hElement;
 	return fResult;
 }
 
@@ -922,12 +922,12 @@ stock Float:json_array_get_float(Handle:hArray, iIndex) {
  * @return                  Integer value,
  *                          or 0 if element is not a JSON Integer.
  */
-stock json_array_get_int(Handle:hArray, iIndex) {
-	new Handle:hElement = json_array_get(hArray, iIndex);
+stock int json_array_get_int(Handle hArray, int iIndex) {
+	Handle hElement = json_array_get(hArray, iIndex);
 
-	new iResult = (json_is_integer(hElement) ? json_integer_value(hElement) : 0);
+	int iResult = (json_is_integer(hElement) ? json_integer_value(hElement) : 0);
 
-	CloseHandle(hElement);
+	delete hElement;
 	return iResult;
 }
 
@@ -943,14 +943,14 @@ stock json_array_get_int(Handle:hArray, iIndex) {
  * @error                   Element is not a JSON String.
  * @return                  Length of the returned string or -1 on error.
  */
-stock json_array_get_string(Handle:hArray, iIndex, String:sBuffer[], maxlength) {
-	new Handle:hElement = json_array_get(hArray, iIndex);
+stock int json_array_get_string(Handle hArray, int iIndex, char[] sBuffer, int maxlength) {
+	Handle hElement = json_array_get(hArray, iIndex);
 
-	new iResult = -1;
+	int iResult = -1;
 	if(json_is_string(hElement)) {
 		iResult = json_string_value(hElement, sBuffer, maxlength);
 	}
-	CloseHandle(hElement);
+	delete hElement;
 
 	return iResult;
 }
@@ -964,12 +964,12 @@ stock json_array_get_string(Handle:hArray, iIndex, String:sBuffer[], maxlength) 
  * @return                  True if it's a boolean and TRUE,
  *                          false otherwise.
  */
-stock bool:json_object_get_bool(Handle:hObj, const String:sKey[]) {
-	new Handle:hElement = json_object_get(hObj, sKey);
+stock bool json_object_get_bool(Handle hObj, const char[] sKey) {
+	Handle hElement = json_object_get(hObj, sKey);
 
-	new bool:bResult = (json_is_true(hElement) ? true : false);
+	bool bResult = json_is_true(hElement);
 
-	CloseHandle(hElement);
+	delete hElement;
 	return bResult;
 }
 
@@ -982,12 +982,12 @@ stock bool:json_object_get_bool(Handle:hObj, const String:sKey[]) {
  * @return                  Float value,
  *                          or 0.0 if element is not a JSON Real.
  */
-stock Float:json_object_get_float(Handle:hObj, const String:sKey[]) {
-	new Handle:hElement = json_object_get(hObj, sKey);
+stock float json_object_get_float(Handle hObj, const char[] sKey) {
+	Handle hElement = json_object_get(hObj, sKey);
 
-	new Float:fResult = (json_is_number(hElement) ? json_number_value(hElement) : 0.0);
+	float fResult = (json_is_number(hElement) ? json_number_value(hElement) : 0.0);
 
-	CloseHandle(hElement);
+	delete hElement;
 	return fResult;
 }
 
@@ -1000,12 +1000,12 @@ stock Float:json_object_get_float(Handle:hObj, const String:sKey[]) {
  * @return                  Integer value,
  *                          or 0 if element is not a JSON Integer.
  */
-stock json_object_get_int(Handle:hObj, const String:sKey[]) {
-	new Handle:hElement = json_object_get(hObj, sKey);
+stock int json_object_get_int(Handle hObj, const char[] sKey) {
+	Handle hElement = json_object_get(hObj, sKey);
 
-	new iResult = (json_is_integer(hElement) ? json_integer_value(hElement) : 0);
+	int iResult = (json_is_integer(hElement) ? json_integer_value(hElement) : 0);
 
-	CloseHandle(hElement);
+	delete hElement;
 	return iResult;
 }
 
@@ -1021,14 +1021,14 @@ stock json_object_get_int(Handle:hObj, const String:sKey[]) {
  * @error                   Element is not a JSON String.
  * @return                  Length of the returned string or -1 on error.
  */
-stock json_object_get_string(Handle:hObj, const String:sKey[], String:sBuffer[], maxlength) {
-	new Handle:hElement = json_object_get(hObj, sKey);
+stock int json_object_get_string(Handle hObj, const char[] sKey, char[] sBuffer, int maxlength) {
+	Handle hElement = json_object_get(hObj, sKey);
 
-	new iResult = -1;
+	int iResult = -1;
 	if(json_is_string(hElement)) {
 		iResult = json_string_value(hElement, sBuffer, maxlength);
 	}
-	CloseHandle(hElement);
+	delete hElement;
 
 	return iResult;
 }
@@ -1072,8 +1072,8 @@ stock json_object_get_string(Handle:hObj, const String:sKey[], String:sBuffer[],
  *                          or size.
  * @return                  Handle to JSON element.
  */
-stock Handle:json_pack(const String:sPackString[], Handle:hParams) {
-	new iPos = 0;
+stock Handle json_pack(const char[] sPackString, ArrayList hParams) {
+	int iPos = 0;
 	return json_pack_element_(sPackString, iPos, hParams);
 }
 
@@ -1085,11 +1085,11 @@ stock Handle:json_pack(const String:sPackString[], Handle:hParams) {
 * Internal stocks used by json_pack(). Don't use these directly!
 *
 */
-stock Handle:json_pack_array_(const String:sFormat[], &iPos, Handle:hParams) {
-	new Handle:hObj = json_array();
-	new iStrLen = strlen(sFormat);
+stock Handle json_pack_array_(const char[] sFormat, int &iPos, ArrayList hParams) {
+	Handle hObj = json_array();
+	int iStrLen = strlen(sFormat);
 	for(; iPos < iStrLen;) {
-		new this_char = sFormat[iPos];
+		int this_char = sFormat[iPos];
 
 		if(this_char == 32 || this_char == 58 || this_char == 44) {
 			// Skip whitespace, ',' and ':'
@@ -1105,7 +1105,7 @@ stock Handle:json_pack_array_(const String:sFormat[], &iPos, Handle:hParams) {
 
 		// Get the next entry as value
 		// This automatically increments the position!
-		new Handle:hValue = json_pack_element_(sFormat, iPos, hParams);
+		Handle hValue = json_pack_element_(sFormat, iPos, hParams);
 
 		// Append the value to the array.
 		json_array_append_new(hObj, hValue);
@@ -1114,11 +1114,11 @@ stock Handle:json_pack_array_(const String:sFormat[], &iPos, Handle:hParams) {
 	return hObj;
 }
 
-stock Handle:json_pack_object_(const String:sFormat[], &iPos, Handle:hParams) {
-	new Handle:hObj = json_object();
-	new iStrLen = strlen(sFormat);
+stock Handle json_pack_object_(const char[] sFormat, int &iPos, ArrayList hParams) {
+	Handle hObj = json_object();
+	int iStrLen = strlen(sFormat);
 	for(; iPos < iStrLen;) {
-		new this_char = sFormat[iPos];
+		int this_char = sFormat[iPos];
 
 		if(this_char == 32 || this_char == 58 || this_char == 44) {
 			// Skip whitespace, ',' and ':'
@@ -1139,9 +1139,9 @@ stock Handle:json_pack_object_(const String:sFormat[], &iPos, Handle:hParams) {
 
 		// Get the key string for this object from
 		// the hParams array.
-		decl String:sKey[255];
-		GetArrayString(hParams, 0, sKey, sizeof(sKey));
-		RemoveFromArray(hParams, 0);
+		char sKey[255];
+		hParams.GetString(0, sKey, sizeof(sKey));
+		hParams.Erase(0);
 
 		// Advance one character in the pack string,
 		// because we've just read the Key string for
@@ -1150,7 +1150,7 @@ stock Handle:json_pack_object_(const String:sFormat[], &iPos, Handle:hParams) {
 
 		// Get the next entry as value
 		// This automatically increments the position!
-		new Handle:hValue = json_pack_element_(sFormat, iPos, hParams);
+		Handle hValue = json_pack_element_(sFormat, iPos, hParams);
 
 		// Insert into object
 		json_object_set_new(hObj, sKey, hValue);
@@ -1159,8 +1159,8 @@ stock Handle:json_pack_object_(const String:sFormat[], &iPos, Handle:hParams) {
 	return hObj;
 }
 
-stock Handle:json_pack_element_(const String:sFormat[], &iPos, Handle:hParams) {
-	new this_char = sFormat[iPos];
+stock Handle json_pack_element_(const char[] sFormat, int &iPos, ArrayList hParams) {
+	int this_char = sFormat[iPos];
 	while(this_char == 32 || this_char == 58 || this_char == 44) {
 		iPos++;
 		this_char = sFormat[iPos];
@@ -1183,16 +1183,16 @@ stock Handle:json_pack_element_(const String:sFormat[], &iPos, Handle:hParams) {
 
 		case 98: {
 			// b  --> Boolean
-			new iValue = GetArrayCell(hParams, 0);
-			RemoveFromArray(hParams, 0);
+			int iValue = hParams.Get(0);
+			hParams.Erase(0);
 
-			return json_boolean(bool:iValue);
+			return json_boolean(view_as<bool>(iValue));
 		}
 
 		case 102, 114: {
 			// r,f  --> Real (Float)
-			new Float:iValue = GetArrayCell(hParams, 0);
-			RemoveFromArray(hParams, 0);
+			float iValue = hParams.Get(0);
+			hParams.Erase(0);
 
 			return json_real(iValue);
 		}
@@ -1204,17 +1204,17 @@ stock Handle:json_pack_element_(const String:sFormat[], &iPos, Handle:hParams) {
 
 		case 115: {
 			// s  --> String
-			decl String:sKey[255];
-			GetArrayString(hParams, 0, sKey, sizeof(sKey));
-			RemoveFromArray(hParams, 0);
+			char sKey[255];
+			hParams.GetString(0, sKey, sizeof(sKey));
+			hParams.Erase(0);
 
 			return json_string(sKey);
 		}
 
 		case 105: {
 			// i  --> Integer
-			new iValue = GetArrayCell(hParams, 0);
-			RemoveFromArray(hParams, 0);
+			int iValue = hParams.Get(0);
+			hParams.Erase(0);
 
 			return json_integer(iValue);
 		}
@@ -1231,8 +1231,8 @@ stock Handle:json_pack_element_(const String:sFormat[], &iPos, Handle:hParams) {
 /**
  * Not yet implemented
  *
- * native json_object_foreach(Handle:hObj, ForEachCallback:cb);
- * native Handle:json_unpack(const String:sFormat[], ...);
+ * native json_object_foreach(Handle hObj, ForEachCallback:cb);
+ * native Handle json_unpack(const char[] sFormat, ...);
  *
  */
 
@@ -1244,7 +1244,7 @@ stock Handle:json_pack_element_(const String:sFormat[], &iPos, Handle:hParams) {
 /**
  * Do not edit below this line!
  */
-public Extension:__ext_smjansson =
+public Extension __ext_smjansson =
 {
 	name = "SMJansson",
 	file = "smjansson.ext",
@@ -1261,7 +1261,7 @@ public Extension:__ext_smjansson =
 };
 
 #if !defined REQUIRE_EXTENSIONS
-public __ext_smjansson_SetNTVOptional()
+public void __ext_smjansson_SetNTVOptional()
 {
 	MarkNativeAsOptional("json_typeof");
 	MarkNativeAsOptional("json_equal");
