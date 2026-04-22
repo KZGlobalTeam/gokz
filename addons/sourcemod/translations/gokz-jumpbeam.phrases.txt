@@ -31,4 +31,27 @@
 		"chi"		"地面"
 		"ru"		"Земля"
 	}
+	
+	// =====[ BEAM OFFSET ]=====
+	"Options Menu - Beam Offset"
+	{
+		"en"		"Beam offset"
+	}
+	"Beam Offset Prompt"
+	{
+		"en"		"Type your beam offset in chat: x y z (e.g. 16 0 0)"
+	}
+	"Beam Offset Invalid"
+	{
+		"en"		"Invalid input. Expected three numbers: x y z (e.g. 16 0 0)"
+	}
+	"Beam Offset Usage"
+	{
+		"en"		"Usage: !beamoffset <x> <y> <z>"
+	}
+	"Current Beam Offset"
+	{
+		"#format"	"{1:.1f},{2:.1f},{3:.1f}"
+		"en"		"Beam offset: {1} {2} {3}"
+	}
 }
