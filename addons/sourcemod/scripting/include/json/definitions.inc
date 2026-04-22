@@ -2,10 +2,10 @@
  * vim: set ts=4 :
  * =============================================================================
  * sm-json
- * Provides a pure SourcePawn implementation of JSON encoding and decoding.
+ * A pure SourcePawn JSON encoder/decoder.
  * https://github.com/clugg/sm-json
  *
- * sm-json (C)2019 James Dickens. (clug)
+ * sm-json (C)2022 James Dickens. (clug)
  * SourceMod (C)2004-2008 AlliedModders LLC.  All rights reserved.
  * =============================================================================
  *
@@ -39,6 +39,42 @@
 #include <string>
 #include <json/helpers/string>
 
+#define SM_INT64_SUPPORTED SOURCEMOD_V_MAJOR >= 1 \
+    && SOURCEMOD_V_MINOR >= 11 \
+    && SOURCEMOD_V_REV >= 6861
+
+/**
+ * @section Settings
+ */
+
+/** Used when no options are desired. */
+#define JSON_NONE 0
+
+/**
+ * @section json_encode settings
+ */
+
+/** Should encoded output be pretty printed? */
+#define JSON_ENCODE_PRETTY 1 << 0
+
+/**
+ * @section json_decode settings
+ */
+
+/** Should single quote wrapped strings be accepted during decoding? */
+#define JSON_DECODE_SINGLE_QUOTES 1 << 0
+
+/**
+ * @section json_merge settings
+ */
+
+/** During merge, should existing keys be replaced if they exist in both objects? */
+#define JSON_MERGE_REPLACE 1 << 0
+
+/** During merge, should existing objects be cleaned up if they exist in
+ * both objects? (only applies when JSON_MERGE_REPLACE is also set) */
+#define JSON_MERGE_CLEANUP 1 << 1
+
 /**
  * @section Pretty Print Constants
  *
@@ -46,58 +82,99 @@
  * You can modify these if you prefer your JSON formatted differently.
  */
 
-#define JSON_PP_AFTER_COLON " "
-#define JSON_PP_INDENT "    "
-#define JSON_PP_NEWLINE "\n"
+char JSON_PP_AFTER_COLON[32] = " ";
+char JSON_PP_INDENT[32] = "    ";
+char JSON_PP_NEWLINE[32] = "\n";
 
 /**
  * @section Buffer Size Constants
- *
- * You may need to change these if you are working with very large arrays or floating point numbers.
  */
 
+/** The longest representable integer ("-2147483648") + NULL terminator */
+#define JSON_INT_BUFFER_SIZE 12
+
+#if SM_INT64_SUPPORTED
+/** The longest representable int64 ("-9223372036854775808") + NULL terminator */
+#define JSON_INT64_BUFFER_SIZE 21
+#endif
+
+/** You may need to change this if you are working with large floats. */
 #define JSON_FLOAT_BUFFER_SIZE 32
-#define JSON_INDEX_BUFFER_SIZE 16
+
+/** "true"|"false" + NULL terminator */
+#define JSON_BOOL_BUFFER_SIZE 6
+
+/** "null" + NULL terminator */
+#define JSON_NULL_BUFFER_SIZE 5
 
 /**
- * @section Meta-key Constants
- *
- * Used to store metadata for each key in an object.
- * You shouldn't need to change these unless working with keys that may clash with them.
+ * @section Array/Object Constants
  */
 
-#define JSON_ARRAY_INDEX_KEY "__array_index"
-#define JSON_META_TYPE_KEY   ":type"
-#define JSON_META_LENGTH_KEY ":length"
-#define JSON_META_HIDDEN_KEY ":hidden"
-
-/**
- * @section General
- */
+#define JSON_ARRAY_KEY "is_array"
+#define JSON_ENFORCE_TYPE_KEY "enforce_type"
 
 /**
  * Types of cells within a JSON object
  */
-enum JSON_CELL_TYPE {
-    Type_Invalid = -1,
-    Type_String = 0,
-    Type_Int,
-    Type_Float,
-    Type_Bool,
-    Type_Null,
-    Type_Object
+enum JSONCellType {
+    JSON_Type_Invalid = -1,
+    JSON_Type_String = 0,
+    JSON_Type_Int,
+    #if SM_INT64_SUPPORTED
+    JSON_Type_Int64,
+    #endif
+    JSON_Type_Float,
+    JSON_Type_Bool,
+    JSON_Type_Object
 };
 
 /**
- * Checks whether the key provided is a meta-key that should only be used internally.
- *
- * @param key   Key to check.
- * @returns     True when it is a meta-key, false otherwise.
+ * Types of metadata a JSON element can have
  */
-stock bool json_is_meta_key(char[] key)
+enum JSONMetaInfo {
+    JSON_Meta_Type = 0,
+    JSON_Meta_Size,
+    JSON_Meta_Hidden,
+    JSON_Meta_Index
+}
+
+/**
+ * An array of all possible meta info values.
+ */
+JSONMetaInfo JSON_ALL_METADATA[4] = {
+    JSON_Meta_Type, JSON_Meta_Size, JSON_Meta_Hidden, JSON_Meta_Index
+};
+
+/**
+ * Calculates the length required to store a meta key
+ * for a specified key/metainfo combination.
+ * @internal
+ *
+ * @param   key
+ * @return  The length required to store the meta key.
+ */
+stock int json_meta_key_length(const char[] key)
 {
-    return json_string_endswith(key, JSON_META_TYPE_KEY)
-        || json_string_endswith(key, JSON_META_LENGTH_KEY)
-        || json_string_endswith(key, JSON_META_HIDDEN_KEY)
-        || StrEqual(key, JSON_ARRAY_INDEX_KEY);
+    // %s:%d
+    return strlen(key) + 1 + JSON_INT_BUFFER_SIZE;
+}
+
+/**
+ * Formats the key/metainfo combination into a buffer.
+ * @internal
+ *
+ * @param output    String buffer to store output.
+ * @param max_size  Maximum size of string buffer.
+ * @param key       Key to generate metakey for.
+ * @param meta      Meta information to generate metakey for.
+ */
+stock void json_format_meta_key(
+    char[] output,
+    int max_size,
+    const char[] key,
+    JSONMetaInfo meta
+)
+{
+    FormatEx(output, max_size, "k|%s:%d", key, view_as<int>(meta));
 }
