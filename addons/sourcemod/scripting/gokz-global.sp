@@ -627,7 +627,7 @@ public int GetModeInfoCallback(JSON_Object modes, GlobalAPIRequestData request)
 	
 	for (int i = 0; i < modes.Length; i++)
 	{
-		APIMode mode = view_as<APIMode>(modes.GetObjectIndexed(i));
+		APIMode mode = view_as<APIMode>(view_as<JSON_Array>(modes).GetObject(i));
 		int mode_id = GOKZ_GL_FromGlobalMode(view_as<GlobalMode>(mode.Id));
 		if (mode_id == -1)
 		{
@@ -705,7 +705,7 @@ public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequ
 		return;
 	}
 	
-	APIPlayer player = view_as<APIPlayer>(player_json.GetObjectIndexed(0));
+	APIPlayer player = view_as<APIPlayer>(view_as<JSON_Array>(player_json).GetObject(0));
 	player.GetSteamId(response_steamid, sizeof(response_steamid));
 	if (!StrEqual(client_steamid, response_steamid))
 	{
