@@ -7,10 +7,6 @@
 
 #include <autoexecconfig>
 
-#undef REQUIRE_EXTENSIONS
-#undef REQUIRE_PLUGIN
-#include <updater>
-
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -25,7 +21,6 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-playermodels.txt"
 #define PLAYER_MODEL_T "models/player/tm_leet_varianta.mdl"
 #define PLAYER_MODEL_CT "models/player/ctm_idf_variantc.mdl"
 #define PLAYER_MODEL_T_BOT "models/player/custom_player/legacy/tm_leet_varianta.mdl"
@@ -47,22 +42,6 @@ public void OnPluginStart()
 {
 	CreateConVars();
 	HookEvents();
-}
-
-public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 }
 
 

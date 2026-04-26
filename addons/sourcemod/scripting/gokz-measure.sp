@@ -4,10 +4,6 @@
 
 #include <gokz/core>
 
-#undef REQUIRE_EXTENSIONS
-#undef REQUIRE_PLUGIN
-#include <updater>
-
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -26,7 +22,6 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-measure.txt"
 #define MEASURE_MIN_DIST 0.01
 int gI_BeamModel;
 bool gB_Measuring[MAXPLAYERS + 1];
@@ -54,22 +49,6 @@ public void OnPluginStart()
 	LoadTranslations("gokz-measure.phrases");
 	
 	RegisterCommands();
-}
-
-public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 }
 
 

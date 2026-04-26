@@ -79,6 +79,7 @@ public void TopMenuHandler_HUD(TopMenu topmenu, TopMenuAction action, TopMenuObj
 	{
 		if (option == JSOption_JumpstatsMaster ||
 			option == JSOption_ExtendedChatReport ||
+			option == JSOption_StrafeSyncChat ||
 			option == JSOption_FailstatsConsole ||
 			option == JSOption_FailstatsChat ||
 			option == JSOption_JumpstatsAlways)

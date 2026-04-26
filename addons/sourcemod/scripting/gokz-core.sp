@@ -15,8 +15,6 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <updater>
-
 #include <gokz/kzplayer>
 #include <gokz/jumpstats>
 
@@ -33,8 +31,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = GOKZ_SOURCE_URL
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-core.txt"
 
 Handle gH_ThisPlugin;
 Handle gH_DHooks_OnTeleport;
@@ -123,11 +119,6 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-	
 	OnAllPluginsLoaded_Modes();
 	OnAllPluginsLoaded_OptionsMenu();
 	
@@ -141,14 +132,6 @@ public void OnAllPluginsLoaded()
 		{
 			OnClientCookiesCached(client);
 		}
-	}
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 

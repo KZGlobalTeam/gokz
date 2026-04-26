@@ -15,7 +15,6 @@
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
 #include <gokz/localranks>
-#include <updater>
 
 #include <gokz/kzplayer>
 
@@ -32,8 +31,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = GOKZ_SOURCE_URL
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-global.txt"
 
 bool gB_GOKZLocalDB;
 
@@ -108,10 +105,6 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_GOKZLocalDB = LibraryExists("gokz-localdb");
 	
 	for (int client = 1; client <= MaxClients; client++)
@@ -125,10 +118,6 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_GOKZLocalDB = gB_GOKZLocalDB || StrEqual(name, "gokz-localdb");
 }
 
@@ -244,14 +233,13 @@ public void OnClientPutInServer(int client)
 {
 	gB_GloballyVerified[client] = false;
 	gB_waitingForFPSKick[client] = false;
+	ResetPoints(client);
 	OnClientPutInServer_PrintRecords(client);
 }
 
 // OnClientAuthorized is apparently too early
 public void OnClientPostAdminCheck(int client)
 {
-	ResetPoints(client);
-	
 	if (GlobalAPI_IsInit() && !IsFakeClient(client))
 	{
 		CheckClientGlobalBan(client);
@@ -374,7 +362,7 @@ public void OnMapEnd()
 public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 {
 	if (StrEqual(option, gC_CoreOptionNames[Option_Mode])
-		&& GlobalAPI_IsInit())
+		&& GlobalAPI_IsInit() && IsClientAuthorized(client))
 	{
 		UpdatePoints(client);
 	}
@@ -638,7 +626,7 @@ public int GetModeInfoCallback(JSON_Object modes, GlobalAPIRequestData request)
 	
 	for (int i = 0; i < modes.Length; i++)
 	{
-		APIMode mode = view_as<APIMode>(modes.GetObjectIndexed(i));
+		APIMode mode = view_as<APIMode>(view_as<JSON_Array>(modes).GetObject(i));
 		int mode_id = GOKZ_GL_FromGlobalMode(view_as<GlobalMode>(mode.Id));
 		if (mode_id == -1)
 		{
@@ -716,7 +704,7 @@ public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequ
 		return;
 	}
 	
-	APIPlayer player = view_as<APIPlayer>(player_json.GetObjectIndexed(0));
+	APIPlayer player = view_as<APIPlayer>(view_as<JSON_Array>(player_json).GetObject(0));
 	player.GetSteamId(response_steamid, sizeof(response_steamid));
 	if (!StrEqual(client_steamid, response_steamid))
 	{

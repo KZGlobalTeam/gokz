@@ -1,4 +1,4 @@
-Phrases
+"Phrases"
 {
 	// =====[ CHAT MESSAGES ]=====
 	"Timer Stopped (Goto)"

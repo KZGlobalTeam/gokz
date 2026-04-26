@@ -13,7 +13,9 @@
 #define DEFAULT_FLOAT -1.0
 #define DEFAULT_BOOL view_as<bool>(-1)
 
-#define GlobalAPI_Plugin_Version "2.0.0"
+static int DEFAULT_INT_ARRAY[1] = { -1 };
+
+#define GlobalAPI_Plugin_Version "2.1.0"
 #define GlobalAPI_Plugin_Desc "Plugin helper for GlobalAPI Production & Staging"
 #define GlobalAPI_Plugin_Url "https://bitbucket.org/kztimerglobalteam/GlobalAPI-SMPlugin"
 #define GlobalAPI_Plugin_NameVersion "GlobalAPI Plugin " ... GlobalAPI_Plugin_Version
@@ -557,11 +559,11 @@ native bool GlobalAPI_GetRecordsTopRecent(OnAPICallFinished callback = INVALID_F
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetRecordsTopWorldRecords(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
-												int[] ids = {}, int idsLength = DEFAULT_INT,
-												int[] mapIds = {}, int mapIdsLength = DEFAULT_INT,
-												int[] stages = {}, int stagesLength = DEFAULT_INT,
-												int[] modeIds = {}, int modeIdsLength = DEFAULT_INT,
-												int[] tickRates = {}, int tickRatesLength = DEFAULT_INT,
+												int[] ids = DEFAULT_INT_ARRAY, int idsLength = DEFAULT_INT,
+												int[] mapIds = DEFAULT_INT_ARRAY, int mapIdsLength = DEFAULT_INT,
+												int[] stages = DEFAULT_INT_ARRAY, int stagesLength = DEFAULT_INT,
+												int[] modeIds = DEFAULT_INT_ARRAY, int modeIdsLength = DEFAULT_INT,
+												int[] tickRates = DEFAULT_INT_ARRAY, int tickRatesLength = DEFAULT_INT,
 												bool hasTeleports = DEFAULT_BOOL, char[] mapTag = DEFAULT_STRING,
 												int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
@@ -634,11 +636,11 @@ native bool GlobalAPI_GetPlayerRanks(OnAPICallFinished callback = INVALID_FUNCTI
 										int pointsGreaterThan = DEFAULT_INT, float averageGreaterThan = DEFAULT_FLOAT,
 										float ratingGreaterThan = DEFAULT_FLOAT, int finishesGreaterThan = DEFAULT_INT,
 										const char[] steamId64List = DEFAULT_STRING,
-										int[] recordFilterIds = {}, int recordFilterIdsLength = DEFAULT_INT,
-										int[] mapIds = {}, int mapIdsLength = DEFAULT_INT,
-										int[] stages = {}, int stagesLength = DEFAULT_INT,
-										int[] modeIds = {}, int modeIdsLength = DEFAULT_INT,
-										int[] tickRates = {}, int tickRatesLength = DEFAULT_INT,
+										int[] recordFilterIds = DEFAULT_INT_ARRAY, int recordFilterIdsLength = DEFAULT_INT,
+										int[] mapIds = DEFAULT_INT_ARRAY, int mapIdsLength = DEFAULT_INT,
+										int[] stages = DEFAULT_INT_ARRAY, int stagesLength = DEFAULT_INT,
+										int[] modeIds = DEFAULT_INT_ARRAY, int modeIdsLength = DEFAULT_INT,
+										int[] tickRates = DEFAULT_INT_ARRAY, int tickRatesLength = DEFAULT_INT,
 										bool hasTeleports = DEFAULT_BOOL, int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
 /**
@@ -662,11 +664,11 @@ native bool GlobalAPI_GetPlayerRanks(OnAPICallFinished callback = INVALID_FUNCTI
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetRecordFilters(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
-										int[] ids = {}, int idsLength = DEFAULT_INT,
-										int[] mapIds = {}, int mapIdsLength = DEFAULT_INT,
-										int[] stages = {}, int stagesLength = DEFAULT_INT,
-										int[] modeIds = {}, int modeIdsLength = DEFAULT_INT,
-										int[] tickRates = {}, int tickRatesLength = DEFAULT_INT,
+										int[] ids = DEFAULT_INT_ARRAY, int idsLength = DEFAULT_INT,
+										int[] mapIds = DEFAULT_INT_ARRAY, int mapIdsLength = DEFAULT_INT,
+										int[] stages = DEFAULT_INT_ARRAY, int stagesLength = DEFAULT_INT,
+										int[] modeIds = DEFAULT_INT_ARRAY, int modeIdsLength = DEFAULT_INT,
+										int[] tickRates = DEFAULT_INT_ARRAY, int tickRatesLength = DEFAULT_INT,
 										bool hasTeleports = DEFAULT_BOOL, bool isOverall = DEFAULT_BOOL,
 										int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 
@@ -691,11 +693,11 @@ native bool GlobalAPI_GetRecordFilters(OnAPICallFinished callback = INVALID_FUNC
  * @return						Whether request was successfully sent
  */
 native bool GlobalAPI_GetRecordFilterDistributions(OnAPICallFinished callback = INVALID_FUNCTION, any data = DEFAULT_DATA,
-													int[] ids = {}, int idsLength = DEFAULT_INT,
-													int[] mapIds = {}, int mapIdsLength = DEFAULT_INT,
-													int[] stages = {}, int stagesLength = DEFAULT_INT,
-													int[] modeIds = {}, int modeIdsLength = DEFAULT_INT,
-													int[] tickRates = {}, int tickRatesLength = DEFAULT_INT,
+													int[] ids = DEFAULT_INT_ARRAY, int idsLength = DEFAULT_INT,
+													int[] mapIds = DEFAULT_INT_ARRAY, int mapIdsLength = DEFAULT_INT,
+													int[] stages = DEFAULT_INT_ARRAY, int stagesLength = DEFAULT_INT,
+													int[] modeIds = DEFAULT_INT_ARRAY, int modeIdsLength = DEFAULT_INT,
+													int[] tickRates = DEFAULT_INT_ARRAY, int tickRatesLength = DEFAULT_INT,
 													bool hasTeleports = DEFAULT_BOOL, bool isOverall = DEFAULT_BOOL,
 													int offset = DEFAULT_INT, int limit = DEFAULT_INT);
 

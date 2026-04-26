@@ -224,7 +224,7 @@ static int MapTopSubmenuAddItems(Menu menu, JSON_Object records, int timeType)
 	
 	for (int i = 0; i < records.Length; i++)
 	{
-		APIRecord record = view_as<APIRecord>(records.GetObjectIndexed(i));
+		APIRecord record = view_as<APIRecord>(view_as<JSON_Array>(records).GetObject(i));
 		
 		record.GetPlayerName(playerName, sizeof(playerName));
 		

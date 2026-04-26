@@ -1005,7 +1005,7 @@ void PlaybackVersion2(int client, int bot, int &buttons, float vel[3], float ang
 		{
 			newButtons |= IN_JUMP;
 		}
-		if (currentTickData.flags & RP_IN_DUCK || currentTickData.flags & RP_FL_DUCKING)
+		if (currentTickData.flags & RP_IN_DUCK)
 		{
 			newButtons |= IN_DUCK;
 		}
@@ -1205,6 +1205,13 @@ void PlaybackVersion2Post(int client, int bot)
 		if (currentTickData.flags & RP_UNDER_WATER)
 		{
 			SetEntityFlags(client, entityFlags | FL_INWATER);
+		}
+		if (currentTickData.flags & RP_FL_DUCKING)
+		{
+			SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", 1.0);
+			SetEntProp(client, Prop_Send, "m_bDucking", false);
+			SetEntProp(client, Prop_Send, "m_bDucked", true);
+			SetEntityFlags(client, FL_DUCKING);
 		}
 
 		botSpeed[bot] = GetVectorHorizontalLength(currentTickData.velocity);

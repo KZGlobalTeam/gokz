@@ -8,7 +8,6 @@
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <updater>
 #include <gokz/hud>
 #pragma newdecls required
 #pragma semicolon 1
@@ -22,7 +21,6 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-saveloc.txt"
 #define LOADLOC_INVALIDATE_DURATION 0.12
 #define MAX_LOCATION_NAME_LENGTH 32
 
@@ -121,8 +119,10 @@ enum struct Location {
 		GOKZ_SetTeleportCount(client, this.teleportCount);
 		GOKZ_SetUndoTeleportData(client, this.undoTeleportData, GOKZ_CHECKPOINT_VERSION);
 
+		int flagsMask = ~(FL_CLIENT | FL_FAKECLIENT | FL_GODMODE | FL_NOTARGET | FL_AIMTARGET);
+		SetEntityFlags(client, (this.flags & flagsMask) | (GetEntityFlags(client) & ~flagsMask));
+
 		SetEntPropEnt(client, Prop_Data, "m_hGroundEntity", this.groundEnt);
-		SetEntityFlags(client, this.flags);
 		TeleportEntity(client, this.position, this.angles, this.velocity);
 		SetEntPropFloat(client, Prop_Send, "m_flDuckAmount", this.duckAmount);
 		SetEntProp(client, Prop_Send, "m_bDucking", this.ducking);
@@ -171,19 +171,11 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_GOKZHUD = LibraryExists("gokz-hud");
 }
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_GOKZHUD = gB_GOKZHUD || StrEqual(name, "gokz-hud");
 }
 

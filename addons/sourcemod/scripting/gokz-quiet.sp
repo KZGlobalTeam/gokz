@@ -7,10 +7,6 @@
 #include <gokz/core>
 #include <gokz/quiet>
 
-#undef REQUIRE_EXTENSIONS
-#undef REQUIRE_PLUGIN
-#include <updater>
-
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -24,8 +20,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION,
 	url = GOKZ_SOURCE_URL
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-quiet.txt"
 
 
 #include "gokz-quiet/ambient.sp"
@@ -57,11 +51,6 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
@@ -74,14 +63,6 @@ public void OnAllPluginsLoaded()
 		{
 			GOKZ_OnJoinTeam(client, GetClientTeam(client));
 		}
-	}
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 

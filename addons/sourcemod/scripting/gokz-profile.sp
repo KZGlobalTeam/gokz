@@ -4,11 +4,10 @@
 
 #include <gokz/core>
 #include <gokz/profile>
-#include <gokz/global>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <updater>
+#include <gokz/global>
 #include <gokz/chat>
 
 #pragma newdecls required
@@ -25,11 +24,10 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-profile.txt"
-
 int gI_Rank[MAXPLAYERS + 1][MODE_COUNT];
 bool gB_Localranks;
 bool gB_Chat;
+bool gB_Global;
 
 #include "gokz-profile/options.sp"
 #include "gokz-profile/profile.sp"
@@ -55,12 +53,9 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_Localranks = LibraryExists("gokz-localranks");
 	gB_Chat = LibraryExists("gokz-chat");
+	gB_Global = LibraryExists("gokz-global");
 
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -79,18 +74,16 @@ public void OnAllPluginsLoaded()
 
 public void OnLibraryAdded(const char[] name)
 {
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
 	gB_Localranks = gB_Localranks || StrEqual(name, "gokz-localranks");
 	gB_Chat = gB_Chat || StrEqual(name, "gokz-chat");
+	gB_Global = gB_Global || StrEqual(name, "gokz-global");
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
 	gB_Localranks = gB_Localranks && !StrEqual(name, "gokz-localranks");
 	gB_Chat = gB_Chat && !StrEqual(name, "gokz-chat");
+	gB_Global = gB_Global && !StrEqual(name, "gokz-global");
 }
 
 
@@ -147,6 +140,15 @@ public void OnClientConnected(int client)
 		gI_Rank[client][mode] = 0;
 	}
 	Profile_OnClientConnected(client);
+}
+
+public void OnClientCookiesCached(int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		int mode = GOKZ_GetCoreOption(client, Option_Mode);
+		UpdateRank(client, mode);
+	}
 }
 
 public void OnClientDisconnect(int client)
@@ -220,6 +222,13 @@ public void UpdateRank(int client, int mode)
 		}
 		return;
 	}
+
+	// If gokz-global is not loaded, just set basic tags without rank
+    if (!gB_Global)
+    {
+        UpdateTags(client, -1, mode);
+        return;
+    }
 
 	int points = GOKZ_GL_GetRankPoints(client, mode);
 	int rank;

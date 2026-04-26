@@ -212,6 +212,31 @@
 		"en"		"{yellow}Warning{grey}: The current map did not pass the Global check. Global times will not save. See {default}!globalcheck{grey} for more information."
 		"chi"		"{yellow}警告{grey}: 当前地图并未通过全球检查，记录将不会上传，使用 {default}!gc{grey} 指令查看详情."
 	}
+	"Filter Check Header"
+	{
+		// kz_map course 0 filters:
+		"#format"	"{1:s},{2:d}"
+		"en"		"{default}{1} {grey}course {default}{2} {grey}filters:"
+	}
+	"Filter Check Mode"
+	{
+		// KZTimer: Pro ✓ Nub ✓
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{purple}{1}{grey}: {blue}PRO {2}{grey} | {yellow}NUB {3}"
+	}
+	"Filter Check - No Map"
+	{
+		"en"		"{grey}Map data is not available yet. Please try again later."
+	}
+	"Filter Check - No Course"
+	{
+		"#format"	"{1:d}"
+		"en"		"{grey}Course {default}{1}{grey} does not exist on this map."
+	}
+	"Filter Check - Failed"
+	{
+		"en"		"{grey}Failed to retrieve filter data from the Global API."
+	}
 
 
 	// =====[ GLOBAL TOP MENU ]=====

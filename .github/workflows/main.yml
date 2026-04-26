@@ -1,7 +1,8 @@
 name: CI
 
 env:
-  SM_VERSION: "1.11"
+  SM_VERSION: "1.12"
+  GOKZ_VERSION: ""
 
 on:
   push:
@@ -15,14 +16,24 @@ on:
 
 jobs:
   build:    
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       
       - name: version
-        run: echo "GOKZ_VERSION=$(git describe --tags --exact-match 2> /dev/null || git rev-parse --short HEAD)" >> $GITHUB_ENV
+        run: |
+          VERSION=$(grep -oP '(?<=#define GOKZ_VERSION ")[^"]+' addons/sourcemod/scripting/include/gokz/version.inc)
+          if [ -z "$VERSION" ]; then
+            echo "Could not parse version from version.inc" >&2
+            exit 1
+          fi
+          echo "GOKZ_VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: compile
         run: |
@@ -34,14 +45,13 @@ jobs:
           wget -q -O - "http://sourcemod.net/latest.php?os=linux&version=${{env.SM_VERSION}}" | tar x -zf -
           cp -r ../addons .
           cd ./addons/sourcemod/scripting
-          echo "#define GOKZ_VERSION \"${GOKZ_VERSION}\"" > include/gokz/version.inc
           for file in gokz-*.sp; do ./spcomp $file; done;
           cd ../../../../
           mkdir -p addons/sourcemod/plugins
           mv sm/addons/sourcemod/scripting/gokz-*.smx addons/sourcemod/plugins
           
       - name: upload-full
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: GOKZ-v${{ env.GOKZ_VERSION }}
           path: |
@@ -56,7 +66,7 @@ jobs:
             !*.fgd
           
       - name: upload-upgrade
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: GOKZ-v${{ env.GOKZ_VERSION }}-upgrade
           path: |
@@ -70,3 +80,30 @@ jobs:
             !cfg*
             !*.zip
             !*.fgd
+
+      - name: Create release archives
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: |
+          rsync -a \
+            --exclude='sm' --exclude='*.md' --exclude='.github' --exclude='.git' \
+            --exclude='LICENSE' --exclude='addons/sourcemod/scripting' \
+            --exclude='*.zip' --exclude='*.fgd' \
+            . /tmp/gokz-full/
+          rsync -a \
+            --exclude='sm' --exclude='*.md' --exclude='.github' --exclude='.git' \
+            --exclude='LICENSE' --exclude='addons/sourcemod/scripting' \
+            --exclude='cfg' --exclude='*.zip' --exclude='*.fgd' \
+            . /tmp/gokz-upgrade/
+          cd /tmp/gokz-full && zip -r $GITHUB_WORKSPACE/GOKZ-v${{ env.GOKZ_VERSION }}.zip .
+          cd /tmp/gokz-upgrade && zip -r $GITHUB_WORKSPACE/GOKZ-v${{ env.GOKZ_VERSION }}-upgrade.zip .
+
+      - name: Create tag and release
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ env.GOKZ_VERSION }} \
+            --title "GOKZ v${{ env.GOKZ_VERSION }}" \
+            --generate-notes \
+            GOKZ-v${{ env.GOKZ_VERSION }}.zip \
+            GOKZ-v${{ env.GOKZ_VERSION }}-upgrade.zip

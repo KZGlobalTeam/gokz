@@ -10,7 +10,6 @@
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #include <gokz/localdb>
-#include <updater>
 
 #include <gokz/kzplayer>
 
@@ -27,8 +26,6 @@ public Plugin myinfo =
 	version = GOKZ_VERSION, 
 	url = GOKZ_SOURCE_URL
 };
-
-#define UPDATER_URL GOKZ_UPDATER_BASE_URL..."gokz-jumpstats.txt"
 
 // This must be global because it's both used by jump tracking and validating.
 bool gB_SpeedJustModifiedExternally[MAXPLAYERS + 1];
@@ -66,12 +63,7 @@ public void OnPluginStart()
 }
 
 public void OnAllPluginsLoaded()
-{
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
-	}
-	
+{	
 	TopMenu topMenu;
 	if (LibraryExists("gokz-core") && ((topMenu = GOKZ_GetOptionsTopMenu()) != null))
 	{
@@ -84,14 +76,6 @@ public void OnAllPluginsLoaded()
 		{
 			OnClientPutInServer(client);
 		}
-	}
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	if (StrEqual(name, "updater"))
-	{
-		Updater_AddPlugin(UPDATER_URL);
 	}
 }
 
@@ -112,9 +96,10 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
-public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
+public Action Movement_OnPlayerMovePost(int client)
 {
-	OnPlayerRunCmdPost_JumpTracking(client);
+	Movement_OnPlayerMovePost_JumpTracking(client);
+	return Plugin_Continue;
 }
 
 public void Movement_OnStartTouchGround(int client)

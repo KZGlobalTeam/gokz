@@ -371,12 +371,4 @@
 		"#format"	"{1:d},{2:s}"
 		"en"		"Specs ({1}): <font color='#ffffff'>{2}</font>"
 	}
-	"Options Menu - Number"
-	{
-		"en"		"Number"
-	}
-	"Options Menu - Number & Names"
-	{
-		"en"		"Number & names"
-	}
 }
