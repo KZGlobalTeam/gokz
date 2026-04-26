@@ -26,7 +26,7 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define MODE_VERSION 2171
+#define MODE_VERSION 2172
 #define DUCK_SPEED_NORMAL 8.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
