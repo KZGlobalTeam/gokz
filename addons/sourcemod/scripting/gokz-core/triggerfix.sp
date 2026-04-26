@@ -7,6 +7,7 @@
 // Engine constants, NOT settings (do not change)
 #define LAND_HEIGHT 2.0 					// Maximum height above ground at which you can "land"
 #define MIN_STANDABLE_ZNRM 0.7				// Minimum surface normal Z component of a walkable surface
+#define EFL_CHECK_UNTOUCH 1<<24
 
 static int processMovementTicks[MAXPLAYERS+1];
 static float playerFrameTime[MAXPLAYERS+1];
@@ -21,6 +22,7 @@ static float jumpBugOrigin[MAXPLAYERS + 1][3];
 
 static ConVar cvGravity;
 
+static Handle physicsCheckForEntityUntouch;
 static Handle acceptInputHookPre;
 static Handle processMovementHookPre;
 static Address serverGameEnts;
@@ -43,6 +45,15 @@ public void OnPluginStart_Triggerfix()
 		SetFailState("Failed to load gokz-core gamedata");
 	}
 	
+	// EndTouch Fix
+	// Thanks rumour and mev
+	StartPrepSDKCall(SDKCall_Entity);
+	if(!PrepSDKCall_SetFromConf(gamedataConf, SDKConf_Signature, "PhysicsCheckForEntityUntouch"))
+	{
+		SetFailState("Failed to get PhysicsCheckForEntityUntouch");
+	}
+
+	physicsCheckForEntityUntouch = EndPrepSDKCall();
 	// PassesTriggerFilters
 	StartPrepSDKCall(SDKCall_Entity);
 	if (!PrepSDKCall_SetFromConf(gamedataConf, SDKConf_Virtual, "CBaseTrigger::PassesTriggerFilters"))
@@ -177,7 +188,6 @@ public void OnClientConnected_Triggerfix(int client)
 
 public void OnClientPutInServer_Triggerfix(int client)
 {
-	SDKHook(client, SDKHook_PostThink, Hook_PlayerPostThink);
 	DHookEntity(acceptInputHookPre, false, client);
 }
 
@@ -415,87 +425,95 @@ static bool DoTriggerjumpFix(int client, const float landingPoint[3], const floa
 }
 
 // PostThink works a little better than a ProcessMovement post hook because we need to wait for ProcessImpacts (trigger activation)
-static void Hook_PlayerPostThink(int client)
+void Hook_PlayerPostThink_Triggerfix(int client)
 {
-	if (!IsPlayerAlive(client)
-		|| GetEntityMoveType(client) != MOVETYPE_WALK
-		|| CheckWater(client))
+	if (!IsPlayerAlive(client))
 	{
 		return;
 	}
-	
-	bool landed = (GetEntPropEnt(client, Prop_Data, "m_hGroundEntity") != -1
-		&& lastGroundEnt[client] == -1)
-		|| jumpBugged[client];
-	
-	float landingMins[3], landingMaxs[3], landingPoint[3];
-	
-	// Get info about the ground we landed on (if we need to do landing fixes).
-	if (landed)
+
+	// Trigger jump fix
+	if (GetEntityMoveType(client) == MOVETYPE_WALK && !CheckWater(client))
 	{
-		float origin[3], nrm[3], velocity[3];
-		GetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
-		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
+		bool landed = (GetEntPropEnt(client, Prop_Data, "m_hGroundEntity") != -1
+			&& lastGroundEnt[client] == -1)
+			|| jumpBugged[client];
 		
-		if (jumpBugged[client])
+		float landingMins[3], landingMaxs[3], landingPoint[3];
+		
+		// Get info about the ground we landed on (if we need to do landing fixes).
+		if (landed)
 		{
-			origin = jumpBugOrigin[client];
-		}
-		
-		GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
-		GetEntPropVector(client, Prop_Data, "m_vecMaxs", landingMaxs);
-		
-		float originBelow[3];
-		originBelow[0] = origin[0];
-		originBelow[1] = origin[1];
-		originBelow[2] = origin[2] - LAND_HEIGHT;
-		
-		TR_TraceHullFilter(origin, originBelow, landingMins, landingMaxs, MASK_PLAYERSOLID, PlayerFilter);
-		
-		if (!TR_DidHit())
-		{
-			// This should never happen, since we know we are on the ground.
-			landed = false;
-		}
-		else
-		{
-			TR_GetPlaneNormal(null, nrm);
+			float origin[3], nrm[3], velocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
 			
-			if (nrm[2] < MIN_STANDABLE_ZNRM)
+			if (jumpBugged[client])
 			{
-				// This is rare, and how the incline fix should behave isn't entirely clear because maybe we should
-				// collide with multiple faces at once in this case, but let's just get the ground we officially
-				// landed on and use that for our ground normal.
-				
-				// landingMins and landingMaxs will contain the final values used to find the ground after returning.
-				if (TracePlayerBBoxForGround(origin, originBelow, landingMins, landingMaxs))
-				{
-					TR_GetPlaneNormal(null, nrm);
-				}
-				else
-				{
-					// This should also never happen.
-					landed = false;
-				}
+				origin = jumpBugOrigin[client];
 			}
 			
-			TR_GetEndPosition(landingPoint);
+			GetEntPropVector(client, Prop_Data, "m_vecMins", landingMins);
+			GetEntPropVector(client, Prop_Data, "m_vecMaxs", landingMaxs);
+			
+			float originBelow[3];
+			originBelow[0] = origin[0];
+			originBelow[1] = origin[1];
+			originBelow[2] = origin[2] - LAND_HEIGHT;
+			
+			TR_TraceHullFilter(origin, originBelow, landingMins, landingMaxs, MASK_PLAYERSOLID, PlayerFilter);
+			
+			if (!TR_DidHit())
+			{
+				// This should never happen, since we know we are on the ground.
+				landed = false;
+			}
+			else
+			{
+				TR_GetPlaneNormal(null, nrm);
+				
+				if (nrm[2] < MIN_STANDABLE_ZNRM)
+				{
+					// This is rare, and how the incline fix should behave isn't entirely clear because maybe we should
+					// collide with multiple faces at once in this case, but let's just get the ground we officially
+					// landed on and use that for our ground normal.
+					
+					// landingMins and landingMaxs will contain the final values used to find the ground after returning.
+					if (TracePlayerBBoxForGround(origin, originBelow, landingMins, landingMaxs))
+					{
+						TR_GetPlaneNormal(null, nrm);
+					}
+					else
+					{
+						// This should also never happen.
+						landed = false;
+					}
+				}
+				
+				TR_GetEndPosition(landingPoint);
+			}
+		}
+		
+		// reset it here because we don't need it again
+		jumpBugged[client] = false;
+		
+		// Must use TR_DidHit because if the unduck origin is closer than 0.03125 units from the ground, 
+		// the trace fraction would return 0.0.
+		if (landed && TR_DidHit())
+		{
+			DoTriggerjumpFix(client, landingPoint, landingMins, landingMaxs);
+			// Check if a trigger we just touched put us in the air (probably due to a teleport).
+			if (GetEntityFlags(client) & FL_ONGROUND == 0)
+			{
+				landed = false;
+			}
 		}
 	}
 	
-	// reset it here because we don't need it again
-	jumpBugged[client] = false;
-	
-	// Must use TR_DidHit because if the unduck origin is closer than 0.03125 units from the ground, 
-	// the trace fraction would return 0.0.
-	if (landed && TR_DidHit())
+	// End touch fix
+	if (GetCheckUntouch(client))
 	{
-		DoTriggerjumpFix(client, landingPoint, landingMins, landingMaxs);
-		// Check if a trigger we just touched put us in the air (probably due to a teleport).
-		if (GetEntityFlags(client) & FL_ONGROUND == 0)
-		{
-			landed = false;
-		}
+		SDKCall(physicsCheckForEntityUntouch, client);
 	}
 }
 
@@ -619,4 +637,10 @@ static bool TracePlayerBBoxForGround(const float origin[3], const float originBe
 	}
 
 	return false;
+}
+
+static bool GetCheckUntouch(int client)
+{
+	int flags = GetEntProp(client, Prop_Data, "m_iEFlags");
+	return (flags & EFL_CHECK_UNTOUCH) != 0;
 }

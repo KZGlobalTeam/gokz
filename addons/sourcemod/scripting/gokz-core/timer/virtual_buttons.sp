@@ -144,9 +144,13 @@ void OnEndButtonPress_VirtualButtons(int client, int course)
 	}
 }
 
-void OnPlayerRunCmdPost_VirtualButtons(int client, int buttons, int cmdnum)
+void Hook_PlayerPostThinkPost_VirtualButtons(int client)
 {
-	CheckForAndHandleUsage(client, buttons);
+	CheckForAndHandleUsage(client, GetClientButtons(client));
+}
+
+void OnPlayerRunCmdPost_VirtualButtons(int client, int cmdnum)
+{
 	UpdateIndicators(client, cmdnum);
 }
 
