@@ -97,6 +97,7 @@ enum
 #define JS_MIN_TELEPORT_DELAY 5
 #define JS_SPEED_MODIFICATION_TOLERANCE 0.1
 #define JS_OFFSET_EPSILON 0.03125
+#define JS_NODUCK_MAX_ESTIMATED_TICKS 20
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
@@ -280,6 +281,7 @@ enum struct Jump
 	float preSpeed;
 	float sync;
 	float width;
+	float estimatedDuckedDistance;
 	
 	// For the 'always' stats
 	float miss;
