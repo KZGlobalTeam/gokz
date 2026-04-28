@@ -56,6 +56,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/triggerfix.sp"
 #include "gokz-core/demofix.sp"
 #include "gokz-core/teamnumfix.sp"
+#include "gokz-core/particles.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/triggers.sp"
@@ -337,6 +338,7 @@ public void OnMapStart()
 	OnMapStart_Checkpoints();
 	OnMapStart_TeamNumber();
 	OnMapStart_Demofix();
+	OnMapStart_PrecacheParticles();
 }
 
 public void OnMapEnd()
