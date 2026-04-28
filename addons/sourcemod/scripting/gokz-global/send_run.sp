@@ -25,6 +25,7 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 		dp.WriteCell(mode);
 		dp.WriteCell(GOKZ_GetTimeTypeEx(teleportsUsed));
 		dp.WriteFloat(time);
+		dp.WriteString(gC_CurrentMap);
 		
 		GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
 		GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
@@ -41,6 +42,8 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	int mode = dp.ReadCell();
 	int timeType = dp.ReadCell();
 	float time = dp.ReadFloat();
+	char mapName[64];
+	dp.ReadString(mapName, sizeof(mapName));
 	delete dp;
 	
 	if (!IsValidClient(client))
@@ -59,7 +62,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	
 	if (top_place > 0)
 	{
-		Call_OnNewTopTime(client, course, mode, timeType, top_place, top_overall_place, time);
+		Call_OnNewTopTime(client, course, mode, timeType, top_place, top_overall_place, time, mapName);
 	}
 	
 	// Don't like doing this here, but seems to be the most efficient place

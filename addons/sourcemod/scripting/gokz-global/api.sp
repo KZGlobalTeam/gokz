@@ -7,11 +7,11 @@ static GlobalForward H_OnPointsUpdated;
 
 void CreateGlobalForwards()
 {
-	H_OnNewTopTime = new GlobalForward("GOKZ_GL_OnNewTopTime", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float);
+	H_OnNewTopTime = new GlobalForward("GOKZ_GL_OnNewTopTime", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_String);
 	H_OnPointsUpdated = new GlobalForward("GOKZ_GL_OnPointsUpdated", ET_Ignore, Param_Cell, Param_Cell);
 }
 
-void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float time)
+void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float time, const char[] mapName)
 {
 	Call_StartForward(H_OnNewTopTime);
 	Call_PushCell(client);
@@ -21,6 +21,7 @@ void Call_OnNewTopTime(int client, int course, int mode, int timeType, int rank,
 	Call_PushCell(rank);
 	Call_PushCell(rankOverall);
 	Call_PushFloat(time);
+	Call_PushString(mapName);
 	Call_Finish();
 }
 
