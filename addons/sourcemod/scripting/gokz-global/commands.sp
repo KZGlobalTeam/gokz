@@ -47,6 +47,12 @@ public Action CommandFilterCheck(int client, int args)
 		}
 	}
 
+	if (gB_FiltersLoaded)
+	{
+		PrintFilterCheck(client, course);
+		return Plugin_Handled;
+	}
+
 	DataPack dp = CreateDataPack();
 	dp.WriteCell(GetClientUserId(client));
 	dp.WriteCell(course);
@@ -60,6 +66,18 @@ public Action CommandFilterCheck(int client, int args)
 
 	GlobalAPI_GetRecordFilters(FilterCheckCallback, dp, _, _, mapIds, 1, stages, 1, _, _, tickRates, 1);
 	return Plugin_Handled;
+}
+
+static void PrintFilterCheck(int client, int course)
+{
+	GOKZ_PrintToChat(client, true, "%t", "Filter Check Header", gC_CurrentMap, course);
+	for (int mode = 0; mode < MODE_COUNT; mode++)
+	{
+		GOKZ_PrintToChat(client, false, "%t", "Filter Check Mode",
+			gC_ModeNames[mode],
+			gB_HasFilter[course][mode][TimeType_Pro] ? "{green}✓" : "{darkred}X",
+			gB_HasFilter[course][mode][TimeType_Nub] ? "{green}✓" : "{darkred}X");
+	}
 }
 
 public int FilterCheckCallback(JSON_Object filters_json, GlobalAPIRequestData request, DataPack dp)
