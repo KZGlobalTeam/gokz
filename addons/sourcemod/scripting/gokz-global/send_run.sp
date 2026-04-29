@@ -63,6 +63,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
+		GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 		return 0;
 	}
 	

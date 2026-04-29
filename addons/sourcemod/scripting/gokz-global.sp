@@ -104,6 +104,8 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateGlobalForwards();
 	RegisterCommands();
+
+	CreateTimer(GL_API_RECHECK_INTERVAL, RecheckAPIStatus, INVALID_HANDLE, TIMER_REPEAT);
 }
 
 public void OnAllPluginsLoaded()
@@ -637,11 +639,46 @@ static void SetupAPI()
 	}
 }
 
+Action RecheckAPIStatus(Handle timer)
+{
+	if (!GlobalAPI_IsInit())
+	{
+		return Plugin_Continue;
+	}
+	
+	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
+	
+	bool anyModeMissing = false;
+	for (int i = 0; i < MODE_COUNT; i++)
+	{
+		if (!gB_ModeCheck[i])
+		{
+			anyModeMissing = true;
+			break;
+		}
+	}
+	if (anyModeMissing)
+	{
+		GlobalAPI_GetModes(GetModeInfoCallback);
+	}
+	
+	if (!MapCheck() && gC_CurrentMap[0] != '\0')
+	{
+		GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
+	}
+	
+	return Plugin_Continue;
+}
+
 public int GetAuthStatusCallback(JSON_Object auth_json, GlobalAPIRequestData request)
 {
 	if (request.Failure)
 	{
-		LogError("Failed to check API key with Global API.");
+		if (gB_APIKeyCheck)
+		{
+			LogError("Failed to check API key with Global API. Global submissions disabled until connectivity is restored.");
+		}
+		gB_APIKeyCheck = false;
 		return 0;
 	}
 	
