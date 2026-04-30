@@ -118,8 +118,9 @@ stock float gF_EnforcedCVarValues[ENFORCEDCVAR_COUNT] =
  * @param rank			Ranking within the same time type.
  * @param rankOverall	Overall (NUB and PRO) ranking (0 if not ranked high enough).
  * @param runTime		Player's end time.
+ * @param mapName		Name of the map the run was performed on. May differ from the current map, as this forward can be called after a map change.
  */
-forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime);
+forward void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime, const char[] mapName);
 
 
 

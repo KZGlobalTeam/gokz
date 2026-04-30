@@ -331,7 +331,7 @@ public void GOKZ_OnRunInvalidated(int client)
 	gB_InValidRun[client] = false;
 }
 
-public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime)
+public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime, const char[] mapName)
 {
 	AnnounceNewTopTime(client, course, mode, timeType, rank, rankOverall);
 }
