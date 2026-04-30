@@ -61,6 +61,8 @@ enum GlobalMode
 #define GL_FPS_MAX_KICK_TIMEOUT 10.0
 #define GL_FPS_MAX_MIN_VALUE 120
 #define GL_MYAW_MAX_VALUE 0.3
+#define GL_WARN_INTERVAL 30.0
+#define GL_API_RECHECK_INTERVAL 60.0
 
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {

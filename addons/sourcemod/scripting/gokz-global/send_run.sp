@@ -19,11 +19,23 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 	
 	if (GlobalsEnabled(mode))
 	{
+		// If filters have been loaded, skip the submission when the API would reject it.
+		int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
+		if (gB_FiltersLoaded && course >= 0 && course < GOKZ_MAX_COURSES)
+		{
+			bool wouldSave = gB_HasFilter[course][mode][TimeType_Nub]
+				|| (timeType == TimeType_Pro && gB_HasFilter[course][mode][TimeType_Pro]);
+			if (!wouldSave)
+			{
+				return;
+			}
+		}
+		
 		DataPack dp = CreateDataPack();
 		dp.WriteCell(GetClientUserId(client));
 		dp.WriteCell(course);
 		dp.WriteCell(mode);
-		dp.WriteCell(GOKZ_GetTimeTypeEx(teleportsUsed));
+		dp.WriteCell(timeType);
 		dp.WriteFloat(time);
 		
 		GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
@@ -51,6 +63,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
+		GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 		return 0;
 	}
 	
