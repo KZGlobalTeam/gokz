@@ -626,6 +626,12 @@ public void OnEnforcedConVarChanged(ConVar convar, const char[] oldValue, const 
 
 static void SetupAPI()
 {
+	if (!GlobalAPI_HasAPIKey())
+	{
+		gB_APIKeyCheck = false;
+		return;
+	}
+	
 	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 	GlobalAPI_GetModes(GetModeInfoCallback);
 	GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
@@ -641,8 +647,9 @@ static void SetupAPI()
 
 Action RecheckAPIStatus(Handle timer)
 {
-	if (!GlobalAPI_IsInit())
+	if (!GlobalAPI_IsInit() || !GlobalAPI_HasAPIKey())
 	{
+		gB_APIKeyCheck = false;
 		return Plugin_Continue;
 	}
 	
