@@ -5,6 +5,7 @@
 #include <sdktools>
 #include <dhooks>
 
+#include <autoexecconfig>
 #include <movementapi>
 
 #include <gokz/core>
@@ -42,6 +43,8 @@ Address gA_BotDuckAddr;
 int gI_BotDuckPatchRestore[40]; // Size of patched section in gamedata
 int gI_BotDuckPatchLength;
 
+ConVar gCV_gokz_replays_download_url;
+
 DynamicDetour gH_DHooks_TeamFull;
 
 #include "gokz-replays/commands.sp"
@@ -67,6 +70,7 @@ public void OnPluginStart()
 	LoadTranslations("gokz-common.phrases");
 	LoadTranslations("gokz-replays.phrases");
 	
+	CreateConVars();
 	HookEvents();
 	RegisterCommands();
 }
@@ -281,6 +285,18 @@ public void GOKZ_OnOptionsLoaded(int client)
 }
 
 // =====[ PRIVATE ]=====
+
+static void CreateConVars()
+{
+	AutoExecConfig_SetFile("gokz-replays", "sourcemod/gokz");
+	AutoExecConfig_SetCreateFile(true);
+	
+	gCV_gokz_replays_download_url = AutoExecConfig_CreateConVar("gokz_replays_download_url", "",
+		"Download link to display in console when starting a replay. Put {filename} in place of the filename.");
+	
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
+}
 
 static void HookEvents()
 {

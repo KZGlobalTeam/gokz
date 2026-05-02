@@ -62,6 +62,21 @@ static float botLandingSpeed[RP_MAX_BOTS];
 // Returns the client index of the replay bot, or -1 otherwise
 int LoadReplayBot(int client, char[] path)
 {
+	// Print the download url
+	static char downloadUrl[512];
+	gCV_gokz_replays_download_url.GetString(downloadUrl, sizeof(downloadUrl));
+	if (downloadUrl[0] != 0)
+	{
+		int lastSlash = FindCharInString(path, '/', true);
+		if (lastSlash != -1)
+		{
+			ReplaceString(downloadUrl, sizeof(downloadUrl), "{filename}", path[lastSlash+1]);
+			PrintToConsole(client, "----------------------------------------------------------------");
+			PrintToConsole(client, "%s", downloadUrl);
+			PrintToConsole(client, "----------------------------------------------------------------");
+		}
+	}
+
 	// Safeguard Check
 	if (GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
 	{
