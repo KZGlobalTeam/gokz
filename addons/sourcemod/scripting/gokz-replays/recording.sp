@@ -744,7 +744,7 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 			{
 				int rollingI = RecordingIndexAdd(client, i);
 				recordedRecentData[client].GetArray(rollingI, tickData);
-				recordedRecentData[client].GetArray(IntMax(0, i-1), prevTickData);
+				recordedRecentData[client].GetArray(RecordingIndexAdd(client, i - 1), prevTickData);
 				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
 				isFirstTick = false;
 			}
@@ -757,7 +757,7 @@ static void WriteTickData(File file, int client, int replayType, int airtime = 0
 			{
 				int rollingI = RecordingIndexAdd(client, i - replayLength);
 				recordedRecentData[client].GetArray(rollingI, tickData);
-				recordedRecentData[client].GetArray(IntMax(0, i-1), prevTickData);
+				recordedRecentData[client].GetArray(RecordingIndexAdd(client, i - 1 - replayLength), prevTickData);
 				WriteTickDataToFile(file, isFirstTick, tickData, prevTickData);
 				isFirstTick = false;
 			}
