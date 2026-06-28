@@ -40,7 +40,8 @@ bool GetHasVirtualEndButton(int client)
 bool CanUseVirtualStartForCourse(int client, int course)
 {
 	float position[3];
-	return GetVirtualButtonPosition(client, position, true) == course
+	return GetHasVirtualStartButton(client)
+		&& GetVirtualButtonPosition(client, position, true) == course
 		&& InRangeOfVirtualStart(client)
 		&& CanReachVirtualStart(client);
 }
