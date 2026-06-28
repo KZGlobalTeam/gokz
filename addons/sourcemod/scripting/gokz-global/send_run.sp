@@ -16,33 +16,31 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 	char steamid[32], modeStr[32];
 	KZPlayer player = KZPlayer(client);
 	int mode = player.Mode;
-	
-	if (GlobalsEnabled(mode))
+
+	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
+
+	// If filters have been loaded, skip the submission when the API would reject it.
+	if (gB_FiltersLoaded && course >= 0 && course < GOKZ_MAX_COURSES)
 	{
-		// If filters have been loaded, skip the submission when the API would reject it.
-		int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
-		if (gB_FiltersLoaded && course >= 0 && course < GOKZ_MAX_COURSES)
+		bool wouldSave = gB_HasFilter[course][mode][TimeType_Nub]
+			|| (timeType == TimeType_Pro && gB_HasFilter[course][mode][TimeType_Pro]);
+		if (!wouldSave)
 		{
-			bool wouldSave = gB_HasFilter[course][mode][TimeType_Nub]
-				|| (timeType == TimeType_Pro && gB_HasFilter[course][mode][TimeType_Pro]);
-			if (!wouldSave)
-			{
-				return;
-			}
+			return;
 		}
-		
-		DataPack dp = CreateDataPack();
-		dp.WriteCell(GetClientUserId(client));
-		dp.WriteCell(course);
-		dp.WriteCell(mode);
-		dp.WriteCell(timeType);
-		dp.WriteFloat(time);
-		dp.WriteString(gC_CurrentMap);
-		
-		GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
-		GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
-		GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, gI_MapID, modeStr, course, 128, teleportsUsed, time);
 	}
+
+	DataPack dp = CreateDataPack();
+	dp.WriteCell(GetClientUserId(client));
+	dp.WriteCell(course);
+	dp.WriteCell(mode);
+	dp.WriteCell(timeType);
+	dp.WriteFloat(time);
+	dp.WriteString(gC_CurrentMap);
+
+	GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+	GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
+	GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, gI_MapID, modeStr, course, 128, teleportsUsed, time);
 }
 
 public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, DataPack dp)

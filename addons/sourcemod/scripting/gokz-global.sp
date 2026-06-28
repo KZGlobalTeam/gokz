@@ -35,6 +35,7 @@ public Plugin myinfo =
 bool gB_GOKZLocalDB;
 
 bool gB_APIKeyCheck;
+int gI_AuthFailCount;
 bool gB_ModeCheck[MODE_COUNT];
 bool gB_BannedCommandsCheck;
 char gC_CurrentMap[64];
@@ -310,6 +311,11 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
+	if (!gB_InValidRun[client] && GlobalsEnabled(KZPlayer(client).Mode))
+	{
+		gB_InValidRun[client] = true;
+	}
+
 	if (gB_GloballyVerified[client] && gB_InValidRun[client])
 	{
 		SendTime(client, course, time, teleportsUsed);
@@ -681,14 +687,17 @@ public int GetAuthStatusCallback(JSON_Object auth_json, GlobalAPIRequestData req
 {
 	if (request.Failure)
 	{
-		if (gB_APIKeyCheck)
+		gI_AuthFailCount++;
+		if (gB_APIKeyCheck && gI_AuthFailCount >= GL_API_AUTH_FAIL_THRESHOLD)
 		{
-			LogError("Failed to check API key with Global API. Global submissions disabled until connectivity is restored.");
+			LogError("Failed to check API key with Global API %d times in a row. Global status disabled until connectivity is restored.", gI_AuthFailCount);
+			gB_APIKeyCheck = false;
 		}
-		gB_APIKeyCheck = false;
 		return 0;
 	}
-	
+
+	gI_AuthFailCount = 0;
+
 	APIAuth auth = view_as<APIAuth>(auth_json);
 	if (!auth.IsValid)
 	{
