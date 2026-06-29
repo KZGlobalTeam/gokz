@@ -33,8 +33,6 @@ static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected
 static bool hitHeadDuringJump[MAXPLAYERS + 1];
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
-static const float playerMinsEx[3] = { -20.0, -20.0, 0.0 };
-static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
 static const Jump emptyJump;
@@ -42,6 +40,10 @@ static Handle acceptInputHook;
 static ConVar cvGravity;
 
 // =====[ DEFINITIONS ]========================================================
+
+#if !defined CONTENTS_LADDER
+#define CONTENTS_LADDER 0x20000000
+#endif
 
 // We cannot return enum structs and it's annoying
 // The modulo operator is broken, so we can't access this using negative numbers
@@ -79,6 +81,7 @@ enum struct JumpTracker
 	float takeoffOrigin[3];
 	float takeoffVelocity[3];
 	float position[3];
+	float takeoffLadderNormal[3];
 	
 	void Init(int jumper)
 	{
@@ -136,6 +139,17 @@ enum struct JumpTracker
 		// Initialize stats
 		this.CalcTakeoff();
 		this.AdjustLowpreJumptypes();
+		
+		if (this.jump.type == JumpType_LadderJump)
+		{
+			GetEntPropVector(this.jumper, Prop_Send, "m_vecLadderNormal", this.takeoffLadderNormal);
+		}
+		else
+		{
+			this.takeoffLadderNormal[0] = 0.0;
+			this.takeoffLadderNormal[1] = 0.0;
+			this.takeoffLadderNormal[2] = 0.0;
+		}
 		
 		this.failstatBlockDetected = this.jump.type != JumpType_LadderJump;
 		this.failstatFailed = false;
@@ -1185,22 +1199,29 @@ enum struct JumpTracker
 	
 	bool TraceLadderOffset(float landingHeight)
 	{
-		float traceOrigin[3], traceEnd[3], ladderTop[3], ladderNormal[3];
+		float traceOrigin[3], traceEnd[3], ladderEnd[3], ladderZ;
 		
-		// Get normal vector of the ladder.
-		GetEntPropVector(this.jumper, Prop_Send, "m_vecLadderNormal", ladderNormal);
-		
+		float window = 400.0 * GetTickInterval();
+
 		// 10 units is the furthest away from the ladder surface you can get while still being on the ladder.
-		traceOrigin[0] = this.takeoffOrigin[0] - 10.0 * ladderNormal[0];
-		traceOrigin[1] = this.takeoffOrigin[1] - 10.0 * ladderNormal[1];
-		traceOrigin[2] = this.takeoffOrigin[2] + 5;
-		
+		traceOrigin[0] = this.takeoffOrigin[0] - 10.0 * this.takeoffLadderNormal[0];
+		traceOrigin[1] = this.takeoffOrigin[1] - 10.0 * this.takeoffLadderNormal[1];
+		traceOrigin[2] = this.takeoffOrigin[2] + window;
 		CopyVector(traceOrigin, traceEnd);
-		traceEnd[2] = this.takeoffOrigin[2] - 10;
+		traceEnd[2] = this.takeoffOrigin[2] - window;
 		
-		// Search for the ladder
-		if (!TraceHullPosition(traceOrigin, traceEnd, playerMinsEx, playerMaxsEx, ladderTop)
-			|| FloatAbs(ladderTop[2] - landingHeight) > JS_OFFSET_EPSILON)
+		// Default to the takeoff origin so the comparison reflects the raw takeoff height when the trace fails to find a ladder.
+		ladderZ = this.takeoffOrigin[2];
+		
+		Handle trace = TR_TraceHullFilterEx(traceOrigin, traceEnd, PLAYER_MINS, PLAYER_MAXS, CONTENTS_LADDER, TraceEntityFilterPlayers);
+		if (TR_DidHit(trace))
+		{
+			TR_GetEndPosition(ladderEnd, trace);
+			ladderZ = ladderEnd[2];
+		}
+		delete trace;
+		
+		if (FloatAbs(ladderZ - landingHeight) > JS_OFFSET_EPSILON)
 		{
 			this.Invalidate();
 			return false;
