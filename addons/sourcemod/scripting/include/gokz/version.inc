@@ -4,4 +4,4 @@
 	Website: https://github.com/kzglobalteam/gokz
 */
 
-#define GOKZ_VERSION "3.6.4"
+#define GOKZ_VERSION "3.7.0"
