@@ -30,17 +30,20 @@ static int lastGroundSpeedCappedTime[MAXPLAYERS + 1];
 static int lastMovementProcessedTime[MAXPLAYERS + 1];
 static float lastJumpButtonTime[MAXPLAYERS + 1];
 static bool validCmd[MAXPLAYERS + 1]; // Whether no illegal action is detected
+static bool hitHeadDuringJump[MAXPLAYERS + 1];
 static const float playerMins[3] =  { -16.0, -16.0, 0.0 };
 static const float playerMaxs[3] =  { 16.0, 16.0, 0.0 };
-static const float playerMinsEx[3] = { -20.0, -20.0, 0.0 };
-static const float playerMaxsEx[3] = { 20.0, 20.0, 0.0 };
 static bool doFailstatAlways[MAXPLAYERS + 1];
 static bool isInAir[MAXPLAYERS + 1];
 static const Jump emptyJump;
 static Handle acceptInputHook;
-
+static ConVar cvGravity;
 
 // =====[ DEFINITIONS ]========================================================
+
+#if !defined CONTENTS_LADDER
+#define CONTENTS_LADDER 0x20000000
+#endif
 
 // We cannot return enum structs and it's annoying
 // The modulo operator is broken, so we can't access this using negative numbers
@@ -73,10 +76,12 @@ enum struct JumpTracker
 	bool failstatBlockDetected;
 	bool failstatFailed;
 	bool failstatValid;
+	bool hitHead;
 	float failstatBlockHeight;
 	float takeoffOrigin[3];
 	float takeoffVelocity[3];
 	float position[3];
+	float takeoffLadderNormal[3];
 	
 	void Init(int jumper)
 	{
@@ -84,6 +89,7 @@ enum struct JumpTracker
 		this.jump.jumper = jumper;
 		this.nextCrouchRelease = 100;
 		this.tickCount = 0;
+		this.hitHead = false;
 	}
 	
 	
@@ -92,6 +98,11 @@ enum struct JumpTracker
 	
 	void Reset(bool jumped, bool ladderJump, bool jumpbug)
 	{
+		// Store the head hit status from the previous jump for bhop validation
+		// This must be done BEFORE DetermineType() since it checks HitHeadRecently()
+		hitHeadDuringJump[this.jumper] = this.hitHead;
+		this.hitHead = false;
+
 		// We need to do that before we reset the jump cause we need the
 		// offset and type of the previous jump
 		this.lastType = this.DetermineType(jumped, ladderJump, jumpbug);
@@ -128,6 +139,17 @@ enum struct JumpTracker
 		// Initialize stats
 		this.CalcTakeoff();
 		this.AdjustLowpreJumptypes();
+		
+		if (this.jump.type == JumpType_LadderJump)
+		{
+			GetEntPropVector(this.jumper, Prop_Send, "m_vecLadderNormal", this.takeoffLadderNormal);
+		}
+		else
+		{
+			this.takeoffLadderNormal[0] = 0.0;
+			this.takeoffLadderNormal[1] = 0.0;
+			this.takeoffLadderNormal[2] = 0.0;
+		}
 		
 		this.failstatBlockDetected = this.jump.type != JumpType_LadderJump;
 		this.failstatFailed = false;
@@ -201,6 +223,7 @@ enum struct JumpTracker
 		// Fix the edgebug for the current position
 		Movement_GetNobugLandingOrigin(this.jumper, this.position);
 		
+		this.CalculateDuckedDistance();
 		// There are a couple bugs and exploits we have to check for
 		this.EndBugfixExploits();
 		
@@ -208,7 +231,8 @@ enum struct JumpTracker
 		this.jump.distance = this.CalcDistance();
 		this.jump.sync = float(this.syncTicks) / float(this.jump.duration) * 100.0;
 		this.jump.offset = this.position[2] - this.takeoffOrigin[2];
-		
+		this.jump.estimatedDuckedDistance = this.CalculateDuckedDistance();
+
 		this.EndBlockDistance();
 		
 		// Make sure the ladder has no offset for ladder jumps
@@ -328,6 +352,11 @@ enum struct JumpTracker
 		}
 		else if (this.HitBhop() && !this.HitDuckbugRecently())
 		{
+			// Head hit invalidates following bhops but not the current jump
+			if (this.HitHeadRecently())
+			{
+				return JumpType_Invalid;
+			}
 			// Check for no offset
 			if (FloatAbs(this.jump.offset) < JS_OFFSET_EPSILON)
 			{
@@ -380,6 +409,11 @@ enum struct JumpTracker
 	bool HitDuckbugRecently()
 	{
 		return this.tickCount - lastDuckbugTime[this.jumper] <= JS_MAX_DUCKBUG_RESET_TICKS;
+	}
+	
+	bool HitHeadRecently()
+	{
+		return hitHeadDuringJump[this.jumper];
 	}
 	
 	bool GroundSpeedCappedRecently()
@@ -693,6 +727,76 @@ enum struct JumpTracker
 		}
 	}
 	
+	float CalculateDuckedDistance()
+	{
+		// Try to use the more correct origin to use as the base.
+		// This would be the nobug origin if the jump is bugged (landing origin height is roughly the same height as bugged).
+		float nbLandingOrigin[3], guessedDuckedOrigin[3];
+		Movement_GetNobugLandingOrigin(this.jumper, nbLandingOrigin);
+		Movement_GetLandingOrigin(this.jumper, guessedDuckedOrigin);
+
+		if (guessedDuckedOrigin[2] - nbLandingOrigin[2] < JS_OFFSET_EPSILON)
+		{
+			guessedDuckedOrigin = nbLandingOrigin;
+		}
+
+		float velocity[3];
+		Movement_GetLandingVelocity(this.jumper, velocity);
+
+		if (!GetEntProp(this.jumper, Prop_Send, "m_bDucked"))
+		{
+			float tempOrigin[3], tempOrigin2[3];
+			
+			tempOrigin = guessedDuckedOrigin;
+			tempOrigin2 = guessedDuckedOrigin;
+
+			tempOrigin[2] += 9.0;
+			tempOrigin2[2] += 9.0;
+			bool success;
+			for (int futureTick = 0; futureTick < JS_NODUCK_MAX_ESTIMATED_TICKS; futureTick++)
+			{
+				float gravityFactor = Movement_GetGravity(this.jumper);
+				if (gravityFactor == 0.0)
+				{
+					gravityFactor = 1.0;
+				}
+				velocity[2] -= gravityFactor * cvGravity.FloatValue * GetTickInterval();
+				for (int i = 0; i < 3; i++)
+				{
+					tempOrigin2[i] += velocity[i] * GetTickInterval();
+				}
+				float destination[3];
+				// If it hits, that means it landed!
+				if (TraceHullPosition(tempOrigin, tempOrigin2, PLAYER_MINS, PLAYER_MAXS_DUCKED, destination))
+				{
+					success = true;
+					// Mirror MovementAPI's optimistic realdist estimation.
+					tempOrigin2[2] += gravityFactor * cvGravity.FloatValue * GetTickInterval() * GetTickInterval();
+					TraceHullPosition(tempOrigin, tempOrigin2, PLAYER_MINS, PLAYER_MAXS_DUCKED, destination);
+					tempOrigin = tempOrigin2;
+					tempOrigin2 = destination;
+					break;
+				}
+				else
+				{
+					tempOrigin = tempOrigin2;
+				}
+			}
+
+			if (success)
+			{
+				float distance = GetVectorHorizontalDistance(this.takeoffOrigin, tempOrigin2);
+
+				if (this.jump.originalType != JumpType_LadderJump)
+				{
+					return distance + 32.0;
+				}
+
+			}
+		}
+		return -1.0;
+	}
+
 	void EndBugfixExploits()
 	{
 		// Try to prevent a form of booster abuse
@@ -1095,22 +1199,29 @@ enum struct JumpTracker
 	
 	bool TraceLadderOffset(float landingHeight)
 	{
-		float traceOrigin[3], traceEnd[3], ladderTop[3], ladderNormal[3];
+		float traceOrigin[3], traceEnd[3], ladderEnd[3], ladderZ;
 		
-		// Get normal vector of the ladder.
-		GetEntPropVector(this.jumper, Prop_Send, "m_vecLadderNormal", ladderNormal);
-		
+		float window = 400.0 * GetTickInterval();
+
 		// 10 units is the furthest away from the ladder surface you can get while still being on the ladder.
-		traceOrigin[0] = this.takeoffOrigin[0] - 10.0 * ladderNormal[0];
-		traceOrigin[1] = this.takeoffOrigin[1] - 10.0 * ladderNormal[1];
-		traceOrigin[2] = this.takeoffOrigin[2] + 5;
-		
+		traceOrigin[0] = this.takeoffOrigin[0] - 10.0 * this.takeoffLadderNormal[0];
+		traceOrigin[1] = this.takeoffOrigin[1] - 10.0 * this.takeoffLadderNormal[1];
+		traceOrigin[2] = this.takeoffOrigin[2] + window;
 		CopyVector(traceOrigin, traceEnd);
-		traceEnd[2] = this.takeoffOrigin[2] - 10;
+		traceEnd[2] = this.takeoffOrigin[2] - window;
 		
-		// Search for the ladder
-		if (!TraceHullPosition(traceOrigin, traceEnd, playerMinsEx, playerMaxsEx, ladderTop)
-			|| FloatAbs(ladderTop[2] - landingHeight) > JS_OFFSET_EPSILON)
+		// Default to the takeoff origin so the comparison reflects the raw takeoff height when the trace fails to find a ladder.
+		ladderZ = this.takeoffOrigin[2];
+		
+		Handle trace = TR_TraceHullFilterEx(traceOrigin, traceEnd, PLAYER_MINS, PLAYER_MAXS, CONTENTS_LADDER, TraceEntityFilterPlayers);
+		if (TR_DidHit(trace))
+		{
+			TR_GetEndPosition(ladderEnd, trace);
+			ladderZ = ladderEnd[2];
+		}
+		delete trace;
+		
+		if (FloatAbs(ladderZ - landingHeight) > JS_OFFSET_EPSILON)
 		{
 			this.Invalidate();
 			return false;
@@ -1299,6 +1410,12 @@ void OnPluginStart_JumpTracking()
 	DHookAddParam(acceptInputHook, HookParamType_Object, 20, DHookPass_ByVal|DHookPass_ODTOR|DHookPass_OCTOR|DHookPass_OASSIGNOP);
 	DHookAddParam(acceptInputHook, HookParamType_Int);
 	delete gd;
+	
+	cvGravity = FindConVar("sv_gravity");
+	if (cvGravity == null)
+	{
+		SetFailState("Could not find sv_gravity");
+	}
 }
 
 void OnOptionChanged_JumpTracking(int client, const char[] option)
@@ -1319,6 +1436,7 @@ void OnClientPutInServer_JumpTracking(int client)
 	lastNoclipTime[client] = 0;
 	lastDuckbugTime[client] = 0;
 	lastJumpButtonTime[client] = 0.0;
+	hitHeadDuringJump[client] = false;
 	jumpTrackers[client].Init(client);
 	DHookEntity(acceptInputHook, true, client);
 }
@@ -1369,6 +1487,13 @@ void OnTouch_JumpTracking(int client)
 	if (entityTouchList[client] != INVALID_HANDLE && entityTouchList[client].Length > 0)
 	{
 		entityTouchDuration[client]++;
+		
+		float velocity[3];
+		Movement_GetVelocity(client, velocity);
+		if (velocity[2] > 0.0)
+		{
+			jumpTrackers[client].hitHead = true;
+		}
 	}
 	if (!Movement_GetOnGround(client) && entityTouchDuration[client] > JS_TOUCH_GRACE_TICKS)
 	{

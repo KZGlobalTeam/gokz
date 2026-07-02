@@ -1,12 +1,7 @@
 /*
 	GOKZ Version Include
 
-	Website: https://bitbucket.org/kztimerglobalteam/gokz
-
-	You should not need to edit this file.
-	This file is overwritten in the build pipeline for versioning.
+	Website: https://github.com/kzglobalteam/gokz
 */
 
-
-
-#define GOKZ_VERSION ""
+#define GOKZ_VERSION "3.7.0"

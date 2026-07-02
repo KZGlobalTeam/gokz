@@ -186,7 +186,7 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 		return;
 	}
 	
-	char releaseWString[32], blockString[32], edgeString[32], deviationString[32], missString[32];
+	char releaseWString[32], blockString[32], edgeString[32], deviationString[32], missString[32], duckedDistString[32];
 	
 	if (jump.originalType == JumpType_LongJump ||
 		jump.originalType == JumpType_LadderJump ||
@@ -215,10 +215,15 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 	{
 		FormatEx(edgeString, sizeof(edgeString), " %s", GetFloatConsoleString2(client, "Edge", jump.edge));
 	}
-	
+
+	if (jump.estimatedDuckedDistance > 0.0)
+	{
+		FormatEx(duckedDistString, sizeof(duckedDistString), " %s", GetFloatConsoleString2(client, "Estimated Crouch Distance", jump.estimatedDuckedDistance));
+	}
+
 	PrintToConsole(client, "%t", header, jump.jumper, jump.distance, gC_JumpTypes[jump.originalType]);
 	
-	PrintToConsole(client, "%s%s%s%s %s %s %s %s%s %s %s%s %s %s %s %s %s",
+	PrintToConsole(client, "%s%s%s%s %s %s %s %s%s %s %s%s %s %s %s %s %s%s",
 		gC_ModeNamesShort[GOKZ_GetCoreOption(jump.jumper, Option_Mode)],
 		blockString,
 		edgeString,
@@ -235,7 +240,8 @@ static void DoConsoleReport(int client, bool isFailstat, Jump jump, int tier, ch
 		GetFloatConsoleString1(client, "Height", jump.height),
 		GetIntConsoleString(client, "Airtime", jump.duration),
 		GetFloatConsoleString1(client, "Offset", jump.offset),
-		GetIntConsoleString(client, "Crouch Ticks", jump.crouchTicks));
+		GetIntConsoleString(client, "Crouch Ticks", jump.crouchTicks),
+		duckedDistString);
 	
 	PrintToConsole(client, "  #.  %12t%12t%12t%12t%12t%9t%t", "Sync (Table)", "Gain (Table)", "Loss (Table)", "Airtime (Table)", "Width (Table)", "Overlap (Table)", "Dead Air (Table)");
 	if (jump.strafes_ticks[0] > 0)
@@ -398,6 +404,35 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 			GetWidthChatString(client, jump.width, jump.strafes), 
 			GetFloatChatString(client, "Height", jump.height),
 			missString);
+	}
+	
+	if (GOKZ_JS_GetOption(client, JSOption_StrafeSyncChat) == JSToggleOption_Enabled
+		&& jump.strafes >= 1 && jump.strafes <= JS_MAX_TRACKED_STRAFES)
+	{
+		char strafeSyncMsg[512];
+		char strafeEntry[32];
+		
+		FormatEx(strafeSyncMsg, sizeof(strafeSyncMsg), "{grey}%T:", "Sync", client);
+		
+		for (int i = 1; i <= jump.strafes && i < JS_MAX_TRACKED_STRAFES; i++)
+		{
+			float strafeSync = GetStrafeSync(jump, i);
+			
+			if (i == 1)
+			{
+				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}%d. {lime}%.0f%%%%", i, strafeSync);
+			}
+			else
+			{
+				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}- %d. {lime}%.0f%%%%", i, strafeSync);
+			}
+			StrCat(strafeSyncMsg, sizeof(strafeSyncMsg), strafeEntry);
+		}
+		
+		FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}[{purple}%.0f%%%%{grey}]", jump.sync);
+		StrCat(strafeSyncMsg, sizeof(strafeSyncMsg), strafeEntry);
+		
+		GOKZ_PrintToChat(client, false, "%s", strafeSyncMsg);
 	}
 }
 

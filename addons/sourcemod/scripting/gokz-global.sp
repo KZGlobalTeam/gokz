@@ -35,6 +35,7 @@ public Plugin myinfo =
 bool gB_GOKZLocalDB;
 
 bool gB_APIKeyCheck;
+int gI_AuthFailCount;
 bool gB_ModeCheck[MODE_COUNT];
 bool gB_BannedCommandsCheck;
 char gC_CurrentMap[64];
@@ -49,6 +50,9 @@ bool gB_MapValidated;
 int gI_MapID;
 int gI_MapFileSize;
 int gI_MapTier;
+bool gB_HasFilter[GOKZ_MAX_COURSES][MODE_COUNT][2];
+bool gB_FiltersLoaded;
+float gF_LastWarn[MAXPLAYERS + 1];
 
 ConVar gCV_gokz_settings_enforcer;
 ConVar gCV_gokz_warn_for_non_global_map;
@@ -101,6 +105,8 @@ public void OnPluginStart()
 	CreateConVars();
 	CreateGlobalForwards();
 	RegisterCommands();
+
+	CreateTimer(GL_API_RECHECK_INTERVAL, RecheckAPIStatus, INVALID_HANDLE, TIMER_REPEAT);
 }
 
 public void OnAllPluginsLoaded()
@@ -233,14 +239,14 @@ public void OnClientPutInServer(int client)
 {
 	gB_GloballyVerified[client] = false;
 	gB_waitingForFPSKick[client] = false;
+	gF_LastWarn[client] = 0.0;
+	ResetPoints(client);
 	OnClientPutInServer_PrintRecords(client);
 }
 
 // OnClientAuthorized is apparently too early
 public void OnClientPostAdminCheck(int client)
 {
-	ResetPoints(client);
-	
 	if (GlobalAPI_IsInit() && !IsFakeClient(client))
 	{
 		CheckClientGlobalBan(client);
@@ -260,12 +266,37 @@ public Action GOKZ_OnTimerStart(int client, int course)
 	int mode = player.Mode;
 
 	// We check the timer running to prevent spam when standing inside VB.
-	if (gCV_gokz_warn_for_non_global_map.BoolValue
-		&& GlobalAPI_HasAPIKey()
-		&& !GlobalsEnabled(mode)
-		&& !GOKZ_GetTimerRunning(client))
+	if (!gCV_gokz_warn_for_non_global_map.BoolValue || GOKZ_GetTimerRunning(client))
 	{
+		return Plugin_Continue;
+	}
+
+	// Both warnings share the same rate-limit timestamp, so only one warning fires per interval (the not-global one takes precedence).
+	float now = GetEngineTime();
+	if (now - gF_LastWarn[client] < GL_WARN_INTERVAL)
+	{
+		return Plugin_Continue;
+	}
+
+	if (GlobalAPI_HasAPIKey() && !GlobalsEnabled(mode))
+	{
+		gF_LastWarn[client] = now;
 		GOKZ_PrintToChat(client, true, "%t", "Warn Player Not Global Run");
+	}
+	else if (GlobalsEnabled(mode)
+		&& gB_FiltersLoaded
+		&& course >= 0 && course < GOKZ_MAX_COURSES
+		&& !CourseHasAnyFilter(course, mode))
+	{
+		gF_LastWarn[client] = now;
+		if (course == 0)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Warn Player No Filter Main", gC_ModeNamesShort[mode]);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Warn Player No Filter Bonus", gC_ModeNamesShort[mode], course);
+		}
 	}
 
 	return Plugin_Continue;
@@ -280,6 +311,11 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
+	if (!gB_InValidRun[client] && GlobalsEnabled(KZPlayer(client).Mode))
+	{
+		gB_InValidRun[client] = true;
+	}
+
 	if (gB_GloballyVerified[client] && gB_InValidRun[client])
 	{
 		SendTime(client, course, time, teleportsUsed);
@@ -301,7 +337,7 @@ public void GOKZ_OnRunInvalidated(int client)
 	gB_InValidRun[client] = false;
 }
 
-public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime)
+public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime, const char[] mapName)
 {
 	AnnounceNewTopTime(client, course, mode, timeType, rank, rankOverall);
 }
@@ -329,6 +365,21 @@ public void OnMapStart()
 	gI_CurrentMapFileSize = GetCurrentMapFileSize();
 	
 	gB_BannedCommandsCheck = true;
+	
+	// Reset cached map data so a stale cache from the previous map can't leak in.
+	gB_FiltersLoaded = false;
+	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
+	{
+		for (int mode = 0; mode < MODE_COUNT; mode++)
+		{
+			gB_HasFilter[course][mode][0] = false;
+			gB_HasFilter[course][mode][1] = false;
+		}
+	}
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		gF_LastWarn[client] = 0.0;
+	}
 	
 	// Prevent just reloading the plugin after messing with the map
 	if (gB_JustLateLoaded)
@@ -581,6 +632,12 @@ public void OnEnforcedConVarChanged(ConVar convar, const char[] oldValue, const 
 
 static void SetupAPI()
 {
+	if (!GlobalAPI_HasAPIKey())
+	{
+		gB_APIKeyCheck = false;
+		return;
+	}
+	
 	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
 	GlobalAPI_GetModes(GetModeInfoCallback);
 	GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
@@ -594,14 +651,53 @@ static void SetupAPI()
 	}
 }
 
+Action RecheckAPIStatus(Handle timer)
+{
+	if (!GlobalAPI_IsInit() || !GlobalAPI_HasAPIKey())
+	{
+		gB_APIKeyCheck = false;
+		return Plugin_Continue;
+	}
+	
+	GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
+	
+	bool anyModeMissing = false;
+	for (int i = 0; i < MODE_COUNT; i++)
+	{
+		if (!gB_ModeCheck[i])
+		{
+			anyModeMissing = true;
+			break;
+		}
+	}
+	if (anyModeMissing)
+	{
+		GlobalAPI_GetModes(GetModeInfoCallback);
+	}
+	
+	if (!MapCheck() && gC_CurrentMap[0] != '\0')
+	{
+		GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
+	}
+	
+	return Plugin_Continue;
+}
+
 public int GetAuthStatusCallback(JSON_Object auth_json, GlobalAPIRequestData request)
 {
 	if (request.Failure)
 	{
-		LogError("Failed to check API key with Global API.");
+		gI_AuthFailCount++;
+		if (gB_APIKeyCheck && gI_AuthFailCount >= GL_API_AUTH_FAIL_THRESHOLD)
+		{
+			LogError("Failed to check API key with Global API %d times in a row. Global status disabled until connectivity is restored.", gI_AuthFailCount);
+			gB_APIKeyCheck = false;
+		}
 		return 0;
 	}
-	
+
+	gI_AuthFailCount = 0;
+
 	APIAuth auth = view_as<APIAuth>(auth_json);
 	if (!auth.IsValid)
 	{
@@ -665,6 +761,17 @@ public int GetMapCallback(JSON_Object map_json, GlobalAPIRequestData request)
 	gI_MapFileSize = map.Filesize;
 	gI_MapTier = map.Difficulty;
 	
+	// Fetch all record filters for this map so we can warn players running unfiltered courses,
+	// and skip submitting times that would be rejected.
+	if (gI_MapID > 0)
+	{
+		int mapIds[1];
+		mapIds[0] = gI_MapID;
+		int tickRates[1];
+		tickRates[0] = 128;
+		GlobalAPI_GetRecordFilters(GetRecordFiltersCallback, _, _, _, mapIds, 1, _, _, _, _, tickRates, 1);
+	}
+	
 	// We don't do that earlier cause we need the map ID
 	for (int client = 1; client <= MaxClients; client++)
 	{
@@ -674,6 +781,92 @@ public int GetMapCallback(JSON_Object map_json, GlobalAPIRequestData request)
 		}
 	}
 	return 0;
+}
+
+public int GetRecordFiltersCallback(JSON_Object filters_json, GlobalAPIRequestData request)
+{
+	if (request.Failure || filters_json == INVALID_HANDLE)
+	{
+		LogError("Failed to fetch record filters for map id %d.", gI_MapID);
+		return 0;
+	}
+	
+	if (!filters_json.IsArray)
+	{
+		LogError("GlobalAPI returned a malformed response while looking up record filters.");
+		return 0;
+	}
+	
+	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
+	{
+		for (int mode = 0; mode < MODE_COUNT; mode++)
+		{
+			gB_HasFilter[course][mode][0] = false;
+			gB_HasFilter[course][mode][1] = false;
+		}
+	}
+	
+	for (int i = 0; i < filters_json.Length; i++)
+	{
+		APIRecordFilter filter = view_as<APIRecordFilter>(view_as<JSON_Array>(filters_json).GetObject(i));
+		int mode = GOKZ_GL_FromGlobalMode(view_as<GlobalMode>(filter.ModeId));
+		if (mode == -1)
+		{
+			continue;
+		}
+		int course = filter.Stage;
+		if (course < 0 || course >= GOKZ_MAX_COURSES)
+		{
+			continue;
+		}
+		// HasTeleports == true => NUB filter (TimeType_Nub == 0)
+		// HasTeleports == false => PRO filter (TimeType_Pro == 1)
+		gB_HasFilter[course][mode][filter.HasTeleports ? TimeType_Nub : TimeType_Pro] = true;
+	}
+	
+	gB_FiltersLoaded = true;
+	
+	// Warn any client whose timer is already running on a course+mode that has no filter.
+	if (gCV_gokz_warn_for_non_global_map.BoolValue)
+	{
+		float now = GetEngineTime();
+		for (int client = 1; client <= MaxClients; client++)
+		{
+			if (!IsValidClient(client) || IsFakeClient(client) || !GOKZ_GetTimerRunning(client))
+			{
+				continue;
+			}
+			if (now - gF_LastWarn[client] < GL_WARN_INTERVAL)
+			{
+				continue;
+			}
+			KZPlayer player = KZPlayer(client);
+			int mode = player.Mode;
+			int course = GOKZ_GetCourse(client);
+			if (course < 0 || course >= GOKZ_MAX_COURSES || !GlobalsEnabled(mode))
+			{
+				continue;
+			}
+			if (!CourseHasAnyFilter(course, mode))
+			{
+				gF_LastWarn[client] = now;
+				if (course == 0)
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Warn Player No Filter Main", gC_ModeNamesShort[mode]);
+				}
+				else
+				{
+					GOKZ_PrintToChat(client, true, "%t", "Warn Player No Filter Bonus", gC_ModeNamesShort[mode], course);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+bool CourseHasAnyFilter(int course, int mode)
+{
+	return gB_HasFilter[course][mode][TimeType_Nub] || gB_HasFilter[course][mode][TimeType_Pro];
 }
 
 void CheckClientGlobalBan(int client)

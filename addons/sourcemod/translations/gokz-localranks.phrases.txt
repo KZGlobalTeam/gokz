@@ -376,8 +376,8 @@
 		// You missed your best PRO time (01:23.45).
 		"#format"	"{1:s}"
 		"en"		"{grey}You missed your best {blue}PRO {grey}time ({lightred}{1}{grey})."
-		"chi"		"{grey}你比个人最佳{blue}裸跳记录{grey}慢了(个人记录:{lightred}{1}{grey})."		 
-		"ru"		"{grey}Ты упустил свое лучшее {blue}PRO {grey}время ({lightred}{1}{grey})."		 
+		"chi"		"{grey}你比个人最佳{blue}裸跳记录{grey}慢了(个人记录:{lightred}{1}{grey})."
+		"ru"		"{grey}Ты упустил свое лучшее {blue}PRO {grey}время ({lightred}{1}{grey})."
 	}
 	"Missed PB (NUB and PRO)"
 	{
@@ -481,7 +481,7 @@
 		//
 		"#format"	"{1:d},{2:s},{3:s},{4:s}"
 		"en"		"Server Top {1} {2} Times\n \nMap - {3}\nMode - {4}\n "
-		"chi"		"服务器 {2} 前{1}\n \n地图- {3}\n模式 - {4}\n "	
+		"chi"		"服务器 {2} 前{1}\n \n地图- {3}\n模式 - {4}\n "
 		"ru"		"Топ {1} сервера {2} времени\n \nКарта - {3}\nРежим - {4}\n "
 	}
 	"Map Top Submenu - Title (Bonus)"
@@ -616,7 +616,7 @@
 		// PRO Records
 		"#format"	"{1:s}"
 		"en"		"{1} Records"
-		"chi"		"{1} 记录"	
+		"chi"		"{1} 记录"
 		"ru"		"{1} рекорды"
 	}
 	"Recent Records Submenu - Title"

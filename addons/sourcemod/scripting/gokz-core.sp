@@ -56,6 +56,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/triggerfix.sp"
 #include "gokz-core/demofix.sp"
 #include "gokz-core/teamnumfix.sp"
+#include "gokz-core/particles.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/triggers.sp"
@@ -177,9 +178,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	{
 		return;
 	}
-	
-	OnPlayerRunCmdPost_VirtualButtons(client, buttons, cmdnum); // Emulate buttons first
-	OnPlayerRunCmdPost_Timer(client); // This should be first after emulating buttons
+	OnPlayerRunCmdPost_VirtualButtons(client, cmdnum);
 	OnPlayerRunCmdPost_ValidJump(client);
 	UpdateTrackingVariables(client, cmdnum, buttons); // This should be last
 }
@@ -247,7 +246,7 @@ public MRESReturn DHooks_OnSetModel(int client, Handle params)
 	return MRES_Handled;
 }
 
-public void OnCSPlayerSpawnPost(int client)
+public void Hook_PlayerSpawnPost(int client)
 {
 	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") == -1)
 	{
@@ -255,9 +254,15 @@ public void OnCSPlayerSpawnPost(int client)
 	}
 }
 
-public void OnClientPreThinkPost(int client)
+public void Hook_PlayerPostThink(int client)
 {
-	OnClientPreThinkPost_UseButtons(client);
+	Hook_PlayerPostThink_Triggerfix(client);
+}
+
+public void Hook_PlayerPostThinkPost(int client)
+{
+	Hook_PlayerPostThinkPost_VirtualButtons(client);
+	Hook_PlayerPostThinkPost_Timer(client); // This should be first after emulating buttons
 }
 
 public void Movement_OnChangeMovetype(int client, MoveType oldMovetype, MoveType newMovetype)
@@ -333,6 +338,7 @@ public void OnMapStart()
 	OnMapStart_Checkpoints();
 	OnMapStart_TeamNumber();
 	OnMapStart_Demofix();
+	OnMapStart_PrecacheParticles();
 }
 
 public void OnMapEnd()
@@ -450,6 +456,7 @@ static void CreateConVars()
 	AutoExecConfig_SetCreateFile(true);
 	
 	gCV_gokz_chat_prefix = AutoExecConfig_CreateConVar("gokz_chat_prefix", "{green}KZ {grey}| ", "Chat prefix used for GOKZ messages.");
+	CreateConVars_Demofix();
 	
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
@@ -498,8 +505,9 @@ static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 	DHookEntity(gH_DHooks_SetModel, true, client);
-	SDKHook(client, SDKHook_SpawnPost, OnCSPlayerSpawnPost);
-	SDKHook(client, SDKHook_PreThinkPost, OnClientPreThinkPost);
+	SDKHook(client, SDKHook_PostThink, Hook_PlayerPostThink);
+	SDKHook(client, SDKHook_PostThinkPost, Hook_PlayerPostThinkPost);
+	SDKHook(client, SDKHook_SpawnPost, Hook_PlayerSpawnPost);
 }
 
 static void UpdateTrackingVariables(int client, int cmdnum, int buttons)

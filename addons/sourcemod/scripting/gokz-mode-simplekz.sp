@@ -26,7 +26,7 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define MODE_VERSION 211
+#define MODE_VERSION 212
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units

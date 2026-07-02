@@ -35,6 +35,7 @@ enum
 // =====[ CONSTANTS ]=====
 
 #define JB_BEAM_LIFETIME 4.0
+#define JB_OFFSET_MAX 32.0
 
 stock char gC_JBOptionNames[JBOPTION_COUNT][] = 
 {

@@ -16,20 +16,31 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 	char steamid[32], modeStr[32];
 	KZPlayer player = KZPlayer(client);
 	int mode = player.Mode;
-	
-	if (GlobalsEnabled(mode))
+
+	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
+
+	// If filters have been loaded, skip the submission when the API would reject it.
+	if (gB_FiltersLoaded && course >= 0 && course < GOKZ_MAX_COURSES)
 	{
-		DataPack dp = CreateDataPack();
-		dp.WriteCell(GetClientUserId(client));
-		dp.WriteCell(course);
-		dp.WriteCell(mode);
-		dp.WriteCell(GOKZ_GetTimeTypeEx(teleportsUsed));
-		dp.WriteFloat(time);
-		
-		GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
-		GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
-		GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, gI_MapID, modeStr, course, 128, teleportsUsed, time);
+		bool wouldSave = gB_HasFilter[course][mode][TimeType_Nub]
+			|| (timeType == TimeType_Pro && gB_HasFilter[course][mode][TimeType_Pro]);
+		if (!wouldSave)
+		{
+			return;
+		}
 	}
+
+	DataPack dp = CreateDataPack();
+	dp.WriteCell(GetClientUserId(client));
+	dp.WriteCell(course);
+	dp.WriteCell(mode);
+	dp.WriteCell(timeType);
+	dp.WriteFloat(time);
+	dp.WriteString(gC_CurrentMap);
+
+	GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+	GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
+	GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, gI_MapID, modeStr, course, 128, teleportsUsed, time);
 }
 
 public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, DataPack dp)
@@ -41,6 +52,8 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	int mode = dp.ReadCell();
 	int timeType = dp.ReadCell();
 	float time = dp.ReadFloat();
+	char mapName[64];
+	dp.ReadString(mapName, sizeof(mapName));
 	delete dp;
 	
 	if (!IsValidClient(client))
@@ -51,6 +64,10 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	if (request.Failure)
 	{
 		LogError("Failed to send a time to the global API.");
+		if (GlobalAPI_HasAPIKey())
+		{
+			GlobalAPI_GetAuthStatus(GetAuthStatusCallback);
+		}
 		return 0;
 	}
 	
@@ -59,7 +76,7 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	
 	if (top_place > 0)
 	{
-		Call_OnNewTopTime(client, course, mode, timeType, top_place, top_overall_place, time);
+		Call_OnNewTopTime(client, course, mode, timeType, top_place, top_overall_place, time, mapName);
 	}
 	
 	// Don't like doing this here, but seems to be the most efficient place

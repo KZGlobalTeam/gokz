@@ -465,7 +465,7 @@ void TeleportToStart(int client)
 	}
 	
 	if (startType[client] != StartPositionType_MapButton
-		&& (!InRangeOfVirtualStart(client) || !CanReachVirtualStart(client)))
+		&& !CanUseVirtualStartForCourse(client, GetCurrentCourse(client)))
 	{
 		GOKZ_StopTimer(client, false);
 	}

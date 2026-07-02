@@ -26,7 +26,7 @@ public Plugin myinfo =
 	url = GOKZ_SOURCE_URL
 };
 
-#define MODE_VERSION 171
+#define MODE_VERSION 172
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {

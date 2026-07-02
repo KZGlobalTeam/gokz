@@ -61,6 +61,7 @@ enum JSOption:
 	JSOption_FailstatsChat, 
 	JSOption_JumpstatsAlways, 
 	JSOption_ExtendedChatReport, 
+	JSOption_StrafeSyncChat,
 	JSOption_MinChatBroadcastTier,
 	JSOption_MinSoundBroadcastTier,
 	JSOPTION_COUNT
@@ -96,6 +97,7 @@ enum
 #define JS_MIN_TELEPORT_DELAY 5
 #define JS_SPEED_MODIFICATION_TOLERANCE 0.1
 #define JS_OFFSET_EPSILON 0.03125
+#define JS_NODUCK_MAX_ESTIMATED_TICKS 20
 
 stock char gC_JumpTypes[JUMPTYPE_COUNT][] = 
 {
@@ -188,6 +190,7 @@ stock char gC_JSOptionNames[JSOPTION_COUNT][] =
 	"GOKZ JS - Failstats Chat", 
 	"GOKZ JS - Jumpstats Always", 
 	"GOKZ JS - Ext Chat Report",
+	"GOKZ JS - Strafe Sync Chat",
 	"GOKZ JS - Min Chat Broadcast",
 	"GOKZ JS - Min Sound Broadcast"
 };
@@ -202,6 +205,7 @@ stock char gC_JSOptionDescriptions[JSOPTION_COUNT][] =
 	"Print Failstats To Chat - 0 = Disabled, 1 = Enabled", 
 	"Always show jumpstats, even for invalid jumps - 0 = Disabled, 1 = Enabled", 
 	"Extended Chat Report - 0 = Disabled, 1 = Enabled",
+	"Print Individual Strafe Sync To Chat - 0 = Disabled, 1 = Enabled",
 	"Minimum Jump Tier for Jumpstat Chat Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker",
 	"Minimum Jump Tier for Jumpstat Sound Broadcast - 0 = Disabled, 1 = Meh+, 2 = Impressive+, 3 = Perfect+, 4 = Godlike+, 5 = Ownage+, 6 = Wrecker"
 };
@@ -216,6 +220,7 @@ stock char gI_JSOptionPhrases[JSOPTION_COUNT][] =
 	"Options Menu - Failstats Chat Report", 
 	"Options Menu - Jumpstats Always", 
 	"Options Menu - Extended Jump Chat Report",
+	"Options Menu - Strafe Sync Chat",
 	"Options Menu - Minimal Jump Chat Broadcast Tier",
 	"Options Menu - Minimal Jump Sound Broadcast Tier"
 };
@@ -230,6 +235,7 @@ stock int gI_JSOptionDefaults[JSOPTION_COUNT] =
 	JSToggleOption_Disabled, 
 	JSToggleOption_Disabled, 
 	JSToggleOption_Disabled,
+	JSToggleOption_Disabled,
 	DistanceTier_Ownage,
 	DistanceTier_None
 };
@@ -243,6 +249,7 @@ stock int gI_JSOptionCounts[JSOPTION_COUNT] =
 	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT, 
 	JSTOGGLEOPTION_COUNT, 
+	JSTOGGLEOPTION_COUNT,
 	JSTOGGLEOPTION_COUNT,
 	DISTANCETIER_COUNT, 
 	DISTANCETIER_COUNT
@@ -274,6 +281,7 @@ enum struct Jump
 	float preSpeed;
 	float sync;
 	float width;
+	float estimatedDuckedDistance;
 	
 	// For the 'always' stats
 	float miss;
