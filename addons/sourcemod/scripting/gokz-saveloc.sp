@@ -356,10 +356,7 @@ public Action Command_LoadLoc(int client, int args)
 		
 		if (IsValidLocationId(id))
 		{
-			if (LoadLocation(client, id))
-			{
-				gF_LastLoadlocTime[client] = GetGameTime();
-			}
+			LoadLocation(client, id);
 		}
 		else
 		{
@@ -643,6 +640,7 @@ bool LoadLocation(int client, int id)
 	if (loc.Load(client))
 	{
 		gB_UsedLoc[client] = true;
+		gF_LastLoadlocTime[client] = GetGameTime();
 		if (gB_GOKZHUD)
 		{
 			GOKZ_HUD_ForceUpdateTPMenu(client);
