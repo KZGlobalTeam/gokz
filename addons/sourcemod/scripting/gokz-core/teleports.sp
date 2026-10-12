@@ -175,12 +175,15 @@ ArrayList GetCheckpointData(int client)
 		// No checkpoint was made, return empty ArrayList
 		return checkpointData;
 	}
+	Checkpoint cp;
 	for (int i = checkpointIndexStart[client]; i != checkpointIndexEnd[client]; i = NextIndex(i, GOKZ_MAX_CHECKPOINTS))
 	{
-		Checkpoint cp;
 		checkpoints[client].GetArray(i, cp);
 		checkpointData.PushArray(cp);
 	}
+	// The end index is inclusive.
+	checkpoints[client].GetArray(checkpointIndexEnd[client], cp);
+	checkpointData.PushArray(cp);
 	return checkpointData;
 }
 
