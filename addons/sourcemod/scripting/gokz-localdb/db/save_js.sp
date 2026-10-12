@@ -53,7 +53,7 @@ public void OnLanding_SaveJumpstat(Jump jump)
 static DataPack JSRecord_FillDataPack(Jump jump, int steamid, int mode, bool blockJump)
 {
 	DataPack data = new DataPack();
-	data.WriteCell(jump.jumper);
+	data.WriteCell(GetClientUserId(jump.jumper));
 	data.WriteCell(steamid);
 	data.WriteCell(jump.type);
 	data.WriteCell(mode);
@@ -70,7 +70,7 @@ static DataPack JSRecord_FillDataPack(Jump jump, int steamid, int mode, bool blo
 public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
-	int client = data.ReadCell();
+	int client = GetClientOfUserId(data.ReadCell());
 	int steamid = data.ReadCell();
 	int jumpType = data.ReadCell();
 	int mode = data.ReadCell();
@@ -140,7 +140,7 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
-	int client = data.ReadCell();
+	int client = GetClientOfUserId(data.ReadCell());
 	data.ReadCell();
 	int jumpType = data.ReadCell();
 	int mode = data.ReadCell();
