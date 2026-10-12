@@ -196,6 +196,7 @@ public void OnMapStart()
 public void OnClientPutInServer(int client)
 {
 	gF_LastLoadlocTime[client] = 0.0;
+	gI_MostRecentLocation[client] = -1;
 }
 
 public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
