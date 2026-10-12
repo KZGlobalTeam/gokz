@@ -130,6 +130,7 @@ void GivePistol(int client, int pistol)
 	if (currentPistol != -1)
 	{
 		RemovePlayerItem(client, currentPistol);
+		RemoveEntity(currentPistol);
 	}
 
 	if (pistol == Pistol_Disabled)
