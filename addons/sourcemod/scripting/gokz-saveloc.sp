@@ -714,6 +714,7 @@ void ClearLocations()
 		// Prevent memory leak
 		gA_Locations.GetArray(i, loc);
 		delete loc.checkpointData;
+		delete loc.undoTeleportData;
 	}
 	gA_Locations.Clear();
 	for (int i = 1; i <= MaxClients; i++)
