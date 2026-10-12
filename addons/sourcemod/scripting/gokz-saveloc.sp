@@ -327,7 +327,14 @@ public Action Command_LoadLoc(int client, int args)
 	{
 		// load most recent location
 		int id = gI_MostRecentLocation[client];
-		LoadLocation(client, id);
+		if (IsValidLocationId(id))
+		{
+			LoadLocation(client, id);
+		}
+		else
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Location Not Found");
+		}
 	}
 	else if (args == 1)
 	{
@@ -429,8 +436,12 @@ public Action Command_NameLoc(int client, int args)
 		char arg[MAX_LOCATION_NAME_LENGTH];
 		GetCmdArg(1, arg, sizeof(arg));
 		int id = gI_MostRecentLocation[client];
-		
-		if (IsValidLocationName(arg) && IsClientLocationCreator(client, id))
+
+		if (!IsValidLocationId(id))
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Location Not Found");
+		}
+		else if (IsValidLocationName(arg) && IsClientLocationCreator(client, id))
 		{
 			NameLocation(client, id, arg);
 		}
