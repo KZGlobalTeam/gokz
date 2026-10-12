@@ -30,6 +30,14 @@ void DB_SetCheater(int cheaterClient, bool cheater)
 
 void DB_SetCheaterSteamID(int client, int cheaterSteamID, bool cheater)
 {
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (IsClientAuthorized(i) && GetSteamAccountID(i) == cheaterSteamID)
+		{
+			gB_Cheater[i] = cheater;
+		}
+	}
+	
 	DataPack data = new DataPack();
 	data.WriteCell(client == 0 ? -1 : GetClientUserId(client)); // -1 if called from server console
 	data.WriteCell(cheaterSteamID);
