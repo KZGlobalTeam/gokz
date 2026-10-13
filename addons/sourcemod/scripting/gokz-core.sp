@@ -150,6 +150,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_VirtualButtons(client);
 	OnClientPutInServer_Options(client);
 	OnClientPutInServer_MapTriggers(client);
+	OnClientPutInServer_MapZones(client);
 	OnClientPutInServer_Triggerfix(client);
 	OnClientPutInServer_Noclip(client);
 	OnClientPutInServer_Turnbinds(client);
@@ -164,6 +165,7 @@ public void OnClientDisconnect(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+	OnPlayerRunCmd_MapZones(client); // First, before anything reads the timer
 	gI_CmdNum[client] = cmdnum;
 	gI_TickCount[client] = tickcount;
 	OnPlayerRunCmd_Triggerfix(client);
@@ -257,6 +259,7 @@ public void Hook_PlayerSpawnPost(int client)
 public void Hook_PlayerPostThink(int client)
 {
 	Hook_PlayerPostThink_Triggerfix(client);
+	Hook_PlayerPostThink_MapZones(client); // After triggerfix, which can touch start zones
 }
 
 public void Hook_PlayerPostThinkPost(int client)
