@@ -302,6 +302,11 @@ public void GOKZ_OnOptionsLoaded(int client)
 	}
 }
 
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
+{
+	OnOptionChanged_ReplayControls(client, option, newValue);
+}
+
 // =====[ PRIVATE ]=====
 
 static void HookEvents()
