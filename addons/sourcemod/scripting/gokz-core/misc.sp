@@ -507,7 +507,7 @@ void OnPlayerSpawn_FirstSpawn(int client)
 
 void OnConfigsExecuted_TimeLimit()
 {
-	CreateTimer(1.0, Timer_TimeLimit, _, TIMER_REPEAT);
+	CreateTimer(1.0, Timer_TimeLimit, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Timer_TimeLimit(Handle timer)

@@ -167,17 +167,22 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 		return;
 	}
 	
+	// Chat gets double formatted, so replace '%' with '%%%%' to end up with '%'
+	char chatMessage[128];
+	strcopy(chatMessage, sizeof(chatMessage), sanitisedMessage);
+	ReplaceString(chatMessage, sizeof(chatMessage), "%", "%%%%");
+	
 	if (IsSpectating(client))
 	{
 		GOKZ_PrintToChatAll(false, "{default}* %s%s{lime}%s{default} : %s",
-							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, chatMessage);
 		PrintToConsoleAll("* %s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 		PrintToServer("* %s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 	}
 	else
 	{
 		GOKZ_PrintToChatAll(false, "%s%s{lime}%s{default} : %s",
-							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, chatMessage);
 		PrintToConsoleAll("%s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 		PrintToServer("%s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 	}
@@ -207,8 +212,6 @@ void SanitiseChatInput(char[] message, int maxlength)
 {
 	Color_StripFromChatText(message, message, maxlength);
 	CRemoveColors(message, maxlength);
-	// Chat gets double formatted, so replace '%' with '%%%%' to end up with '%'
-	ReplaceString(message, maxlength, "%", "%%%%");
 }
 
 

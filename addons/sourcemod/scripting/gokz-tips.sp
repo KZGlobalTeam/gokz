@@ -180,6 +180,8 @@ void LoadTipPhrases()
 	}
 
 	ShuffleTipPhrases();
+	// The list may have shrunk.
+	gI_CurrentTip = 0;
 }
 
 void LoadTipPhrasesFromFile(const char[] filePath)
