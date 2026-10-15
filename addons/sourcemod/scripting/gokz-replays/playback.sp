@@ -1329,12 +1329,14 @@ public void RequestFrame_SetBotStuff(int userid)
 	if (currentPistol != -1)
 	{
 		RemovePlayerItem(client, currentPistol);
+		RemoveEntity(currentPistol);
 	}
 	
 	int currentKnife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
 	if (currentKnife != -1)
 	{
 		RemovePlayerItem(client, currentKnife);
+		RemoveEntity(currentKnife);
 	}
 
 	char weaponName[128];
