@@ -53,7 +53,7 @@ public void OnLanding_SaveJumpstat(Jump jump)
 static DataPack JSRecord_FillDataPack(Jump jump, int steamid, int mode, bool blockJump)
 {
 	DataPack data = new DataPack();
-	data.WriteCell(jump.jumper);
+	data.WriteCell(GetClientUserId(jump.jumper));
 	data.WriteCell(steamid);
 	data.WriteCell(jump.type);
 	data.WriteCell(mode);
@@ -70,7 +70,7 @@ static DataPack JSRecord_FillDataPack(Jump jump, int steamid, int mode, bool blo
 public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
-	int client = data.ReadCell();
+	int client = GetClientOfUserId(data.ReadCell());
 	int steamid = data.ReadCell();
 	int jumpType = data.ReadCell();
 	int mode = data.ReadCell();
@@ -140,7 +140,7 @@ public void DB_TxnSuccess_LookupJSRecordForSave(Handle db, DataPack data, int nu
 public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
 {
 	data.Reset();
-	int client = data.ReadCell();
+	int client = GetClientOfUserId(data.ReadCell());
 	data.ReadCell();
 	int jumpType = data.ReadCell();
 	int mode = data.ReadCell();
@@ -188,6 +188,17 @@ public void DB_TxnSuccess_SaveJSRecord(Handle db, DataPack data, int numQueries,
 	Call_OnJumpstatPB(client, jumpType, mode, distanceFloat, block, strafes, syncFloat, preFloat, maxFloat, airtime);
 }
 
+static void ClearCacheOfSteamID(int steamAccountID)
+{
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientAuthorized(client) && GetSteamAccountID(client) == steamAccountID)
+		{
+			ClearCache(client);
+		}
+	}
+}
+
 public void DB_DeleteBestJump(int client, int steamAccountID, int jumpType, int mode, int isBlock)
 {
 	DataPack data = new DataPack();
@@ -224,7 +235,7 @@ public void DB_TxnSuccess_BestJumpDeleted(Handle db, DataPack data, int numQueri
 		FormatEx(blockString, sizeof(blockString), "%T ", "Block", client);
 	}
 	
-	ClearCache(client);
+	ClearCacheOfSteamID(steamAccountID);
 	
 	GOKZ_PrintToChatAndLog(client, true, "%t", "Best Jump Deleted", 
 		gC_ModeNames[mode], 
@@ -257,7 +268,7 @@ public void DB_TxnSuccess_AllJumpsDeleted(Handle db, DataPack data, int numQueri
 	int steamAccountID = data.ReadCell();
 	delete data;
 	
-	ClearCache(client);
+	ClearCacheOfSteamID(steamAccountID);
 	
 	GOKZ_PrintToChatAndLog(client, true, "%t", "All Jumps Deleted", 
 		steamAccountID & 1,
