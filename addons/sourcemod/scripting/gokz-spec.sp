@@ -288,6 +288,11 @@ public Action CommandSpecs(int client, int args)
 	else
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Spectator List", specs, specNames);
+		if (target == -1)
+		{
+			// No target in free-look.
+			return Plugin_Handled;
+		}
 		if (targetSpecs == 0)
 		{
 			GOKZ_PrintToChat(client, false, "%t", "Target Spectator List (None)", target);
