@@ -37,7 +37,7 @@ public void DB_TxnSuccess_CacheJSPBs(Handle db, int userID, int numQueries, Hand
 		mode = SQL_FetchInt(results[0], 1);
 		jumpType = SQL_FetchInt(results[0], 2);
 		
-		gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] = block;
+		gI_PBJSCache[client][mode][jumpType][JumpstatDB_Cache_Distance] = distance;
 	}
 	
 	while (SQL_FetchRow(results[1]))

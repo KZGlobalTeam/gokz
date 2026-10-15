@@ -21,6 +21,14 @@
 		"chi"		"{darkred}当前没有可用的回放机器人."
 		"ru"		"{darkred}В настоящее время нет доступных ботов воспроизведения."
 	}
+	"Bot Add Failed"
+	{
+		"en"		"{red}Failed to add a replay bot."
+	}
+	"Server Full"
+	{
+		"en"		"{red}The server is full, so no replay bot can be added!"
+	}
 	"No Replay Found"
 	{
 		"en"		"{red}No replay found!"
@@ -115,6 +123,10 @@
 		"chi"		"自由视角"
 		"ru"		"Свободная камера"
 	}
+	"Replay Controls - Back To Bot"
+	{
+		"en"		"Back to bot"
+	}
 	"Replay Controls - Exit"
 	{
 		"en"		"Exit"
@@ -125,5 +137,17 @@
 		"en"		"{red}Invalid Time."
 		"chi"		"{red}无效的计时."
 		"ru"		"{red}Неправильное время."
+	}
+	"Replay Controls - Bot Controlled"
+	{
+		"en"		"{red}Another player is controlling this replay bot!"
+	}
+	"Replay Controls - Not Spectating Bot"
+	{
+		"en"		"{red}You are not spectating a replay bot!"
+	}
+	"Replay Controls - Not Controlling Bot"
+	{
+		"en"		"{red}You are not controlling this replay bot! Use !rpcontrols to take control."
 	}
 }

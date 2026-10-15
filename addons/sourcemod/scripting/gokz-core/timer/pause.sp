@@ -243,6 +243,12 @@ void OnJoinTeam_Pause(int client, int team)
 	// Only handle joining spectators. Joining other teams is handled by OnPlayerSpawn.
 	if (team == CS_TEAM_SPECTATOR)
 	{
+		// Players who were already paused keep the values from that pause.
+		if (!paused[client])
+		{
+			lastDuckValue[client] = Movement_GetDuckSpeed(client);
+			lastStaminaValue[client] = GetEntPropFloat(client, Prop_Send, "m_flStamina");
+		}
 		paused[client] = true;
 		
 		if (GetTimerRunning(client))

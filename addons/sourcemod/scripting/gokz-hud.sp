@@ -156,6 +156,7 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	}
 	else
 	{
+		OnPlayerRunCmdPost_TPMenuNoTarget(client, cmdnum);
 		return;
 	}
 
