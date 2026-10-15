@@ -12,7 +12,7 @@ void DB_SetupClient(int client)
 	}
 	
 	// Setup Client Step 1 - Upsert them into Players Table
-	char query[1024], name[MAX_NAME_LENGTH], nameEscaped[MAX_NAME_LENGTH * 2 + 1], clientIP[16], country[45];
+	char query[1024], name[MAX_NAME_LENGTH], nameEscaped[MAX_NAME_LENGTH * 2 + 1], clientIP[16], country[45], countryEscaped[45 * 2 + 1];
 	
 	int steamID = GetSteamAccountID(client);
 	if (!GetClientName(client, name, MAX_NAME_LENGTH))
@@ -31,6 +31,7 @@ void DB_SetupClient(int client)
 		LogMessage("Couldn't get country of %L (%s).", client, clientIP);
 		country = "Unknown";
 	}
+	SQL_EscapeString(gH_DB, country, countryEscaped, sizeof(countryEscaped));
 	
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
@@ -44,16 +45,16 @@ void DB_SetupClient(int client)
 		case DatabaseType_SQLite:
 		{
 			// UPDATE OR IGNORE
-			FormatEx(query, sizeof(query), sqlite_players_update, nameEscaped, country, clientIP, steamID);
+			FormatEx(query, sizeof(query), sqlite_players_update, nameEscaped, countryEscaped, clientIP, steamID);
 			txn.AddQuery(query);
 			// INSERT OR IGNORE
-			FormatEx(query, sizeof(query), sqlite_players_insert, nameEscaped, country, clientIP, steamID);
+			FormatEx(query, sizeof(query), sqlite_players_insert, nameEscaped, countryEscaped, clientIP, steamID);
 			txn.AddQuery(query);
 		}
 		case DatabaseType_MySQL:
 		{
 			// INSERT ... ON DUPLICATE KEY ...
-			FormatEx(query, sizeof(query), mysql_players_upsert, nameEscaped, country, clientIP, steamID);
+			FormatEx(query, sizeof(query), mysql_players_upsert, nameEscaped, countryEscaped, clientIP, steamID);
 			txn.AddQuery(query);
 		}
 	}
