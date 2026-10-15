@@ -117,12 +117,15 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 	// Record buttons BEFORE checking for bhop
 	RecordButtons(client, buttons);
 	
+	bool jumpbug = Movement_GetJumpbugged(client);
+	
 	// If bhop was last tick, then record the pre bhop inputs.
 	// Require two times the button sample size since the last
 	// takeoff to avoid pre and post bhop input overlap.
+	// Jumpbugs land and take off in the same tick, so only the teleport check applies.
 	if (HitBhop(client, cmdnum)
 		 && cmdnum >= gI_BhopLastTakeoffCmdnum[client] + AC_MAX_BUTTON_SAMPLES * 2
-		 && gB_LastLandingWasValid[client])
+		 && (jumpbug ? cmdnum - gI_LastOriginTeleportCmdNum[client] > 1 : gB_LastLandingWasValid[client]))
 	{
 		gB_BhopHitPerf[client][nextIndex] = Movement_GetHitPerf(client);
 		gI_BhopPreJumpInputs[client][nextIndex] = CountJumpInputs(client);
@@ -192,7 +195,7 @@ void OnPlayerRunCmdPost_BhopTracking(int client, int buttons, int cmdnum)
 		// before landing and none after landing. We require the one input to be right
 		// before the jump to make it a lot harder to fake a binded jump when doing
 		// a regular longjump.
-		gB_BindExceptionPending[client] = (CountJumpInputs(client, AC_BINDEXCEPTION_SAMPLES) == 1 && CountJumpInputs(client, AC_MAX_BUTTON_SAMPLES) == 1);
+		gB_BindExceptionPending[client] = !jumpbug && (CountJumpInputs(client, AC_BINDEXCEPTION_SAMPLES) == 1 && CountJumpInputs(client, AC_MAX_BUTTON_SAMPLES) == 1);
 		gB_BindExceptionPostPending[client] = false;
 	}
 }
