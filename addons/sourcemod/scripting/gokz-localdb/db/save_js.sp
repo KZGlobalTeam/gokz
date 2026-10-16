@@ -6,6 +6,11 @@
 
 public void OnLanding_SaveJumpstat(Jump jump)
 {
+	if (!gB_ClientSetUp[jump.jumper])
+	{
+		return;
+	}
+	
 	int mode = GOKZ_GetCoreOption(jump.jumper, Option_Mode);
 	
 	// No tiers given for 'Invalid' jumps.
