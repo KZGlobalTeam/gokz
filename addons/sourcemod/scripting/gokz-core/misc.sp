@@ -749,7 +749,7 @@ static int FindUseEntity(int client)
 	// If there is, we will press two buttons at once, the "right" button found by this function and the "wrong" button that we only happen to press because
 	// there is a player in the way.
 	
-	trace = TR_TraceRayFilterEx(eyeOrigin, nearestPoint, useableContents, RayType_EndPoint, TRFOtherPlayersOnly);
+	trace = TR_TraceRayFilterEx(eyeOrigin, nearestPoint, useableContents, RayType_EndPoint, TRFOtherPlayersOnly, client);
 	bool playerInWay = TR_DidHit(trace);
 	delete trace;
 	if (playerInWay)
