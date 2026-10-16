@@ -256,6 +256,11 @@ public void Hook_PlayerSpawnPost(int client)
 	}
 }
 
+public void Hook_PlayerPreThinkPost(int client)
+{
+	OnClientPreThinkPost_UseButtons(client);
+}
+
 public void Hook_PlayerPostThink(int client)
 {
 	Hook_PlayerPostThink_Triggerfix(client);
@@ -508,6 +513,7 @@ static void HookClientEvents(int client)
 {
 	DHookEntity(gH_DHooks_OnTeleport, true, client);
 	DHookEntity(gH_DHooks_SetModel, true, client);
+	SDKHook(client, SDKHook_PreThinkPost, Hook_PlayerPreThinkPost);
 	SDKHook(client, SDKHook_PostThink, Hook_PlayerPostThink);
 	SDKHook(client, SDKHook_PostThinkPost, Hook_PlayerPostThinkPost);
 	SDKHook(client, SDKHook_SpawnPost, Hook_PlayerSpawnPost);
