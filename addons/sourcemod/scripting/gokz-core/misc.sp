@@ -713,7 +713,7 @@ static int FindUseEntity(int client)
 			float dir[3];
 			for (int j = 0; j < 3; j++)
 			{
-				dir[j] = point[j] - eyeOrigin[2];
+				dir[j] = point[j] - eyeOrigin[j];
 			}
 			// Check the maximum angle the player can be away from the button.
 			float minimumDot = GetEntPropFloat(ent, Prop_Send, "m_flUseLookAtAngle");
