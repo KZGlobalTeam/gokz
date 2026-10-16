@@ -609,7 +609,7 @@ void OnMapStart_FixMissingSpawns()
 
 void OnClientPreThinkPost_UseButtons(int client)
 {
-	if (GOKZ_GetCoreOption(client, Option_ButtonThroughPlayers) == ButtonThroughPlayers_Enabled && GetEntProp(client, Prop_Data, "m_afButtonPressed") & IN_USE)
+	if (IsPlayerAlive(client) && GOKZ_GetCoreOption(client, Option_ButtonThroughPlayers) == ButtonThroughPlayers_Enabled && GetEntProp(client, Prop_Data, "m_afButtonPressed") & IN_USE)
 	{
 		int entity = FindUseEntity(client);
 		if (entity != -1)
