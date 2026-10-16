@@ -92,14 +92,15 @@ bool UpdateReplayControlMenu(int client)
 		return false;
 	}
 	
+	bool hudMenuShowing = gB_GOKZHUD && GOKZ_HUD_GetMenuShowing(client);
 	// We have to update this often if bot uses teleports.
 	if (GetClientMenu(client) == MenuSource_None || 
-		GOKZ_HUD_GetMenuShowing(client) && GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
-		GOKZ_HUD_GetMenuShowing(client) && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu ||
-		GOKZ_HUD_GetMenuShowing(client) && PlaybackGetTeleports(bot) > 0 ||
+		hudMenuShowing && GetClientAvgLoss(client, NetFlow_Both) > EPSILON || 
+		hudMenuShowing && GOKZ_HUD_GetOption(client, HUDOption_TimerText) == TimerText_TPMenu ||
+		hudMenuShowing && PlaybackGetTeleports(bot) > 0 ||
 		// The last item depends on freecam, and nothing else redraws the menu when
 		// only that changes, such as entering freecam with the spectator mode key.
-		GOKZ_HUD_GetMenuShowing(client) && menuDrawnInFreecam[client] != (GetObserverMode(client) == ObsMode_Roaming))
+		hudMenuShowing && menuDrawnInFreecam[client] != (GetObserverMode(client) == ObsMode_Roaming))
 	{
 		botTeleports[bot] = PlaybackGetTeleports(bot);
 		ShowReplayControlMenu(client, bot);
@@ -262,11 +263,17 @@ int MenuHandler_ReplayControls(Menu menu, MenuAction action, int param1, int par
 			{
 				SpectateBot(param1, bot);
 			}
-			GOKZ_HUD_SetMenuShowing(param1, false);
+			if (gB_GOKZHUD)
+			{
+				GOKZ_HUD_SetMenuShowing(param1, false);
+			}
 		}
 		case MenuAction_Cancel:
 		{
-			GOKZ_HUD_SetMenuShowing(param1, false);
+			if (gB_GOKZHUD)
+			{
+				GOKZ_HUD_SetMenuShowing(param1, false);
+			}
 			if (param2 == MenuCancel_Exit)
 			{
 				// The menu is already closing, so release without closing it again.
