@@ -13,7 +13,7 @@ public Action GOKZ_OnEmitSoundToClient(int client, const char[] sample, float &v
 			return Plugin_Continue;
 		}
 	}
-	else if (StrEqual(description, "Checkpoint"))
+	else if (StrEqual(description, "Teleport"))
 	{
 		volumeFactor = GOKZ_QT_GetOption(client, QTOption_TeleportVolume);
 		if (volumeFactor == -1)
