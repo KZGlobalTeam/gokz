@@ -341,7 +341,7 @@ enum struct JumpTracker
 		{
 			// Check for no offset
 			// The origin and offset is now correct, no workaround needed
-			if (FloatAbs(this.jump.offset) < JS_OFFSET_EPSILON && this.lastType == JumpType_LongJump)
+			if (FloatAbs(this.jump.offset) < JS_OFFSET_EPSILON && this.lastType == JumpType_LongJump && !this.HitHeadRecently())
 			{
 				return JumpType_Jumpbug;
 			}
