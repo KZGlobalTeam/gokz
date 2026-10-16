@@ -694,7 +694,7 @@ static int FindUseEntity(int client)
 		}
 	}
 	
-	int nearestEntity;
+	int nearestEntity = -1;
 	float nearestPoint[3];
 	float nearestDist = FLOAT_MAX;
 	ArrayList entities = new ArrayList();
@@ -740,6 +740,10 @@ static int FindUseEntity(int client)
 		}
 	}
 	delete entities;
+	if (nearestEntity == -1)
+	{
+		return -1;
+	}
 	// We found the closest button, but we still need to check if there is a player in front of it or not.
 	// In the case that there isn't a player inbetween, we don't return the entity index, because that button will be pressed by the game function anyway.
 	// If there is, we will press two buttons at once, the "right" button found by this function and the "wrong" button that we only happen to press because
