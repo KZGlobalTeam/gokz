@@ -639,12 +639,8 @@ static int FindUseEntity(int client)
 	bool hitPlayer = TR_DidHit(trace);
 	int hitEntity = TR_GetEntityIndex(trace);
 	delete trace;
-	if (hitPlayer)
+	if (hitPlayer && 0 < hitEntity <= MaxClients)
 	{
-		if (hitEntity < 1 || hitEntity > MaxClients)
-		{
-			return -1;
-		}
 		// Search for a button behind it.
 		trace = TR_TraceRayFilterEx(eyeOrigin, angles, useableContents, RayType_Infinite, TraceEntityFilterPlayers);
 		bool hitBehind = TR_DidHit(trace);
