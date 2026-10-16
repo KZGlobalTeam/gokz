@@ -21,7 +21,7 @@ void DisplayReplayModeMenu(int client)
 	
 	Menu menu = new Menu(MenuHandler_ReplayMode);
 	menu.SetTitle("%T", "Replay Menu (Mode) - Title", client, gC_CurrentMap);
-	GOKZ_MenuAddModeItems(client, menu, false);
+	GOKZ_MenuAddModeItems(client, menu, true);
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
