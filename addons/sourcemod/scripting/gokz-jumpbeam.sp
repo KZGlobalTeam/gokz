@@ -34,7 +34,6 @@ int gI_BeamModel;
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
 TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
-TopMenuObject gTMO_ItemBeamOffset;
 
 
 
@@ -383,7 +382,7 @@ void OnOptionsMenuReady_OptionsMenu(TopMenu topMenu)
 		gTMO_ItemsJB[option] = gTM_Options.AddItem(gC_JBOptionNames[option], TopMenuHandler_General, gTMO_CatGeneral);
 	}
 	
-	gTMO_ItemBeamOffset = gTM_Options.AddItem("GOKZ JB - Beam Offset", TopMenuHandler_BeamOffset, gTMO_CatGeneral);
+	gTM_Options.AddItem("GOKZ JB - Beam Offset", TopMenuHandler_BeamOffset, gTMO_CatGeneral);
 }
 
 public void TopMenuHandler_General(TopMenu topmenu, TopMenuAction action, TopMenuObject topobj_id, int param, char[] buffer, int maxlength)
