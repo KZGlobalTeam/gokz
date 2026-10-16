@@ -4,12 +4,9 @@
 
 
 
+// ITEM_INFO_ABORT, _MODE, _COURSE and _TELEPORT come from duel_menu.sp
 #define ITEM_INFO_START "st"
-#define ITEM_INFO_ABORT "ab"
 #define ITEM_INFO_INVITE "iv"
-#define ITEM_INFO_MODE "md"
-#define ITEM_INFO_COURSE "co"
-#define ITEM_INFO_TELEPORT "tp"
 
 static int raceMenuMode[MAXPLAYERS + 1];
 static int raceMenuCourse[MAXPLAYERS + 1];

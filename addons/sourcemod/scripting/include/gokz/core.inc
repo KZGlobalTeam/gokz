@@ -1785,7 +1785,7 @@ stock int GOKZ_MatchIntFromEntityName(int entity, Regex re, int substringID)
 	
 	if (re.Match(buffer) > 0)
 	{
-		re.GetSubString(1, buffer, sizeof(buffer));
+		re.GetSubString(substringID, buffer, sizeof(buffer));
 		num = StringToInt(buffer);
 	}
 	
