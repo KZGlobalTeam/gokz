@@ -1034,7 +1034,7 @@ stock int GOKZGetClientFromGameMovementAddress(Address addr, int offsetCGameMove
 stock void CalcNearestPoint(int entity, float origin[3], float result[3])
 {
 	float entOrigin[3], entMins[3], entMaxs[3], trueMins[3], trueMaxs[3];
-	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", entOrigin);
+	GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", entOrigin);
 	GetEntPropVector(entity, Prop_Send, "m_vecMaxs", entMaxs);
 	GetEntPropVector(entity, Prop_Send, "m_vecMins", entMins);
 
