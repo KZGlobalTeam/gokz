@@ -1826,7 +1826,7 @@ stock void GOKZ_EmitSoundToClientSpectators(int client, const char[] sample, flo
 	{
 		if (IsValidClient(i) && GetObserverTarget(i) == client)
 		{
-			GOKZ_EmitSoundToClient(i, sample, volume);
+			GOKZ_EmitSoundToClient(i, sample, volume, description);
 		}
 	}
 }
