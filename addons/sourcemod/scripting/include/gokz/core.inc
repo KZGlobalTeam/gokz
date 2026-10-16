@@ -1642,7 +1642,7 @@ stock void GOKZ_MenuAddModeItems(int client, Menu menu, bool disableUnloadedMode
 			Format(display, sizeof(display), "%s*", display);
 		}
 		
-		if (GOKZ_GetModeLoaded(mode))
+		if (!disableUnloadedModes || GOKZ_GetModeLoaded(mode))
 		{
 			menu.AddItem("", display, ITEMDRAW_DEFAULT);
 		}
