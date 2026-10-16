@@ -636,19 +636,24 @@ static int FindUseEntity(int client)
 
 	// Check if +use trace collide with a player first, so we don't activate any button twice
 	trace = TR_TraceRayFilterEx(eyeOrigin, angles, useableContents, RayType_Infinite, TRFOtherPlayersOnly, client);
-	if (TR_DidHit(trace))
+	bool hitPlayer = TR_DidHit(trace);
+	int hitEntity = TR_GetEntityIndex(trace);
+	delete trace;
+	if (hitPlayer)
 	{
-		int ent = TR_GetEntityIndex(trace);
-		if (ent < 1 || ent > MaxClients)
+		if (hitEntity < 1 || hitEntity > MaxClients)
 		{
 			return -1;
 		}
 		// Search for a button behind it.
 		trace = TR_TraceRayFilterEx(eyeOrigin, angles, useableContents, RayType_Infinite, TraceEntityFilterPlayers);
-		if (TR_DidHit(trace))
+		bool hitBehind = TR_DidHit(trace);
+		int ent = TR_GetEntityIndex(trace);
+		TR_GetEndPosition(endpos, trace);
+		delete trace;
+		if (hitBehind)
 		{
 			char buffer[20];
-			ent = TR_GetEntityIndex(trace);
 			// Make sure that it is a button, and this button activates when pressed.
 			// If it is not a button, check its parent to see if it is a button.
 			bool isButton;
@@ -667,7 +672,6 @@ static int FindUseEntity(int client)
 			}
 			if (isButton)
 			{
-				TR_GetEndPosition(endpos, trace);
 				float delta[3];
 				for (int i = 0; i < 2; i++)
 				{
@@ -724,7 +728,9 @@ static int FindUseEntity(int client)
 			if (dist < nearestDist)
 			{
 				trace = TR_TraceRayFilterEx(eyeOrigin, point, useableContents, RayType_EndPoint, TraceEntityFilterPlayers);
-				if (TR_GetFraction(trace) == 1.0 || TR_GetEntityIndex(trace) == ent)
+				bool reachable = TR_GetFraction(trace) == 1.0 || TR_GetEntityIndex(trace) == ent;
+				delete trace;
+				if (reachable)
 				{
 					CopyVector(point, nearestPoint);
 					nearestDist = dist;
@@ -733,13 +739,16 @@ static int FindUseEntity(int client)
 			}
 		}
 	}
+	delete entities;
 	// We found the closest button, but we still need to check if there is a player in front of it or not.
 	// In the case that there isn't a player inbetween, we don't return the entity index, because that button will be pressed by the game function anyway.
 	// If there is, we will press two buttons at once, the "right" button found by this function and the "wrong" button that we only happen to press because
 	// there is a player in the way.
 	
 	trace = TR_TraceRayFilterEx(eyeOrigin, nearestPoint, useableContents, RayType_EndPoint, TRFOtherPlayersOnly);
-	if (TR_DidHit(trace))
+	bool playerInWay = TR_DidHit(trace);
+	delete trace;
+	if (playerInWay)
 	{
 		return nearestEntity;
 	}
