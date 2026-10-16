@@ -443,6 +443,11 @@ static bool LoadPlayback(int client, int bot, char[] path)
 	}
 
 	File file = OpenFile(path, "rb");
+	if (file == null)
+	{
+		LogError("Failed to open replay file: \"%s\".", path);
+		return false;
+	}
 	
 	// Check magic number in header
 	int magicNumber;
