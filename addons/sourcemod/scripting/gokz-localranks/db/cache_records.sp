@@ -4,6 +4,12 @@
 
 
 
+// A map with a malformed course number would otherwise write past the caches
+bool ValidRecordCacheIndex(int course, int mode)
+{
+	return course >= 0 && course < GOKZ_MAX_COURSES && mode >= 0 && mode < MODE_COUNT;
+}
+
 void DB_CacheRecords(int mapID)
 {
 	char query[1024];
@@ -40,6 +46,10 @@ public void DB_TxnSuccess_CacheRecords(Handle db, any data, int numQueries, Hand
 	{
 		course = SQL_FetchInt(results[0], 1);
 		mode = SQL_FetchInt(results[0], 2);
+		if (!ValidRecordCacheIndex(course, mode))
+		{
+			continue;
+		}
 		gB_RecordExistsCache[course][mode][TimeType_Nub] = true;
 		gF_RecordTimesCache[course][mode][TimeType_Nub] = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[0], 0));
 	}
@@ -48,6 +58,10 @@ public void DB_TxnSuccess_CacheRecords(Handle db, any data, int numQueries, Hand
 	{
 		course = SQL_FetchInt(results[1], 1);
 		mode = SQL_FetchInt(results[1], 2);
+		if (!ValidRecordCacheIndex(course, mode))
+		{
+			continue;
+		}
 		gB_RecordExistsCache[course][mode][TimeType_Pro] = true;
 		gF_RecordTimesCache[course][mode][TimeType_Pro] = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[1], 0));
 	}
