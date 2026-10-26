@@ -33,6 +33,7 @@ bool gB_JBTakeoff[MAXPLAYERS + 1];
 bool gB_FastUpdateRate[MAXPLAYERS + 1];
 int gI_DynamicMenu[MAXPLAYERS + 1];
 
+#include "gokz-hud/spectate_name.sp"
 #include "gokz-hud/spectate_text.sp"
 #include "gokz-hud/commands.sp"
 #include "gokz-hud/hide_weapon.sp"
@@ -270,6 +271,10 @@ public void OnGameFrame()
 	if (GetGameTickCount() % 4 == 0)
 	{
 		UpdateSpecList();
+	}
+	if (GetGameTickCount() % 32 == 0)
+	{
+		OnGameFrame_SpectateName();
 	}
 }
 
