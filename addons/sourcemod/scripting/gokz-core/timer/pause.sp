@@ -102,6 +102,15 @@ bool CanPause(int client, bool showError = false)
 			}
 			return false;
 		}
+		else if (TriggerTouchesPending(client))
+		{
+			if (showError)
+			{
+				GOKZ_PrintToChat(client, true, "%t", "Can't Pause (Generic)");
+				GOKZ_PlayErrorSound(client);
+			}
+			return false;
+		}
 	}
 	
 	return true;

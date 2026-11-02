@@ -270,9 +270,36 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 static bool savedOnLadder[MAXPLAYERS + 1];
+static bool triggerTouchesPending[MAXPLAYERS + 1];
+static int triggerTouchesPendingTick[MAXPLAYERS + 1];
+
+// Client commands run before usercmds, so touches are stale until the player's next command
+bool TriggerTouchesPending(int client)
+{
+	return triggerTouchesPending[client];
+}
+
+void Hook_PlayerPostThink_JoinTeam(int client)
+{
+	if (!triggerTouchesPending[client])
+	{
+		return;
+	}
+
+	// The hold-still's no-trigger collision group keeps touches stale while it lasts,
+	// and the tick bound stops waiting if something else keeps the player in that
+	// group, such as gokz-saveloc restoring a saved collision group
+	if (GetEntProp(client, Prop_Send, "m_CollisionGroup") != GOKZ_COLLISION_GROUP_NOTRIGGER
+		 || GetGameTickCount() - triggerTouchesPendingTick[client] > GOKZ_TP_FREEZE_TICKS)
+	{
+		triggerTouchesPending[client] = false;
+	}
+}
 
 void OnClientPutInServer_JoinTeam(int client)
 {
+	triggerTouchesPending[client] = false;
+
 	// Automatically put the player on a team if he doesn't choose one.
 	// The mp_force_pick_time convar is the built in way to do this, but that obviously
 	// does not call GOKZ_JoinTeam which includes a fix for spawning in the void when
@@ -338,6 +365,8 @@ void JoinTeam(int client, int newTeam, bool restorePos, bool forceBroadcast = fa
 		if (restorePos && hasSavedPosition[client])
 		{
 			TeleportPlayer(client, savedOrigin[client], savedAngles[client]);
+			triggerTouchesPending[client] = true;
+			triggerTouchesPendingTick[client] = GetGameTickCount();
 			if (savedOnLadder[client])
 			{
 				player.Movetype = MOVETYPE_LADDER;

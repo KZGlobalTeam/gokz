@@ -135,6 +135,15 @@ bool CanMakeCheckpoint(int client, bool showError = false)
 		}
 		return false;
 	}
+	if (TriggerTouchesPending(client))
+	{
+		if (showError)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Can't Checkpoint (Generic)");
+			GOKZ_PlayErrorSound(client);
+		}
+		return false;
+	}
 	if (GetTimerRunning(client) && AntiCpTriggerIsTouched(client))
 	{
 		if (showError)

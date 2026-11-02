@@ -259,6 +259,7 @@ public void Hook_PlayerSpawnPost(int client)
 public void Hook_PlayerPostThink(int client)
 {
 	Hook_PlayerPostThink_Triggerfix(client);
+	Hook_PlayerPostThink_JoinTeam(client);
 	Hook_PlayerPostThink_MapZones(client); // After triggerfix, which can touch start zones
 }
 
