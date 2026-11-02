@@ -104,7 +104,7 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	
 	if (team == CS_TEAM_SPECTATOR)
 	{
-		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
+		if (!GOKZ_GetPaused(client) && !CanPause(client, true))
 		{
 			SendFakeTeamEvent(client);
 			return Plugin_Handled;
