@@ -100,11 +100,14 @@ stock void Movement_GetOriginEx(int client, float result[3])
 	GetClientAbsOrigin(client, startPosition);
 	endPosition = startPosition;
 	endPosition[2] = startPosition[2] - 2.0; // Should be less than 2.0 units away
+	float mins[3], maxs[3];
+	GetClientMins(client, mins);
+	GetClientMaxs(client, maxs);
 	Handle trace = TR_TraceHullFilterEx(
 		startPosition, 
 		endPosition, 
-		view_as<float>( { -16.0, -16.0, 0.0 } ),  // Players are 32 x 32 x 72
-		view_as<float>( { 16.0, 16.0, 72.0 } ), 
+		mins, 
+		maxs, 
 		MASK_PLAYERSOLID, 
 		TraceEntityFilterPlayers, 
 		client);
@@ -121,7 +124,7 @@ stock void Movement_GetOriginEx(int client, float result[3])
 	delete trace;
 }
 
-public bool TraceEntityFilterPlayers(int entity, int contentsMask)
+stock bool TraceEntityFilterPlayers(int entity, int contentsMask)
 {
 	return entity > MaxClients;
 }
@@ -183,7 +186,7 @@ stock void Movement_SetSpeed(int client, float value, bool applyBaseVel = false)
 {
 	float velocity[3];
 	Movement_GetVelocity(client, velocity);
-	SetVectorHorizontalLength(velocity, value)
+	SetVectorHorizontalLength(velocity, value);
 	if (applyBaseVel)
 	{
 		float baseVelocity[3];
