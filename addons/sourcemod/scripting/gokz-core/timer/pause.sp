@@ -248,14 +248,13 @@ void OnJoinTeam_Pause(int client, int team)
 		{
 			lastDuckValue[client] = Movement_GetDuckSpeed(client);
 			lastStaminaValue[client] = GetEntPropFloat(client, Prop_Send, "m_flStamina");
+			if (GetTimerRunning(client))
+			{
+				hasPausedInThisRun[client] = true;
+				lastPauseTime[client] = GetEngineTime();
+			}
 		}
 		paused[client] = true;
-		
-		if (GetTimerRunning(client))
-		{
-			hasPausedInThisRun[client] = true;
-			lastPauseTime[client] = GetEngineTime();
-		}
 		
 		// Call Post Forward
 		Call_GOKZ_OnPause_Post(client);
