@@ -7,7 +7,6 @@
 #include <gokz/localdb>
 #include <gokz/localranks>
 
-#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN

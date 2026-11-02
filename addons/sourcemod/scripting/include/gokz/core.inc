@@ -1562,7 +1562,7 @@ stock void GOKZ_PrintToChatAll(bool addPrefix, const char[] format, any...)
 		{
 			SetGlobalTransTarget(client);
 			VFormat(buffer, sizeof(buffer), format, 3);
-			GOKZ_PrintToChat(client, addPrefix, buffer);
+			GOKZ_PrintToChat(client, addPrefix, "%s", buffer);
 		}
 	}
 }
@@ -1586,7 +1586,7 @@ stock void GOKZ_PrintToChatSpectators(int client, bool addPrefix, const char[] f
 		{
 			SetGlobalTransTarget(target);
 			VFormat(buffer, sizeof(buffer), format, 4);
-			GOKZ_PrintToChat(target, addPrefix, buffer);
+			GOKZ_PrintToChat(target, addPrefix, "%s", buffer);
 		}
 	}
 }

@@ -154,7 +154,7 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 		LogMessage(colorlessBuffer);
 	}
 	
-	if (client != 0)
+	if (client != 0 && ((IsValidClient(client) && !IsFakeClient(client)) || IsClientSourceTV(client)))
 	{
 		if (addPrefix)
 		{
@@ -163,7 +163,8 @@ static int NativeHelper_PrintToChatOrLog(bool alwaysLog)
 			Format(buffer, sizeof(buffer), "%s%s", prefix, buffer);
 		}
 
-		CPrintToChat(client, "%s", buffer);
+		Color_ReplaceChatTags(buffer, sizeof(buffer));
+		PrintToChat(client, " \x01%s", buffer);
 	}
 	return 0;
 }

@@ -28,6 +28,28 @@ enum ObsMode
 	ObsMode_Roaming // Free roaming
 };
 
+enum
+{
+	ChatColor_Default = 0,
+	ChatColor_TeamColor,
+	ChatColor_Red,
+	ChatColor_LightRed,
+	ChatColor_DarkRed,
+	ChatColor_BlueGrey,
+	ChatColor_Blue,
+	ChatColor_DarkBlue,
+	ChatColor_Purple,
+	ChatColor_Orchid,
+	ChatColor_Yellow,
+	ChatColor_Gold,
+	ChatColor_LightGreen,
+	ChatColor_Green,
+	ChatColor_Lime,
+	ChatColor_Grey,
+	ChatColor_Grey2,
+	CHATCOLOR_COUNT
+};
+
 
 
 // =====[ CONSTANTS ]=====
@@ -46,6 +68,48 @@ enum ObsMode
 stock float PLAYER_MINS[3] = {-16.0, -16.0, 0.0};
 stock float PLAYER_MAXS[3] = {16.0, 16.0, 72.0};
 stock float PLAYER_MAXS_DUCKED[3] = {16.0, 16.0, 54.0};
+
+stock char gC_ChatColorTags[CHATCOLOR_COUNT][] =
+{
+	"{default}",
+	"{teamcolor}",
+	"{red}",
+	"{lightred}",
+	"{darkred}",
+	"{bluegrey}",
+	"{blue}",
+	"{darkblue}",
+	"{purple}",
+	"{orchid}",
+	"{yellow}",
+	"{gold}",
+	"{lightgreen}",
+	"{green}",
+	"{lime}",
+	"{grey}",
+	"{grey2}"
+};
+
+stock char gC_ChatColorCodes[CHATCOLOR_COUNT][] =
+{
+	"\x01",
+	"\x03",
+	"\x07",
+	"\x0F",
+	"\x02",
+	"\x0A",
+	"\x0B",
+	"\x0C",
+	"\x03",
+	"\x0E",
+	"\x09",
+	"\x10",
+	"\x05",
+	"\x04",
+	"\x06",
+	"\x08",
+	"\x0D"
+};
 
 
 
@@ -327,6 +391,20 @@ stock void Color_StripFromChatText(const char[] input, char[] output, int size)
 	}
 
 	output[x] = '\0';
+}
+
+/**
+ * Replaces {color} tags with CS:GO chat colour codes.
+ *
+ * @param buffer			String to process in place.
+ * @param size				Size of buffer.
+ */
+stock void Color_ReplaceChatTags(char[] buffer, int size)
+{
+	for (int i = 0; i < CHATCOLOR_COUNT; i++)
+	{
+		ReplaceString(buffer, size, gC_ChatColorTags[i], gC_ChatColorCodes[i], false);
+	}
 }
 
 /**
