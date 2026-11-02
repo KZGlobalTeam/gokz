@@ -48,6 +48,10 @@ public void DB_TxnSuccess_CachePBs(Handle db, int userID, int numQueries, Handle
 	{
 		course = SQL_FetchInt(results[0], 1);
 		mode = SQL_FetchInt(results[0], 2);
+		if (!ValidRecordCacheIndex(course, mode))
+		{
+			continue;
+		}
 		gB_PBExistsCache[client][course][mode][TimeType_Nub] = true;
 		gF_PBTimesCache[client][course][mode][TimeType_Nub] = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[0], 0));
 	}
@@ -56,6 +60,10 @@ public void DB_TxnSuccess_CachePBs(Handle db, int userID, int numQueries, Handle
 	{
 		course = SQL_FetchInt(results[1], 1);
 		mode = SQL_FetchInt(results[1], 2);
+		if (!ValidRecordCacheIndex(course, mode))
+		{
+			continue;
+		}
 		gB_PBExistsCache[client][course][mode][TimeType_Pro] = true;
 		gF_PBTimesCache[client][course][mode][TimeType_Pro] = GOKZ_DB_TimeIntToFloat(SQL_FetchInt(results[1], 0));
 	}
