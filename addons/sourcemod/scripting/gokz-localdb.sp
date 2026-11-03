@@ -122,6 +122,8 @@ public void OnClientConnected(int client)
 		gB_CheaterPending[client] = false;
 		DB_DiscardUnverifiedTimes(client);
 	}
+	// A pending flag is all we know until the database sets them up
+	gB_Cheater[client] = gB_CheaterPending[client];
 	gB_WarnedUnverified[client] = false;
 }
 
