@@ -1,5 +1,7 @@
 static StringMap optionData;
 static StringMap optionDescriptions;
+static int lastNotifiedMode[MAXPLAYERS + 1];
+static bool modePickedBeforeLoad[MAXPLAYERS + 1];
 
 
 
@@ -154,6 +156,12 @@ bool SetOption(int client, const char[] option, any newValue)
 		return false;
 	}
 	
+	// Before loading, a mode set here has to outlast the load, even if they're already in it
+	if (!AreClientCookiesCached(client) && StrEqual(option, gC_CoreOptionNames[Option_Mode]))
+	{
+		modePickedBeforeLoad[client] = true;
+	}
+	
 	if (GetOption(client, option) == newValue)
 	{
 		return true;
@@ -209,6 +217,23 @@ void OnPluginStart_Options()
 
 void OnClientCookiesCached_Options(int client)
 {
+	// Keep the mode the player picked over the saved one. A saved one is marked changed as well, since
+	// clientprefs still writes a value set before the load on disconnect, and this writes after it.
+	if (IsClientInGame(client))
+	{
+		char value[16];
+		Cookie cookie = GetOptionProp(gC_CoreOptionNames[Option_Mode], OptionProp_Cookie);
+		if (modePickedBeforeLoad[client])
+		{
+			IntToString(lastNotifiedMode[client], value, sizeof(value));
+		}
+		else
+		{
+			cookie.Get(client, value, sizeof(value));
+		}
+		cookie.Set(client, value);
+	}
+	
 	StringMapSnapshot optionDataSnapshot = optionData.Snapshot();
 	char option[GOKZ_OPTION_MAX_NAME_LENGTH];
 	
@@ -219,6 +244,17 @@ void OnClientCookiesCached_Options(int client)
 	}
 	
 	delete optionDataSnapshot;
+	modePickedBeforeLoad[client] = false;
+	
+	if (IsClientInGame(client))
+	{
+		// Loading swaps in saved values silently, but a new mode still has to stop a running timer, replicate its convars etc.
+		int mode = GOKZ_GetCoreOption(client, Option_Mode);
+		if (mode != lastNotifiedMode[client])
+		{
+			Call_GOKZ_OnOptionChanged(client, gC_CoreOptionNames[Option_Mode], mode);
+		}
+	}
 	
 	Call_GOKZ_OnOptionsLoaded(client);
 }
@@ -229,10 +265,18 @@ void OnClientPutInServer_Options(int client)
 	{
 		GOKZ_SetCoreOption(client, Option_Mode, GetALoadedMode());
 	}
+	lastNotifiedMode[client] = GOKZ_GetCoreOption(client, Option_Mode);
+	// A fallback isn't their pick, and a pick from the last map went with its cookies
+	modePickedBeforeLoad[client] = false;
 }
 
 void OnOptionChanged_Options(int client, Option option, int newValue)
 {
+	if (option == Option_Mode)
+	{
+		lastNotifiedMode[client] = newValue;
+	}
+	
 	if (option == Option_Mode && !GetModeLoaded(newValue))
 	{
 		GOKZ_PrintToChat(client, true, "%t", "Mode Not Available", newValue);
@@ -251,6 +295,8 @@ void OnModeUnloaded_Options(int mode)
 		if (IsClientInGame(client) && GOKZ_GetCoreOption(client, Option_Mode) == mode)
 		{
 			GOKZ_SetCoreOption(client, Option_Mode, GetALoadedMode());
+			// A fallback isn't their pick
+			modePickedBeforeLoad[client] = false;
 		}
 	}
 }

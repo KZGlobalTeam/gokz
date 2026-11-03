@@ -576,7 +576,7 @@ forward void GOKZ_OnOptionsLoaded(int client);
 
 /**
  * Called when a player's option's value is changed.
- * Only called if client is in game.
+ * Only called if client is in game. Also called when clientprefs loads a different mode for them.
  *
  * @param client		Client index.
  * @param option		Option name.
