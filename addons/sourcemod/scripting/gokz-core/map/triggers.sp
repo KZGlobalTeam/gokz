@@ -225,7 +225,7 @@ void OnPlayerSpawn_MapTriggers(int client)
 	if (parseErrorStrings.Length > 0)
 	{
 		char errStart[] = "ERROR: Errors detected when trying to load triggers!";
-		CPrintToChat(client, "{red}%s", errStart);
+		GOKZ_PrintToChat(client, false, "{red}%s", errStart);
 		PrintToConsole(client, "\n%s", errStart);
 		
 		int length = parseErrorStrings.Length;
@@ -233,10 +233,10 @@ void OnPlayerSpawn_MapTriggers(int client)
 		{
 			char error[GOKZ_MAX_MAPTRIGGERS_ERROR_LENGTH];
 			parseErrorStrings.GetString(err, error, sizeof(error));
-			CPrintToChat(client, "{red}%s", error);
+			GOKZ_PrintToChat(client, false, "{red}%s", error);
 			PrintToConsole(client, error);
 		}
-		CPrintToChat(client, "{red}If the errors get clipped off in the chat, then look in your developer console!\n");
+		GOKZ_PrintToChat(client, false, "{red}If the errors get clipped off in the chat, then look in your developer console!\n");
 	}
 }
 

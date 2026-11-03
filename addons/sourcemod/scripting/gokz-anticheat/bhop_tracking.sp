@@ -10,7 +10,7 @@
 void PrintBhopCheckToChat(int client, int target)
 {
 	GOKZ_PrintToChat(client, true, 
-		"{lime}%N {grey}[{lime}%d%%%% {grey}%t | {lime}%.2f {grey}%t]", 
+		"{lime}%N {grey}[{lime}%d%% {grey}%t | {lime}%.2f {grey}%t]", 
 		target, 
 		RoundFloat(GOKZ_AC_GetPerfRatio(target, 20) * 100.0), 
 		"Perfs", 

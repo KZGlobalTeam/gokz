@@ -5,7 +5,6 @@
 #include <gokz/core>
 
 #include <autoexecconfig>
-#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -156,36 +155,32 @@ void OnClientSayCommand_ChatProcessing(int client, const char[] command, const c
 	
 	char sanitisedMessage[128];
 	strcopy(sanitisedMessage, sizeof(sanitisedMessage), message);
-	SanitiseChatInput(sanitisedMessage, sizeof(sanitisedMessage));
-	
+	StripControlChars(sanitisedMessage);
+
 	char sanitisedName[MAX_NAME_LENGTH];
 	GetClientName(client, sanitisedName, sizeof(sanitisedName));
-	SanitiseChatInput(sanitisedName, sizeof(sanitisedName));
-	
+	StripControlChars(sanitisedName);
+
 	if (TrimString(sanitisedMessage) == 0)
 	{
 		return;
 	}
-	
-	// Chat gets double formatted, so replace '%' with '%%%%' to end up with '%'
-	char chatMessage[128];
-	strcopy(chatMessage, sizeof(chatMessage), sanitisedMessage);
-	ReplaceString(chatMessage, sizeof(chatMessage), "%", "%%%%");
-	
+
+	char spectatorMark[3];
 	if (IsSpectating(client))
 	{
-		GOKZ_PrintToChatAll(false, "{default}* %s%s{lime}%s{default} : %s",
-							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, chatMessage);
-		PrintToConsoleAll("* %s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
-		PrintToServer("* %s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+		spectatorMark = "* ";
 	}
-	else
-	{
-		GOKZ_PrintToChatAll(false, "%s%s{lime}%s{default} : %s",
-							gC_PlayerTagColors[client], gC_PlayerTags[client], sanitisedName, chatMessage);
-		PrintToConsoleAll("%s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
-		PrintToServer("%s%s : %s", gC_PlayerTags[client], sanitisedName, sanitisedMessage);
-	}
+
+	// Tags are replaced before the player's name and message are added, so typed tags and % show as typed.
+	char line[512];
+	FormatEx(line, sizeof(line), "{default}%s%s%s{lime}", spectatorMark, gC_PlayerTagColors[client], gC_PlayerTags[client]);
+	Color_ReplaceChatTags(line, sizeof(line));
+	Format(line, sizeof(line), "%s%s\x01 : %s", line, sanitisedName, sanitisedMessage);
+	PrintToChatAll(" %s", line);
+
+	PrintToConsoleAll("%s%s%s : %s", spectatorMark, gC_PlayerTags[client], sanitisedName, sanitisedMessage);
+	PrintToServer("%s%s%s : %s", spectatorMark, gC_PlayerTags[client], sanitisedName, sanitisedMessage);
 }
 
 bool UsedBaseChat(int client, const char[] command, const char[] message)
@@ -208,10 +203,18 @@ bool UsedBaseChat(int client, const char[] command, const char[] message)
 	return false;
 }
 
-void SanitiseChatInput(char[] message, int maxlength)
+// Control characters include CS:GO's colour codes 0x01-0x10.
+void StripControlChars(char[] str)
 {
-	Color_StripFromChatText(message, message, maxlength);
-	CRemoveColors(message, maxlength);
+	int x = 0;
+	for (int i = 0; str[i] != '\0'; i++)
+	{
+		if (str[i] > 0x1F && str[i] != 0x7F)
+		{
+			str[x++] = str[i];
+		}
+	}
+	str[x] = '\0';
 }
 
 

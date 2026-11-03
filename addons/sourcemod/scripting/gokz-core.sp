@@ -11,7 +11,6 @@
 #include <movementapi>
 
 #include <autoexecconfig>
-#include <sourcemod-colors>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN

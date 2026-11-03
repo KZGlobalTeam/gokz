@@ -420,16 +420,16 @@ static void DoChatReport(int client, bool isFailstat, Jump jump, int tier)
 			
 			if (i == 1)
 			{
-				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}%d. {lime}%.0f%%%%", i, strafeSync);
+				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}%d. {lime}%.0f%%", i, strafeSync);
 			}
 			else
 			{
-				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}- %d. {lime}%.0f%%%%", i, strafeSync);
+				FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}- %d. {lime}%.0f%%", i, strafeSync);
 			}
 			StrCat(strafeSyncMsg, sizeof(strafeSyncMsg), strafeEntry);
 		}
 		
-		FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}[{purple}%.0f%%%%{grey}]", jump.sync);
+		FormatEx(strafeEntry, sizeof(strafeEntry), " {grey}[{purple}%.0f%%{grey}]", jump.sync);
 		StrCat(strafeSyncMsg, sizeof(strafeSyncMsg), strafeEntry);
 		
 		GOKZ_PrintToChat(client, false, "%s", strafeSyncMsg);
@@ -440,7 +440,7 @@ static char[] GetStrafesSyncChatString(int client, int strafes, float sync)
 {
 	char resultString[64];
 	FormatEx(resultString, sizeof(resultString), 
-		"{lime}%d{grey} %T ({lime}%.0f%%%%{grey})", 
+		"{lime}%d{grey} %T ({lime}%.0f%%{grey})", 
 		strafes, "Strafes", client, sync);
 	return resultString;
 }
