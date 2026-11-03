@@ -128,6 +128,18 @@
 		"chi"		"{grey}计时器设置已加载!"
 		"ru"		"{grey}Настройка таймера загружена!"
 	}
+	"Timer Setup Unavailable (Unverified)"
+	{
+		"en"		"{grey}Timer setups can't be saved or loaded until Steam verifies you."
+	}
+	"Unverified Warning"
+	{
+		"en"		"{grey}Steam has not verified you yet. Your times will be saved if it does before you leave, but jumpstats won't be."
+	}
+	"Time Saved Once Verified"
+	{
+		"en"		"{grey}Your time will be saved if Steam verifies you before you leave."
+	}
 	"Options Menu - Disabled"
 	{
 		"en"		"Disabled"

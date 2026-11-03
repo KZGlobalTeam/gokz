@@ -12,6 +12,13 @@ void DB_SetCheater(int cheaterClient, bool cheater)
 	}
 	
 	gB_Cheater[cheaterClient] = cheater;
+	// Written on setup, once Steam has verified them
+	if (!IsClientAuthorized(cheaterClient))
+	{
+		gB_CheaterPending[cheaterClient] = cheater;
+		gI_UnverifiedUserID[cheaterClient] = GetClientUserId(cheaterClient);
+		return;
+	}
 	
 	DataPack data = new DataPack();
 	data.WriteCell(-1);

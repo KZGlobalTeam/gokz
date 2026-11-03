@@ -19,6 +19,16 @@ public void OnLanding_SaveJumpstat(Jump jump)
 		return;
 	}
 	
+	// Saving needs the player's database row, which setup creates once Steam has verified them
+	if (!gB_ClientSetUp[jump.jumper])
+	{
+		if (!IsClientAuthorized(jump.jumper))
+		{
+			WarnUnverified(jump.jumper);
+		}
+		return;
+	}
+	
 	char query[1024];
 	DataPack data;
 	int steamid = GetSteamAccountID(jump.jumper);

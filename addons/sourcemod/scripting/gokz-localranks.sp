@@ -242,7 +242,8 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 
 public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int teleportsUsed)
 {
-	if (GOKZ_DB_IsCheater(client))
+	// Cheaters' times aren't processed, and unverified players' only once Steam verifies them
+	if (GOKZ_DB_IsCheater(client) || !IsClientAuthorized(client))
 	{
 		return Plugin_Continue;
 	}
