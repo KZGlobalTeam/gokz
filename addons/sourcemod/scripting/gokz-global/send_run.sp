@@ -11,22 +11,25 @@ bool deleteRecord[MAXPLAYERS + 1];
 
 // =====[ PUBLIC ]=====
 
-void SendTime(int client, int course, float time, int teleportsUsed)
+// Returns whether the request went out. replayPath is a kept run's temporary replay, which this takes over.
+bool SendTime(int client, int mapID, const char[] map, int course, int mode, float time, int teleportsUsed, bool kept = false, const char[] replayPath = "")
 {
 	char steamid[32], modeStr[32];
-	KZPlayer player = KZPlayer(client);
-	int mode = player.Mode;
 
 	int timeType = GOKZ_GetTimeTypeEx(teleportsUsed);
 
-	// If filters have been loaded, skip the submission when the API would reject it.
-	if (gB_FiltersLoaded && course >= 0 && course < GOKZ_MAX_COURSES)
+	// If this map's filters have been loaded, skip the submission when the API would reject it.
+	if (gB_FiltersLoaded && mapID == gI_MapID && course >= 0 && course < GOKZ_MAX_COURSES)
 	{
 		bool wouldSave = gB_HasFilter[course][mode][TimeType_Nub]
 			|| (timeType == TimeType_Pro && gB_HasFilter[course][mode][TimeType_Pro]);
 		if (!wouldSave)
 		{
-			return;
+			if (replayPath[0] != '\0')
+			{
+				DeleteFile(replayPath);
+			}
+			return false;
 		}
 	}
 
@@ -36,11 +39,22 @@ void SendTime(int client, int course, float time, int teleportsUsed)
 	dp.WriteCell(mode);
 	dp.WriteCell(timeType);
 	dp.WriteFloat(time);
-	dp.WriteString(gC_CurrentMap);
+	dp.WriteString(map);
+	dp.WriteCell(kept);
+	dp.WriteString(replayPath);
 
 	GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
 	GOKZ_GL_GetModeString(mode, modeStr, sizeof(modeStr));
-	GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, gI_MapID, modeStr, course, 128, teleportsUsed, time);
+	if (!GlobalAPI_CreateRecord(SendTimeCallback, dp, steamid, mapID, modeStr, course, 128, teleportsUsed, time))
+	{
+		delete dp;
+		if (replayPath[0] != '\0')
+		{
+			DeleteFile(replayPath);
+		}
+		return false;
+	}
+	return true;
 }
 
 public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, DataPack dp)
@@ -54,14 +68,39 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	float time = dp.ReadFloat();
 	char mapName[64];
 	dp.ReadString(mapName, sizeof(mapName));
+	bool kept = dp.ReadCell();
+	char keptReplayPath[PLATFORM_MAX_PATH];
+	dp.ReadString(keptReplayPath, sizeof(keptReplayPath));
 	delete dp;
+	
+	// A successful request can still have no response body
+	bool failed = request.Failure || response == null;
+	
+	// A kept run's replay was saved before its record existed, so it doesn't wait for GOKZ_RP_OnReplaySaved
+	if (keptReplayPath[0] != '\0')
+	{
+		if (failed)
+		{
+			DeleteFile(keptReplayPath);
+		}
+		else
+		{
+			DataPack replayDP = new DataPack();
+			replayDP.WriteString(keptReplayPath);
+			if (!GlobalAPI_CreateReplayForRecordId(SendReplayCallback, replayDP, response.GetInt("record_id"), keptReplayPath))
+			{
+				delete replayDP;
+				DeleteFile(keptReplayPath);
+			}
+		}
+	}
 	
 	if (!IsValidClient(client))
 	{
 		return 0;
 	}
 	
-	if (request.Failure)
+	if (failed)
 	{
 		LogError("Failed to send a time to the global API.");
 		if (GlobalAPI_HasAPIKey())
@@ -81,6 +120,17 @@ public int SendTimeCallback(JSON_Object response, GlobalAPIRequestData request, 
 	
 	// Don't like doing this here, but seems to be the most efficient place
 	UpdatePoints(client, true);
+
+	if (kept)
+	{
+		// Only the newest can still have a replay coming, as a run ending cuts short the last one's breather
+		bool newest = !HasUnverifiedRuns(client);
+		SendNextUnverifiedRun(client);
+		if (!newest || keptReplayPath[0] != '\0')
+		{
+			return 0;
+		}
+	}
 
 	// Check if we can send the replay
 	lastRecordId[client] = response.GetInt("record_id");
