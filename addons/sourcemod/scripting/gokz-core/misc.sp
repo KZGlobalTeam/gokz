@@ -270,6 +270,8 @@ static bool hasSavedPosition[MAXPLAYERS + 1];
 static float savedOrigin[MAXPLAYERS + 1][3];
 static float savedAngles[MAXPLAYERS + 1][3];
 static bool savedOnLadder[MAXPLAYERS + 1];
+static int savedHealth[MAXPLAYERS + 1];
+static int savedWeaponSlot[MAXPLAYERS + 1];
 static bool triggerTouchesPending[MAXPLAYERS + 1];
 static int triggerTouchesPendingTick[MAXPLAYERS + 1];
 
@@ -346,6 +348,9 @@ void JoinTeam(int client, int newTeam, bool restorePos, bool forceBroadcast = fa
 			player.GetOrigin(savedOrigin[client]);
 			player.GetEyeAngles(savedAngles[client]);
 			savedOnLadder[client] = player.Movetype == MOVETYPE_LADDER;
+			// Observer mode sets health to 0 and removes weapons
+			savedHealth[client] = GetClientHealth(client);
+			savedWeaponSlot[client] = GetActiveWeaponSlot(client);
 			hasSavedPosition[client] = true;
 		}
 
@@ -359,17 +364,39 @@ void JoinTeam(int client, int newTeam, bool restorePos, bool forceBroadcast = fa
 	else if (newTeam == CS_TEAM_CT && currentTeam != CS_TEAM_CT
 		 || newTeam == CS_TEAM_T && currentTeam != CS_TEAM_T)
 	{
+		// Read late, since map outputs can still change these while the player spectates
+		float gravity = player.Gravity;
+		float laggedMovement = GetEntPropFloat(client, Prop_Send, "m_flLaggedMovementValue");
+		float velocityModifier = player.VelocityModifier;
+
 		ForcePlayerSuicide(client);
 		CS_SwitchTeam(client, newTeam);
 		CS_RespawnPlayer(client);
 		if (restorePos && hasSavedPosition[client])
 		{
-			TeleportPlayer(client, savedOrigin[client], savedAngles[client]);
+			TeleportPlayer(client, savedOrigin[client], savedAngles[client], .holdGravity = gravity);
 			triggerTouchesPending[client] = true;
 			triggerTouchesPendingTick[client] = GetGameTickCount();
+			SetEntPropFloat(client, Prop_Send, "m_flLaggedMovementValue", laggedMovement);
+			player.VelocityModifier = velocityModifier;
+			if (savedHealth[client] > 0)
+			{
+				SetEntityHealth(client, savedHealth[client]);
+			}
 			if (savedOnLadder[client])
 			{
 				player.Movetype = MOVETYPE_LADDER;
+			}
+			// The respawn gives new weapon entities, so find the held one again by its slot
+			if (savedWeaponSlot[client] != -1)
+			{
+				int weapon = GetPlayerWeaponSlot(client, savedWeaponSlot[client]);
+				if (weapon != -1)
+				{
+					char classname[64];
+					GetEntityClassname(weapon, classname, sizeof(classname));
+					FakeClientCommand(client, "use %s", classname);
+				}
 			}
 		}
 		else
@@ -389,6 +416,23 @@ void JoinTeam(int client, int newTeam, bool restorePos, bool forceBroadcast = fa
 	{
 		Call_GOKZ_OnJoinTeam(client, newTeam);
 	}
+}
+
+static int GetActiveWeaponSlot(int client)
+{
+	int activeWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	if (activeWeapon == -1)
+	{
+		return -1;
+	}
+	for (int slot = CS_SLOT_PRIMARY; slot <= CS_SLOT_C4; slot++)
+	{
+		if (GetPlayerWeaponSlot(client, slot) == activeWeapon)
+		{
+			return slot;
+		}
+	}
+	return -1;
 }
 
 void SendFakeTeamEvent(int client)
