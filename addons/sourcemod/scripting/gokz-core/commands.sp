@@ -104,11 +104,16 @@ public Action CommandJoinTeam(int client, const char[] command, int argc)
 	
 	if (team == CS_TEAM_SPECTATOR)
 	{
-		if (!GOKZ_GetPaused(client) && !GOKZ_GetCanPause(client))
+		if (!GOKZ_GetPaused(client) && !CanPause(client, true))
 		{
 			SendFakeTeamEvent(client);
 			return Plugin_Handled;
 		}
+	}
+	else if ((team == CS_TEAM_CT || team == CS_TEAM_T) && GetClientTeam(client) == CS_TEAM_SPECTATOR && GOKZ_GetPaused(client) && !CanResume(client, true))
+	{
+		SendFakeTeamEvent(client);
+		return Plugin_Handled;
 	}
 	else if (IsPlayerAlive(client) && GOKZ_GetCoreOption(client, Option_Safeguard) > Safeguard_Disabled && GOKZ_GetTimerRunning(client) && GOKZ_GetValidTimer(client))
 	{
@@ -268,6 +273,10 @@ public Action CommandTogglePause(int client, int args)
 {
 	if (!IsPlayerAlive(client))
 	{
+		if (GOKZ_GetPaused(client) && !CanResume(client, true))
+		{
+			return Plugin_Handled;
+		}
 		GOKZ_RespawnPlayer(client);
 	}
 	else
