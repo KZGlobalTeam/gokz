@@ -106,6 +106,7 @@ public void OnPluginStart()
 	HookEvents();
 	RegisterCommands();
 	
+	OnPluginStart_UseButtons(); // Before OnPluginStart_Triggerfix, whose late-load loop hooks clients
 	OnPluginStart_MapTriggers();
 	OnPluginStart_MapButtons();
 	OnPluginStart_MapStarts();
@@ -154,6 +155,7 @@ public void OnClientPutInServer(int client)
 	OnClientPutInServer_Triggerfix(client);
 	OnClientPutInServer_Noclip(client);
 	OnClientPutInServer_Turnbinds(client);
+	OnClientPutInServer_UseButtons(client);
 	HookClientEvents(client);
 }
 
