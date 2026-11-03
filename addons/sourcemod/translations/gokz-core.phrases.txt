@@ -58,6 +58,10 @@
 		"en"		"{yellow}Warning{grey}: Checkpoint created in checkpoint disabled area."
 		"chi"		"{yellow}警告{grey}: 存点创建在禁用存点区域."
 	}
+	"Can't Checkpoint (Generic)"
+	{
+		"en"		"{darkred}You can't make a checkpoint right now."
+	}
 	"Can't Checkpoint (Midair)"
 	{
 		"en"		"{darkred}You can't make a checkpoint mid-air."

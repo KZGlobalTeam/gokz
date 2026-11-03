@@ -431,8 +431,11 @@ stock int Steam2ToSteamAccountID(const char[] steamID2)
  * @param client		Client index.
  * @param origin		Origin to teleport to.
  * @param angles		Eye angles to set.
+ * @param setAngles		Whether to set the eye angles.
+ * @param holdStill		Whether to hold the player still for the next 5 ticks.
+ * @param holdGravity	Gravity to set on each tick the player is held still.
  */
-stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true)
+stock void TeleportPlayer(int client, const float origin[3], const float angles[3], bool setAngles = true, bool holdStill = true, float holdGravity = 1.0)
 {
 	// Clear the player's parent before teleporting to fix being
 	// teleported into seemingly random places if the player has a parent.
@@ -463,7 +466,7 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 		SetEntProp(client, Prop_Send, "m_CollisionGroup", GOKZ_COLLISION_GROUP_STANDARD);
 
 		// Intelligently hold player still to prevent booster and trigger exploits
-		StartHoldStill(client, ducked);
+		StartHoldStill(client, ducked, holdGravity);
 	}
 	else if (ducked)
 	{
@@ -473,13 +476,14 @@ stock void TeleportPlayer(int client, const float origin[3], const float angles[
 	delete trace;
 }
 
-static void StartHoldStill(int client, bool ducked)
+static void StartHoldStill(int client, bool ducked, float gravity)
 {
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(0); // tick counter
 	data.WriteCell(GOKZ_TP_FREEZE_TICKS); // number of ticks to hold still
 	data.WriteCell(ducked);
+	data.WriteFloat(gravity);
 	ContinueHoldStill(data);
 }
 
@@ -490,6 +494,7 @@ public void ContinueHoldStill(DataPack data)
 	int ticks = data.ReadCell();
 	int tickCount = data.ReadCell();
 	bool ducked = data.ReadCell();
+	float gravity = data.ReadFloat();
 	delete data;
 
 	if (!IsValidClient(client))
@@ -501,7 +506,7 @@ public void ContinueHoldStill(DataPack data)
 	{
 		Movement_SetVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
 		Movement_SetBaseVelocity(client, view_as<float>( { 0.0, 0.0, 0.0 } ));
-		Movement_SetGravity(client, 1.0);
+		Movement_SetGravity(client, gravity);
 
 		// Don't drop the player off of ladders.
 		// The game will automatically change the movetype back to MOVETYPE_WALK if it can't find a ladder.
@@ -538,6 +543,7 @@ public void ContinueHoldStill(DataPack data)
 		data.WriteCell(ticks);
 		data.WriteCell(tickCount);
 		data.WriteCell(ducked);
+		data.WriteFloat(gravity);
 		RequestFrame(ContinueHoldStill, data);
 	}
 }
