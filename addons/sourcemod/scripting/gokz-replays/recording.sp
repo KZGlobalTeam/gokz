@@ -35,6 +35,20 @@ static bool movementProcessed[MAXPLAYERS + 1];
 
 // =====[ EVENTS ]=====
 
+void OnPluginStart_Recording()
+{
+	// Replays left from before a restart have no run to go with. A late load leaves them,
+	// as gokz-global may still hold some for kept runs.
+	if (gB_LateLoaded)
+	{
+		return;
+	}
+
+	char path[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_RUNS_TEMP);
+	DeleteFilesIn(path);
+}
+
 void OnMapStart_Recording()
 {
 	CreateReplaysDirectory(gC_CurrentMap);
@@ -263,9 +277,10 @@ public Action Timer_EndRecording(Handle timer, DataPack data)
 	runningRunBreatherTimer[client] = INVALID_HANDLE;
 	postRunRecording[client] = false;
 
-	if (gB_GOKZLocalDB && GOKZ_DB_IsCheater(client))
+	if (gB_GOKZLocalDB && (GOKZ_DB_IsCheater(client) || !IsClientAuthorized(client)))
 	{
 		// Replay might be submitted globally, but will not be saved locally.
+		// localdb saves an unverified player's time only if Steam verifies them later, which may never happen.
 		saveState = ReplaySave_Temp;
 	}
 	
@@ -661,7 +676,9 @@ static void FillGeneralHeader(GeneralReplayHeader generalHeader, int client, int
 	generalHeader.serverIP = FindConVar("hostip").IntValue;
 	generalHeader.timestamp = GetTime();
 	GetClientName(client, generalHeader.playerAlias, sizeof(GeneralReplayHeader::playerAlias));
-	generalHeader.playerSteamID = GetSteamAccountID(client);
+	// Not validated for runs: a replay saved before Steam verifies the player is uploaded with their run
+	// once it does, and the ID they connected with can't change in between
+	generalHeader.playerSteamID = GetSteamAccountID(client, replayType != ReplayType_Run);
 	generalHeader.mode = mode;
 	generalHeader.style = style;
 	generalHeader.playerSensitivity = playerSensitivity[client];
@@ -930,6 +947,31 @@ static bool IsCurrentWeaponSecondary(int client)
 	int activeWeaponEnt = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
 	int secondaryEnt = GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY);
 	return activeWeaponEnt == secondaryEnt;
+}
+
+static void DeleteFilesIn(const char[] directory)
+{
+	DirectoryListing listing = OpenDirectory(directory);
+	if (listing == null)
+	{
+		return;
+	}
+
+	char name[PLATFORM_MAX_PATH], path[PLATFORM_MAX_PATH];
+	FileType type;
+	while (listing.GetNext(name, sizeof(name), type))
+	{
+		FormatEx(path, sizeof(path), "%s/%s", directory, name);
+		if (type == FileType_File)
+		{
+			DeleteFile(path);
+		}
+		else if (type == FileType_Directory && !StrEqual(name, ".") && !StrEqual(name, ".."))
+		{
+			DeleteFilesIn(path);
+		}
+	}
+	delete listing;
 }
 
 static void CreateReplaysDirectory(const char[] map)
