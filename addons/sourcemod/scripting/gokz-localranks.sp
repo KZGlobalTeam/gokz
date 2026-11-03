@@ -123,6 +123,11 @@ public void OnLibraryRemoved(const char[] name)
 
 // =====[ CLIENT EVENTS ]=====
 
+public void OnClientConnected(int client)
+{
+	ResetPBCache(client);
+}
+
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	UpdateRecordMissed(client);
@@ -242,7 +247,8 @@ public void GOKZ_DB_OnMapSetup(int mapID)
 
 public Action GOKZ_OnTimerEndMessage(int client, int course, float time, int teleportsUsed)
 {
-	if (GOKZ_DB_IsCheater(client))
+	// Cheaters' times aren't processed, and unverified players' only once Steam verifies them
+	if (GOKZ_DB_IsCheater(client) || !IsClientAuthorized(client))
 	{
 		return Plugin_Continue;
 	}

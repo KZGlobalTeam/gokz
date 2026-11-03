@@ -40,7 +40,7 @@ enum
  *
  * @param client		Client index.
  * @param steamID		SteamID32 of the player (from GetSteamAccountID()).
- * @param mapID 		MapID from the "Maps" database table.
+ * @param mapID 		MapID from the "Maps" database table. May differ from the current map, as this forward can be called after a map change.
  * @param course    	Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode			Player's movement mode.
  * @param style			Player's movement style.
@@ -78,7 +78,7 @@ forward void GOKZ_LR_OnTimeProcessed(
  *
  * @param client			Client index.
  * @param steamID			SteamID32 of the player (from GetSteamAccountID()).
- * @param mapID 			MapID from the "Maps" table.
+ * @param mapID 			MapID from the "Maps" table. May differ from the current map, as this forward can be called after a map change.
  * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.

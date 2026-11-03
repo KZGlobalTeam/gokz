@@ -36,6 +36,7 @@ void DB_SetupClient(int client)
 	DataPack data = new DataPack();
 	data.WriteCell(GetClientUserId(client));
 	data.WriteCell(steamID);
+	data.WriteCell(gB_CheaterPending[client]);
 	
 	Transaction txn = SQL_CreateTransaction();
 	
@@ -70,7 +71,14 @@ public void DB_TxnSuccess_SetupClient(Handle db, DataPack data, int numQueries, 
 	data.Reset();
 	int client = GetClientOfUserId(data.ReadCell());
 	int steamID = data.ReadCell();
+	bool cheaterPending = view_as<bool>(data.ReadCell());
 	delete data;
+	
+	// Even if they've left by now, as the flag was only waiting for a validated ID
+	if (cheaterPending)
+	{
+		DB_SetCheaterSteamID(0, steamID, true);
+	}
 	
 	if (client == 0 || !IsClientAuthorized(client))
 	{
@@ -96,5 +104,15 @@ public void DB_TxnSuccess_SetupClient(Handle db, DataPack data, int numQueries, 
 	}
 	
 	gB_ClientSetUp[client] = true;
+	if (cheaterPending)
+	{
+		gB_CheaterPending[client] = false;
+		gB_Cheater[client] = true;
+	}
 	Call_OnClientSetup(client, steamID, gB_Cheater[client]);
+	// Once in game, as the insert's callback stops for anyone still loading into a new map
+	if (gB_ClientPostAdminChecked[client])
+	{
+		DB_SaveNextUnverifiedTime(client, steamID);
+	}
 } 

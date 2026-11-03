@@ -139,5 +139,5 @@ public int Native_GetMapValid(Handle plugin, int numParams)
 
 public int Native_GetPlayerValid(Handle plugin, int numParams)
 {
-	return view_as<int>(gB_GloballyVerified[GetNativeCell(1)]);
+	return view_as<int>(CanSubmitRuns(GetNativeCell(1)));
 }

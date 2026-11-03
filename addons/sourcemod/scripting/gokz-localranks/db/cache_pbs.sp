@@ -4,13 +4,8 @@
 
 
 
-void DB_CachePBs(int client, int steamID)
+void ResetPBCache(int client)
 {
-	char query[1024];
-	
-	Transaction txn = SQL_CreateTransaction();
-	
-	// Reset PB exists array
 	for (int course = 0; course < GOKZ_MAX_COURSES; course++)
 	{
 		for (int mode = 0; mode < MODE_COUNT; mode++)
@@ -21,6 +16,15 @@ void DB_CachePBs(int client, int steamID)
 			}
 		}
 	}
+}
+
+void DB_CachePBs(int client, int steamID)
+{
+	char query[1024];
+	
+	Transaction txn = SQL_CreateTransaction();
+	
+	ResetPBCache(client);
 	
 	int mapID = GOKZ_DB_GetCurrentMapID();
 	

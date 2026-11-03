@@ -42,6 +42,9 @@ char gC_CurrentMap[64];
 int gI_CurrentMapFileSize;
 bool gB_InValidRun[MAXPLAYERS + 1];
 bool gB_GloballyVerified[MAXPLAYERS + 1];
+bool gB_BanChecked[MAXPLAYERS + 1]; // the ban check answered on this map
+bool gB_SuspectedUnverified[MAXPLAYERS + 1]; // by the anticheat before they were globally verified
+int gI_UnverifiedUserID[MAXPLAYERS + 1]; // whose kept runs and suspicion these are
 bool gB_EnforcerOnFreshMap;
 bool gB_JustLateLoaded;
 int gI_FPSMax[MAXPLAYERS + 1];
@@ -64,6 +67,7 @@ ConVar gCV_EnforcedCVar[ENFORCEDCVAR_COUNT];
 #include "gokz-global/maptop_menu.sp"
 #include "gokz-global/print_records.sp"
 #include "gokz-global/send_run.sp"
+#include "gokz-global/unverified_runs.sp"
 #include "gokz-global/points.sp"
 
 
@@ -235,9 +239,21 @@ Action FPSKickPlayer(Handle timer, int userid)
 
 // =====[ CLIENT EVENTS ]=====
 
+public void OnClientConnected(int client)
+{
+	// Map changes reconnect players under the same userid, so only a new player
+	// in the slot drops the runs and suspicion of an unverified one
+	if (gI_UnverifiedUserID[client] != GetClientUserId(client))
+	{
+		gB_SuspectedUnverified[client] = false;
+		DiscardUnverifiedRuns(client);
+	}
+}
+
 public void OnClientPutInServer(int client)
 {
 	gB_GloballyVerified[client] = false;
+	gB_BanChecked[client] = false;
 	gB_waitingForFPSKick[client] = false;
 	gF_LastWarn[client] = 0.0;
 	ResetPoints(client);
@@ -311,20 +327,31 @@ public void GOKZ_OnTimerStart_Post(int client, int course)
 
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
-	if (!gB_InValidRun[client] && GlobalsEnabled(KZPlayer(client).Mode))
+	int mode = KZPlayer(client).Mode;
+	if (!gB_InValidRun[client] && GlobalsEnabled(mode))
 	{
 		gB_InValidRun[client] = true;
 	}
 
-	if (gB_GloballyVerified[client] && gB_InValidRun[client])
+	if (CanSubmitRuns(client) && gB_InValidRun[client])
 	{
-		SendTime(client, course, time, teleportsUsed);
+		SendTime(client, gI_MapID, gC_CurrentMap, course, mode, time, teleportsUsed);
+	}
+	else if (!gB_BanChecked[client] && !gB_SuspectedUnverified[client] && gB_InValidRun[client] && !IsFakeClient(client))
+	{
+		// Steam hasn't verified them yet, or the ban check hasn't answered
+		KeepUnverifiedRun(client, course, mode, time, teleportsUsed);
 	}
 }
 
 public Action GOKZ_RP_OnReplaySaved(int client, int replayType, const char[] map, int course, int timeType, float time, const char[] filePath, bool tempReplay)
 {
-	if (gB_GloballyVerified[client] && gB_InValidRun[client])
+	// Also once they're verified, while the run is still waiting its turn to be sent
+	if (tempReplay && KeepUnverifiedReplay(client, map, course, timeType, time, filePath))
+	{
+		return Plugin_Handled;
+	}
+	if (CanSubmitRuns(client) && gB_InValidRun[client])
 	{
 		OnReplaySaved_SendReplay(client, replayType, map, course, timeType, time, filePath, tempReplay);
 		return Plugin_Handled;
@@ -339,13 +366,25 @@ public void GOKZ_OnRunInvalidated(int client)
 
 public void GOKZ_GL_OnNewTopTime(int client, int course, int mode, int timeType, int rank, int rankOverall, float runTime, const char[] mapName)
 {
+	// A run kept until Steam verified the player can be from an earlier map
+	if (!StrEqual(mapName, gC_CurrentMap))
+	{
+		return;
+	}
+	
 	AnnounceNewTopTime(client, course, mode, timeType, rank, rankOverall);
 }
 
 public void GOKZ_AC_OnPlayerSuspected(int client, ACReason reason, const char[] notes, const char[] stats)
 {
+	// Whether they're still waiting to be verified or still having their kept runs sent
+	DiscardUnverifiedRuns(client);
+	
 	if (!gB_GloballyVerified[client])
 	{
+		// Only globally verified players get reported, so keep this one's runs out of the API instead
+		gB_SuspectedUnverified[client] = true;
+		gI_UnverifiedUserID[client] = GetClientUserId(client);
 		return;
 	}
 	
@@ -441,6 +480,13 @@ public Action GOKZ_OnTimerNativeCalledExternally(Handle plugin, int client)
 
 // =====[ PUBLIC ]=====
 
+// A player the anticheat suspected before they were verified isn't reported for it, only for a later detection,
+// and their runs stay out of the API
+bool CanSubmitRuns(int client)
+{
+	return gB_GloballyVerified[client] && !gB_SuspectedUnverified[client];
+}
+
 bool GlobalsEnabled(int mode)
 {
 	return gB_APIKeyCheck && gB_BannedCommandsCheck && gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap && MapCheck() && gB_ModeCheck[mode];
@@ -461,7 +507,7 @@ void PrintGlobalCheckToChat(int client)
 		gB_BannedCommandsCheck ? "{green}✓" : "{darkred}X",
 		gCV_gokz_settings_enforcer.BoolValue && gB_EnforcerOnFreshMap ? "{green}✓" : "{darkred}X", 
 		MapCheck() ? "{green}✓" : "{darkred}X", 
-		gB_GloballyVerified[client] ? "{green}✓" : "{darkred}X");
+		CanSubmitRuns(client) ? "{green}✓" : "{darkred}X");
 	
 	char modeCheck[256];
 	FormatEx(modeCheck, sizeof(modeCheck), "{purple}%s %s", gC_ModeNames[0], gB_ModeCheck[0] ? "{green}✓" : "{darkred}X");
@@ -678,6 +724,21 @@ Action RecheckAPIStatus(Handle timer)
 	if (!MapCheck() && gC_CurrentMap[0] != '\0')
 	{
 		GlobalAPI_GetMapByName(GetMapCallback, _, gC_CurrentMap);
+	}
+	
+	// During an outage, retrying ban checks would only log an error per player per minute
+	if (gI_AuthFailCount > 0)
+	{
+		return Plugin_Continue;
+	}
+	
+	// A failed ban check would otherwise hold the player's runs until the next map
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client) && !IsFakeClient(client) && IsClientAuthorized(client) && !gB_BanChecked[client])
+		{
+			CheckClientGlobalBan(client);
+		}
 	}
 	
 	return Plugin_Continue;
@@ -905,7 +966,17 @@ public void CheckClientGlobalBan_Callback(JSON_Object player_json, GlobalAPIRequ
 		return;
 	}
 	
+	gB_BanChecked[client] = true;
 	gB_GloballyVerified[client] = !player.IsBanned;
+	
+	if (gB_GloballyVerified[client])
+	{
+		SendNextUnverifiedRun(client);
+	}
+	else
+	{
+		DiscardUnverifiedRuns(client);
+	}
 	
 	if (player.IsBanned && gB_GOKZLocalDB)
 	{

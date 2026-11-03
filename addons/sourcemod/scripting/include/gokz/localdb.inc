@@ -200,7 +200,7 @@ forward void GOKZ_DB_OnMapSetup(int mapID);
  *
  * @param client			Client index.
  * @param steamID			SteamID32 of the player (from GetSteamAccountID()).
- * @param mapID				MapID from the "Maps" table.
+ * @param mapID				MapID from the "Maps" table. May differ from the current map, as this forward can be called after a map change.
  * @param course    		Course number e.g. 0=main, 1='bonus1' etc.
  * @param mode				Player's movement mode.
  * @param style				Player's movement style.
@@ -283,10 +283,10 @@ native bool GOKZ_DB_IsMapSetUp();
 native int GOKZ_DB_GetCurrentMapID();
 
 /**
- * Gets whether player is marked as a cheater in the database.
+ * Gets whether player is marked as a cheater in the database, or will be once Steam verifies them.
  *
  * @param client		Client index.
- * @return				Whether player is marked as a cheater in the database.
+ * @return				Whether player is marked as a cheater in the database, or will be once Steam verifies them.
  */
 native bool GOKZ_DB_IsCheater(int client);
 

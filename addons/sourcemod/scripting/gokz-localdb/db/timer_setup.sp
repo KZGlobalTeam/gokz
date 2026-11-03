@@ -12,6 +12,12 @@ void DB_SaveTimerSetup(int client)
 		return;
 	}
 	
+	if (!IsClientAuthorized(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Timer Setup Unavailable (Unverified)");
+		return;
+	}
+	
 	int steamid = GetSteamAccountID(client);
 	DataPack data = new DataPack();
 	
@@ -78,6 +84,12 @@ void DB_LoadTimerSetup(int client, bool doChatMessage = false)
 {
 	if (!IsValidClient(client))
 	{
+		return;
+	}
+	
+	if (!IsClientAuthorized(client))
+	{
+		GOKZ_PrintToChat(client, true, "%t", "Timer Setup Unavailable (Unverified)");
 		return;
 	}
 	

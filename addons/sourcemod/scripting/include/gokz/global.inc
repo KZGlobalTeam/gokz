@@ -64,6 +64,7 @@ enum GlobalMode
 #define GL_WARN_INTERVAL 30.0
 #define GL_API_RECHECK_INTERVAL 60.0
 #define GL_API_AUTH_FAIL_THRESHOLD 5
+#define GL_MAX_UNVERIFIED_RUNS 50 // Per player, as each can have a replay on disk
 
 stock char gC_EnforcedCVars[ENFORCEDCVAR_COUNT][] = 
 {
@@ -222,6 +223,7 @@ native bool GOKZ_GL_GetMapValid();
 
 /**
  * Gets whether the current player is valid or not for global status.
+ * Not valid if the anticheat suspected them before they were verified.
  *
  * @param client		Client index.
  * @return				True if the player is valid, false otherwise or if there is no connection to the Global API.

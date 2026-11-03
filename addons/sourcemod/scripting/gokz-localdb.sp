@@ -27,7 +27,10 @@ Database gH_DB = null;
 DatabaseType g_DBType = DatabaseType_None;
 bool gB_ClientSetUp[MAXPLAYERS + 1];
 bool gB_ClientPostAdminChecked[MAXPLAYERS + 1];
+bool gB_WarnedUnverified[MAXPLAYERS + 1];
 bool gB_Cheater[MAXPLAYERS + 1];
+bool gB_CheaterPending[MAXPLAYERS + 1]; // flagged before Steam verified them
+int gI_UnverifiedUserID[MAXPLAYERS + 1]; // whose pending flag and times these are
 int gI_PBJSCache[MAXPLAYERS + 1][MODE_COUNT][JUMPTYPE_COUNT][JUMPSTATDB_CACHE_COUNT];
 bool gB_MapSetUp;
 int gI_DBCurrentMapID;
@@ -110,6 +113,20 @@ public void OnMapEnd()
 	gB_MapSetUp = false;
 }
 
+public void OnClientConnected(int client)
+{
+	// Map changes reconnect players under the same userid, so only a new player
+	// in the slot drops what an unverified one had waiting to be saved
+	if (gI_UnverifiedUserID[client] != GetClientUserId(client))
+	{
+		gB_CheaterPending[client] = false;
+		DB_DiscardUnverifiedTimes(client);
+	}
+	// A pending flag is all we know until the database sets them up
+	gB_Cheater[client] = gB_CheaterPending[client];
+	gB_WarnedUnverified[client] = false;
+}
+
 public void OnClientAuthorized(int client, const char[] auth)
 {
 	DB_SetupClient(client);
@@ -123,6 +140,11 @@ public void OnClientPostAdminCheck(int client)
 	if (gB_MapSetUp && GOKZ_GetOption(client, gC_DBOptionNames[DBOption_AutoLoadTimerSetup]) == DBOption_Enabled)
 	{
 		DB_LoadTimerSetup(client);
+	}
+	
+	if (gB_ClientSetUp[client])
+	{
+		DB_SaveNextUnverifiedTime(client, GetSteamAccountID(client));
 	}
 }
 
@@ -159,6 +181,14 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 	OnOptionsMenuReady_OptionsMenu(topMenu);
 }
 
+public void GOKZ_OnTimerStart_Post(int client, int course)
+{
+	if (!IsClientAuthorized(client))
+	{
+		WarnUnverified(client);
+	}
+}
+
 public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int teleportsUsed)
 {
 	int mode = GOKZ_GetCoreOption(client, Option_Mode);
@@ -169,4 +199,17 @@ public void GOKZ_OnTimerEnd_Post(int client, int course, float time, int telepor
 public void GOKZ_JS_OnLanding(Jump jump)
 {
 	OnLanding_SaveJumpstat(jump);
+}
+
+
+
+// =====[ PUBLIC ]=====
+
+void WarnUnverified(int client)
+{
+	if (!gB_WarnedUnverified[client])
+	{
+		gB_WarnedUnverified[client] = true;
+		GOKZ_PrintToChat(client, true, "%t", "Unverified Warning");
+	}
 }

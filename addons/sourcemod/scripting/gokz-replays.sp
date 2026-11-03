@@ -35,6 +35,7 @@ public Plugin myinfo =
 
 bool gB_GOKZHUD;
 bool gB_GOKZLocalDB;
+bool gB_LateLoaded;
 char gC_CurrentMap[64];
 int gI_CurrentMapFileSize;
 bool gB_HideNameChange;
@@ -63,6 +64,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
 	CreateNatives();
 	RegPluginLibrary("gokz-replays");
+	gB_LateLoaded = late;
 	return APLRes_Success;
 }
 
@@ -74,6 +76,7 @@ public void OnPluginStart()
 	CreateGlobalForwards();
 	HookEvents();
 	RegisterCommands();
+	OnPluginStart_Recording();
 }
 
 public void OnAllPluginsLoaded()
