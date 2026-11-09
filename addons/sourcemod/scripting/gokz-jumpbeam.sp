@@ -30,11 +30,30 @@ bool gB_OldDucking[MAXPLAYERS + 1];
 float gF_BeamOffset[MAXPLAYERS + 1][3];
 bool gB_WaitingForOffset[MAXPLAYERS + 1];
 Cookie gH_BeamOffsetCookie;
+Cookie gH_LastTypeCookie;
 int gI_BeamModel;
 TopMenu gTM_Options;
 TopMenuObject gTMO_CatGeneral;
 TopMenuObject gTMO_ItemsJB[JBOPTION_COUNT];
 TopMenuObject gTMO_ItemBeamOffset;
+
+char gC_JBTypeKeywords[JBTYPE_COUNT][] =
+{
+	"off",
+	"feet",
+	"head",
+	"both",
+	"ground"
+};
+
+char gC_JBTypeChangePhrases[JBTYPE_COUNT][] =
+{
+	"Option - Jump Beam - Disable",
+	"Option - Jump Beam - Feet",
+	"Option - Jump Beam - Head",
+	"Option - Jump Beam - Feet and Head",
+	"Option - Jump Beam - Ground"
+};
 
 
 
@@ -52,8 +71,11 @@ public void OnPluginStart()
 	LoadTranslations("gokz-jumpbeam.phrases");
 	
 	gH_BeamOffsetCookie = new Cookie("gokz-jb-offset", "Jump Beam Offset (x y z)", CookieAccess_Private);
+	gH_LastTypeCookie = new Cookie("gokz-jb-last-type", "Jump Beam Type restored by !beam", CookieAccess_Private);
 	
 	RegConsoleCmd("sm_beamoffset", CommandBeamOffset, "[KZ] Set jump beam offset. Usage: !beamoffset <x> <y> <z>");
+	RegConsoleCmd("sm_beam", CommandJumpBeam, "[KZ] Toggle your jump beam, or set its type. Usage: !beam to toggle, !beam <feet/head/both/ground/off> to set the type");
+	RegConsoleCmd("sm_jumpbeam", CommandJumpBeam, "[KZ] Toggle your jump beam, or set its type. Usage: !jumpbeam to toggle, !jumpbeam <feet/head/both/ground/off> to set the type");
 }
 
 public void OnClientDisconnect(int client)
@@ -117,6 +139,14 @@ public void GOKZ_OnOptionsMenuReady(TopMenu topMenu)
 {
 	OnOptionsMenuReady_Options();
 	OnOptionsMenuReady_OptionsMenu(topMenu);
+}
+
+public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
+{
+	if (StrEqual(option, gC_JBOptionNames[JBOption_Type]))
+	{
+		GOKZ_PrintToChat(client, true, "%t", gC_JBTypeChangePhrases[newValue]);
+	}
 }
 
 
@@ -344,6 +374,67 @@ void SetBeamOffset(int client, float x, float y, float z)
 	gH_BeamOffsetCookie.Set(client, value);
 	
 	GOKZ_PrintToChat(client, true, "%t", "Current Beam Offset", x, y, z);
+}
+
+public Action CommandJumpBeam(int client, int args)
+{
+	if (!IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
+
+	int currentType = GOKZ_JB_GetOption(client, JBOption_Type);
+	int newType = -1;
+	if (args == 0)
+	{
+		newType = currentType == JBType_Disabled ? GetLastJumpBeamType(client) : JBType_Disabled;
+	}
+	else
+	{
+		char arg[16];
+		GetCmdArg(1, arg, sizeof(arg));
+		for (int type = 0; type < JBTYPE_COUNT; type++)
+		{
+			if (StrEqual(arg, gC_JBTypeKeywords[type], false))
+			{
+				newType = type;
+			}
+		}
+		if (newType == -1)
+		{
+			GOKZ_PrintToChat(client, true, "%t", "Jump Beam Usage");
+			return Plugin_Handled;
+		}
+	}
+
+	if (newType == currentType)
+	{
+		// GOKZ only fires GOKZ_OnOptionChanged when the value changes
+		GOKZ_PrintToChat(client, true, "%t", gC_JBTypeChangePhrases[currentType]);
+		return Plugin_Handled;
+	}
+
+	if (newType == JBType_Disabled)
+	{
+		char value[8];
+		IntToString(currentType, value, sizeof(value));
+		gH_LastTypeCookie.Set(client, value);
+	}
+	GOKZ_JB_SetOption(client, JBOption_Type, newType);
+	return Plugin_Handled;
+}
+
+int GetLastJumpBeamType(int client)
+{
+	char value[8];
+	gH_LastTypeCookie.Get(client, value, sizeof(value));
+
+	int type;
+	if (StringToIntEx(value, type) == 0 || type <= JBType_Disabled || type >= JBTYPE_COUNT)
+	{
+		return JBType_Feet;
+	}
+	return type;
 }
 
 
