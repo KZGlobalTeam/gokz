@@ -30,7 +30,7 @@ static bool CheckForNavFile()
 	char navFilePath[PLATFORM_MAX_PATH];
 	FormatEx(navFilePath, PLATFORM_MAX_PATH, "maps/%s.nav", mapPath);
 
-	return FileExists(navFilePath);
+	return FileExists(navFilePath, true);
 }
 
 static void GenerateNavFile()
@@ -41,15 +41,19 @@ static void GenerateNavFile()
 	char mapPath[PLATFORM_MAX_PATH];
 	GetCurrentMap(mapPath, sizeof(mapPath));
 
-	char[] navFilePath = new char[PLATFORM_MAX_PATH];
+	char navFilePath[PLATFORM_MAX_PATH];
 	FormatEx(navFilePath, PLATFORM_MAX_PATH, "maps/%s.nav", mapPath);
 
-	if (!FileExists(RP_NAV_FILE))
+	if (!FileExists(GOKZ_NAV_FILE))
 	{
-		SetFailState("Failed to load file: \"%s\". Check that it exists.", RP_NAV_FILE);
+		SetFailState("Failed to load file: \"%s\". Check that it exists.", GOKZ_NAV_FILE);
 	}
-	File_Copy(RP_NAV_FILE, navFilePath);
-	ForceChangeLevel(gC_CurrentMap, "[gokz-replays] Generate .nav file.");
+	if (!File_Copy(GOKZ_NAV_FILE, navFilePath))
+	{
+		LogError("Failed to copy \"%s\" to \"%s\".", GOKZ_NAV_FILE, navFilePath);
+		return;
+	}
+	ForceChangeLevel(mapPath, "[gokz-core] Generate .nav file.");
 }
 
 /*
