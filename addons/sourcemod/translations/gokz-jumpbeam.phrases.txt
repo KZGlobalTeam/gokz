@@ -1,5 +1,31 @@
 "Phrases"
 {
+	// =====[ OPTIONS ]=====
+	"Option - Jump Beam - Disable"
+	{
+		"en"		"{grey}Your jump beam has been disabled."
+	}
+	"Option - Jump Beam - Feet"
+	{
+		"en"		"{grey}Your jump beam type is now feet."
+	}
+	"Option - Jump Beam - Head"
+	{
+		"en"		"{grey}Your jump beam type is now head."
+	}
+	"Option - Jump Beam - Feet and Head"
+	{
+		"en"		"{grey}Your jump beam type is now feet and head."
+	}
+	"Option - Jump Beam - Ground"
+	{
+		"en"		"{grey}Your jump beam type is now ground."
+	}
+	"Jump Beam Usage"
+	{
+		"en"		"{grey}Usage: {default}!beam {grey}to toggle, or {default}!beam <feet/head/both/ground/off>"
+	}
+
 	// =====[ OPTIONS MENU ]=====
 	"Options Menu - Jump Beam"
 	{

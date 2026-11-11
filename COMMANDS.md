@@ -49,6 +49,10 @@
  * `!hide` - Toggle the visibility of other players.
  * `!stopsound` - Stop all sounds e.g. map soundscapes (music).
 
+### gokz-jumpbeam
+
+ * `!beam`/`!jumpbeam` - Toggle your jump beam, or set its type. Usage: `!beam` to toggle, `!beam <feet/head/both/ground/off>` to set the type
+
 ### gokz-pistol
 
  * `!pistol` - Open the pistol selection menu.
