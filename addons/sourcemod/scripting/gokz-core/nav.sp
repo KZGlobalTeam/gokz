@@ -30,7 +30,7 @@ static bool CheckForNavFile()
 	char navFilePath[PLATFORM_MAX_PATH];
 	FormatEx(navFilePath, PLATFORM_MAX_PATH, "maps/%s.nav", mapPath);
 
-	return FileExists(navFilePath);
+	return FileExists(navFilePath, true);
 }
 
 static void GenerateNavFile()
