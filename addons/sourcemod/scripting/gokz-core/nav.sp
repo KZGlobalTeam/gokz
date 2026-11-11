@@ -48,7 +48,11 @@ static void GenerateNavFile()
 	{
 		SetFailState("Failed to load file: \"%s\". Check that it exists.", GOKZ_NAV_FILE);
 	}
-	File_Copy(GOKZ_NAV_FILE, navFilePath);
+	if (!File_Copy(GOKZ_NAV_FILE, navFilePath))
+	{
+		LogError("Failed to copy \"%s\" to \"%s\".", GOKZ_NAV_FILE, navFilePath);
+		return;
+	}
 	ForceChangeLevel(mapPath, "[gokz-core] Generate .nav file.");
 }
 
