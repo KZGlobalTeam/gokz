@@ -139,6 +139,7 @@ enum struct ReplayTickData
 #define RP_DIRECTORY_RUNS "data/gokz-replays/_runs" // In Path_SM
 #define RP_DIRECTORY_RUNS_TEMP "data/gokz-replays/_tempRuns" // In Path_SM
 #define RP_DIRECTORY_CHEATERS "data/gokz-replays/_cheaters" // In Path_SM
+#define RP_DIRECTORY_IMPORTED "data/gokz-replays/_imported" // In Path_SM
 #define RP_DIRECTORY_JUMPS "data/gokz-replays/_jumps" // In Path_SM
 #define RP_DIRECTORY_BLOCKJUMPS "blocks"
 #define RP_FILE_EXTENSION "replay"

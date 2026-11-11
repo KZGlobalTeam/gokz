@@ -52,6 +52,7 @@ DynamicDetour gH_DHooks_TeamFull;
 #include "gokz-replays/recording.sp"
 #include "gokz-replays/replay_cache.sp"
 #include "gokz-replays/replay_menu.sp"
+#include "gokz-replays/replay_admin.sp"
 #include "gokz-replays/api.sp"
 #include "gokz-replays/controls.sp"
 
@@ -123,6 +124,7 @@ public void OnMapStart()
 	OnMapStart_Nav();
 	OnMapStart_Recording();
 	OnMapStart_ReplayCache();
+	OnMapStart_ReplayAdmin();
 }
 
 public void OnConfigsExecuted()
@@ -273,6 +275,11 @@ public void GOKZ_OnTimerStopped(int client)
 public void GOKZ_OnCountedTeleport_Post(int client)
 {
 	GOKZ_OnCountedTeleport_Recording(client);
+}
+
+public void GOKZ_OnJoinTeam(int client, int team)
+{
+	GOKZ_OnJoinTeam_ReplayAdmin(client);
 }
 
 public void GOKZ_LR_OnRecordMissed(int client, float recordTime, int course, int mode, int style, int recordType)

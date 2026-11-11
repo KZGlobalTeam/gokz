@@ -80,6 +80,76 @@
 	}
 
 
+	// =====[ REPLAY ADMIN MENU ]=====
+	"Replay Admin - Title"
+	{
+		// Replay Admin
+		//
+		// Import Folder - addons/sourcemod/data/gokz-replays/_imported
+		"#format"	"{1:s}"
+		"en"		"Replay Admin\n \nImport Folder - {1}\n "
+	}
+	"Replay Admin (Unreadable) - Title"
+	{
+		// Replay Admin
+		//
+		// Import Folder - addons/sourcemod/data/gokz-replays/_imported
+		// Unreadable Files - 2
+		"#format"	"{1:s},{2:d}"
+		"en"		"Replay Admin\n \nImport Folder - {1}\nUnreadable Files - {2}\n "
+	}
+	"Replay Admin - Imported"
+	{
+		// Imported (3)
+		"#format"	"{1:d}"
+		"en"		"Imported ({1})"
+	}
+	"Replay Admin - Cheaters"
+	{
+		// Cheaters (12)
+		"#format"	"{1:d}"
+		"en"		"Cheaters ({1})"
+	}
+	"Replay Admin (Map) - Title"
+	{
+		"en"		"Replay Admin\n \nSelect a Map"
+	}
+	"Replay Admin - Current Map"
+	{
+		// kz_map (current, 3)
+		"#format"	"{1:s},{2:d}"
+		"en"		"{1} (current, {2})"
+	}
+	"Replay Admin - Map"
+	{
+		// kz_map (3)
+		"#format"	"{1:s},{2:d}"
+		"en"		"{1} ({2})"
+	}
+	"Replay Admin (Replay) - Title"
+	{
+		// Replay Admin
+		//
+		// Map - kz_map
+		"#format"	"{1:s}"
+		"en"		"Replay Admin\n \nMap - {1}\n "
+	}
+	"Replay Admin - Change Map"
+	{
+		"#format"	"{1:s}"
+		"en"		"Change map to {1}"
+	}
+	"Replay Admin - Unknown Date"
+	{
+		"en"		"unknown date"
+	}
+	"Replay Admin - Map Not On Server"
+	{
+		"#format"	"{1:s}"
+		"en"		"{darkred}This replay was recorded on {1}, which is not on this server."
+	}
+
+
 	// =====[ REPLAY CONTROL MENU ]=====
 	"Replay Controls - Title"
 	{

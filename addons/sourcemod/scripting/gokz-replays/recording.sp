@@ -980,6 +980,13 @@ static void CreateReplaysDirectory(const char[] map)
 		CreateDirectory(path, 511);
 	}
 
+	// Create imported replay directory
+	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_IMPORTED);
+	if (!DirExists(path))
+	{
+		CreateDirectory(path, 511);
+	}
+
 	// Create jumps parent replay directory
 	BuildPath(Path_SM, path, sizeof(path), "%s", RP_DIRECTORY_JUMPS);
 	if (!DirExists(path))
