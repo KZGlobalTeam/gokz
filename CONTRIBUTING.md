@@ -12,6 +12,10 @@ GOKZ is a community project. All are welcome to contribute as long as they follo
 
 Once your pull request is checked and approved, your branch will be merged into our `dev` branch. Keep an eye out for any comments and requested changes. Your changes will then be released in the next version of GOKZ!
 
+## License
+
+By contributing, you agree to license your contribution under the [GNU Affero General Public License v3.0 or later](LICENSE). See the License section of [README.md](README.md) for how this applies to existing code.
+
 ## Style Guide
 
 To keep our code beautiful and maintainable, please adhere to the style guide.

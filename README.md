@@ -57,6 +57,15 @@ Please see the [Mapping-API](https://github.com/KZGlobalTeam/gokz/wiki/Mapping-A
 
 GOKZ is an open-source, community-driven project. If you are interested in helping out, please see [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
+## License
+
+GOKZ's code is under two licenses:
+
+ * Code added after GOKZ 3.8.0 is licensed under the [GNU Affero General Public License v3.0 or later](LICENSE).
+ * Code from GOKZ 3.8.0 and earlier stays under the [GNU General Public License v3.0](LICENSE-GPL-3.0).
+
+Section 13 of the GPLv3 allows combining the two, and the network clause in section 13 of the AGPLv3 applies to GOKZ as a whole. If you run a modified version of GOKZ on a server, you must offer its players the source code of your version.
+
 ## Authors
 
  * **DanZay** - danzayau@gmail.com - [*Steam*](https://steamcommunity.com/id/DanZay)
