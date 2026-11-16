@@ -60,7 +60,7 @@ jobs:
             !*.md
             !.github*
             !.git*
-            !LICENSE
+            !LICENSE*
             !addons/sourcemod/scripting*
             !*.zip
             !*.fgd
@@ -75,7 +75,7 @@ jobs:
             !*.md
             !.github*
             !.git*
-            !LICENSE
+            !LICENSE*
             !addons/sourcemod/scripting*
             !cfg*
             !*.zip
@@ -86,12 +86,12 @@ jobs:
         run: |
           rsync -a \
             --exclude='sm' --exclude='*.md' --exclude='.github' --exclude='.git' \
-            --exclude='LICENSE' --exclude='addons/sourcemod/scripting' \
+            --exclude='LICENSE*' --exclude='addons/sourcemod/scripting' \
             --exclude='*.zip' --exclude='*.fgd' \
             . /tmp/gokz-full/
           rsync -a \
             --exclude='sm' --exclude='*.md' --exclude='.github' --exclude='.git' \
-            --exclude='LICENSE' --exclude='addons/sourcemod/scripting' \
+            --exclude='LICENSE*' --exclude='addons/sourcemod/scripting' \
             --exclude='cfg' --exclude='*.zip' --exclude='*.fgd' \
             . /tmp/gokz-upgrade/
           cd /tmp/gokz-full && zip -r $GITHUB_WORKSPACE/GOKZ-v${{ env.GOKZ_VERSION }}.zip .
