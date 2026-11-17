@@ -77,6 +77,38 @@ void SetGOKZTakeoffSpeed(int client, float takeoffSpeed)
 	GOKZTakeoffSpeed[client] = takeoffSpeed;
 }
 
+// Cell 0 is the mode, the rest is the mode plugin's.
+bool GetModeState(int client, any state[GOKZ_MODE_STATE_SIZE])
+{
+	int mode = GOKZ_GetCoreOption(client, Option_Mode);
+	any modeState[GOKZ_MODE_STATE_SIZE - 1];
+	Action result;
+	Call_GOKZ_OnGetModeState(client, mode, modeState, sizeof(modeState), result);
+	state[0] = mode;
+	for (int i = 0; i < sizeof(modeState); i++)
+	{
+		state[i + 1] = modeState[i];
+	}
+	return result >= Plugin_Handled;
+}
+
+bool SetModeState(int client, const any state[GOKZ_MODE_STATE_SIZE])
+{
+	int mode = state[0];
+	if (mode != GOKZ_GetCoreOption(client, Option_Mode))
+	{
+		return false;
+	}
+	any modeState[GOKZ_MODE_STATE_SIZE - 1];
+	for (int i = 0; i < sizeof(modeState); i++)
+	{
+		modeState[i] = state[i + 1];
+	}
+	Action result;
+	Call_GOKZ_OnSetModeState(client, mode, modeState, sizeof(modeState), result);
+	return result >= Plugin_Handled;
+}
+
 
 
 // =====[ EVENTS ]=====

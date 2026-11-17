@@ -27,6 +27,7 @@ public Plugin myinfo =
 };
 
 #define MODE_VERSION 172
+#define MODE_STATE_VERSION 1 // Layout of GOKZ_OnGetModeState's state
 
 float gF_ModeCVarValues[MODECVAR_COUNT] = 
 {
@@ -215,6 +216,23 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 	{
 		ReplicateConVars(client);
 	}
+}
+
+// Vanilla keeps nothing between ticks: its state is only the layout's version.
+public Action GOKZ_OnGetModeState(int client, int mode, any[] state)
+{
+	if (mode != Mode_Vanilla)
+	{
+		return Plugin_Continue;
+	}
+
+	state[0] = MODE_STATE_VERSION;
+	return Plugin_Handled;
+}
+
+public Action GOKZ_OnSetModeState(int client, int mode, const any[] state)
+{
+	return mode == Mode_Vanilla && state[0] == MODE_STATE_VERSION ? Plugin_Handled : Plugin_Continue;
 }
 
 

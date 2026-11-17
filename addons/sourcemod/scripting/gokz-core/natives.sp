@@ -4,6 +4,8 @@ void CreateNatives()
 	CreateNative("GOKZ_GetModeVersion", Native_GetModeVersion);
 	CreateNative("GOKZ_SetModeLoaded", Native_SetModeLoaded);
 	CreateNative("GOKZ_GetLoadedModeCount", Native_GetLoadedModeCount);
+	CreateNative("GOKZ_GetModeState", Native_GetModeState);
+	CreateNative("GOKZ_SetModeState", Native_SetModeState);
 	CreateNative("GOKZ_SetMode", Native_SetMode);
 	CreateNative("GOKZ_PrintToChat", Native_PrintToChat);
 	CreateNative("GOKZ_PrintToChatAndLog", Native_PrintToChatAndLog);
@@ -95,6 +97,42 @@ public int Native_SetModeLoaded(Handle plugin, int numParams)
 public int Native_GetLoadedModeCount(Handle plugin, int numParams)
 {
 	return GetLoadedModeCount();
+}
+
+public int Native_GetModeState(Handle plugin, int numParams)
+{
+	if (!ValidModeStateSize(GetNativeCell(3)))
+	{
+		return view_as<int>(false);
+	}
+	any state[GOKZ_MODE_STATE_SIZE];
+	if (!GetModeState(GetNativeCell(1), state))
+	{
+		return view_as<int>(false);
+	}
+	SetNativeArray(2, state, sizeof(state));
+	return view_as<int>(true);
+}
+
+public int Native_SetModeState(Handle plugin, int numParams)
+{
+	if (!ValidModeStateSize(GetNativeCell(3)))
+	{
+		return view_as<int>(false);
+	}
+	any state[GOKZ_MODE_STATE_SIZE];
+	GetNativeArray(2, state, sizeof(state));
+	return view_as<int>(SetModeState(GetNativeCell(1), state));
+}
+
+static bool ValidModeStateSize(int size)
+{
+	if (size != GOKZ_MODE_STATE_SIZE)
+	{
+		ThrowNativeError(SP_ERROR_NATIVE, "Mode state size %d doesn't match gokz-core's %d.", size, GOKZ_MODE_STATE_SIZE);
+		return false;
+	}
+	return true;
 }
 
 public int Native_SetMode(Handle plugin, int numParams)

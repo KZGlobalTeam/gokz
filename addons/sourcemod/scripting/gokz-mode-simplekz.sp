@@ -27,6 +27,7 @@ public Plugin myinfo =
 };
 
 #define MODE_VERSION 212
+#define MODE_STATE_VERSION 1 // Layout of GOKZ_OnGetModeState's state
 #define PS_MAX_REWARD_TURN_RATE 0.703125 // Degrees per tick (90 degrees per second)
 #define PS_MAX_TURN_RATE_DECREMENT 0.015625 // Degrees per tick (2 degrees per second)
 #define PS_SPEED_MAX 26.54321 // Units
@@ -85,6 +86,7 @@ float gF_OldOrigin[MAXPLAYERS + 1][3];
 float gF_OldAngles[MAXPLAYERS + 1][3];
 float gF_OldVelocity[MAXPLAYERS + 1][3];
 int gI_LastJumpButtonCmdnum[MAXPLAYERS + 1];
+bool gB_InUsercmd[MAXPLAYERS + 1];
 int gI_OffsetCGameMovement_player;
 
 
@@ -159,6 +161,7 @@ public void OnClientPutInServer(int client)
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+	gB_InUsercmd[client] = true;
 	if (!IsPlayerAlive(client) || !IsUsingMode(client))
 	{
 		return Plugin_Continue;
@@ -234,6 +237,7 @@ public MRESReturn DHooks_OnCanUnduck_Pre(Address pThis, DHookReturn hReturn)
 
 public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
+	gB_InUsercmd[client] = false;
 	if (!IsValidClient(client) || !IsPlayerAlive(client) || !IsUsingMode(client))
 	{
 		return;
@@ -316,6 +320,63 @@ public void GOKZ_OnOptionChanged(int client, const char[] option, any newValue)
 public void GOKZ_OnCountedTeleport_Post(int client)
 {
 	ResetClient(client);
+}
+
+public Action GOKZ_OnGetModeState(int client, int mode, any[] state)
+{
+	if (mode != Mode_SimpleKZ)
+	{
+		return Plugin_Continue;
+	}
+
+	int i = 0;
+	state[i++] = MODE_STATE_VERSION;
+	state[i++] = gF_PSBonusSpeed[client];
+	state[i++] = gF_PSVelMod[client];
+	state[i++] = gF_PSVelModLanding[client];
+	state[i++] = gB_PSTurningLeft[client];
+	state[i++] = gF_PSTurnRate[client];
+	state[i++] = gI_PSTicksSinceIncrement[client];
+	// In another plugin's OnPlayerRunCmdPost that runs first, this usercmd's jump isn't recorded yet.
+	int lastJump = gB_InUsercmd[client] && GetClientButtons(client) & IN_JUMP ? gI_Cmdnum[client] : gI_LastJumpButtonCmdnum[client];
+	state[i++] = lastJump - gI_Cmdnum[client];
+	state[i++] = gI_OldButtons[client];
+	state[i++] = gI_OldFlags[client];
+	state[i++] = gB_OldOnGround[client];
+	for (int j = 0; j < 3; j++)
+	{
+		state[i++] = gF_OldOrigin[client][j];
+		state[i++] = gF_OldAngles[client][j];
+		state[i++] = gF_OldVelocity[client][j];
+	}
+	return Plugin_Handled;
+}
+
+public Action GOKZ_OnSetModeState(int client, int mode, const any[] state)
+{
+	if (mode != Mode_SimpleKZ || state[0] != MODE_STATE_VERSION)
+	{
+		return Plugin_Continue;
+	}
+
+	int i = 1;
+	gF_PSBonusSpeed[client] = state[i++];
+	gF_PSVelMod[client] = state[i++];
+	gF_PSVelModLanding[client] = state[i++];
+	gB_PSTurningLeft[client] = state[i++];
+	gF_PSTurnRate[client] = state[i++];
+	gI_PSTicksSinceIncrement[client] = state[i++];
+	gI_LastJumpButtonCmdnum[client] = gI_Cmdnum[client] + state[i++];
+	gI_OldButtons[client] = state[i++];
+	gI_OldFlags[client] = state[i++];
+	gB_OldOnGround[client] = state[i++];
+	for (int j = 0; j < 3; j++)
+	{
+		gF_OldOrigin[client][j] = state[i++];
+		gF_OldAngles[client][j] = state[i++];
+		gF_OldVelocity[client][j] = state[i++];
+	}
+	return Plugin_Handled;
 }
 
 
