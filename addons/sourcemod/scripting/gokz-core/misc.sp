@@ -201,6 +201,25 @@ void OnPlayerRunCmd_Turnbinds(int client, int buttons, int tickcount, float angl
 	}
 }
 
+// Starts are stored as ticks ago, since the tick count keeps going through a restore.
+int GetTurnbindsState(int client, any[] state, int cell)
+{
+	state[cell++] = gI_TickCount[client] - turnbindsLastLeftStart[client];
+	state[cell++] = gI_TickCount[client] - turnbindsLastRightStart[client];
+	state[cell++] = turnbindsLastValidYaw[client];
+	state[cell++] = turnbindsOldButtons[client];
+	return cell;
+}
+
+int SetTurnbindsState(int client, const any[] state, int cell)
+{
+	turnbindsLastLeftStart[client] = gI_TickCount[client] - state[cell++];
+	turnbindsLastRightStart[client] = gI_TickCount[client] - state[cell++];
+	turnbindsLastValidYaw[client] = view_as<float>(state[cell++]);
+	turnbindsOldButtons[client] = state[cell++];
+	return cell;
+}
+
 
 
 // =====[ PLAYER COLLISION ]=====

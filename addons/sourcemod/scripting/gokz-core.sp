@@ -57,6 +57,7 @@ ConVar gCV_sv_full_alltalk;
 #include "gokz-core/demofix.sp"
 #include "gokz-core/teamnumfix.sp"
 #include "gokz-core/particles.sp"
+#include "gokz-core/playerstate.sp"
 
 #include "gokz-core/map/buttons.sp"
 #include "gokz-core/map/triggers.sp"

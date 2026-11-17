@@ -221,6 +221,7 @@ enum TriggerType
 #define GOKZ_CHECKPOINT_VERSION 2
 #define GOKZ_MAX_CHECKPOINTS 2048
 #define GOKZ_MAX_COURSES 100
+#define GOKZ_PLAYER_STATE_SIZE 128
 
 #define GOKZ_BHOP_NO_CHECKPOINT_TIME 0.15
 #define GOKZ_MULT_NO_CHECKPOINT_TIME 0.11
@@ -1402,6 +1403,29 @@ native void GOKZ_PlayErrorSound(int client);
 native void GOKZ_SetValidJumpOrigin(int client, const float origin[3]);
 
 /**
+ * Gets what gokz-core keeps between a player's usercmds, for GOKZ_SetPlayerState.
+ * The run (timer, pause, checkpoints) has its own natives.
+ * A state is only valid on the map it was taken on.
+ *
+ * @param client		Client index.
+ * @param state			Buffer to store the state in.
+ * @param size			Size of the buffer, must be GOKZ_PLAYER_STATE_SIZE.
+ * @return				Whether the state fit in the buffer.
+ */
+native bool GOKZ_GetPlayerState(int client, any[] state, int size = GOKZ_PLAYER_STATE_SIZE);
+
+/**
+ * Sets a player's state from GOKZ_GetPlayerState. Call it between the player's
+ * usercmds, once they touch the triggers they touched when it was taken.
+ *
+ * @param client		Client index.
+ * @param state			State to set.
+ * @param size			Size of the state, must be GOKZ_PLAYER_STATE_SIZE.
+ * @return				Whether the state was set, false if another version took it.
+ */
+native bool GOKZ_SetPlayerState(int client, const any[] state, int size = GOKZ_PLAYER_STATE_SIZE);
+
+/**
  * Registers an option with gokz-core, which uses clientprefs to
  * keep track of the option's value and to save it to a database.
  * This also effectively provides natives and forwards for other 
@@ -1889,6 +1913,8 @@ public void __pl_gokz_core_SetNTVOptional()
 	MarkNativeAsOptional("GOKZ_GetCanTeleportToStartOrEnd");
 	MarkNativeAsOptional("GOKZ_PlayErrorSound");
 	MarkNativeAsOptional("GOKZ_SetValidJumpOrigin");
+	MarkNativeAsOptional("GOKZ_GetPlayerState");
+	MarkNativeAsOptional("GOKZ_SetPlayerState");
 	MarkNativeAsOptional("GOKZ_GetTimerRunning");
 	MarkNativeAsOptional("GOKZ_GetCourse");
 	MarkNativeAsOptional("GOKZ_SetCourse");
