@@ -27,6 +27,7 @@ public Plugin myinfo =
 };
 
 #define MODE_VERSION 2172
+#define MODE_STATE_VERSION 1 // Layout of GOKZ_OnGetModeState's state
 #define DUCK_SPEED_NORMAL 8.0
 #define PRE_VELMOD_MAX 1.104 // Calculated 276/250
 #define PERF_SPEED_CAP 380.0
@@ -309,6 +310,53 @@ public void GOKZ_OnCountedTeleport_Post(int client)
 {
 	KZPlayer player = KZPlayer(client);
 	ResetPrestrafeVelMod(player);
+}
+
+public Action GOKZ_OnGetModeState(int client, int mode, any[] state)
+{
+	if (mode != Mode_KZTimer)
+	{
+		return Plugin_Continue;
+	}
+
+	int i = 0;
+	state[i++] = MODE_STATE_VERSION;
+	state[i++] = gF_PreVelMod[client];
+	// An age: engine time keeps running while the state is stored.
+	state[i++] = GetEngineTime() - gF_PreVelModLastChange[client];
+	state[i++] = gF_RealPreVelMod[client];
+	state[i++] = gI_PreTickCounter[client];
+	state[i++] = gI_OldButtons[client];
+	state[i++] = gI_OldFlags[client];
+	state[i++] = gB_OldOnGround[client];
+	for (int j = 0; j < 3; j++)
+	{
+		state[i++] = gF_OldVelocity[client][j];
+	}
+	return Plugin_Handled;
+}
+
+public Action GOKZ_OnSetModeState(int client, int mode, const any[] state)
+{
+	if (mode != Mode_KZTimer || state[0] != MODE_STATE_VERSION)
+	{
+		return Plugin_Continue;
+	}
+
+	int i = 1;
+	gF_PreVelMod[client] = state[i++];
+	float age = state[i++];
+	gF_PreVelModLastChange[client] = GetEngineTime() - age;
+	gF_RealPreVelMod[client] = state[i++];
+	gI_PreTickCounter[client] = state[i++];
+	gI_OldButtons[client] = state[i++];
+	gI_OldFlags[client] = state[i++];
+	gB_OldOnGround[client] = state[i++];
+	for (int j = 0; j < 3; j++)
+	{
+		gF_OldVelocity[client][j] = state[i++];
+	}
+	return Plugin_Handled;
 }
 
 

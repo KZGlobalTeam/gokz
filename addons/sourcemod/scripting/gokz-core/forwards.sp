@@ -33,6 +33,8 @@ static GlobalForward H_OnJoinTeam;
 static GlobalForward H_OnFirstSpawn;
 static GlobalForward H_OnModeLoaded;
 static GlobalForward H_OnModeUnloaded;
+static GlobalForward H_OnGetModeState;
+static GlobalForward H_OnSetModeState;
 static GlobalForward H_OnTimerNativeCalledExternally;
 static GlobalForward H_OnOptionsMenuCreated;
 static GlobalForward H_OnOptionsMenuReady;
@@ -77,6 +79,8 @@ void CreateGlobalForwards()
 	H_OnFirstSpawn = new GlobalForward("GOKZ_OnFirstSpawn", ET_Ignore, Param_Cell);
 	H_OnModeLoaded = new GlobalForward("GOKZ_OnModeLoaded", ET_Ignore, Param_Cell);
 	H_OnModeUnloaded = new GlobalForward("GOKZ_OnModeUnloaded", ET_Ignore, Param_Cell);
+	H_OnGetModeState = new GlobalForward("GOKZ_OnGetModeState", ET_Hook, Param_Cell, Param_Cell, Param_Array);
+	H_OnSetModeState = new GlobalForward("GOKZ_OnSetModeState", ET_Hook, Param_Cell, Param_Cell, Param_Array);
 	H_OnTimerNativeCalledExternally = new GlobalForward("GOKZ_OnTimerNativeCalledExternally", ET_Event, Param_Cell, Param_Cell);
 	H_OnOptionsMenuCreated = new GlobalForward("GOKZ_OnOptionsMenuCreated", ET_Ignore, Param_Cell);
 	H_OnOptionsMenuReady = new GlobalForward("GOKZ_OnOptionsMenuReady", ET_Ignore, Param_Cell);
@@ -352,6 +356,24 @@ void Call_GOKZ_OnModeUnloaded(int mode)
 	Call_StartForward(H_OnModeUnloaded);
 	Call_PushCell(mode);
 	Call_Finish();
+}
+
+void Call_GOKZ_OnGetModeState(int client, int mode, any[] state, int size, Action &result)
+{
+	Call_StartForward(H_OnGetModeState);
+	Call_PushCell(client);
+	Call_PushCell(mode);
+	Call_PushArrayEx(state, size, SM_PARAM_COPYBACK);
+	Call_Finish(result);
+}
+
+void Call_GOKZ_OnSetModeState(int client, int mode, const any[] state, int size, Action &result)
+{
+	Call_StartForward(H_OnSetModeState);
+	Call_PushCell(client);
+	Call_PushCell(mode);
+	Call_PushArray(state, size);
+	Call_Finish(result);
 }
 
 void Call_GOKZ_OnTimerNativeCalledExternally(Handle plugin, int client, Action &result)
