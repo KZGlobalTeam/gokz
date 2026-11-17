@@ -44,6 +44,8 @@ void CreateNatives()
 	CreateNative("GOKZ_GetCanTeleportToEnd", Native_GetCanTeleportToEnd);
 	CreateNative("GOKZ_PlayErrorSound", Native_PlayErrorSound);
 	CreateNative("GOKZ_SetValidJumpOrigin", Native_SetValidJumpOrigin);
+	CreateNative("GOKZ_GetPlayerState", Native_GetPlayerState);
+	CreateNative("GOKZ_SetPlayerState", Native_SetPlayerState);
 	
 	CreateNative("GOKZ_GetTimerRunning", Native_GetTimerRunning);
 	CreateNative("GOKZ_GetValidTimer", Native_GetValidTimer);
@@ -402,6 +404,42 @@ public int Native_SetValidJumpOrigin(Handle plugin, int numParams)
 	// Using Movement_SetOrigin instead causes considerable lag for spectators
 	SetEntPropVector(client, Prop_Data, "m_vecAbsOrigin", origin);
 	return 0;
+}
+
+public int Native_GetPlayerState(Handle plugin, int numParams)
+{
+	if (!ValidPlayerStateSize(GetNativeCell(3)))
+	{
+		return view_as<int>(false);
+	}
+	any state[GOKZ_PLAYER_STATE_SIZE];
+	if (!GetPlayerState(GetNativeCell(1), state))
+	{
+		return view_as<int>(false);
+	}
+	SetNativeArray(2, state, sizeof(state));
+	return view_as<int>(true);
+}
+
+public int Native_SetPlayerState(Handle plugin, int numParams)
+{
+	if (!ValidPlayerStateSize(GetNativeCell(3)))
+	{
+		return view_as<int>(false);
+	}
+	any state[GOKZ_PLAYER_STATE_SIZE];
+	GetNativeArray(2, state, sizeof(state));
+	return view_as<int>(SetPlayerState(GetNativeCell(1), state));
+}
+
+static bool ValidPlayerStateSize(int size)
+{
+	if (size != GOKZ_PLAYER_STATE_SIZE)
+	{
+		ThrowNativeError(SP_ERROR_NATIVE, "Player state size %d doesn't match gokz-core's %d.", size, GOKZ_PLAYER_STATE_SIZE);
+		return false;
+	}
+	return true;
 }
 
 public int Native_GetTimerRunning(Handle plugin, int numParams)

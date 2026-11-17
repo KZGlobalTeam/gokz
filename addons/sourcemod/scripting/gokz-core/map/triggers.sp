@@ -105,6 +105,106 @@ bool IsTimerButtonTrigger(int entity, TimerButtonTrigger trigger)
 	return false;
 }
 
+// Triggers are stored as entity index and hammer ID. Stamps are stored as ages, since the tick count and engine time
+// keep going through a restore; a groundTouchTick of -1 stays -1.
+bool GetMapTriggersState(int client, any[] state, int cell, int size)
+{
+	int touchedCount = triggerTouchList[client].Length;
+	if (cell + 7 + 4 * touchedCount > size)
+	{
+		return false;
+	}
+	
+	int counts = cell;
+	cell += 2;
+	float engineTime = GetEngineTime();
+	state[counts] = touchedCount;
+	state[cell++] = engineTime - lastTouchGroundOrLadderTime[client];
+	state[cell++] = engineTime - lastTrigMultiTouchTime[client];
+	state[cell++] = engineTime - lastTrigTeleTouchTime[client];
+	state[cell++] = EntRefToEntIndex(lastTouchSingleBhopEntRef[client]);
+	state[cell++] = GetEntityHammerID(lastTouchSingleBhopEntRef[client]);
+	
+	for (int i = 0; i < touchedCount; i++)
+	{
+		TouchedTrigger touched;
+		triggerTouchList[client].GetArray(i, touched);
+		state[cell++] = EntRefToEntIndex(touched.entRef);
+		state[cell++] = GetEntityHammerID(touched.entRef);
+		state[cell++] = gI_TickCount[client] - touched.startTouchTick;
+		state[cell++] = touched.groundTouchTick == -1 ? -1 : gI_TickCount[client] - touched.groundTouchTick;
+	}
+	
+	// Only membership is checked, and the list gets an entry per takeoff.
+	int sequentialStart = cell;
+	for (int i = 0; i < lastTouchSequentialBhopEntRefs[client].Length; i++)
+	{
+		int index = EntRefToEntIndex(lastTouchSequentialBhopEntRefs[client].Get(i));
+		bool seen = false;
+		for (int j = sequentialStart; j < cell && !seen; j += 2)
+		{
+			seen = state[j] == index;
+		}
+		if (seen)
+		{
+			continue;
+		}
+		if (cell + 2 > size)
+		{
+			return false;
+		}
+		state[cell++] = index;
+		state[cell++] = GetEntityHammerID(index);
+	}
+	state[counts + 1] = (cell - sequentialStart) / 2;
+	return true;
+}
+
+// Which triggers are touched follows the engine, so only those touched now get their stamps back.
+void SetMapTriggersState(int client, const any[] state, int cell)
+{
+	int touchedCount = state[cell++];
+	int sequentialCount = state[cell++];
+	float engineTime = GetEngineTime();
+	float age = state[cell++];
+	lastTouchGroundOrLadderTime[client] = engineTime - age;
+	age = state[cell++];
+	lastTrigMultiTouchTime[client] = engineTime - age;
+	age = state[cell++];
+	lastTrigTeleTouchTime[client] = engineTime - age;
+	lastTouchSingleBhopEntRef[client] = FindTrigger(state[cell], state[cell + 1]);
+	cell += 2;
+	
+	for (int i = 0; i < touchedCount; i++, cell += 4)
+	{
+		int entRef = FindTrigger(state[cell], state[cell + 1]);
+		for (int j = 0; j < triggerTouchList[client].Length; j++)
+		{
+			TouchedTrigger touched;
+			triggerTouchList[client].GetArray(j, touched);
+			if (touched.entRef == entRef)
+			{
+				touched.startTouchTick = gI_TickCount[client] - state[cell + 2];
+				touched.groundTouchTick = state[cell + 3] == -1 ? -1 : gI_TickCount[client] - state[cell + 3];
+				triggerTouchList[client].SetArray(j, touched);
+				break;
+			}
+		}
+	}
+	
+	lastTouchSequentialBhopEntRefs[client].Clear();
+	for (int i = 0; i < sequentialCount; i++, cell += 2)
+	{
+		int entRef = FindTrigger(state[cell], state[cell + 1]);
+		if (entRef != INVALID_ENT_REFERENCE)
+		{
+			lastTouchSequentialBhopEntRefs[client].Push(entRef);
+		}
+	}
+}
+
+
+
 // =====[ EVENTS ]=====
 
 void OnPluginStart_MapTriggers()
@@ -813,20 +913,46 @@ static void ResetBhopState(int client)
 
 static bool GetEntityHammerIDString(int entity, char[] buffer, int maxLength)
 {
-	if (!IsValidEntity(entity))
+	int hammerID = GetEntityHammerID(entity);
+	if (hammerID == -1)
 	{
 		return false;
 	}
 	
-	if (!HasEntProp(entity, Prop_Data, "m_iHammerID"))
-	{
-		return false;
-	}
-	
-	int hammerID = GetEntProp(entity, Prop_Data, "m_iHammerID");
 	IntToString(hammerID, buffer, maxLength);
 	
 	return true;
+}
+
+static int GetEntityHammerID(int entity)
+{
+	if (!IsValidEntity(entity) || !HasEntProp(entity, Prop_Data, "m_iHammerID"))
+	{
+		return -1;
+	}
+	return GetEntProp(entity, Prop_Data, "m_iHammerID");
+}
+
+// Template copies share a hammer ID, so the entity at the stored index comes first.
+static int FindTrigger(int index, int hammerID)
+{
+	if (hammerID == -1)
+	{
+		return INVALID_ENT_REFERENCE;
+	}
+	if (GetEntityHammerID(index) == hammerID)
+	{
+		return EntIndexToEntRef(index);
+	}
+	int entity = -1;
+	while ((entity = FindEntityByClassname(entity, "trigger_multiple")) != -1)
+	{
+		if (GetEntityHammerID(entity) == hammerID)
+		{
+			return EntIndexToEntRef(entity);
+		}
+	}
+	return INVALID_ENT_REFERENCE;
 }
 
 // NOTE: returns an entity reference (possibly invalid).
