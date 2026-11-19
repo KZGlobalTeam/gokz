@@ -365,6 +365,7 @@ void OnClientDisconnect_Playback(int client)
 				lastSpectatedBot[spec] = -1;
 			}
 		}
+		botClient[bot] = 0;
 		if (playbackTickData[bot] != null)
 		{
 			playbackTickData[bot].Clear(); // Clear it all out
